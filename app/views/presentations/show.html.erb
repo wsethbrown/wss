@@ -1,0 +1,310 @@
+<div>
+  <h1 class="font-bold text-4xl">Presentations#show</h1>
+  <p>Find me in app/views/presentations/show.html.erb</p>
+</div>
+
+<!-- Hero Section -->
+<div class="relative min-h-[60vh] flex flex-col items-center justify-center text-center overflow-hidden bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 w-full">
+  <div class="absolute inset-0 pointer-events-none">
+    <div class="w-full h-full rounded-[3rem] bg-white/30 blur-3xl opacity-80 mx-auto mt-16"></div>
+  </div>
+  <div class="relative z-10 px-4 py-24 w-full flex flex-col items-center justify-center">
+    <div class="max-w-4xl mx-auto">
+      <!-- Category Badge -->
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-blue-700 font-semibold text-sm mb-6">
+        <span class="w-2 h-2 bg-blue-500 rounded-full"></span>
+        Scotch Whisky
+      </div>
+
+      <h1 class="text-4xl md:text-6xl font-extrabold tracking-tight text-black mb-6 leading-tight">
+        Introduction to Scotch Whisky
+      </h1>
+      <p class="text-xl md:text-2xl text-gray-700 mb-8 font-medium max-w-3xl mx-auto">
+        Perfect for beginners, this comprehensive presentation covers the basics of Scotch whisky production, regions, and tasting techniques.
+      </p>
+
+      <!-- Quick Stats -->
+      <div class="flex flex-wrap justify-center gap-8 mb-8">
+        <div class="flex items-center gap-2 text-gray-700">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+          <span class="font-semibold">45 minutes</span>
+        </div>
+        <div class="flex items-center gap-2 text-gray-700">
+          <svg class="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+          </svg>
+          <span class="font-semibold">4.8 (127 reviews)</span>
+        </div>
+        <div class="flex items-center gap-2 text-gray-700">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6 0A4 4 0 005 16m6-4a4 4 0 100-8 4 4 0 000 8zm6 4a4 4 0 00-3-3.87"></path>
+          </svg>
+          <span class="font-semibold">Beginner Level</span>
+        </div>
+      </div>
+
+      <!-- CTA Buttons -->
+      <div class="flex flex-col sm:flex-row gap-4 justify-center">
+        <button class="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-black text-white text-lg font-bold shadow-lg hover:bg-blue-800 transition focus:outline-none focus:ring-2 focus:ring-blue-400">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01"></path>
+          </svg>
+          Purchase for $9.99
+        </button>
+        <button class="inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white/20 backdrop-blur-sm text-black text-lg font-bold shadow-lg hover:bg-white/30 transition focus:outline-none focus:ring-2 focus:ring-white/50">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
+          </svg>
+          Add to Wishlist
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Main Content -->
+<div class="relative w-full bg-white">
+  <div class="max-w-7xl mx-auto px-4 py-16">
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
+      <!-- Left Column - Main Content -->
+      <div class="lg:col-span-2">
+        <!-- What You'll Learn -->
+        <section class="mb-16">
+          <h2 class="text-3xl font-bold text-gray-900 mb-8">What You'll Learn</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="flex items-start gap-4 p-6 rounded-2xl bg-blue-50 border border-blue-100">
+              <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900 mb-2">Scotch Whisky Basics</h3>
+                <p class="text-gray-600 text-sm">Understand the fundamental differences between Scotch and other whiskies, including production methods and legal requirements.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 p-6 rounded-2xl bg-green-50 border border-green-100">
+              <div class="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900 mb-2">Regional Differences</h3>
+                <p class="text-gray-600 text-sm">Explore the six main Scotch regions and learn how geography and tradition shape each area's unique flavor profile.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 p-6 rounded-2xl bg-purple-50 border border-purple-100">
+              <div class="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900 mb-2">Tasting Techniques</h3>
+                <p class="text-gray-600 text-sm">Master the proper way to taste Scotch whisky, from nosing to palate evaluation and finish assessment.</p>
+              </div>
+            </div>
+            <div class="flex items-start gap-4 p-6 rounded-2xl bg-amber-50 border border-amber-100">
+              <div class="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
+                <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+              </div>
+              <div>
+                <h3 class="font-semibold text-gray-900 mb-2">Age Statements & Quality</h3>
+                <p class="text-gray-600 text-sm">Learn to read labels, understand age statements, and identify quality indicators when selecting Scotch whisky.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Presentation Overview -->
+        <section class="mb-16">
+          <h2 class="text-3xl font-bold text-gray-900 mb-8">Presentation Overview</h2>
+          <div class="prose prose-lg max-w-none">
+            <p class="text-gray-700 leading-relaxed mb-6">
+              This comprehensive presentation is designed for whiskey enthusiasts who are new to Scotch whisky or want to deepen their understanding of this iconic spirit. Over 45 minutes, you'll explore the rich history, production methods, and regional characteristics that make Scotch whisky unique.
+            </p>
+            <p class="text-gray-700 leading-relaxed mb-6">
+              The presentation includes detailed slides covering everything from the basic definition of Scotch whisky to advanced tasting techniques. You'll learn about the six main regions of Scotland, each with its own distinct style and character, and discover how factors like water source, peat, and barrel aging influence the final product.
+            </p>
+            <p class="text-gray-700 leading-relaxed">
+              Perfect for hosting whiskey tastings, educational events, or simply expanding your own knowledge, this presentation provides everything you need to confidently discuss and appreciate Scotch whisky.
+            </p>
+          </div>
+        </section>
+
+        <!-- Slides Preview -->
+        <section class="mb-16">
+          <h2 class="text-3xl font-bold text-gray-900 mb-8">Slides Preview</h2>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <% [
+              { title: "Introduction", desc: "Welcome and overview of what we'll cover", time: "5 min" },
+              { title: "What is Scotch Whisky?", desc: "Legal definition and basic requirements", time: "8 min" },
+              { title: "Production Process", desc: "From barley to bottle - the complete journey", time: "12 min" },
+              { title: "Scotch Regions", desc: "Highlands, Lowlands, Speyside, Islay, Campbeltown, Islands", time: "15 min" },
+              { title: "Tasting Techniques", desc: "Proper nosing, tasting, and evaluation methods", time: "10 min" },
+              { title: "Age & Quality", desc: "Understanding labels and quality indicators", time: "8 min" },
+              { title: "Recommended Bottles", desc: "Great starter bottles for each region", time: "7 min" },
+              { title: "Q&A & Discussion", desc: "Common questions and group discussion", time: "5 min" }
+            ].each_with_index do |slide, index| %>
+              <div class="group relative bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-200 cursor-pointer">
+                <div class="flex items-start justify-between mb-3">
+                  <span class="text-sm font-semibold text-blue-600">Slide <%= index + 1 %></span>
+                  <span class="text-sm text-gray-500"><%= slide[:time] %></span>
+                </div>
+                <h3 class="font-bold text-gray-900 mb-2"><%= slide[:title] %></h3>
+                <p class="text-gray-600 text-sm"><%= slide[:desc] %></p>
+              </div>
+            <% end %>
+          </div>
+        </section>
+
+        <!-- Whiskey Recommendations -->
+        <section class="mb-16">
+          <h2 class="text-3xl font-bold text-gray-900 mb-8">Recommended Whiskeys</h2>
+          <p class="text-gray-700 mb-8">These carefully selected bottles are perfect for tasting alongside this presentation. Each represents a different region and style of Scotch whisky.</p>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <% [
+              { name: "Glenfiddich 12 Year", region: "Speyside", price: "$45", style: "Light & Fruity", notes: "Pear, oak, subtle spice" },
+              { name: "Laphroaig 10 Year", region: "Islay", price: "$65", style: "Peaty & Smoky", notes: "Iodine, peat, sea salt" },
+              { name: "Highland Park 12 Year", region: "Highlands", price: "$55", style: "Balanced", notes: "Honey, heather, light smoke" },
+              { name: "Auchentoshan 12 Year", region: "Lowlands", price: "$50", style: "Smooth & Light", notes: "Vanilla, citrus, nuts" }
+            ].each do |whiskey| %>
+              <div class="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-lg transition-shadow">
+                <div class="flex items-start justify-between mb-3">
+                  <h3 class="font-bold text-gray-900"><%= whiskey[:name] %></h3>
+                  <span class="text-lg font-bold text-blue-600"><%= whiskey[:price] %></span>
+                </div>
+                <div class="space-y-2 text-sm">
+                  <div class="flex items-center gap-2">
+                    <span class="font-semibold text-gray-700">Region:</span>
+                    <span class="text-gray-600"><%= whiskey[:region] %></span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-semibold text-gray-700">Style:</span>
+                    <span class="text-gray-600"><%= whiskey[:style] %></span>
+                  </div>
+                  <div class="flex items-center gap-2">
+                    <span class="font-semibold text-gray-700">Notes:</span>
+                    <span class="text-gray-600"><%= whiskey[:notes] %></span>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        </section>
+
+        <!-- Reviews -->
+        <section class="mb-16">
+          <h2 class="text-3xl font-bold text-gray-900 mb-8">Customer Reviews</h2>
+          <div class="space-y-6">
+            <% [
+              { name: "Sarah M.", rating: 5, date: "2 weeks ago", text: "Perfect for our whiskey club! The slides are beautiful and the script is easy to follow. Our members learned so much about Scotch whisky." },
+              { name: "Michael R.", rating: 5, date: "1 month ago", text: "As a beginner, this presentation was exactly what I needed. Clear explanations and great whiskey recommendations. Highly recommend!" },
+              { name: "Jennifer L.", rating: 4, date: "3 weeks ago", text: "Great content and well-structured. The regional breakdown was particularly helpful. Would love to see more presentations like this." }
+            ].each do |review| %>
+              <div class="bg-gray-50 rounded-2xl p-6">
+                <div class="flex items-center justify-between mb-3">
+                  <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
+                      <span class="text-white font-semibold"><%= review[:name].split(' ').first[0] %></span>
+                    </div>
+                    <div>
+                      <h4 class="font-semibold text-gray-900"><%= review[:name] %></h4>
+                      <div class="flex items-center gap-1">
+                        <% review[:rating].times do %>
+                          <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
+                          </svg>
+                        <% end %>
+                        <span class="text-sm text-gray-500 ml-2"><%= review[:date] %></span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <p class="text-gray-700"><%= review[:text] %></p>
+              </div>
+            <% end %>
+          </div>
+        </section>
+      </div>
+
+      <!-- Right Column - Sidebar -->
+      <div class="lg:col-span-1">
+        <!-- Purchase Card -->
+        <div class="sticky top-8">
+          <div class="bg-white border border-gray-200 rounded-3xl shadow-xl p-8">
+            <div class="text-center mb-6">
+              <div class="text-4xl font-bold text-gray-900 mb-2">$9.99</div>
+              <p class="text-gray-600">One-time purchase</p>
+            </div>
+
+            <div class="space-y-4 mb-8">
+              <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-gray-700">45-minute presentation</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-gray-700">Professional slides</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-gray-700">Detailed script</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-gray-700">Whiskey recommendations</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <svg class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <span class="text-gray-700">Lifetime access</span>
+              </div>
+            </div>
+
+            <button class="w-full bg-black text-white font-bold py-4 px-6 rounded-2xl hover:bg-blue-800 transition mb-4">
+              Purchase Now
+            </button>
+
+            <button class="w-full bg-gray-100 text-gray-700 font-bold py-4 px-6 rounded-2xl hover:bg-gray-200 transition mb-4">
+              Add to Wishlist
+            </button>
+
+            <div class="text-center">
+              <p class="text-sm text-gray-500">30-day money-back guarantee</p>
+            </div>
+          </div>
+
+          <!-- Author Info -->
+          <div class="bg-gray-50 rounded-2xl p-6 mt-6">
+            <h3 class="font-bold text-gray-900 mb-4">About the Author</h3>
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-blue-500 rounded-full flex items-center justify-center">
+                <span class="text-white font-bold">JD</span>
+              </div>
+              <div>
+                <h4 class="font-semibold text-gray-900">John Daniels</h4>
+                <p class="text-sm text-gray-600">Whiskey Educator & Sommelier</p>
+                <p class="text-xs text-gray-500">15+ years experience in whiskey education</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

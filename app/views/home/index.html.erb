@@ -1,0 +1,343 @@
+<div class="relative min-h-[70vh] flex flex-col items-center justify-center text-center overflow-hidden bg-gradient-to-br from-blue-100 via-blue-200 to-blue-300 w-full">
+  <div class="absolute inset-0 pointer-events-none">
+    <div class="w-full h-full rounded-[3rem] bg-white/30 blur-3xl opacity-80 mx-auto mt-16"></div>
+  </div>
+  <div class="relative z-10 px-4 py-24 w-full flex flex-col items-center justify-center">
+    <h1 class="text-5xl md:text-7xl font-extrabold tracking-tight text-black mb-6 leading-tight">
+      <span class="block">Discover. Share. Savor.</span>
+      <span class="block text-blue-700">Whiskey, Together.</span>
+    </h1>
+    <p class="text-xl md:text-2xl text-gray-700 mb-10 font-medium">
+      Ready-made whiskey experiences, in a single click.<br>
+      Join exclusive clubs, RSVP to tastings, and share your favorites.
+    </p>
+    <%= link_to 'Get Started', new_user_registration_path, class: 'inline-flex items-center gap-2 px-8 py-4 rounded-full bg-black text-white text-lg font-bold shadow-lg hover:bg-blue-800 transition focus:outline-none focus:ring-2 focus:ring-blue-400' %>
+    <div class="mt-8 text-gray-400 text-sm">
+      Already a member?
+      <%= link_to 'Log in', new_user_session_path, class: 'underline hover:text-blue-700' %>
+    </div>
+  </div>
+</div>
+
+<!-- How it Works Section -->
+<section id="how-it-works-section" class="relative w-full bg-white py-24 px-4">
+  <div class="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+    <!-- Sticky Left Column -->
+    <div class="md:sticky md:top-32 flex flex-col justify-center h-full">
+      <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 mb-6">How it Works</h2>
+      <p class="text-lg text-gray-600 font-medium max-w-md">Host a whiskey night in three easy steps.</p>
+    </div>
+    <!-- Vertically Snap-Scrolling Right Column -->
+    <div id="how-it-works-scroll" tabindex="0" class="relative h-[60vh] overflow-y-auto snap-y snap-mandatory hide-scrollbar bg-white">
+      <!-- Step 1 -->
+      <div class="flex flex-col justify-center items-start h-[45vh] min-h-[45vh] w-full snap-center mb-8">
+        <div class="flex items-center gap-4">
+          <span class="text-3xl md:text-4xl">🥃</span>
+          <span class="text-2xl md:text-3xl font-bold text-gray-900">Pick a Presentation</span>
+        </div>
+        <div class="text-gray-600 text-base md:text-lg font-medium mt-2 ml-12">Choose from a library of ready-made whiskey presentations—each with slides, a script, and whiskey recommendations.</div>
+      </div>
+      <!-- Step 2 -->
+      <div class="flex flex-col justify-center items-start h-[45vh] min-h-[45vh] w-full snap-center mb-8">
+        <div class="flex items-center gap-4">
+          <span class="text-3xl md:text-4xl">📨</span>
+          <span class="text-2xl md:text-3xl font-bold text-gray-900">Invite Your Friends</span>
+        </div>
+        <div class="text-gray-600 text-base md:text-lg font-medium mt-2 ml-12">Send invites or share your club link—no experience needed. Everyone's welcome, from beginners to connoisseurs.</div>
+      </div>
+      <!-- Step 3 -->
+      <div class="flex flex-col justify-center items-start h-[45vh] min-h-[45vh] w-full snap-center">
+        <div class="flex items-center gap-4">
+          <span class="text-3xl md:text-4xl">🎤</span>
+          <span class="text-2xl md:text-3xl font-bold text-gray-900">Host Your Whiskey Night</span>
+        </div>
+        <div class="text-gray-600 text-base md:text-lg font-medium mt-2 ml-12">Use our script, slides, and whiskey picks to run a world-class tasting. Just read the script or make it your own!</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Societies Overview Section (Home) -->
+<section id="societies-overview" class="relative w-full py-24 px-4 bg-gradient-to-br from-blue-50 via-white to-indigo-50">
+  <div class="max-w-4xl mx-auto flex flex-col items-center text-center">
+    <!-- Section Title -->
+    <h2 class="text-5xl md:text-6xl font-extrabold tracking-tight text-gray-900 mb-4">
+      Societies: Where Whiskey Meets Community
+    </h2>
+    <p class="text-xl md:text-2xl text-gray-700 mb-10 max-w-2xl">
+      Join a vibrant world of whiskey lovers. Subscribe to unlock exclusive clubs, RSVP to tastings, and connect with a passionate community. Whether you're a seasoned connoisseur or just getting started, there's a Society for you.
+    </p>
+    <!-- How Societies Work -->
+    <div class="w-full max-w-3xl grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+      <div class="flex flex-col items-center p-8 rounded-2xl bg-white/70 shadow-lg border border-gray-200">
+        <span class="text-4xl mb-3">🌐</span>
+        <h3 class="text-2xl font-bold mb-2">Public Societies</h3>
+        <p class="text-gray-600 text-base">Join instantly. Discover open clubs, meet new friends, and RSVP to public events with a single click.</p>
+      </div>
+      <div class="flex flex-col items-center p-8 rounded-2xl bg-white/70 shadow-lg border border-gray-200">
+        <span class="text-4xl mb-3">🔒</span>
+        <h3 class="text-2xl font-bold mb-2">Private Societies</h3>
+        <p class="text-gray-600 text-base">Apply to join exclusive clubs. Admins and officers review applications to keep the community curated and welcoming.</p>
+      </div>
+      <div class="flex flex-col items-center p-8 rounded-2xl bg-white/70 shadow-lg border border-gray-200">
+        <span class="text-4xl mb-3">🥃</span>
+        <h3 class="text-2xl font-bold mb-2">Events & Community</h3>
+        <p class="text-gray-600 text-base">See upcoming tastings, RSVP, and join lively forums. Societies are the heart of Whiskey Share Society.</p>
+      </div>
+    </div>
+    <!-- Call to Action -->
+    <div class="mt-8">
+      <%= link_to 'Subscribe & Join the Community', new_user_registration_path, class: 'inline-flex items-center gap-3 px-10 py-5 rounded-full bg-indigo-700 text-white text-2xl font-extrabold shadow-lg hover:bg-black transition focus:outline-none focus:ring-2 focus:ring-indigo-400' %>
+    </div>
+  </div>
+</section>
+
+<!-- Pricing Section -->
+<section id="pricing" class="relative w-full py-24 px-4 bg-gradient-to-br from-slate-50 via-white to-blue-50 overflow-hidden">
+  <!-- Animated background elements -->
+  <div class="absolute inset-0 pointer-events-none">
+    <div class="absolute top-20 left-10 w-32 h-32 bg-blue-200/30 rounded-full blur-xl animate-pulse"></div>
+    <div class="absolute bottom-20 right-10 w-24 h-24 bg-indigo-200/40 rounded-full blur-xl animate-pulse delay-1000"></div>
+    <div class="absolute top-1/2 left-1/4 w-16 h-16 bg-purple-200/30 rounded-full blur-lg animate-bounce delay-500"></div>
+  </div>
+
+  <div class="max-w-6xl mx-auto relative z-10">
+    <!-- Section Header with enhanced typography -->
+    <div class="text-center mb-20">
+      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100/50 backdrop-blur-sm border border-blue-200/50 text-blue-700 font-semibold text-sm mb-6">
+        <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+        Pricing Plans
+      </div>
+      <h2 class="text-5xl md:text-6xl font-extrabold tracking-tight text-gray-900 mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-indigo-900 bg-clip-text text-transparent">
+        Choose Your Whiskey Journey
+      </h2>
+      <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">Unlock unlimited presentations, exclusive societies, and a world of whiskey experiences. Start your free trial today.</p>
+    </div>
+
+    <!-- Pricing Cards with modern glassmorphism -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+      <!-- Monthly Plan -->
+      <div class="group relative bg-white/60 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 p-8 hover:bg-white/80 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer">
+        <!-- Glassmorphism overlay -->
+        <div class="absolute inset-0 rounded-3xl pointer-events-none bg-gradient-to-br from-blue-50/50 via-white/30 to-indigo-50/50 opacity-80 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <!-- Animated border -->
+        <div class="absolute inset-0 rounded-3xl bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-indigo-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm"></div>
+        <div class="relative z-10 text-center mb-8">
+          <h3 class="text-2xl font-bold text-gray-900 mb-2">Monthly</h3>
+          <p class="text-gray-600 mb-4">Perfect for trying it out</p>
+          <div class="mb-6">
+            <span class="text-5xl font-extrabold bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent">$15.99</span>
+            <span class="text-gray-600">/month</span>
+          </div>
+          <%= link_to 'Start Free Trial', new_user_registration_path, class: 'group/btn w-full inline-flex justify-center items-center px-6 py-4 rounded-2xl bg-gradient-to-r from-gray-100 to-gray-200 text-gray-900 font-semibold hover:from-gray-200 hover:to-gray-300 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-400 shadow-lg hover:shadow-xl hover:-translate-y-1' %>
+        </div>
+        <ul class="space-y-3 text-sm text-gray-600">
+          <li class="flex items-center">
+            <svg class="w-4 h-4 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Unlimited presentations
+          </li>
+          <li class="flex items-center">
+            <svg class="w-4 h-4 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Access to public societies
+          </li>
+          <li class="flex items-center">
+            <svg class="w-4 h-4 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Event RSVP & forums
+          </li>
+          <li class="flex items-center">
+            <svg class="w-4 h-4 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Cancel anytime
+          </li>
+        </ul>
+      </div>
+
+      <!-- Quarterly Plan (Most Popular) -->
+      <div class="group relative bg-gradient-to-br from-blue-50/80 via-indigo-50/60 to-purple-50/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-blue-200/30 p-8 transform scale-105 hover:scale-110 transition-all duration-500 cursor-pointer">
+        <!-- Enhanced glassmorphism overlay -->
+        <div class="absolute inset-0 rounded-3xl pointer-events-none bg-gradient-to-br from-blue-100/40 via-white/20 to-indigo-100/40 opacity-80 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <!-- Animated glowing border -->
+        <div class="absolute inset-0 rounded-3xl bg-gradient-to-r from-blue-400/30 via-indigo-400/30 to-purple-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-md animate-pulse"></div>
+        <!-- Most Popular badge with enhanced design -->
+        <div class="absolute -top-5 left-1/2 transform -translate-x-1/2">
+          <span class="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg backdrop-blur-sm border border-blue-500/20">
+            <span class="mr-2">⭐</span>Most Popular
+          </span>
+        </div>
+        <div class="relative z-10 text-center mb-8">
+          <h3 class="text-2xl font-bold text-gray-900 mb-2">Quarterly</h3>
+          <p class="text-gray-600 mb-4">Great value</p>
+          <div class="mb-6">
+            <span class="text-5xl font-extrabold bg-gradient-to-r from-blue-600 to-indigo-700 bg-clip-text text-transparent">$12.99</span>
+            <span class="text-gray-600">/month</span>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold text-sm mt-2">
+              <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              Save 19%
+            </div>
+          </div>
+          <%= link_to 'Start Free Trial', new_user_registration_path, class: 'group/btn w-full inline-flex justify-center items-center px-6 py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold hover:from-blue-700 hover:to-indigo-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-blue-400 shadow-lg hover:shadow-xl hover:-translate-y-1' %>
+        </div>
+        <ul class="space-y-3 text-sm text-gray-600">
+          <li class="flex items-center">
+            <svg class="w-4 h-4 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Everything in Monthly
+          </li>
+          <li class="flex items-center">
+            <svg class="w-4 h-4 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Priority support
+          </li>
+          <li class="flex items-center">
+            <svg class="w-4 h-4 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Early access to new features
+          </li>
+          <li class="flex items-center">
+            <svg class="w-4 h-4 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Cancel anytime
+          </li>
+        </ul>
+      </div>
+
+      <!-- Yearly Plan (Best Value) -->
+      <div class="group relative bg-gradient-to-br from-amber-50/80 via-yellow-50/60 to-orange-50/80 backdrop-blur-xl rounded-3xl shadow-xl border border-amber-200/30 p-8 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer">
+        <!-- Enhanced glassmorphism overlay -->
+        <div class="absolute inset-0 rounded-3xl pointer-events-none bg-gradient-to-br from-amber-100/40 via-white/20 to-orange-100/40 opacity-80 group-hover:opacity-100 transition-opacity duration-500"></div>
+        <!-- Animated glowing border -->
+        <div class="absolute inset-0 rounded-3xl bg-gradient-to-r from-amber-400/30 via-yellow-400/30 to-orange-400/30 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-md animate-pulse"></div>
+        <!-- Best Value badge with enhanced design -->
+        <div class="absolute -top-5 left-1/2 transform -translate-x-1/2">
+          <span class="bg-gradient-to-r from-amber-600 to-orange-600 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg backdrop-blur-sm border border-amber-500/20">
+            <span class="mr-2">🏆</span>Best Value
+          </span>
+        </div>
+        <div class="relative z-10 text-center mb-8">
+          <h3 class="text-2xl font-bold text-gray-900 mb-2">Yearly</h3>
+          <p class="text-gray-600 mb-4">Save 31%</p>
+          <div class="mb-6">
+            <span class="text-5xl font-extrabold bg-gradient-to-r from-amber-600 to-orange-700 bg-clip-text text-transparent">$10.99</span>
+            <span class="text-gray-600">/month</span>
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold text-sm mt-2">
+              <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
+              Save 31%
+            </div>
+          </div>
+          <%= link_to 'Start Free Trial', new_user_registration_path, class: 'group/btn w-full inline-flex justify-center items-center px-6 py-4 rounded-2xl bg-gradient-to-r from-amber-600 to-orange-600 text-white font-semibold hover:from-amber-700 hover:to-orange-700 transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-amber-400 shadow-lg hover:shadow-xl hover:-translate-y-1' %>
+        </div>
+        <ul class="space-y-3 text-sm text-gray-600">
+          <li class="flex items-center">
+            <svg class="w-4 h-4 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Everything in Quarterly
+          </li>
+          <li class="flex items-center">
+            <svg class="w-4 h-4 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            VIP access to exclusive events
+          </li>
+          <li class="flex items-center">
+            <svg class="w-4 h-4 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Personalized whiskey recommendations
+          </li>
+          <li class="flex items-center">
+            <svg class="w-4 h-4 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            Cancel anytime
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Trust Indicators with modern design -->
+    <div class="text-center">
+      <div class="flex flex-col md:flex-row items-center justify-center gap-8">
+        <div class="group flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/20 hover:bg-white/80 transition-all duration-300 cursor-pointer">
+          <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <span class="text-gray-700 font-medium">7-day free trial</span>
+        </div>
+        <div class="group flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/20 hover:bg-white/80 transition-all duration-300 cursor-pointer">
+          <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <span class="text-gray-700 font-medium">30-day money-back guarantee</span>
+        </div>
+        <div class="group flex items-center gap-3 px-6 py-3 rounded-2xl bg-white/60 backdrop-blur-sm border border-white/20 hover:bg-white/80 transition-all duration-300 cursor-pointer">
+          <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+            <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+            </svg>
+          </div>
+          <span class="text-gray-700 font-medium">Cancel anytime</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Hide scrollbar for all browsers */
+  .hide-scrollbar {
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none; /* IE 10+ */
+  }
+  .hide-scrollbar::-webkit-scrollbar {
+    display: none; /* Chrome/Safari/Webkit */
+  }
+</style>
+
+<script>
+  // Simplified scroll proxy logic for How it Works section
+  document.addEventListener('DOMContentLoaded', function() {
+    var section = document.getElementById('how-it-works-section');
+    var scrollCol = document.getElementById('how-it-works-scroll');
+    if (!section || !scrollCol) return;
+
+    // Use Intersection Observer to only proxy scroll when section is in view
+    var sectionInView = false;
+    var observer = new window.IntersectionObserver(function(entries) {
+      sectionInView = entries[0].isIntersecting;
+    }, { threshold: 0.2 });
+    observer.observe(section);
+
+    section.addEventListener('wheel', function(e) {
+      if (!sectionInView) return;
+      // Only vertical scroll
+      if (e.deltaY === 0) return;
+
+      var atTop = scrollCol.scrollTop === 0;
+      var atBottom = Math.ceil(scrollCol.scrollTop + scrollCol.clientHeight) >= scrollCol.scrollHeight;
+
+      // If we can scroll within the container, prevent page scroll and let native snap handle it
+      if ((e.deltaY < 0 && !atTop) || (e.deltaY > 0 && !atBottom)) {
+        e.preventDefault();
+        // Let the native snap scrolling handle the behavior
+        scrollCol.scrollBy({ top: e.deltaY, behavior: 'smooth' });
+      }
+      // If at boundaries, let the page scroll naturally
+    }, { passive: false });
+  });
+</script>
