@@ -1,14 +1,77 @@
 # See https://docs.docker.com/engine/reference/builder/#dockerignore-file for more about ignoring files.
 
-# Ignore git directory.
-/.git/
-/.gitignore
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Documentation
+README.md
+*.md
+
+# Logs
+log/*
+*.log
+
+# Runtime data
+tmp/*
+!tmp/.keep
+
+# Environment files
+.env
+.env.*
+
+# Database
+db/*.sqlite3
+db/*.sqlite3-*
+
+# Node modules (will be installed in container)
+node_modules/
+
+# Coverage directory used by tools like istanbul
+coverage/
+
+# nyc test coverage
+.nyc_output
+
+# Dependency directories
+vendor/bundle/
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS generated files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Docker
+Dockerfile*
+docker-compose*
+.dockerignore
+
+# CI/CD
+.github/
+.gitlab-ci.yml
+
+# Testing
+spec/
+test/
+.rspec
+.rubocop.yml
+
+# Kamal deployment
+.kamal/
 
 # Ignore bundler config.
 /.bundle
-
-# Ignore all environment files.
-/.env*
 
 # Ignore all default key files.
 /config/master.key
@@ -45,7 +108,3 @@
 
 # Ignore development files
 /.devcontainer
-
-# Ignore Docker-related files
-/.dockerignore
-/Dockerfile*

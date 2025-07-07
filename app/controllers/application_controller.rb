@@ -8,6 +8,10 @@ class ApplicationController < ActionController::Base
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
 
+  def health
+    render json: { status: 'ok', timestamp: Time.current }
+  end
+
   private
 
   def user_not_authorized

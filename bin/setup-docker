@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+
+set -e
+
+echo "🚀 Setting up Whiskey Share Society with Docker..."
+
+# Check if Docker is running
+if ! docker info > /dev/null 2>&1; then
+  echo "❌ Docker is not running. Please start Docker and try again."
+  exit 1
+fi
+
+# Build and start services
+echo "📦 Building and starting services..."
+docker-compose up --build -d
+
+# Wait for database to be ready
+echo "⏳ Waiting for database to be ready..."
+sleep 10
+
+# Run database setup
+echo "🗄️ Setting up database..."
+docker-compose exec web rails db:create
+docker-compose exec web rails db:migrate
+docker-compose exec web rails db:seed
+
+echo "✅ Setup complete!"
+echo ""
+echo "🌐 Visit http://localhost:3000 to see your application"
+echo ""
+echo "📝 Useful commands:"
+echo "  docker-compose logs -f web    # View application logs"
+echo "  docker-compose exec web rails console  # Open Rails console"
+echo "  docker-compose down           # Stop all services"
+echo "  docker-compose restart web    # Restart just the web service"
