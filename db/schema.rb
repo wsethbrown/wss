@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_08_203336) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_09_151220) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -145,6 +145,17 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_08_203336) do
     t.index ["name"], name: "index_tags_on_name", unique: true
   end
 
+  create_table "user_presentations", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "presentation_id", null: false
+    t.string "purchase_type"
+    t.datetime "purchased_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["presentation_id"], name: "index_user_presentations_on_presentation_id"
+    t.index ["user_id"], name: "index_user_presentations_on_user_id"
+  end
+
   create_table "user_tags", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "tag_id", null: false
@@ -180,6 +191,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_08_203336) do
     t.string "subscription_status"
     t.string "subscription_plan"
     t.datetime "subscription_ends_at"
+    t.text "whiskey_shelf"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
@@ -197,6 +209,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_08_203336) do
   add_foreign_key "society_applications", "users"
   add_foreign_key "society_memberships", "societies"
   add_foreign_key "society_memberships", "users"
+  add_foreign_key "user_presentations", "presentations"
+  add_foreign_key "user_presentations", "users"
   add_foreign_key "user_tags", "tags"
   add_foreign_key "user_tags", "users"
 end

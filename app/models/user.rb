@@ -76,6 +76,8 @@ class User < ApplicationRecord
   has_many :event_rsvps, dependent: :destroy
   has_many :rsvped_events, through: :event_rsvps, source: :event
   has_many :presentations, foreign_key: :author_id, dependent: :destroy
+  has_many :user_presentations, dependent: :destroy
+  has_many :purchased_presentations, through: :user_presentations, source: :presentation
   has_many :user_tags, dependent: :destroy
   has_many :tags, through: :user_tags
 

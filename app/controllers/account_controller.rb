@@ -252,6 +252,6 @@ class AccountController < ApplicationController
   private
 
   def profile_params
-    params.require(:user).permit(:first_name, :last_name, :bio)
+    params.require(:user).permit(:first_name, :last_name, :bio, :whiskey_shelf)
   end
 end

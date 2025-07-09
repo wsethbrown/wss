@@ -1,5 +1,7 @@
 class Presentation < ApplicationRecord
   belongs_to :author, class_name: 'User'
+  has_many :user_presentations, dependent: :destroy
+  has_many :purchasers, through: :user_presentations, source: :user
 
   # Validations
   validates :title, presence: true, length: { minimum: 2, maximum: 200 }
