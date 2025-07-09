@@ -3,17 +3,17 @@ class SubscriptionsController < ApplicationController
   protect_from_forgery with: :exception
 
   def create_checkout_session
-    plan = params[:plan]
+    price_id = params[:price_id]
     
     # Define price IDs for each plan (these will be your Stripe Price IDs)
     price_ids = {
       'monthly' => ENV.fetch('STRIPE_MONTHLY_PRICE_ID', 'price_monthly'),
-      'quarterly' => ENV.fetch('STRIPE_QUARTERLY_PRICE_ID', 'price_quarterly'),
-      'yearly' => ENV.fetch('STRIPE_YEARLY_PRICE_ID', 'price_yearly')
+      'annual' => ENV.fetch('STRIPE_ANNUAL_PRICE_ID', 'price_annual'),
+      'yearly' => ENV.fetch('STRIPE_YEARLY_PRICE_ID', 'price_yearly') # Legacy support
     }
     
-    unless price_ids.key?(plan)
-      render json: { error: 'Invalid subscription plan' }, status: :bad_request
+    unless price_ids.key?(price_id)
+      redirect_to account_path(anchor: 'subscription'), alert: 'Invalid subscription plan'
       return
     end
 
@@ -26,22 +26,22 @@ class SubscriptionsController < ApplicationController
         customer: customer.id,
         payment_method_types: ['card'],
         line_items: [{
-          price: price_ids[plan],
+          price: price_ids[price_id],
           quantity: 1,
         }],
         mode: 'subscription',
-        success_url: account_url + '?subscription=success',
-        cancel_url: account_url + '?subscription=cancelled',
+        success_url: account_url + '?subscription=success#subscription',
+        cancel_url: account_url + '?subscription=cancelled#subscription',
         metadata: {
           user_id: current_user.id,
-          plan: plan
+          plan: price_id
         }
       })
 
-      render json: { checkout_url: session.url }
+      redirect_to session.url, allow_other_host: true
     rescue Stripe::StripeError => e
       Rails.logger.error "Stripe error: #{e.message}"
-      render json: { error: 'Payment processing error. Please try again.' }, status: :internal_server_error
+      redirect_to account_path(anchor: 'subscription'), alert: 'Payment processing error. Please try again.'
     end
   end
 
