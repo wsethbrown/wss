@@ -23,9 +23,14 @@ email_files.each_with_index do |file, index|
   email = File.basename(file)
   mtime = File.mtime(file).strftime("%H:%M")
   
-  # Extract magic link URLs from the email (only complete tokens)
+  # Extract magic link URLs from the email
   content = File.read(file)
-  magic_links = content.scan(/https:\/\/[^\s<>"]+\/magic_links\/[A-Za-z0-9_-]{20,}/)
+  
+  # Decode quoted-printable encoding (removes soft line breaks)
+  content = content.gsub(/=\r?\n/, '').gsub(/=([0-9A-F]{2})/) { [$1].pack('H*') }
+  
+  # Extract magic links
+  magic_links = content.scan(/https:\/\/[^\s<>"]+\/magic_links\/[A-Za-z0-9_-]+/).uniq
   
   magic_links.uniq.each do |link|
     puts "#{email} (#{mtime}): #{link}"
