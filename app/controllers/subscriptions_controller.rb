@@ -8,8 +8,8 @@ class SubscriptionsController < ApplicationController
     # Define price IDs for each plan (these will be your Stripe Price IDs)
     price_ids = {
       'monthly' => ENV.fetch('STRIPE_MONTHLY_PRICE_ID', 'price_monthly'),
-      'annual' => ENV.fetch('STRIPE_ANNUAL_PRICE_ID', 'price_annual'),
-      'yearly' => ENV.fetch('STRIPE_YEARLY_PRICE_ID', 'price_yearly') # Legacy support
+      'quarterly' => ENV.fetch('STRIPE_QUARTERLY_PRICE_ID', 'price_quarterly'),
+      'yearly' => ENV.fetch('STRIPE_YEARLY_PRICE_ID', 'price_yearly')
     }
     
     unless price_ids.key?(price_id)

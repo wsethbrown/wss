@@ -4,9 +4,12 @@ class AccountController < ApplicationController
   def index
     # Clear any expired email change requests
     current_user.clear_expired_email_change
-    
+
     @available_tags = Tag.order(:category, :name)
     @user_tags = current_user.tags.order(:category, :name)
+
+    # Fetch Stripe products if available
+    @stripe_products = fetch_stripe_products
   end
 
   def update_profile
@@ -85,7 +88,7 @@ class AccountController < ApplicationController
 
     # Generate verification token
     token = SecureRandom.urlsafe_base64(32)
-    
+
     # Store the email change request
     current_user.update!(
       unconfirmed_email: new_email,
@@ -102,9 +105,9 @@ class AccountController < ApplicationController
 
   def verify_email_change
     token = params[:token]
-    
+
     user = User.find_by(email_change_token: token)
-    
+
     if user.nil?
       flash[:alert] = "Invalid verification link."
       redirect_to account_path
@@ -129,7 +132,7 @@ class AccountController < ApplicationController
 
     # Sign out all sessions for security
     sign_out(user)
-    
+
     flash[:notice] = "Your email has been successfully changed from #{old_email} to #{user.email}. Please sign in again with your new email address."
     redirect_to auth_path
   end
@@ -156,13 +159,13 @@ class AccountController < ApplicationController
 
     # Check if this is adding a password for the first time
     was_passwordless = current_user.passwordless_only?
-    
+
     # Update password and mark as manually set
     current_user.update!(
       password: params[:new_password],
       password_set_manually: true
     )
-    
+
     # Different success messages based on whether password was added or changed
     if was_passwordless
       redirect_to account_path, notice: 'Password added successfully! You can now sign in with either magic links or your password.'
@@ -176,31 +179,31 @@ class AccountController < ApplicationController
   def setup_2fa
     current_user.generate_otp_secret
     current_user.save!
-    
-    render json: { 
+
+    render json: {
       qr_code: current_user.otp_qr_code,
-      secret_key: current_user.otp_secret_key 
+      secret_key: current_user.otp_secret_key
     }
   end
 
   def enable_2fa
     code = params[:code]
-    
+
     unless current_user.otp_secret_key.present?
       render json: { error: "Please set up 2FA first" }, status: :unprocessable_entity
       return
     end
-    
+
     totp = ROTP::TOTP.new(current_user.otp_secret_key)
     if totp.verify(code, drift_ahead: 30, drift_behind: 30)
       current_user.otp_enabled = true
       backup_codes = current_user.generate_backup_codes
       current_user.save!
-      
-      render json: { 
-        success: true, 
+
+      render json: {
+        success: true,
         backup_codes: backup_codes,
-        message: "2FA enabled successfully!" 
+        message: "2FA enabled successfully!"
       }
     else
       render json: { error: "Invalid verification code" }, status: :unprocessable_entity
@@ -209,21 +212,21 @@ class AccountController < ApplicationController
 
   def disable_2fa
     password = params[:password]
-    
+
     unless current_user.valid_password?(password)
       render json: { error: "Invalid password" }, status: :unprocessable_entity
       return
     end
-    
+
     current_user.update!(
       otp_enabled: false,
       otp_secret_key: nil,
       backup_codes: nil
     )
-    
-    render json: { 
-      success: true, 
-      message: "2FA disabled successfully!" 
+
+    render json: {
+      success: true,
+      message: "2FA disabled successfully!"
     }
   end
 
@@ -232,20 +235,20 @@ class AccountController < ApplicationController
       render json: { error: "2FA is not enabled" }, status: :unprocessable_entity
       return
     end
-    
+
     password = params[:password]
     unless current_user.valid_password?(password)
       render json: { error: "Invalid password" }, status: :unprocessable_entity
       return
     end
-    
+
     backup_codes = current_user.generate_backup_codes
     current_user.save!
-    
-    render json: { 
-      success: true, 
+
+    render json: {
+      success: true,
       backup_codes: backup_codes,
-      message: "Backup codes regenerated successfully!" 
+      message: "Backup codes regenerated successfully!"
     }
   end
 
@@ -253,5 +256,153 @@ class AccountController < ApplicationController
 
   def profile_params
     params.require(:user).permit(:first_name, :last_name, :bio, :whiskey_shelf)
+  end
+
+  def fetch_stripe_products
+    return fallback_products unless Stripe.api_key.present?
+
+    begin
+      # Cache the products to avoid repeated API calls
+      Rails.cache.fetch('stripe_products', expires_in: 1.hour) do
+        products = []
+
+        # Fetch monthly product
+        if ENV['STRIPE_MONTHLY_PRICE_ID'].present?
+          begin
+            monthly_price = Stripe::Price.retrieve(ENV['STRIPE_MONTHLY_PRICE_ID'], expand: ['product'])
+            if monthly_price && monthly_price.product
+              products << {
+                id: 'monthly',
+                name: monthly_price.product.name || 'Monthly Membership',
+                price: monthly_price.unit_amount,
+                interval: 'month',
+                display_interval: 'month',
+                features: monthly_price.product.metadata.to_h.fetch('features', '1 credit per month,Access to all society features,Monthly whiskey recommendations').split(',').map(&:strip),
+                popular: monthly_price.product.metadata.to_h.fetch('popular', 'false') == 'true',
+                price_id: monthly_price.id
+              }
+            end
+          rescue => e
+            Rails.logger.error "Error fetching monthly price: #{e.message}"
+          end
+        end
+
+        # Fetch quarterly product
+        if ENV['STRIPE_QUARTERLY_PRICE_ID'].present?
+          begin
+            quarterly_price = Stripe::Price.retrieve(ENV['STRIPE_QUARTERLY_PRICE_ID'], expand: ['product'])
+            if quarterly_price && quarterly_price.product
+              # Calculate monthly equivalent for quarterly
+              quarterly_interval = quarterly_price.recurring&.interval || 'month'
+              quarterly_interval_count = quarterly_price.recurring&.interval_count || 1
+              monthly_equivalent = if quarterly_interval == 'month' && quarterly_interval_count == 3
+                (quarterly_price.unit_amount / 3.0).round
+              else
+                quarterly_price.unit_amount
+              end
+
+              products << {
+                id: 'quarterly',
+                name: quarterly_price.product.name || 'Quarterly Membership',
+                price: monthly_equivalent,
+                interval: 'month',
+                display_interval: 'month',
+                features: quarterly_price.product.metadata.to_h.fetch('features', 'Everything in Monthly,Priority support,Early access to new features').split(',').map(&:strip).reject { |f| f.include?('%') || f.downcase.include?('save') || f.downcase.include?('savings') },
+                popular: quarterly_price.product.metadata.to_h.fetch('popular', 'true') == 'true',
+                price_id: quarterly_price.id,
+                savings: quarterly_price.product.metadata.to_h.fetch('savings', '19%')
+              }
+            end
+          rescue => e
+            Rails.logger.error "Error fetching quarterly price: #{e.message}"
+          end
+        end
+
+        # Fetch yearly product
+        if ENV['STRIPE_YEARLY_PRICE_ID'].present?
+          begin
+            yearly_price = Stripe::Price.retrieve(ENV['STRIPE_YEARLY_PRICE_ID'], expand: ['product'])
+            if yearly_price && yearly_price.product
+              # Calculate monthly equivalent for yearly
+              yearly_interval = yearly_price.recurring&.interval || 'year'
+              monthly_equivalent = if yearly_interval == 'year'
+                (yearly_price.unit_amount / 12.0).round
+              else
+                yearly_price.unit_amount
+              end
+
+              products << {
+                id: 'yearly',
+                name: yearly_price.product.name || 'Yearly Membership',
+                price: monthly_equivalent,
+                interval: 'month',
+                display_interval: 'month',
+                features: yearly_price.product.metadata.to_h.fetch('features', 'Everything in Quarterly,VIP access to exclusive events,Personal whisky curator').split(',').map(&:strip).reject { |f| f.include?('%') || f.downcase.include?('save') || f.downcase.include?('savings') },
+                popular: yearly_price.product.metadata.to_h.fetch('popular', 'false') == 'true',
+                price_id: yearly_price.id,
+                savings: yearly_price.product.metadata.to_h.fetch('savings', '31%')
+              }
+            end
+          rescue => e
+            Rails.logger.error "Error fetching yearly price: #{e.message}"
+          end
+        end
+
+        # Sort products to ensure consistent order: monthly, quarterly, yearly
+        sorted_products = products.sort_by do |p|
+          case p[:id]
+          when 'monthly' then 0
+          when 'quarterly' then 1
+          when 'yearly' then 2
+          else 3
+          end
+        end
+
+        # Return default products if we got no products from Stripe
+        if sorted_products.empty?
+          fallback_products
+        else
+          sorted_products
+        end
+      end
+    rescue => e
+      Rails.logger.error "Error fetching Stripe products: #{e.message}"
+      # Return default products if Stripe is unavailable
+      fallback_products
+    end
+  end
+
+  def fallback_products
+    [
+      {
+        id: 'monthly',
+        name: 'Monthly Membership',
+        price: 1599,
+        interval: 'month',
+        features: ['1 credit per month', 'Access to all society features', 'Monthly whiskey recommendations'],
+        popular: false,
+        price_id: ENV.fetch('STRIPE_MONTHLY_PRICE_ID', 'price_monthly')
+      },
+      {
+        id: 'quarterly',
+        name: 'Quarterly Membership',
+        price: 1299,
+        interval: 'month',
+        features: ['Everything in Monthly', 'Priority support', 'Early access to new features'],
+        popular: true,
+        price_id: ENV.fetch('STRIPE_QUARTERLY_PRICE_ID', 'price_quarterly'),
+        savings: '19%'
+      },
+      {
+        id: 'yearly',
+        name: 'Yearly Membership',
+        price: 1099,
+        interval: 'month',
+        features: ['Everything in Quarterly', 'VIP access to exclusive events', 'Personal whisky curator'],
+        popular: false,
+        price_id: ENV.fetch('STRIPE_YEARLY_PRICE_ID', 'price_yearly'),
+        savings: '31%'
+      }
+    ]
   end
 end
