@@ -86,8 +86,8 @@ class Society < ApplicationRecord
   def add_creator_as_admin
     society_memberships.create!(
       user: creator,
-      role: 'admin',
-      status: 'active'
+      role: :admin,
+      status: :active
     )
   end
 end

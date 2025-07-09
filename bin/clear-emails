@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+# Get the project root directory
+project_root = File.expand_path('..', __dir__)
+mail_dir = File.join(project_root, 'tmp/mail')
+
+unless Dir.exist?(mail_dir)
+  puts "📭 No mail directory found."
+  exit 0
+end
+
+email_files = Dir.glob("#{mail_dir}/*")
+
+if email_files.empty?
+  puts "📭 No emails to clear."
+  exit 0
+end
+
+email_files.each { |file| File.delete(file) }
+puts "🗑️  Cleared #{email_files.length} email(s)"

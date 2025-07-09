@@ -46,21 +46,19 @@
       <div class="max-w-6xl mx-auto flex items-center justify-between px-6 py-3">
         <!-- Logo -->
         <a href="/" class="flex items-center gap-3 font-bold text-2xl tracking-tight text-black hover:text-indigo-600 transition">
-          <%= image_tag "wss-logo.jpg", alt: "Whiskey Share Society", class: "h-10 w-auto rounded-lg shadow-sm" %>
+          <%= image_tag "wss-logo.jpg", alt: "Whiskey Share Society", class: "h-10 w-auto rounded-lg" %>
           <span class="hidden sm:inline">Whiskey Share Society</span>
         </a>
         <!-- Navigation Links -->
         <div class="hidden md:flex gap-6 text-lg font-medium">
-          <%= nav_link_to 'Dashboard', dashboard_path %>
           <%= nav_link_to 'Societies', societies_path %>
           <%= nav_link_to 'Events', events_path %>
           <%= nav_link_to 'Presentations', presentations_path %>
           <% if user_signed_in? %>
-            <%= nav_link_to 'Account', edit_user_registration_path %>
-            <%= link_to 'Sign Out', destroy_user_session_path, method: :delete, class: 'ml-4 text-gray-400 hover:text-red-500 transition' %>
+            <%= nav_link_to 'Account', account_path %>
+            <%= link_to 'Sign Out', destroy_user_session_path, data: { 'turbo-method': :delete, 'turbo-confirm': 'Are you sure you want to sign out?' }, class: 'ml-4 text-gray-400 hover:text-red-500 transition' %>
           <% else %>
-            <%= nav_link_to 'Sign In', new_user_session_path %>
-            <%= nav_link_to 'Sign Up', new_user_registration_path %>
+            <%= nav_link_to 'Sign In', auth_path %>
           <% end %>
         </div>
         <!-- Mobile Menu (optional, can add later) -->
@@ -68,34 +66,36 @@
     </nav>
 
     <!-- Flash Messages -->
-    <div class="max-w-2xl mx-auto">
-      <% if notice %>
-        <div class="mb-4 rounded-lg bg-green-50 border border-green-200 text-green-800 px-4 py-3 text-center shadow">
-          <%= notice %>
-        </div>
-      <% end %>
-      <% if alert %>
-        <div class="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-800 px-4 py-3 text-center shadow">
-          <%= alert %>
-        </div>
-      <% end %>
-    </div>
+    <% if notice || alert %>
+      <div class="max-w-2xl mx-auto pt-20 px-4">
+        <% if notice %>
+          <div class="mb-4 rounded-lg bg-green-50 border border-green-200 text-green-800 px-4 py-3 text-center shadow">
+            <%= notice %>
+          </div>
+        <% end %>
+        <% if alert %>
+          <div class="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-800 px-4 py-3 text-center shadow">
+            <%= alert %>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
 
     <!-- Main Content -->
     <% if controller_name == 'home' && action_name == 'index' %>
-      <main class="pb-16 min-h-[80vh] w-full">
+      <main class="min-h-[80vh] w-full <%= 'pt-20' unless notice || alert %>">
         <%= yield %>
       </main>
     <% elsif controller_name == 'societies' && action_name == 'index' %>
-      <main class="pb-16 min-h-[80vh] w-full">
+      <main class="min-h-[80vh] w-full <%= 'pt-20' unless notice || alert %>">
         <%= yield %>
       </main>
     <% elsif controller_name == 'presentations' %>
-      <main class="pb-16 min-h-[80vh] w-full">
+      <main class="min-h-[80vh] w-full <%= 'pt-20' unless notice || alert %>">
         <%= yield %>
       </main>
     <% else %>
-      <main class="max-w-6xl mx-auto px-4 pt-8 pb-16 min-h-[80vh]">
+      <main class="max-w-6xl mx-auto px-4 min-h-[80vh] <%= 'pt-20' unless notice || alert %>">
         <%= yield %>
       </main>
     <% end %>

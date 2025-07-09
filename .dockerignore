@@ -1,110 +1,49 @@
-# See https://docs.docker.com/engine/reference/builder/#dockerignore-file for more about ignoring files.
-
 # Git
 .git
 .gitignore
-.gitattributes
 
 # Documentation
 README.md
-*.md
-
-# Logs
-log/*
-*.log
-
-# Runtime data
-tmp/*
-!tmp/.keep
+CLAUDE.md
 
 # Environment files
 .env
-.env.*
+.env.local
+.env.example
 
-# Database
-db/*.sqlite3
-db/*.sqlite3-*
+# Dependencies
+node_modules
+vendor/bundle
 
-# Node modules (will be installed in container)
-node_modules/
+# Logs
+*.log
+log/*
 
-# Coverage directory used by tools like istanbul
-coverage/
+# Temporary files
+tmp/*
+.tmp
+.temp
 
-# nyc test coverage
-.nyc_output
-
-# Dependency directories
-vendor/bundle/
-
-# IDE files
-.vscode/
-.idea/
+# Editor files
+.vscode
+.idea
 *.swp
 *.swo
 
-# OS generated files
+# OS files
 .DS_Store
-.DS_Store?
-._*
-.Spotlight-V100
-.Trashes
-ehthumbs.db
 Thumbs.db
 
-# Docker
-Dockerfile*
-docker-compose*
+# Test files
+coverage/
+.nyc_output
+
+# SSL certificates
+*.pem
+*.key
+*.crt
+
+# Docker files
+Dockerfile
+docker-compose*.yml
 .dockerignore
-
-# CI/CD
-.github/
-.gitlab-ci.yml
-
-# Testing
-spec/
-test/
-.rspec
-.rubocop.yml
-
-# Kamal deployment
-.kamal/
-
-# Ignore bundler config.
-/.bundle
-
-# Ignore all default key files.
-/config/master.key
-/config/credentials/*.key
-
-# Ignore all logfiles and tempfiles.
-/log/*
-/tmp/*
-!/log/.keep
-!/tmp/.keep
-
-# Ignore pidfiles, but keep the directory.
-/tmp/pids/*
-!/tmp/pids/.keep
-
-# Ignore storage (uploaded files in development and any SQLite databases).
-/storage/*
-!/storage/.keep
-/tmp/storage/*
-!/tmp/storage/.keep
-
-# Ignore assets.
-/node_modules/
-/app/assets/builds/*
-!/app/assets/builds/.keep
-/public/assets
-
-# Ignore CI service files.
-/.github
-
-# Ignore Kamal files.
-/config/deploy*.yml
-/.kamal
-
-# Ignore development files
-/.devcontainer

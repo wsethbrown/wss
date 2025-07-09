@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Your Magic Link - Whiskey Share Society</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    
+    .header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+      border-radius: 12px;
+      color: white;
+    }
+    
+    .logo {
+      width: 60px;
+      height: 60px;
+      margin: 0 auto 15px;
+      background: white;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 24px;
+    }
+    
+    .content {
+      background: #f8fafc;
+      padding: 30px;
+      border-radius: 12px;
+      border: 1px solid #e2e8f0;
+      margin-bottom: 30px;
+    }
+    
+    .magic-link-btn {
+      display: inline-block;
+      background: linear-gradient(135deg, #f59e0b 0%, #ea580c 100%);
+      color: white;
+      padding: 15px 30px;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: 600;
+      text-align: center;
+      margin: 20px 0;
+      transition: transform 0.2s;
+    }
+    
+    .magic-link-btn:hover {
+      transform: translateY(-2px);
+    }
+    
+    .security-info {
+      background: #dbeafe;
+      padding: 20px;
+      border-radius: 8px;
+      border-left: 4px solid #3b82f6;
+      margin-top: 20px;
+    }
+    
+    .footer {
+      text-align: center;
+      color: #6b7280;
+      font-size: 14px;
+      margin-top: 30px;
+      padding-top: 20px;
+      border-top: 1px solid #e5e7eb;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">🥃</div>
+    <h1>Your Magic Link</h1>
+    <p>Sign in to Whiskey Share Society</p>
+  </div>
+  
+  <div class="content">
+    <p>Hello<%= @user.first_name.present? ? " #{@user.first_name}" : "" %>!</p>
+    
+    <% if @user.first_name.blank? && @user.last_name.blank? %>
+      <p>Welcome to Whiskey Share Society! You requested a magic link to create your account and sign in. Click the button below to get started:</p>
+    <% else %>
+      <p>You requested a magic link to sign in to your Whiskey Share Society account. Click the button below to securely sign in:</p>
+    <% end %>
+    
+    <div style="text-align: center;">
+      <a href="<%= @magic_link_url %>" class="magic-link-btn" style="word-break: keep-all; white-space: nowrap; text-decoration: none;">Sign In with Magic Link</a>
+    </div>
+    
+    <p>This link will automatically sign you in - no password required!</p>
+    
+    <div class="security-info">
+      <h3 style="margin-top: 0; color: #1e40af;">🔒 Security Information</h3>
+      <ul style="margin-bottom: 0;">
+        <li>This magic link expires in <strong>15 minutes</strong></li>
+        <li>It can only be used <strong>once</strong></li>
+        <li>If you didn't request this link, please ignore this email</li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="footer">
+    <p>
+      If the button doesn't work, copy and paste this link into your browser:<br>
+      <span style="color: #f59e0b; word-break: break-all; font-family: monospace; font-size: 12px;"><%= @magic_link_url %></span>
+    </p>
+    
+    <p>
+      © 2025 Whiskey Share Society. All rights reserved.<br>
+      This email was sent because you requested a magic link to sign in.
+    </p>
+  </div>
+</body>
+</html>

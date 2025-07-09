@@ -1,0 +1,20 @@
+#!/usr/bin/env ruby
+
+# Get the project root directory
+project_root = File.expand_path('..', __dir__)
+mail_dir = File.join(project_root, 'tmp/mail')
+
+unless Dir.exist?(mail_dir)
+  puts "📭 No emails sent yet."
+  exit 0
+end
+
+email_files = Dir.glob("#{mail_dir}/*").sort_by { |f| File.mtime(f) }
+
+if email_files.empty?
+  puts "📭 No emails found."
+  exit 0
+end
+
+latest_file = email_files.last
+puts File.read(latest_file)

@@ -1,0 +1,20 @@
+whiskey_lovers:
+  name: Whiskey Lovers Society
+  description: A group for passionate whiskey enthusiasts who love to explore different brands and flavors.
+  location: New York, NY
+  creator: john
+  is_private: false
+
+bourbon_club:
+  name: Exclusive Bourbon Club
+  description: A private club for serious bourbon collectors and connoisseurs.
+  location: Louisville, KY
+  creator: jane
+  is_private: true
+
+single_malt:
+  name: Single Malt Appreciation
+  description: Dedicated to the finest single malt scotch whiskies from around the world.
+  location: Online
+  creator: admin
+  is_private: false

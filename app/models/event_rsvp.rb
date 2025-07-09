@@ -3,16 +3,15 @@ class EventRsvp < ApplicationRecord
   belongs_to :event
 
   # Enums
-  enum status: { pending: 'pending', confirmed: 'confirmed', declined: 'declined', cancelled: 'cancelled' }
+  enum :status, pending: :pending, confirmed: :confirmed, declined: :declined, cancelled: :cancelled
 
   # Validations
   validates :user_id, uniqueness: { scope: :event_id, message: 'has already RSVPed to this event' }
   validates :status, presence: true, inclusion: { in: statuses.keys }
   validate :event_not_past
 
-  # Scopes
-  scope :confirmed, -> { where(status: 'confirmed') }
-  scope :pending, -> { where(status: 'pending') }
+  # Note: Rails generates scopes automatically for enums
+  # .pending, .confirmed, .declined, .cancelled are available
   scope :for_upcoming_events, -> { joins(:event).where('events.start_time > ?', Time.current) }
 
   # Instance methods

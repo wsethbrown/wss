@@ -1,0 +1,17 @@
+Hello<%= @user.first_name.present? ? " #{@user.first_name}" : "" %>!
+
+<% if @user.first_name.blank? && @user.last_name.blank? %>Welcome to Whiskey Share Society! You requested a magic link to create your account and sign in.<% else %>You requested a magic link to sign in to your Whiskey Share Society account.<% end %>
+
+Sign in with this link:
+<%= @magic_link_url %>
+
+SECURITY INFORMATION:
+- This magic link expires in 15 minutes
+- It can only be used once
+- If you didn't request this link, please ignore this email
+
+This link will automatically sign you in - no password required!
+
+---
+© 2025 Whiskey Share Society. All rights reserved.
+This email was sent because you requested a magic link to sign in.

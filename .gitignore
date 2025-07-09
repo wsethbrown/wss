@@ -35,3 +35,12 @@
 
 /app/assets/builds/*
 !/app/assets/builds/.keep
+
+# ClaudeOnRails
+.claude-on-rails/sessions/
+.claude-swarm/
+claude-swarm.log
+
+# Stripe webhook logs and PID files
+stripe-webhooks.log
+.stripe_pid

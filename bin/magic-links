@@ -1,0 +1,33 @@
+#!/usr/bin/env ruby
+
+# Get the project root directory
+project_root = File.expand_path('..', __dir__)
+mail_dir = File.join(project_root, 'tmp/mail')
+
+unless Dir.exist?(mail_dir)
+  puts "📭 No emails sent yet. Send a magic link first!"
+  exit 0
+end
+
+email_files = Dir.glob("#{mail_dir}/*").sort_by { |f| File.mtime(f) }.reverse
+
+if email_files.empty?
+  puts "📭 No emails found. Send a magic link first!"
+  exit 0
+end
+
+puts "🔗 MAGIC LINKS (most recent first)"
+puts "=" * 40
+
+email_files.each_with_index do |file, index|
+  email = File.basename(file)
+  mtime = File.mtime(file).strftime("%H:%M")
+  
+  # Extract magic link URLs from the email (only complete tokens)
+  content = File.read(file)
+  magic_links = content.scan(/https:\/\/[^\s<>"]+\/magic_links\/[A-Za-z0-9_-]{20,}/)
+  
+  magic_links.uniq.each do |link|
+    puts "#{email} (#{mtime}): #{link}"
+  end
+end

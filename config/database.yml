@@ -23,9 +23,9 @@ default: &default
 development:
   <<: *default
   database: wss_development
-  host: <%= ENV.fetch("DATABASE_HOST", "localhost") %>
-  username: <%= ENV.fetch("DATABASE_USERNAME", "wss") %>
-  password: <%= ENV.fetch("DATABASE_PASSWORD", "password") %>
+  host: <%= ENV.fetch("DATABASE_HOST", "127.0.0.1") %>
+  username: <%= ENV.fetch("DATABASE_USERNAME", "sethbrown") %>
+  password: <%= ENV.fetch("DATABASE_PASSWORD", "") %>
   port: <%= ENV.fetch("DATABASE_PORT", 5432) %>
 
   # The specified database role being used to connect to PostgreSQL.

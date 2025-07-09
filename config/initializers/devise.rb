@@ -24,7 +24,7 @@ Devise.setup do |config|
   # Configure the e-mail address which will be shown in Devise::Mailer,
   # note that it will be overwritten if you use your own mailer class
   # with default "from" parameter.
-  config.mailer_sender = 'please-change-me-at-config-initializers-devise@example.com'
+  config.mailer_sender = 'noreply@whiskeysharesociety.com'
 
   # Configure the class responsible to send e-mails.
   # config.mailer = 'Devise::Mailer'
@@ -272,6 +272,38 @@ Devise.setup do |config|
   # Add a new OmniAuth provider. Check the wiki for more information on setting
   # up on your models and hooks.
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
+  
+  # Configure OAuth providers
+  config.omniauth :google_oauth2, 
+    ENV['GOOGLE_CLIENT_ID'], 
+    ENV['GOOGLE_CLIENT_SECRET'],
+    {
+      scope: 'email,profile',
+      prompt: 'select_account',
+      name: 'google_oauth2',
+      origin_param: 'origin'
+    }
+    
+  # Apple OAuth configuration - TEMPORARILY DISABLED
+  # if ENV['APPLE_CLIENT_ID'].present? && File.exist?('apple_private_key.pem')
+  #   config.omniauth :apple,
+  #     ENV['APPLE_CLIENT_ID'],
+  #     '',
+  #     {
+  #       scope: 'email name',
+  #       team_id: ENV['APPLE_TEAM_ID'],
+  #       key_id: ENV['APPLE_KEY_ID'], 
+  #       pem: File.read('apple_private_key.pem'),
+  #       name: 'apple',
+  #       redirect_uri: "#{ENV.fetch('RAILS_HOST', 'https://dev.whiskeysharesociety.com:3000')}/users/auth/apple/callback",
+  #       provider_ignores_state: true,
+  #       authorized_client_ids: [ENV['APPLE_CLIENT_ID']],
+  #       nonce_supported: false
+  #     }
+  # end
+    
+  # Configure OmniAuth failure handling
+  config.omniauth_path_prefix = '/users/auth'
 
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or

@@ -49,12 +49,20 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
+  
+  # Load environment variables from .env file
+  gem "dotenv-rails"
+  
+  # System testing with Capybara
+  gem "capybara"
+  gem "selenium-webdriver"
 end
 
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
   gem 'foreman'
+  gem 'claude-on-rails'
 end
 
 gem "hotwire-rails", "~> 0.1.3"
@@ -66,3 +74,15 @@ gem "pundit", "~> 2.5"
 gem "tailwindcss-rails", "~> 4.3"
 
 gem "kaminari", "~> 1.2"
+
+# OAuth providers
+gem "omniauth-google-oauth2", "~> 1.1"
+gem "omniauth-apple", "~> 1.0"
+gem "omniauth-rails_csrf_protection", "~> 1.0"
+
+# 2FA support
+gem "rotp", "~> 6.3"
+gem "rqrcode", "~> 2.2"
+
+# Stripe payment processing
+gem "stripe", "~> 10.0"

@@ -2,7 +2,70 @@ class User < ApplicationRecord
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
-         :recoverable, :rememberable, :validatable
+         :recoverable, :rememberable, :validatable,
+         :omniauthable, omniauth_providers: [:google_oauth2, :apple]
+
+  # OAuth methods
+  def self.from_omniauth(auth)
+    # First, try to find existing user with this provider and uid
+    existing_user = where(provider: auth.provider, uid: auth.uid).first
+    
+    if existing_user
+      return existing_user
+    end
+    
+    # If no existing user with this provider/uid, check for user with same email
+    user_by_email = find_by(email: auth.info.email)
+    
+    if user_by_email
+      # Update existing user with new provider info
+      user_by_email.provider = auth.provider
+      user_by_email.uid = auth.uid
+      user_by_email.save!
+      return user_by_email
+    end
+    
+    # No existing user found, create new one
+    create!(
+      email: auth.info.email,
+      provider: auth.provider,
+      uid: auth.uid,
+      password: Devise.friendly_token[0, 20],
+      password_set_manually: false,
+      first_name: auth.info.first_name || auth.info.name&.split(' ')&.first,
+      last_name: auth.info.last_name || auth.info.name&.split(' ')&.last
+    )
+  end
+
+  def self.new_with_session(params, session)
+    super.tap do |user|
+      if session["devise.oauth_data"] && session["devise.oauth_data"]["extra"] && session["devise.oauth_data"]["extra"]["raw_info"]
+        data = session["devise.oauth_data"]["extra"]["raw_info"]
+        user.email = data["email"] if user.email.blank?
+        user.first_name = data["first_name"] if user.first_name.blank?
+        user.last_name = data["last_name"] if user.last_name.blank?
+      end
+    end
+  end
+
+  # Instance methods
+  def full_name
+    if first_name.present? && last_name.present?
+      "#{first_name} #{last_name}"
+    elsif first_name.present?
+      first_name
+    elsif last_name.present?
+      last_name
+    else
+      email.split('@').first.titleize
+    end
+  end
+
+  # Active Storage
+  has_one_attached :profile_image
+  
+  # Profile image validation
+  validate :profile_image_validation
 
   # Associations
   has_many :societies, foreign_key: :creator_id, dependent: :destroy
@@ -13,6 +76,8 @@ class User < ApplicationRecord
   has_many :event_rsvps, dependent: :destroy
   has_many :rsvped_events, through: :event_rsvps, source: :event
   has_many :presentations, foreign_key: :author_id, dependent: :destroy
+  has_many :user_tags, dependent: :destroy
+  has_many :tags, through: :user_tags
 
   # Validations
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
@@ -20,10 +85,6 @@ class User < ApplicationRecord
   # Scopes
   scope :active, -> { where.not(encrypted_password: [nil, '']) }
 
-  # Instance methods
-  def full_name
-    email.split('@').first.titleize
-  end
 
   def admin?
     # For now, simple admin check - can be enhanced later
@@ -31,23 +92,23 @@ class User < ApplicationRecord
   end
 
   def member_of?(society)
-    society_memberships.exists?(society: society, status: 'active')
+    society_memberships.exists?(society: society, status: :active)
   end
 
   def admin_of?(society)
-    society_memberships.exists?(society: society, role: 'admin', status: 'active')
+    society_memberships.exists?(society: society, role: :admin, status: :active)
   end
 
   def officer_of?(society)
-    society_memberships.exists?(society: society, role: 'officer', status: 'active')
+    society_memberships.exists?(society: society, role: :officer, status: :active)
   end
 
   def can_manage?(society)
-    society_memberships.exists?(society: society, role: ['admin', 'officer'], status: 'active')
+    society_memberships.exists?(society: society, role: [:admin, :officer], status: :active)
   end
 
   def can_manage_officers?(society)
-    society_memberships.exists?(society: society, role: 'admin', status: 'active')
+    society_memberships.exists?(society: society, role: :admin, status: :active)
   end
 
   def applied_to?(society)
@@ -63,14 +124,246 @@ class User < ApplicationRecord
   end
 
   def admin_societies
-    societies.joins(:society_memberships).where(society_memberships: { user: self, role: 'admin', status: 'active' })
+    societies.joins(:society_memberships).where(society_memberships: { user: self, role: :admin, status: :active })
   end
 
   def officer_societies
-    member_societies.joins(:society_memberships).where(society_memberships: { user: self, role: 'officer', status: 'active' })
+    member_societies.joins(:society_memberships).where(society_memberships: { user: self, role: :officer, status: :active })
   end
 
   def managed_societies
-    member_societies.joins(:society_memberships).where(society_memberships: { user: self, role: ['admin', 'officer'], status: 'active' })
+    member_societies.joins(:society_memberships).where(society_memberships: { user: self, role: [:admin, :officer], status: :active })
+  end
+  
+  # Tag helper methods
+  def tags_by_category(category)
+    tags.where(category: category)
+  end
+  
+  def whiskey_tags
+    tags_by_category('whiskey')
+  end
+  
+  def interest_tags
+    tags_by_category('interests')
+  end
+  
+  def skill_tags
+    tags_by_category('skills')
+  end
+  
+  def has_tag?(tag_name)
+    tags.exists?(name: tag_name)
+  end
+  
+  def add_tag(tag_name)
+    tag = Tag.find_or_create_by(name: tag_name)
+    user_tags.find_or_create_by(tag: tag) unless has_tag?(tag_name)
+  end
+  
+  def remove_tag(tag_name)
+    tag = Tag.find_by(name: tag_name)
+    user_tags.where(tag: tag).destroy_all if tag
+  end
+
+  # Profile image helper methods
+  def profile_image_url
+    if profile_image.attached?
+      Rails.application.routes.url_helpers.rails_blob_url(profile_image, only_path: true)
+    else
+      nil
+    end
+  end
+
+  def has_profile_image?
+    profile_image.attached?
+  end
+
+  # Email change helper methods
+  def has_pending_email_change?
+    unconfirmed_email.present? && email_change_token.present? && email_change_token_expires_at&.future?
+  end
+
+  def pending_email_change_expired?
+    unconfirmed_email.present? && email_change_token.present? && email_change_token_expires_at&.past?
+  end
+
+  def clear_expired_email_change
+    if pending_email_change_expired?
+      update!(unconfirmed_email: nil, email_change_token: nil, email_change_token_expires_at: nil)
+    end
+  end
+
+  # 2FA helper methods
+  def two_factor_enabled?
+    otp_enabled? && otp_secret_key.present?
+  end
+  
+  def otp_required_for_login?
+    two_factor_enabled?
+  end
+
+  # Authentication method helpers
+  def has_password?
+    password_set_manually? && encrypted_password.present?
+  end
+
+  def passwordless_only?
+    !password_set_manually?
+  end
+
+  def authentication_methods
+    methods = []
+    methods << "Magic Link" # All users have magic link capability
+    methods << "Password" if has_password?
+    methods
+  end
+
+  def primary_authentication_method
+    return "Magic Link Only" if passwordless_only?
+    "Magic Link + Password"
+  end
+
+  # Subscription helper methods
+  def has_active_subscription?
+    subscription_status == 'active' && (subscription_ends_at.nil? || subscription_ends_at.future?)
+  end
+
+  def subscription_status_display
+    case subscription_status
+    when 'active'
+      'Active'
+    when 'cancelled'
+      'Cancelled'
+    when 'past_due'
+      'Past Due'
+    when 'incomplete'
+      'Incomplete'
+    when 'trialing'
+      'Trial'
+    else
+      'No Subscription'
+    end
+  end
+
+  def subscription_plan_display
+    case subscription_plan
+    when 'monthly'
+      'Monthly ($19.99/month)'
+    when 'quarterly'
+      'Quarterly ($38.97/quarter)'
+    when 'yearly'
+      'Yearly ($119.88/year)'
+    else
+      'No Plan'
+    end
+  end
+
+  def subscription_active?
+    has_active_subscription?
+  end
+
+  def can_access_premium_content?
+    has_active_subscription?
+  end
+
+  def days_until_renewal
+    return nil unless subscription_ends_at
+    return 0 if subscription_ends_at.past?
+    
+    (subscription_ends_at.to_date - Date.current).to_i
+  end
+
+  def generate_otp_secret
+    self.otp_secret_key = ROTP::Base32.random
+  end
+
+  def generate_backup_codes
+    codes = 8.times.map { SecureRandom.hex(4).upcase }
+    self.backup_codes = codes.to_json
+    codes
+  end
+
+  def backup_codes_array
+    backup_codes.present? ? JSON.parse(backup_codes) : []
+  end
+
+  def verify_otp(code)
+    return false unless two_factor_enabled?
+    
+    # Check if it's a backup code
+    if backup_codes_array.include?(code.upcase)
+      # Remove used backup code
+      codes = backup_codes_array
+      codes.delete(code.upcase)
+      update!(backup_codes: codes.to_json)
+      return true
+    end
+    
+    # Check TOTP code
+    totp = ROTP::TOTP.new(otp_secret_key)
+    totp.verify(code, drift_ahead: 30, drift_behind: 30)
+  end
+
+  def otp_qr_code
+    return nil unless otp_secret_key.present?
+    
+    totp = ROTP::TOTP.new(otp_secret_key)
+    issuer = "Whiskey Share Society"
+    uri = totp.provisioning_uri(email, issuer_name: issuer)
+    
+    qr = RQRCode::QRCode.new(uri)
+    qr.as_svg(
+      module_size: 4,
+      standalone: true,
+      use_path: true,
+      viewbox: true,
+      svg_attributes: {
+        class: "qr-code",
+        style: "width: 200px; height: 200px;"
+      }
+    )
+  end
+
+  def initials
+    if first_name.present? && last_name.present?
+      "#{first_name[0]}#{last_name[0]}".upcase
+    elsif first_name.present?
+      first_name[0].upcase
+    elsif last_name.present?
+      last_name[0].upcase
+    else
+      email[0].upcase
+    end
+  end
+
+  def avatar_color
+    # Generate a consistent color based on the user's email
+    colors = [
+      '#EF4444', '#F97316', '#F59E0B', '#EAB308', '#84CC16',
+      '#22C55E', '#10B981', '#14B8A6', '#06B6D4', '#0EA5E9',
+      '#3B82F6', '#6366F1', '#8B5CF6', '#A855F7', '#D946EF',
+      '#EC4899', '#F43F5E'
+    ]
+    
+    # Use a simple hash of the email to pick a color
+    hash = email.sum { |char| char.ord }
+    colors[hash % colors.length]
+  end
+
+  private
+
+  def profile_image_validation
+    return unless profile_image.attached?
+    
+    # Check content type
+    unless profile_image.content_type.in?(%w[image/jpeg image/jpg image/png image/gif image/webp])
+      errors.add(:profile_image, "must be a valid image format")
+    end
+    
+    # Check file size
+    if profile_image.byte_size > 5.megabytes
+      errors.add(:profile_image, "must be less than 5MB")
+    end
   end
 end

@@ -39,3 +39,14 @@ plugin :solid_queue if ENV["SOLID_QUEUE_IN_PUMA"]
 # Specify the PID file. Defaults to tmp/pids/server.pid in development.
 # In other environments, only set the PID file if requested.
 pidfile ENV["PIDFILE"] if ENV["PIDFILE"]
+
+# Configure SSL for development to support Apple OAuth
+if ENV.fetch("RAILS_ENV", "development") == "development"
+  # Use absolute paths to avoid path resolution issues
+  root_dir = File.expand_path('..', __dir__)
+  ssl_bind '0.0.0.0', 3000, {
+    key: File.join(root_dir, 'dev-key.pem'),
+    cert: File.join(root_dir, 'dev-cert.pem'),
+    verify_mode: 'none'
+  }
+end

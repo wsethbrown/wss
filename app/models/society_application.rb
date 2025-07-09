@@ -3,7 +3,7 @@ class SocietyApplication < ApplicationRecord
   belongs_to :society
 
   # Enums
-  enum status: { pending: 'pending', approved: 'approved', rejected: 'rejected' }
+  enum :status, pending: :pending, approved: :approved, rejected: :rejected
 
   # Validations
   validates :user_id, uniqueness: { scope: :society_id, message: 'has already applied to this society' }
@@ -43,7 +43,7 @@ class SocietyApplication < ApplicationRecord
   private
 
   def set_default_status
-    self.status ||= 'pending'
+    self.status ||= :pending
   end
 
   def handle_status_change
@@ -52,8 +52,8 @@ class SocietyApplication < ApplicationRecord
       # Create membership when application is approved
       society.society_memberships.create!(
         user: user,
-        role: 'member',
-        status: 'active'
+        role: :member,
+        status: :active
       )
     when 'rejected'
       # Could send notification to user about rejection

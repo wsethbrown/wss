@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+
+# Install WSS CLI globally
+# This script creates a global alias for the wss command
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+WSS_CLI="$SCRIPT_DIR/wss"
+
+echo "🥃 Installing Whiskey Share Society CLI..."
+
+# Check if the wss script exists
+if [[ ! -f "$WSS_CLI" ]]; then
+    echo "❌ Error: wss CLI script not found at $WSS_CLI"
+    exit 1
+fi
+
+# Make sure it's executable
+chmod +x "$WSS_CLI"
+
+# Create symlink in /usr/local/bin (requires sudo)
+if sudo ln -sf "$WSS_CLI" /usr/local/bin/wss; then
+    echo "✅ WSS CLI installed successfully!"
+    echo "📍 You can now run 'wss' from anywhere"
+    echo ""
+    echo "Try: wss help"
+else
+    echo "❌ Failed to install globally. You can still use: ./bin/wss"
+    echo ""
+    echo "To add to your shell:"
+    echo "  echo 'alias wss=\"$WSS_CLI\"' >> ~/.zshrc"
+    echo "  source ~/.zshrc"
+fi

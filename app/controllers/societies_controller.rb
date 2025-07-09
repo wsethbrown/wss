@@ -1,19 +1,31 @@
 class SocietiesController < ApplicationController
+  before_action :authenticate_user!, except: [:index, :show]
   before_action :set_society, only: [:show, :edit, :update, :destroy]
 
   def index
     if user_signed_in?
-      # For authorized users, show their societies and searchable public societies
-      @societies = Society.includes(:creator, :society_memberships, :members, :events)
-                         .joins(:society_memberships)
-                         .where(society_memberships: { user: current_user })
-                         .search(params[:search])
-                         .by_location(params[:location])
-                         .order(created_at: :desc)
-                         .page(params[:page])
+      # Get user's societies (separate from searchable societies)
+      @user_societies = current_user.societies.includes(:creator, :society_memberships, :members, :events)
+                                             .order(created_at: :desc)
+      
+      # For search results, show all societies the user has access to (excluding their own)
+      scope = policy_scope(Society).includes(:creator, :society_memberships, :members, :events)
+                                   .where.not(id: @user_societies.pluck(:id))
+      
+      # Apply search filters
+      scope = apply_search_filters(scope)
+      
+      @societies = scope.order(created_at: :desc)
     else
-      # For unauthorized users, just set empty array since we show placeholder content
-      @societies = []
+      # For unauthorized users, show only public societies
+      @user_societies = []
+      scope = Society.includes(:creator, :society_memberships, :members, :events)
+                     .where(is_private: false)
+      
+      # Apply search filters for public users too
+      scope = apply_search_filters(scope)
+      
+      @societies = scope.order(created_at: :desc)
     end
   end
 
@@ -63,7 +75,7 @@ class SocietiesController < ApplicationController
     @society = Society.find(params[:id])
     authorize @society, :join?
 
-    membership = @society.society_memberships.build(user: current_user, role: 'member', status: 'active')
+    membership = @society.society_memberships.build(user: current_user, role: :member, status: :active)
 
     if membership.save
       redirect_to @society, notice: 'Successfully joined the society!'
@@ -92,6 +104,43 @@ class SocietiesController < ApplicationController
   end
 
   def society_params
-    params.require(:society).permit(:name, :description, :location)
+    params.require(:society).permit(:name, :description, :location, :is_private)
   end
+
+  def apply_search_filters(scope)
+    # Name search
+    if params[:search].present?
+      search_term = params[:search].strip
+      scope = scope.where("name ILIKE ? OR description ILIKE ?", "%#{search_term}%", "%#{search_term}%")
+    end
+
+    # Zip code and range search (geolocation)
+    if params[:zip_code].present? && params[:range].present?
+      zip_code = params[:zip_code].strip
+      range_miles = params[:range].to_i
+      
+      # For now, we'll do a simple text match on location
+      # In production, you'd want to use a geocoding service and proper distance calculation
+      if zip_code.match?(/^\d{5}(-\d{4})?$/) # Valid US zip code
+        scope = scope.where("location ILIKE ?", "%#{zip_code}%")
+        
+        # Future enhancement: Add proper geolocation with lat/lng coordinates
+        # scope = scope.near([latitude, longitude], range_miles)
+      end
+    end
+
+    # Public only filter
+    if params[:public_only] == '1'
+      scope = scope.where(is_private: false)
+    end
+
+    scope
+  end
+
+  # Future method for proper geocoding
+  # def geocode_zip_code(zip_code)
+  #   # Use a geocoding service like Google Maps API or Geocoder gem
+  #   # to convert zip code to latitude/longitude coordinates
+  #   # Returns [latitude, longitude] or nil if not found
+  # end
 end

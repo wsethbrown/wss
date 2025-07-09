@@ -1,4 +1,198 @@
-<div>
-  <h1 class="font-bold text-4xl">Societies#new</h1>
-  <p>Find me in app/views/societies/new.html.erb</p>
+<!-- Society Creation Page -->
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+  <!-- Background Effects -->
+  <div class="absolute inset-0 pointer-events-none">
+    <div class="absolute top-1/4 left-1/6 w-40 h-40 bg-blue-200/20 rounded-full blur-3xl animate-pulse"></div>
+    <div class="absolute bottom-1/4 right-1/6 w-32 h-32 bg-indigo-200/25 rounded-full blur-2xl animate-pulse delay-1000"></div>
+  </div>
+
+  <div class="max-w-4xl mx-auto relative z-10">
+    <!-- Header -->
+    <div class="text-center mb-12">
+      <div class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-blue-100/80 backdrop-blur-sm border border-blue-200/50 text-blue-800 font-bold text-sm mb-8 shadow-lg">
+        <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
+        <span>🏛️ Create Society</span>
+      </div>
+
+      <h1 class="text-5xl md:text-6xl font-black tracking-tight mb-6 leading-tight">
+        <span class="block text-gray-900">Build Your</span>
+        <span class="block bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">Whiskey Community</span>
+      </h1>
+
+      <p class="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed font-medium">
+        Create a space where <strong class="text-gray-900">passion meets community</strong>. Bring together whiskey enthusiasts who share your interests and values.
+      </p>
+    </div>
+
+    <!-- Form Card -->
+    <div class="bg-white/90 backdrop-blur-xl border border-white/50 rounded-3xl shadow-2xl p-8 md:p-12">
+      <%= form_with(model: @society, local: true, html: { class: "space-y-8" }) do |form| %>
+        <% if @society.errors.any? %>
+          <div class="rounded-2xl bg-red-50 border border-red-200 p-6">
+            <div class="flex items-center gap-3 mb-4">
+              <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
+                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
+                </svg>
+              </div>
+              <h3 class="text-lg font-semibold text-red-800">Please fix the following errors:</h3>
+            </div>
+            <ul class="list-disc list-inside text-red-700 space-y-1">
+              <% @society.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        <% end %>
+
+        <!-- Society Name -->
+        <div class="space-y-3">
+          <%= form.label :name, class: "block text-lg font-semibold text-gray-900" do %>
+            <span class="flex items-center gap-2">
+              🏷️ Society Name
+              <span class="text-red-500">*</span>
+            </span>
+          <% end %>
+          <%= form.text_field :name, 
+              class: "w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400 bg-white/80",
+              placeholder: "e.g., Single Malt Enthusiasts, Urban Whiskey Club" %>
+          <p class="text-sm text-gray-600">Choose a memorable name that reflects your community's personality and focus.</p>
+        </div>
+
+        <!-- Society Description -->
+        <div class="space-y-3">
+          <%= form.label :description, class: "block text-lg font-semibold text-gray-900" do %>
+            <span class="flex items-center gap-2">
+              📝 Description
+            </span>
+          <% end %>
+          <%= form.text_area :description, 
+              rows: 5,
+              class: "w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400 bg-white/80 resize-none",
+              placeholder: "Describe your society's mission, what makes it special, and what members can expect..." %>
+          <p class="text-sm text-gray-600">Share your vision and help potential members understand what makes your community unique.</p>
+        </div>
+
+        <!-- Location -->
+        <div class="space-y-3">
+          <%= form.label :location, class: "block text-lg font-semibold text-gray-900" do %>
+            <span class="flex items-center gap-2">
+              📍 Location
+            </span>
+          <% end %>
+          <%= form.text_field :location, 
+              class: "w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-colors placeholder-gray-400 bg-white/80",
+              placeholder: "e.g., New York, NY or Online" %>
+          <p class="text-sm text-gray-600">Where will your society primarily meet? This helps members find local communities.</p>
+        </div>
+
+        <!-- Privacy Setting -->
+        <div class="space-y-6">
+          <%= form.label :is_private, class: "block text-lg font-semibold text-gray-900" do %>
+            <span class="flex items-center gap-2">
+              🔐 Privacy Setting
+              <span class="text-red-500">*</span>
+            </span>
+          <% end %>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Public Option -->
+            <div class="relative">
+              <%= form.radio_button :is_private, false, 
+                  class: "peer sr-only",
+                  id: "public_society" %>
+              <%= form.label :is_private, value: false, for: "public_society",
+                  class: "block cursor-pointer" do %>
+                <div class="p-6 border-2 border-gray-200 rounded-2xl transition-all duration-300 peer-checked:border-blue-500 peer-checked:bg-blue-50 hover:border-blue-300 bg-white/80 backdrop-blur-sm">
+                  <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center">
+                      <span class="text-2xl">🌐</span>
+                    </div>
+                    <div>
+                      <h3 class="text-xl font-bold text-gray-900">Public Society</h3>
+                      <p class="text-sm text-gray-600">Open to everyone</p>
+                    </div>
+                  </div>
+                  <p class="text-gray-700 leading-relaxed">
+                    Anyone can discover and join your society instantly. Perfect for growing a large, welcoming community and meeting new whiskey enthusiasts.
+                  </p>
+                  <div class="mt-4 flex items-center gap-2 text-green-600 text-sm font-medium">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    Instant membership
+                  </div>
+                </div>
+              <% end %>
+            </div>
+
+            <!-- Private Option -->
+            <div class="relative">
+              <%= form.radio_button :is_private, true, 
+                  class: "peer sr-only",
+                  id: "private_society" %>
+              <%= form.label :is_private, value: true, for: "private_society",
+                  class: "block cursor-pointer" do %>
+                <div class="p-6 border-2 border-gray-200 rounded-2xl transition-all duration-300 peer-checked:border-amber-500 peer-checked:bg-amber-50 hover:border-amber-300 bg-white/80 backdrop-blur-sm">
+                  <div class="flex items-center gap-4 mb-4">
+                    <div class="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center">
+                      <span class="text-2xl">🔒</span>
+                    </div>
+                    <div>
+                      <h3 class="text-xl font-bold text-gray-900">Private Society</h3>
+                      <p class="text-sm text-gray-600">Application required</p>
+                    </div>
+                  </div>
+                  <p class="text-gray-700 leading-relaxed">
+                    Members must apply to join and be approved by admins. Ideal for creating curated, exclusive communities with shared values and serious commitment.
+                  </p>
+                  <div class="mt-4 flex items-center gap-2 text-amber-600 text-sm font-medium">
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                    </svg>
+                    Curated membership
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-col sm:flex-row gap-4 pt-8">
+          <%= form.submit "Create Society", 
+              class: "flex-1 py-4 px-8 bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white text-lg font-bold rounded-2xl hover:from-blue-700 hover:via-indigo-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 transform" %>
+          
+          <%= link_to "Cancel", societies_path, 
+              class: "flex-1 py-4 px-8 bg-gray-100 text-gray-700 text-lg font-semibold rounded-2xl hover:bg-gray-200 transition-all duration-300 text-center border-2 border-gray-200 hover:border-gray-300" %>
+        </div>
+
+        <!-- Pro Tips -->
+        <div class="bg-gradient-to-r from-blue-50 to-indigo-50 rounded-2xl p-6 border border-blue-100">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
+              </svg>
+            </div>
+            <h3 class="text-lg font-semibold text-blue-900">💡 Pro Tips</h3>
+          </div>
+          <ul class="space-y-2 text-blue-800">
+            <li class="flex items-start gap-2">
+              <span class="text-blue-500 mt-1">•</span>
+              <span><strong>Be specific:</strong> Names like "Bourbon Lovers NYC" work better than "Whiskey Group"</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-blue-500 mt-1">•</span>
+              <span><strong>Set expectations:</strong> Mention meeting frequency, experience level, and what members should bring</span>
+            </li>
+            <li class="flex items-start gap-2">
+              <span class="text-blue-500 mt-1">•</span>
+              <span><strong>Start public:</strong> You can always change to private later as your community grows</span>
+            </li>
+          </ul>
+        </div>
+      <% end %>
+    </div>
+  </div>
 </div>

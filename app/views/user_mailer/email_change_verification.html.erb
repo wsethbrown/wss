@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Verify Your Email Change - Whiskey Share Society</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 600px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    .header {
+      text-align: center;
+      padding: 40px 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      border-radius: 8px;
+      margin-bottom: 30px;
+    }
+    .logo {
+      font-size: 24px;
+      font-weight: bold;
+      margin-bottom: 10px;
+    }
+    .content {
+      background: white;
+      padding: 30px;
+      border-radius: 8px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+      margin-bottom: 30px;
+    }
+    .verify-button {
+      display: inline-block;
+      background: #667eea;
+      color: white;
+      padding: 15px 30px;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+      margin: 20px 0;
+    }
+    .verify-button:hover {
+      background: #5a67d8;
+    }
+    .footer {
+      text-align: center;
+      color: #666;
+      font-size: 14px;
+      margin-top: 30px;
+      padding: 20px 0;
+    }
+    .warning {
+      background: #fef3cd;
+      border: 1px solid #fecaca;
+      padding: 15px;
+      border-radius: 5px;
+      margin: 20px 0;
+    }
+    .link-text {
+      word-break: break-all;
+      background: #f8f9fa;
+      padding: 10px;
+      border-radius: 4px;
+      margin: 10px 0;
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <div class="logo">🥃 Whiskey Share Society</div>
+    <p>Verify Your Email Change</p>
+  </div>
+
+  <div class="content">
+    <h2>Hello <%= @user.first_name %>,</h2>
+    
+    <p>We received a request to change your email address from <strong><%= @user.email %></strong> to <strong><%= @new_email %></strong>.</p>
+    
+    <p>To complete this change, please click the verification link below:</p>
+    
+    <div style="text-align: center; margin: 30px 0;">
+      <a href="<%= @verification_url %>" class="verify-button" style="color: white; text-decoration: none; word-break: keep-all; white-space: nowrap;">
+        Verify Email Change
+      </a>
+    </div>
+    
+    <div class="warning">
+      <strong>⚠️ Important:</strong>
+      <ul>
+        <li>This link will expire in 24 hours</li>
+        <li>If you didn't request this change, please ignore this email</li>
+        <li>After verification, you'll need to sign in with your new email address</li>
+      </ul>
+    </div>
+    
+    <p>If the button doesn't work, copy and paste this link into your browser:</p>
+    <div class="link-text">
+      <%= @verification_url %>
+    </div>
+  </div>
+
+  <div class="footer">
+    <p>This email was sent to <%= @user.email %> because a request was made to change your email address.</p>
+    <p>If you have any questions, please contact our support team.</p>
+    <p>&copy; 2025 Whiskey Share Society. All rights reserved.</p>
+  </div>
+</body>
+</html>
