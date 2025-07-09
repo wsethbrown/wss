@@ -15,13 +15,14 @@ class MagicLinksController < ApplicationController
     
     # Send appropriate email based on whether user exists
     if is_new_user
-      # Store the magic link data in session for new user registration
-      session[:magic_link_data] = {
+      # For new users, we'll use a cache-based approach to allow multiple magic links
+      # Store in Rails cache with the token as the key
+      cache_key = "magic_link:#{token}"
+      Rails.cache.write(cache_key, {
         email: email,
-        token: token,
-        is_new_user: is_new_user,
-        expires_at: 15.minutes.from_now.to_i  # Store as timestamp to avoid serialization issues
-      }
+        is_new_user: true,
+        expires_at: 15.minutes.from_now.to_i
+      }, expires_in: 15.minutes)
       
       UserMailer.magic_link_registration_email(email, token).deliver_now
       message = 'Check your email for a magic link to create your account!'
@@ -50,57 +51,44 @@ class MagicLinksController < ApplicationController
     
     return redirect_to auth_path, alert: 'Invalid magic link.' unless token.present?
 
-    # Check session for magic link data (for new users)
-    magic_link_data = session[:magic_link_data]
-    Rails.logger.info "Session magic link data: #{magic_link_data.inspect}"
+    # First check cache for magic link data (new user flow)
+    cache_key = "magic_link:#{token}"
+    magic_link_data = Rails.cache.read(cache_key)
+    Rails.logger.info "Cache magic link data: #{magic_link_data.inspect}"
     
-    # First check if this is a session-based magic link (new user flow)
-    # Handle both symbol and string keys due to session serialization
-    session_token = magic_link_data&.dig(:token) || magic_link_data&.dig('token')
-    session_expires_at = magic_link_data&.dig(:expires_at) || magic_link_data&.dig('expires_at')
-    
-    Rails.logger.info "Session token: #{session_token}"
-    Rails.logger.info "Session expires at: #{session_expires_at}"
-    Rails.logger.info "Current time (int): #{Time.current.to_i}"
-    Rails.logger.info "Token matches: #{session_token == token}"
-    Rails.logger.info "Not expired: #{session_expires_at && Time.current.to_i < session_expires_at}"
-    
-    if magic_link_data && 
-       session_token == token && 
-       session_expires_at && 
-       Time.current.to_i < session_expires_at
-      
-      Rails.logger.info "Processing session-based magic link"
-      
-      if magic_link_data[:is_new_user] || magic_link_data['is_new_user']
-        # Handle new user registration
-        email = magic_link_data[:email] || magic_link_data['email']
-        temp_password = SecureRandom.hex(16)
+    if magic_link_data
+      # Validate expiration
+      if magic_link_data[:expires_at] && Time.current.to_i < magic_link_data[:expires_at]
+        Rails.logger.info "Processing cache-based magic link"
         
-        begin
-          @user = User.create!(
-            email: email,
-            password: temp_password,
-            password_confirmation: temp_password,
-            first_name: '',
-            last_name: ''
-          )
+        # Delete from cache to prevent reuse
+        Rails.cache.delete(cache_key)
+        
+        if magic_link_data[:is_new_user]
+          # Handle new user registration
+          email = magic_link_data[:email]
+          temp_password = SecureRandom.hex(16)
           
-          # Clear the session data
-          session.delete(:magic_link_data)
-          
-          # Sign in the new user
-          sign_in(@user)
-          redirect_to account_path, notice: 'Welcome to Whiskey Share Society! Please complete your profile.'
-          return
-        rescue ActiveRecord::RecordInvalid => e
-          redirect_to auth_path, alert: "Unable to create account: #{e.message}"
-          return
+          begin
+            @user = User.create!(
+              email: email,
+              password: temp_password,
+              password_confirmation: temp_password,
+              first_name: '',
+              last_name: ''
+            )
+            
+            # Sign in the new user
+            sign_in(@user)
+            redirect_to account_path, notice: 'Welcome to Whiskey Share Society! Please complete your profile.'
+            return
+          rescue ActiveRecord::RecordInvalid => e
+            redirect_to auth_path, alert: "Unable to create account: #{e.message}"
+            return
+          end
         end
       else
-        # For existing users, clear session data and fall through to token-based verification
-        # This ensures proper token cleanup and reuse prevention
-        session.delete(:magic_link_data)
+        Rails.logger.info "Magic link expired in cache"
       end
     end
 
