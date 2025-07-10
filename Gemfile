@@ -85,4 +85,4 @@ gem "rotp", "~> 6.3"
 gem "rqrcode", "~> 2.2"
 
 # Stripe payment processing
-gem "stripe", "~> 10.0"
+gem "stripe", "~> 15.3"
