@@ -104,7 +104,7 @@ class SocietiesController < ApplicationController
   end
 
   def society_params
-    params.require(:society).permit(:name, :description, :location, :is_private)
+    params.require(:society).permit(:name, :description, :location, :is_private, :profile_picture, :banner_image, :banner_position)
   end
 
   def apply_search_filters(scope)

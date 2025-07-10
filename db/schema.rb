@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_09_151220) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_10_152821) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -104,6 +104,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_09_151220) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "is_private"
+    t.string "banner_position", default: "center center"
     t.index ["creator_id"], name: "index_societies_on_creator_id"
     t.index ["location"], name: "index_societies_on_location"
     t.index ["name"], name: "index_societies_on_name"
@@ -192,6 +193,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_09_151220) do
     t.string "subscription_plan"
     t.datetime "subscription_ends_at"
     t.text "whiskey_shelf"
+    t.integer "credits", default: 0, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end

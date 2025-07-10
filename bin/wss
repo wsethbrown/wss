@@ -40,8 +40,8 @@ ${YELLOW}Usage:${NC}
   wss [command] [options]
 
 ${YELLOW}Commands:${NC}
-  ${GREEN}start${NC}             Start all services with HTTPS + Stripe webhooks
-  ${GREEN}stop${NC}              Stop all services and Stripe webhooks
+  ${GREEN}start${NC}             Start all services with HTTPS + Stripe webhooks (Docker preferred, falls back to native Rails)
+  ${GREEN}stop${NC}              Stop all services and Stripe webhooks  
   ${GREEN}restart${NC}           Restart all services and Stripe webhooks
   ${GREEN}build${NC}             Build/rebuild Docker images
   ${GREEN}logs${NC} [service]    Show logs (optionally for specific service)
@@ -81,14 +81,22 @@ EOF
 
 check_docker() {
     if ! command -v docker &> /dev/null; then
-        log_error "Docker is not installed or not in PATH"
-        exit 1
+        log_warning "Docker is not installed or not in PATH"
+        return 1
     fi
     
     if ! command -v docker-compose &> /dev/null; then
-        log_error "Docker Compose is not installed or not in PATH"
-        exit 1
+        log_warning "Docker Compose is not installed or not in PATH"
+        return 1
     fi
+    
+    # Check if Docker daemon is running
+    if ! docker info &> /dev/null; then
+        log_warning "Docker daemon is not running"
+        return 1
+    fi
+    
+    return 0
 }
 
 check_env_file() {
@@ -150,6 +158,52 @@ stop_stripe_webhooks() {
     fi
 }
 
+start_services_native() {
+    log_info "Starting ${PROJECT_NAME} with native Rails..."
+    check_env_file
+    
+    # Check for SSL certificates (required for HTTPS-only mode)
+    if [[ ! -f "dev-cert.pem" ]] || [[ ! -f "dev-key.pem" ]]; then
+        log_warning "SSL certificates not found. Generating..."
+        openssl req -x509 -newkey rsa:2048 -keyout dev-key.pem -out dev-cert.pem -days 365 -nodes \
+            -subj "/C=US/ST=Georgia/L=Athens/O=WSS Ltd/CN=dev.whiskeysharesociety.com"
+        log_success "SSL certificates generated"
+    fi
+    
+    # Check if Rails is available
+    if ! command -v rails &> /dev/null; then
+        log_error "Rails not found. Please install Rails or use Docker mode."
+        exit 1
+    fi
+    
+    # Check if bin/dev exists (Foreman)
+    if [[ -f "bin/dev" ]]; then
+        log_info "Starting Rails with Foreman (bin/dev)..."
+        nohup bin/dev > rails-server.log 2>&1 &
+        local rails_pid=$!
+        echo $rails_pid > .rails_pid
+        log_success "Rails server started (PID: $rails_pid)"
+        log_info "Server logs: tail -f rails-server.log"
+    else
+        log_info "Starting Rails server directly..."
+        nohup rails server > rails-server.log 2>&1 &
+        local rails_pid=$!
+        echo $rails_pid > .rails_pid
+        log_success "Rails server started (PID: $rails_pid)"
+        log_info "Server logs: tail -f rails-server.log"
+    fi
+    
+    # Start Stripe webhook forwarding
+    start_stripe_webhooks
+    
+    log_success "Development server started!"
+    log_info "Visit https://localhost:3000 or https://dev.whiskeysharesociety.com:3000"
+    
+    if check_stripe_cli; then
+        log_info "💳 Stripe webhooks: Subscription changes will auto-sync"
+    fi
+}
+
 start_services() {
     log_info "Starting ${PROJECT_NAME}..."
     check_env_file
@@ -178,6 +232,29 @@ start_services() {
     fi
 }
 
+
+stop_services_native() {
+    log_info "Stopping ${PROJECT_NAME} (native Rails)..."
+    
+    # Stop Stripe webhook forwarding first
+    stop_stripe_webhooks
+    
+    # Stop Rails server
+    if [[ -f .rails_pid ]]; then
+        local rails_pid=$(cat .rails_pid)
+        if ps -p $rails_pid > /dev/null; then
+            log_info "Stopping Rails server (PID: $rails_pid)..."
+            kill $rails_pid
+            log_success "Rails server stopped"
+        fi
+        rm -f .rails_pid
+    else
+        log_warning "No Rails PID file found. Trying to kill by process name..."
+        pkill -f "bin/dev\|rails server" || true
+    fi
+    
+    log_success "Services stopped"
+}
 
 stop_services() {
     log_info "Stopping ${PROJECT_NAME}..."
@@ -304,7 +381,28 @@ clean_docker() {
 
 show_status() {
     log_info "Service status:"
-    docker-compose ps
+    
+    if check_docker; then
+        docker-compose ps
+    else
+        # Check native Rails status
+        if [[ -f .rails_pid ]]; then
+            local rails_pid=$(cat .rails_pid)
+            if ps -p $rails_pid > /dev/null; then
+                echo -e "${GREEN}✓${NC} Rails server running (PID: $rails_pid)"
+                echo -e "${BLUE}📄${NC} Server logs: tail -f rails-server.log"
+            else
+                echo -e "${RED}✗${NC} Rails server not running (stale PID file)"
+                rm -f .rails_pid
+            fi
+        else
+            if pgrep -f "bin/dev\|rails server" > /dev/null; then
+                echo -e "${YELLOW}⚠${NC} Rails process running but not managed by wss"
+            else
+                echo -e "${RED}✗${NC} Rails server not running"
+            fi
+        fi
+    fi
     
     echo ""
     log_info "Stripe webhook status:"
@@ -329,16 +427,29 @@ show_status() {
 # Main command handler
 case "$1" in
     start)
-        check_docker
-        start_services
+        if check_docker; then
+            start_services
+        else
+            log_warning "Docker not available, falling back to native Rails development..."
+            start_services_native
+        fi
         ;;
     stop)
-        check_docker
-        stop_services
+        if check_docker; then
+            stop_services
+        else
+            stop_services_native
+        fi
         ;;
     restart)
-        check_docker
-        restart_services
+        if check_docker; then
+            restart_services
+        else
+            log_info "Restarting native Rails..."
+            stop_services_native
+            sleep 2
+            start_services_native
+        fi
         ;;
     build)
         check_docker
@@ -373,7 +484,6 @@ case "$1" in
         clean_docker
         ;;
     status)
-        check_docker
         show_status
         ;;
     help|--help|-h)

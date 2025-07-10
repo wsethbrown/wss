@@ -53,6 +53,9 @@ group :development, :test do
   # Load environment variables from .env file
   gem "dotenv-rails"
   
+  # JWT token decoding for Apple OAuth
+  gem "jwt"
+  
   # System testing with Capybara
   gem "capybara"
   gem "selenium-webdriver"

@@ -3,8 +3,8 @@ class SocietyMembership < ApplicationRecord
   belongs_to :society
 
   # Enums
-  enum :role, member: :member, admin: :admin, officer: :officer
-  enum :status, active: :active, inactive: :inactive, banned: :banned
+  enum :role, { member: 'member', admin: 'admin', officer: 'officer' }
+  enum :status, { active: 'active', inactive: 'inactive', banned: 'banned' }
 
   # Validations
   validates :user_id, uniqueness: { scope: :society_id, message: 'is already a member of this society' }

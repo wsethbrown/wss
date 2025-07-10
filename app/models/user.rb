@@ -3,28 +3,45 @@ class User < ApplicationRecord
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
          :recoverable, :rememberable, :validatable,
-         :omniauthable, omniauth_providers: [:google_oauth2, :apple]
+         :omniauthable, omniauth_providers: [ :google_oauth2, :apple ]
 
   # OAuth methods
   def self.from_omniauth(auth)
-    # First, try to find existing user with this provider and uid
+    # First, try to find existing user with this exact provider and uid
     existing_user = where(provider: auth.provider, uid: auth.uid).first
-    
+
     if existing_user
       return existing_user
     end
-    
-    # If no existing user with this provider/uid, check for user with same email
+
+    # Check if there's an existing user with this email
     user_by_email = find_by(email: auth.info.email)
-    
+
     if user_by_email
-      # Update existing user with new provider info
-      user_by_email.provider = auth.provider
-      user_by_email.uid = auth.uid
-      user_by_email.save!
-      return user_by_email
+      # User exists with this email - check their OAuth status
+      if user_by_email.provider.blank?
+        # User has no OAuth provider yet, safe to add this one
+        user_by_email.update!(
+          provider: auth.provider, 
+          uid: auth.uid,
+          first_name: auth.info.first_name || auth.info.name&.split(" ")&.first,
+          last_name: auth.info.last_name || auth.info.name&.split(" ")&.last
+        )
+        return user_by_email
+      elsif user_by_email.provider == auth.provider
+        # Same provider, update uid if needed
+        user_by_email.update!(uid: auth.uid) if user_by_email.uid != auth.uid
+        return user_by_email
+      else
+        # User already has a different OAuth provider
+        # For now, we'll reject the login and show an error
+        Rails.logger.warn "User #{auth.info.email} already exists with provider #{user_by_email.provider}. Cannot add #{auth.provider}."
+        user = User.new
+        user.errors.add(:email, "This email is already associated with #{user_by_email.provider.humanize} login. Please use #{user_by_email.provider.humanize} to sign in, or use a different email address.")
+        return user
+      end
     end
-    
+
     # No existing user found, create new one
     create!(
       email: auth.info.email,
@@ -32,8 +49,8 @@ class User < ApplicationRecord
       uid: auth.uid,
       password: Devise.friendly_token[0, 20],
       password_set_manually: false,
-      first_name: auth.info.first_name || auth.info.name&.split(' ')&.first,
-      last_name: auth.info.last_name || auth.info.name&.split(' ')&.last
+      first_name: auth.info.first_name || auth.info.name&.split(" ")&.first,
+      last_name: auth.info.last_name || auth.info.name&.split(" ")&.last
     )
   end
 
@@ -57,13 +74,17 @@ class User < ApplicationRecord
     elsif last_name.present?
       last_name
     else
-      email.split('@').first.titleize
+      email.split("@").first.titleize
     end
+  end
+
+  def display_name
+    full_name
   end
 
   # Active Storage
   has_one_attached :profile_image
-  
+
   # Profile image validation
   validate :profile_image_validation
 
@@ -85,12 +106,12 @@ class User < ApplicationRecord
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
 
   # Scopes
-  scope :active, -> { where.not(encrypted_password: [nil, '']) }
+  scope :active, -> { where.not(encrypted_password: [ nil, "" ]) }
 
 
   def admin?
     # For now, simple admin check - can be enhanced later
-    email.end_with?('@whiskeysharesociety.com')
+    email.end_with?("@whiskeysharesociety.com")
   end
 
   def member_of?(society)
@@ -106,7 +127,7 @@ class User < ApplicationRecord
   end
 
   def can_manage?(society)
-    society_memberships.exists?(society: society, role: [:admin, :officer], status: :active)
+    society_memberships.exists?(society: society, role: [ :admin, :officer ], status: :active)
   end
 
   def can_manage_officers?(society)
@@ -118,11 +139,11 @@ class User < ApplicationRecord
   end
 
   def pending_application_for?(society)
-    society_applications.exists?(society: society, status: 'pending')
+    society_applications.exists?(society: society, status: "pending")
   end
 
   def rsvped_to?(event)
-    event_rsvps.exists?(event: event, status: 'confirmed')
+    event_rsvps.exists?(event: event, status: "confirmed")
   end
 
   def admin_societies
@@ -134,35 +155,35 @@ class User < ApplicationRecord
   end
 
   def managed_societies
-    member_societies.joins(:society_memberships).where(society_memberships: { user: self, role: [:admin, :officer], status: :active })
+    member_societies.joins(:society_memberships).where(society_memberships: { user: self, role: [ :admin, :officer ], status: :active })
   end
-  
+
   # Tag helper methods
   def tags_by_category(category)
     tags.where(category: category)
   end
-  
+
   def whiskey_tags
-    tags_by_category('whiskey')
+    tags_by_category("whiskey")
   end
-  
+
   def interest_tags
-    tags_by_category('interests')
+    tags_by_category("interests")
   end
-  
+
   def skill_tags
-    tags_by_category('skills')
+    tags_by_category("skills")
   end
-  
+
   def has_tag?(tag_name)
     tags.exists?(name: tag_name)
   end
-  
+
   def add_tag(tag_name)
     tag = Tag.find_or_create_by(name: tag_name)
     user_tags.find_or_create_by(tag: tag) unless has_tag?(tag_name)
   end
-  
+
   def remove_tag(tag_name)
     tag = Tag.find_by(name: tag_name)
     user_tags.where(tag: tag).destroy_all if tag
@@ -200,7 +221,7 @@ class User < ApplicationRecord
   def two_factor_enabled?
     otp_enabled? && otp_secret_key.present?
   end
-  
+
   def otp_required_for_login?
     two_factor_enabled?
   end
@@ -228,36 +249,36 @@ class User < ApplicationRecord
 
   # Subscription helper methods
   def has_active_subscription?
-    subscription_status == 'active' && (subscription_ends_at.nil? || subscription_ends_at.future?)
+    subscription_status == "active" && (subscription_ends_at.nil? || subscription_ends_at.future?)
   end
 
   def subscription_status_display
     case subscription_status
-    when 'active'
-      'Active'
-    when 'cancelled'
-      'Cancelled'
-    when 'past_due'
-      'Past Due'
-    when 'incomplete'
-      'Incomplete'
-    when 'trialing'
-      'Trial'
+    when "active"
+      "Active"
+    when "cancelled"
+      "Cancelled"
+    when "past_due"
+      "Past Due"
+    when "incomplete"
+      "Incomplete"
+    when "trialing"
+      "Trial"
     else
-      'No Subscription'
+      "No Subscription"
     end
   end
 
   def subscription_plan_display
     case subscription_plan
-    when 'monthly'
-      'Monthly ($19.99/month)'
-    when 'quarterly'
-      'Quarterly ($38.97/quarter)'
-    when 'yearly'
-      'Yearly ($119.88/year)'
+    when "monthly"
+      "Monthly ($19.99/month)"
+    when "quarterly"
+      "Quarterly ($38.97/quarter)"
+    when "yearly"
+      "Yearly ($119.88/year)"
     else
-      'No Plan'
+      "No Plan"
     end
   end
 
@@ -272,8 +293,28 @@ class User < ApplicationRecord
   def days_until_renewal
     return nil unless subscription_ends_at
     return 0 if subscription_ends_at.past?
-    
+
     (subscription_ends_at.to_date - Date.current).to_i
+  end
+
+  # Credit management methods
+  def add_credits(amount)
+    update!(credits: (credits || 0) + amount)
+  end
+
+  def deduct_credits(amount)
+    return false if (credits || 0) < amount
+    update!(credits: (credits || 0) - amount)
+  end
+
+  def has_sufficient_credits?(amount)
+    (credits || 0) >= amount
+  end
+
+  def next_credit_date
+    # Credits are added on the 1st of each month
+    return nil unless has_active_subscription?
+    Date.today.next_month.beginning_of_month
   end
 
   def generate_otp_secret
@@ -292,7 +333,7 @@ class User < ApplicationRecord
 
   def verify_otp(code)
     return false unless two_factor_enabled?
-    
+
     # Check if it's a backup code
     if backup_codes_array.include?(code.upcase)
       # Remove used backup code
@@ -301,7 +342,7 @@ class User < ApplicationRecord
       update!(backup_codes: codes.to_json)
       return true
     end
-    
+
     # Check TOTP code
     totp = ROTP::TOTP.new(otp_secret_key)
     totp.verify(code, drift_ahead: 30, drift_behind: 30)
@@ -309,11 +350,11 @@ class User < ApplicationRecord
 
   def otp_qr_code
     return nil unless otp_secret_key.present?
-    
+
     totp = ROTP::TOTP.new(otp_secret_key)
     issuer = "Whiskey Share Society"
     uri = totp.provisioning_uri(email, issuer_name: issuer)
-    
+
     qr = RQRCode::QRCode.new(uri)
     qr.as_svg(
       module_size: 4,
@@ -342,12 +383,12 @@ class User < ApplicationRecord
   def avatar_color
     # Generate a consistent color based on the user's email
     colors = [
-      '#EF4444', '#F97316', '#F59E0B', '#EAB308', '#84CC16',
-      '#22C55E', '#10B981', '#14B8A6', '#06B6D4', '#0EA5E9',
-      '#3B82F6', '#6366F1', '#8B5CF6', '#A855F7', '#D946EF',
-      '#EC4899', '#F43F5E'
+      "#EF4444", "#F97316", "#F59E0B", "#EAB308", "#84CC16",
+      "#22C55E", "#10B981", "#14B8A6", "#06B6D4", "#0EA5E9",
+      "#3B82F6", "#6366F1", "#8B5CF6", "#A855F7", "#D946EF",
+      "#EC4899", "#F43F5E"
     ]
-    
+
     # Use a simple hash of the email to pick a color
     hash = email.sum { |char| char.ord }
     colors[hash % colors.length]
@@ -357,12 +398,12 @@ class User < ApplicationRecord
 
   def profile_image_validation
     return unless profile_image.attached?
-    
+
     # Check content type
     unless profile_image.content_type.in?(%w[image/jpeg image/jpg image/png image/gif image/webp])
       errors.add(:profile_image, "must be a valid image format")
     end
-    
+
     # Check file size
     if profile_image.byte_size > 5.megabytes
       errors.add(:profile_image, "must be less than 5MB")

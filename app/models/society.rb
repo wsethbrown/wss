@@ -1,6 +1,10 @@
 class Society < ApplicationRecord
   belongs_to :creator, class_name: 'User'
 
+  # Active Storage attachments
+  has_one_attached :profile_picture
+  has_one_attached :banner_image
+
   # Associations
   has_many :society_memberships, dependent: :destroy
   has_many :members, through: :society_memberships, source: :user
