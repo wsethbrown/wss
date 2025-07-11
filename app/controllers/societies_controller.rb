@@ -6,10 +6,14 @@ class SocietiesController < ApplicationController
     if user_signed_in?
       # Get user's societies (separate from searchable societies)
       @user_societies = current_user.societies.includes(:creator, :society_memberships, :members, :events)
+                                             .with_attached_profile_picture
+                                             .with_attached_banner_image
                                              .order(created_at: :desc)
       
       # For search results, show all societies the user has access to (excluding their own)
       scope = policy_scope(Society).includes(:creator, :society_memberships, :members, :events)
+                                   .with_attached_profile_picture
+                                   .with_attached_banner_image
                                    .where.not(id: @user_societies.pluck(:id))
       
       # Apply search filters
@@ -20,6 +24,8 @@ class SocietiesController < ApplicationController
       # For unauthorized users, show only public societies
       @user_societies = []
       scope = Society.includes(:creator, :society_memberships, :members, :events)
+                     .with_attached_profile_picture
+                     .with_attached_banner_image
                      .where(is_private: false)
       
       # Apply search filters for public users too
@@ -100,7 +106,7 @@ class SocietiesController < ApplicationController
   private
 
   def set_society
-    @society = Society.find(params[:id])
+    @society = Society.with_attached_profile_picture.with_attached_banner_image.find(params[:id])
   end
 
   def society_params
