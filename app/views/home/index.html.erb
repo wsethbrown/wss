@@ -1,5 +1,5 @@
 <!-- Enhanced Hero Section -->
-<section class="relative min-h-screen flex w-full overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900">
+<section class="relative min-h-screen flex w-full overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-indigo-900 pt-16">
   <!-- Animated Background Elements -->
   <div class="absolute inset-0 pointer-events-none">
     <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl animate-pulse"></div>
@@ -1035,7 +1035,7 @@
     <!-- Pricing Cards with modern glassmorphism -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
       <% @stripe_products.each_with_index do |product, index| %>
-        <div class="group relative flex flex-col <%= product[:popular] ? 'bg-gradient-to-br from-amber-50/80 via-yellow-50/60 to-orange-50/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-amber-200/30 transform scale-105 hover:scale-110' : 'bg-white/60 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 hover:bg-white/80 hover:shadow-2xl hover:-translate-y-2' %> p-8 transition-all duration-500 cursor-pointer">
+        <div class="group relative flex flex-col <%= product[:popular] ? 'bg-gradient-to-br from-amber-50/80 via-yellow-50/60 to-orange-50/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-amber-200/30 transform scale-105 hover:scale-110' : 'bg-white/60 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 hover:bg-white/80 hover:shadow-2xl hover:-translate-y-2' %> p-8 transition-all duration-500 cursor-pointer" onclick="var form = this.querySelector('form'); if(form) form.submit(); else window.location.href='<%= auth_path %>';">
           <!-- Glassmorphism overlay -->
           <div class="absolute inset-0 rounded-3xl pointer-events-none <%= product[:popular] ? 'bg-gradient-to-br from-amber-100/40 via-white/20 to-orange-100/40' : 'bg-gradient-to-br from-blue-50/50 via-white/30 to-indigo-50/50' %> opacity-80 group-hover:opacity-100 transition-opacity duration-500"></div>
           
@@ -1092,9 +1092,16 @@
           </ul>
           
           <!-- CTA Button -->
-          <div class="mt-8">
-            <%= link_to auth_path, class: "w-full inline-flex justify-center items-center px-6 py-3 border border-transparent rounded-full shadow-sm text-base font-medium text-white #{product[:popular] ? 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200" do %>
-              Get Started
+          <div class="mt-8" onclick="event.stopPropagation();">
+            <% if user_signed_in? %>
+              <%= form_with url: subscriptions_checkout_path, method: :post, local: true, data: { turbo: false } do |f| %>
+                <%= f.hidden_field :price_id, value: product[:id] %>
+                <%= f.submit "Get Started", class: "w-full inline-flex justify-center items-center px-6 py-3 border border-transparent rounded-full shadow-sm text-base font-medium text-white #{product[:popular] ? 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200 cursor-pointer" %>
+              <% end %>
+            <% else %>
+              <%= link_to auth_path, class: "w-full inline-flex justify-center items-center px-6 py-3 border border-transparent rounded-full shadow-sm text-base font-medium text-white #{product[:popular] ? 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200" do %>
+                Get Started
+              <% end %>
             <% end %>
           </div>
         </div>
