@@ -85,9 +85,10 @@ Rails.application.routes.draw do
 
   # Admin panel
   namespace :admin do
+    get 'dashboard', to: 'dashboard#index'
     resources :presentations
     resources :users, only: [:index, :show]
-    root to: 'presentations#index'
+    root to: 'dashboard#index'
   end
 
   # Presentations

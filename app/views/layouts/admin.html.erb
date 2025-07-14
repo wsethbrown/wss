@@ -25,10 +25,37 @@
           </div>
           
           <div class="flex items-center gap-6">
-            <%= link_to "Presentations", admin_presentations_path, class: "text-gray-700 hover:text-black font-medium transition-colors" %>
-            <%= link_to "Users", admin_users_path, class: "text-gray-700 hover:text-black font-medium transition-colors" %>
-            <%= link_to "Back to Site", root_path, class: "text-blue-600 hover:text-blue-700 font-medium transition-colors" %>
-            <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "text-red-600 hover:text-red-700 font-medium transition-colors cursor-pointer" %>
+            <%= link_to admin_root_path, class: "flex items-center gap-2 text-gray-700 hover:text-black font-medium transition-colors" do %>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
+              </svg>
+              Dashboard
+            <% end %>
+            <%= link_to admin_presentations_path, class: "flex items-center gap-2 text-gray-700 hover:text-black font-medium transition-colors" do %>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
+              </svg>
+              Presentations
+            <% end %>
+            <%= link_to admin_users_path, class: "flex items-center gap-2 text-gray-700 hover:text-black font-medium transition-colors" do %>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+              </svg>
+              Users
+            <% end %>
+            <div class="h-6 w-px bg-gray-300"></div>
+            <%= link_to root_path, class: "flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors" do %>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+              </svg>
+              Back to Site
+            <% end %>
+            <%= button_to destroy_user_session_path, method: :delete, class: "flex items-center gap-2 text-red-600 hover:text-red-700 font-medium transition-colors cursor-pointer" do %>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+              </svg>
+              Logout
+            <% end %>
           </div>
         </div>
       </div>
@@ -36,16 +63,47 @@
 
     <!-- Main Content -->
     <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
+      <!-- Breadcrumbs -->
+      <%= render 'shared/admin_breadcrumbs' %>
+      
       <!-- Flash Messages -->
       <% if notice %>
-        <div class="mb-4 rounded-lg bg-green-50 border border-green-200 text-green-800 px-4 py-3">
-          <%= notice %>
+        <div class="mb-6 rounded-xl bg-green-50 border border-green-200 p-4" data-controller="flash">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="flex-shrink-0">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <p class="text-sm font-medium text-green-800"><%= notice %></p>
+            </div>
+            <button type="button" data-action="click->flash#dismiss" class="text-green-600 hover:text-green-800">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
         </div>
       <% end %>
       
       <% if alert %>
-        <div class="mb-4 rounded-lg bg-red-50 border border-red-200 text-red-800 px-4 py-3">
-          <%= alert %>
+        <div class="mb-6 rounded-xl bg-red-50 border border-red-200 p-4" data-controller="flash">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="flex-shrink-0">
+                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+              </div>
+              <p class="text-sm font-medium text-red-800"><%= alert %></p>
+            </div>
+            <button type="button" data-action="click->flash#dismiss" class="text-red-600 hover:text-red-800">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+              </svg>
+            </button>
+          </div>
         </div>
       <% end %>
 

@@ -1,8 +1,16 @@
 <% content_for :title, "Admin - Presentations" %>
 
 <div class="flex justify-between items-center mb-8">
-  <h1 class="text-3xl font-bold text-gray-900">Presentations</h1>
-  <%= link_to "New Presentation", new_admin_presentation_path, class: "inline-flex items-center gap-2 px-6 py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition" %>
+  <div>
+    <h1 class="text-3xl font-bold text-gray-900">Presentations</h1>
+    <p class="mt-2 text-gray-600"><%= @presentations.count %> presentations total</p>
+  </div>
+  <%= link_to new_admin_presentation_path, class: "inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition shadow-sm" do %>
+    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+    </svg>
+    New Presentation
+  <% end %>
 </div>
 
 <div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
@@ -76,7 +84,12 @@
       </div>
       <h3 class="text-lg font-medium text-gray-900 mb-2">No presentations yet</h3>
       <p class="text-gray-500 mb-6">Get started by creating your first presentation.</p>
-      <%= link_to "Create Presentation", new_admin_presentation_path, class: "inline-flex items-center gap-2 px-4 py-2 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition" %>
+      <%= link_to new_admin_presentation_path, class: "inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition shadow-sm" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+        </svg>
+        Create Your First Presentation
+      <% end %>
     </div>
   <% end %>
 </div>
