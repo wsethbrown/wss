@@ -1,7 +1,7 @@
 ---
 id: task-4
 title: Account Tab
-status: In Progress
+status: Done
 assignee:
   - Claude
 created_date: '2025-07-09'

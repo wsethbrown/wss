@@ -104,7 +104,7 @@ class WebhooksController < ApplicationController
     return unless user
 
     # Update subscription end date based on successful payment
-    if invoice.subscription
+    if invoice.respond_to?(:subscription) && invoice.subscription
       subscription = Stripe::Subscription.retrieve(invoice.subscription)
       user.update!(
         subscription_ends_at: subscription.current_period_end ? Time.at(subscription.current_period_end) : nil
@@ -117,6 +117,18 @@ class WebhooksController < ApplicationController
       else
         Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice.id}"
       end
+    elsif invoice.lines && invoice.lines.data.any? { |line| line.type == "subscription" }
+      # Handle invoice lines that are subscription related
+      subscription_id = invoice.lines.data.find { |line| line.type == "subscription" }&.subscription
+      if subscription_id
+        subscription = Stripe::Subscription.retrieve(subscription_id)
+        user.update!(
+          subscription_ends_at: subscription.current_period_end ? Time.at(subscription.current_period_end) : nil
+        )
+        Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice.id} (via invoice lines)"
+      end
+    else
+      Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice.id} (non-subscription)"
     end
   end
 
