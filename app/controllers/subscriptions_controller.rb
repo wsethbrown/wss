@@ -72,6 +72,9 @@ class SubscriptionsController < ApplicationController
         { cancel_at_period_end: true }
       )
 
+      # Update the user's cancel_at_period_end flag
+      current_user.update!(cancel_at_period_end: true)
+
       redirect_to account_path(anchor: "subscription"), notice: "Subscription will be cancelled at the end of your current billing period."
     rescue Stripe::StripeError => e
       Rails.logger.error "Stripe cancellation error: #{e.message}"
@@ -111,21 +114,36 @@ class SubscriptionsController < ApplicationController
       subscription = Stripe::Subscription.retrieve(current_user.stripe_subscription_id)
 
       # Update the subscription to the new plan
+      update_params = {
+        items: [ {
+          id: subscription.items.data[0].id,
+          price: price_ids[new_plan]
+        } ],
+        proration_behavior: "create_prorations"
+      }
+      
+      # If subscription is pending cancellation, reactivate it
+      if subscription.cancel_at_period_end
+        update_params[:cancel_at_period_end] = false
+      end
+      
       updated_subscription = Stripe::Subscription.update(
         current_user.stripe_subscription_id,
-        {
-          items: [ {
-            id: subscription.items.data[0].id,
-            price: price_ids[new_plan]
-          } ],
-          proration_behavior: "create_prorations"
-        }
+        update_params
       )
 
       # Update our local record
-      current_user.update!(subscription_plan: new_plan)
+      current_user.update!(
+        subscription_plan: new_plan,
+        cancel_at_period_end: false
+      )
 
-      redirect_to account_path(anchor: "subscription"), notice: "Subscription updated to #{new_plan.capitalize} plan!"
+      notice_message = if subscription.cancel_at_period_end
+        "Subscription reactivated and updated to #{new_plan.capitalize} plan!"
+      else
+        "Subscription updated to #{new_plan.capitalize} plan!"
+      end
+      redirect_to account_path(anchor: "subscription"), notice: notice_message
     rescue Stripe::StripeError => e
       Rails.logger.error "Stripe plan change error: #{e.message}"
       redirect_to subscriptions_plans_path, alert: "Unable to change plan. Please try again."

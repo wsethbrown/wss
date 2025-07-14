@@ -73,10 +73,11 @@ class WebhooksController < ApplicationController
     user.update!(
       subscription_status: subscription.status,
       subscription_plan: plan_name,
-      subscription_ends_at: subscription.current_period_end ? Time.at(subscription.current_period_end) : nil
+      subscription_ends_at: subscription.current_period_end ? Time.at(subscription.current_period_end) : nil,
+      cancel_at_period_end: subscription.cancel_at_period_end
     )
 
-    Rails.logger.info "Subscription updated for user #{user.id}: #{subscription.id} -> #{subscription.status}"
+    Rails.logger.info "Subscription updated for user #{user.id}: #{subscription.id} -> #{subscription.status} (cancel_at_period_end: #{subscription.cancel_at_period_end})"
   end
 
   def handle_subscription_deleted(subscription)
@@ -86,7 +87,8 @@ class WebhooksController < ApplicationController
     user.update!(
       stripe_subscription_id: nil,
       subscription_status: "cancelled",
-      subscription_ends_at: subscription.current_period_end ? Time.at(subscription.current_period_end) : Time.current
+      subscription_ends_at: subscription.current_period_end ? Time.at(subscription.current_period_end) : Time.current,
+      cancel_at_period_end: false
     )
     
     # If subscription is ending immediately (not at period end), expire credits

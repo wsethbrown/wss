@@ -63,8 +63,20 @@
                 <span class="text-sm font-semibold text-amber-700"><%= current_user.credits %> Credit<%= 's' if current_user.credits != 1 %></span>
               </div>
             <% end %>
-            <%= nav_link_to 'Account', account_path %>
-            <%= link_to 'Sign Out', destroy_user_session_path, data: { 'turbo-method': :delete, 'turbo-confirm': 'Are you sure you want to sign out?' }, class: 'ml-4 text-gray-400 hover:text-red-500 transition' %>
+            <div class="flex items-center gap-4">
+              <%= link_to account_path, class: "flex items-center gap-2 hover:opacity-80 transition" do %>
+                <% if current_user.profile_image.attached? %>
+                  <%= image_tag current_user.profile_image, class: "h-8 w-8 rounded-full object-cover border-2 border-gray-200 shadow-sm", alt: current_user.full_name %>
+                <% else %>
+                  <div class="h-8 w-8 rounded-full flex items-center justify-center text-white font-semibold text-sm border-2 border-gray-200 shadow-sm" style="background-color: <%= current_user.avatar_color %>">
+                    <%= current_user.initials %>
+                  </div>
+                <% end %>
+                <span class="hidden sm:inline text-lg font-medium hover:text-indigo-600 transition">Account</span>
+              <% end %>
+              <div class="h-6 w-px bg-gray-300"></div>
+              <%= link_to 'Sign Out', destroy_user_session_path, data: { 'turbo-method': :delete, 'turbo-confirm': 'Are you sure you want to sign out?' }, class: 'text-gray-400 hover:text-red-500 transition' %>
+            </div>
           <% else %>
             <%= nav_link_to 'Sign In', auth_path %>
           <% end %>

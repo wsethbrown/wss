@@ -56,12 +56,12 @@
             
             <% if @has_credits && @user_subscription_active %>
               <!-- Credit Purchase Option -->
-              <label class="relative block cursor-pointer">
-                <input type="radio" name="purchase_method" value="credit" class="peer sr-only" checked>
-                <div class="border-2 border-gray-200 rounded-xl p-6 transition-all peer-checked:border-indigo-600 peer-checked:bg-indigo-50 hover:border-gray-300">
+              <label class="relative block cursor-pointer" onclick="selectPurchaseMethod('credit')">
+                <input type="radio" name="purchase_method" value="credit" id="credit_option" class="peer sr-only" checked>
+                <div class="border-2 border-gray-200 rounded-xl p-6 transition-all hover:border-gray-300" id="credit_option_div">
                   <div class="flex items-start">
                     <div class="flex items-center h-5">
-                      <div class="w-4 h-4 border-2 border-gray-300 rounded-full peer-checked:border-indigo-600 peer-checked:bg-indigo-600 transition-all"></div>
+                      <div class="w-4 h-4 border-2 border-gray-300 rounded-full transition-all" id="credit_radio"></div>
                     </div>
                     <div class="ml-3 flex-1">
                       <div class="flex items-center justify-between">
@@ -87,12 +87,12 @@
             <% end %>
 
             <!-- Direct Purchase Option -->
-            <label class="relative block cursor-pointer">
-              <input type="radio" name="purchase_method" value="direct" class="peer sr-only" <%= 'checked' unless @has_credits && @user_subscription_active %>>
-              <div class="border-2 border-gray-200 rounded-xl p-6 transition-all peer-checked:border-indigo-600 peer-checked:bg-indigo-50 hover:border-gray-300">
+            <label class="relative block cursor-pointer" onclick="selectPurchaseMethod('direct')">
+              <input type="radio" name="purchase_method" value="direct" id="direct_option" class="peer sr-only" <%= 'checked' unless (@has_credits && @user_subscription_active) %>>
+              <div class="border-2 border-gray-200 rounded-xl p-6 transition-all hover:border-gray-300" id="direct_option_div">
                 <div class="flex items-start">
                   <div class="flex items-center h-5">
-                    <div class="w-4 h-4 border-2 border-gray-300 rounded-full peer-checked:border-indigo-600 peer-checked:bg-indigo-600 transition-all"></div>
+                    <div class="w-4 h-4 border-2 border-gray-300 rounded-full transition-all" id="direct_radio"></div>
                   </div>
                   <div class="ml-3 flex-1">
                     <div class="flex items-center justify-between">
@@ -152,3 +152,62 @@
     </div>
   </div>
 </div>
+
+<script>
+function selectPurchaseMethod(method) {
+  // Update radio buttons
+  if (document.getElementById('credit_option')) {
+    document.getElementById('credit_option').checked = (method === 'credit');
+  }
+  document.getElementById('direct_option').checked = (method === 'direct');
+  
+  // Update visual states
+  if (method === 'credit') {
+    // Credit option selected
+    document.getElementById('credit_option_div').classList.add('border-indigo-600', 'bg-indigo-50');
+    document.getElementById('credit_option_div').classList.remove('border-gray-200');
+    document.getElementById('credit_radio').classList.add('border-indigo-600', 'bg-indigo-600');
+    document.getElementById('credit_radio').classList.remove('border-gray-300');
+    
+    // Direct option deselected
+    document.getElementById('direct_option_div').classList.remove('border-indigo-600', 'bg-indigo-50');
+    document.getElementById('direct_option_div').classList.add('border-gray-200');
+    document.getElementById('direct_radio').classList.remove('border-indigo-600', 'bg-indigo-600');
+    document.getElementById('direct_radio').classList.add('border-gray-300');
+  } else {
+    // Direct option selected
+    document.getElementById('direct_option_div').classList.add('border-indigo-600', 'bg-indigo-50');
+    document.getElementById('direct_option_div').classList.remove('border-gray-200');
+    document.getElementById('direct_radio').classList.add('border-indigo-600', 'bg-indigo-600');
+    document.getElementById('direct_radio').classList.remove('border-gray-300');
+    
+    // Credit option deselected (if it exists)
+    if (document.getElementById('credit_option_div')) {
+      document.getElementById('credit_option_div').classList.remove('border-indigo-600', 'bg-indigo-50');
+      document.getElementById('credit_option_div').classList.add('border-gray-200');
+      document.getElementById('credit_radio').classList.remove('border-indigo-600', 'bg-indigo-600');
+      document.getElementById('credit_radio').classList.add('border-gray-300');
+    }
+  }
+}
+
+// Initialize on page load
+document.addEventListener('DOMContentLoaded', function() {
+  // Check which options are available and select the appropriate one
+  const hasCreditOption = document.getElementById('credit_option') !== null;
+  const hasDirectOption = document.getElementById('direct_option') !== null;
+  
+  <% if @has_credits && @user_subscription_active %>
+    // User has credits, select credit option
+    selectPurchaseMethod('credit');
+  <% else %>
+    // No credits or no subscription, select direct option
+    selectPurchaseMethod('direct');
+  <% end %>
+  
+  // If only one option is available, ensure it's selected
+  if (!hasCreditOption && hasDirectOption) {
+    selectPurchaseMethod('direct');
+  }
+});
+</script>

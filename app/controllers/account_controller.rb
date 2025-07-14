@@ -188,6 +188,9 @@ class AccountController < ApplicationController
       password: params[:new_password],
       password_set_manually: true
     )
+    
+    # Keep the user signed in after password change
+    bypass_sign_in(current_user)
 
     # Different success messages based on whether password was added or changed
     message = if was_passwordless

@@ -1,11 +1,11 @@
 ---
 id: task-4
 title: Account Tab
-status: To Do
+status: In Progress
 assignee:
   - Claude
 created_date: '2025-07-09'
-updated_date: '2025-07-09'
+updated_date: '2025-07-14'
 labels: []
 dependencies:
   - task-8

@@ -268,8 +268,20 @@
         <div class="sticky top-8">
           <div class="bg-white border border-gray-200 rounded-3xl shadow-xl p-8">
             <div class="text-center mb-6">
-              <div class="text-4xl font-bold text-gray-900 mb-2"><%= @presentation.formatted_price %></div>
-              <p class="text-gray-600">One-time purchase</p>
+              <% if user_signed_in? && @presentation.purchased_by?(current_user) %>
+                <% purchase = current_user.user_presentations.find_by(presentation_id: @presentation.id) %>
+                <% if purchase&.purchase_type == 'credit' && !current_user.subscription_active? %>
+                  <div class="text-3xl font-bold text-amber-600 mb-2">Subscription Required</div>
+                  <p class="text-gray-600">You own this presentation</p>
+                  <p class="text-sm text-amber-600 mt-2">Reactivate your subscription to access</p>
+                <% else %>
+                  <div class="text-4xl font-bold text-green-600 mb-2">Already Purchased</div>
+                  <p class="text-gray-600">You have access to this presentation</p>
+                <% end %>
+              <% else %>
+                <div class="text-4xl font-bold text-gray-900 mb-2"><%= @presentation.formatted_price %></div>
+                <p class="text-gray-600">One-time purchase</p>
+              <% end %>
             </div>
 
             <div class="space-y-4 mb-8">
@@ -303,39 +315,50 @@
               </div>
             </div>
 
-            <% if user_signed_in? && current_user.owns_presentation?(params[:id]) %>
+            <% if user_signed_in? && @presentation.purchased_by?(current_user) %>
               <!-- Already purchased -->
-              <% access_type = current_user.presentation_access_type(params[:id]) %>
-              <div class="w-full bg-green-100 text-green-800 font-bold py-4 px-6 rounded-2xl mb-4 text-center">
-                <div class="flex items-center justify-center gap-2">
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  <span>Owned</span>
-                </div>
-                <div class="text-sm mt-1">
-                  <% case access_type %>
-                  <% when 'lifetime' %>
-                    Lifetime access
-                  <% when 'subscription' %>
-                    Access via subscription
-                  <% when 'expired' %>
-                    Subscription required for access
-                  <% end %>
-                </div>
-              </div>
+              <% purchase = current_user.user_presentations.find_by(presentation_id: @presentation.id) %>
               
-              <% if current_user.can_access_presentation?(params[:id]) %>
+              <% if purchase&.purchase_type == 'credit' && !current_user.subscription_active? %>
+                <!-- Owns via credit but subscription inactive -->
+                <div class="w-full bg-amber-100 text-amber-800 font-bold py-4 px-6 rounded-2xl mb-4 text-center">
+                  <div class="flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                    </svg>
+                    <span>Subscription Required</span>
+                  </div>
+                  <div class="text-sm mt-1">
+                    You purchased this with a credit
+                  </div>
+                </div>
+                
+                <%= link_to subscriptions_plans_path, class: "block w-full bg-amber-600 text-white font-bold py-4 px-6 rounded-2xl hover:bg-amber-700 transition mb-4 text-center" do %>
+                  Reactivate Subscription
+                <% end %>
+              <% else %>
+                <!-- Has access (direct purchase or active subscription) -->
+                <div class="w-full bg-green-100 text-green-800 font-bold py-4 px-6 rounded-2xl mb-4 text-center">
+                  <div class="flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                    </svg>
+                    <span>You Own This</span>
+                  </div>
+                  <div class="text-sm mt-1">
+                    <%= purchase&.purchase_type == 'direct' ? 'Lifetime access' : 'Access via subscription' %>
+                  </div>
+                </div>
+                
                 <button class="w-full bg-blue-600 text-white font-bold py-4 px-6 rounded-2xl hover:bg-blue-700 transition mb-4">
                   Access Presentation
                 </button>
               <% end %>
             <% else %>
-              <!-- Purchase options -->
+              <!-- Not purchased yet -->
               <%= link_to new_presentation_purchase_path(@presentation), class: "block w-full bg-black text-white font-bold py-4 px-6 rounded-2xl hover:bg-blue-800 transition mb-4 text-center" do %>
                 Purchase Now
               <% end %>
-              
             <% end %>
 
             <button class="w-full bg-gray-100 text-gray-700 font-bold py-4 px-6 rounded-2xl hover:bg-gray-200 transition mb-4">

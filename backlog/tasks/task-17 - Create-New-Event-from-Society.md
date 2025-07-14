@@ -1,9 +1,10 @@
 ---
 id: task-17
 title: Create New Event from Society
-status: To Do
+status: Done
 assignee: []
 created_date: '2025-07-10'
+updated_date: '2025-07-14'
 labels: []
 dependencies: []
 ---
