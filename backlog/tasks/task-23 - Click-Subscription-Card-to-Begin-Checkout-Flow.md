@@ -1,9 +1,10 @@
 ---
 id: task-23
 title: Click Subscription Card to Begin Checkout Flow
-status: To Do
+status: Done
 assignee: []
 created_date: '2025-07-14'
+updated_date: '2025-07-14'
 labels: []
 dependencies: []
 ---

@@ -1,7 +1,7 @@
 ---
 id: task-22
 title: All User to Change their Plan
-status: To Do
+status: Done
 assignee: []
 created_date: '2025-07-14'
 updated_date: '2025-07-14'

@@ -9,7 +9,7 @@
     <% end %>
     <h1 class="text-3xl font-bold text-gray-900">Edit Presentation</h1>
   </div>
-  <p class="text-gray-600">Update "<%= @presentation.title %>"</p>
+  <p class="text-gray-600">Update the presentation details.</p>
 </div>
 
 <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
@@ -28,7 +28,7 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
         <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= form.text_field :title, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        <%= form.text_field :title, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "e.g., Introduction to Scotch Whisky" %>
       </div>
 
       <div>
@@ -49,7 +49,7 @@
 
       <div>
         <%= form.label :price, class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= form.number_field :price, step: 0.01, min: 0, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        <%= form.number_field :price, step: 0.01, min: 0, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "9.99" %>
       </div>
 
       <div>
@@ -66,36 +66,87 @@
 
       <div>
         <%= form.label :duration, class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= form.text_field :duration, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        <%= form.text_field :duration, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "45 min" %>
       </div>
 
       <div>
         <%= form.label :image, class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= form.text_field :image, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        <%= form.text_field :image, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "scotch-intro" %>
         <p class="text-xs text-gray-500 mt-1">Image identifier for presentation thumbnail</p>
       </div>
     </div>
 
     <div>
       <%= form.label :description, class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.text_area :description, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      <%= form.text_area :description, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "Brief description of what this presentation covers..." %>
     </div>
 
     <div>
       <%= form.label :content, class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.text_area :content, rows: 10, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      <%= form.text_area :content, rows: 10, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "Full presentation content, slides, notes, etc..." %>
       <p class="text-xs text-gray-500 mt-1">This will be the main content users receive when they purchase the presentation</p>
+    </div>
+
+    <div>
+      <%= form.label :whiskey_recommendations, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_area :whiskey_recommendations, rows: 4, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "List recommended whiskeys for tasting during this presentation..." %>
+      <p class="text-xs text-gray-500 mt-1">Suggest specific bottles that complement this presentation</p>
+    </div>
+
+    <div>
+      <%= form.label :tasting_notes, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_area :tasting_notes, rows: 4, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "Detailed tasting notes for the recommended whiskeys..." %>
+      <p class="text-xs text-gray-500 mt-1">Include aroma, palate, finish, and pairing suggestions</p>
+    </div>
+
+    <h3 class="text-lg font-semibold text-gray-900 mt-8 mb-4">File Uploads</h3>
+
+    <div>
+      <%= form.label :featured_image, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <% if @presentation.featured_image.attached? %>
+        <div class="mb-2 p-3 bg-gray-50 rounded-lg">
+          <p class="text-sm text-gray-600">Current image: <%= @presentation.featured_image.filename %></p>
+        </div>
+      <% end %>
+      <%= form.file_field :featured_image, accept: "image/jpeg,image/jpg,image/png,image/gif,image/webp", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      <p class="text-xs text-gray-500 mt-1">Featured image for the presentation (JPEG, PNG, GIF, or WebP, max 5MB)</p>
+    </div>
+
+    <div>
+      <%= form.label :pdf_file, "Presentation PDF", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <% if @presentation.pdf_file.attached? %>
+        <div class="mb-2 p-3 bg-gray-50 rounded-lg">
+          <p class="text-sm text-gray-600">Current PDF: <%= @presentation.pdf_file.filename %></p>
+        </div>
+      <% end %>
+      <%= form.file_field :pdf_file, accept: "application/pdf", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      <p class="text-xs text-gray-500 mt-1">Main presentation file in PDF format (max 50MB)</p>
+    </div>
+
+    <div>
+      <%= form.label :supplemental_materials, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <% if @presentation.supplemental_materials.attached? %>
+        <div class="mb-2 p-3 bg-gray-50 rounded-lg">
+          <p class="text-sm text-gray-600">Current materials: <%= @presentation.supplemental_materials.count %> file(s)</p>
+          <ul class="mt-1 text-xs text-gray-500">
+            <% @presentation.supplemental_materials.each do |material| %>
+              <li>• <%= material.filename %></li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+      <%= form.file_field :supplemental_materials, multiple: true, accept: "application/pdf,image/jpeg,image/jpg,image/png,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      <p class="text-xs text-gray-500 mt-1">Additional materials like worksheets, guides, or slides (PDF, images, or PowerPoint, max 25MB each)</p>
     </div>
 
     <div class="flex items-center">
       <%= form.check_box :published, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
-      <%= form.label :published, "Published", class: "ml-2 block text-sm text-gray-700" %>
+      <%= form.label :published, "Publish immediately", class: "ml-2 block text-sm text-gray-700" %>
     </div>
 
     <div class="flex items-center gap-4 pt-6 border-t border-gray-200">
       <%= form.submit "Update Presentation", class: "px-6 py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition" %>
       <%= link_to "Cancel", admin_presentations_path, class: "px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition" %>
-      <%= link_to "View", presentation_path(@presentation), class: "px-6 py-3 bg-blue-100 text-blue-700 font-semibold rounded-xl hover:bg-blue-200 transition", target: "_blank" %>
     </div>
   <% end %>
 </div>

@@ -168,6 +168,18 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 - **@Database.md** - Complete database schema documentation, relationships, indexes, and common queries
 - **@SecurityChecklist.md** - Comprehensive security checklist, best practices, and incident response procedures
 - **@Backlog.md** - Task management system using file-based kanban boards and workflow documentation
+- **@admin_panel_todo.md** - Admin panel development plan, requirements, and progress tracking
+
+### Admin Panel Development
+**IMPORTANT**: When working on admin panel features:
+1. **Always update admin_panel_todo.md** with progress
+2. Mark completed items with [x]
+3. Add new requirements as discovered
+4. Update the "Last Updated" date
+5. Move completed phases to a "Completed" section
+6. Document any architectural decisions or changes
+
+This ensures continuity across sessions and maintains a clear development roadmap.
 
 ### Debugging
 - You should use extensive logging to debug problems.

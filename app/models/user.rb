@@ -302,6 +302,11 @@ class User < ApplicationRecord
     has_active_subscription?
   end
 
+  # Admin methods
+  def is_admin?
+    is_admin == true
+  end
+
   # Presentation access logic
   def owns_presentation?(presentation_id)
     user_presentations.exists?(presentation_id: presentation_id)

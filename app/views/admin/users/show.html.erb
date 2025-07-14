@@ -1,0 +1,166 @@
+<% content_for :title, "#{@user.full_name} - Admin" %>
+
+<div class="mb-8">
+  <div class="flex items-center gap-4 mb-4">
+    <%= link_to admin_users_path, class: "text-gray-500 hover:text-gray-700" do %>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+    <% end %>
+    <h1 class="text-3xl font-bold text-gray-900"><%= @user.full_name %></h1>
+  </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+  <!-- Main Content -->
+  <div class="lg:col-span-2 space-y-6">
+    <!-- User Information -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">User Information</h2>
+      <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Email</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @user.email %></dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Name</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @user.full_name %></dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Joined</dt>
+          <dd class="mt-1 text-sm text-gray-900"><%= @user.created_at.strftime("%B %d, %Y") %></dd>
+        </div>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Authentication</dt>
+          <dd class="mt-1 text-sm text-gray-900">
+            <% if @user.provider.present? %>
+              <%= @user.provider.humanize %>
+            <% else %>
+              Email/Password
+            <% end %>
+          </dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Recent Purchases -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Purchases</h2>
+      <% if @recent_purchases.any? %>
+        <ul class="space-y-3">
+          <% @recent_purchases.each do |purchase| %>
+            <li class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+              <div>
+                <p class="text-sm font-medium text-gray-900"><%= purchase.presentation.title %></p>
+                <p class="text-xs text-gray-500">
+                  <%= purchase.purchase_type.capitalize %> • 
+                  <%= purchase.created_at.strftime("%b %d, %Y") %>
+                </p>
+              </div>
+              <% if purchase.purchase_type == 'direct' %>
+                <span class="text-sm text-gray-900">$<%= purchase.purchase_price || purchase.presentation.price %></span>
+              <% else %>
+                <span class="text-sm text-gray-500">1 Credit</span>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-sm text-gray-500">No purchases yet.</p>
+      <% end %>
+    </div>
+
+    <!-- Society Memberships -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Society Memberships</h2>
+      <% if @society_memberships.any? %>
+        <ul class="space-y-3">
+          <% @society_memberships.each do |membership| %>
+            <li class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
+              <div>
+                <p class="text-sm font-medium text-gray-900"><%= membership.society.name %></p>
+                <p class="text-xs text-gray-500">
+                  <%= membership.role.capitalize %> • 
+                  Joined <%= membership.created_at.strftime("%b %d, %Y") %>
+                </p>
+              </div>
+              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                <%= membership.status.capitalize %>
+              </span>
+            </li>
+          <% end %>
+        </ul>
+      <% else %>
+        <p class="text-sm text-gray-500">Not a member of any societies.</p>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <div class="space-y-6">
+    <!-- Profile Picture -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Profile Picture</h2>
+      <div class="flex justify-center">
+        <% if @user.profile_image.attached? %>
+          <%= image_tag @user.profile_image, class: "h-32 w-32 rounded-full object-cover" %>
+        <% else %>
+          <div class="h-32 w-32 rounded-full flex items-center justify-center text-white font-semibold text-3xl" style="background-color: <%= @user.avatar_color %>">
+            <%= @user.initials %>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Subscription Status -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Subscription</h2>
+      <dl class="space-y-3">
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Status</dt>
+          <dd class="mt-1">
+            <% if @user.has_active_subscription? %>
+              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
+                Active
+              </span>
+            <% else %>
+              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
+                None
+              </span>
+            <% end %>
+          </dd>
+        </div>
+        <% if @user.has_active_subscription? %>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Plan</dt>
+            <dd class="mt-1 text-sm text-gray-900"><%= @user.subscription_plan_display %></dd>
+          </div>
+          <div>
+            <dt class="text-sm font-medium text-gray-500">Renews</dt>
+            <dd class="mt-1 text-sm text-gray-900">
+              <%= @user.subscription_ends_at&.strftime("%B %d, %Y") || "N/A" %>
+            </dd>
+          </div>
+        <% end %>
+        <div>
+          <dt class="text-sm font-medium text-gray-500">Credits</dt>
+          <dd class="mt-1 text-2xl font-semibold text-gray-900"><%= @user.credits || 0 %></dd>
+        </div>
+      </dl>
+    </div>
+
+    <!-- Admin Status -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Role</h2>
+      <% if @user.is_admin? %>
+        <span class="px-3 py-2 text-sm font-semibold rounded-full bg-purple-100 text-purple-800">
+          Administrator
+        </span>
+      <% else %>
+        <span class="px-3 py-2 text-sm font-semibold rounded-full bg-blue-100 text-blue-800">
+          Regular User
+        </span>
+      <% end %>
+    </div>
+  </div>
+</div>

@@ -2,6 +2,11 @@ class Presentation < ApplicationRecord
   belongs_to :author, class_name: 'User'
   has_many :user_presentations, dependent: :destroy
   has_many :purchasers, through: :user_presentations, source: :user
+  
+  # Active Storage attachments
+  has_one_attached :featured_image
+  has_one_attached :pdf_file
+  has_many_attached :supplemental_materials
 
   # Validations
   validates :title, presence: true, length: { minimum: 2, maximum: 200 }
@@ -11,6 +16,11 @@ class Presentation < ApplicationRecord
   validates :category, length: { maximum: 100 }
   validates :difficulty, inclusion: { in: %w[Beginner Intermediate Advanced], allow_blank: true }
   validates :rating, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 5 }, allow_nil: true
+  
+  # File attachment validations
+  validate :featured_image_validation
+  validate :pdf_file_validation
+  validate :supplemental_materials_validation
 
   # Scopes
   scope :free, -> { where(price: 0) }
@@ -66,5 +76,45 @@ class Presentation < ApplicationRecord
   
   def stripe_amount
     (price * 100).to_i # Convert to cents for Stripe
+  end
+  
+  private
+  
+  def featured_image_validation
+    return unless featured_image.attached?
+    
+    unless featured_image.content_type.in?(%w[image/jpeg image/jpg image/png image/gif image/webp])
+      errors.add(:featured_image, 'must be a valid image format (JPEG, PNG, GIF, or WebP)')
+    end
+    
+    if featured_image.byte_size > 5.megabytes
+      errors.add(:featured_image, 'must be less than 5MB')
+    end
+  end
+  
+  def pdf_file_validation
+    return unless pdf_file.attached?
+    
+    unless pdf_file.content_type == 'application/pdf'
+      errors.add(:pdf_file, 'must be a PDF file')
+    end
+    
+    if pdf_file.byte_size > 50.megabytes
+      errors.add(:pdf_file, 'must be less than 50MB')
+    end
+  end
+  
+  def supplemental_materials_validation
+    return unless supplemental_materials.attached?
+    
+    supplemental_materials.each do |material|
+      unless material.content_type.in?(%w[application/pdf image/jpeg image/jpg image/png application/vnd.ms-powerpoint application/vnd.openxmlformats-officedocument.presentationml.presentation])
+        errors.add(:supplemental_materials, 'must be PDF, image, or PowerPoint files')
+      end
+      
+      if material.byte_size > 25.megabytes
+        errors.add(:supplemental_materials, 'files must be less than 25MB each')
+      end
+    end
   end
 end

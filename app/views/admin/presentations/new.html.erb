@@ -87,6 +87,38 @@
       <p class="text-xs text-gray-500 mt-1">This will be the main content users receive when they purchase the presentation</p>
     </div>
 
+    <div>
+      <%= form.label :whiskey_recommendations, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_area :whiskey_recommendations, rows: 4, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "List recommended whiskeys for tasting during this presentation..." %>
+      <p class="text-xs text-gray-500 mt-1">Suggest specific bottles that complement this presentation</p>
+    </div>
+
+    <div>
+      <%= form.label :tasting_notes, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_area :tasting_notes, rows: 4, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "Detailed tasting notes for the recommended whiskeys..." %>
+      <p class="text-xs text-gray-500 mt-1">Include aroma, palate, finish, and pairing suggestions</p>
+    </div>
+
+    <h3 class="text-lg font-semibold text-gray-900 mt-8 mb-4">File Uploads</h3>
+
+    <div>
+      <%= form.label :featured_image, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.file_field :featured_image, accept: "image/jpeg,image/jpg,image/png,image/gif,image/webp", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      <p class="text-xs text-gray-500 mt-1">Featured image for the presentation (JPEG, PNG, GIF, or WebP, max 5MB)</p>
+    </div>
+
+    <div>
+      <%= form.label :pdf_file, "Presentation PDF", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.file_field :pdf_file, accept: "application/pdf", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      <p class="text-xs text-gray-500 mt-1">Main presentation file in PDF format (max 50MB)</p>
+    </div>
+
+    <div>
+      <%= form.label :supplemental_materials, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.file_field :supplemental_materials, multiple: true, accept: "application/pdf,image/jpeg,image/jpg,image/png,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      <p class="text-xs text-gray-500 mt-1">Additional materials like worksheets, guides, or slides (PDF, images, or PowerPoint, max 25MB each)</p>
+    </div>
+
     <div class="flex items-center">
       <%= form.check_box :published, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
       <%= form.label :published, "Publish immediately", class: "ml-2 block text-sm text-gray-700" %>

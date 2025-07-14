@@ -1,12 +1,15 @@
-class Admin::PresentationsController < AdminController
-  layout 'admin'
+class Admin::PresentationsController < Admin::BaseController
   before_action :set_presentation, only: [:show, :edit, :update, :destroy]
 
   def index
-    @presentations = Presentation.all.order(:created_at)
+    @presentations = Presentation.includes(:author, :user_presentations)
+                                .order(created_at: :desc)
   end
 
   def show
+    @purchases = @presentation.user_presentations
+                              .includes(:user)
+                              .order(created_at: :desc)
   end
 
   def new
@@ -15,7 +18,7 @@ class Admin::PresentationsController < AdminController
 
   def create
     @presentation = Presentation.new(presentation_params)
-    @presentation.user = current_user
+    @presentation.author = current_user
 
     if @presentation.save
       redirect_to admin_presentation_path(@presentation), notice: 'Presentation created successfully.'
@@ -36,7 +39,7 @@ class Admin::PresentationsController < AdminController
   end
 
   def destroy
-    @presentation.destroy
+    @presentation.destroy!
     redirect_to admin_presentations_path, notice: 'Presentation deleted successfully.'
   end
 
@@ -47,6 +50,21 @@ class Admin::PresentationsController < AdminController
   end
 
   def presentation_params
-    params.require(:presentation).permit(:title, :description, :content, :price, :category, :duration, :difficulty, :image, :published)
+    params.require(:presentation).permit(
+      :title, 
+      :description, 
+      :content, 
+      :category, 
+      :price, 
+      :duration,
+      :difficulty,
+      :published,
+      :whiskey_recommendations,
+      :tasting_notes,
+      :image,
+      :featured_image,
+      :pdf_file,
+      supplemental_materials: []
+    )
   end
 end

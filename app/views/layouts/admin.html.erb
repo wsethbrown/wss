@@ -24,10 +24,11 @@
             <% end %>
           </div>
           
-          <div class="flex items-center gap-4">
-            <%= link_to "Presentations", admin_presentations_path, class: "text-gray-700 hover:text-black font-medium" %>
-            <%= link_to "Back to Site", root_path, class: "text-blue-600 hover:text-blue-700 font-medium" %>
-            <%= link_to "Logout", destroy_user_session_path, method: :delete, class: "text-gray-700 hover:text-black font-medium" %>
+          <div class="flex items-center gap-6">
+            <%= link_to "Presentations", admin_presentations_path, class: "text-gray-700 hover:text-black font-medium transition-colors" %>
+            <%= link_to "Users", admin_users_path, class: "text-gray-700 hover:text-black font-medium transition-colors" %>
+            <%= link_to "Back to Site", root_path, class: "text-blue-600 hover:text-blue-700 font-medium transition-colors" %>
+            <%= button_to "Logout", destroy_user_session_path, method: :delete, class: "text-red-600 hover:text-red-700 font-medium transition-colors cursor-pointer" %>
           </div>
         </div>
       </div>

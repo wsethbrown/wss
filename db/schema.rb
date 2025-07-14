@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_14_123149) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_14_181047) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -110,6 +110,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_14_123149) do
     t.boolean "published", default: false
     t.decimal "rating", precision: 3, scale: 2
     t.integer "review_count", default: 0
+    t.text "whiskey_recommendations"
+    t.text "tasting_notes"
     t.index ["author_id"], name: "index_presentations_on_author_id"
     t.index ["category"], name: "index_presentations_on_category"
     t.index ["price"], name: "index_presentations_on_price"
@@ -218,7 +220,9 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_14_123149) do
     t.text "whiskey_shelf"
     t.integer "credits", default: 0, null: false
     t.boolean "cancel_at_period_end", default: false
+    t.boolean "is_admin", default: false, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["is_admin"], name: "index_users_on_is_admin"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 
