@@ -134,7 +134,7 @@
         </div>
 
         <!-- Banner Image Upload -->
-        <div class="space-y-3">
+        <div class="space-y-3" data-controller="banner-crop">
           <%= form.label :banner_image, class: "block text-lg font-semibold text-gray-900" do %>
             <span class="flex items-center gap-2">
               🌄 Banner Image
@@ -145,21 +145,25 @@
           <% end %>
           <%= form.file_field :banner_image, 
               accept: "image/*",
-              id: "banner-image-input",
+              data: { banner_crop_target: "input", action: "change->banner-crop#fileChanged" },
               class: "w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors bg-white/80 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100" %>
           <p class="text-sm text-gray-600">Upload a banner image for your society's page. This will appear at the top of your society's detail page. Recommended size: 1200x400px.</p>
           
           <!-- Banner Image Preview & Crop -->
-          <div id="banner-preview-container" class="hidden mt-4">
+          <div data-banner-crop-target="container" class="<%= @society.banner_image.attached? ? '' : 'hidden' %> mt-4">
             <label class="block text-sm font-medium text-gray-700 mb-2">Position your banner image:</label>
-            <div class="relative bg-gray-100 rounded-2xl overflow-hidden border-2 border-gray-200" style="height: 200px;">
-              <img id="banner-preview-image" src="" alt="Banner preview" class="absolute inset-0 w-full h-full object-cover cursor-move" style="object-position: center center;">
+            <div class="relative bg-gray-100 rounded-2xl overflow-hidden border-2 border-gray-200 h-64 md:h-80">
+              <% if @society.banner_image.attached? %>
+                <img data-banner-crop-target="preview" src="<%= url_for(@society.banner_image) %>" alt="Banner preview" class="absolute inset-0 w-full h-full object-cover cursor-move" style="object-position: <%= @society.banner_position || 'center center' %>; transform: scale(1.1);">
+              <% else %>
+                <img data-banner-crop-target="preview" src="" alt="Banner preview" class="absolute inset-0 w-full h-full object-cover cursor-move" style="object-position: center center; transform: scale(1.1);">
+              <% end %>
               <div class="absolute inset-2 border-2 border-dashed border-amber-400 pointer-events-none rounded-xl"></div>
               <div class="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
                 Click and drag to reposition
               </div>
             </div>
-            <input type="hidden" name="society[banner_position]" id="banner-position" value="center center">
+            <input type="hidden" name="society[banner_position]" data-banner-crop-target="position" value="<%= @society.banner_position || 'center center' %>">
             <p class="text-xs text-gray-500 mt-2">The image will be cropped to fit the banner area. Drag the image to position it how you'd like it to appear.</p>
           </div>
         </div>
@@ -262,107 +266,3 @@
   </div>
 </div>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-  const bannerInput = document.getElementById('banner-image-input');
-  const previewContainer = document.getElementById('banner-preview-container');
-  const previewImage = document.getElementById('banner-preview-image');
-  const positionInput = document.getElementById('banner-position');
-  
-  if (bannerInput && previewContainer && previewImage) {
-    bannerInput.addEventListener('change', function(e) {
-      const file = e.target.files[0];
-      if (file && file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          previewImage.src = e.target.result;
-          previewContainer.classList.remove('hidden');
-          setupImageDragging();
-        };
-        reader.readAsDataURL(file);
-      }
-    });
-  }
-  
-  function setupImageDragging() {
-    let isDragging = false;
-    let startX, startY;
-    let initialX = 50, initialY = 50; // Start at center (50% x, 50% y)
-    
-    previewImage.addEventListener('mousedown', function(e) {
-      isDragging = true;
-      startX = e.clientX;
-      startY = e.clientY;
-      previewImage.style.cursor = 'grabbing';
-      e.preventDefault();
-    });
-    
-    document.addEventListener('mousemove', function(e) {
-      if (!isDragging) return;
-      
-      const deltaX = e.clientX - startX;
-      const deltaY = e.clientY - startY;
-      
-      const container = previewImage.parentElement;
-      const containerRect = container.getBoundingClientRect();
-      
-      // Calculate new position as percentage
-      const newX = Math.max(0, Math.min(100, initialX - (deltaX / containerRect.width * 100)));
-      const newY = Math.max(0, Math.min(100, initialY - (deltaY / containerRect.height * 100)));
-      
-      previewImage.style.objectPosition = `${newX}% ${newY}%`;
-      positionInput.value = `${newX}% ${newY}%`;
-    });
-    
-    document.addEventListener('mouseup', function() {
-      if (isDragging) {
-        isDragging = false;
-        previewImage.style.cursor = 'move';
-        
-        // Update initial position for next drag
-        const position = positionInput.value.split(' ');
-        initialX = parseFloat(position[0]);
-        initialY = parseFloat(position[1]);
-      }
-    });
-    
-    // Touch events for mobile
-    previewImage.addEventListener('touchstart', function(e) {
-      isDragging = true;
-      const touch = e.touches[0];
-      startX = touch.clientX;
-      startY = touch.clientY;
-      e.preventDefault();
-    });
-    
-    document.addEventListener('touchmove', function(e) {
-      if (!isDragging) return;
-      
-      const touch = e.touches[0];
-      const deltaX = touch.clientX - startX;
-      const deltaY = touch.clientY - startY;
-      
-      const container = previewImage.parentElement;
-      const containerRect = container.getBoundingClientRect();
-      
-      const newX = Math.max(0, Math.min(100, initialX - (deltaX / containerRect.width * 100)));
-      const newY = Math.max(0, Math.min(100, initialY - (deltaY / containerRect.height * 100)));
-      
-      previewImage.style.objectPosition = `${newX}% ${newY}%`;
-      positionInput.value = `${newX}% ${newY}%`;
-      
-      e.preventDefault();
-    });
-    
-    document.addEventListener('touchend', function() {
-      if (isDragging) {
-        isDragging = false;
-        
-        const position = positionInput.value.split(' ');
-        initialX = parseFloat(position[0]);
-        initialY = parseFloat(position[1]);
-      }
-    });
-  }
-});
-</script>

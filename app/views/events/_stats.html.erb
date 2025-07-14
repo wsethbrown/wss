@@ -1,0 +1,53 @@
+<div id="event-stats" class="bg-white shadow-sm rounded-lg overflow-hidden">
+  <div class="px-6 py-4 border-b border-gray-200">
+    <h2 class="text-lg font-semibold text-gray-900">Event Stats</h2>
+  </div>
+  <div class="p-6">
+    <div class="space-y-4">
+      <div class="flex justify-between">
+        <span class="text-sm text-gray-600">Yes</span>
+        <span class="text-sm font-semibold text-green-700"><%= event.yes_count %></span>
+      </div>
+      <% if event.maybe_count > 0 %>
+        <div class="flex justify-between">
+          <span class="text-sm text-gray-600">Maybe</span>
+          <span class="text-sm font-semibold text-yellow-700"><%= event.maybe_count %></span>
+        </div>
+      <% end %>
+      <% if event.no_count > 0 %>
+        <div class="flex justify-between">
+          <span class="text-sm text-gray-600">No</span>
+          <span class="text-sm font-semibold text-red-700"><%= event.no_count %></span>
+        </div>
+      <% end %>
+      <% if event.total_rsvp_count > 0 %>
+        <div class="flex justify-between">
+          <span class="text-sm text-gray-600">Total RSVPs</span>
+          <span class="text-sm font-semibold text-gray-900"><%= event.total_rsvp_count %></span>
+        </div>
+      <% end %>
+      <% if user_signed_in? && event.society.has_member?(current_user) %>
+        <div class="flex justify-between">
+          <span class="text-sm text-gray-600">Unanswered</span>
+          <span class="text-sm font-semibold text-gray-500"><%= event.unanswered_count %></span>
+        </div>
+      <% end %>
+      <div class="flex justify-between">
+        <span class="text-sm text-gray-600">Status</span>
+        <span class="text-sm font-semibold text-gray-900">
+          <% if event.upcoming? %>
+            Upcoming
+          <% elsif event.ongoing? %>
+            Live Now
+          <% else %>
+            Completed
+          <% end %>
+        </span>
+      </div>
+      <div class="flex justify-between">
+        <span class="text-sm text-gray-600">Created</span>
+        <span class="text-sm font-semibold text-gray-900"><%= event.created_at.strftime("%B %Y") %></span>
+      </div>
+    </div>
+  </div>
+</div>

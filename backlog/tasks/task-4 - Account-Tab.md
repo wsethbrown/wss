@@ -5,8 +5,10 @@ status: To Do
 assignee:
   - Claude
 created_date: '2025-07-09'
+updated_date: '2025-07-09'
 labels: []
-dependencies: []
+dependencies:
+  - task-8
 ---
 
 ## Description

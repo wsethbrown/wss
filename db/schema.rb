@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_10_152821) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_12_124046) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,20 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_10_152821) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "credit_transactions", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "transaction_type", null: false
+    t.integer "amount", null: false
+    t.bigint "presentation_id"
+    t.text "description"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["presentation_id"], name: "index_credit_transactions_on_presentation_id"
+    t.index ["transaction_type"], name: "index_credit_transactions_on_transaction_type"
+    t.index ["user_id", "created_at"], name: "index_credit_transactions_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_credit_transactions_on_user_id"
   end
 
   create_table "event_rsvps", force: :cascade do |t|
@@ -90,6 +104,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_10_152821) do
     t.string "category"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "duration"
+    t.string "difficulty"
+    t.string "image"
+    t.boolean "published", default: false
+    t.decimal "rating", precision: 3, scale: 2
+    t.integer "review_count", default: 0
     t.index ["author_id"], name: "index_presentations_on_author_id"
     t.index ["category"], name: "index_presentations_on_category"
     t.index ["price"], name: "index_presentations_on_price"
@@ -149,11 +169,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_10_152821) do
   create_table "user_presentations", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "presentation_id", null: false
-    t.string "purchase_type"
+    t.string "purchase_type", default: "credit", null: false
     t.datetime "purchased_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.decimal "purchase_price", precision: 10, scale: 2
+    t.string "stripe_payment_intent_id"
     t.index ["presentation_id"], name: "index_user_presentations_on_presentation_id"
+    t.index ["purchase_type"], name: "index_user_presentations_on_purchase_type"
     t.index ["user_id"], name: "index_user_presentations_on_user_id"
   end
 
@@ -200,6 +223,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_10_152821) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "credit_transactions", "presentations"
+  add_foreign_key "credit_transactions", "users"
   add_foreign_key "event_rsvps", "events"
   add_foreign_key "event_rsvps", "users"
   add_foreign_key "events", "societies"

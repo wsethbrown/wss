@@ -14,11 +14,16 @@ class AccountController < ApplicationController
 
   def update_profile
     if current_user.update(profile_params)
-      flash[:notice] = "Profile updated successfully!"
+      respond_to do |format|
+        format.html { redirect_to account_path, notice: 'Profile updated successfully' }
+        format.turbo_stream { redirect_to account_path, notice: 'Profile updated successfully' }
+      end
     else
-      flash[:alert] = "Error updating profile. Please check your information."
+      respond_to do |format|
+        format.html { redirect_to account_path, alert: 'Failed to update profile' }
+        format.turbo_stream { redirect_to account_path, alert: 'Failed to update profile' }
+      end
     end
-    redirect_to account_path
   end
 
   def update_tags
@@ -31,36 +36,35 @@ class AccountController < ApplicationController
       end
     end
 
-    flash[:notice] = "Tags updated successfully!"
     redirect_to account_path
   end
 
   def upload_avatar
-    Rails.logger.info "Upload avatar called with params: #{params.inspect}"
     if params[:profile_image].present?
-      Rails.logger.info "Profile image param present: #{params[:profile_image].inspect}"
-      if current_user.profile_image.attach(params[:profile_image])
-        Rails.logger.info "Profile image attached successfully"
-        flash[:notice] = "Profile picture updated successfully!"
-      else
-        Rails.logger.info "Profile image attach failed"
-        flash[:alert] = "Failed to upload profile picture. Please try again."
-      end
+      current_user.profile_image.attach(params[:profile_image])
+      message = 'Profile photo updated successfully'
     else
-      Rails.logger.info "No profile image param present"
-      flash[:alert] = "Please select an image file."
+      message = 'No photo selected'
     end
-    redirect_to account_path
+    
+    respond_to do |format|
+      format.html { redirect_to account_path, notice: message }
+      format.turbo_stream { redirect_to account_path, notice: message }
+    end
   end
 
   def remove_avatar
     if current_user.profile_image.attached?
       current_user.profile_image.purge
-      flash[:notice] = "Profile picture removed successfully!"
+      message = 'Profile photo removed successfully'
     else
-      flash[:alert] = "No profile picture to remove."
+      message = 'No photo to remove'
     end
-    redirect_to account_path
+    
+    respond_to do |format|
+      format.html { redirect_to account_path, notice: message }
+      format.turbo_stream { redirect_to account_path, notice: message }
+    end
   end
 
   def request_email_change
@@ -68,21 +72,27 @@ class AccountController < ApplicationController
 
     # Validate new email
     if new_email.blank?
-      flash[:alert] = "Please enter a new email address."
-      redirect_to account_path
+      respond_to do |format|
+        format.html { redirect_to account_path, alert: "Please enter a new email address." }
+        format.turbo_stream { redirect_to account_path, alert: "Please enter a new email address." }
+      end
       return
     end
 
     if new_email == current_user.email
-      flash[:alert] = "The new email address must be different from your current email."
-      redirect_to account_path
+      respond_to do |format|
+        format.html { redirect_to account_path, alert: "The new email address must be different from your current email." }
+        format.turbo_stream { redirect_to account_path, alert: "The new email address must be different from your current email." }
+      end
       return
     end
 
     # Check if email is already taken
     if User.where(email: new_email).exists?
-      flash[:alert] = "This email address is already in use."
-      redirect_to account_path
+      respond_to do |format|
+        format.html { redirect_to account_path, alert: "This email address is already in use." }
+        format.turbo_stream { redirect_to account_path, alert: "This email address is already in use." }
+      end
       return
     end
 
@@ -99,8 +109,12 @@ class AccountController < ApplicationController
     # Send verification email
     UserMailer.email_change_verification(current_user, new_email, token).deliver_now
 
-    flash[:notice] = "A verification link has been sent to your current email address (#{current_user.email}). Please check your inbox and click the link to confirm the email change."
-    redirect_to account_path
+    message = "A verification link has been sent to your current email address (#{current_user.email}). Please check your inbox and click the link to confirm the email change."
+    
+    respond_to do |format|
+      format.html { redirect_to account_path, notice: message }
+      format.turbo_stream { redirect_to account_path, notice: message }
+    end
   end
 
   def verify_email_change
@@ -141,19 +155,28 @@ class AccountController < ApplicationController
     # For users with existing passwords, verify current password
     if current_user.has_password?
       unless current_user.valid_password?(params[:current_password])
-        redirect_to account_path, alert: 'Current password is incorrect'
+        respond_to do |format|
+          format.html { redirect_to account_path, alert: 'Current password is incorrect' }
+          format.turbo_stream { redirect_to account_path, alert: 'Current password is incorrect' }
+        end
         return
       end
     end
 
     # Validate new password
     if params[:new_password] != params[:confirm_password]
-      redirect_to account_path, alert: 'New passwords do not match'
+      respond_to do |format|
+        format.html { redirect_to account_path, alert: 'New passwords do not match' }
+        format.turbo_stream { redirect_to account_path, alert: 'New passwords do not match' }
+      end
       return
     end
 
     if params[:new_password].length < 8
-      redirect_to account_path, alert: 'New password must be at least 8 characters long'
+      respond_to do |format|
+        format.html { redirect_to account_path, alert: 'New password must be at least 8 characters long' }
+        format.turbo_stream { redirect_to account_path, alert: 'New password must be at least 8 characters long' }
+      end
       return
     end
 
@@ -167,13 +190,21 @@ class AccountController < ApplicationController
     )
 
     # Different success messages based on whether password was added or changed
-    if was_passwordless
-      redirect_to account_path, notice: 'Password added successfully! You can now sign in with either magic links or your password.'
+    message = if was_passwordless
+      'Password added successfully! You can now sign in with either magic links or your password.'
     else
-      redirect_to account_path, notice: 'Password updated successfully'
+      'Password updated successfully'
+    end
+    
+    respond_to do |format|
+      format.html { redirect_to account_path, notice: message }
+      format.turbo_stream { redirect_to account_path, notice: message }
     end
   rescue => e
-    redirect_to account_path, alert: 'Failed to update password. Please try again.'
+    respond_to do |format|
+      format.html { redirect_to account_path, alert: 'Failed to update password. Please try again.' }
+      format.turbo_stream { redirect_to account_path, alert: 'Failed to update password. Please try again.' }
+    end
   end
 
   def setup_2fa

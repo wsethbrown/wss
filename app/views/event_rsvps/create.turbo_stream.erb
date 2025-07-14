@@ -1,0 +1,15 @@
+<%= turbo_stream.replace "event-rsvp-buttons" do %>
+  <%= render partial: "events/rsvp_buttons", locals: { event: @event, user_rsvp: @rsvp } %>
+<% end %>
+
+<%= turbo_stream.replace "header-rsvp-count" do %>
+  <%= render partial: "events/header_rsvp_count", locals: { event: @event } %>
+<% end %>
+
+<%= turbo_stream.replace "event-stats" do %>
+  <%= render partial: "events/stats", locals: { event: @event } %>
+<% end %>
+
+<%= turbo_stream.replace "flash-messages" do %>
+  <!-- Clear any existing flash messages -->
+<% end %>

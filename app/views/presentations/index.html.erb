@@ -109,23 +109,44 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
       <% if @presentations.any? %>
                 <% @presentations.each do |presentation| %>
-          <div class="group relative bg-white/60 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 hover:bg-white/80 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer" onclick="openPresentationModal(<%= presentation[:id] %>)">
-          <!-- Glassmorphism overlay -->
-          <div class="absolute inset-0 rounded-3xl pointer-events-none bg-gradient-to-br from-blue-50/50 via-white/30 to-indigo-50/50 opacity-80 group-hover:opacity-100 transition-opacity duration-500"></div>
-          <!-- Animated border -->
-          <div class="absolute inset-0 rounded-3xl bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-indigo-400/20 opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm"></div>
-
-          <div class="relative z-10 p-6">
-            <!-- Category Badge -->
-            <div class="flex items-center justify-between mb-4">
-              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+          <div class="group relative bg-white rounded-3xl shadow-xl border border-gray-200 hover:shadow-2xl hover:-translate-y-2 transition-all duration-500 cursor-pointer overflow-hidden" onclick="openPresentationModal(<%= presentation[:id] %>)">
+          
+          <!-- Header Image Section -->
+          <div class="relative h-48 bg-cover bg-center bg-gray-800" style="background-image: url('<%= case presentation[:image]
+            when 'scotch-intro' then 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=800&h=400&fit=crop&crop=center'
+            when 'bourbon-guide' then 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800&h=400&fit=crop&crop=center'
+            when 'japanese-whisky' then 'https://images.unsplash.com/photo-1582037928769-181f2644ecb7?w=800&h=400&fit=crop&crop=center'
+            when 'irish-traditions' then 'https://images.unsplash.com/photo-1527281400683-1aae777175f8?w=800&h=400&fit=crop&crop=center'
+            when 'rye-renaissance' then 'https://images.unsplash.com/photo-1540982736923-fe0e51da8053?w=800&h=400&fit=crop&crop=center'
+            when 'canadian-deep-dive' then 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=800&h=400&fit=crop&crop=center'
+            when 'peated-scotch' then 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&h=400&fit=crop&crop=center'
+            when 'single-barrel' then 'https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?w=800&h=400&fit=crop&crop=center'
+            when 'food-pairing' then 'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=800&h=400&fit=crop&crop=center'
+            when 'craft-distillery' then 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=400&fit=crop&crop=center'
+            when 'vintage-appreciation' then 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=800&h=400&fit=crop&crop=center'
+            when 'cocktail-classics' then 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=800&h=400&fit=crop&crop=center'
+            else 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=800&h=400&fit=crop&crop=center'
+          end %>')">
+            
+            <!-- Dark overlay for text readability -->
+            <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+            
+            <!-- Category Badge on Header -->
+            <div class="absolute top-4 left-4">
+              <span class="px-3 py-1 rounded-full text-xs font-semibold bg-white/20 backdrop-blur-sm border border-white/30 text-white">
                 <%= presentation[:category] %>
               </span>
-              <span class="text-2xl font-bold text-gray-900">
+            </div>
+            
+            <!-- Price on Header -->
+            <div class="absolute top-4 right-4">
+              <span class="text-2xl font-bold text-white">
                 <%= presentation[:price] %>
               </span>
             </div>
+          </div>
 
+          <div class="relative z-10 p-6">
             <!-- Title -->
             <h3 class="text-xl font-bold text-gray-900 mb-3 group-hover:text-blue-700 transition-colors">
               <%= presentation[:title] %>
@@ -213,7 +234,7 @@
       </button>
 
       <!-- Header Image with Title Overlay -->
-      <div class="relative h-64 md:h-80 bg-gradient-to-br from-blue-600 via-purple-600 to-indigo-700 rounded-t-3xl overflow-hidden">
+      <div id="modalHeaderImage" class="relative h-64 md:h-80 bg-cover bg-center bg-gray-800 rounded-t-3xl overflow-hidden" style="background-image: url('https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=800&h=400&fit=crop&crop=center')">
         <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
         <div class="absolute bottom-6 left-6 right-6">
           <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white font-semibold text-sm mb-3">
@@ -313,9 +334,9 @@
               <div class="text-3xl font-bold text-gray-900 mb-1" id="modalPrice">$9.99</div>
               <p class="text-gray-600">One-time purchase • Lifetime access</p>
             </div>
-            <button class="px-8 py-4 bg-black text-white font-bold rounded-2xl hover:bg-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl">
-              Purchase Now
-            </button>
+            <a href="#" id="modalPurchaseLink" class="inline-block px-8 py-4 bg-black text-white font-bold rounded-2xl hover:bg-blue-800 transition-all duration-200 shadow-lg hover:shadow-xl text-center">
+              View Details
+            </a>
           </div>
         </div>
       </div>
@@ -362,6 +383,46 @@
       document.getElementById('modalRating').textContent = `${presentation.rating} (${presentation.reviews} reviews)`;
       document.getElementById('modalDescription').textContent = presentation.description;
       document.getElementById('modalPrice').textContent = presentation.price;
+      document.getElementById('modalPurchaseLink').href = `/presentations/${presentation.id}`;
+
+      // Update modal header image based on presentation
+      const headerElement = document.getElementById('modalHeaderImage');
+      const imageUrls = {
+        'scotch-intro': 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=800&h=400&fit=crop&crop=center',
+        'bourbon-guide': 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800&h=400&fit=crop&crop=center',
+        'japanese-whisky': 'https://images.unsplash.com/photo-1582037928769-181f2644ecb7?w=800&h=400&fit=crop&crop=center',
+        'irish-traditions': 'https://images.unsplash.com/photo-1527281400683-1aae777175f8?w=800&h=400&fit=crop&crop=center',
+        'rye-renaissance': 'https://images.unsplash.com/photo-1540982736923-fe0e51da8053?w=800&h=400&fit=crop&crop=center',
+        'canadian-deep-dive': 'https://images.unsplash.com/photo-1563729784474-d77dbb933a9e?w=800&h=400&fit=crop&crop=center',
+        'peated-scotch': 'https://images.unsplash.com/photo-1513475382585-d06e58bcb0e0?w=800&h=400&fit=crop&crop=center',
+        'single-barrel': 'https://images.unsplash.com/photo-1523741543316-beb7fc7023d8?w=800&h=400&fit=crop&crop=center',
+        'food-pairing': 'https://images.unsplash.com/photo-1551024506-0bccd828d307?w=800&h=400&fit=crop&crop=center',
+        'craft-distillery': 'https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=800&h=400&fit=crop&crop=center',
+        'vintage-appreciation': 'https://images.unsplash.com/photo-1598300042247-d088f8ab3a91?w=800&h=400&fit=crop&crop=center',
+        'cocktail-classics': 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=800&h=400&fit=crop&crop=center'
+      };
+      
+      // Update background image with fallback handling
+      const imageUrl = imageUrls[presentation.image] || 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=800&h=400&fit=crop&crop=center';
+      
+      // Test image loading before applying
+      const testImg = new Image();
+      testImg.onload = function() {
+        // Image loaded successfully
+        headerElement.style.backgroundImage = `url('${imageUrl}')`;
+        headerElement.style.backgroundSize = 'cover';
+        headerElement.style.backgroundPosition = 'center';
+      };
+      
+      testImg.onerror = function() {
+        // Image failed to load, use fallback gradient
+        headerElement.style.backgroundImage = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+        headerElement.style.backgroundSize = 'cover';
+        headerElement.style.backgroundPosition = 'center';
+        console.log('Modal header fallback applied for failed image:', imageUrl);
+      };
+      
+      testImg.src = imageUrl;
 
       // Show modal
       document.getElementById('presentationModal').classList.remove('hidden');
@@ -379,5 +440,43 @@
     if (event.key === 'Escape') {
       closePresentationModal();
     }
+  });
+
+  // Image loading fallback system
+  document.addEventListener('DOMContentLoaded', function() {
+    const fallbackGradients = [
+      'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+      'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
+      'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
+      'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
+      'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
+      'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)'
+    ];
+
+    // Test each background image and apply fallback if needed
+    const imageElements = document.querySelectorAll('[style*="background-image"]');
+    imageElements.forEach((element, index) => {
+      const bgImage = element.style.backgroundImage;
+      if (bgImage && bgImage.includes('unsplash.com')) {
+        const img = new Image();
+        const url = bgImage.match(/url\(['"]?([^'"]+)['"]?\)/)?.[1];
+        
+        if (url) {
+          img.onload = function() {
+            // Image loaded successfully, keep the Unsplash image
+            element.style.backgroundImage = bgImage;
+          };
+          
+          img.onerror = function() {
+            // Image failed to load, use fallback gradient
+            const gradientIndex = index % fallbackGradients.length;
+            element.style.backgroundImage = fallbackGradients[gradientIndex];
+            console.log('Fallback applied for failed image:', url);
+          };
+          
+          img.src = url;
+        }
+      }
+    });
   });
 </script>

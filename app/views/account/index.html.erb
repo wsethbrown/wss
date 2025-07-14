@@ -64,13 +64,13 @@
                     <%= image_tag current_user.profile_image, class: "w-full h-full object-cover" %>
                   </div>
                 <% else %>
-                  <div class="w-24 h-24 rounded-full bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
-                    <span class="text-3xl text-white font-semibold"><%= current_user.full_name.first.upcase %></span>
+                  <div class="w-24 h-24 rounded-full flex items-center justify-center" style="background-color: <%= current_user.avatar_color %>;">
+                    <span class="text-3xl text-white font-semibold"><%= current_user.initials %></span>
                   </div>
                 <% end %>
                 
                 <div class="flex space-x-3">
-                  <%= form_with url: account_avatar_path, method: :patch, multipart: true, local: true, class: "inline-block" do |f| %>
+                  <%= form_with url: account_avatar_path, method: :patch, multipart: true, class: "inline-block" do |f| %>
                     <%= f.file_field :profile_image, accept: "image/*", class: "hidden", id: "profile-image-upload", onchange: "this.form.submit();" %>
                     <label for="profile-image-upload" class="cursor-pointer inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
                       Upload Photo
@@ -87,7 +87,7 @@
             <!-- Basic Info Section -->
             <div class="bg-white rounded-lg border border-gray-200 p-6">
               <h3 class="text-lg font-medium text-gray-900 mb-4">Basic Information</h3>
-              <%= form_with model: current_user, url: account_profile_path, method: :patch, local: true, class: "space-y-4" do |f| %>
+              <%= form_with model: current_user, url: account_profile_path, method: :patch, class: "space-y-4", id: "profile-form" do |f| %>
                 <div class="grid grid-cols-2 gap-4">
                   <div>
                     <%= f.label :first_name, class: "block text-sm font-medium text-gray-700 mb-1" %>
@@ -110,8 +110,9 @@
                   <%= f.text_area :whiskey_shelf, rows: 6, class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm font-mono", placeholder: "Macallan 18\nGlenfiddich 21\nBlantons Single Barrel\nRedbreast 12" %>
                 </div>
                 
-                <div class="pt-4">
+                <div class="pt-4 flex gap-3">
                   <%= f.submit "Save Profile", class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+                  <%= link_to "See my Profile", profile_path(current_user), class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500", target: "_blank" %>
                 </div>
               <% end %>
             </div>
@@ -145,7 +146,7 @@
                   </div>
                 <% end %>
                 
-                <%= form_with url: account_change_email_path, method: :patch, local: true, class: "space-y-3" do |f| %>
+                <%= form_with url: account_change_email_path, method: :patch, class: "space-y-3" do |f| %>
                   <div>
                     <%= f.label :new_email, "New email address", class: "block text-sm font-medium text-gray-700 mb-1" %>
                     <%= f.email_field :new_email, class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm", placeholder: "new.email@example.com" %>
@@ -169,7 +170,7 @@
                 </div>
               <% end %>
               
-              <%= form_with url: account_change_password_path, method: :patch, local: true, class: "space-y-4" do |f| %>
+              <%= form_with url: account_change_password_path, method: :patch, class: "space-y-4" do |f| %>
                 <% if current_user.has_password? %>
                   <div>
                     <%= f.label :current_password, class: "block text-sm font-medium text-gray-700 mb-1" %>
@@ -263,15 +264,7 @@
                     <div class="text-center">
                       <!-- Society Icon -->
                       <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-105 transition-transform">
-                        <% if society.is_private %>
-                          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                          </svg>
-                        <% else %>
-                          <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                          </svg>
-                        <% end %>
+                        <%= render 'shared/society_icon', society: society %>
                       </div>
                       
                       <!-- Society Name & Role Badge -->
@@ -293,9 +286,7 @@
                       <!-- Society Stats -->
                       <div class="flex justify-center space-x-6 text-xs text-gray-500">
                         <div class="flex items-center">
-                          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-3-3.87M9 20H4v-2a3 3 0 013-3.87m6 0A4 4 0 005 16m6-4a4 4 0 100-8 4 4 0 000 8zm6 4a3 3 0 00-3-3.87"></path>
-                          </svg>
+                          <%= render 'shared/user_group_icon', size: 'small' %>
                           <span><%= society.society_memberships.active.count %></span>
                         </div>
                         <div class="flex items-center">
@@ -454,45 +445,118 @@
               </div>
             <% end %>
             
-            <!-- Current Plan -->
-            <div class="bg-white rounded-lg border border-gray-200 p-6">
-              <h3 class="text-lg font-medium text-gray-900 mb-4">Current Plan</h3>
-              
-              <% if current_user.stripe_subscription_id.present? %>
-                <div class="space-y-4">
-                  <div class="flex justify-between items-center py-3 border-b border-gray-100">
-                    <div>
-                      <p class="text-sm font-medium text-gray-900">Premium Membership</p>
-                      <p class="text-sm text-gray-500">1 presentation credit per month</p>
+            <% if current_user.stripe_subscription_id.present? %>
+              <!-- Current Plan Section -->
+              <!-- Current Plan Section -->
+              <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Current Plan</h3>
+                
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div class="flex items-center gap-4">
+                    <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
+                      <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                      </svg>
                     </div>
-                    <div class="text-right">
-                      <p class="text-lg font-semibold text-gray-900">$9.99/month</p>
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                        <%= current_user.subscription_status&.capitalize || 'Active' %>
-                      </span>
-                    </div>
-                  </div>
-                  
-                  <div class="flex items-center justify-between">
                     <div>
-                      <p class="text-sm text-gray-500">Next billing date</p>
-                      <p class="text-sm font-medium text-gray-900">
-                        <%= current_user.subscription_ends_at&.strftime('%B %d, %Y') || 'N/A' %>
+                      <h4 class="font-semibold text-gray-900">
+                        <%= current_user.subscription_plan&.capitalize || 'Monthly' %> plan
+                      </h4>
+                      <p class="text-sm text-gray-600">
+                        <%= current_user.credits %> credit<%= 's' if current_user.credits != 1 %> available
+                      </p>
+                      <p class="text-xs text-gray-500 mt-1">
+                        Your subscription will auto-renew on <%= (current_user.subscription_ends_at || 30.days.from_now).strftime('%b %d, %Y') %>.
                       </p>
                     </div>
-                    <div>
-                      <p class="text-sm text-gray-500">Available credits</p>
-                      <p class="text-sm font-medium text-gray-900">1 credit</p>
-                    </div>
                   </div>
                   
-                  <div class="pt-4">
-                    <button class="inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                      Cancel Subscription
-                    </button>
+                  <%= link_to "Adjust plan", subscriptions_plans_path, class: "px-4 py-2 bg-gray-900 text-white text-sm font-medium rounded-md hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-900" %>
+                </div>
+              </div>
+              
+              
+              <!-- Payment Section -->
+              <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Payment</h3>
+                
+                <div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div class="flex items-center gap-3">
+                    <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
+                    </svg>
+                    <span class="text-sm text-gray-600">Link by Stripe</span>
+                  </div>
+                  
+                  <%= link_to "Update", subscriptions_portal_path, method: :post, class: "px-4 py-2 bg-white border border-gray-300 text-sm font-medium text-gray-700 rounded-md hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500" %>
+                </div>
+                
+                <div class="mt-4">
+                  <p class="text-sm text-gray-500">Credit available: <span class="font-semibold text-gray-900">$<%= sprintf('%.2f', current_user.credits * 9.99) %></span></p>
+                </div>
+              </div>
+                
+                <div class="flex items-center">
+                  <div class="flex-shrink-0">
+                    <svg class="h-8 w-12" viewBox="0 0 48 32" fill="none">
+                      <rect width="48" height="32" rx="4" fill="#1A1F71"/>
+                      <path d="M19.946 10.742H16.519V21.259H19.946V10.742Z" fill="white"/>
+                      <path d="M14.367 16C14.367 13.561 15.55 11.398 17.308 10.109C16.308 9.34601 15.092 8.91602 13.775 8.91602C10.499 8.91602 7.838 11.576 7.838 14.854C7.838 18.132 10.499 20.792 13.775 20.792C15.092 20.792 16.308 20.362 17.308 19.599C15.55 18.333 14.367 16.17 14.367 16Z" fill="white"/>
+                      <path d="M26.462 16C26.462 13.561 25.279 11.398 23.521 10.109C24.521 9.34601 25.737 8.91602 27.054 8.91602C30.33 8.91602 32.991 11.576 32.991 14.854C32.991 18.132 30.33 20.792 27.054 20.792C25.737 20.792 24.521 20.362 23.521 19.599C25.279 18.333 26.462 16.17 26.462 16Z" fill="#ED0006"/>
+                      <path d="M40.162 14.854C40.162 18.132 37.501 20.792 34.225 20.792C32.908 20.792 31.692 20.362 30.692 19.599C32.473 18.31 33.633 16.147 33.633 14C33.633 11.853 32.45 9.69001 30.692 8.40101C31.692 7.63801 32.908 7.20801 34.225 7.20801C37.501 7.20801 40.162 9.86801 40.162 14.854Z" fill="#F9A000"/>
+                    </svg>
+                  </div>
+                  <div class="ml-4">
+                    <p class="text-sm font-medium text-gray-900">•••• •••• •••• 4242</p>
+                    <p class="text-sm text-gray-500">Expires 12/2025</p>
                   </div>
                 </div>
-              <% else %>
+              </div>
+              
+              <!-- Credits Section -->
+              <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Credit Balance</h3>
+                <div class="bg-gray-50 rounded-lg p-4">
+                  <div class="flex items-center justify-between">
+                    <div>
+                      <p class="text-sm text-gray-500">Available Credits</p>
+                      <p class="text-3xl font-bold text-gray-900"><%= current_user.credits || 0 %></p>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-sm text-gray-500">Next credit on</p>
+                      <p class="text-sm font-medium text-gray-900"><%= Date.today.next_month.beginning_of_month.strftime('%B %d, %Y') %></p>
+                    </div>
+                  </div>
+                </div>
+                <p class="text-sm text-gray-500 mt-3">Credits are used to unlock premium presentations. You receive 1 credit on the 1st of each month.</p>
+              </div>
+              
+              <!-- Invoices Section -->
+              <div class="bg-white rounded-lg border border-gray-200 p-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Recent Invoices</h3>
+                <div class="overflow-hidden">
+                  <table class="min-w-full">
+                    <thead>
+                      <tr class="border-b border-gray-200">
+                        <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider pb-3">Date</th>
+                        <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider pb-3">Amount</th>
+                        <th class="text-left text-xs font-medium text-gray-500 uppercase tracking-wider pb-3">Status</th>
+                        <th class="text-right text-xs font-medium text-gray-500 uppercase tracking-wider pb-3">Actions</th>
+                      </tr>
+                    </thead>
+                    <tbody class="divide-y divide-gray-200">
+                      <tr>
+                        <td class="py-4 text-sm text-gray-900"><%= Date.today.strftime('%B %d, %Y') %></td>
+                        <td class="py-4 text-sm text-gray-900">$<%= current_user.subscription_plan == 'yearly' ? '131.88' : current_user.subscription_plan == 'quarterly' ? '38.97' : '15.99' %></td>
+                        <td class="py-4"><span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">Paid</span></td>
+                        <td class="py-4 text-right"><button class="text-sm text-indigo-600 hover:text-indigo-500">View</button></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+                <%= link_to "View All Invoices", subscriptions_portal_path, method: :post, class: "text-sm font-medium text-indigo-600 hover:text-indigo-500 mt-4 inline-block" %>
+              </div>
+            <% else %>
                 <!-- Subscription Plans with home page styling -->
                 <div class="mb-8">
                   <div class="text-center mb-8">
@@ -553,7 +617,7 @@
                           </ul>
                           
                           <div class="mt-auto">
-                            <%= form_with url: subscriptions_checkout_path, method: :post, local: true do |f| %>
+                            <%= form_with url: subscriptions_checkout_path, method: :post, local: true, data: { turbo: false } do |f| %>
                               <%= f.hidden_field :price_id, value: product[:id] %>
                               <%= f.submit "Get Started", class: "w-full inline-flex justify-center items-center px-6 py-3 border border-transparent rounded-full shadow-sm text-base font-medium text-white #{product[:popular] ? 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700 focus:ring-orange-500' : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:ring-indigo-500'} focus:outline-none focus:ring-2 focus:ring-offset-2 transition-all duration-200" %>
                             <% end %>
@@ -598,27 +662,49 @@
               <% end %>
             </div>
             
-            <!-- Payment Method -->
-            <div class="bg-white rounded-lg border border-gray-200 p-6">
+            <!-- Credits History -->
+            <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
               <div class="flex justify-between items-center mb-4">
-                <h3 class="text-lg font-medium text-gray-900">Payment Method</h3>
-                <a href="#" class="text-sm text-indigo-600 hover:text-indigo-500">Update</a>
+                <h3 class="text-lg font-medium text-gray-900">Credits History</h3>
+                <div class="flex items-center gap-3">
+                  <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-100 text-amber-800">
+                    <%= current_user.credits %> credit<%= 's' if current_user.credits != 1 %> available
+                  </span>
+                </div>
               </div>
               
-              <% if current_user.stripe_customer_id.present? %>
-                <div class="flex items-center space-x-3">
-                  <div class="flex-shrink-0">
-                    <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="text-sm font-medium text-gray-900">•••• •••• •••• 4242</p>
-                    <p class="text-sm text-gray-500">Expires 12/2025</p>
-                  </div>
+              <% credit_transactions = current_user.credit_transactions.order(created_at: :desc).limit(5) %>
+              <% if credit_transactions.any? %>
+                <div class="space-y-3">
+                  <% credit_transactions.each do |transaction| %>
+                    <div class="flex justify-between items-center py-2 border-b border-gray-100 last:border-0">
+                      <div>
+                        <p class="text-sm font-medium text-gray-900">
+                          <% case transaction.transaction_type %>
+                          <% when 'granted' %>
+                            Monthly Credit
+                          <% when 'used' %>
+                            <%= transaction.presentation&.title || 'Presentation Purchase' %>
+                          <% when 'expired' %>
+                            Credits Expired
+                          <% when 'refunded' %>
+                            Credit Refunded
+                          <% end %>
+                        </p>
+                        <p class="text-sm text-gray-500">
+                          <%= transaction.created_at.strftime('%B %d, %Y at %l:%M %p') %>
+                        </p>
+                      </div>
+                      <div class="text-right">
+                        <p class="text-sm font-semibold <%= transaction.transaction_type == 'granted' || transaction.transaction_type == 'refunded' ? 'text-green-600' : 'text-red-600' %>">
+                          <%= transaction.transaction_type == 'granted' || transaction.transaction_type == 'refunded' ? '+' : '-' %><%= transaction.amount.abs %> credit<%= 's' if transaction.amount.abs != 1 %>
+                        </p>
+                      </div>
+                    </div>
+                  <% end %>
                 </div>
               <% else %>
-                <p class="text-sm text-gray-500">No payment method on file</p>
+                <p class="text-sm text-gray-500 text-center py-4">No credit transactions yet</p>
               <% end %>
             </div>
             
@@ -672,13 +758,17 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function() {
+function initializeAccountPage() {
   const tabs = document.querySelectorAll('[data-tab]');
   const contents = document.querySelectorAll('.tab-content');
 
   function activateTab(tabName) {
+    // Get fresh references to tabs and contents
+    const currentTabs = document.querySelectorAll('[data-tab]');
+    const currentContents = document.querySelectorAll('.tab-content');
+    
     // Remove active classes from all tabs
-    tabs.forEach(t => {
+    currentTabs.forEach(t => {
       t.className = 'flex items-center px-3 py-2 text-sm font-medium text-gray-700 hover:text-indigo-600 hover:bg-gray-50 rounded-md group';
       const icon = t.querySelector('svg');
       if (icon) {
@@ -696,8 +786,8 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     }
     
-    // Hide all content
-    contents.forEach(content => {
+    // Hide all content with fresh references
+    currentContents.forEach(content => {
       content.classList.add('hidden');
     });
     
@@ -708,12 +798,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', function(e) {
+  // Use event delegation instead of individual listeners
+  document.addEventListener('click', function(e) {
+    const tabElement = e.target.closest('[data-tab]');
+    if (tabElement) {
       e.preventDefault();
-      const targetTab = this.getAttribute('data-tab');
+      const targetTab = tabElement.getAttribute('data-tab');
       activateTab(targetTab);
-    });
+    }
   });
   
   // Check if we need to navigate to a specific tab based on URL
@@ -723,5 +815,19 @@ document.addEventListener('DOMContentLoaded', function() {
   if (urlParams.has('subscription') || hash === 'subscription') {
     activateTab('subscription');
   }
-});
+}
+
+// Initialize on DOM ready and Turbo navigation
+document.addEventListener('DOMContentLoaded', initializeAccountPage);
+document.addEventListener('turbo:load', initializeAccountPage);
+
+function showPlanSelector() {
+  document.getElementById('plan-selector').classList.remove('hidden');
+}
+
+function hidePlanSelector(event) {
+  if (!event || event.target === event.currentTarget) {
+    document.getElementById('plan-selector').classList.add('hidden');
+  }
+}
 </script>

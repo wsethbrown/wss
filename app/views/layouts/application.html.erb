@@ -42,7 +42,7 @@
 
   <body class="bg-white text-black min-h-screen font-sans">
     <!-- Top Navigation Bar -->
-    <nav class="fixed top-0 left-0 w-full z-50 bg-white/80 backdrop-blur border-b border-gray-200 shadow-sm">
+    <nav class="fixed top-0 left-0 w-full z-50 bg-white border-b border-gray-200 shadow-sm">
       <div class="max-w-6xl mx-auto flex items-center justify-between px-6 py-3">
         <!-- Logo -->
         <a href="/" class="flex items-center gap-3 font-bold text-2xl tracking-tight text-black hover:text-indigo-600 transition">
@@ -50,11 +50,19 @@
           <span class="hidden sm:inline">Whiskey Share Society</span>
         </a>
         <!-- Navigation Links -->
-        <div class="hidden md:flex gap-6 text-lg font-medium">
+        <div class="hidden md:flex gap-6 text-lg font-medium items-center">
           <%= nav_link_to 'Societies', societies_path %>
-          <%= nav_link_to 'Events', events_path %>
           <%= nav_link_to 'Presentations', presentations_path %>
           <% if user_signed_in? %>
+            <% if current_user.subscription_active? && current_user.credits > 0 %>
+              <div class="flex items-center gap-2 px-3 py-1 bg-gradient-to-r from-amber-50 to-orange-50 border border-amber-200 rounded-full">
+                <svg class="w-4 h-4 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/>
+                </svg>
+                <span class="text-sm font-semibold text-amber-700"><%= current_user.credits %> Credit<%= 's' if current_user.credits != 1 %></span>
+              </div>
+            <% end %>
             <%= nav_link_to 'Account', account_path %>
             <%= link_to 'Sign Out', destroy_user_session_path, data: { 'turbo-method': :delete, 'turbo-confirm': 'Are you sure you want to sign out?' }, class: 'ml-4 text-gray-400 hover:text-red-500 transition' %>
           <% else %>
@@ -83,11 +91,11 @@
 
     <!-- Main Content -->
     <% if controller_name == 'home' && action_name == 'index' %>
-      <main class="min-h-[80vh] w-full <%= 'pt-20' unless notice || alert %>">
+      <main class="min-h-[80vh] w-full">
         <%= yield %>
       </main>
     <% elsif controller_name == 'societies' && action_name == 'index' %>
-      <main class="min-h-[80vh] w-full <%= 'pt-20' unless notice || alert %>">
+      <main class="min-h-[80vh] w-full">
         <%= yield %>
       </main>
     <% elsif controller_name == 'presentations' %>
@@ -131,7 +139,6 @@
             <h3 class="text-xl font-bold mb-6">Quick Links</h3>
             <ul class="space-y-3">
               <li><%= link_to 'Societies', societies_path, class: 'text-gray-300 hover:text-white transition-colors' %></li>
-              <li><%= link_to 'Events', events_path, class: 'text-gray-300 hover:text-white transition-colors' %></li>
               <li><%= link_to 'Presentations', presentations_path, class: 'text-gray-300 hover:text-white transition-colors' %></li>
               <li><%= link_to 'About Us', '#', class: 'text-gray-300 hover:text-white transition-colors' %></li>
             </ul>

@@ -1,9 +1,10 @@
 ---
 id: task-3
 title: Profile tab
-status: To Do
+status: Done
 assignee: []
 created_date: '2025-07-09'
+updated_date: '2025-07-09'
 labels: []
 dependencies: []
 ---

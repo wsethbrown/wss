@@ -172,4 +172,32 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 ### Debugging
 - You should use extensive logging to debug problems.
 
+### Stripe Webhook Configuration
+For the credit system and subscriptions to work properly, you need to configure Stripe webhooks:
+
+1. **In Stripe Dashboard**:
+   - Go to Developers → Webhooks
+   - Add endpoint: `https://your-domain.com/webhooks/stripe`
+   - Select events: 
+     - `customer.subscription.created`
+     - `customer.subscription.updated`
+     - `customer.subscription.deleted`
+     - `invoice.payment_succeeded`
+     - `checkout.session.completed`
+   - Copy the webhook signing secret to your `.env` file as `STRIPE_WEBHOOK_SECRET`
+
+2. **For Local Development**:
+   - Install Stripe CLI: `brew install stripe/stripe-cli/stripe`
+   - Login: `stripe login`
+   - Forward webhooks: `stripe listen --forward-to localhost:3000/webhooks/stripe`
+   - Use the webhook secret provided by the CLI in your `.env`
+
+3. **Testing Credits**:
+   - New subscriptions automatically grant 1 credit
+   - Monthly renewals grant 1 credit
+   - Credits expire when subscription ends
+
+### Git Workflow
+- Whenever a new feature is marked as complete by the User, make a new commit and push it up
+
 /file:.claude-on-rails/context.md

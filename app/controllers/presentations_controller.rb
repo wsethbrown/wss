@@ -2,199 +2,41 @@ class PresentationsController < ApplicationController
   before_action :set_presentation, only: [:show, :edit, :update, :destroy]
 
   def index
-    # Static presentation data
-    @all_presentations = [
-      {
-        id: 1,
-        title: "Introduction to Scotch Whisky",
-        category: "Scotch Whisky",
-        duration: "45 min",
-        difficulty: "Beginner",
-        rating: 4.8,
-        reviews: 127,
-        price: "$9.99",
-        image: "scotch-intro",
-        description: "Perfect for beginners, this presentation covers the basics of Scotch whisky production, regions, and tasting techniques."
-      },
-      {
-        id: 2,
-        title: "Bourbon: America's Native Spirit",
-        category: "Bourbon",
-        duration: "60 min",
-        difficulty: "Intermediate",
-        rating: 4.9,
-        reviews: 89,
-        price: "$12.99",
-        image: "bourbon-guide",
-        description: "Explore the rich history and production methods of America's favorite whiskey, from mash bills to barrel aging."
-      },
-      {
-        id: 3,
-        title: "Japanese Whisky Masterclass",
-        category: "Japanese Whisky",
-        duration: "75 min",
-        difficulty: "Advanced",
-        rating: 4.7,
-        reviews: 156,
-        price: "$14.99",
-        image: "japanese-whisky",
-        description: "Discover the unique characteristics and craftsmanship behind Japan's world-renowned whisky tradition."
-      },
-      {
-        id: 4,
-        title: "Irish Whiskey Traditions",
-        category: "Irish Whiskey",
-        duration: "50 min",
-        difficulty: "Beginner",
-        rating: 4.6,
-        reviews: 94,
-        price: "$10.99",
-        image: "irish-traditions",
-        description: "From triple distillation to pot still whiskey, learn about Ireland's centuries-old whiskey heritage."
-      },
-      {
-        id: 5,
-        title: "Rye Whiskey Renaissance",
-        category: "Rye Whiskey",
-        duration: "55 min",
-        difficulty: "Intermediate",
-        rating: 4.5,
-        reviews: 67,
-        price: "$11.99",
-        image: "rye-renaissance",
-        description: "Explore the spicy, bold flavors of rye whiskey and its resurgence in modern craft distilling."
-      },
-      {
-        id: 6,
-        title: "Canadian Whisky Deep Dive",
-        category: "Canadian Whisky",
-        duration: "40 min",
-        difficulty: "Beginner",
-        rating: 4.4,
-        reviews: 43,
-        price: "$9.99",
-        image: "canadian-deep-dive",
-        description: "Learn about the smooth, approachable style of Canadian whisky and its unique production methods."
-      },
-      {
-        id: 7,
-        title: "Peated Scotch Exploration",
-        category: "Scotch Whisky",
-        duration: "70 min",
-        difficulty: "Advanced",
-        rating: 4.8,
-        reviews: 112,
-        price: "$13.99",
-        image: "peated-scotch",
-        description: "Dive deep into the smoky, peaty world of Islay and other peated Scotch whiskies."
-      },
-      {
-        id: 8,
-        title: "Single Barrel Bourbon Tasting",
-        category: "Bourbon",
-        duration: "65 min",
-        difficulty: "Advanced",
-        rating: 4.9,
-        reviews: 78,
-        price: "$15.99",
-        image: "single-barrel",
-        description: "Master the art of single barrel bourbon tasting and understand what makes each barrel unique."
-      },
-      {
-        id: 9,
-        title: "Whiskey & Food Pairing",
-        category: "Beginner",
-        duration: "80 min",
-        difficulty: "Intermediate",
-        rating: 4.7,
-        reviews: 134,
-        price: "$16.99",
-        image: "food-pairing",
-        description: "Learn how to pair different whiskey styles with food to enhance both the drink and the meal."
-      },
-      {
-        id: 10,
-        title: "Craft Distillery Tour",
-        category: "Beginner",
-        duration: "45 min",
-        difficulty: "Beginner",
-        rating: 4.6,
-        reviews: 89,
-        price: "$8.99",
-        image: "craft-distillery",
-        description: "Take a virtual tour of craft distilleries and learn about small-batch whiskey production."
-      },
-      {
-        id: 11,
-        title: "Vintage Whiskey Appreciation",
-        category: "Advanced",
-        duration: "90 min",
-        difficulty: "Advanced",
-        rating: 4.9,
-        reviews: 45,
-        price: "$19.99",
-        image: "vintage-appreciation",
-        description: "Explore vintage and rare whiskies, understanding what makes them special and valuable."
-      },
-      {
-        id: 12,
-        title: "Whiskey Cocktail Classics",
-        category: "Beginner",
-        duration: "60 min",
-        difficulty: "Beginner",
-        rating: 4.5,
-        reviews: 156,
-        price: "$11.99",
-        image: "cocktail-classics",
-        description: "Learn to make classic whiskey cocktails and understand how different styles work in mixed drinks."
-      }
-    ]
-
+    # Use database presentations
+    @presentations = Presentation.published.includes(:author)
+    
     # Filter by search term
     if params[:search].present?
-      search_term = params[:search].downcase
-      @all_presentations = @all_presentations.select do |presentation|
-        presentation[:title].downcase.include?(search_term) ||
-        presentation[:description].downcase.include?(search_term) ||
-        presentation[:category].downcase.include?(search_term)
-      end
+      @presentations = @presentations.search(params[:search])
     end
 
     # Filter by category
     if params[:category].present?
-      @all_presentations = @all_presentations.select do |presentation|
-        presentation[:category] == params[:category]
-      end
+      @presentations = @presentations.by_category(params[:category])
     end
 
-    # Sort by popularity (rating) by default, or by other criteria
+    # Filter by difficulty
+    if params[:difficulty].present?
+      @presentations = @presentations.by_difficulty(params[:difficulty])
+    end
+
+    # Sort
     case params[:sort]
     when 'newest'
-      @all_presentations = @all_presentations.sort_by { |p| p[:id] }.reverse
+      @presentations = @presentations.recent
     when 'rating'
-      @all_presentations = @all_presentations.sort_by { |p| p[:rating] }.reverse
-    when 'duration'
-      @all_presentations = @all_presentations.sort_by { |p| p[:duration].to_i }
+      @presentations = @presentations.popular
+    when 'price_low'
+      @presentations = @presentations.order(:price)
+    when 'price_high'
+      @presentations = @presentations.order(price: :desc)
     else # 'popular' - default
-      @all_presentations = @all_presentations.sort_by { |p| p[:rating] }.reverse
+      @presentations = @presentations.popular
     end
-
-    @presentations = @all_presentations
   end
 
   def show
-    # For now, we'll use static data for the show page
-    @presentation = {
-      id: params[:id],
-      title: "Introduction to Scotch Whisky",
-      category: "Scotch Whisky",
-      duration: "45 min",
-      difficulty: "Beginner",
-      rating: 4.8,
-      reviews: 127,
-      price: "$9.99",
-      description: "Perfect for beginners, this comprehensive presentation covers the basics of Scotch whisky production, regions, and tasting techniques."
-    }
+    @presentation = Presentation.find(params[:id])
   end
 
   def new
@@ -234,6 +76,32 @@ class PresentationsController < ApplicationController
     redirect_to presentations_url, notice: 'Presentation was successfully deleted.'
   end
 
+  def purchase_options
+    # Show purchase options modal/page
+    @presentation = Presentation.find(params[:id])
+    render :purchase_options
+  end
+
+  def purchase
+    Rails.logger.info "=== PURCHASE ACTION CALLED ==="
+    Rails.logger.info "Params: #{params.inspect}"
+    Rails.logger.info "Purchase type: #{params[:purchase_type]}"
+    Rails.logger.info "User signed in: #{user_signed_in?}"
+    Rails.logger.info "Current user: #{current_user&.email}"
+    
+    @presentation = Presentation.find(params[:id])
+    purchase_type = params[:purchase_type] # 'credit' or 'direct'
+    
+    if purchase_type == 'credit'
+      purchase_with_credit
+    elsif purchase_type == 'direct'
+      # Temporarily disable Stripe - just simulate successful purchase
+      simulate_direct_purchase
+    else
+      redirect_to presentation_path(params[:id]), alert: 'Invalid purchase type'
+    end
+  end
+
   private
 
   def set_presentation
@@ -242,5 +110,136 @@ class PresentationsController < ApplicationController
 
   def presentation_params
     params.require(:presentation).permit(:title, :description, :content, :price, :category)
+  end
+
+  def simulate_direct_purchase
+    unless user_signed_in?
+      redirect_to auth_path, alert: 'Please sign in to purchase presentations'
+      return
+    end
+
+    # Check if already purchased
+    if already_purchased?
+      redirect_to presentation_path(params[:id]), notice: 'You already own this presentation'
+      return
+    end
+
+    # Simulate successful direct purchase
+    UserPresentation.create!(
+      user: current_user,
+      presentation_id: params[:id],
+      purchase_type: 'direct',
+      purchased_at: Time.current
+    )
+    
+    redirect_to presentation_path(params[:id]) + "?purchase=success", notice: 'Presentation purchased successfully! (Simulated - no payment processed)'
+  end
+
+  def purchase_with_credit
+    unless user_signed_in?
+      redirect_to auth_path, alert: 'Please sign in to purchase presentations'
+      return
+    end
+
+    unless current_user.has_active_subscription?
+      redirect_to presentation_path(params[:id]), alert: 'Active subscription required to purchase with credits'
+      return
+    end
+
+    credit_cost = 1 # Presentations cost 1 credit
+    unless current_user.has_sufficient_credits?(credit_cost)
+      redirect_to presentation_path(params[:id]), alert: 'Insufficient credits. You need 1 credit to purchase this presentation.'
+      return
+    end
+
+    # Check if already purchased
+    if already_purchased?
+      redirect_to presentation_path(params[:id]), notice: 'You already own this presentation'
+      return
+    end
+
+    # Process credit purchase
+    if current_user.deduct_credits(credit_cost)
+      # Create user_presentation record
+      UserPresentation.create!(
+        user: current_user,
+        presentation_id: params[:id],
+        purchase_type: 'credit',
+        purchased_at: Time.current
+      )
+      
+      redirect_to presentation_path(params[:id]), notice: 'Presentation purchased successfully with credit!'
+    else
+      redirect_to presentation_path(params[:id]), alert: 'Failed to process credit purchase'
+    end
+  end
+
+  def purchase_with_stripe
+    unless user_signed_in?
+      redirect_to auth_path, alert: 'Please sign in to purchase presentations'
+      return
+    end
+
+    # Check if already purchased
+    if already_purchased?
+      redirect_to presentation_path(params[:id]), notice: 'You already own this presentation'
+      return
+    end
+
+    begin
+      # Get or create Stripe customer
+      customer = get_or_create_stripe_customer
+
+      # Create Stripe checkout session for one-time payment
+      session = Stripe::Checkout::Session.create({
+        customer: customer.id,
+        payment_method_types: ['card'],
+        line_items: [{
+          price_data: {
+            currency: 'usd',
+            product_data: {
+              name: @presentation.title,
+              description: @presentation.description
+            },
+            unit_amount: (@presentation.price * 100).to_i # Convert to cents
+          },
+          quantity: 1
+        }],
+        mode: 'payment', # One-time payment, not subscription
+        success_url: presentation_url(params[:id]) + "?purchase=success",
+        cancel_url: presentation_url(params[:id]) + "?purchase=cancelled",
+        metadata: {
+          user_id: current_user.id,
+          presentation_id: params[:id],
+          purchase_type: 'direct'
+        }
+      })
+
+      redirect_to session.url, allow_other_host: true
+    rescue Stripe::StripeError => e
+      Rails.logger.error "Stripe error: #{e.message}"
+      redirect_to presentation_path(params[:id]), alert: 'Payment processing error. Please try again.'
+    end
+  end
+
+  def already_purchased?
+    current_user&.user_presentations&.exists?(presentation_id: params[:id])
+  end
+
+  def get_or_create_stripe_customer
+    if current_user.stripe_customer_id.present?
+      Stripe::Customer.retrieve(current_user.stripe_customer_id)
+    else
+      customer = Stripe::Customer.create({
+        email: current_user.email,
+        name: current_user.full_name,
+        metadata: {
+          user_id: current_user.id
+        }
+      })
+
+      current_user.update!(stripe_customer_id: customer.id)
+      customer
+    end
   end
 end

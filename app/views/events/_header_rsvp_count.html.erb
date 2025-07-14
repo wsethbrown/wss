@@ -1,0 +1,19 @@
+<div id="header-rsvp-count" class="flex items-start space-x-3">
+  <div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center">
+    <svg class="w-5 h-5 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path>
+    </svg>
+  </div>
+  <div>
+    <h3 class="text-sm font-medium text-gray-900">RSVPs</h3>
+    <p class="text-sm text-gray-600 mt-1">
+      <%= event.yes_count %> yes
+      <% if event.maybe_count > 0 %>
+        · <%= event.maybe_count %> maybe
+      <% end %>
+      <% if event.no_count > 0 %>
+        · <%= event.no_count %> no
+      <% end %>
+    </p>
+  </div>
+</div>

@@ -1,0 +1,147 @@
+<% content_for :title, "#{@user.full_name} - Profile" %>
+
+<div class="min-h-screen bg-gray-50">
+  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <!-- Header -->
+    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-6">
+      <div class="flex items-center space-x-6">
+        <!-- Profile Photo -->
+        <div class="flex-shrink-0">
+          <% if @user.profile_image.attached? %>
+            <div class="w-32 h-32 rounded-full overflow-hidden bg-gray-100">
+              <%= image_tag @user.profile_image, class: "w-full h-full object-cover" %>
+            </div>
+          <% else %>
+            <div class="w-32 h-32 rounded-full flex items-center justify-center" style="background-color: <%= @user.avatar_color %>;">
+              <span class="text-4xl text-white font-semibold"><%= @user.initials %></span>
+            </div>
+          <% end %>
+        </div>
+        
+        <!-- Profile Info -->
+        <div class="flex-1">
+          <h1 class="text-3xl font-bold text-gray-900 mb-2"><%= @user.full_name %></h1>
+          <p class="text-gray-600 mb-4">Member since <%= @user.created_at.strftime('%B %Y') %></p>
+          
+          <!-- Social Stats -->
+          <div class="flex space-x-6 text-sm text-gray-500">
+            <div class="flex items-center">
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-3-3.87M9 20H4v-2a3 3 0 013-3.87m6 0A4 4 0 005 16m6-4a4 4 0 100-8 4 4 0 000 8zm6 4a3 3 0 00-3-3.87"></path>
+              </svg>
+              <span><%= @user.member_societies.count %> societies</span>
+            </div>
+            <div class="flex items-center">
+              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+              </svg>
+              <span><%= @user.event_rsvps.where(status: 'confirmed').count %> events attended</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Main Content -->
+      <div class="lg:col-span-2 space-y-6">
+        <!-- About Me Section -->
+        <% if @user.bio.present? %>
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">About Me</h2>
+            <p class="text-gray-700 leading-relaxed whitespace-pre-wrap"><%= @user.bio %></p>
+          </div>
+        <% end %>
+
+        <!-- Societies Section -->
+        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h2 class="text-xl font-semibold text-gray-900 mb-4">Societies</h2>
+          <% user_societies = @user.member_societies.includes(:creator) %>
+          <% if user_societies.any? %>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <% user_societies.each do |society| %>
+                <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
+                  <div class="flex items-center space-x-3">
+                    <!-- Society Icon -->
+                    <div class="w-10 h-10 bg-gradient-to-br from-purple-500 to-pink-500 rounded-lg flex items-center justify-center flex-shrink-0">
+                      <% if society.is_private %>
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+                        </svg>
+                      <% else %>
+                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                        </svg>
+                      <% end %>
+                    </div>
+                    
+                    <div class="flex-1 min-w-0">
+                      <h3 class="font-medium text-gray-900 truncate"><%= society.name %></h3>
+                      <p class="text-sm text-gray-500 truncate"><%= truncate(society.description, length: 50) %></p>
+                      <% membership = @user.society_memberships.find_by(society: society) %>
+                      <% if membership&.admin? %>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-purple-100 text-purple-800 mt-1">Creator</span>
+                      <% elsif membership&.officer? %>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 mt-1">Officer</span>
+                      <% else %>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 mt-1">Member</span>
+                      <% end %>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <p class="text-gray-500 text-center py-8">Not a member of any societies yet.</p>
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Sidebar -->
+      <div class="space-y-6">
+        <!-- Whiskey Shelf -->
+        <% if @user.whiskey_shelf.present? %>
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
+              <svg class="w-5 h-5 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
+              </svg>
+              Whiskey Shelf
+            </h2>
+            <div class="space-y-2">
+              <% @user.whiskey_shelf.split("\n").reject(&:blank?).each do |whiskey| %>
+                <div class="flex items-center p-2 bg-amber-50 rounded-lg">
+                  <svg class="w-4 h-4 text-amber-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m11-9h-4V3h4v4zM9 21V9a2 2 0 012-2h2a2 2 0 012 2v12"></path>
+                  </svg>
+                  <span class="text-sm text-gray-700"><%= whiskey.strip %></span>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- Tags Section -->
+        <% if @user.tags.any? %>
+          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Interests & Expertise</h2>
+            <div class="space-y-4">
+              <% @user.tags.group_by(&:category).each do |category, tags| %>
+                <div>
+                  <h3 class="text-sm font-medium text-gray-700 mb-2 capitalize"><%= category.humanize %></h3>
+                  <div class="flex flex-wrap gap-2">
+                    <% tags.each do |tag| %>
+                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                        <%= tag.name %>
+                      </span>
+                    <% end %>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -2,8 +2,8 @@ class EventRsvp < ApplicationRecord
   belongs_to :user
   belongs_to :event
 
-  # Enums
-  enum :status, pending: :pending, confirmed: :confirmed, declined: :declined, cancelled: :cancelled
+  # Enums - Yes/Maybe/No RSVP system
+  enum :status, { yes: 'yes', maybe: 'maybe', no: 'no' }
 
   # Validations
   validates :user_id, uniqueness: { scope: :event_id, message: 'has already RSVPed to this event' }
@@ -11,28 +11,28 @@ class EventRsvp < ApplicationRecord
   validate :event_not_past
 
   # Note: Rails generates scopes automatically for enums
-  # .pending, .confirmed, .declined, .cancelled are available
+  # .yes, .maybe, .no are available
   scope :for_upcoming_events, -> { joins(:event).where('events.start_time > ?', Time.current) }
 
   # Instance methods
-  def confirmed?
-    status == 'confirmed'
+  def yes?
+    status == 'yes'
   end
 
-  def pending?
-    status == 'pending'
+  def maybe?
+    status == 'maybe'
   end
 
-  def declined?
-    status == 'declined'
+  def no?
+    status == 'no'
   end
 
-  def cancelled?
-    status == 'cancelled'
+  def attending?
+    yes?
   end
 
-  def can_cancel?
-    confirmed? && event.upcoming?
+  def can_change_response?
+    event.upcoming?
   end
 
   private

@@ -18,3 +18,6 @@
 11:01:47 web.1  | *          PID: 93526
 11:01:48 web.1  | * Inherited ssl://0.0.0.0:3000?cert=dev-cert.pem&key=dev-key.pem
 11:01:48 web.1  | Use Ctrl-C to stop
+11:29:22 web.1  | - Gracefully stopping, waiting for requests to finish
+11:29:22 web.1  | terminated by SIGTERM
+11:29:22 system | sending SIGTERM to all processes

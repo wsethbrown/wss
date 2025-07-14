@@ -14,8 +14,9 @@ class EventsController < ApplicationController
 
   def show
     @rsvps = @event.event_rsvps.includes(:user)
-    @confirmed_attendees = @event.confirmed_attendees
-    @pending_rsvps = @event.pending_rsvps
+    @yes_attendees = @event.yes_attendees
+    @maybe_attendees = @event.maybe_attendees
+    @no_attendees = @event.no_attendees
   end
 
   def new

@@ -1,0 +1,101 @@
+<% content_for :title, "Edit Presentation - Admin" %>
+
+<div class="mb-8">
+  <div class="flex items-center gap-4 mb-4">
+    <%= link_to admin_presentations_path, class: "text-gray-500 hover:text-gray-700" do %>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+    <% end %>
+    <h1 class="text-3xl font-bold text-gray-900">Edit Presentation</h1>
+  </div>
+  <p class="text-gray-600">Update "<%= @presentation.title %>"</p>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
+  <%= form_with model: [:admin, @presentation], local: true, class: "space-y-6" do |form| %>
+    <% if @presentation.errors.any? %>
+      <div class="rounded-lg bg-red-50 border border-red-200 text-red-800 px-4 py-3">
+        <h4 class="font-bold">Please fix the following errors:</h4>
+        <ul class="list-disc list-inside mt-2">
+          <% @presentation.errors.full_messages.each do |message| %>
+            <li><%= message %></li>
+          <% end %>
+        </ul>
+      </div>
+    <% end %>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= form.text_field :title, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      </div>
+
+      <div>
+        <%= form.label :category, class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= form.select :category, 
+            options_for_select([
+              ['Scotch Whisky', 'Scotch Whisky'],
+              ['Bourbon', 'Bourbon'],
+              ['Irish Whiskey', 'Irish Whiskey'],
+              ['Japanese Whisky', 'Japanese Whisky'],
+              ['Rye Whiskey', 'Rye Whiskey'],
+              ['Canadian Whisky', 'Canadian Whisky'],
+              ['General Education', 'General Education']
+            ], @presentation.category),
+            { include_blank: 'Select a category' },
+            { class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
+      </div>
+
+      <div>
+        <%= form.label :price, class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= form.number_field :price, step: 0.01, min: 0, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      </div>
+
+      <div>
+        <%= form.label :difficulty, class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= form.select :difficulty, 
+            options_for_select([
+              ['Beginner', 'Beginner'],
+              ['Intermediate', 'Intermediate'],
+              ['Advanced', 'Advanced']
+            ], @presentation.difficulty),
+            { include_blank: 'Select difficulty level' },
+            { class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
+      </div>
+
+      <div>
+        <%= form.label :duration, class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= form.text_field :duration, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      </div>
+
+      <div>
+        <%= form.label :image, class: "block text-sm font-medium text-gray-700 mb-2" %>
+        <%= form.text_field :image, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        <p class="text-xs text-gray-500 mt-1">Image identifier for presentation thumbnail</p>
+      </div>
+    </div>
+
+    <div>
+      <%= form.label :description, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_area :description, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+    </div>
+
+    <div>
+      <%= form.label :content, class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_area :content, rows: 10, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      <p class="text-xs text-gray-500 mt-1">This will be the main content users receive when they purchase the presentation</p>
+    </div>
+
+    <div class="flex items-center">
+      <%= form.check_box :published, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+      <%= form.label :published, "Published", class: "ml-2 block text-sm text-gray-700" %>
+    </div>
+
+    <div class="flex items-center gap-4 pt-6 border-t border-gray-200">
+      <%= form.submit "Update Presentation", class: "px-6 py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition" %>
+      <%= link_to "Cancel", admin_presentations_path, class: "px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition" %>
+      <%= link_to "View", presentation_path(@presentation), class: "px-6 py-3 bg-blue-100 text-blue-700 font-semibold rounded-xl hover:bg-blue-200 transition", target: "_blank" %>
+    </div>
+  <% end %>
+</div>

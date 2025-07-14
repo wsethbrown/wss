@@ -56,7 +56,10 @@ Rails.application.routes.draw do
 
   # Subscriptions
   post "subscriptions/checkout", to: "subscriptions#create_checkout_session"
-  get "subscriptions/portal", to: "subscriptions#portal"
+  post "subscriptions/portal", to: "subscriptions#portal"
+  post "subscriptions/cancel", to: "subscriptions#cancel"
+  post "subscriptions/change_plan", to: "subscriptions#change_plan"
+  get "subscriptions/plans", to: "subscriptions#plans"
 
   # Stripe webhooks
   post "webhooks/stripe", to: "webhooks#stripe"
@@ -67,15 +70,36 @@ Rails.application.routes.draw do
       post :join
       delete :leave
     end
+    
+    # Events are now nested under societies
+    resources :events do
+      resources :event_rsvps, only: [:create, :update, :destroy]
+    end
   end
-
-  # Events
-  resources :events do
+  
+  # Keep top-level event routes for existing functionality
+  # but they should redirect to the society page
+  resources :events, only: [:show] do
     resources :event_rsvps, only: [:create, :update, :destroy]
   end
 
+  # Admin panel
+  namespace :admin do
+    resources :presentations
+    root to: 'presentations#index'
+  end
+
   # Presentations
-  resources :presentations
+  resources :presentations do
+    resources :purchases, only: [ :new, :create ], controller: 'presentations/purchases'
+    member do
+      get :purchase_options
+      post :purchase
+    end
+  end
+
+  # Profiles
+  resources :profiles, only: [:show]
 
   # Health check
   get "health" => "application#health"

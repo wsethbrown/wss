@@ -23,16 +23,54 @@ class Event < ApplicationRecord
   scope :search, ->(query) { where('title ILIKE ? OR description ILIKE ?', "%#{query}%", "%#{query}%") if query.present? }
 
   # Instance methods
+  def yes_attendees
+    User.joins(:event_rsvps).where(event_rsvps: { event_id: id, status: 'yes' })
+  end
+
+  def maybe_attendees
+    User.joins(:event_rsvps).where(event_rsvps: { event_id: id, status: 'maybe' })
+  end
+
+  def no_attendees
+    User.joins(:event_rsvps).where(event_rsvps: { event_id: id, status: 'no' })
+  end
+
+  def yes_count
+    event_rsvps.where(status: 'yes').count
+  end
+
+  def maybe_count
+    event_rsvps.where(status: 'maybe').count
+  end
+
+  def no_count
+    event_rsvps.where(status: 'no').count
+  end
+
+  # Legacy method for compatibility - returns "Yes" attendees
   def confirmed_attendees
-    event_rsvps.where(status: 'confirmed').includes(:user)
+    yes_attendees
   end
 
   def confirmed_attendee_count
-    event_rsvps.where(status: 'confirmed').count
+    yes_count
   end
 
-  def pending_rsvps
-    event_rsvps.where(status: 'pending').includes(:user)
+  def total_rsvp_count
+    event_rsvps.count
+  end
+
+  def potential_attendees
+    society.members
+  end
+
+  def unanswered_count
+    # Get society members who haven't RSVPd
+    society.members.where.not(id: event_rsvps.select(:user_id)).count
+  end
+
+  def unanswered_users
+    society.members.where.not(id: event_rsvps.select(:user_id))
   end
 
   def upcoming?

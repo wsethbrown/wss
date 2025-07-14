@@ -22,7 +22,7 @@ class User < ApplicationRecord
       if user_by_email.provider.blank?
         # User has no OAuth provider yet, safe to add this one
         user_by_email.update!(
-          provider: auth.provider, 
+          provider: auth.provider,
           uid: auth.uid,
           first_name: auth.info.first_name || auth.info.name&.split(" ")&.first,
           last_name: auth.info.last_name || auth.info.name&.split(" ")&.last
@@ -101,6 +101,7 @@ class User < ApplicationRecord
   has_many :purchased_presentations, through: :user_presentations, source: :presentation
   has_many :user_tags, dependent: :destroy
   has_many :tags, through: :user_tags
+  has_many :credit_transactions, dependent: :destroy
 
   # Validations
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
@@ -156,6 +157,17 @@ class User < ApplicationRecord
 
   def managed_societies
     member_societies.joins(:society_memberships).where(society_memberships: { user: self, role: [ :admin, :officer ], status: :active })
+  end
+
+  def administered_societies
+    # Returns societies where the user can create events (created societies + admin/officer roles)
+    Society.left_joins(:society_memberships)
+           .where(
+             "(societies.creator_id = ? OR " +
+             "(society_memberships.user_id = ? AND society_memberships.role IN (?) AND society_memberships.status = ?))",
+             id, id, [ "admin", "officer" ], "active"
+           )
+           .distinct
   end
 
   # Tag helper methods
@@ -288,6 +300,43 @@ class User < ApplicationRecord
 
   def can_access_premium_content?
     has_active_subscription?
+  end
+
+  # Presentation access logic
+  def owns_presentation?(presentation_id)
+    user_presentations.exists?(presentation_id: presentation_id)
+  end
+
+  def can_access_presentation?(presentation_id)
+    return false unless owns_presentation?(presentation_id)
+    
+    purchase = user_presentations.find_by(presentation_id: presentation_id)
+    return false unless purchase
+    
+    case purchase.purchase_type
+    when 'direct'
+      # Direct purchases are always accessible
+      true
+    when 'credit'
+      # Credit purchases require active subscription
+      has_active_subscription?
+    else
+      false
+    end
+  end
+
+  def presentation_access_type(presentation_id)
+    purchase = user_presentations.find_by(presentation_id: presentation_id)
+    return nil unless purchase
+    
+    case purchase.purchase_type
+    when 'direct'
+      'lifetime'
+    when 'credit'
+      has_active_subscription? ? 'subscription' : 'expired'
+    else
+      nil
+    end
   end
 
   def days_until_renewal
