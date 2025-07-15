@@ -92,7 +92,19 @@ if Rails.env.development?
       p.review_count = presentation_data[:review_count]
       p.image = presentation_data[:image]
       p.published = presentation_data[:published]
+      
+      # Add tasting notes for first presentation
+      if presentation_data[:title] == "Introduction to Scotch Whisky"
+        p.nose_notes = "Vanilla, honey, light oak, subtle fruit notes"
+        p.palate_notes = "Smooth, balanced, with notes of caramel and spice"
+        p.finish_notes = "Medium length with warming oak and gentle smoke"
+        p.body_notes = "Medium-bodied with a smooth, approachable texture"
+        p.whiskey_recommendations = "Glenfiddich 12 Year|Speyside|$45|Light & Fruity|Pear, oak, subtle spice\nLaphroaig 10 Year|Islay|$65|Peaty & Smoky|Iodine, peat, sea salt\nHighland Park 12 Year|Highlands|$55|Balanced|Honey, heather, light smoke\nAuchentoshan 12 Year|Lowlands|$50|Smooth & Light|Vanilla, citrus, nuts"
+      end
     end
     puts "Created presentation: #{presentation.title}"
   end
+  
+  # Load additional presentation seeds
+  require_relative 'seeds/presentations'
 end

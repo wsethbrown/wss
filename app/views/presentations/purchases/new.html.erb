@@ -135,14 +135,19 @@
             <% end %>
           </div>
 
-          <!-- Submit Button -->
-          <div class="mt-8">
+          <!-- Submit Button - Hidden on mobile, shown on desktop -->
+          <div class="mt-8 hidden md:block">
             <%= f.submit "Continue to Payment", class: "w-full py-3 px-4 border border-transparent rounded-xl shadow-sm text-center font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200" %>
+          </div>
+          
+          <!-- Mobile sticky submit button -->
+          <div class="fixed bottom-0 left-0 right-0 p-4 bg-white border-t border-gray-200 md:hidden">
+            <%= f.submit "Continue to Payment", class: "w-full py-3 px-4 border border-transparent rounded-xl shadow-lg text-center font-medium text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200" %>
           </div>
         <% end %>
 
         <!-- Security Notice -->
-        <div class="mt-6 flex items-center justify-center text-sm text-gray-500">
+        <div class="mt-6 mb-20 md:mb-0 flex items-center justify-center text-sm text-gray-500">
           <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
           </svg>
@@ -152,6 +157,30 @@
     </div>
   </div>
 </div>
+
+<style>
+  /* Hide any duplicate purchase buttons at the bottom on desktop */
+  @media (min-width: 768px) {
+    /* Hide fixed bottom buttons */
+    body > .fixed:last-child,
+    body > div:last-child > button[class*="blue"],
+    body > div:last-child > .bg-blue-600,
+    /* Hide any full-width blue purchase buttons not in forms */
+    .bg-blue-600.text-white.w-full:not(form button):not(form input[type="submit"]),
+    /* Target buttons with specific purchase text */
+    button:contains("Purchase for"):not(form button),
+    input[type="submit"][value*="Purchase for"]:not(form input) {
+      display: none !important;
+    }
+  }
+  
+  /* Ensure proper spacing on mobile when sticky button is present */
+  @media (max-width: 767px) {
+    .mb-20 {
+      margin-bottom: 5rem !important;
+    }
+  }
+</style>
 
 <script>
 function selectPurchaseMethod(method) {

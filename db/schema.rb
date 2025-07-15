@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_14_181047) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_15_132801) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -112,10 +112,18 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_14_181047) do
     t.integer "review_count", default: 0
     t.text "whiskey_recommendations"
     t.text "tasting_notes"
+    t.text "nose_notes"
+    t.text "palate_notes"
+    t.text "finish_notes"
+    t.text "body_notes"
+    t.jsonb "whiskey_recommendations_json", default: []
+    t.text "what_youll_learn"
+    t.text "slides_preview"
     t.index ["author_id"], name: "index_presentations_on_author_id"
     t.index ["category"], name: "index_presentations_on_category"
     t.index ["price"], name: "index_presentations_on_price"
     t.index ["title"], name: "index_presentations_on_title"
+    t.index ["whiskey_recommendations_json"], name: "index_presentations_on_whiskey_recommendations_json", using: :gin
   end
 
   create_table "societies", force: :cascade do |t|

@@ -7,6 +7,7 @@ class Presentation < ApplicationRecord
   has_one_attached :featured_image
   has_one_attached :pdf_file
   has_many_attached :supplemental_materials
+  has_many_attached :preview_images
 
   # Validations
   validates :title, presence: true, length: { minimum: 2, maximum: 200 }
@@ -21,6 +22,7 @@ class Presentation < ApplicationRecord
   validate :featured_image_validation
   validate :pdf_file_validation
   validate :supplemental_materials_validation
+  validate :preview_images_validation
 
   # Scopes
   scope :free, -> { where(price: 0) }
@@ -78,6 +80,117 @@ class Presentation < ApplicationRecord
     (price * 100).to_i # Convert to cents for Stripe
   end
   
+  def parsed_whiskey_recommendations
+    # Use JSON format if available, otherwise fall back to old format
+    if whiskey_recommendations_json.present? && whiskey_recommendations_json.is_a?(Array)
+      return whiskey_recommendations_json.map do |rec|
+        rec = rec.symbolize_keys
+        # Ensure price has $ prefix
+        if rec[:price].present?
+          rec[:price] = rec[:price].to_s.start_with?('$') ? rec[:price] : "$#{rec[:price]}"
+        end
+        rec
+      end
+    end
+    
+    # Legacy format support
+    return [] if whiskey_recommendations.blank?
+    
+    whiskey_recommendations.split("\n").map do |line|
+      parts = line.split('|')
+      next if parts.length < 4
+      
+      price = parts[2].strip
+      # Ensure price has $ prefix
+      price = price.start_with?('$') ? price : "$#{price}" if price.present?
+      
+      {
+        name: parts[0].strip,
+        region: parts[1].strip,
+        price: price,
+        style: parts[3].strip,
+        notes: parts[4]&.strip
+      }
+    end.compact
+  end
+  
+  # Get preview images in consistent order (by blob id)
+  def ordered_preview_images
+    return [] unless preview_images.attached?
+    preview_images.order(:id)
+  end
+  
+  # Parse what you'll learn into array of points
+  def parsed_what_youll_learn
+    return [] if what_youll_learn.blank?
+    
+    # Split into sections based on lines that start with - followed by a title
+    sections = []
+    current_title = nil
+    current_description = []
+    in_section = false
+    
+    what_youll_learn.split("\n").each do |line|
+      # Check if this is a new section (starts with - and has a title format)
+      if line.strip.match(/^[-•*]\s*(.+)$/)
+        # Save previous section if exists
+        if current_title && in_section
+          sections << {
+            title: current_title,
+            description: current_description.join(" ").strip
+          }
+        end
+        
+        # Start new section
+        current_title = $1.strip
+        current_description = []
+        in_section = true
+      elsif line.strip.blank?
+        # Blank line - if we're in a section, it might be ending
+        if in_section && current_description.any?
+          # This blank line ends the current section
+          sections << {
+            title: current_title,
+            description: current_description.join(" ").strip
+          }
+          current_title = nil
+          current_description = []
+          in_section = false
+        end
+      elsif in_section
+        # This is part of the description
+        current_description << line.strip
+      end
+    end
+    
+    # Don't forget the last section if it wasn't ended by a blank line
+    if current_title && in_section
+      sections << {
+        title: current_title,
+        description: current_description.join(" ").strip
+      }
+    end
+    
+    sections
+  end
+  
+  # Parse slides preview into structured data
+  def parsed_slides_preview
+    return [] if slides_preview.blank?
+    
+    slides_preview.split("\n").map do |line|
+      parts = line.split('|')
+      next if parts.length < 4
+      
+      {
+        slide_number: parts[0].strip,
+        title: parts[1].strip,
+        description: parts[2].strip,
+        duration: parts[3].strip
+      }
+    end.compact
+  end
+  
   private
   
   def featured_image_validation
@@ -95,8 +208,14 @@ class Presentation < ApplicationRecord
   def pdf_file_validation
     return unless pdf_file.attached?
     
-    unless pdf_file.content_type == 'application/pdf'
-      errors.add(:pdf_file, 'must be a PDF file')
+    allowed_types = [
+      'application/pdf',
+      'application/vnd.openxmlformats-officedocument.presentationml.presentation', # .pptx
+      'application/vnd.ms-powerpoint' # .ppt
+    ]
+    
+    unless pdf_file.content_type.in?(allowed_types)
+      errors.add(:pdf_file, 'must be a PDF or PowerPoint file')
     end
     
     if pdf_file.byte_size > 50.megabytes
@@ -114,6 +233,24 @@ class Presentation < ApplicationRecord
       
       if material.byte_size > 25.megabytes
         errors.add(:supplemental_materials, 'files must be less than 25MB each')
+      end
+    end
+  end
+  
+  def preview_images_validation
+    return unless preview_images.attached?
+    
+    if preview_images.count > 3
+      errors.add(:preview_images, 'maximum 3 preview images allowed')
+    end
+    
+    preview_images.each do |image|
+      unless image.content_type.in?(%w[image/jpeg image/jpg image/png image/gif image/webp])
+        errors.add(:preview_images, 'must be valid image formats (JPEG, PNG, GIF, or WebP)')
+      end
+      
+      if image.byte_size > 5.megabytes
+        errors.add(:preview_images, 'must be less than 5MB each')
       end
     end
   end

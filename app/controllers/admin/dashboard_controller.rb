@@ -19,7 +19,7 @@ class Admin::DashboardController < Admin::BaseController
     @recent_users = User.order(created_at: :desc).limit(5)
     @recent_purchases = UserPresentation.includes(:user, :presentation)
                                        .order(created_at: :desc)
-                                       .limit(5)
+                                       .limit(10)
     @popular_presentations = Presentation.left_joins(:user_presentations)
                                         .group(:id)
                                         .order('COUNT(user_presentations.id) DESC')
@@ -27,6 +27,13 @@ class Admin::DashboardController < Admin::BaseController
     
     # Chart data for the last 7 days
     @signup_chart_data = generate_signup_chart_data
+    
+    # Subscription plan breakdown
+    @plan_breakdown = User.where.not(subscription_plan: nil)
+                          .group(:subscription_plan)
+                          .count
+                          .sort_by { |_, count| -count }
+                          .to_h
   end
   
   private

@@ -1,39 +1,12 @@
-08:49:39 web.1  | started with pid 73803
-08:49:39 web.1  | Puma starting in single mode...
-08:49:39 web.1  | * Puma version: 6.6.0 ("Return to Forever")
-08:49:39 web.1  | * Ruby version: ruby 3.4.3 (2025-04-14 revision d0b7e5b6a0) +PRISM [arm64-darwin23]
-08:49:39 web.1  | *  Min threads: 3
-08:49:39 web.1  | *  Max threads: 3
-08:49:39 web.1  | *  Environment: development
-08:49:39 web.1  | *          PID: 73803
-08:49:40 web.1  | bundler: failed to load command: puma (/opt/homebrew/lib/ruby/gems/3.4.0/bin/puma)
-08:49:40 web.1  | /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:376:in 'TCPServer#initialize': Address already in use - bind(2) for "0.0.0.0" port 3000 (Errno::EADDRINUSE)
-08:49:40 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:376:in 'IO.new'
-08:49:40 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:376:in 'Puma::Binder#add_ssl_listener'
-08:49:40 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:262:in 'block in Puma::Binder#parse'
-08:49:40 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:154:in 'Array#each'
-08:49:40 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:154:in 'Puma::Binder#parse'
-08:49:40 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/runner.rb:175:in 'Puma::Runner#load_and_bind'
-08:49:40 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/single.rb:44:in 'Puma::Single#run'
-08:49:40 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/launcher.rb:203:in 'Puma::Launcher#run'
-08:49:40 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/cli.rb:75:in 'Puma::CLI#run'
-08:49:40 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/bin/puma:10:in '<top (required)>'
-08:49:40 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/bin/puma:25:in 'Kernel#load'
-08:49:40 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/bin/puma:25:in '<top (required)>'
-08:49:40 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/cli/exec.rb:59:in 'Kernel.load'
-08:49:40 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/cli/exec.rb:59:in 'Bundler::CLI::Exec#kernel_load'
-08:49:40 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/cli/exec.rb:23:in 'Bundler::CLI::Exec#run'
-08:49:40 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/cli.rb:452:in 'Bundler::CLI#exec'
-08:49:40 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/vendor/thor/lib/thor/command.rb:28:in 'Bundler::Thor::Command#run'
-08:49:40 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/vendor/thor/lib/thor/invocation.rb:127:in 'Bundler::Thor::Invocation#invoke_command'
-08:49:40 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/vendor/thor/lib/thor.rb:538:in 'Bundler::Thor.dispatch'
-08:49:40 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/cli.rb:35:in 'Bundler::CLI.dispatch'
-08:49:40 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/vendor/thor/lib/thor/base.rb:584:in 'Bundler::Thor::Base::ClassMethods#start'
-08:49:40 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/cli.rb:29:in 'Bundler::CLI.start'
-08:49:40 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/bundler-2.6.8/exe/bundle:28:in 'block in <top (required)>'
-08:49:40 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/friendly_errors.rb:117:in 'Bundler.with_friendly_errors'
-08:49:40 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/bundler-2.6.8/exe/bundle:20:in '<top (required)>'
-08:49:40 web.1  | 	from /opt/homebrew/opt/ruby/bin/bundle:25:in 'Kernel#load'
-08:49:40 web.1  | 	from /opt/homebrew/opt/ruby/bin/bundle:25:in '<main>'
-08:49:40 web.1  | exited with code 1
-08:49:40 system | sending SIGTERM to all processes
+08:52:47 web.1  | started with pid 59946
+08:52:48 web.1  | Puma starting in single mode...
+08:52:48 web.1  | * Puma version: 6.6.0 ("Return to Forever")
+08:52:48 web.1  | * Ruby version: ruby 3.4.3 (2025-04-14 revision d0b7e5b6a0) +PRISM [arm64-darwin23]
+08:52:48 web.1  | *  Min threads: 3
+08:52:48 web.1  | *  Max threads: 3
+08:52:48 web.1  | *  Environment: development
+08:52:48 web.1  | *          PID: 59946
+08:52:49 web.1  | * Listening on ssl://0.0.0.0:3000?cert=dev-cert.pem&key=dev-key.pem
+08:52:49 web.1  | Use Ctrl-C to stop
+09:02:05 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
+15:15:04 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
