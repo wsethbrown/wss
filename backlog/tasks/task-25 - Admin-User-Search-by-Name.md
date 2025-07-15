@@ -1,7 +1,7 @@
 ---
 id: task-25
 title: Admin User Search by Name
-status: To Do
+status: In Progress
 assignee: []
 created_date: '2025-07-14'
 labels: []

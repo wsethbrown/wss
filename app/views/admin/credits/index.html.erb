@@ -1,0 +1,271 @@
+<div class="max-w-7xl mx-auto">
+  <!-- Header -->
+  <div class="mb-8 flex items-center justify-between">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">Credit Management</h1>
+      <p class="text-gray-600 mt-2">Manage user credits and view transaction history</p>
+    </div>
+    <div class="flex gap-4">
+      <%= link_to grant_monthly_admin_credits_path, 
+          method: :post,
+          data: { confirm: "Grant 1 credit to all active subscribers?" },
+          class: "px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition flex items-center gap-2" do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+        </svg>
+        Grant Monthly Credits
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Total Credits</p>
+          <p class="text-3xl font-bold text-purple-600 mt-2"><%= number_with_delimiter(@total_credits) %></p>
+        </div>
+        <div class="p-3 bg-purple-100 rounded-lg">
+          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Users with Credits</p>
+          <p class="text-3xl font-bold text-green-600 mt-2"><%= @users_with_credits %></p>
+        </div>
+        <div class="p-3 bg-green-100 rounded-lg">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Average Credits</p>
+          <p class="text-3xl font-bold text-blue-600 mt-2"><%= @average_credits %></p>
+        </div>
+        <div class="p-3 bg-blue-100 rounded-lg">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Credit Usage (30d)</p>
+          <p class="text-3xl font-bold text-amber-600 mt-2">N/A</p>
+        </div>
+        <div class="p-3 bg-amber-100 rounded-lg">
+          <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0V9m0 8l-8-8-4 4-6-6"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bulk Actions -->
+  <%= form_with url: bulk_add_admin_credits_path, method: :post, local: true, class: "bg-amber-50 border border-amber-200 rounded-xl p-6 mb-8" do |form| %>
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">Bulk Credit Addition</h2>
+    <div class="flex items-end gap-4">
+      <div class="flex-1">
+        <label class="block text-sm font-medium text-gray-700 mb-2">Credits to Add</label>
+        <%= number_field_tag :credits_to_add, nil, 
+            placeholder: "Number of credits",
+            min: 1,
+            class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      </div>
+      <div>
+        <p class="text-sm text-gray-600 mb-2">Quick Options</p>
+        <div class="flex gap-2">
+          <button type="button" 
+                  onclick="document.getElementById('credits_to_add').value = 1"
+                  class="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition">
+            +1
+          </button>
+          <button type="button" 
+                  onclick="document.getElementById('credits_to_add').value = 5"
+                  class="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition">
+            +5
+          </button>
+          <button type="button" 
+                  onclick="document.getElementById('credits_to_add').value = 10"
+                  class="px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition">
+            +10
+          </button>
+        </div>
+      </div>
+    </div>
+    <p class="text-sm text-gray-600 mt-4 mb-6">Select users below to add credits to their accounts</p>
+
+  <!-- Filters -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+    <%= form_with url: admin_credits_path, method: :get, local: true, class: "space-y-4" do |filter_form| %>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- Search -->
+        <div class="md:col-span-2">
+          <label class="block text-sm font-medium text-gray-700 mb-2">Search Users</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <%= filter_form.text_field :search, 
+                value: params[:search], 
+                placeholder: "Search by name or email...",
+                class: "w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+          </div>
+        </div>
+
+        <!-- Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Filter</label>
+          <%= filter_form.select :filter, 
+              options_for_select([
+                ['All Users', ''],
+                ['Has Credits', 'has_credits'],
+                ['No Credits', 'no_credits'],
+                ['Negative Balance', 'negative']
+              ], params[:filter]),
+              {},
+              { class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
+        </div>
+
+        <!-- Sort -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
+          <%= filter_form.select :sort, 
+              options_for_select([
+                ['Most Credits', 'most_credits'],
+                ['Least Credits', 'least_credits'],
+                ['Name', 'name']
+              ], params[:sort]),
+              {},
+              { class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <%= filter_form.submit "Apply Filters", class: "px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition" %>
+        <%= link_to "Clear", admin_credits_path, class: "px-6 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Users Table -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <% if @users.any? %>
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left">
+              <%= check_box_tag 'select_all', '1', false, 
+                  onclick: "document.querySelectorAll('input[name=\"user_ids[]\"]').forEach(cb => cb.checked = this.checked)",
+                  class: "h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
+            </th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Current Credits</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subscription</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Last Activity</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @users.each do |user| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4">
+                <%= check_box_tag 'user_ids[]', user.id, false, 
+                    class: "h-4 w-4 text-blue-600 border-gray-300 rounded focus:ring-blue-500" %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="flex-shrink-0 h-10 w-10">
+                    <% if user.profile_image.attached? %>
+                      <%= image_tag user.profile_image, class: "h-10 w-10 rounded-full object-cover" %>
+                    <% else %>
+                      <div class="h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold" style="background-color: <%= user.avatar_color %>">
+                        <%= user.initials %>
+                      </div>
+                    <% end %>
+                  </div>
+                  <div class="ml-4">
+                    <div class="text-sm font-medium text-gray-900"><%= user.full_name %></div>
+                    <div class="text-sm text-gray-500"><%= user.email %></div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="text-2xl font-bold <%= user.credits > 0 ? 'text-green-600' : user.credits < 0 ? 'text-red-600' : 'text-gray-500' %>">
+                  <%= user.credits %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <% if user.subscription_status == 'active' %>
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                    Active
+                  </span>
+                <% else %>
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                    None
+                  </span>
+                <% end %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= user.updated_at.strftime("%b %d, %Y") %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                <%= link_to "Adjust", adjust_admin_credit_path(user), class: "text-blue-600 hover:text-blue-900" %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+
+      <!-- Bulk Action Submit -->
+      <div class="bg-gray-50 px-6 py-4 border-t border-gray-200">
+        <div class="flex items-center justify-between">
+          <p class="text-sm text-gray-600">
+            Select users and enter credit amount above
+          </p>
+          <%= form.submit "Add Credits to Selected Users", 
+              class: "px-6 py-2 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition cursor-pointer" %>
+        </div>
+      </div>
+    <% end %>
+
+      <!-- Pagination -->
+      <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+        <%= paginate @users %>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No users found</h3>
+        <p class="mt-1 text-sm text-gray-500">
+          <% if params[:search].present? || params[:filter].present? %>
+            No users match your filters.
+          <% else %>
+            No users in the system yet.
+          <% end %>
+        </p>
+      </div>
+    <% end %>
+  </div>
+  <% end %>
+</div>

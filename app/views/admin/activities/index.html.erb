@@ -1,0 +1,203 @@
+<div class="max-w-7xl mx-auto">
+  <!-- Header -->
+  <div class="mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">User Activity</h1>
+    <p class="text-gray-600 mt-2">Monitor user actions and system events</p>
+  </div>
+
+  <!-- Stats Cards -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Activities Today</p>
+          <p class="text-3xl font-bold text-blue-600 mt-2"><%= @total_activities_today %></p>
+        </div>
+        <div class="p-3 bg-blue-100 rounded-lg">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Active Users Today</p>
+          <p class="text-3xl font-bold text-green-600 mt-2"><%= @active_users_today %></p>
+        </div>
+        <div class="p-3 bg-green-100 rounded-lg">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Most Common Activity</p>
+          <p class="text-lg font-bold text-purple-600 mt-2">
+            <% if @most_common_activity %>
+              <%= ActivityLog::ACTIVITY_TYPES[@most_common_activity[0].to_sym] || @most_common_activity[0].humanize %>
+            <% else %>
+              No activities yet
+            <% end %>
+          </p>
+        </div>
+        <div class="p-3 bg-purple-100 rounded-lg">
+          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filters -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
+    <%= form_with url: admin_activities_path, method: :get, local: true, class: "space-y-4" do |form| %>
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <!-- Search -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Search</label>
+          <div class="relative">
+            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+              </svg>
+            </div>
+            <%= form.text_field :search, 
+                value: params[:search], 
+                placeholder: "Search activities...",
+                class: "w-full pl-10 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+          </div>
+        </div>
+
+        <!-- Activity Type Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Activity Type</label>
+          <%= form.select :activity_type, 
+              options_for_select(
+                [['All Activities', '']] + ActivityLog::ACTIVITY_TYPES.map { |k, v| [v, k] },
+                params[:activity_type]
+              ),
+              {},
+              { class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
+        </div>
+
+        <!-- Date Range -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Date Range</label>
+          <%= form.select :date_range, 
+              options_for_select([
+                ['All Time', ''],
+                ['Today', 'today'],
+                ['This Week', 'week'],
+                ['This Month', 'month']
+              ], params[:date_range]),
+              {},
+              { class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
+        </div>
+
+        <!-- User Filter -->
+        <div>
+          <label class="block text-sm font-medium text-gray-700 mb-2">Specific User</label>
+          <% if @selected_user %>
+            <div class="flex items-center gap-2">
+              <span class="text-sm text-gray-900"><%= @selected_user.full_name %></span>
+              <%= link_to "Clear", admin_activities_path, class: "text-sm text-blue-600 hover:text-blue-800" %>
+            </div>
+          <% else %>
+            <p class="text-sm text-gray-500 py-2">All users</p>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-4">
+        <%= form.submit "Apply Filters", class: "px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition" %>
+        <%= link_to "Clear", admin_activities_path, class: "px-6 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition" %>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Activity Feed -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+    <% if @activities.any? %>
+      <div class="divide-y divide-gray-200">
+        <% @activities.each do |activity| %>
+          <div class="p-6 hover:bg-gray-50">
+            <div class="flex items-start justify-between">
+              <div class="flex items-start gap-4">
+                <!-- User Avatar -->
+                <div class="flex-shrink-0">
+                  <% if activity.user.profile_image.attached? %>
+                    <%= image_tag activity.user.profile_image, class: "h-10 w-10 rounded-full object-cover" %>
+                  <% else %>
+                    <div class="h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold" style="background-color: <%= activity.user.avatar_color %>">
+                      <%= activity.user.initials %>
+                    </div>
+                  <% end %>
+                </div>
+                
+                <!-- Activity Details -->
+                <div class="flex-1">
+                  <p class="text-sm">
+                    <%= link_to activity.user.full_name, admin_user_path(activity.user), class: "font-medium text-gray-900 hover:text-blue-600" %>
+                    <span class="text-gray-600"><%= activity.activity_description %></span>
+                    <% if activity.trackable_name %>
+                      <span class="font-medium text-gray-900">"<%= activity.trackable_name %>"</span>
+                    <% end %>
+                  </p>
+                  
+                  <div class="mt-1 flex items-center gap-4 text-xs text-gray-500">
+                    <span><%= activity.created_at.strftime("%b %d, %Y at %I:%M %p") %></span>
+                    <% if activity.ip_address.present? %>
+                      <span>IP: <%= activity.ip_address %></span>
+                    <% end %>
+                  </div>
+                  
+                  <% if activity.metadata.present? && activity.metadata.any? %>
+                    <div class="mt-2 text-sm text-gray-600">
+                      <% activity.metadata.except('ip_address', 'user_agent').each do |key, value| %>
+                        <span class="inline-block bg-gray-100 rounded px-2 py-1 mr-2 mb-1">
+                          <%= key.humanize %>: <%= value %>
+                        </span>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              </div>
+              
+              <!-- View Details -->
+              <%= link_to admin_activity_path(activity), class: "text-sm text-blue-600 hover:text-blue-800" do %>
+                View Details →
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Pagination -->
+      <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
+        <%= paginate @activities %>
+      </div>
+    <% else %>
+      <div class="text-center py-12">
+        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+        </svg>
+        <h3 class="mt-2 text-sm font-medium text-gray-900">No activities found</h3>
+        <p class="mt-1 text-sm text-gray-500">
+          <% if params[:search].present? || params[:activity_type].present? || params[:date_range].present? %>
+            No activities match your filters.
+          <% else %>
+            No activities have been logged yet.
+          <% end %>
+        </p>
+      </div>
+    <% end %>
+  </div>
+</div>

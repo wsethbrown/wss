@@ -102,6 +102,7 @@ class User < ApplicationRecord
   has_many :user_tags, dependent: :destroy
   has_many :tags, through: :user_tags
   has_many :credit_transactions, dependent: :destroy
+  has_many :activity_logs, dependent: :destroy
 
   # Validations
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }

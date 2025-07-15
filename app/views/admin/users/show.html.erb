@@ -1,15 +1,23 @@
 <% content_for :title, "#{@user.full_name} - Admin" %>
 
-<div class="mb-8">
-  <div class="flex items-center gap-4 mb-4">
-    <%= link_to admin_users_path, class: "text-gray-500 hover:text-gray-700" do %>
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-      </svg>
-    <% end %>
-    <h1 class="text-3xl font-bold text-gray-900"><%= @user.full_name %></h1>
+<div class="max-w-7xl mx-auto">
+  <!-- Header -->
+  <div class="mb-8 flex items-center justify-between">
+    <div>
+      <div class="flex items-center gap-2 text-sm text-gray-600 mb-2">
+        <%= link_to "Admin", admin_root_path, class: "hover:text-gray-900" %>
+        <span>/</span>
+        <%= link_to "Users", admin_users_path, class: "hover:text-gray-900" %>
+        <span>/</span>
+        <span class="text-gray-900"><%= @user.full_name %></span>
+      </div>
+      <h1 class="text-3xl font-bold text-gray-900">User Details</h1>
+    </div>
+    <div class="flex gap-4">
+      <%= link_to "Edit User", edit_admin_user_path(@user), class: "px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition" %>
+      <%= link_to "Back to Users", admin_users_path, class: "px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition" %>
+    </div>
   </div>
-</div>
 
 <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
   <!-- Main Content -->

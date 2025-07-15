@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_15_132801) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_15_232913) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -40,6 +40,23 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_15_132801) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "activity_logs", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "trackable_type"
+    t.bigint "trackable_id"
+    t.string "activity_type", null: false
+    t.jsonb "metadata", default: {}
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["activity_type"], name: "index_activity_logs_on_activity_type"
+    t.index ["created_at"], name: "index_activity_logs_on_created_at"
+    t.index ["trackable_type", "trackable_id"], name: "index_activity_logs_on_trackable"
+    t.index ["user_id", "created_at"], name: "index_activity_logs_on_user_id_and_created_at"
+    t.index ["user_id"], name: "index_activity_logs_on_user_id"
   end
 
   create_table "credit_transactions", force: :cascade do |t|
@@ -229,6 +246,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_15_132801) do
     t.integer "credits", default: 0, null: false
     t.boolean "cancel_at_period_end", default: false
     t.boolean "is_admin", default: false, null: false
+    t.datetime "subscription_paused_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["is_admin"], name: "index_users_on_is_admin"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -236,6 +254,7 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_15_132801) do
 
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "activity_logs", "users"
   add_foreign_key "credit_transactions", "presentations"
   add_foreign_key "credit_transactions", "users"
   add_foreign_key "event_rsvps", "events"

@@ -87,7 +87,26 @@ Rails.application.routes.draw do
   namespace :admin do
     get 'dashboard', to: 'dashboard#index'
     resources :presentations
-    resources :users, only: [:index, :show]
+    resources :users, only: [:index, :show, :edit, :update]
+    resources :subscriptions, only: [:index, :edit, :update] do
+      member do
+        post :cancel
+        post :pause
+        post :resume
+      end
+    end
+    resources :credits, only: [:index] do
+      collection do
+        post :bulk_add
+        post :grant_monthly
+        get :transactions
+      end
+      member do
+        get :adjust
+        post :adjust
+      end
+    end
+    resources :activities, only: [:index, :show]
     root to: 'dashboard#index'
   end
 

@@ -3,6 +3,7 @@ class ApplicationController < ActionController::Base
   allow_browser versions: :modern
 
   include Pundit::Authorization
+  include ActivityLogger
 
   # before_action :authenticate_user!
 
