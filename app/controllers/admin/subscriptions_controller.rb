@@ -70,41 +70,65 @@ class Admin::SubscriptionsController < Admin::BaseController
 
   def cancel
     begin
-      # Cancel in Stripe if subscription ID exists
-      if @user.stripe_subscription_id.present?
+      Rails.logger.info "=== ADMIN CANCEL START ==="
+      Rails.logger.info "Admin #{current_user.email} attempting to cancel subscription for user #{@user.email}"
+      Rails.logger.info "User subscription ID: #{@user.stripe_subscription_id}"
+      Rails.logger.info "User subscription status: #{@user.subscription_status}"
+      
+      # Cancel ALL active subscriptions in Stripe for this customer
+      if @user.stripe_customer_id.present?
         begin
-          # Cancel the subscription immediately in Stripe
-          subscription = Stripe::Subscription.cancel(@user.stripe_subscription_id)
-          
-          Rails.logger.info "Admin #{current_user.email} canceled Stripe subscription #{@user.stripe_subscription_id} for user #{@user.email}"
-          
-          # Update local database to match Stripe - clear the subscription ID since it's canceled
-          @user.update!(
-            stripe_subscription_id: nil,
-            subscription_status: 'canceled',
-            subscription_ends_at: Time.current,
-            cancel_at_period_end: false
+          # First, list all active subscriptions
+          active_subscriptions = Stripe::Subscription.list(
+            customer: @user.stripe_customer_id,
+            status: 'active',
+            limit: 100
           )
-        rescue Stripe::InvalidRequestError => e
-          Rails.logger.error "Stripe subscription not found for cancellation: #{e.message}"
-          # Subscription doesn't exist in Stripe, just update our database
-          @user.update!(
-            stripe_subscription_id: nil,
-            subscription_status: 'canceled',
-            subscription_ends_at: Time.current
-          )
+          
+          Rails.logger.info "Found #{active_subscriptions.data.count} active subscription(s) for customer #{@user.stripe_customer_id}"
+          
+          # Cancel each active subscription
+          active_subscriptions.data.each do |subscription|
+            Rails.logger.info "Canceling subscription #{subscription.id}..."
+            canceled_sub = Stripe::Subscription.cancel(subscription.id)
+            Rails.logger.info "Subscription #{subscription.id} canceled with status: #{canceled_sub.status}"
+          end
+          
+          # Also cancel the stored subscription if it exists and wasn't in the list
+          if @user.stripe_subscription_id.present?
+            begin
+              stored_sub = Stripe::Subscription.retrieve(@user.stripe_subscription_id)
+              if stored_sub.status == 'active' || stored_sub.status == 'trialing'
+                Rails.logger.info "Also canceling stored subscription #{@user.stripe_subscription_id}"
+                Stripe::Subscription.cancel(@user.stripe_subscription_id)
+              end
+            rescue Stripe::InvalidRequestError => e
+              Rails.logger.info "Stored subscription not found or already canceled: #{e.message}"
+            end
+          end
+          
+        rescue Stripe::StripeError => e
+          Rails.logger.error "Error listing/canceling subscriptions: #{e.message}"
+          redirect_to admin_subscriptions_path, alert: "Error canceling subscription: #{e.message}"
+          return
         end
-      else
-        # No Stripe subscription, just update our database
-        @user.update!(
-          subscription_status: 'canceled',
-          subscription_ends_at: Time.current
-        )
       end
       
-      redirect_to admin_subscriptions_path, notice: "Subscription canceled for #{@user.full_name}"
-    rescue Stripe::StripeError => e
-      Rails.logger.error "Error canceling subscription: #{e.message}"
+      # Update local database - clear ALL subscription data
+      @user.update!(
+        stripe_subscription_id: nil,
+        subscription_status: 'canceled',
+        subscription_plan: nil,
+        subscription_ends_at: Time.current,
+        cancel_at_period_end: false
+      )
+      
+      Rails.logger.info "=== ADMIN CANCEL COMPLETE ==="
+      redirect_to admin_subscriptions_path, notice: "All subscriptions canceled for #{@user.full_name}"
+      
+    rescue => e
+      Rails.logger.error "Unexpected error in admin cancel: #{e.class} - #{e.message}"
+      Rails.logger.error e.backtrace.first(5).join("\n")
       redirect_to admin_subscriptions_path, alert: "Error canceling subscription: #{e.message}"
     end
   end
