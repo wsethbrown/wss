@@ -78,19 +78,20 @@ class Admin::SubscriptionsController < Admin::BaseController
           
           Rails.logger.info "Admin #{current_user.email} canceled Stripe subscription #{@user.stripe_subscription_id} for user #{@user.email}"
           
-          # Update local database to match Stripe
+          # Update local database to match Stripe - clear the subscription ID since it's canceled
           @user.update!(
+            stripe_subscription_id: nil,
             subscription_status: 'canceled',
-            subscription_ends_at: Time.at(subscription.current_period_end),
+            subscription_ends_at: Time.current,
             cancel_at_period_end: false
           )
         rescue Stripe::InvalidRequestError => e
           Rails.logger.error "Stripe subscription not found for cancellation: #{e.message}"
           # Subscription doesn't exist in Stripe, just update our database
           @user.update!(
+            stripe_subscription_id: nil,
             subscription_status: 'canceled',
-            subscription_ends_at: Time.current,
-            stripe_subscription_id: nil
+            subscription_ends_at: Time.current
           )
         end
       else

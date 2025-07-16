@@ -11,10 +11,9 @@
 19:58:17 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:376:in 'IO.new'
 19:58:17 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:376:in 'Puma::Binder#add_ssl_listener'
 19:58:17 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:262:in08:41:11 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
-t/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:154:in 'Puma::Binder#parse'
-19:58:17 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/runner.rb:175:in 'Puma::Runner#load_and_bind'
-19:58:17 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/single.rb:44:in 'Puma::Single#run'
-19:58:17 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/launcher.rb:203:in 'Puma::Launcher#run'
+13:05:38 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
+13:05:59 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
+9:58:17 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/launcher.rb:203:in 'Puma::Launcher#run'
 19:58:17 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/cli.rb:75:in 'Puma::CLI#run'
 19:58:17 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/bin/puma:10:in '<top (required)>'
 19:58:17 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/bin/puma:25:in 'Kernel#load'
