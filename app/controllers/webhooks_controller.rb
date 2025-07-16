@@ -1,4 +1,6 @@
 class WebhooksController < ApplicationController
+  include ActivityLogger
+  
   # Skip CSRF protection for webhooks
   skip_before_action :verify_authenticity_token
   before_action :authenticate_stripe_webhook
@@ -60,6 +62,10 @@ class WebhooksController < ApplicationController
 
     # Add initial credit for new subscription
     CreditTransaction.grant_monthly_credit(user, "Welcome credit - new subscription")
+    
+    # Log activities
+    log_activity_for_user(user, :subscription_created, nil, { plan: plan_name, stripe_id: subscription.id })
+    log_activity_for_user(user, :credits_added, nil, { amount: 1, reason: 'new_subscription' })
 
     Rails.logger.info "Subscription created for user #{user.id}: #{subscription.id}, credit added"
   end
@@ -76,6 +82,11 @@ class WebhooksController < ApplicationController
       subscription_ends_at: subscription.current_period_end ? Time.at(subscription.current_period_end) : nil,
       cancel_at_period_end: subscription.cancel_at_period_end
     )
+    
+    # Log activity if subscription was canceled
+    if subscription.cancel_at_period_end
+      log_activity_for_user(user, :subscription_canceled, nil, { plan: plan_name, ends_at: subscription.current_period_end })
+    end
 
     Rails.logger.info "Subscription updated for user #{user.id}: #{subscription.id} -> #{subscription.status} (cancel_at_period_end: #{subscription.cancel_at_period_end})"
   end

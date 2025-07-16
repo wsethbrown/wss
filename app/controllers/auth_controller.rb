@@ -1,4 +1,6 @@
 class AuthController < ApplicationController
+  include ActivityLogger
+  
   # Skip CSRF protection for OAuth redirects
   skip_before_action :verify_authenticity_token, only: [:omniauth_callback]
   
@@ -17,6 +19,7 @@ class AuthController < ApplicationController
       else
         warden.set_user(user, scope: :user)
         user.remember_me! if params[:user][:remember_me] == '1'
+        log_activity(:login, nil, { method: 'password' })
         redirect_to account_path, notice: 'Signed in successfully'
       end
     else
@@ -25,6 +28,7 @@ class AuthController < ApplicationController
   end
 
   def logout
+    log_activity(:logout) if current_user
     sign_out(current_user) if user_signed_in?
     redirect_to root_path
   end

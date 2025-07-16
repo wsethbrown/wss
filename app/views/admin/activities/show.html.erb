@@ -1,0 +1,165 @@
+<% content_for :title, "Activity Details - Admin" %>
+
+<div class="max-w-4xl mx-auto">
+  <!-- Header -->
+  <div class="mb-8">
+    <div class="flex items-center gap-2 text-sm text-gray-600 mb-2">
+      <%= link_to "Admin", admin_root_path, class: "hover:text-gray-900" %>
+      <span>/</span>
+      <%= link_to "Activities", admin_activities_path, class: "hover:text-gray-900" %>
+      <span>/</span>
+      <span class="text-gray-900">Activity #<%= @activity.id %></span>
+    </div>
+    <h1 class="text-3xl font-bold text-gray-900">Activity Details</h1>
+  </div>
+
+  <!-- Activity Overview -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">Overview</h2>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+        <p class="text-sm text-gray-600">Activity Type</p>
+        <p class="text-lg font-medium text-gray-900 mt-1">
+          <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full">
+            <%= @activity.activity_description %>
+          </span>
+        </p>
+      </div>
+      
+      <div>
+        <p class="text-sm text-gray-600">Timestamp</p>
+        <p class="text-lg font-medium text-gray-900 mt-1">
+          <%= @activity.created_at.strftime("%B %d, %Y at %I:%M %p %Z") %>
+        </p>
+      </div>
+      
+      <div>
+        <p class="text-sm text-gray-600">User</p>
+        <div class="flex items-center gap-3 mt-2">
+          <% if @activity.user.profile_image.attached? %>
+            <%= image_tag @activity.user.profile_image, class: "h-10 w-10 rounded-full object-cover" %>
+          <% else %>
+            <div class="h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold" style="background-color: <%= @activity.user.avatar_color %>">
+              <%= @activity.user.initials %>
+            </div>
+          <% end %>
+          <div>
+            <%= link_to @activity.user.full_name, admin_user_path(@activity.user), class: "font-medium text-gray-900 hover:text-blue-600" %>
+            <p class="text-sm text-gray-500"><%= @activity.user.email %></p>
+          </div>
+        </div>
+      </div>
+      
+      <% if @activity.trackable_name %>
+        <div>
+          <p class="text-sm text-gray-600">Related <%= @activity.trackable_type %></p>
+          <p class="text-lg font-medium text-gray-900 mt-1">
+            <% if @activity.trackable %>
+              <% case @activity.trackable_type %>
+              <% when 'Presentation' %>
+                <%= link_to @activity.trackable_name, admin_presentation_path(@activity.trackable), class: "text-blue-600 hover:text-blue-800" %>
+              <% when 'Society' %>
+                <%= link_to @activity.trackable_name, society_path(@activity.trackable), class: "text-blue-600 hover:text-blue-800" %>
+              <% else %>
+                <%= @activity.trackable_name %>
+              <% end %>
+            <% else %>
+              <%= @activity.trackable_name %> <span class="text-sm text-gray-500">(deleted)</span>
+            <% end %>
+          </p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Technical Details -->
+  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">Technical Details</h2>
+    
+    <div class="space-y-4">
+      <div>
+        <p class="text-sm text-gray-600">IP Address</p>
+        <p class="font-mono text-gray-900"><%= @activity.ip_address || 'Not recorded' %></p>
+      </div>
+      
+      <div>
+        <p class="text-sm text-gray-600">User Agent</p>
+        <p class="font-mono text-sm text-gray-900 break-all"><%= @activity.user_agent || 'Not recorded' %></p>
+      </div>
+      
+      <div>
+        <p class="text-sm text-gray-600">Activity ID</p>
+        <p class="font-mono text-gray-900">#<%= @activity.id %></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Metadata -->
+  <% if @activity.metadata.present? && @activity.metadata.any? %>
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+      <h2 class="text-xl font-semibold text-gray-900 mb-4">Additional Data</h2>
+      
+      <div class="bg-gray-50 rounded-lg p-4">
+        <dl class="space-y-2">
+          <% @activity.metadata.each do |key, value| %>
+            <div class="flex">
+              <dt class="font-medium text-gray-700 min-w-[150px]"><%= key.humanize %>:</dt>
+              <dd class="text-gray-900">
+                <% if value.is_a?(Array) %>
+                  <%= value.join(', ') %>
+                <% elsif value.is_a?(Hash) %>
+                  <%= value.to_json %>
+                <% else %>
+                  <%= value %>
+                <% end %>
+              </dd>
+            </div>
+          <% end %>
+        </dl>
+      </div>
+    </div>
+  <% end %>
+
+  <!-- Related Activities -->
+  <div class="bg-gray-50 rounded-xl border border-gray-200 p-6">
+    <h2 class="text-xl font-semibold text-gray-900 mb-4">Related Activities</h2>
+    
+    <div class="space-y-4">
+      <div>
+        <p class="text-sm text-gray-600 mb-2">Recent activities by this user</p>
+        <% recent_activities = @activity.user.activity_logs.where.not(id: @activity.id).recent.limit(5) %>
+        <% if recent_activities.any? %>
+          <ul class="space-y-2">
+            <% recent_activities.each do |activity| %>
+              <li class="flex items-center justify-between p-3 bg-white rounded-lg">
+                <div>
+                  <span class="font-medium text-gray-900"><%= activity.activity_description %></span>
+                  <% if activity.trackable_name %>
+                    - <span class="text-gray-600"><%= activity.trackable_name %></span>
+                  <% end %>
+                </div>
+                <div class="flex items-center gap-4 text-sm text-gray-500">
+                  <span><%= activity.created_at.strftime("%b %d at %I:%M %p") %></span>
+                  <%= link_to "View", admin_activity_path(activity), class: "text-blue-600 hover:text-blue-800" %>
+                </div>
+              </li>
+            <% end %>
+          </ul>
+        <% else %>
+          <p class="text-sm text-gray-500">No other recent activities</p>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="mt-8 flex justify-between">
+    <div>
+      <%= link_to "← Back to Activities", admin_activities_path, class: "text-blue-600 hover:text-blue-800" %>
+    </div>
+    <div>
+      <%= link_to "View User Profile", admin_user_path(@activity.user), class: "px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition" %>
+    </div>
+  </div>
+</div>

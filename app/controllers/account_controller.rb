@@ -1,4 +1,6 @@
 class AccountController < ApplicationController
+  include ActivityLogger
+  
   before_action :authenticate_user!
 
   def index
@@ -14,6 +16,7 @@ class AccountController < ApplicationController
 
   def update_profile
     if current_user.update(profile_params)
+      log_activity(:profile_updated, current_user, { fields: profile_params.keys })
       respond_to do |format|
         format.html { redirect_to account_path, notice: 'Profile updated successfully' }
         format.turbo_stream { redirect_to account_path, notice: 'Profile updated successfully' }

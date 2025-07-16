@@ -1,4 +1,6 @@
 class PresentationsController < ApplicationController
+  include ActivityLogger
+  
   before_action :set_presentation, only: [:show, :edit, :update, :destroy]
 
   def index
@@ -37,6 +39,7 @@ class PresentationsController < ApplicationController
 
   def show
     @presentation = Presentation.find(params[:id])
+    log_activity(:presentation_viewed, @presentation) if user_signed_in?
   end
 
   def new

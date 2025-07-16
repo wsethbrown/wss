@@ -1,4 +1,6 @@
 class SocietiesController < ApplicationController
+  include ActivityLogger
+  
   before_action :authenticate_user!, except: [:index, :show]
   before_action :set_society, only: [:show, :edit, :update, :destroy]
 
@@ -84,6 +86,7 @@ class SocietiesController < ApplicationController
     membership = @society.society_memberships.build(user: current_user, role: :member, status: :active)
 
     if membership.save
+      log_activity(:society_joined, @society)
       redirect_to @society, notice: 'Successfully joined the society!'
     else
       redirect_to @society, alert: 'Unable to join the society.'
@@ -97,6 +100,7 @@ class SocietiesController < ApplicationController
     membership = @society.society_memberships.find_by(user: current_user)
 
     if membership&.destroy
+      log_activity(:society_left, @society)
       redirect_to societies_path, notice: 'Successfully left the society.'
     else
       redirect_to @society, alert: 'Unable to leave the society.'

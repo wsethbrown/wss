@@ -1,4 +1,6 @@
 class Presentations::PurchasesController < ApplicationController
+  include ActivityLogger
+  
   before_action :authenticate_user!
   before_action :set_presentation
   before_action :check_already_purchased, only: [:new, :create]
@@ -41,6 +43,8 @@ class Presentations::PurchasesController < ApplicationController
     end
     
     if CreditTransaction.use_credit(current_user, @presentation)
+      log_activity(:presentation_purchased, @presentation, { purchase_type: 'credit', price: 1 })
+      log_activity(:credits_used, @presentation, { amount: 1 })
       redirect_to @presentation, notice: 'Presentation purchased successfully with credit!'
     else
       redirect_to new_presentation_purchase_path(@presentation), alert: 'Failed to complete purchase'
