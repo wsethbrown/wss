@@ -16,11 +16,10 @@
 14:09:40 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
 14:10:45 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
 14:47:38 web.1  | 2025-07-16 14:47:38 -0400 SSL error, peer: 127.0.0.1, peer cert: : #<Puma::MiniSSL::SSLError: HTTP connection?>
-uby/gems/3.4.0/bin/puma:25:in '<top (required)>'
-19:58:17 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/cli/exec.rb:59:in 'Kernel.load'
-19:58:17 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/cli/exec.rb:59:in 'Bundler::CLI::Exec#kernel_load'
-19:58:17 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/cli/exec.rb:23:in 'Bundler::CLI::Exec#run'
-19:58:17 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/cli.rb:452:in 'Bundler::CLI#exec'
+14:50:57 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
+14:51:23 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
+14:51:35 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
+::CLI#exec'
 19:58:17 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/vendor/thor/lib/thor/command.rb:28:in 'Bundler::Thor::Command#run'
 19:58:17 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/vendor/thor/lib/thor/invocation.rb:127:in 'Bundler::Thor::Invocation#invoke_command'
 19:58:17 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/vendor/thor/lib/thor.rb:538:in 'Bundler::Thor.dispatch'

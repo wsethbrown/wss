@@ -78,17 +78,27 @@ class Admin::SubscriptionsController < Admin::BaseController
       # Cancel ALL active subscriptions in Stripe for this customer
       if @user.stripe_customer_id.present?
         begin
-          # First, list all active AND trialing subscriptions
+          # First, list all active subscriptions
           active_subscriptions = Stripe::Subscription.list(
             customer: @user.stripe_customer_id,
-            status: ['active', 'trialing'],
+            status: 'active',
             limit: 100
           )
           
-          Rails.logger.info "Found #{active_subscriptions.data.count} active subscription(s) for customer #{@user.stripe_customer_id}"
+          # Then list all trialing subscriptions
+          trialing_subscriptions = Stripe::Subscription.list(
+            customer: @user.stripe_customer_id,
+            status: 'trialing',
+            limit: 100
+          )
           
-          # Cancel each active subscription
-          active_subscriptions.data.each do |subscription|
+          # Combine both lists
+          all_subscriptions = active_subscriptions.data + trialing_subscriptions.data
+          
+          Rails.logger.info "Found #{all_subscriptions.count} active/trialing subscription(s) for customer #{@user.stripe_customer_id}"
+          
+          # Cancel each subscription
+          all_subscriptions.each do |subscription|
             Rails.logger.info "Canceling subscription #{subscription.id}..."
             canceled_sub = Stripe::Subscription.cancel(subscription.id)
             Rails.logger.info "Subscription #{subscription.id} canceled with status: #{canceled_sub.status}"
@@ -168,14 +178,21 @@ class Admin::SubscriptionsController < Admin::BaseController
         @user.update!(stripe_customer_id: customer.id)
       end
       
-      # Check for existing active or trialing subscriptions
-      existing_subs = Stripe::Subscription.list(
+      # Check for existing active subscriptions
+      active_subs = Stripe::Subscription.list(
         customer: @user.stripe_customer_id,
-        status: ['active', 'trialing'],
+        status: 'active',
         limit: 1
       )
       
-      if existing_subs.data.any?
+      # Check for existing trialing subscriptions
+      trialing_subs = Stripe::Subscription.list(
+        customer: @user.stripe_customer_id,
+        status: 'trialing',
+        limit: 1
+      )
+      
+      if active_subs.data.any? || trialing_subs.data.any?
         redirect_back(fallback_location: edit_admin_user_path(@user), alert: "User already has an active or trial subscription")
         return
       end

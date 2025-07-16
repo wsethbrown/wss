@@ -105,17 +105,28 @@
         <% # Check Stripe for current subscription status %>
         <% begin %>
           <% active_subs = Stripe::Subscription.list(customer: @user.stripe_customer_id, status: 'active', limit: 1) %>
-          <% current_sub = active_subs.data.first %>
+          <% trialing_subs = Stripe::Subscription.list(customer: @user.stripe_customer_id, status: 'trialing', limit: 1) %>
+          <% current_sub = active_subs.data.first || trialing_subs.data.first %>
           
           <% if current_sub %>
-            <!-- Active Subscription -->
-            <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
-              <p class="text-sm font-medium text-green-800 mb-2">Active Subscription</p>
-              <p class="text-sm text-green-700">ID: <%= current_sub.id %></p>
-              <p class="text-sm text-green-700">Status: <%= current_sub.status.capitalize %></p>
-              <p class="text-sm text-green-700">Plan: <%= @user.subscription_plan || 'Unknown' %></p>
-              <p class="text-sm text-green-700">Next billing: <%= Time.at(current_sub.current_period_end).strftime("%B %d, %Y") %></p>
-            </div>
+            <!-- Active/Trial Subscription -->
+            <% if current_sub.status == 'trialing' %>
+              <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                <p class="text-sm font-medium text-blue-800 mb-2">Trial Subscription</p>
+                <p class="text-sm text-blue-700">ID: <%= current_sub.id %></p>
+                <p class="text-sm text-blue-700">Status: <%= current_sub.status.capitalize %></p>
+                <p class="text-sm text-blue-700">Plan: <%= @user.subscription_plan || 'Unknown' %></p>
+                <p class="text-sm text-blue-700">Trial ends: <%= Time.at(current_sub.trial_end).strftime("%B %d, %Y at %I:%M %p") %></p>
+              </div>
+            <% else %>
+              <div class="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg">
+                <p class="text-sm font-medium text-green-800 mb-2">Active Subscription</p>
+                <p class="text-sm text-green-700">ID: <%= current_sub.id %></p>
+                <p class="text-sm text-green-700">Status: <%= current_sub.status.capitalize %></p>
+                <p class="text-sm text-green-700">Plan: <%= @user.subscription_plan || 'Unknown' %></p>
+                <p class="text-sm text-green-700">Next billing: <%= Time.at(current_sub.current_period_end).strftime("%B %d, %Y") %></p>
+              </div>
+            <% end %>
             
             <!-- Action Buttons -->
             <div class="flex flex-wrap gap-3">

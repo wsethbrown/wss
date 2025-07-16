@@ -31,15 +31,21 @@ class SubscriptionsController < ApplicationController
           limit: 100
         )
         
-        if active_subscriptions.data.any?
-          Rails.logger.warn "User #{current_user.email} has #{active_subscriptions.data.count} active subscription(s) in Stripe"
+        trialing_subscriptions = Stripe::Subscription.list(
+          customer: customer.id,
+          status: 'trialing',
+          limit: 100
+        )
+        
+        if active_subscriptions.data.any? || trialing_subscriptions.data.any?
+          Rails.logger.warn "User #{current_user.email} has #{active_subscriptions.data.count} active and #{trialing_subscriptions.data.count} trialing subscription(s) in Stripe"
           
           # If we have active subscriptions but no stored ID, sync the first one
-          if current_user.stripe_subscription_id.blank? && active_subscriptions.data.any?
-            first_active = active_subscriptions.data.first
+          if current_user.stripe_subscription_id.blank?
+            first_sub = active_subscriptions.data.first || trialing_subscriptions.data.first
             current_user.update!(
-              stripe_subscription_id: first_active.id,
-              subscription_status: 'active'
+              stripe_subscription_id: first_sub.id,
+              subscription_status: first_sub.status
             )
           end
           
