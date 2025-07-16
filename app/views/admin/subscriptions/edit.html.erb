@@ -148,10 +148,10 @@
               Pause Subscription
             <% end %>
             
-            <%= link_to cancel_admin_subscription_path(@user), 
+            <%= button_to cancel_admin_subscription_path(@user), 
                 method: :post,
-                data: { confirm: "Cancel subscription for #{@user.full_name}? This will end at the current billing period." },
-                class: "flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition" do %>
+                data: { turbo_confirm: "Cancel subscription for #{@user.full_name}? This will cancel immediately." },
+                class: "flex items-center justify-center gap-2 px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition w-full" do %>
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
               </svg>
