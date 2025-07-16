@@ -107,12 +107,26 @@ Rails.application.routes.draw do
       end
     end
     resources :activities, only: [:index, :show]
+    
+    # Analytics routes
+    get 'analytics/downloads', to: 'analytics#downloads', as: 'downloads_analytics'
+    get 'analytics/presentations/:id/downloads', to: 'analytics#presentation_downloads', as: 'presentation_downloads_analytics'
+    
     root to: 'dashboard#index'
   end
 
   # Presentations
   resources :presentations do
     resources :purchases, only: [ :new, :create ], controller: 'presentations/purchases'
+    resources :downloads, only: [], controller: 'presentations/downloads' do
+      collection do
+        get :sneak_peek
+        get :full_presentation
+        get :speaker_notes
+        get :outline
+        get :recommendations
+      end
+    end
     member do
       get :purchase_options
       post :purchase

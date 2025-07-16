@@ -2,12 +2,18 @@ class Presentation < ApplicationRecord
   belongs_to :author, class_name: 'User'
   has_many :user_presentations, dependent: :destroy
   has_many :purchasers, through: :user_presentations, source: :user
-  
+
   # Active Storage attachments
   has_one_attached :featured_image
   has_one_attached :pdf_file
   has_many_attached :supplemental_materials
   has_many_attached :preview_images
+
+  # Specific file types for better organization
+  has_one_attached :sneak_peek_file  # Preview version of the presentation
+  has_one_attached :speaker_notes     # Speaker notes document
+  has_one_attached :outline_file      # Presentation outline
+  has_one_attached :recommendations_sheet  # Whiskey recommendations PDF
 
   # Validations
   validates :title, presence: true, length: { minimum: 2, maximum: 200 }
@@ -17,7 +23,7 @@ class Presentation < ApplicationRecord
   validates :category, length: { maximum: 100 }
   validates :difficulty, inclusion: { in: %w[Beginner Intermediate Advanced], allow_blank: true }
   validates :rating, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 5 }, allow_nil: true
-  
+
   # File attachment validations
   validate :featured_image_validation
   validate :pdf_file_validation
@@ -59,27 +65,54 @@ class Presentation < ApplicationRecord
     words = content.split.length
     (words / 200.0).ceil # Average reading speed of 200 words per minute
   end
-  
+
   def purchased_by?(user)
     return false unless user
     user_presentations.exists?(user: user)
   end
-  
+
+  # File access control methods
+  def can_view_sneak_peek?(user = nil)
+    # Sneak peek is always available to everyone
+    true
+  end
+
+  def can_download_full_presentation?(user)
+    return false unless user
+    purchased_by?(user) || user.admin?
+  end
+
+  def can_download_speaker_notes?(user)
+    can_download_full_presentation?(user)
+  end
+
+  def can_download_outline?(user)
+    can_download_full_presentation?(user)
+  end
+
+  def can_download_recommendations?(user)
+    can_download_full_presentation?(user)
+  end
+
+  def increment_download_count!
+    increment!(:download_count)
+  end
+
   def purchase_type_for(user)
     return nil unless user
     user_presentations.find_by(user: user)&.purchase_type
   end
-  
+
   def stripe_price_id
     # This would be set via admin or seeded data
     # For now, we'll generate it dynamically
     "price_presentation_#{id}"
   end
-  
+
   def stripe_amount
     (price * 100).to_i # Convert to cents for Stripe
   end
-  
+
   def parsed_whiskey_recommendations
     # Use JSON format if available, otherwise fall back to old format
     if whiskey_recommendations_json.present? && whiskey_recommendations_json.is_a?(Array)
@@ -92,18 +125,18 @@ class Presentation < ApplicationRecord
         rec
       end
     end
-    
+
     # Legacy format support
     return [] if whiskey_recommendations.blank?
-    
+
     whiskey_recommendations.split("\n").map do |line|
       parts = line.split('|')
       next if parts.length < 4
-      
+
       price = parts[2].strip
       # Ensure price has $ prefix
       price = price.start_with?('$') ? price : "$#{price}" if price.present?
-      
+
       {
         name: parts[0].strip,
         region: parts[1].strip,
@@ -113,23 +146,23 @@ class Presentation < ApplicationRecord
       }
     end.compact
   end
-  
+
   # Get preview images in consistent order (by blob id)
   def ordered_preview_images
     return [] unless preview_images.attached?
     preview_images.order(:id)
   end
-  
+
   # Parse what you'll learn into array of points
   def parsed_what_youll_learn
     return [] if what_youll_learn.blank?
-    
+
     # Split into sections based on lines that start with - followed by a title
     sections = []
     current_title = nil
     current_description = []
     in_section = false
-    
+
     what_youll_learn.split("\n").each do |line|
       # Check if this is a new section (starts with - and has a title format)
       if line.strip.match(/^[-•*]\s*(.+)$/)
@@ -140,7 +173,7 @@ class Presentation < ApplicationRecord
             description: current_description.join(" ").strip
           }
         end
-        
+
         # Start new section
         current_title = $1.strip
         current_description = []
@@ -162,7 +195,7 @@ class Presentation < ApplicationRecord
         current_description << line.strip
       end
     end
-    
+
     # Don't forget the last section if it wasn't ended by a blank line
     if current_title && in_section
       sections << {
@@ -170,18 +203,18 @@ class Presentation < ApplicationRecord
         description: current_description.join(" ").strip
       }
     end
-    
+
     sections
   end
-  
+
   # Parse slides preview into structured data
   def parsed_slides_preview
     return [] if slides_preview.blank?
-    
+
     slides_preview.split("\n").map do |line|
       parts = line.split('|')
       next if parts.length < 4
-      
+
       {
         slide_number: parts[0].strip,
         title: parts[1].strip,
@@ -190,65 +223,65 @@ class Presentation < ApplicationRecord
       }
     end.compact
   end
-  
+
   private
-  
+
   def featured_image_validation
     return unless featured_image.attached?
-    
+
     unless featured_image.content_type.in?(%w[image/jpeg image/jpg image/png image/gif image/webp])
       errors.add(:featured_image, 'must be a valid image format (JPEG, PNG, GIF, or WebP)')
     end
-    
+
     if featured_image.byte_size > 5.megabytes
       errors.add(:featured_image, 'must be less than 5MB')
     end
   end
-  
+
   def pdf_file_validation
     return unless pdf_file.attached?
-    
+
     allowed_types = [
       'application/pdf',
       'application/vnd.openxmlformats-officedocument.presentationml.presentation', # .pptx
       'application/vnd.ms-powerpoint' # .ppt
     ]
-    
+
     unless pdf_file.content_type.in?(allowed_types)
       errors.add(:pdf_file, 'must be a PDF or PowerPoint file')
     end
-    
+
     if pdf_file.byte_size > 50.megabytes
       errors.add(:pdf_file, 'must be less than 50MB')
     end
   end
-  
+
   def supplemental_materials_validation
     return unless supplemental_materials.attached?
-    
+
     supplemental_materials.each do |material|
       unless material.content_type.in?(%w[application/pdf image/jpeg image/jpg image/png application/vnd.ms-powerpoint application/vnd.openxmlformats-officedocument.presentationml.presentation])
         errors.add(:supplemental_materials, 'must be PDF, image, or PowerPoint files')
       end
-      
+
       if material.byte_size > 25.megabytes
         errors.add(:supplemental_materials, 'files must be less than 25MB each')
       end
     end
   end
-  
+
   def preview_images_validation
     return unless preview_images.attached?
-    
+
     if preview_images.count > 3
       errors.add(:preview_images, 'maximum 3 preview images allowed')
     end
-    
+
     preview_images.each do |image|
       unless image.content_type.in?(%w[image/jpeg image/jpg image/png image/gif image/webp])
         errors.add(:preview_images, 'must be valid image formats (JPEG, PNG, GIF, or WebP)')
       end
-      
+
       if image.byte_size > 5.megabytes
         errors.add(:preview_images, 'must be less than 5MB each')
       end

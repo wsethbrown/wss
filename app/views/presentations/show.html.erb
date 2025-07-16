@@ -416,9 +416,51 @@
                   </div>
                 </div>
                 
-                <button class="w-full bg-blue-600 text-white font-bold py-4 px-6 rounded-2xl hover:bg-blue-700 transition mb-4">
-                  Access Presentation
-                </button>
+                <!-- Downloads Section -->
+                <div class="bg-gray-50 rounded-2xl p-4 mb-4">
+                  <h4 class="font-semibold text-gray-900 mb-3 text-sm">Available Downloads</h4>
+                  <div class="space-y-2">
+                    <% if @presentation.pdf_file.attached? %>
+                      <%= link_to full_presentation_presentation_downloads_path(@presentation), 
+                          class: "flex items-center justify-between p-2 bg-white border border-gray-200 rounded-lg hover:border-blue-500 transition text-sm" do %>
+                        <span class="font-medium text-gray-700">Full Presentation</span>
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                        </svg>
+                      <% end %>
+                    <% end %>
+                    
+                    <% if @presentation.speaker_notes.attached? %>
+                      <%= link_to speaker_notes_presentation_downloads_path(@presentation), 
+                          class: "flex items-center justify-between p-2 bg-white border border-gray-200 rounded-lg hover:border-blue-500 transition text-sm" do %>
+                        <span class="font-medium text-gray-700">Speaker Notes</span>
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                        </svg>
+                      <% end %>
+                    <% end %>
+                    
+                    <% if @presentation.outline_file.attached? %>
+                      <%= link_to outline_presentation_downloads_path(@presentation), 
+                          class: "flex items-center justify-between p-2 bg-white border border-gray-200 rounded-lg hover:border-blue-500 transition text-sm" do %>
+                        <span class="font-medium text-gray-700">Outline</span>
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                        </svg>
+                      <% end %>
+                    <% end %>
+                    
+                    <% if @presentation.recommendations_sheet.attached? %>
+                      <%= link_to recommendations_presentation_downloads_path(@presentation), 
+                          class: "flex items-center justify-between p-2 bg-white border border-gray-200 rounded-lg hover:border-blue-500 transition text-sm" do %>
+                        <span class="font-medium text-gray-700">Whiskey List</span>
+                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                        </svg>
+                      <% end %>
+                    <% end %>
+                  </div>
+                </div>
               <% end %>
             <% else %>
               <!-- Not purchased yet -->
@@ -434,6 +476,20 @@
             <div class="text-center">
               <p class="text-sm text-gray-500">30-day money-back guarantee</p>
             </div>
+            
+            <!-- Sneak Peek Available to All -->
+            <% if @presentation.sneak_peek_file.attached? %>
+              <div class="mt-4 pt-4 border-t border-gray-200">
+                <%= link_to sneak_peek_presentation_downloads_path(@presentation), 
+                    class: "flex items-center justify-center gap-2 text-sm text-blue-600 hover:text-blue-800 font-medium" do %>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
+                  </svg>
+                  View Free Preview
+                <% end %>
+              </div>
+            <% end %>
           </div>
 
           <!-- Author Info -->

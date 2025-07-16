@@ -11,6 +11,10 @@ class Admin::DashboardController < Admin::BaseController
     @published_presentations = Presentation.published.count
     @total_purchases = UserPresentation.count
     
+    # Download metrics
+    @total_downloads_today = DownloadLog.today.count
+    @total_downloads_week = DownloadLog.this_week.count
+    
     # Revenue metrics (approximate - would need Stripe integration for accurate data)
     @total_revenue = calculate_total_revenue
     @revenue_this_month = calculate_monthly_revenue

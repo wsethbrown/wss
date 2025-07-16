@@ -1,0 +1,111 @@
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="mb-8">
+    <%= link_to admin_downloads_analytics_path, class: "inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 mb-4" do %>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      </svg>
+      Back to Analytics
+    <% end %>
+    
+    <h1 class="text-3xl font-bold text-gray-900"><%= @presentation.title %> - Download Analytics</h1>
+    <p class="text-gray-600 mt-2">by <%= @presentation.author.full_name %></p>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-2xl border border-gray-200 p-6">
+      <p class="text-sm font-medium text-gray-600">Total Downloads</p>
+      <p class="text-3xl font-bold text-gray-900 mt-2"><%= number_with_delimiter(@downloads.count) %></p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-200 p-6">
+      <p class="text-sm font-medium text-gray-600">Unique Downloaders</p>
+      <p class="text-3xl font-bold text-gray-900 mt-2"><%= number_with_delimiter(@unique_downloaders) %></p>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-200 p-6">
+      <p class="text-sm font-medium text-gray-600">Downloads Today</p>
+      <p class="text-3xl font-bold text-gray-900 mt-2"><%= number_with_delimiter(@downloads.today.count) %></p>
+    </div>
+  </div>
+
+  <!-- Download Types Breakdown -->
+  <div class="bg-white rounded-2xl border border-gray-200 p-6 mb-8">
+    <h2 class="text-xl font-bold text-gray-900 mb-4">Downloads by File Type</h2>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <% 
+        file_type_names = {
+          'sneak_peek' => 'Sneak Peek',
+          'full_presentation' => 'Full Presentation',
+          'speaker_notes' => 'Speaker Notes',
+          'outline' => 'Outline',
+          'recommendations' => 'Recommendations'
+        }
+      %>
+      <% file_type_names.each do |type, name| %>
+        <div class="bg-gray-50 rounded-lg p-4 text-center">
+          <p class="text-sm text-gray-600"><%= name %></p>
+          <p class="text-2xl font-bold text-gray-900 mt-1">
+            <%= number_with_delimiter(@downloads_by_type[type] || 0) %>
+          </p>
+          <% if @downloads.count > 0 %>
+            <p class="text-xs text-gray-500 mt-1">
+              <%= number_to_percentage((@downloads_by_type[type] || 0).to_f / @downloads.count * 100, precision: 0) %>
+            </p>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Recent Downloads Table -->
+  <div class="bg-white rounded-2xl border border-gray-200">
+    <div class="px-6 py-4 border-b border-gray-200">
+      <h2 class="text-xl font-bold text-gray-900">Recent Downloads</h2>
+    </div>
+    
+    <div class="overflow-x-auto">
+      <table class="w-full">
+        <thead class="bg-gray-50">
+          <tr>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">File Type</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Downloaded</th>
+            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">IP Address</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-gray-200">
+          <% @recent_downloads.each do |download| %>
+            <tr class="hover:bg-gray-50">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center">
+                  <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center mr-3">
+                    <span class="text-xs font-semibold text-gray-600">
+                      <%= download.user.first_name[0] %><%= download.user.last_name[0] if download.user.last_name.present? %>
+                    </span>
+                  </div>
+                  <div>
+                    <p class="text-sm font-medium text-gray-900"><%= download.user.full_name %></p>
+                    <p class="text-sm text-gray-500"><%= download.user.email %></p>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                  <%= download.file_type.humanize %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <%= download.downloaded_at.strftime("%b %d, %Y %l:%M %p") %>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                <%= download.ip_address || 'N/A' %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>

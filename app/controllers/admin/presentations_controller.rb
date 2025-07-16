@@ -124,6 +124,10 @@ class Admin::PresentationsController < Admin::BaseController
       :image,
       :featured_image,
       :pdf_file,
+      :sneak_peek_file,
+      :speaker_notes,
+      :outline_file,
+      :recommendations_sheet,
       supplemental_materials: [],
       preview_images: []
     )

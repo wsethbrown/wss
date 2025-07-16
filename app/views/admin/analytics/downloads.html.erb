@@ -1,0 +1,136 @@
+<div class="max-w-7xl mx-auto px-4 py-8">
+  <!-- Header -->
+  <div class="flex justify-between items-center mb-8">
+    <h1 class="text-3xl font-bold text-gray-900">Download Analytics</h1>
+    
+    <!-- Date Range Filter -->
+    <div class="flex items-center gap-2">
+      <% %w[today week month all].each do |range| %>
+        <%= link_to range.capitalize, 
+            admin_downloads_analytics_path(date_range: range), 
+            class: "px-4 py-2 rounded-lg font-medium transition #{@date_range == range ? 'bg-black text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'}" %>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Stats Overview -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+    <div class="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Total Downloads</p>
+          <p class="text-3xl font-bold text-gray-900 mt-2"><%= number_with_delimiter(@total_downloads) %></p>
+        </div>
+        <div class="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Unique Users</p>
+          <p class="text-3xl font-bold text-gray-900 mt-2"><%= number_with_delimiter(@unique_users) %></p>
+        </div>
+        <div class="w-12 h-12 bg-green-100 rounded-full flex items-center justify-center">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Avg Downloads/User</p>
+          <p class="text-3xl font-bold text-gray-900 mt-2">
+            <%= @unique_users > 0 ? number_with_precision(@total_downloads.to_f / @unique_users, precision: 1) : '0' %>
+          </p>
+        </div>
+        <div class="w-12 h-12 bg-purple-100 rounded-full flex items-center justify-center">
+          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Download Types -->
+  <div class="bg-white rounded-2xl border border-gray-200 p-6 mb-8">
+    <h2 class="text-xl font-bold text-gray-900 mb-4">Downloads by Type</h2>
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+      <% 
+        file_type_names = {
+          'sneak_peek' => 'Sneak Peek',
+          'full_presentation' => 'Full Presentation',
+          'speaker_notes' => 'Speaker Notes',
+          'outline' => 'Outline',
+          'recommendations' => 'Recommendations'
+        }
+      %>
+      <% file_type_names.each do |type, name| %>
+        <div class="text-center">
+          <p class="text-sm text-gray-600"><%= name %></p>
+          <p class="text-2xl font-bold text-gray-900 mt-1">
+            <%= number_with_delimiter(@downloads_by_type[type] || 0) %>
+          </p>
+        </div>
+      <% end %>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <!-- Popular Presentations -->
+    <div class="bg-white rounded-2xl border border-gray-200 p-6">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">Most Downloaded Presentations</h2>
+      <div class="space-y-3">
+        <% @popular_presentations.each_with_index do |(presentation, count), index| %>
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <span class="text-sm font-semibold text-gray-500">#<%= index + 1 %></span>
+              <div>
+                <%= link_to presentation.title, admin_presentation_downloads_analytics_path(presentation), 
+                    class: "font-medium text-gray-900 hover:text-blue-600 transition" %>
+                <p class="text-sm text-gray-500">by <%= presentation.author.full_name %></p>
+              </div>
+            </div>
+            <span class="text-sm font-semibold text-gray-700">
+              <%= number_with_delimiter(count) %> downloads
+            </span>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <!-- Recent Downloads -->
+    <div class="bg-white rounded-2xl border border-gray-200 p-6">
+      <h2 class="text-xl font-bold text-gray-900 mb-4">Recent Downloads</h2>
+      <div class="space-y-3 max-h-96 overflow-y-auto">
+        <% @recent_downloads.each do |download| %>
+          <div class="flex items-center justify-between text-sm">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 bg-gray-100 rounded-full flex items-center justify-center">
+                <span class="text-xs font-semibold text-gray-600">
+                  <%= download.user.first_name[0] %><%= download.user.last_name[0] if download.user.last_name.present? %>
+                </span>
+              </div>
+              <div>
+                <p class="font-medium text-gray-900"><%= download.user.full_name %></p>
+                <p class="text-gray-500"><%= download.presentation.title.truncate(30) %></p>
+              </div>
+            </div>
+            <div class="text-right">
+              <p class="text-gray-700"><%= download.file_type.humanize %></p>
+              <p class="text-xs text-gray-500"><%= time_ago_in_words(download.downloaded_at) %> ago</p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

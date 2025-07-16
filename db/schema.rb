@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_15_232913) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_16_122155) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -71,6 +71,22 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_15_232913) do
     t.index ["transaction_type"], name: "index_credit_transactions_on_transaction_type"
     t.index ["user_id", "created_at"], name: "index_credit_transactions_on_user_id_and_created_at"
     t.index ["user_id"], name: "index_credit_transactions_on_user_id"
+  end
+
+  create_table "download_logs", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "presentation_id", null: false
+    t.string "file_type", null: false
+    t.string "ip_address"
+    t.string "user_agent"
+    t.datetime "downloaded_at", default: -> { "CURRENT_TIMESTAMP" }, null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["downloaded_at"], name: "index_download_logs_on_downloaded_at"
+    t.index ["presentation_id", "file_type"], name: "index_download_logs_on_presentation_id_and_file_type"
+    t.index ["presentation_id"], name: "index_download_logs_on_presentation_id"
+    t.index ["user_id", "downloaded_at"], name: "index_download_logs_on_user_id_and_downloaded_at"
+    t.index ["user_id"], name: "index_download_logs_on_user_id"
   end
 
   create_table "event_rsvps", force: :cascade do |t|
@@ -136,8 +152,12 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_15_232913) do
     t.jsonb "whiskey_recommendations_json", default: []
     t.text "what_youll_learn"
     t.text "slides_preview"
+    t.jsonb "file_access_settings", default: {}
+    t.integer "download_count", default: 0
+    t.integer "preview_pages", default: 3
     t.index ["author_id"], name: "index_presentations_on_author_id"
     t.index ["category"], name: "index_presentations_on_category"
+    t.index ["download_count"], name: "index_presentations_on_download_count"
     t.index ["price"], name: "index_presentations_on_price"
     t.index ["title"], name: "index_presentations_on_title"
     t.index ["whiskey_recommendations_json"], name: "index_presentations_on_whiskey_recommendations_json", using: :gin
@@ -257,6 +277,8 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_15_232913) do
   add_foreign_key "activity_logs", "users"
   add_foreign_key "credit_transactions", "presentations"
   add_foreign_key "credit_transactions", "users"
+  add_foreign_key "download_logs", "presentations"
+  add_foreign_key "download_logs", "users"
   add_foreign_key "event_rsvps", "events"
   add_foreign_key "event_rsvps", "users"
   add_foreign_key "events", "societies"
