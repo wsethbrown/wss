@@ -22,6 +22,26 @@ class SubscriptionsController < ApplicationController
     begin
       # Get or create Stripe customer
       customer = get_or_create_stripe_customer
+      
+      # Check for any existing active subscriptions
+      if current_user.stripe_subscription_id.present?
+        begin
+          existing_subscription = Stripe::Subscription.retrieve(current_user.stripe_subscription_id)
+          
+          # If there's an active subscription, don't allow creating a new one
+          if existing_subscription.status == 'active' || existing_subscription.status == 'trialing'
+            redirect_to account_path(anchor: "subscription"), alert: "You already have an active subscription. Please manage it from your account page."
+            return
+          end
+          
+          # If the subscription is canceled or past_due, we can proceed
+          Rails.logger.info "User #{current_user.email} has a #{existing_subscription.status} subscription, allowing new subscription creation"
+        rescue Stripe::InvalidRequestError => e
+          # Subscription doesn't exist in Stripe, clear the ID
+          Rails.logger.info "Clearing invalid subscription ID for user #{current_user.email}"
+          current_user.update!(stripe_subscription_id: nil, subscription_status: nil)
+        end
+      end
 
       # Create Stripe checkout session
       session = Stripe::Checkout::Session.create({
@@ -43,7 +63,21 @@ class SubscriptionsController < ApplicationController
       redirect_to session.url, allow_other_host: true
     rescue Stripe::StripeError => e
       Rails.logger.error "Stripe error: #{e.message}"
-      redirect_to account_path(anchor: "subscription"), alert: "Payment processing error. Please try again."
+      Rails.logger.error "Stripe error details: #{e.inspect}"
+      
+      # Handle specific Stripe errors with better user messages
+      error_message = case e.message
+      when /test clock customer.*already has.*active subscription/i
+        "This test account has reached the maximum number of test subscriptions. Please contact support to reset your test account."
+      when /customer.*already has.*active subscription/i
+        "You already have an active subscription. Please cancel it first or contact support."
+      when /no such customer/i
+        "Customer account not found. Please try again or contact support."
+      else
+        "Payment processing error. Please try again or contact support."
+      end
+      
+      redirect_to account_path(anchor: "subscription"), alert: error_message
     end
   end
 
@@ -156,8 +190,33 @@ class SubscriptionsController < ApplicationController
 
   def get_or_create_stripe_customer
     if current_user.stripe_customer_id.present?
-      # Return existing customer
-      Stripe::Customer.retrieve(current_user.stripe_customer_id)
+      begin
+        # Try to retrieve existing customer
+        customer = Stripe::Customer.retrieve(current_user.stripe_customer_id)
+        
+        # Check if customer exists and is not deleted
+        if customer.deleted?
+          # Customer was deleted in Stripe, create a new one
+          raise Stripe::InvalidRequestError.new("Customer was deleted", nil)
+        end
+        
+        customer
+      rescue Stripe::InvalidRequestError => e
+        # Customer doesn't exist or was deleted, create a new one
+        Rails.logger.info "Creating new Stripe customer for #{current_user.email} (previous customer not found)"
+        
+        customer = Stripe::Customer.create({
+          email: current_user.email,
+          name: current_user.full_name,
+          metadata: {
+            user_id: current_user.id
+          }
+        })
+        
+        # Update customer ID
+        current_user.update!(stripe_customer_id: customer.id)
+        customer
+      end
     else
       # Create new customer
       customer = Stripe::Customer.create({

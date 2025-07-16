@@ -69,11 +69,43 @@ class Admin::SubscriptionsController < Admin::BaseController
   end
 
   def cancel
-    @user.update!(
-      subscription_status: 'canceled',
-      subscription_ends_at: Time.current.end_of_month
-    )
-    redirect_to admin_subscriptions_path, notice: "Subscription canceled for #{@user.full_name}"
+    begin
+      # Cancel in Stripe if subscription ID exists
+      if @user.stripe_subscription_id.present?
+        begin
+          # Cancel the subscription immediately in Stripe
+          subscription = Stripe::Subscription.cancel(@user.stripe_subscription_id)
+          
+          Rails.logger.info "Admin #{current_user.email} canceled Stripe subscription #{@user.stripe_subscription_id} for user #{@user.email}"
+          
+          # Update local database to match Stripe
+          @user.update!(
+            subscription_status: 'canceled',
+            subscription_ends_at: Time.at(subscription.current_period_end),
+            cancel_at_period_end: false
+          )
+        rescue Stripe::InvalidRequestError => e
+          Rails.logger.error "Stripe subscription not found for cancellation: #{e.message}"
+          # Subscription doesn't exist in Stripe, just update our database
+          @user.update!(
+            subscription_status: 'canceled',
+            subscription_ends_at: Time.current,
+            stripe_subscription_id: nil
+          )
+        end
+      else
+        # No Stripe subscription, just update our database
+        @user.update!(
+          subscription_status: 'canceled',
+          subscription_ends_at: Time.current
+        )
+      end
+      
+      redirect_to admin_subscriptions_path, notice: "Subscription canceled for #{@user.full_name}"
+    rescue Stripe::StripeError => e
+      Rails.logger.error "Error canceling subscription: #{e.message}"
+      redirect_to admin_subscriptions_path, alert: "Error canceling subscription: #{e.message}"
+    end
   end
 
   def pause
