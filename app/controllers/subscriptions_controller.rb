@@ -23,7 +23,8 @@ class SubscriptionsController < ApplicationController
       # Get or create Stripe customer
       customer = get_or_create_stripe_customer
       
-      # Check for any existing active subscriptions
+      # Check for any existing active subscriptions in Stripe
+      # First check the stored subscription ID
       if current_user.stripe_subscription_id.present?
         begin
           existing_subscription = Stripe::Subscription.retrieve(current_user.stripe_subscription_id)
@@ -34,13 +35,39 @@ class SubscriptionsController < ApplicationController
             return
           end
           
-          # If the subscription is canceled or past_due, we can proceed
-          Rails.logger.info "User #{current_user.email} has a #{existing_subscription.status} subscription, allowing new subscription creation"
+          # If the subscription is canceled or past_due, clear it
+          Rails.logger.info "User #{current_user.email} has a #{existing_subscription.status} subscription, clearing it"
+          current_user.update!(stripe_subscription_id: nil, subscription_status: nil)
         rescue Stripe::InvalidRequestError => e
           # Subscription doesn't exist in Stripe, clear the ID
           Rails.logger.info "Clearing invalid subscription ID for user #{current_user.email}"
           current_user.update!(stripe_subscription_id: nil, subscription_status: nil)
         end
+      end
+      
+      # Also check for ANY active subscriptions for this customer in Stripe
+      # This catches cases where the database is out of sync
+      begin
+        active_subscriptions = Stripe::Subscription.list(
+          customer: customer.id,
+          status: 'active',
+          limit: 10
+        )
+        
+        if active_subscriptions.data.any?
+          Rails.logger.warn "User #{current_user.email} has #{active_subscriptions.data.count} active subscription(s) in Stripe that are not tracked in database"
+          
+          # Cancel all active subscriptions since they're not tracked
+          active_subscriptions.data.each do |sub|
+            Rails.logger.info "Canceling untracked subscription #{sub.id} for user #{current_user.email}"
+            Stripe::Subscription.cancel(sub.id)
+          end
+          
+          redirect_to account_path(anchor: "subscription"), alert: "Found existing subscriptions that needed to be cleaned up. Please try again."
+          return
+        end
+      rescue Stripe::StripeError => e
+        Rails.logger.error "Error checking for active subscriptions: #{e.message}"
       end
 
       # Create Stripe checkout session
