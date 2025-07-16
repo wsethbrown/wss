@@ -519,6 +519,51 @@
                 </div>
               </div>
               
+              <!-- Subscription Management -->
+              <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">
+                <h3 class="text-lg font-medium text-gray-900 mb-4">Subscription Management</h3>
+                
+                <% if current_user.subscription_paused? %>
+                  <!-- Paused Subscription -->
+                  <div class="bg-yellow-50 border border-yellow-200 rounded-lg p-4 mb-4">
+                    <div class="flex">
+                      <div class="flex-shrink-0">
+                        <svg class="h-5 w-5 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                      </div>
+                      <div class="ml-3">
+                        <h4 class="text-sm font-medium text-yellow-800">Subscription Paused</h4>
+                        <p class="mt-1 text-sm text-yellow-700">
+                          Your subscription was paused on <%= current_user.subscription_paused_at.strftime('%B %d, %Y') %>. 
+                          You can resume billing at any time.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+                
+                <div class="flex flex-wrap gap-3">
+                  <% if current_user.subscription_can_be_paused? %>
+                    <%= button_to "Pause Subscription", subscriptions_pause_path, 
+                        method: :post,
+                        data: { turbo_confirm: "Are you sure you want to pause your subscription? Billing will stop but you'll keep access to your current benefits." },
+                        class: "px-4 py-2 bg-yellow-600 text-white text-sm font-medium rounded-md hover:bg-yellow-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-yellow-500" %>
+                  <% elsif current_user.subscription_can_be_resumed? %>
+                    <%= button_to "Resume Subscription", subscriptions_resume_path, 
+                        method: :post,
+                        data: { turbo_confirm: "Are you sure you want to resume your subscription? Billing will restart immediately." },
+                        class: "px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500" %>
+                  <% end %>
+                  
+                  <% unless current_user.cancel_at_period_end? %>
+                    <%= button_to "Cancel Subscription", subscriptions_cancel_path, 
+                        method: :post,
+                        data: { turbo_confirm: "Are you sure you want to cancel your subscription? You'll lose access at the end of your current billing period." },
+                        class: "px-4 py-2 bg-red-600 text-white text-sm font-medium rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500" %>
+                  <% end %>
+                </div>
+              </div>
               
               <!-- Payment Section -->
               <div class="bg-white rounded-lg border border-gray-200 p-6 mb-6">

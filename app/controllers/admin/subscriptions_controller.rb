@@ -144,15 +144,70 @@ class Admin::SubscriptionsController < Admin::BaseController
   end
 
   def pause
-    # TODO: Implement pause functionality with Stripe
-    @user.update!(subscription_paused_at: Time.current)
-    redirect_to admin_subscriptions_path, notice: "Subscription paused for #{@user.full_name}"
+    begin
+      Rails.logger.info "Admin #{current_user.email} attempting to pause subscription for user #{@user.email}"
+      
+      if @user.stripe_subscription_id.blank?
+        redirect_to admin_subscriptions_path, alert: "User has no active subscription to pause"
+        return
+      end
+      
+      # Pause payment collection using Stripe API
+      subscription = Stripe::Subscription.update(
+        @user.stripe_subscription_id,
+        {
+          pause_collection: {
+            behavior: 'keep_as_draft',
+            resumes_at: 1.month.from_now.to_i  # Auto-resume after 1 month
+          }
+        }
+      )
+      
+      # Update user's pause status
+      @user.update!(
+        subscription_paused_at: Time.current,
+        subscription_status: 'paused'
+      )
+      
+      Rails.logger.info "Admin #{current_user.email} paused subscription #{@user.stripe_subscription_id} for user #{@user.email}"
+      redirect_to admin_subscriptions_path, notice: "Subscription paused for #{@user.full_name}. Will auto-resume in 1 month."
+      
+    rescue Stripe::StripeError => e
+      Rails.logger.error "Admin pause error: #{e.message}"
+      redirect_to admin_subscriptions_path, alert: "Error pausing subscription: #{e.message}"
+    end
   end
 
   def resume
-    # TODO: Implement resume functionality with Stripe
-    @user.update!(subscription_paused_at: nil)
-    redirect_to admin_subscriptions_path, notice: "Subscription resumed for #{@user.full_name}"
+    begin
+      Rails.logger.info "Admin #{current_user.email} attempting to resume subscription for user #{@user.email}"
+      
+      if @user.stripe_subscription_id.blank?
+        redirect_to admin_subscriptions_path, alert: "User has no subscription to resume"
+        return
+      end
+      
+      # Resume payment collection using Stripe API
+      subscription = Stripe::Subscription.update(
+        @user.stripe_subscription_id,
+        {
+          pause_collection: ''  # Empty string removes the pause
+        }
+      )
+      
+      # Update user's pause status
+      @user.update!(
+        subscription_paused_at: nil,
+        subscription_status: 'active'
+      )
+      
+      Rails.logger.info "Admin #{current_user.email} resumed subscription #{@user.stripe_subscription_id} for user #{@user.email}"
+      redirect_to admin_subscriptions_path, notice: "Subscription resumed for #{@user.full_name}. Billing will continue normally."
+      
+    rescue Stripe::StripeError => e
+      Rails.logger.error "Admin resume error: #{e.message}"
+      redirect_to admin_subscriptions_path, alert: "Error resuming subscription: #{e.message}"
+    end
   end
 
   def create_subscription

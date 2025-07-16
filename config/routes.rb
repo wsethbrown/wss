@@ -58,6 +58,8 @@ Rails.application.routes.draw do
   post "subscriptions/checkout", to: "subscriptions#create_checkout_session"
   post "subscriptions/portal", to: "subscriptions#portal"
   post "subscriptions/cancel", to: "subscriptions#cancel"
+  post "subscriptions/pause", to: "subscriptions#pause"
+  post "subscriptions/resume", to: "subscriptions#resume"
   post "subscriptions/change_plan", to: "subscriptions#change_plan"
   get "subscriptions/plans", to: "subscriptions#plans"
 

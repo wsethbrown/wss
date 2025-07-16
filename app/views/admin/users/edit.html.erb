@@ -130,6 +130,18 @@
             
             <!-- Action Buttons -->
             <div class="flex flex-wrap gap-3">
+              <% if @user.subscription_can_be_paused? %>
+                <%= button_to "Pause Subscription", pause_admin_subscription_path(@user), 
+                    method: :post,
+                    data: { turbo_confirm: "This will pause billing for this subscription. Are you sure?" },
+                    class: "px-4 py-2 bg-yellow-600 text-white font-medium rounded-lg hover:bg-yellow-700 transition" %>
+              <% elsif @user.subscription_can_be_resumed? %>
+                <%= button_to "Resume Subscription", resume_admin_subscription_path(@user), 
+                    method: :post,
+                    data: { turbo_confirm: "This will resume billing for this subscription. Are you sure?" },
+                    class: "px-4 py-2 bg-green-600 text-white font-medium rounded-lg hover:bg-green-700 transition" %>
+              <% end %>
+              
               <%= button_to "Cancel Subscription", cancel_admin_subscription_path(@user), 
                   method: :post,
                   data: { turbo_confirm: "This will immediately cancel the subscription. Are you sure?" },
@@ -139,7 +151,7 @@
                   method: :patch,
                   params: { user: { subscription_status: 'past_due' } },
                   data: { turbo_confirm: "This will only update the local status. Continue?" },
-                  class: "px-4 py-2 bg-yellow-600 text-white font-medium rounded-lg hover:bg-yellow-700 transition" %>
+                  class: "px-4 py-2 bg-orange-600 text-white font-medium rounded-lg hover:bg-orange-700 transition" %>
             </div>
           <% else %>
             <!-- No Active Subscription -->

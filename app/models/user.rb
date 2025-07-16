@@ -265,10 +265,24 @@ class User < ApplicationRecord
     subscription_status == "active" && (subscription_ends_at.nil? || subscription_ends_at.future?)
   end
 
+  def subscription_paused?
+    subscription_paused_at.present?
+  end
+
+  def subscription_can_be_paused?
+    has_active_subscription? && !subscription_paused?
+  end
+
+  def subscription_can_be_resumed?
+    subscription_paused?
+  end
+
   def subscription_status_display
     case subscription_status
     when "active"
-      "Active"
+      subscription_paused? ? "Paused" : "Active"
+    when "paused"
+      "Paused"
     when "cancelled"
       "Cancelled"
     when "past_due"

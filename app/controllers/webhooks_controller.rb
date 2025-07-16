@@ -86,21 +86,37 @@ class WebhooksController < ApplicationController
     period_end = subscription.try(:current_period_end) || subscription["current_period_end"]
     cancel_at_period_end = subscription.try(:cancel_at_period_end) || subscription["cancel_at_period_end"]
 
+    # Check for pause collection information
+    pause_collection = subscription.try(:pause_collection) || subscription["pause_collection"]
+    is_paused = pause_collection.present?
+    
+    # Determine final status
+    final_status = subscription.try(:status) || subscription["status"]
+    paused_at = is_paused ? Time.current : nil
+    
     user.update!(
-      subscription_status: subscription.try(:status) || subscription["status"],
+      subscription_status: final_status,
       subscription_plan: plan_name,
       subscription_ends_at: period_end ? Time.at(period_end) : nil,
-      cancel_at_period_end: cancel_at_period_end
+      cancel_at_period_end: cancel_at_period_end,
+      subscription_paused_at: paused_at
     )
     
     # Log activity if subscription was canceled
     if cancel_at_period_end
       log_activity_for_user(user, :subscription_canceled, nil, { plan: plan_name, ends_at: period_end })
     end
+    
+    # Log activity if subscription was paused/resumed
+    if is_paused && user.subscription_paused_at_previously_was.nil?
+      log_activity_for_user(user, :subscription_paused, nil, { plan: plan_name })
+    elsif !is_paused && user.subscription_paused_at_previously_was.present?
+      log_activity_for_user(user, :subscription_resumed, nil, { plan: plan_name })
+    end
 
     subscription_id = subscription.try(:id) || subscription["id"]
     status = subscription.try(:status) || subscription["status"]
-    Rails.logger.info "Subscription updated for user #{user.id}: #{subscription_id} -> #{status} (cancel_at_period_end: #{cancel_at_period_end})"
+    Rails.logger.info "Subscription updated for user #{user.id}: #{subscription_id} -> #{status} (cancel_at_period_end: #{cancel_at_period_end}, paused: #{is_paused})"
   end
 
   def handle_subscription_deleted(subscription)
