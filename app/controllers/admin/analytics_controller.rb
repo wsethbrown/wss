@@ -33,10 +33,21 @@ class Admin::AnalyticsController < Admin::BaseController
       .recent
       .limit(20)
     
-    # Download trends (for charts)
-    @daily_downloads = @downloads
-      .group_by_day(:downloaded_at, last: 30)
+    # Download trends (for charts) - last 30 days
+    start_date = 30.days.ago.to_date
+    end_date = Date.current
+    
+    # Get downloads grouped by date
+    downloads_by_date = @downloads
+      .where(downloaded_at: start_date.beginning_of_day..end_date.end_of_day)
+      .group("DATE(downloaded_at)")
       .count
+    
+    # Fill in missing dates with zeros
+    @daily_downloads = {}
+    (start_date..end_date).each do |date|
+      @daily_downloads[date.strftime("%Y-%m-%d")] = downloads_by_date[date] || 0
+    end
   end
   
   def presentation_downloads
@@ -55,9 +66,20 @@ class Admin::AnalyticsController < Admin::BaseController
       .recent
       .limit(50)
     
-    # Download timeline
-    @download_timeline = @downloads
-      .group_by_day(:downloaded_at, last: 30)
+    # Download timeline - last 30 days
+    start_date = 30.days.ago.to_date
+    end_date = Date.current
+    
+    # Get downloads grouped by date
+    downloads_by_date = @downloads
+      .where(downloaded_at: start_date.beginning_of_day..end_date.end_of_day)
+      .group("DATE(downloaded_at)")
       .count
+    
+    # Fill in missing dates with zeros
+    @download_timeline = {}
+    (start_date..end_date).each do |date|
+      @download_timeline[date.strftime("%Y-%m-%d")] = downloads_by_date[date] || 0
+    end
   end
 end
