@@ -78,10 +78,10 @@ class Admin::SubscriptionsController < Admin::BaseController
       # Cancel ALL active subscriptions in Stripe for this customer
       if @user.stripe_customer_id.present?
         begin
-          # First, list all active subscriptions
+          # First, list all active AND trialing subscriptions
           active_subscriptions = Stripe::Subscription.list(
             customer: @user.stripe_customer_id,
-            status: 'active',
+            status: ['active', 'trialing'],
             limit: 100
           )
           
@@ -143,6 +143,92 @@ class Admin::SubscriptionsController < Admin::BaseController
     # TODO: Implement resume functionality with Stripe
     @user.update!(subscription_paused_at: nil)
     redirect_to admin_subscriptions_path, notice: "Subscription resumed for #{@user.full_name}"
+  end
+
+  def create_subscription
+    @user = User.find(params[:user_id])
+    plan = params[:plan]
+    
+    # Validate plan
+    unless ['monthly', 'quarterly', 'yearly'].include?(plan)
+      redirect_back(fallback_location: edit_admin_user_path(@user), alert: "Invalid plan selected")
+      return
+    end
+    
+    begin
+      # Ensure user has a Stripe customer
+      if @user.stripe_customer_id.blank?
+        customer = Stripe::Customer.create({
+          email: @user.email,
+          name: @user.full_name,
+          metadata: {
+            user_id: @user.id
+          }
+        })
+        @user.update!(stripe_customer_id: customer.id)
+      end
+      
+      # Check for existing active or trialing subscriptions
+      existing_subs = Stripe::Subscription.list(
+        customer: @user.stripe_customer_id,
+        status: ['active', 'trialing'],
+        limit: 1
+      )
+      
+      if existing_subs.data.any?
+        redirect_back(fallback_location: edit_admin_user_path(@user), alert: "User already has an active or trial subscription")
+        return
+      end
+      
+      # Get the price ID for the plan
+      price_id = case plan
+      when 'monthly'
+        ENV['STRIPE_MONTHLY_PRICE_ID']
+      when 'quarterly'
+        ENV['STRIPE_QUARTERLY_PRICE_ID']
+      when 'yearly'
+        ENV['STRIPE_YEARLY_PRICE_ID']
+      end
+      
+      # Create the subscription with a trial period to allow user to add payment method later
+      subscription = Stripe::Subscription.create({
+        customer: @user.stripe_customer_id,
+        items: [{
+          price: price_id,
+        }],
+        trial_period_days: 1, # 1 day trial to allow payment method setup
+        payment_behavior: 'allow_incomplete',
+        payment_settings: {
+          save_default_payment_method: 'on_subscription',
+          payment_method_types: ['card']
+        },
+        metadata: {
+          created_by: 'admin',
+          admin_email: current_user.email
+        }
+      })
+      
+      # Update user's subscription data
+      @user.update!(
+        stripe_subscription_id: subscription.id,
+        subscription_status: subscription.status,
+        subscription_plan: plan,
+        subscription_ends_at: subscription.current_period_end ? Time.at(subscription.current_period_end) : nil
+      )
+      
+      # Grant initial credit
+      if CreditTransaction.respond_to?(:grant_monthly_credit)
+        CreditTransaction.grant_monthly_credit(@user, "Admin-created subscription - welcome credit")
+      end
+      
+      Rails.logger.info "Admin #{current_user.email} created #{plan} subscription #{subscription.id} for user #{@user.email}"
+      
+      redirect_to edit_admin_user_path(@user), notice: "#{plan.capitalize} subscription created successfully with 1-day trial. User must add payment method before trial ends to avoid interruption."
+      
+    rescue Stripe::StripeError => e
+      Rails.logger.error "Error creating subscription: #{e.message}"
+      redirect_back(fallback_location: edit_admin_user_path(@user), alert: "Error creating subscription: #{e.message}")
+    end
   end
 
   private

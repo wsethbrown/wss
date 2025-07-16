@@ -95,6 +95,7 @@ Rails.application.routes.draw do
         post :resume
       end
     end
+    post 'create_subscription', to: 'subscriptions#create_subscription'
     resources :credits, only: [:index] do
       collection do
         post :bulk_add

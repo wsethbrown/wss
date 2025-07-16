@@ -83,8 +83,6 @@ class Admin::UsersController < Admin::BaseController
       :last_name, 
       :email, 
       :credits,
-      :subscription_status,
-      :subscription_plan,
       :bio
     )
   end
