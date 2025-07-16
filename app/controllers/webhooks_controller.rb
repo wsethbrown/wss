@@ -48,120 +48,156 @@ class WebhooksController < ApplicationController
   end
 
   def handle_subscription_created(subscription)
-    user = find_user_by_customer_id(subscription.customer)
+    customer_id = subscription.try(:customer) || subscription["customer"]
+    user = find_user_by_customer_id(customer_id)
     return unless user
 
     plan_name = extract_plan_name(subscription)
+    
+    # Access current_period_end correctly
+    period_end = subscription.try(:current_period_end) || subscription["current_period_end"]
 
     user.update!(
-      stripe_subscription_id: subscription.id,
-      subscription_status: subscription.status,
+      stripe_subscription_id: subscription.try(:id) || subscription["id"],
+      subscription_status: subscription.try(:status) || subscription["status"],
       subscription_plan: plan_name,
-      subscription_ends_at: subscription.current_period_end ? Time.at(subscription.current_period_end) : nil
+      subscription_ends_at: period_end ? Time.at(period_end) : nil
     )
 
     # Add initial credit for new subscription
     CreditTransaction.grant_monthly_credit(user, "Welcome credit - new subscription")
     
     # Log activities
-    log_activity_for_user(user, :subscription_created, nil, { plan: plan_name, stripe_id: subscription.id })
+    subscription_id = subscription.try(:id) || subscription["id"]
+    log_activity_for_user(user, :subscription_created, nil, { plan: plan_name, stripe_id: subscription_id })
     log_activity_for_user(user, :credits_added, nil, { amount: 1, reason: 'new_subscription' })
 
-    Rails.logger.info "Subscription created for user #{user.id}: #{subscription.id}, credit added"
+    Rails.logger.info "Subscription created for user #{user.id}: #{subscription_id}, credit added"
   end
 
   def handle_subscription_updated(subscription)
-    user = find_user_by_customer_id(subscription.customer)
+    customer_id = subscription.try(:customer) || subscription["customer"]
+    user = find_user_by_customer_id(customer_id)
     return unless user
 
     plan_name = extract_plan_name(subscription)
+    
+    # Access current_period_end correctly
+    period_end = subscription.try(:current_period_end) || subscription["current_period_end"]
+    cancel_at_period_end = subscription.try(:cancel_at_period_end) || subscription["cancel_at_period_end"]
 
     user.update!(
-      subscription_status: subscription.status,
+      subscription_status: subscription.try(:status) || subscription["status"],
       subscription_plan: plan_name,
-      subscription_ends_at: subscription.current_period_end ? Time.at(subscription.current_period_end) : nil,
-      cancel_at_period_end: subscription.cancel_at_period_end
+      subscription_ends_at: period_end ? Time.at(period_end) : nil,
+      cancel_at_period_end: cancel_at_period_end
     )
     
     # Log activity if subscription was canceled
-    if subscription.cancel_at_period_end
-      log_activity_for_user(user, :subscription_canceled, nil, { plan: plan_name, ends_at: subscription.current_period_end })
+    if cancel_at_period_end
+      log_activity_for_user(user, :subscription_canceled, nil, { plan: plan_name, ends_at: period_end })
     end
 
-    Rails.logger.info "Subscription updated for user #{user.id}: #{subscription.id} -> #{subscription.status} (cancel_at_period_end: #{subscription.cancel_at_period_end})"
+    subscription_id = subscription.try(:id) || subscription["id"]
+    status = subscription.try(:status) || subscription["status"]
+    Rails.logger.info "Subscription updated for user #{user.id}: #{subscription_id} -> #{status} (cancel_at_period_end: #{cancel_at_period_end})"
   end
 
   def handle_subscription_deleted(subscription)
-    user = find_user_by_customer_id(subscription.customer)
+    customer_id = subscription.try(:customer) || subscription["customer"]
+    user = find_user_by_customer_id(customer_id)
     return unless user
+    
+    # Access current_period_end correctly
+    period_end = subscription.try(:current_period_end) || subscription["current_period_end"]
 
     user.update!(
       stripe_subscription_id: nil,
       subscription_status: "cancelled",
-      subscription_ends_at: subscription.current_period_end ? Time.at(subscription.current_period_end) : Time.current,
+      subscription_ends_at: period_end ? Time.at(period_end) : Time.current,
       cancel_at_period_end: false
     )
     
     # If subscription is ending immediately (not at period end), expire credits
-    if subscription.cancel_at.nil? || subscription.cancel_at <= Time.current.to_i
+    cancel_at = subscription.try(:cancel_at) || subscription["cancel_at"]
+    if cancel_at.nil? || cancel_at <= Time.current.to_i
       CreditTransaction.expire_all_credits(user, "Subscription cancelled")
     end
 
-    Rails.logger.info "Subscription cancelled for user #{user.id}: #{subscription.id}"
+    subscription_id = subscription.try(:id) || subscription["id"]
+    Rails.logger.info "Subscription cancelled for user #{user.id}: #{subscription_id}"
   end
 
   def handle_payment_succeeded(invoice)
-    user = find_user_by_customer_id(invoice.customer)
+    customer_id = invoice.try(:customer) || invoice["customer"]
+    user = find_user_by_customer_id(customer_id)
     return unless user
 
     # Update subscription end date based on successful payment
-    if invoice.respond_to?(:subscription) && invoice.subscription
-      subscription = Stripe::Subscription.retrieve(invoice.subscription)
+    subscription_id = invoice.try(:subscription) || invoice["subscription"]
+    if subscription_id
+      subscription = Stripe::Subscription.retrieve(subscription_id)
+      # Access current_period_end correctly
+      period_end = subscription.try(:current_period_end) || subscription["current_period_end"]
       user.update!(
-        subscription_ends_at: subscription.current_period_end ? Time.at(subscription.current_period_end) : nil
+        subscription_ends_at: period_end ? Time.at(period_end) : nil
       )
 
       # Add credit for recurring subscription payments (not initial subscription creation)
-      if invoice.billing_reason == "subscription_cycle"
+      billing_reason = invoice.try(:billing_reason) || invoice["billing_reason"]
+      invoice_id = invoice.try(:id) || invoice["id"]
+      if billing_reason == "subscription_cycle"
         CreditTransaction.grant_monthly_credit(user, "Monthly subscription renewal")
-        Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice.id}, credit added for renewal"
+        Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice_id}, credit added for renewal"
       else
-        Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice.id}"
+        Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice_id}"
       end
-    elsif invoice.lines && invoice.lines.data.any? { |line| line.type == "subscription" }
+    elsif (invoice.try(:lines) || invoice["lines"])
       # Handle invoice lines that are subscription related
-      subscription_id = invoice.lines.data.find { |line| line.type == "subscription" }&.subscription
-      if subscription_id
+      lines_data = invoice.try(:lines).try(:data) || invoice.dig("lines", "data") || []
+      subscription_line = lines_data.find { |line| line.try(:subscription) || line["subscription"] }
+      if subscription_line
+        subscription_id = subscription_line.try(:subscription) || subscription_line["subscription"]
         subscription = Stripe::Subscription.retrieve(subscription_id)
+        # Access current_period_end correctly
+        period_end = subscription.try(:current_period_end) || subscription["current_period_end"]
         user.update!(
-          subscription_ends_at: subscription.current_period_end ? Time.at(subscription.current_period_end) : nil
+          subscription_ends_at: period_end ? Time.at(period_end) : nil
         )
-        Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice.id} (via invoice lines)"
+        invoice_id = invoice.try(:id) || invoice["id"]
+        Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice_id} (via invoice lines)"
       end
     else
-      Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice.id} (non-subscription)"
+      invoice_id = invoice.try(:id) || invoice["id"]
+      Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice_id} (non-subscription)"
     end
   end
 
   def handle_payment_failed(invoice)
-    user = find_user_by_customer_id(invoice.customer)
+    customer_id = invoice.try(:customer) || invoice["customer"]
+    user = find_user_by_customer_id(customer_id)
     return unless user
 
     # Mark subscription as past due or failed
     user.update!(subscription_status: "past_due")
 
-    Rails.logger.warn "Payment failed for user #{user.id}: #{invoice.id}"
+    invoice_id = invoice.try(:id) || invoice["id"]
+    Rails.logger.warn "Payment failed for user #{user.id}: #{invoice_id}"
   end
 
   def handle_checkout_completed(session)
     # Handle presentation purchases
-    if session.mode == "payment" && session.metadata&.dig("presentation_id").present?
-      user_id = session.metadata["user_id"]
-      presentation_id = session.metadata["presentation_id"]
+    metadata = session.try(:metadata) || session["metadata"]
+    mode = session.try(:mode) || session["mode"]
+    
+    if mode == "payment" && metadata && (metadata["presentation_id"] || metadata.try(:[], "presentation_id"))
+      user_id = metadata["user_id"] || metadata.try(:[], "user_id")
+      presentation_id = metadata["presentation_id"] || metadata.try(:[], "presentation_id")
       
       user = User.find_by(id: user_id)
       unless user
-        Rails.logger.error "User not found for checkout session: #{session.id}, user_id: #{user_id}"
+        session_id = session.try(:id) || session["id"]
+        Rails.logger.error "User not found for checkout session: #{session_id}, user_id: #{user_id}"
         return
       end
 
@@ -173,27 +209,33 @@ class WebhooksController < ApplicationController
       end
 
       # Get the payment intent to retrieve the amount paid
-      payment_intent = Stripe::PaymentIntent.retrieve(session.payment_intent)
+      payment_intent_id = session.try(:payment_intent) || session["payment_intent"]
+      payment_intent = Stripe::PaymentIntent.retrieve(payment_intent_id)
       
       # Create user_presentation record for direct purchase
       UserPresentation.create!(
         user: user,
         presentation_id: presentation_id,
         purchase_type: 'direct',
-        purchase_price: payment_intent.amount / 100.0, # Convert from cents
-        stripe_payment_intent_id: payment_intent.id,
+        purchase_price: (payment_intent.try(:amount) || payment_intent["amount"]) / 100.0, # Convert from cents
+        stripe_payment_intent_id: payment_intent.try(:id) || payment_intent["id"],
         purchased_at: Time.current
       )
 
-      Rails.logger.info "Direct presentation purchase completed: user #{user.id}, presentation #{presentation_id}, session #{session.id}"
-    elsif session.mode == "subscription" && session.metadata&.dig("plan").present?
+      session_id = session.try(:id) || session["id"]
+      Rails.logger.info "Direct presentation purchase completed: user #{user.id}, presentation #{presentation_id}, session #{session_id}"
+    elsif mode == "subscription" && metadata && (metadata["plan"] || metadata.try(:[], "plan"))
       # Handle subscription creation from checkout
       # This is already handled by customer.subscription.created event
-      Rails.logger.info "Subscription checkout completed: #{session.id}"
+      session_id = session.try(:id) || session["id"]
+      Rails.logger.info "Subscription checkout completed: #{session_id}"
     end
   end
 
-  def find_user_by_customer_id(customer_id)
+  def find_user_by_customer_id(customer_id_obj)
+    # Handle both string customer IDs and customer objects
+    customer_id = customer_id_obj.is_a?(String) ? customer_id_obj : (customer_id_obj.try(:id) || customer_id_obj["id"] || customer_id_obj)
+    
     User.find_by(stripe_customer_id: customer_id).tap do |user|
       Rails.logger.error "User not found for Stripe customer: #{customer_id}" unless user
     end
@@ -201,7 +243,14 @@ class WebhooksController < ApplicationController
 
   def extract_plan_name(subscription)
     # Extract plan name from subscription items
-    price_id = subscription.items.data.first&.price&.id
+    items = subscription.try(:items) || subscription["items"]
+    items_data = items.try(:data) || items["data"] || []
+    first_item = items_data.first
+    
+    if first_item
+      price = first_item.try(:price) || first_item["price"]
+      price_id = price.try(:id) || price["id"] if price
+    end
 
     case price_id
     when ENV["STRIPE_MONTHLY_PRICE_ID"]
