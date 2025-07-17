@@ -109,8 +109,17 @@
           <% current_sub = active_subs.data.first || trialing_subs.data.first %>
           
           <% if current_sub %>
-            <!-- Active/Trial Subscription -->
-            <% if current_sub.status == 'trialing' %>
+            <!-- Check database status first for paused subscriptions -->
+            <% if @user.subscription_paused? %>
+              <div class="mb-6 p-4 bg-yellow-50 border border-yellow-200 rounded-lg">
+                <p class="text-sm font-medium text-yellow-800 mb-2">Paused Subscription</p>
+                <p class="text-sm text-yellow-700">ID: <%= current_sub.id %></p>
+                <p class="text-sm text-yellow-700">Status: Paused</p>
+                <p class="text-sm text-yellow-700">Plan: <%= @user.subscription_plan || 'Unknown' %></p>
+                <p class="text-sm text-yellow-700">Paused on: <%= @user.subscription_paused_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+                <p class="text-sm text-yellow-700">Will auto-resume: <%= (@user.subscription_paused_at + 1.month).strftime("%B %d, %Y") %></p>
+              </div>
+            <% elsif current_sub.status == 'trialing' %>
               <div class="mb-6 p-4 bg-blue-50 border border-blue-200 rounded-lg">
                 <p class="text-sm font-medium text-blue-800 mb-2">Trial Subscription</p>
                 <p class="text-sm text-blue-700">ID: <%= current_sub.id %></p>
@@ -130,11 +139,14 @@
             
             <!-- Action Buttons -->
             <div class="flex flex-wrap gap-3">
+              
               <% if @user.subscription_can_be_paused? %>
                 <%= button_to "Pause Subscription", pause_admin_subscription_path(@user), 
                     method: :post,
                     data: { turbo_confirm: "This will pause billing for this subscription. Are you sure?" },
-                    class: "px-4 py-2 bg-yellow-600 text-white font-medium rounded-lg hover:bg-yellow-700 transition" %>
+                    style: "background-color: #EAB308; color: #000000; padding: 8px 16px; border-radius: 8px; border: none; font-weight: 500; cursor: pointer;",
+                    onmouseover: "this.style.backgroundColor='#CA8A04'",
+                    onmouseout: "this.style.backgroundColor='#EAB308'" %>
               <% elsif @user.subscription_can_be_resumed? %>
                 <%= button_to "Resume Subscription", resume_admin_subscription_path(@user), 
                     method: :post,

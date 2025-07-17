@@ -1,12 +1,13 @@
-22:28:07 web.1  | started with pid 75527
-22:28:07 web.1  | Puma starting in single mode...
-22:28:07 web.1  | * Puma version: 6.6.0 ("Return to Forever")
-22:28:07 web.1  | * Ruby version: ruby 3.4.3 (2025-04-14 revision d0b7e5b6a0) +PRISM [arm64-darwin23]
-22:28:07 web.1  | *  Min threads: 3
-22:28:07 web.1  | *  Max threads: 3
-22:28:07 web.1  | *  Environment: development
-22:28:07 web.1  | *          PID: 75527
-22:28:08 web.1  | * Listening on ssl://0.0.0.0:3000?cert=dev-cert.pem&key=dev-key.pem
-22:28:08 web.1  | Use Ctrl-C to stop
-22:28:15 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
-22:28:33 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
+22:30:07 web.1  | started with pid 76253
+22:30:08 web.1  | Puma starting in single mode...
+22:30:08 web.1  | * Puma version: 6.6.0 ("Return to Forever")
+22:30:08 web.1  | * Ruby version: ruby 3.4.3 (2025-04-14 revision d0b7e5b6a0) +PRISM [arm64-darwin23]
+22:30:08 web.1  | *  Min threads: 3
+22:30:08 web.1  | *  Max threads: 3
+22:30:08 web.1  | *  Environment: development
+22:30:08 web.1  | *          PID: 76253
+22:30:08 web.1  | * Listening on ssl://0.0.0.0:3000?cert=dev-cert.pem&key=dev-key.pem
+22:30:08 web.1  | Use Ctrl-C to stop
+22:30:23 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
+22:32:46 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
+22:34:42 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
