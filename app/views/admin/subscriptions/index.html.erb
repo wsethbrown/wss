@@ -6,16 +6,30 @@
   </div>
 
   <!-- Stats Cards -->
-  <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+  <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-sm font-medium text-gray-600">Active Subscriptions</p>
+          <p class="text-sm font-medium text-gray-600">Active</p>
           <p class="text-3xl font-bold text-green-600 mt-2"><%= @total_active %></p>
         </div>
         <div class="p-3 bg-green-100 rounded-lg">
           <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          </svg>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <p class="text-sm font-medium text-gray-600">Paused</p>
+          <p class="text-3xl font-bold text-amber-600 mt-2"><%= @total_paused %></p>
+        </div>
+        <div class="p-3 bg-amber-100 rounded-lg">
+          <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
         </div>
       </div>
@@ -91,6 +105,7 @@
               options_for_select([
                 ['All Statuses', ''],
                 ['Active', 'active'],
+                ['Paused', 'paused'],
                 ['Canceled', 'canceled'],
                 ['Past Due', 'past_due']
               ], params[:status]),
@@ -157,23 +172,29 @@
                 <div class="text-sm text-gray-900 capitalize"><%= user.subscription_plan || 'N/A' %></div>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <% case user.subscription_status %>
-                <% when 'active' %>
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    Active
-                  </span>
-                <% when 'canceled' %>
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                    Canceled
-                  </span>
-                <% when 'past_due' %>
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                    Past Due
+                <% if user.subscription_paused? %>
+                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800">
+                    Paused
                   </span>
                 <% else %>
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                    Unknown
-                  </span>
+                  <% case user.subscription_status %>
+                  <% when 'active' %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
+                      Active
+                    </span>
+                  <% when 'canceled' %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
+                      Canceled
+                    </span>
+                  <% when 'past_due' %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
+                      Past Due
+                    </span>
+                  <% else %>
+                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                      Unknown
+                    </span>
+                  <% end %>
                 <% end %>
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
@@ -187,7 +208,20 @@
                   <%= link_to "View", admin_user_path(user), class: "text-blue-600 hover:text-blue-900" %>
                   <span class="text-gray-300">|</span>
                   <%= link_to "Edit", edit_admin_subscription_path(user), class: "text-indigo-600 hover:text-indigo-900" %>
-                  <% if user.subscription_status == 'active' %>
+                  <% if user.subscription_can_be_paused? %>
+                    <span class="text-gray-300">|</span>
+                    <%= button_to "Pause", pause_admin_subscription_path(user), 
+                        method: :post,
+                        data: { turbo_confirm: "Pause this subscription?" },
+                        class: "text-yellow-600 hover:text-yellow-900 bg-transparent border-0 cursor-pointer underline p-0" %>
+                  <% elsif user.subscription_can_be_resumed? %>
+                    <span class="text-gray-300">|</span>
+                    <%= button_to "Resume", resume_admin_subscription_path(user), 
+                        method: :post,
+                        data: { turbo_confirm: "Resume this subscription?" },
+                        class: "text-green-600 hover:text-green-900 bg-transparent border-0 cursor-pointer underline p-0" %>
+                  <% end %>
+                  <% if user.subscription_status == 'active' && !user.subscription_paused? %>
                     <span class="text-gray-300">|</span>
                     <%= button_to "Cancel", cancel_admin_subscription_path(user), 
                         method: :post,

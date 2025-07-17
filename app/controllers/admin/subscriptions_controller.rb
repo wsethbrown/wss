@@ -6,7 +6,11 @@ class Admin::SubscriptionsController < Admin::BaseController
     
     # Filter by status
     if params[:status].present?
-      @subscriptions = @subscriptions.where(subscription_status: params[:status])
+      if params[:status] == 'paused'
+        @subscriptions = @subscriptions.where.not(subscription_paused_at: nil)
+      else
+        @subscriptions = @subscriptions.where(subscription_status: params[:status])
+      end
     end
     
     # Filter by plan
@@ -41,7 +45,8 @@ class Admin::SubscriptionsController < Admin::BaseController
     @subscriptions = @subscriptions.includes(:profile_image_attachment).page(params[:page]).per(25)
     
     # Stats
-    @total_active = User.where(subscription_status: 'active').count
+    @total_active = User.where(subscription_status: 'active').where(subscription_paused_at: nil).count
+    @total_paused = User.where.not(subscription_paused_at: nil).count
     @total_canceled = User.where(subscription_status: 'canceled').count
     @total_revenue = calculate_monthly_revenue
   end
