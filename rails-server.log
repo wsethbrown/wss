@@ -1,35 +1,12 @@
-19:58:16 web.1  | started with pid 67940
-19:58:16 web.1  | Puma starting in single mode...
-19:58:16 web.1  | * Puma version: 6.6.0 ("Return to Forever")
-19:58:16 web.1  | * Ruby version: ruby 3.4.3 (2025-04-14 revision d0b7e5b6a0) +PRISM [arm64-darwin23]
-19:58:16 web.1  | *  Min threads: 3
-19:58:16 web.1  | *  Max threads: 3
-19:58:16 web.1  | *  Environment: development
-19:58:16 web.1  | *          PID: 67940
-19:58:17 web.1  | bundler: failed to load command: puma (/opt/homebrew/lib/ruby/gems/3.4.0/bin/puma)
-19:58:17 web.1  | /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:376:in 'TCPServer#initialize': Address already in use - bind(2) for "0.0.0.0" port 3000 (Errno::EADDRINUSE)
-19:58:17 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:376:in 'IO.new'
-19:58:17 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:376:in 'Puma::Binder#add_ssl_listener'
-19:58:17 web.1  | 	from /opt/homebrew/lib/ruby/gems/3.4.0/gems/puma-6.6.0/lib/puma/binder.rb:262:in08:41:11 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
-13:05:38 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
-13:05:59 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
-14:09:40 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
-14:10:45 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
-14:47:38 web.1  | 2025-07-16 14:47:38 -0400 SSL error, peer: 127.0.0.1, peer cert: : #<Puma::MiniSSL::SSLError: HTTP connection?>
-14:50:57 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
-14:51:23 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
-14:51:35 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
-::CLI#exec'
-19:58:17 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/vendor/thor/lib/thor/command.rb:28:in 'Bundler::Thor::Command#run'
-19:58:17 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/vendor/thor/lib/thor/invocation.rb:127:in 'Bundler::Thor::Invocation#invoke_command'
-19:58:17 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/vendor/thor/lib/thor.rb:538:in 'Bundler::Thor.dispatch'
-19:58:17 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/cli.rb:35:in 'Bundler::CLI.dispatch'
-19:58:17 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/vendor/thor/lib/thor/base.rb:584:in 'Bundler::Thor::Base::ClassMethods#start'
-19:58:17 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/cli.rb:29:in 'Bundler::CLI.start'
-19:58:17 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/bundler-2.6.8/exe/bundle:28:in 'block in <top (required)>'
-19:58:17 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/3.4.0/bundler/friendly_errors.rb:117:in 'Bundler.with_friendly_errors'
-19:58:17 web.1  | 	from /opt/homebrew/Cellar/ruby/3.4.3/lib/ruby/gems/3.4.0/gems/bundler-2.6.8/exe/bundle:20:in '<top (required)>'
-19:58:17 web.1  | 	from /opt/homebrew/opt/ruby/bin/bundle:25:in 'Kernel#load'
-19:58:17 web.1  | 	from /opt/homebrew/opt/ruby/bin/bundle:25:in '<main>'
-19:58:18 web.1  | exited with code 1
-19:58:18 system | sending SIGTERM to all processes
+22:28:07 web.1  | started with pid 75527
+22:28:07 web.1  | Puma starting in single mode...
+22:28:07 web.1  | * Puma version: 6.6.0 ("Return to Forever")
+22:28:07 web.1  | * Ruby version: ruby 3.4.3 (2025-04-14 revision d0b7e5b6a0) +PRISM [arm64-darwin23]
+22:28:07 web.1  | *  Min threads: 3
+22:28:07 web.1  | *  Max threads: 3
+22:28:07 web.1  | *  Environment: development
+22:28:07 web.1  | *          PID: 75527
+22:28:08 web.1  | * Listening on ssl://0.0.0.0:3000?cert=dev-cert.pem&key=dev-key.pem
+22:28:08 web.1  | Use Ctrl-C to stop
+22:28:15 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
+22:28:33 web.1  | WARNING: Running without SSL cert verification. You should never do this in production. Execute `Stripe.verify_ssl_certs = true` to enable verification.
