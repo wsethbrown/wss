@@ -20,14 +20,25 @@ class EventsController < ApplicationController
   end
 
   def new
+    @society = Society.find(params[:society_id]) if params[:society_id]
     @event = Event.new
     @event.society_id = params[:society_id] if params[:society_id]
     authorize @event
   end
 
   def create
+    @society = Society.find(event_params[:society_id]) if event_params[:society_id]
     @event = Event.new(event_params)
     @event.organizer = current_user
+
+    # Convert times from browser timezone to UTC for storage
+    if browser_timezone.present?
+      Time.use_zone(browser_timezone) do
+        @event.start_time = Time.zone.parse(params[:event][:start_time]) if params[:event][:start_time].present?
+        @event.end_time = Time.zone.parse(params[:event][:end_time]) if params[:event][:end_time].present?
+      end
+    end
+
     authorize @event
 
     if @event.save
@@ -38,13 +49,26 @@ class EventsController < ApplicationController
   end
 
   def edit
+    @society = @event.society
     authorize @event
   end
 
   def update
+    @society = @event.society
     authorize @event
 
-    if @event.update(event_params)
+    # Convert times from browser timezone to UTC for storage
+    updated_params = event_params
+    if browser_timezone.present? && (params[:event][:start_time].present? || params[:event][:end_time].present?)
+      Time.use_zone(browser_timezone) do
+        updated_params = updated_params.merge(
+          start_time: params[:event][:start_time].present? ? Time.zone.parse(params[:event][:start_time]) : @event.start_time,
+          end_time: params[:event][:end_time].present? ? Time.zone.parse(params[:event][:end_time]) : @event.end_time
+        )
+      end
+    end
+
+    if @event.update(updated_params)
       redirect_to @event, notice: 'Event was successfully updated.'
     else
       render :edit, status: :unprocessable_entity

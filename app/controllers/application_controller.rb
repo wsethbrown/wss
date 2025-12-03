@@ -6,9 +6,10 @@ class ApplicationController < ActionController::Base
   include ActivityLogger
 
   # before_action :authenticate_user!
+  before_action :set_timezone
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
-  
+
   # Add CSRF protection logging
   rescue_from ActionController::InvalidAuthenticityToken, with: :handle_csrf_error
 
@@ -17,6 +18,19 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  def set_timezone
+    Time.zone = browser_timezone if browser_timezone.present?
+  end
+
+  def browser_timezone
+    @browser_timezone ||= begin
+      tz = cookies[:browser_timezone]
+      return nil if tz.blank?
+      ActiveSupport::TimeZone[tz] ? tz : nil
+    end
+  end
+  helper_method :browser_timezone
 
   def user_not_authorized
     flash[:alert] = "You are not authorized to perform this action."

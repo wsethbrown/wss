@@ -1,42 +1,38 @@
 class Admin::ActivitiesController < Admin::BaseController
   def index
-    @activities = ActivityLog.includes(:user, :trackable)
-    
+    activities = ActivityLog.includes(:user, :trackable)
+
     # Filter by user
     if params[:user_id].present?
-      @activities = @activities.where(user_id: params[:user_id])
+      activities = activities.where(user_id: params[:user_id])
       @selected_user = User.find(params[:user_id])
     end
-    
+
     # Filter by activity type
-    if params[:activity_type].present?
-      @activities = @activities.by_type(params[:activity_type])
-    end
-    
+    activities = activities.by_type(params[:activity_type]) if params[:activity_type].present?
+
     # Filter by date range
-    case params[:date_range]
-    when 'today'
-      @activities = @activities.today
-    when 'week'
-      @activities = @activities.this_week
-    when 'month'
-      @activities = @activities.this_month
-    end
-    
+    activities = case params[:date_range]
+                 when "today" then activities.today
+                 when "week" then activities.this_week
+                 when "month" then activities.this_month
+                 else activities
+                 end
+
     # Search
     if params[:search].present?
       search_term = params[:search].strip.downcase
-      @activities = @activities.joins(:user).where(
-        "LOWER(users.first_name) LIKE :search OR 
-         LOWER(users.last_name) LIKE :search OR 
-         LOWER(users.email) LIKE :search OR 
+      activities = activities.joins(:user).where(
+        "LOWER(users.first_name) LIKE :search OR
+         LOWER(users.last_name) LIKE :search OR
+         LOWER(users.email) LIKE :search OR
          LOWER(activity_logs.activity_type) LIKE :search",
         search: "%#{search_term}%"
       )
     end
-    
-    @activities = @activities.recent.page(params[:page]).per(50)
-    
+
+    @activities = activities.recent.page(params[:page]).per(50)
+
     # Stats
     @total_activities_today = ActivityLog.today.count
     @active_users_today = ActivityLog.today.distinct.count(:user_id)

@@ -1,4 +1,4 @@
-# 🥃 Whiskey Share Society
+# Whiskey Share Society
 
 A modern Rails platform for whiskey enthusiasts to discover, share, and savor whiskey together. Join exclusive clubs, RSVP to tastings, and access professional presentations to host world-class whiskey experiences.
 
@@ -8,39 +8,39 @@ A modern Rails platform for whiskey enthusiasts to discover, share, and savor wh
 ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-14+-blue.svg)
 ![Docker](https://img.shields.io/badge/Docker-Ready-blue.svg)
 
-## ✨ Features
+## Features
 
-### 🏠 **Home Page**
+### **Home Page**
 - **Full-width hero section** with modern glassmorphism design
 - **Interactive "How it Works"** section with sticky scroll
 - **Societies overview** with public/private club information
 - **Pricing plans** with subscription tiers ($15.99/month, $12.99/quarterly, $10.99/yearly)
 
-### 🏛️ **Societies**
+### **Societies**
 - **Public & Private Societies** with different access levels
 - **Role-based membership** (Admin, Officer, Member)
 - **Application system** for private societies
 - **Event coordination** and forum features
 - **Search and filter** functionality
 
-### 📚 **Presentations**
+### **Presentations**
 - **12 professional presentations** covering all whiskey types
 - **Interactive search** with real-time filtering
 - **Detailed modal views** with tasting notes and recommendations
 - **Whiskey recommendations** with price ranges ($, $$, $$$)
 - **Purchase system** for individual presentations
 
-### 🎫 **Events**
+### **Events**
 - **Event creation and management**
 - **RSVP system** for society members
 - **Event details** and coordination tools
 
-### 👤 **User Management**
+### **User Management**
 - **Authentication** with Devise
 - **User profiles** and preferences
 - **Society memberships** and applications
 
-## 🚀 Quick Start
+## Quick Start
 
 ### Prerequisites
 - Ruby 3.2+
@@ -92,7 +92,7 @@ A modern Rails platform for whiskey enthusiasts to discover, share, and savor wh
    docker run -p 3000:3000 whiskey-share-society
    ```
 
-## 🛠️ Technology Stack
+## Technology Stack
 
 ### **Backend**
 - **Rails 7.1+** - Modern Ruby web framework
@@ -113,7 +113,7 @@ A modern Rails platform for whiskey enthusiasts to discover, share, and savor wh
 - **Kamal** - Modern Rails deployment
 - **RuboCop** - Code quality and style enforcement
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 wss/
@@ -129,7 +129,7 @@ wss/
 └── vendor/             # Third-party dependencies
 ```
 
-## 🎨 Design Philosophy
+## Design Philosophy
 
 ### **Modern Aesthetics**
 - **Glassmorphism** effects with backdrop blur
@@ -143,7 +143,7 @@ wss/
 - **Progressive enhancement** for better accessibility
 - **Mobile-first** design approach
 
-## 🔧 Configuration
+## Configuration
 
 ### Environment Variables
 
@@ -174,7 +174,7 @@ development:
   password: your_password
 ```
 
-## 🚀 Deployment
+## Deployment
 
 ### Production Setup
 
@@ -209,7 +209,7 @@ docker run -d \
   wss:production
 ```
 
-## 🤝 Contributing
+## Contributing
 
 1. Fork the repository
 2. Create a feature branch (`git checkout -b feature/amazing-feature`)
@@ -224,17 +224,9 @@ docker run -d \
 - Update documentation as needed
 - Ensure responsive design works on all screen sizes
 
-## 📝 License
+## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🙏 Acknowledgments
-
-- **Rails team** for the amazing framework
-- **Tailwind CSS** for the utility-first approach
-- **Hotwire** for modern Rails frontend patterns
-- **Whiskey community** for inspiration and feedback
-
 ---
 
 **Built with ❤️ for whiskey enthusiasts everywhere**

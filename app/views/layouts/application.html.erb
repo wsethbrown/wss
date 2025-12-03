@@ -20,6 +20,15 @@
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
+
+    <!-- Detect and store user's timezone -->
+    <script>
+      (function() {
+        const timezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        document.cookie = "browser_timezone=" + timezone + "; path=/; max-age=31536000; SameSite=Lax";
+      })();
+    </script>
+
     <style>
       html, body {
         height: 100%;

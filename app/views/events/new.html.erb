@@ -33,7 +33,7 @@
 
     <!-- Form Card -->
     <div class="bg-white/90 backdrop-blur-xl border border-white/50 rounded-3xl shadow-2xl p-8 md:p-12">
-      <%= form_with(model: @event, local: true, html: { class: "space-y-8" }) do |form| %>
+      <%= form_with(model: [@society, @event].compact, local: true, html: { class: "space-y-8" }) do |form| %>
         <% if @event.errors.any? %>
           <div class="rounded-2xl bg-red-50 border border-red-200 p-6">
             <div class="flex items-center gap-3 mb-4">
@@ -144,15 +144,15 @@
 
         <!-- Action Buttons -->
         <div class="flex flex-col sm:flex-row gap-4 pt-8">
-          <%= form.submit "Create Event", 
-              class: "flex-1 py-4 px-8 bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 text-white text-lg font-bold rounded-2xl hover:from-indigo-700 hover:via-purple-700 hover:to-blue-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 transform" %>
-          
+          <%= form.submit "Create Event",
+              class: "flex-1 py-4 px-8 bg-indigo-600 text-white text-lg font-semibold rounded-xl hover:bg-indigo-700 transition-colors duration-200 shadow-md cursor-pointer" %>
+
           <% if @event.society %>
-            <%= link_to "Cancel", society_path(@event.society), 
-                class: "flex-1 py-4 px-8 bg-gray-100 text-gray-700 text-lg font-semibold rounded-2xl hover:bg-gray-200 transition-all duration-300 text-center border-2 border-gray-200 hover:border-gray-300" %>
+            <%= link_to "Cancel", society_path(@event.society),
+                class: "flex-1 py-4 px-8 bg-white text-gray-700 text-lg font-semibold rounded-xl hover:bg-gray-50 transition-colors duration-200 text-center border-2 border-gray-300 hover:border-gray-400" %>
           <% else %>
-            <%= link_to "Cancel", societies_path, 
-                class: "flex-1 py-4 px-8 bg-gray-100 text-gray-700 text-lg font-semibold rounded-2xl hover:bg-gray-200 transition-all duration-300 text-center border-2 border-gray-200 hover:border-gray-300" %>
+            <%= link_to "Cancel", societies_path,
+                class: "flex-1 py-4 px-8 bg-white text-gray-700 text-lg font-semibold rounded-xl hover:bg-gray-50 transition-colors duration-200 text-center border-2 border-gray-300 hover:border-gray-400" %>
           <% end %>
         </div>
 

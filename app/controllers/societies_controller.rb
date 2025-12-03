@@ -39,6 +39,7 @@ class SocietiesController < ApplicationController
 
   def show
     @upcoming_events = @society.upcoming_events.limit(5)
+    @past_events = @society.past_events.limit(5)
     @recent_members = @society.members.limit(10)
   end
 
@@ -114,7 +115,14 @@ class SocietiesController < ApplicationController
   end
 
   def society_params
-    params.require(:society).permit(:name, :description, :location, :is_private, :profile_picture, :banner_image, :banner_position)
+    permitted = params.require(:society).permit(:name, :description, :location, :is_private, :profile_picture, :banner_image, :banner_position)
+
+    # Convert is_private string to boolean
+    if permitted[:is_private].present?
+      permitted[:is_private] = ActiveModel::Type::Boolean.new.cast(permitted[:is_private])
+    end
+
+    permitted
   end
 
   def apply_search_filters(scope)

@@ -1,6 +1,6 @@
 class SubscriptionsController < ApplicationController
   include ActivityLogger
-  
+
   before_action :authenticate_user!
   protect_from_forgery with: :exception
 
@@ -22,7 +22,7 @@ class SubscriptionsController < ApplicationController
     begin
       # Get or create Stripe customer
       customer = get_or_create_stripe_customer
-      
+
       # ALWAYS check Stripe for active subscriptions first - this is the source of truth
       begin
         active_subscriptions = Stripe::Subscription.list(
@@ -30,16 +30,16 @@ class SubscriptionsController < ApplicationController
           status: 'active',
           limit: 100
         )
-        
+
         trialing_subscriptions = Stripe::Subscription.list(
           customer: customer.id,
           status: 'trialing',
           limit: 100
         )
-        
+
         if active_subscriptions.data.any? || trialing_subscriptions.data.any?
           Rails.logger.warn "User #{current_user.email} has #{active_subscriptions.data.count} active and #{trialing_subscriptions.data.count} trialing subscription(s) in Stripe"
-          
+
           # If we have active subscriptions but no stored ID, sync the first one
           if current_user.stripe_subscription_id.blank?
             first_sub = active_subscriptions.data.first || trialing_subscriptions.data.first
@@ -48,7 +48,7 @@ class SubscriptionsController < ApplicationController
               subscription_status: first_sub.status
             )
           end
-          
+
           redirect_to account_path(anchor: "subscription"), alert: "You already have an active subscription. Please manage it from your account page."
           return
         end
@@ -57,7 +57,7 @@ class SubscriptionsController < ApplicationController
         redirect_to account_path(anchor: "subscription"), alert: "Error checking subscription status. Please try again."
         return
       end
-      
+
       # Clear any stored subscription ID since we verified there are no active subscriptions
       if current_user.stripe_subscription_id.present?
         Rails.logger.info "Clearing stored subscription ID #{current_user.stripe_subscription_id} for user #{current_user.email} since no active subscriptions exist"
@@ -89,7 +89,7 @@ class SubscriptionsController < ApplicationController
     rescue Stripe::StripeError => e
       Rails.logger.error "Stripe error: #{e.message}"
       Rails.logger.error "Stripe error details: #{e.inspect}"
-      
+
       # Handle specific Stripe errors with better user messages
       error_message = case e.message
       when /test clock customer.*already has.*active subscription/i
@@ -101,7 +101,7 @@ class SubscriptionsController < ApplicationController
       else
         "Payment processing error. Please try again or contact support."
       end
-      
+
       redirect_to account_path(anchor: "subscription"), alert: error_message
     end
   end
@@ -149,7 +149,7 @@ class SubscriptionsController < ApplicationController
       redirect_to root_path, alert: "Please subscribe to access plan options"
       return
     end
-    
+
     # Fetch available plans
     @stripe_products = fetch_stripe_products
     @current_plan = current_user.subscription_plan || 'monthly'
@@ -182,12 +182,12 @@ class SubscriptionsController < ApplicationController
         } ],
         proration_behavior: "create_prorations"
       }
-      
+
       # If subscription is pending cancellation, reactivate it
       if subscription.cancel_at_period_end
         update_params[:cancel_at_period_end] = false
       end
-      
+
       updated_subscription = Stripe::Subscription.update(
         current_user.stripe_subscription_id,
         update_params
@@ -218,18 +218,18 @@ class SubscriptionsController < ApplicationController
       begin
         # Try to retrieve existing customer
         customer = Stripe::Customer.retrieve(current_user.stripe_customer_id)
-        
+
         # Check if customer exists and is not deleted
         if customer.deleted?
           # Customer was deleted in Stripe, create a new one
           raise Stripe::InvalidRequestError.new("Customer was deleted", nil)
         end
-        
+
         customer
       rescue Stripe::InvalidRequestError => e
         # Customer doesn't exist or was deleted, create a new one
         Rails.logger.info "Creating new Stripe customer for #{current_user.email} (previous customer not found)"
-        
+
         customer = Stripe::Customer.create({
           email: current_user.email,
           name: current_user.full_name,
@@ -237,7 +237,7 @@ class SubscriptionsController < ApplicationController
             user_id: current_user.id
           }
         })
-        
+
         # Update customer ID
         current_user.update!(stripe_customer_id: customer.id)
         customer
@@ -318,7 +318,7 @@ class SubscriptionsController < ApplicationController
 
       Rails.logger.info "User #{current_user.email} paused subscription #{current_user.stripe_subscription_id}"
       redirect_to account_path(anchor: "subscription"), notice: "Subscription paused successfully. Billing will resume automatically in 1 month."
-      
+
     rescue Stripe::StripeError => e
       Rails.logger.error "Stripe pause error: #{e.message}"
       redirect_to account_path(anchor: "subscription"), alert: "Unable to pause subscription. Please try again."
@@ -348,7 +348,7 @@ class SubscriptionsController < ApplicationController
 
       Rails.logger.info "User #{current_user.email} resumed subscription #{current_user.stripe_subscription_id}"
       redirect_to account_path(anchor: "subscription"), notice: "Subscription resumed successfully. Billing will continue normally."
-      
+
     rescue Stripe::StripeError => e
       Rails.logger.error "Stripe resume error: #{e.message}"
       redirect_to account_path(anchor: "subscription"), alert: "Unable to resume subscription. Please try again."
