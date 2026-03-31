@@ -85,7 +85,7 @@ gem "omniauth-rails_csrf_protection", "~> 1.0"
 
 # 2FA support
 gem "rotp", "~> 6.3"
-gem "rqrcode", "~> 2.2"
+gem "rqrcode", "~> 3.1"
 
 # Stripe payment processing
 gem "stripe", "~> 10.0"
