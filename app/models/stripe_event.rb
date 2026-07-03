@@ -3,10 +3,12 @@ class StripeEvent < ApplicationRecord
 
   # Claims an event id for processing. Returns true if this caller won the claim
   # (should process), false if the event was already claimed/processed.
+  # Handles both the validation-caught duplicate (RecordInvalid) and the racy
+  # DB-level duplicate (RecordNotUnique).
   def self.claim(event_id, event_type)
     create!(stripe_event_id: event_id, event_type: event_type)
     true
-  rescue ActiveRecord::RecordNotUnique
+  rescue ActiveRecord::RecordNotUnique, ActiveRecord::RecordInvalid
     false
   end
 

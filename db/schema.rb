@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2025_07_16_122155) do
+ActiveRecord::Schema[8.0].define(version: 2025_07_17_000002) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -202,6 +202,14 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_16_122155) do
     t.index ["user_id"], name: "index_society_memberships_on_user_id"
   end
 
+  create_table "stripe_events", force: :cascade do |t|
+    t.string "stripe_event_id", null: false
+    t.string "event_type"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["stripe_event_id"], name: "index_stripe_events_on_stripe_event_id", unique: true
+  end
+
   create_table "tags", force: :cascade do |t|
     t.string "name", null: false
     t.string "color", default: "#3B82F6", null: false
@@ -267,8 +275,11 @@ ActiveRecord::Schema[8.0].define(version: 2025_07_16_122155) do
     t.boolean "cancel_at_period_end", default: false
     t.boolean "is_admin", default: false, null: false
     t.datetime "subscription_paused_at"
+    t.string "magic_link_token"
+    t.datetime "magic_link_sent_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["is_admin"], name: "index_users_on_is_admin"
+    t.index ["magic_link_token"], name: "index_users_on_magic_link_token", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
   end
 

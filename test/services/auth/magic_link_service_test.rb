@@ -37,6 +37,11 @@ class Auth::MagicLinkServiceTest < ActiveSupport::TestCase
   end
 
   test "consume of a new-user token creates the account" do
+    # The new-user token lives in Rails.cache; the test env defaults to :null_store,
+    # so swap in a real store for this test (prod/dev use solid_cache/memory).
+    original_cache = Rails.cache
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new
+
     email = "newcomer@example.com"
     raw = "raw-token-new"
     Rails.cache.write(Auth::MagicLinkService.cache_key(Auth::MagicLinkService.digest(raw)),
@@ -47,6 +52,8 @@ class Auth::MagicLinkServiceTest < ActiveSupport::TestCase
       assert_equal email, user.email
       assert_not user.password_set_manually
     end
+  ensure
+    Rails.cache = original_cache
   end
 
   test "consume returns nil for a blank or unknown token" do
