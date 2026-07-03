@@ -2,12 +2,17 @@ require "test_helper"
 
 class AppleOAuthTest < ActionDispatch::IntegrationTest
   def setup
+    # Sign in with Apple is registered only when real APPLE_* credentials are present
+    # (see config/initializers/devise.rb). Without them the omniauth-apple routes don't
+    # exist, so these tests can't run — skip cleanly rather than error.
+    skip "Apple Sign In not configured in this environment" unless Devise.omniauth_configs.key?(:apple)
+
     # Clear any existing OAuth mocks
     clear_oauth_mocks
-    
+
     # Clean up any existing test emails
     Dir.glob("#{Rails.root}/tmp/mail/*").each { |file| File.delete(file) }
-    
+
     # Ensure we start with a clean database state
     User.destroy_all
   end

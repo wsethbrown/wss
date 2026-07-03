@@ -15,3 +15,4 @@ admin:
   encrypted_password: <%= Devise::Encryptor.digest(User, 'password') %>
   first_name: Admin
   last_name: User
+  is_admin: true

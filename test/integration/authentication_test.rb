@@ -51,11 +51,17 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_select "a[href*='/users/auth/google_oauth2']"
   end
 
-  test "apple oauth button is present" do
+  test "apple oauth button appears only when Apple Sign In is configured" do
     get auth_path
-
     assert_response :success
-    assert_select "a[href*='/users/auth/apple']"
+
+    if Devise.omniauth_configs.key?(:apple)
+      assert_select "form[action*='/users/auth/apple']"
+    else
+      # Apple is gated on real credentials; when unconfigured the button is hidden
+      # rather than linking to a broken/insecure endpoint.
+      assert_select "form[action*='/users/auth/apple']", count: 0
+    end
   end
 
   test "unauthenticated user is redirected when accessing dashboard" do
