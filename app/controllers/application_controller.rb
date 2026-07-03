@@ -38,26 +38,9 @@ class ApplicationController < ActionController::Base
   end
   
   def handle_csrf_error
-    # Apple OAuth callbacks come as POST and need special handling
-    if request.path == '/users/auth/apple/callback' && request.post?
-      Rails.logger.info "=== APPLE OAUTH CSRF - BYPASSING ==="
-      # Don't handle the error, let it bubble up to be handled by the controller
-      return
-    end
-    
-    Rails.logger.error "=== CSRF ERROR DETECTED ==="
-    Rails.logger.error "Controller: #{self.class.name}"
-    Rails.logger.error "Action: #{action_name}"
-    Rails.logger.error "Request method: #{request.method}"
-    Rails.logger.error "Request path: #{request.path}"
-    Rails.logger.error "Request params: #{params.inspect}"
-    Rails.logger.error "Session: #{session.inspect}"
-    Rails.logger.error "CSRF token from session: #{session[:_csrf_token]}"
-    Rails.logger.error "CSRF token from params: #{params[:authenticity_token]}"
-    Rails.logger.error "CSRF token from headers: #{request.headers['X-CSRF-Token']}"
-    Rails.logger.error "Form authenticity token: #{form_authenticity_token}"
-    
-    redirect_to auth_path, alert: "Authentication failed: csrf_detected. Please try again."
+    # Log the fact of the failure without leaking tokens, session contents, or params.
+    Rails.logger.warn "CSRF verification failed for #{self.class.name}##{action_name} (#{request.method} #{request.path})"
+    redirect_to auth_path, alert: "Your session expired. Please try again."
   end
 
   # Redirect to account after sign in

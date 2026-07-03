@@ -1,31 +1,14 @@
 Rails.application.routes.draw do
-  # Direct Apple Sign In (bypasses OmniAuth)
-  get '/apple/auth', to: 'apple_direct#auth'
-  post '/apple/callback', to: 'apple_direct#callback'
-  get '/apple/callback', to: 'apple_direct#callback'
-  
-  # Catch-all callback for testing
-  match '/callback', to: 'test_callback#callback', via: [:get, :post]
-  match '/auth/callback', to: 'test_callback#callback', via: [:get, :post]
-  match '/users/callback', to: 'test_callback#callback', via: [:get, :post]
-  
-  # Apple OAuth direct route (before Devise)
-  post '/users/auth/apple/callback', to: 'apple_auth#callback'
-  get '/users/auth/apple/callback', to: 'apple_auth#callback'
-  
+  # Authentication is handled exclusively through Devise + OmniAuth (Google, Apple)
+  # and the magic-link flow below. The Apple/Google OAuth callbacks are verified by
+  # the OmniAuth strategies (signature-checked); we no longer hand-roll any callback.
   devise_for :users, controllers: {
     omniauth_callbacks: 'users/omniauth_callbacks',
     registrations: 'users/registrations'
   }, skip: [:sessions]
-  
-  # OAuth failure route inside devise scope
+
   devise_scope :user do
-    get '/users/auth/failure', to: 'apple_auth#callback'
-    post '/users/auth/failure', to: 'apple_auth#callback'
-    # Apple OAuth needs both GET and POST
-    post '/users/auth/apple/callback', to: 'apple_auth#callback'
-    get '/users/auth/apple/callback', to: 'apple_auth#callback'
-    # Custom session routes
+    # Custom password sign-in (adds 2FA + remember-me handling on top of Devise)
     post '/users/sign_in', to: 'auth#sign_in', as: 'user_session'
     delete '/users/sign_out', to: 'auth#logout', as: 'destroy_user_session'
   end

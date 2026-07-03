@@ -1,9 +1,6 @@
 class AuthController < ApplicationController
   include ActivityLogger
-  
-  # Skip CSRF protection for OAuth redirects
-  skip_before_action :verify_authenticity_token, only: [:omniauth_callback]
-  
+
   def unified
     redirect_to root_path if user_signed_in?
   end
@@ -31,8 +28,5 @@ class AuthController < ApplicationController
     log_activity(:logout) if current_user
     sign_out(current_user) if user_signed_in?
     redirect_to root_path
-  end
-
-  def omniauth_callback
   end
 end

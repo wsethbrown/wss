@@ -284,23 +284,25 @@ Devise.setup do |config|
       origin_param: 'origin'
     }
     
-  # Apple OAuth configuration - TEMPORARILY DISABLED
-  # if ENV['APPLE_CLIENT_ID'].present? && File.exist?('apple_private_key.pem')
-  #   config.omniauth :apple,
-  #     ENV['APPLE_CLIENT_ID'],
-  #     '',
-  #     {
-  #       scope: 'email name',
-  #       team_id: ENV['APPLE_TEAM_ID'],
-  #       key_id: ENV['APPLE_KEY_ID'], 
-  #       pem: File.read('apple_private_key.pem'),
-  #       name: 'apple',
-  #       redirect_uri: "#{ENV.fetch('RAILS_HOST', 'https://dev.whiskeysharesociety.com:3000')}/users/auth/apple/callback",
-  #       provider_ignores_state: true,
-  #       authorized_client_ids: [ENV['APPLE_CLIENT_ID']],
-  #       nonce_supported: false
-  #     }
-  # end
+  # Apple "Sign in with Apple" via the omniauth-apple strategy, which verifies the
+  # Apple ID token signature for us. Registered only when all required credentials are
+  # present, so a missing/rotated key never breaks boot — the Apple button simply hides.
+  #
+  # Provide the signing key via the APPLE_PRIVATE_KEY env var (the full PEM contents),
+  # NOT a file in the repo. Set APPLE_CLIENT_ID, APPLE_TEAM_ID, and APPLE_KEY_ID too.
+  if ENV['APPLE_CLIENT_ID'].present? && ENV['APPLE_TEAM_ID'].present? &&
+     ENV['APPLE_KEY_ID'].present? && ENV['APPLE_PRIVATE_KEY'].present?
+    config.omniauth :apple,
+      ENV['APPLE_CLIENT_ID'],
+      '',
+      {
+        scope: 'email name',
+        team_id: ENV['APPLE_TEAM_ID'],
+        key_id: ENV['APPLE_KEY_ID'],
+        pem: ENV['APPLE_PRIVATE_KEY'],
+        name: 'apple'
+      }
+  end
     
   # Configure OmniAuth failure handling
   config.omniauth_path_prefix = '/users/auth'
