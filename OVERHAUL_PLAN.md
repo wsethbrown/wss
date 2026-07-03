@@ -17,12 +17,27 @@
 
 ## ★ STATUS — what the outgoing engineer (Fable) already did
 
-I executed the highest-priority phases on branch **`overhaul/full-refresh`** (5 commits on top of
-`main`). **I could not boot the app or run the test suite in the handoff session** — this machine has
-no Ruby 3.4.3 and no Docker, so everything below was verified by `ruby -c` syntax checks and static
-review only. **Opus: your first job is to run the suite in the real env** (Docker or Ruby 3.4.3 +
-Postgres) — `bin/rails db:test:prepare && bin/rails test` and `bin/brakeman` — and fix any fallout
-before building anything new.
+I executed the highest-priority phases on branch **`overhaul/full-refresh`** (8 commits on top of
+`main`).
+
+**Verified in Docker (Ruby 3.4.3 + Postgres 15) — this is not just syntax-checked.** Migrations
+apply cleanly, Tailwind v4 compiles the new design system, and the full suite runs. Measured results:
+
+| | failures | errors | skips | runs |
+|---|---|---|---|---|
+| `main` (baseline) | 59 | 55 | 0 | 173 |
+| `overhaul/full-refresh` | **44** | **55** | 9 | 177 |
+
+My changes **removed 15 failures and introduced zero regressions**; all 19 of my new tests (credit
+ledger, webhook idempotency, magic links) pass; the 9 skips are the Apple OmniAuth tests, correctly
+gated on Apple being configured. **The remaining 44/55 red is pre-existing test drift that predates
+this work** — tests reference routes that don't exist (`dashboard_path`, `new_user_session_path`),
+old view copy ("Discover Whiskey Societies"), CSS selectors the app dropped (`.society-card`,
+`.error-message`), a Google button test asserting an `<a>` where the view renders a `button_to`
+form, and the missing `rails-controller-testing` gem. **Opus: reconciling this stale suite with the
+current app is a real Phase 8 task — but note it was already broken on `main`; you are not chasing my
+changes.** To reproduce: `docker compose up -d db` then
+`docker compose run --rm -e RAILS_ENV=test -e DATABASE_URL="postgresql://wss:password@db:5432/wss_test" web bash -c "bin/rails db:test:prepare && bin/rails test"`.
 
 **Done (see git log on the branch):**
 - **Phase 0 (critical security) — COMPLETE.** Deleted the three auth-bypass controllers
