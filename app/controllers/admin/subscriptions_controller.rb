@@ -63,8 +63,15 @@ class Admin::SubscriptionsController < Admin::BaseController
       # Handle special actions
       if params[:add_credits].present?
         credits_to_add = params[:add_credits].to_i
-        @user.increment!(:credits, credits_to_add)
-        flash[:notice] = "Added #{credits_to_add} credits to #{@user.full_name}"
+        if credits_to_add != 0
+          CreditTransaction.record!(
+            user: @user,
+            amount: credits_to_add,
+            transaction_type: CreditTransaction::TRANSACTION_TYPES[:admin_adjustment],
+            description: "Added via subscription admin by #{current_user.email}"
+          )
+          flash[:notice] = "Added #{credits_to_add} credits to #{@user.full_name}"
+        end
       end
       
       redirect_to admin_subscriptions_path, notice: 'Subscription updated successfully.'

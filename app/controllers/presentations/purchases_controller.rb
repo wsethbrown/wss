@@ -56,7 +56,9 @@ class Presentations::PurchasesController < ApplicationController
       # Create Stripe checkout session
       session = Stripe::Checkout::Session.create({
         customer: current_user.stripe_customer_id || create_stripe_customer.id,
-        payment_method_types: ['card'],
+        # Surface every payment method enabled in the Stripe Dashboard (card, Apple Pay,
+        # Link, etc.) instead of hard-coding card only.
+        automatic_payment_methods: { enabled: true },
         line_items: [{
           price_data: {
             currency: 'usd',

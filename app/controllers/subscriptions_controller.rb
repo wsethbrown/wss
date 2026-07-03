@@ -71,7 +71,9 @@ class SubscriptionsController < ApplicationController
       # Create Stripe checkout session
       session = Stripe::Checkout::Session.create({
         customer: customer.id,
-        payment_method_types: [ "card" ],
+        # Surface every payment method enabled in the Stripe Dashboard (card, Apple Pay,
+        # Link, etc.) instead of hard-coding card only.
+        automatic_payment_methods: { enabled: true },
         line_items: [ {
           price: price_ids[price_id],
           quantity: 1

@@ -52,7 +52,14 @@ class Admin::CreditsController < Admin::BaseController
 
       if credits_to_add > 0 && user_ids.any?
         users = User.where(id: user_ids)
-        users.update_all("credits = credits + #{credits_to_add}")
+        users.find_each do |user|
+          CreditTransaction.record!(
+            user: user,
+            amount: credits_to_add,
+            transaction_type: CreditTransaction::TRANSACTION_TYPES[:admin_adjustment],
+            description: "Bulk add by #{current_user.email}"
+          )
+        end
 
         flash[:notice] = "Added #{credits_to_add} credits to #{users.count} users"
         redirect_to admin_credits_path
@@ -71,9 +78,11 @@ class Admin::CreditsController < Admin::BaseController
   end
 
   def grant_monthly
-    # Grant monthly credits to all active subscribers
+    # Grant the monthly credit to all active subscribers through the ledger.
     active_users = User.where(subscription_status: "active")
-    active_users.update_all("credits = credits + 1")
+    active_users.find_each do |user|
+      CreditTransaction.grant_monthly_credit(user, "Monthly grant by #{current_user.email}")
+    end
 
     flash[:notice] = "Granted 1 credit to #{active_users.count} active subscribers"
     redirect_to admin_credits_path
@@ -87,17 +96,15 @@ class Admin::CreditsController < Admin::BaseController
       reason = params[:reason]
 
       if adjustment != 0
-        @user.increment!(:credits, adjustment)
-
-        # Log this transaction
-        CreditTransaction.create!(
+        # Single ledger entry; the ledger recomputes the cached balance. (Previously
+        # this both increment!'d and created a transaction — a double count — using an
+        # invalid transaction_type that failed validation after the increment.)
+        CreditTransaction.record!(
           user: @user,
           amount: adjustment,
-          transaction_type: 'admin_adjustment',
+          transaction_type: CreditTransaction::TRANSACTION_TYPES[:admin_adjustment],
           description: "Admin adjustment by #{current_user.email}: #{reason}"
         )
-
-        Rails.logger.info "Admin #{current_user.email} adjusted credits for #{@user.email} by #{adjustment}: #{reason}"
 
         flash[:notice] = "Credits adjusted successfully"
         redirect_to admin_credits_path

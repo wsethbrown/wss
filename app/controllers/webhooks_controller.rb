@@ -6,6 +6,14 @@ class WebhooksController < ApplicationController
   before_action :authenticate_stripe_webhook
 
   def stripe
+    # Idempotency: process each Stripe event exactly once. Retried/duplicate deliveries
+    # (which Stripe sends routinely) return 200 without re-running the handler, so we
+    # never double-grant credits.
+    unless StripeEvent.claim(@event.id, @event.type)
+      Rails.logger.info "Stripe event #{@event.id} already processed; skipping"
+      return render json: { status: "already_processed" }
+    end
+
     case @event.type
     when "customer.subscription.created"
       handle_subscription_created(@event.data.object)
@@ -25,7 +33,10 @@ class WebhooksController < ApplicationController
 
     render json: { status: "success" }
   rescue => e
-    Rails.logger.error "Stripe webhook error: #{e.message}"
+    # Release the claim so Stripe's retry can reprocess this event, and return 500 so
+    # Stripe knows to retry.
+    StripeEvent.release(@event.id) if @event
+    Rails.logger.error "Stripe webhook error (#{@event&.id}): #{e.message}"
     render json: { error: "Webhook processing failed" }, status: 500
   end
 

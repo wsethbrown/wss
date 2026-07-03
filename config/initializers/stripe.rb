@@ -1,16 +1,20 @@
-Stripe.api_key = ENV.fetch('STRIPE_SECRET_KEY', 'sk_test_...')
-
-# Set API version
-Stripe.api_version = '2024-06-20'
-
-# Configure Stripe to handle SSL verification properly in development
-if Rails.env.development?
-  # This allows webhooks to work with ngrok/localtunnel SSL certificates
-  Stripe.verify_ssl_certs = false
+# Fail loudly in production if Stripe isn't configured, rather than silently booting
+# with placeholder keys that break payments and webhook verification.
+if Rails.env.production?
+  %w[STRIPE_SECRET_KEY STRIPE_PUBLISHABLE_KEY STRIPE_WEBHOOK_SECRET].each do |var|
+    raise "Missing required env var #{var}" if ENV[var].blank?
+  end
 end
 
+Stripe.api_key = ENV.fetch('STRIPE_SECRET_KEY', 'sk_test_placeholder')
+Stripe.api_version = '2024-06-20'
+
+# In development we allow self-signed certs so local webhook tunnels (ngrok/stripe CLI)
+# work. Never relax this outside development.
+Stripe.verify_ssl_certs = false if Rails.env.development?
+
 Rails.configuration.stripe = {
-  publishable_key: ENV.fetch('STRIPE_PUBLISHABLE_KEY', 'pk_test_...'),
-  secret_key: ENV.fetch('STRIPE_SECRET_KEY', 'sk_test_...'),
-  webhook_secret: ENV.fetch('STRIPE_WEBHOOK_SECRET', 'whsec_...')
+  publishable_key: ENV.fetch('STRIPE_PUBLISHABLE_KEY', 'pk_test_placeholder'),
+  secret_key: ENV.fetch('STRIPE_SECRET_KEY', 'sk_test_placeholder'),
+  webhook_secret: ENV.fetch('STRIPE_WEBHOOK_SECRET', 'whsec_placeholder')
 }

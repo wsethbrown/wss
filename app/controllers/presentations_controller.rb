@@ -86,20 +86,15 @@ class PresentationsController < ApplicationController
   end
 
   def purchase
-    Rails.logger.info "=== PURCHASE ACTION CALLED ==="
-    Rails.logger.info "Params: #{params.inspect}"
-    Rails.logger.info "Purchase type: #{params[:purchase_type]}"
-    Rails.logger.info "User signed in: #{user_signed_in?}"
-    Rails.logger.info "Current user: #{current_user&.email}"
-    
     @presentation = Presentation.find(params[:id])
-    purchase_type = params[:purchase_type] # 'credit' or 'direct'
-    
-    if purchase_type == 'credit'
+
+    case params[:purchase_type]
+    when 'credit'
       purchase_with_credit
-    elsif purchase_type == 'direct'
-      # Temporarily disable Stripe - just simulate successful purchase
-      simulate_direct_purchase
+    when 'direct'
+      # Direct (money) purchases go through the real Stripe checkout flow. We never
+      # grant paid content without a completed payment.
+      redirect_to new_presentation_purchase_path(@presentation)
     else
       redirect_to presentation_path(params[:id]), alert: 'Invalid purchase type'
     end
@@ -113,29 +108,6 @@ class PresentationsController < ApplicationController
 
   def presentation_params
     params.require(:presentation).permit(:title, :description, :content, :price, :category)
-  end
-
-  def simulate_direct_purchase
-    unless user_signed_in?
-      redirect_to auth_path, alert: 'Please sign in to purchase presentations'
-      return
-    end
-
-    # Check if already purchased
-    if already_purchased?
-      redirect_to presentation_path(params[:id]), notice: 'You already own this presentation'
-      return
-    end
-
-    # Simulate successful direct purchase
-    UserPresentation.create!(
-      user: current_user,
-      presentation_id: params[:id],
-      purchase_type: 'direct',
-      purchased_at: Time.current
-    )
-    
-    redirect_to presentation_path(params[:id]) + "?purchase=success", notice: 'Presentation purchased successfully! (Simulated - no payment processed)'
   end
 
   def purchase_with_credit
@@ -161,16 +133,9 @@ class PresentationsController < ApplicationController
       return
     end
 
-    # Process credit purchase
-    if current_user.deduct_credits(credit_cost)
-      # Create user_presentation record
-      UserPresentation.create!(
-        user: current_user,
-        presentation_id: params[:id],
-        purchase_type: 'credit',
-        purchased_at: Time.current
-      )
-      
+    # Process credit purchase atomically through the ledger (spends the credit and
+    # grants access in one locked transaction).
+    if CreditTransaction.use_credit(current_user, @presentation)
       redirect_to presentation_path(params[:id]), notice: 'Presentation purchased successfully with credit!'
     else
       redirect_to presentation_path(params[:id]), alert: 'Failed to process credit purchase'

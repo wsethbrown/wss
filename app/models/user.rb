@@ -111,9 +111,11 @@ class User < ApplicationRecord
   scope :active, -> { where.not(encrypted_password: [ nil, "" ]) }
 
 
+  # Site-wide admin. Single source of truth is the is_admin boolean column.
+  # (Previously this checked the email domain, which disagreed with is_admin? and
+  # was used to gate presentation downloads — a real authorization inconsistency.)
   def admin?
-    # For now, simple admin check - can be enhanced later
-    email.end_with?("@whiskeysharesociety.com")
+    is_admin?
   end
 
   def member_of?(society)
@@ -317,11 +319,6 @@ class User < ApplicationRecord
     has_active_subscription?
   end
 
-  # Admin methods
-  def is_admin?
-    is_admin == true
-  end
-
   # Presentation access logic
   def owns_presentation?(presentation_id)
     user_presentations.exists?(presentation_id: presentation_id)
@@ -366,16 +363,8 @@ class User < ApplicationRecord
     (subscription_ends_at.to_date - Date.current).to_i
   end
 
-  # Credit management methods
-  def add_credits(amount)
-    update!(credits: (credits || 0) + amount)
-  end
-
-  def deduct_credits(amount)
-    return false if (credits || 0) < amount
-    update!(credits: (credits || 0) - amount)
-  end
-
+  # Credit balance is a cache derived from the credit_transactions ledger; never write
+  # it directly. Route all changes through CreditTransaction.record! and friends.
   def has_sufficient_credits?(amount)
     (credits || 0) >= amount
   end
