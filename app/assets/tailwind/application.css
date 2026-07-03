@@ -28,38 +28,34 @@
 }
 
 @layer components {
-  /* Buttons -------------------------------------------------------------- */
+  /* Buttons. Each variant @applies only real utilities (Tailwind v4 does not let you
+     @apply another component class), and shares a base look via the .btn utilities. */
   .btn {
     @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-whiskey-500;
   }
   .btn-primary {
-    @apply btn bg-whiskey-600 text-white hover:bg-whiskey-700;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-whiskey-500 bg-whiskey-600 text-white hover:bg-whiskey-700;
   }
   .btn-secondary {
-    @apply btn border border-whiskey-300 bg-white text-whiskey-800 hover:bg-whiskey-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-whiskey-500 border border-whiskey-300 bg-white text-whiskey-800 hover:bg-whiskey-50;
   }
   .btn-ghost {
-    @apply btn text-gray-700 hover:bg-gray-100;
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-whiskey-500 text-gray-700 hover:bg-gray-100;
   }
 
-  /* Cards ---------------------------------------------------------------- */
+  /* Cards */
   .card {
     @apply rounded-2xl border border-gray-200 bg-white shadow-sm;
   }
   .card-hover {
-    @apply card transition hover:-translate-y-0.5 hover:shadow-md;
+    @apply rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md;
   }
 
-  /* Badges --------------------------------------------------------------- */
-  .badge {
-    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
-  }
+  /* Badges */
   .badge-whiskey {
-    @apply badge bg-whiskey-100 text-whiskey-800;
-  }
-
-  /* Narrative deck headings ---------------------------------------------- */
-  .font-display {
-    font-family: var(--font-display);
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-whiskey-100 text-whiskey-800;
   }
 }
+
+/* The --font-display theme token above auto-generates a `font-display` utility
+   (Tailwind v4), so narrative headings can use class="font-display". */
