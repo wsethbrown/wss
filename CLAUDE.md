@@ -2,6 +2,24 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
+## ⭐ Active overhaul — read OVERHAUL_PLAN.md first
+
+A full refresh/refactor is in progress on branch `overhaul/full-refresh`. **@OVERHAUL_PLAN.md** is the
+source of truth for what's done and what's next. Key invariants established there (do not regress):
+
+- **Auth:** Only three paths — Devise password, magic link (`Auth::MagicLinkService`), and OmniAuth
+  (Google always; Apple only when `APPLE_*` env vars are set). There are NO hand-rolled OAuth
+  callbacks; never add one, and never disable OAuth/JWT signature verification.
+- **Admin:** A user is an admin iff the `is_admin` boolean column is true (`User#admin?` returns it).
+  Do not reintroduce email-domain admin checks.
+- **Credits:** `credit_transactions` is the ledger and single source of truth. `users.credits` is a
+  cache recomputed from the ledger; NEVER write it directly. All changes go through
+  `CreditTransaction.record!` / `use_credit` / `grant_monthly_credit` / `expire_all_credits`.
+- **Stripe webhooks:** Idempotent via the `StripeEvent` claim table — process each event once.
+- **Secrets:** No `.pem`/`.key`/`.env`/`*.log` in git (see `.gitignore`); use env vars / credentials.
+  The previously committed Apple signing key is compromised and must be rotated.
+- **Design:** One warm `whiskey-*` Tailwind palette is the brand accent (not indigo/amber).
+
 ## Development Commands
 
 ### Starting the Application

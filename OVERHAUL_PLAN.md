@@ -15,6 +15,61 @@
 
 ---
 
+## ★ STATUS — what the outgoing engineer (Fable) already did
+
+I executed the highest-priority phases on branch **`overhaul/full-refresh`** (5 commits on top of
+`main`). **I could not boot the app or run the test suite in the handoff session** — this machine has
+no Ruby 3.4.3 and no Docker, so everything below was verified by `ruby -c` syntax checks and static
+review only. **Opus: your first job is to run the suite in the real env** (Docker or Ruby 3.4.3 +
+Postgres) — `bin/rails db:test:prepare && bin/rails test` and `bin/brakeman` — and fix any fallout
+before building anything new.
+
+**Done (see git log on the branch):**
+- **Phase 0 (critical security) — COMPLETE.** Deleted the three auth-bypass controllers
+  (`TestCallbackController`, `AppleAuthController`, `AppleDirectController`) and their routes; two of
+  them signed every caller in as the hard-coded owner, one trusted an unverified Apple JWT. Untracked
+  the committed `apple_private_key.pem` / dev certs / `*.log` and gitignored them. Stopped logging
+  tokens/session/params. Deleted committed scratch scripts.
+- **Phase 1 (authz) — MOSTLY DONE.** Unified admin onto the `is_admin` column (`User#admin?` no
+  longer keys off email domain). *Still TODO:* audit Pundit coverage on account/subscriptions/admin,
+  and harden paid-download URLs (expiring/proxied) — see Phase 4/§4.
+- **Phase 2 (payments/credits) — MOSTLY DONE.** `credit_transactions` is now the single source of
+  truth; `users.credits` is a self-healing cache (`credits == sum(ledger)`); all mutations go through
+  `CreditTransaction.record!/use_credit` under a row lock; deleted every direct-write path. Added the
+  `StripeEvent` dedup table so webhooks are idempotent. Removed the "simulated" free-purchase path.
+  Enabled Apple Pay/Link via `automatic_payment_methods`. Stripe init fails loud in prod.
+  *Still TODO:* move webhook processing to a Solid Queue job; replace the `obj.try(:x)||obj["x"]`
+  soup with typed SDK access and verify `current_period_end` location for the pinned API version.
+- **Phase 3 (auth consolidation) — MOSTLY DONE.** Magic links rewritten via
+  `Auth::MagicLinkService` (single-use, expiring, HMAC-digested tokens on dedicated columns, no more
+  password-reset collision, `deliver_later`). Apple reintroduced through `omniauth-apple` (real
+  signature verification), gated on `APPLE_*` env vars. *Still TODO:* decide whether to restore the
+  standard Devise session controller (sessions are still hand-rolled in `AuthController`).
+- **Phase 4 (hygiene) — PARTIAL.** Added `.env.example`; removed scratch files and a stray `.backup`
+  view. *Still TODO:* consolidate the three Dockerfiles, prune/update the stale `*.md` docs
+  (Architecture.md, Database.md, Backlog.md, admin_panel_todo.md, AuthenticationFix.md), refresh
+  README/CLAUDE.md.
+- **Phase 7 (frontend) — FOUNDATION DONE.** Built a real design system in the (previously empty)
+  Tailwind source: one warm **whiskey** palette (50–950), an editorial serif token for narrative
+  headings, reusable `.btn/.card/.badge` components. Unified the accent app-wide by swapping ~370
+  `indigo-*` utilities across 20 views to shade-matched `whiskey-*`. *Still TODO (the big visual
+  work):* the premium narrative **deck viewer**, marketplace browse/filter polish, a11y pass, mobile.
+- **Phase 8 (tests/CI) — PARTIAL.** Added tests for the credit ledger invariant, `StripeEvent`
+  idempotency, and the magic-link service; rewrote/aligned the auth tests. Added a `test` job (with
+  Postgres) and a `bundle-audit` step to CI. *Still TODO:* broaden Pundit/policy and subscription
+  lifecycle coverage.
+
+**Not started (need owner sign-off before building):**
+- **Phase 5 (deeper backend refactor)** — extract the remaining Stripe orchestration into service
+  objects; finish the presentation structured-content migration; promote string statuses to enums.
+- **Phase 6 (the product's soul)** — model the monthly rotating-presenter ritual and narrative deck,
+  tying societies to the marketplace. Additive product design; confirm scope first.
+
+Everything below is the original plan, kept intact as the deeper spec. Trust the STATUS block above
+for what's already merged.
+
+---
+
 ## 0. The 30-second orientation
 
 WSS is a **subscription marketplace for whiskey slide decks**, plus **societies** (public/private
