@@ -198,7 +198,7 @@
                     <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2 shadow-lg border-2 border-white">
                       <span class="text-lg">👤</span>
                     </div>
-                    Created by <%= link_to @society.creator.full_name, profile_path(@society.creator), class: "text-indigo-600 hover:text-indigo-500 font-medium" %>
+                    Created by <%= link_to @society.creator.full_name, profile_path(@society.creator), class: "text-whiskey-600 hover:text-whiskey-500 font-medium" %>
                   </div>
                 </div>
               </div>
@@ -236,15 +236,15 @@
                 <% else %>
                   <% if @society.private? %>
                     <%= button_to "Request to Join", join_society_path(@society), method: :post,
-                        class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700" %>
+                        class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-whiskey-600 hover:bg-whiskey-700" %>
                   <% else %>
                     <%= button_to "Join Society", join_society_path(@society), method: :post,
-                        class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700" %>
+                        class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-whiskey-600 hover:bg-whiskey-700" %>
                   <% end %>
                 <% end %>
               <% else %>
                 <%= link_to "Sign In to Join", auth_path,
-                    class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700" %>
+                    class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-whiskey-600 hover:bg-whiskey-700" %>
               <% end %>
             </div>
           </div>
@@ -267,7 +267,7 @@
               <% membership = current_user.society_memberships.find_by(society: @society) %>
               <% if membership&.admin? || membership&.officer? %>
                 <%= link_to "Create New Event", new_society_event_path(@society), 
-                    class: "inline-flex items-center px-4 py-2 bg-indigo-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-indigo-700 focus:bg-indigo-700 active:bg-indigo-900 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 transition ease-in-out duration-150" %>
+                    class: "inline-flex items-center px-4 py-2 bg-whiskey-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-whiskey-700 focus:bg-whiskey-700 active:bg-whiskey-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500 focus:ring-offset-2 transition ease-in-out duration-150" %>
               <% end %>
             <% end %>
           </div>
@@ -276,14 +276,14 @@
               <div class="space-y-4">
                 <% @upcoming_events.each do |event| %>
                   <%= link_to society_event_path(@society, event), class: "block" do %>
-                    <div class="flex items-start space-x-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-indigo-300 transition-all duration-200 cursor-pointer">
-                      <div class="w-12 h-12 bg-indigo-100 rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div class="flex items-start space-x-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-whiskey-300 transition-all duration-200 cursor-pointer">
+                      <div class="w-12 h-12 bg-whiskey-100 rounded-lg flex items-center justify-center">
+                        <svg class="w-6 h-6 text-whiskey-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                         </svg>
                       </div>
                       <div class="flex-1">
-                        <h3 class="text-sm font-semibold text-gray-900 group-hover:text-indigo-600"><%= event.title %></h3>
+                        <h3 class="text-sm font-semibold text-gray-900 group-hover:text-whiskey-600"><%= event.title %></h3>
                         <p class="text-sm text-gray-600 mt-1"><%= truncate(event.description, length: 100) if event.description.present? %></p>
                         <div class="flex items-center mt-2 text-xs text-gray-500">
                           <span><%= event.start_time.strftime("%B %d, %Y at %I:%M %p") %></span>

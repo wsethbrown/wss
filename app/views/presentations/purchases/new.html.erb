@@ -13,9 +13,9 @@
     <!-- Purchase Options Card -->
     <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
       <!-- Header -->
-      <div class="bg-gradient-to-r from-indigo-600 to-purple-600 px-8 py-6">
+      <div class="bg-gradient-to-r from-whiskey-600 to-purple-600 px-8 py-6">
         <h1 class="text-2xl font-bold text-white">Choose Your Purchase Method</h1>
-        <p class="text-indigo-100 mt-2">Get instant access to this presentation</p>
+        <p class="text-whiskey-100 mt-2">Get instant access to this presentation</p>
       </div>
 
       <!-- Presentation Info -->
@@ -70,11 +70,11 @@
                           <p class="text-gray-600 mt-1">You have <%= current_user.credits %> credit<%= 's' if current_user.credits != 1 %> available</p>
                         </div>
                         <div class="text-right">
-                          <span class="text-2xl font-bold text-indigo-600">1 Credit</span>
+                          <span class="text-2xl font-bold text-whiskey-600">1 Credit</span>
                           <p class="text-sm text-gray-500">No charge</p>
                         </div>
                       </div>
-                      <div class="mt-3 flex items-center text-sm text-indigo-600">
+                      <div class="mt-3 flex items-center text-sm text-whiskey-600">
                         <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                         </svg>
@@ -120,15 +120,15 @@
 
             <% unless @has_credits || @user_subscription_active %>
               <!-- No subscription info -->
-              <div class="mt-6 bg-gradient-to-r from-indigo-50 to-purple-50 rounded-xl p-6 border border-indigo-200">
+              <div class="mt-6 bg-gradient-to-r from-whiskey-50 to-purple-50 rounded-xl p-6 border border-whiskey-200">
                 <div class="flex items-start">
-                  <svg class="w-6 h-6 text-indigo-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-6 h-6 text-whiskey-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg>
                   <div class="ml-3">
-                    <h4 class="font-semibold text-indigo-900">Did you know?</h4>
-                    <p class="text-indigo-700 mt-1">With a subscription, you get 1 credit every month to use on any presentation, plus exclusive member benefits.</p>
-                    <%= link_to "View subscription plans", root_path(anchor: "pricing"), class: "inline-flex items-center mt-2 text-indigo-600 hover:text-indigo-700 font-medium" %>
+                    <h4 class="font-semibold text-whiskey-900">Did you know?</h4>
+                    <p class="text-whiskey-700 mt-1">With a subscription, you get 1 credit every month to use on any presentation, plus exclusive member benefits.</p>
+                    <%= link_to "View subscription plans", root_path(anchor: "pricing"), class: "inline-flex items-center mt-2 text-whiskey-600 hover:text-whiskey-700 font-medium" %>
                   </div>
                 </div>
               </div>
@@ -137,7 +137,7 @@
 
           <!-- Submit Button -->
           <div class="mt-8">
-            <%= f.submit "Continue to Payment", class: "w-full py-4 px-6 border border-transparent rounded-xl shadow-lg text-lg font-semibold text-white bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer", style: "transition: background 0.2s ease; transform: none !important;" %>
+            <%= f.submit "Continue to Payment", class: "w-full py-4 px-6 border border-transparent rounded-xl shadow-lg text-lg font-semibold text-white bg-gradient-to-r from-whiskey-600 to-purple-600 hover:from-whiskey-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-whiskey-500 cursor-pointer", style: "transition: background 0.2s ease; transform: none !important;" %>
           </div>
         <% end %>
 
@@ -165,28 +165,28 @@ function selectPurchaseMethod(method) {
   // Update visual states
   if (method === 'credit') {
     // Credit option selected
-    document.getElementById('credit_option_div').classList.add('border-indigo-600', 'bg-indigo-50');
+    document.getElementById('credit_option_div').classList.add('border-whiskey-600', 'bg-whiskey-50');
     document.getElementById('credit_option_div').classList.remove('border-gray-200');
-    document.getElementById('credit_radio').classList.add('border-indigo-600', 'bg-indigo-600');
+    document.getElementById('credit_radio').classList.add('border-whiskey-600', 'bg-whiskey-600');
     document.getElementById('credit_radio').classList.remove('border-gray-300');
     
     // Direct option deselected
-    document.getElementById('direct_option_div').classList.remove('border-indigo-600', 'bg-indigo-50');
+    document.getElementById('direct_option_div').classList.remove('border-whiskey-600', 'bg-whiskey-50');
     document.getElementById('direct_option_div').classList.add('border-gray-200');
-    document.getElementById('direct_radio').classList.remove('border-indigo-600', 'bg-indigo-600');
+    document.getElementById('direct_radio').classList.remove('border-whiskey-600', 'bg-whiskey-600');
     document.getElementById('direct_radio').classList.add('border-gray-300');
   } else {
     // Direct option selected
-    document.getElementById('direct_option_div').classList.add('border-indigo-600', 'bg-indigo-50');
+    document.getElementById('direct_option_div').classList.add('border-whiskey-600', 'bg-whiskey-50');
     document.getElementById('direct_option_div').classList.remove('border-gray-200');
-    document.getElementById('direct_radio').classList.add('border-indigo-600', 'bg-indigo-600');
+    document.getElementById('direct_radio').classList.add('border-whiskey-600', 'bg-whiskey-600');
     document.getElementById('direct_radio').classList.remove('border-gray-300');
     
     // Credit option deselected (if it exists)
     if (document.getElementById('credit_option_div')) {
-      document.getElementById('credit_option_div').classList.remove('border-indigo-600', 'bg-indigo-50');
+      document.getElementById('credit_option_div').classList.remove('border-whiskey-600', 'bg-whiskey-50');
       document.getElementById('credit_option_div').classList.add('border-gray-200');
-      document.getElementById('credit_radio').classList.remove('border-indigo-600', 'bg-indigo-600');
+      document.getElementById('credit_radio').classList.remove('border-whiskey-600', 'bg-whiskey-600');
       document.getElementById('credit_radio').classList.add('border-gray-300');
     }
   }

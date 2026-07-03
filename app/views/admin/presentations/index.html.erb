@@ -5,7 +5,7 @@
     <h1 class="text-3xl font-bold text-gray-900">Presentations</h1>
     <p class="mt-2 text-gray-600"><%= @presentations.count %> presentations total</p>
   </div>
-  <%= link_to new_admin_presentation_path, class: "inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition shadow-sm" do %>
+  <%= link_to new_admin_presentation_path, class: "inline-flex items-center gap-2 px-6 py-3 bg-whiskey-600 text-white font-semibold rounded-xl hover:bg-whiskey-700 transition shadow-sm" do %>
     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
     </svg>
@@ -62,8 +62,8 @@
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
                 <div class="flex items-center gap-2">
-                  <%= link_to "View", admin_presentation_path(presentation), class: "text-indigo-600 hover:text-indigo-900" %>
-                  <%= link_to "Edit", edit_admin_presentation_path(presentation), class: "text-indigo-600 hover:text-indigo-900" %>
+                  <%= link_to "View", admin_presentation_path(presentation), class: "text-whiskey-600 hover:text-whiskey-900" %>
+                  <%= link_to "Edit", edit_admin_presentation_path(presentation), class: "text-whiskey-600 hover:text-whiskey-900" %>
                   <%= button_to "Delete", admin_presentation_path(presentation), 
                       method: :delete,
                       data: { turbo_confirm: "Are you sure you want to delete this presentation?" }, 
@@ -84,7 +84,7 @@
       </div>
       <h3 class="text-lg font-medium text-gray-900 mb-2">No presentations yet</h3>
       <p class="text-gray-500 mb-6">Get started by creating your first presentation.</p>
-      <%= link_to new_admin_presentation_path, class: "inline-flex items-center gap-2 px-6 py-3 bg-indigo-600 text-white font-semibold rounded-xl hover:bg-indigo-700 transition shadow-sm" do %>
+      <%= link_to new_admin_presentation_path, class: "inline-flex items-center gap-2 px-6 py-3 bg-whiskey-600 text-white font-semibold rounded-xl hover:bg-whiskey-700 transition shadow-sm" do %>
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>

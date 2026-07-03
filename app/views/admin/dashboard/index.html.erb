@@ -89,8 +89,8 @@
           Today • <%= @total_downloads_week %> this week
         </p>
       </div>
-      <div class="p-3 bg-indigo-50 rounded-xl">
-        <svg class="w-8 h-8 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <div class="p-3 bg-whiskey-50 rounded-xl">
+        <svg class="w-8 h-8 text-whiskey-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
         </svg>
       </div>
@@ -123,8 +123,8 @@
     <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
     <div class="space-y-2">
       <%= link_to new_admin_presentation_path, class: "flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors" do %>
-        <div class="p-1.5 bg-indigo-100 rounded-lg">
-          <svg class="w-4 h-4 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="p-1.5 bg-whiskey-100 rounded-lg">
+          <svg class="w-4 h-4 text-whiskey-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
           </svg>
         </div>
@@ -167,7 +167,7 @@
   <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg font-semibold text-gray-900">Recent Purchases</h2>
-      <%= link_to "All", admin_presentations_path, class: "text-sm text-indigo-600 hover:text-indigo-900" %>
+      <%= link_to "All", admin_presentations_path, class: "text-sm text-whiskey-600 hover:text-whiskey-900" %>
     </div>
     <% if @recent_purchases.any? %>
       <div class="space-y-2 max-h-80 overflow-y-auto">
@@ -196,17 +196,17 @@
   <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg font-semibold text-gray-900">Top Presentations</h2>
-      <%= link_to "All", admin_presentations_path, class: "text-sm text-indigo-600 hover:text-indigo-900" %>
+      <%= link_to "All", admin_presentations_path, class: "text-sm text-whiskey-600 hover:text-whiskey-900" %>
     </div>
     <% if @popular_presentations.any? %>
       <div class="space-y-2">
         <% @popular_presentations.each_with_index do |presentation, index| %>
           <div class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg transition-colors">
-            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-indigo-100 flex items-center justify-center">
-              <span class="text-xs font-bold text-indigo-600"><%= index + 1 %></span>
+            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-whiskey-100 flex items-center justify-center">
+              <span class="text-xs font-bold text-whiskey-600"><%= index + 1 %></span>
             </div>
             <div class="flex-1 min-w-0">
-              <%= link_to presentation.title, admin_presentation_path(presentation), class: "text-sm font-medium text-gray-900 hover:text-indigo-600 truncate block" %>
+              <%= link_to presentation.title, admin_presentation_path(presentation), class: "text-sm font-medium text-gray-900 hover:text-whiskey-600 truncate block" %>
               <p class="text-xs text-gray-500"><%= presentation.user_presentations.count %> sales • $<%= presentation.user_presentations.where(purchase_type: 'direct').sum(:purchase_price).to_i %></p>
             </div>
           </div>
@@ -258,7 +258,7 @@
       </div>
       
       <div class="space-y-1">
-        <% colors_rgb = ['bg-indigo-600', 'bg-purple-600', 'bg-pink-600', 'bg-blue-600'] %>
+        <% colors_rgb = ['bg-whiskey-600', 'bg-purple-600', 'bg-pink-600', 'bg-blue-600'] %>
         <% @plan_breakdown.each_with_index do |(plan, count), index| %>
           <div class="flex items-center justify-between text-sm">
             <div class="flex items-center gap-2">
@@ -310,7 +310,7 @@
       <div class="pt-3 border-t border-gray-200">
         <div class="flex items-center justify-between">
           <p class="text-sm font-medium text-gray-600">This Month</p>
-          <p class="text-xl font-bold text-indigo-600">$<%= @revenue_this_month.to_i %></p>
+          <p class="text-xl font-bold text-whiskey-600">$<%= @revenue_this_month.to_i %></p>
         </div>
       </div>
     </div>
@@ -320,7 +320,7 @@
   <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
     <div class="flex items-center justify-between mb-4">
       <h2 class="text-lg font-semibold text-gray-900">Recent Users</h2>
-      <%= link_to "View All", admin_users_path, class: "text-sm text-indigo-600 hover:text-indigo-900" %>
+      <%= link_to "View All", admin_users_path, class: "text-sm text-whiskey-600 hover:text-whiskey-900" %>
     </div>
     <% if @recent_users.any? %>
       <div class="grid grid-cols-2 gap-3">

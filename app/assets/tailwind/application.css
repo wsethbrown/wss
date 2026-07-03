@@ -1,1 +1,65 @@
 @import "tailwindcss";
+
+/*
+  Whiskey Share Society design system.
+
+  A single warm "whiskey" accent (oak/amber) replaces the previous mix of indigo
+  (nav) and amber (auth) so the whole app reads as one intentional brand. An editorial
+  serif is reserved for narrative deck headings — the storytelling that is WSS's soul.
+
+  Tailwind v4 exposes @theme tokens as utilities automatically, e.g. bg-whiskey-600,
+  text-whiskey-700, so existing views can adopt them incrementally.
+*/
+@theme {
+  --color-whiskey-50: #fbf6ef;
+  --color-whiskey-100: #f4e7d5;
+  --color-whiskey-200: #e8cca7;
+  --color-whiskey-300: #d9ab74;
+  --color-whiskey-400: #c9884a;
+  --color-whiskey-500: #b86e2f;
+  --color-whiskey-600: #a15825;
+  --color-whiskey-700: #82441f;
+  --color-whiskey-800: #6a3820;
+  --color-whiskey-900: #582f1e;
+  --color-whiskey-950: #32180e;
+
+  /* Editorial serif for narrative headings; system fallbacks so no web font is required. */
+  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+}
+
+@layer components {
+  /* Buttons -------------------------------------------------------------- */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-whiskey-500;
+  }
+  .btn-primary {
+    @apply btn bg-whiskey-600 text-white hover:bg-whiskey-700;
+  }
+  .btn-secondary {
+    @apply btn border border-whiskey-300 bg-white text-whiskey-800 hover:bg-whiskey-50;
+  }
+  .btn-ghost {
+    @apply btn text-gray-700 hover:bg-gray-100;
+  }
+
+  /* Cards ---------------------------------------------------------------- */
+  .card {
+    @apply rounded-2xl border border-gray-200 bg-white shadow-sm;
+  }
+  .card-hover {
+    @apply card transition hover:-translate-y-0.5 hover:shadow-md;
+  }
+
+  /* Badges --------------------------------------------------------------- */
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
+  }
+  .badge-whiskey {
+    @apply badge bg-whiskey-100 text-whiskey-800;
+  }
+
+  /* Narrative deck headings ---------------------------------------------- */
+  .font-display {
+    font-family: var(--font-display);
+  }
+}

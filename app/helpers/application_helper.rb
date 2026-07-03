@@ -4,12 +4,12 @@ module ApplicationHelper
     active = current_page?(path)
     classes = [
       'transition-colors',
-      'hover:text-indigo-600',
+      'hover:text-whiskey-700',
       'px-3',
       'py-2',
       'rounded-lg',
       'font-semibold',
-      active ? 'text-indigo-600' : 'text-gray-700'
+      active ? 'text-whiskey-700' : 'text-gray-700'
     ]
     link_to name, path, options.merge(class: classes.join(' '))
   end
