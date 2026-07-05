@@ -29,7 +29,7 @@ class HomeController < ApplicationController
         # Fetch monthly product
         if ENV['STRIPE_MONTHLY_PRICE_ID'].present?
           begin
-            monthly_price = Stripe::Price.retrieve(ENV['STRIPE_MONTHLY_PRICE_ID'], expand: ['product'])
+            monthly_price = Stripe::Price.retrieve({ id: ENV['STRIPE_MONTHLY_PRICE_ID'], expand: ['product'] })
             if monthly_price && monthly_price.product
               products << {
                 id: 'monthly',
@@ -50,7 +50,7 @@ class HomeController < ApplicationController
         # Fetch quarterly product
         if ENV['STRIPE_QUARTERLY_PRICE_ID'].present?
           begin
-            quarterly_price = Stripe::Price.retrieve(ENV['STRIPE_QUARTERLY_PRICE_ID'], expand: ['product'])
+            quarterly_price = Stripe::Price.retrieve({ id: ENV['STRIPE_QUARTERLY_PRICE_ID'], expand: ['product'] })
             if quarterly_price && quarterly_price.product
               # Calculate monthly equivalent for quarterly
               quarterly_interval = quarterly_price.recurring&.interval || 'month'
@@ -81,7 +81,7 @@ class HomeController < ApplicationController
         # Fetch yearly product
         if ENV['STRIPE_YEARLY_PRICE_ID'].present?
           begin
-            yearly_price = Stripe::Price.retrieve(ENV['STRIPE_YEARLY_PRICE_ID'], expand: ['product'])
+            yearly_price = Stripe::Price.retrieve({ id: ENV['STRIPE_YEARLY_PRICE_ID'], expand: ['product'] })
             if yearly_price && yearly_price.product
               # Calculate monthly equivalent for yearly
               yearly_interval = yearly_price.recurring&.interval || 'year'
