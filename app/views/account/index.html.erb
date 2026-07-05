@@ -969,6 +969,16 @@ function initializeAccountPage() {
     const targetContent = document.getElementById(tabName + '-content');
     if (targetContent) {
       targetContent.classList.remove('hidden');
+
+      // Bring the newly shown panel into view. When scrolled deep into a long
+      // panel (e.g. Billing History), swapping content above the fold looks
+      // like the click did nothing. Only scroll when actually needed.
+      const navClearance = 96;
+      const panelTop = targetContent.getBoundingClientRect().top + window.scrollY - navClearance;
+      if (window.scrollY > panelTop) {
+        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.scrollTo({ top: Math.max(panelTop, 0), behavior: reduceMotion ? 'auto' : 'smooth' });
+      }
     }
   }
 
@@ -979,15 +989,21 @@ function initializeAccountPage() {
       e.preventDefault();
       const targetTab = tabElement.getAttribute('data-tab');
       activateTab(targetTab);
+      // The click handler suppresses native anchor navigation, so mirror the
+      // tab into the hash by hand — keeps deep links and back/forward sane.
+      history.replaceState(null, '', '#' + targetTab);
     }
   });
   
-  // Check if we need to navigate to a specific tab based on URL
+  // Restore the tab named in the URL (hash deep-link, or legacy ?subscription
+  // param used by Stripe checkout return URLs).
   const urlParams = new URLSearchParams(window.location.search);
   const hash = window.location.hash.substring(1);
-  
-  if (urlParams.has('subscription') || hash === 'subscription') {
+
+  if (urlParams.has('subscription')) {
     activateTab('subscription');
+  } else if (hash && document.getElementById(hash + '-content')) {
+    activateTab(hash);
   }
 }
 
