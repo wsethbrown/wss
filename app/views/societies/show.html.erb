@@ -24,7 +24,7 @@
                   <%= render 'shared/society_icon', society: @society, size: 'large' %>
                 </div>
               <% else %>
-                <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center border-4 border-white/20 backdrop-blur-sm">
+                <div class="w-20 h-20 bg-gradient-to-br from-whiskey-500 to-whiskey-500 rounded-xl flex items-center justify-center border-4 border-white/20 backdrop-blur-sm">
                   <%= render 'shared/society_icon', society: @society, size: 'large' %>
                 </div>
               <% end %>
@@ -88,7 +88,7 @@
                 <% if @society.has_member?(current_user) %>
                   <% membership = current_user.society_memberships.find_by(society: @society) %>
                   <% if membership&.admin? %>
-                    <span class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-purple-600 border border-purple-500 text-white shadow-lg">
+                    <span class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-whiskey-600 border border-whiskey-500 text-white shadow-lg">
                       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 713.138-3.138z"></path>
                       </svg>
@@ -146,7 +146,7 @@
                   <%= render 'shared/society_icon', society: @society, size: 'large' %>
                 </div>
               <% else %>
-                <div class="w-20 h-20 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center">
+                <div class="w-20 h-20 bg-gradient-to-br from-whiskey-500 to-whiskey-500 rounded-xl flex items-center justify-center">
                   <%= render 'shared/society_icon', society: @society, size: 'large' %>
                 </div>
               <% end %>
@@ -210,7 +210,7 @@
                 <% if @society.has_member?(current_user) %>
                   <% membership = current_user.society_memberships.find_by(society: @society) %>
                   <% if membership&.admin? %>
-                    <span class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-purple-100 text-purple-800">
+                    <span class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-whiskey-100 text-whiskey-800">
                       <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 714.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 713.138-3.138z"></path>
                       </svg>

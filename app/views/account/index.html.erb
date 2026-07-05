@@ -269,7 +269,7 @@
                   <a href="<%= society_path(society) %>" class="block bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-whiskey-300 transition-all duration-200 group">
                     <div class="text-center">
                       <!-- Society Icon -->
-                      <div class="w-16 h-16 bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-105 transition-transform">
+                      <div class="w-16 h-16 bg-gradient-to-br from-whiskey-500 to-whiskey-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-105 transition-transform">
                         <%= render 'shared/society_icon', society: society %>
                       </div>
                       
@@ -278,7 +278,7 @@
                         <h3 class="text-base font-semibold text-gray-900 mb-2 group-hover:text-whiskey-600 transition-colors"><%= society.name %></h3>
                             <% membership = current_user.society_memberships.find_by(society: society) %>
                             <% if membership&.admin? %>
-                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-purple-100 text-purple-800">Creator</span>
+                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-whiskey-100 text-whiskey-800">Creator</span>
                             <% elsif membership&.officer? %>
                               <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Officer</span>
                             <% end %>
@@ -762,7 +762,7 @@
                             %></p>
                             <div class="mb-4">
                               <div class="flex justify-center">
-                                <span class="text-5xl font-extrabold <%= product[:popular] ? 'bg-gradient-to-r from-amber-600 to-orange-700 bg-clip-text text-transparent' : 'bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent' %>">$<%= sprintf('%.2f', product[:price] / 100.0) %></span>
+                                <span class="text-5xl font-display font-semibold <%= product[:popular] ? 'bg-gradient-to-r from-amber-600 to-orange-700 bg-clip-text text-transparent' : 'bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent' %>">$<%= sprintf('%.2f', product[:price] / 100.0) %></span>
                                 <span class="text-gray-400 ml-1 text-lg self-end pb-1">/mo</span>
                               </div>
                               <% if product[:id] == 'quarterly' || product[:id] == 'yearly' %>

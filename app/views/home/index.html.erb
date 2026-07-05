@@ -192,27 +192,8 @@
 
       <div class="mt-12 grid gap-8 md:grid-cols-3">
         <% @featured_presentations.each do |deck| %>
-          <%= link_to presentation_path(deck), class: 'group block' do %>
-            <article class="flex h-full flex-col overflow-hidden rounded-2xl border border-whiskey-200 bg-white shadow-sm transition group-hover:-translate-y-1 group-hover:shadow-md">
-              <% if deck.featured_image.attached? %>
-                <%= image_tag deck.featured_image, alt: deck.title, class: 'aspect-[16/9] w-full object-cover' %>
-              <% else %>
-                <%# Typographic cover, like a label. %>
-                <div class="flex aspect-[16/9] w-full items-center justify-center bg-char px-6 text-center">
-                  <span class="font-display text-2xl font-semibold leading-snug text-cream"><%= deck.title %></span>
-                </div>
-              <% end %>
-              <div class="flex flex-1 flex-col p-6">
-                <p class="eyebrow text-whiskey-600"><%= deck.category.presence || 'Whiskey' %><%= " · #{deck.difficulty}" if deck.difficulty.present? %></p>
-                <h3 class="mt-2 font-display text-xl font-semibold text-gray-900"><%= deck.title %></h3>
-                <p class="mt-2 line-clamp-3 text-gray-600"><%= deck.excerpt(140) %></p>
-                <div class="mt-auto flex items-center justify-between pt-6">
-                  <span class="font-semibold text-gray-900"><%= deck.formatted_price %></span>
-                  <span class="text-sm font-semibold text-whiskey-700">Read the story →</span>
-                </div>
-              </div>
-            </article>
-          <% end %>
+          <%= render 'presentations/deck_card', deck: deck,
+              owned: user_signed_in? && deck.purchased_by?(current_user) %>
         <% end %>
       </div>
     </div>

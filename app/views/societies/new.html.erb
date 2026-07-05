@@ -1,5 +1,5 @@
 <!-- Society Creation Page -->
-<div class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-whiskey-50 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+<div class="min-h-screen bg-whiskey-50 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
   <!-- Background Effects -->
   <div class="absolute inset-0 pointer-events-none">
     <div class="absolute top-1/4 left-1/6 w-40 h-40 bg-blue-200/20 rounded-full blur-3xl animate-pulse"></div>
@@ -14,9 +14,9 @@
         <span>🏛️ Create Society</span>
       </div>
 
-      <h1 class="text-5xl md:text-6xl font-black tracking-tight mb-6 leading-tight">
+      <h1 class="text-5xl md:text-6xl font-display font-semibold tracking-tight mb-6 leading-tight">
         <span class="block text-gray-900">Build Your</span>
-        <span class="block bg-gradient-to-r from-blue-600 via-whiskey-600 to-purple-600 bg-clip-text text-transparent">Whiskey Community</span>
+        <span class="block bg-gradient-to-r from-blue-600 via-whiskey-600 to-whiskey-600 bg-clip-text text-transparent">Whiskey Community</span>
       </h1>
 
       <p class="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed font-medium">
@@ -218,7 +218,7 @@
         <!-- Action Buttons -->
         <div class="flex flex-col sm:flex-row gap-4 pt-8">
           <%= form.submit "Create Society", 
-              class: "flex-1 py-4 px-8 bg-gradient-to-r from-blue-600 via-whiskey-600 to-purple-600 text-white text-lg font-bold rounded-2xl hover:from-blue-700 hover:via-whiskey-700 hover:to-purple-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 transform" %>
+              class: "flex-1 py-4 px-8 bg-gradient-to-r from-blue-600 via-whiskey-600 to-whiskey-600 text-white text-lg font-bold rounded-2xl hover:from-blue-700 hover:via-whiskey-700 hover:to-whiskey-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 transform" %>
           
           <%= link_to "Cancel", societies_path, 
               class: "flex-1 py-4 px-8 bg-gray-100 text-gray-700 text-lg font-semibold rounded-2xl hover:bg-gray-200 transition-all duration-300 text-center border-2 border-gray-200 hover:border-gray-300" %>
