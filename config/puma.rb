@@ -40,13 +40,10 @@ plugin :solid_queue if ENV["SOLID_QUEUE_IN_PUMA"]
 # In other environments, only set the PID file if requested.
 pidfile ENV["PIDFILE"] if ENV["PIDFILE"]
 
-# Configure SSL for development to support Apple OAuth
-if ENV.fetch("RAILS_ENV", "development") == "development"
-  # Use absolute paths to avoid path resolution issues
-  root_dir = File.expand_path('..', __dir__)
-  ssl_bind '0.0.0.0', 3000, {
-    key: File.join(root_dir, 'dev-key.pem'),
-    cert: File.join(root_dir, 'dev-cert.pem'),
-    verify_mode: 'none'
-  }
-end
+# Development binds plain HTTP on 0.0.0.0:3000 (see `port` above). We used to
+# ssl_bind here for hand-rolled Apple OAuth, but that required committed dev
+# certs (removed in the security pass) and added friction for no benefit —
+# Devise, magic links and Stripe all work fine over HTTP locally. Apple Sign-In
+# now goes through omniauth-apple, which does not need a locally-terminated TLS
+# cert. For an HTTPS-required flow, front the app with a tunnel (e.g. Stripe CLI
+# or ngrok) rather than terminating TLS in Puma.

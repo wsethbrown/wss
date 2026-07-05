@@ -25,7 +25,10 @@ if Rails.env.development?
   
   puts "Created test user: test@example.com / password"
   
-  # Create admin user for testing admin panel
+  # Create admin user for testing admin panel.
+  # Admin rights key off the `is_admin` column (unified in the security pass);
+  # the old "@whiskeysharesociety.com email == admin" shortcut is gone, so we
+  # must set the flag explicitly here.
   admin_user = User.find_or_create_by!(email: 'admin@whiskeysharesociety.com') do |user|
     user.password = 'password'
     user.password_confirmation = 'password'
@@ -33,8 +36,9 @@ if Rails.env.development?
     user.last_name = 'User'
     user.bio = 'Administrative user for managing presentations.'
   end
-  
-  puts "Created admin user: admin@whiskeysharesociety.com / password"
+  admin_user.update!(is_admin: true) unless admin_user.is_admin?
+
+  puts "Created admin user: admin@whiskeysharesociety.com / password (is_admin: true)"
   
   # Create sample presentations
   presentations = [
@@ -107,4 +111,95 @@ if Rails.env.development?
   
   # Load additional presentation seeds
   require_relative 'seeds/presentations'
+
+  # Give the test user an active subscription + a couple of credits so the
+  # marketplace / credit-redemption flow can be exercised end to end.
+  test_user.update!(
+    subscription_status: 'active',
+    subscription_plan: 'monthly',
+    subscription_ends_at: 1.month.from_now
+  )
+  if test_user.credit_transactions.none?
+    2.times { CreditTransaction.grant_monthly_credit(test_user, 'Seed credit') }
+  end
+  puts "Test user: active subscription, #{test_user.reload.credits} credit(s)"
+
+  # --- Societies (public + private), memberships, and events ---------------
+  society_seeds = [
+    {
+      name: "Athens Whiskey Society",
+      description: "The founding chapter. Each month a member is assigned a topic, " \
+                   "researches it, and presents a narrative tasting deck with a pour to match.",
+      location: "Athens, GA",
+      is_private: false,
+      creator: admin_user
+    },
+    {
+      name: "Peat Freaks",
+      description: "For the Islay-obsessed. Heavily peated drams, smoke-forward flights, " \
+                   "and the occasional coastal cask-strength showdown.",
+      location: "Online",
+      is_private: false,
+      creator: test_user
+    },
+    {
+      name: "The Rare Cask Room",
+      description: "Invite-only. Allocated bottles, single-barrel picks, and vertical " \
+                   "tastings you won't find on a shelf.",
+      location: "Private",
+      is_private: true,
+      creator: admin_user
+    }
+  ]
+
+  societies = society_seeds.map do |attrs|
+    society = Society.find_or_create_by!(name: attrs[:name]) do |s|
+      s.description = attrs[:description]
+      s.location    = attrs[:location]
+      s.is_private  = attrs[:is_private]
+      s.creator     = attrs[:creator]
+    end
+    puts "Created society: #{society.name} (#{society.public? ? 'public' : 'private'})"
+    society
+  end
+
+  # Make the test user an active member of the public societies they don't own.
+  societies.select(&:public?).each do |society|
+    next if society.creator == test_user
+    society.society_memberships.find_or_create_by!(user: test_user) do |m|
+      m.role = :member
+      m.status = :active
+    end
+  end
+
+  # A few events across the societies, some upcoming and one past, with RSVPs.
+  event_seeds = [
+    { society: societies[0], title: "May: The Sherried Speyside Thread",
+      description: "A narrative flight tracing how sherry-cask maturation reshapes a Speyside spirit.",
+      location: "Creature Comforts, Athens", start_offset: 6.days, duration_hours: 2 },
+    { society: societies[0], title: "June: Bourbon & the Corn Question",
+      description: "Why mash bill matters — a story told through four pours.",
+      location: "Member's home", start_offset: 34.days, duration_hours: 2 },
+    { society: societies[1], title: "Islay Cask-Strength Showdown",
+      description: "Blind-taste four cask-strength Islay drams and rank them.",
+      location: "Online (Zoom)", start_offset: 12.days, duration_hours: 1 },
+    { society: societies[0], title: "April: Japanese Whisky Origins (recap)",
+      description: "Our recorded session on the roots of Japanese whisky.",
+      location: "Athens, GA", start_offset: -20.days, duration_hours: 2 }
+  ]
+
+  event_seeds.each do |attrs|
+    event = attrs[:society].events.find_or_create_by!(title: attrs[:title]) do |e|
+      e.description = attrs[:description]
+      e.location    = attrs[:location]
+      e.organizer   = attrs[:society].creator
+      e.start_time  = attrs[:start_offset].from_now
+      e.end_time    = attrs[:start_offset].from_now + attrs[:duration_hours].hours
+    end
+    # RSVP the test user "yes" to upcoming events they're a member of.
+    if event.upcoming? && event.society.has_member?(test_user)
+      event.event_rsvps.find_or_create_by!(user: test_user) { |r| r.status = 'yes' }
+    end
+    puts "Created event: #{event.title}"
+  end
 end

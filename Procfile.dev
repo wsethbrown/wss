@@ -1,1 +1,2 @@
-web: bundle exec puma -b "ssl://0.0.0.0:3000?cert=dev-cert.pem&key=dev-key.pem"
+web: bundle exec rails server -b 0.0.0.0 -p 3000
+css: bundle exec rails tailwindcss:watch

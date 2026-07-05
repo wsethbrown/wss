@@ -75,11 +75,20 @@ Rails.application.configure do
   # Allow custom development domain for OAuth testing
   config.hosts << "dev.whiskeysharesociety.com"
   config.hosts << "dev.whiskeysharesociety.com:3000"
-  
-  # Enable HTTPS for OAuth authentication
-  config.force_ssl = true
-  config.ssl_options = {
-    secure_cookies: true,
-    hsts: false # Disable HSTS in development to avoid browser caching issues
-  }
+
+  # Development runs over plain HTTP on localhost:3000. Forcing SSL here (a
+  # leftover from the hand-rolled Apple OAuth experiment) 301-redirected every
+  # request to https:// with no TLS terminator listening, making the app
+  # unreachable. Production still enforces SSL via config/environments/production.rb.
+  config.force_ssl = false
+
+  # When running inside Docker on macOS, the repo is a bind mount and Rails'
+  # attempt to flock log/development.log fails ("Resource deadlock avoided"),
+  # silently dropping every log line. Route logs to STDOUT there so they show up
+  # in `wss logs` / `docker compose logs`. Native runs keep the file logger.
+  if ENV["RAILS_LOG_TO_STDOUT"].present?
+    logger = ActiveSupport::Logger.new($stdout)
+    logger.formatter = config.log_formatter
+    config.logger = ActiveSupport::TaggedLogging.new(logger)
+  end
 end
