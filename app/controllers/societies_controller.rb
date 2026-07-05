@@ -142,39 +142,17 @@ class SocietiesController < ApplicationController
   end
 
   def apply_search_filters(scope)
-    # Name search
+    # Name/description search
     if params[:search].present?
       search_term = params[:search].strip
       scope = scope.where("name ILIKE ? OR description ILIKE ?", "%#{search_term}%", "%#{search_term}%")
     end
 
-    # Zip code and range search (geolocation)
-    if params[:zip_code].present? && params[:range].present?
-      zip_code = params[:zip_code].strip
-      range_miles = params[:range].to_i
-      
-      # For now, we'll do a simple text match on location
-      # In production, you'd want to use a geocoding service and proper distance calculation
-      if zip_code.match?(/^\d{5}(-\d{4})?$/) # Valid US zip code
-        scope = scope.where("location ILIKE ?", "%#{zip_code}%")
-        
-        # Future enhancement: Add proper geolocation with lat/lng coordinates
-        # scope = scope.near([latitude, longitude], range_miles)
-      end
-    end
-
-    # Public only filter
-    if params[:public_only] == '1'
-      scope = scope.where(is_private: false)
-    end
+    # Location text search (city/state). The previous ZIP-radius search was
+    # decorative — no coordinates or geocoding existed. If radius search is
+    # ever wanted for real, add lat/lng columns + the geocoder gem.
+    scope = scope.by_location(params[:location]) if params[:location].present?
 
     scope
   end
-
-  # Future method for proper geocoding
-  # def geocode_zip_code(zip_code)
-  #   # Use a geocoding service like Google Maps API or Geocoder gem
-  #   # to convert zip code to latitude/longitude coordinates
-  #   # Returns [latitude, longitude] or nil if not found
-  # end
 end
