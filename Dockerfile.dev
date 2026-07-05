@@ -7,6 +7,9 @@ RUN apt-get update -qq && \
     libpq-dev \
     libyaml-dev \
     postgresql-client \
+    libreoffice-impress \
+    poppler-utils \
+    fonts-liberation \
     nodejs \
     npm \
     && rm -rf /var/lib/apt/lists/*

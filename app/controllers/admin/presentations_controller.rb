@@ -50,6 +50,11 @@ class Admin::PresentationsController < Admin::BaseController
       deck.preview_images.attach(io: StringIO.new(img[:data]), filename: img[:filename])
     end
 
+    file.rewind
+    DeckImport.render_slides(file.read).each do |s|
+      deck.slide_images.attach(io: StringIO.new(s[:data]), filename: s[:filename], content_type: "image/png")
+    end
+
     if deck.save
       redirect_to edit_admin_presentation_path(deck),
                   notice: 'Draft imported from your deck — review each section, set a price, then publish.'

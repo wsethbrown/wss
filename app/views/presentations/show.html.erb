@@ -206,30 +206,42 @@
           </section>
         <% end %>
 
-        <!-- Preview Images (if present) -->
-        <% if @presentation.preview_images.attached? %>
+        <!-- The Slides — rendered pages of the actual deck. Non-owners see the
+             first three; owners see every slide. Falls back to the text outline
+             (and legacy preview images) when no renders exist. -->
+        <% if @presentation.slide_images.attached? %>
           <section class="mb-16">
-            <h2 class="font-display text-3xl font-semibold text-gray-900 mb-8">Preview</h2>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-              <% @presentation.ordered_preview_images.each_with_index do |image, index| %>
-                <div class="relative group cursor-pointer">
-                  <%= image_tag image, class: "w-full rounded-2xl shadow-lg hover:shadow-xl transition-shadow", alt: "Preview #{index + 1}" %>
-                  <div class="absolute top-4 left-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-semibold">
-                    Slide <%= index + 1 %>
-                  </div>
-                </div>
+            <p class="eyebrow text-whiskey-600 mb-2">The slides</p>
+            <h2 class="font-display text-3xl font-semibold text-gray-900 mb-3">Inside the deck, as presented</h2>
+            <div class="rule-double text-whiskey-800 mb-8"></div>
+            <% slides = @presentation.slide_images.order(:filename) %>
+            <% visible = @full_story ? slides : slides.first(3) %>
+            <div class="space-y-6">
+              <% visible.each_with_index do |slide, i| %>
+                <figure>
+                  <%= image_tag slide, alt: "Slide #{i + 1}", loading: 'lazy',
+                      class: 'w-full rounded-2xl border border-whiskey-200 shadow-sm' %>
+                  <figcaption class="eyebrow mt-2 text-center text-gray-400">Slide <%= i + 1 %> of <%= slides.size %></figcaption>
+                </figure>
               <% end %>
             </div>
+            <% unless @full_story || slides.size <= 3 %>
+              <div class="mt-6 rounded-2xl border border-whiskey-200 bg-whiskey-50 p-6 text-center">
+                <p class="font-display text-lg font-semibold text-gray-900"><%= slides.size - 3 %> more slides in the full deck.</p>
+                <%= link_to user_signed_in? ? new_presentation_purchase_path(@presentation) : auth_path,
+                    class: 'mt-4 inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-6 py-3 font-semibold text-white transition hover:bg-whiskey-700' do %>
+                  <%= user_signed_in? ? 'Get this deck' : 'Sign in to get this deck' %>
+                <% end %>
+              </div>
+            <% end %>
           </section>
-        <% end %>
-
-        <!-- Slides Preview -->
-        <% if @presentation.parsed_slides_preview.any? %>
+        <% elsif @presentation.parsed_slides_preview.any? %>
           <section class="mb-16">
-            <h2 class="font-display text-3xl font-semibold text-gray-900 mb-8">Slides Preview</h2>
+            <p class="eyebrow text-whiskey-600 mb-2">The slides</p>
+            <h2 class="font-display text-3xl font-semibold text-gray-900 mb-8">Slide-by-slide outline</h2>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <% @presentation.parsed_slides_preview.each_with_index do |slide, index| %>
-                <div class="group relative bg-gray-50 rounded-2xl p-6 hover:bg-gray-100 transition-all duration-200 cursor-pointer">
+              <% @presentation.parsed_slides_preview.each do |slide| %>
+                <div class="bg-gray-50 rounded-2xl p-6">
                   <div class="flex items-start justify-between mb-3">
                     <span class="text-sm font-semibold text-whiskey-600"><%= slide[:slide_number] %></span>
                     <span class="text-sm text-gray-500"><%= slide[:duration] %></span>

@@ -1,4 +1,5 @@
 require "zip"
+require "tmpdir"
 
 # Parses an uploaded .pptx into draft deck fields. The goal is a good DRAFT —
 # title, story skeleton, slide-preview rows, images — for a human to polish in
@@ -7,6 +8,23 @@ class DeckImport
   Result = Struct.new(:title, :description, :content, :slides_preview, :images, keyword_init: true)
 
   A_NS = "http://schemas.openxmlformats.org/drawingml/2006/main".freeze
+
+  # Renders each slide to a PNG via LibreOffice + poppler (both in the app
+  # image). Returns [{filename:, data:}, ...] in slide order; [] if rendering
+  # is unavailable so import still succeeds without slide images.
+  def self.render_slides(data)
+    Dir.mktmpdir do |dir|
+      src = File.join(dir, "deck.pptx")
+      File.binwrite(src, data)
+      system("soffice", "--headless", "--convert-to", "pdf", "--outdir", dir, src, out: File::NULL, err: File::NULL)
+      pdf = File.join(dir, "deck.pdf")
+      return [] unless File.exist?(pdf)
+      system("pdftoppm", "-png", "-r", "110", pdf, File.join(dir, "slide"), out: File::NULL, err: File::NULL)
+      Dir[File.join(dir, "slide-*.png")].sort.map { |p| { filename: File.basename(p), data: File.binread(p) } }
+    end
+  rescue Errno::ENOENT
+    []
+  end
 
   def self.parse(io)
     slides = []

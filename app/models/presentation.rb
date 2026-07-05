@@ -8,6 +8,7 @@ class Presentation < ApplicationRecord
   has_one_attached :pdf_file
   has_many_attached :supplemental_materials
   has_many_attached :preview_images
+  has_many_attached :slide_images   # rendered pages of the deck, in order
 
   # Specific file types for better organization
   has_one_attached :sneak_peek_file  # Preview version of the presentation
