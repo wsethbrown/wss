@@ -5,7 +5,7 @@
     <h1 class="text-3xl font-bold text-gray-900">Presentations</h1>
     <p class="mt-2 text-gray-600"><%= @presentations.count %> presentations total</p>
   </div>
-  <%= link_to new_admin_presentation_path, class: "inline-flex items-center gap-2 px-6 py-3 bg-whiskey-600 text-white font-semibold rounded-xl hover:bg-whiskey-700 transition shadow-sm" do %>
+  <%= link_to new_admin_presentation_path, class: "inline-flex items-center gap-2 px-4 py-3 bg-whiskey-600 text-white font-semibold rounded-xl hover:bg-whiskey-700 transition shadow-sm" do %>
     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
     </svg>
@@ -19,48 +19,44 @@
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purchases</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Title</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Author</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Category</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purchases</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <% @presentations.each do |presentation| %>
             <tr>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <div>
-                    <div class="text-sm font-medium text-gray-900"><%= presentation.title %></div>
-                    <div class="text-sm text-gray-500"><%= truncate(presentation.description, length: 60) %></div>
-                  </div>
-                </div>
+              <td class="max-w-xs px-4 py-4">
+                <div class="truncate text-sm font-medium text-gray-900"><%= presentation.title %></div>
+                <div class="truncate text-sm text-gray-500"><%= presentation.description %></div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                 <%= presentation.author&.full_name || 'N/A' %>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-blue-100 text-blue-800">
+              <td class="px-4 py-4 whitespace-nowrap">
+                <span class="px-2 py-1 text-xs font-semibold rounded-full bg-whiskey-100 text-whiskey-800">
                   <%= presentation.category || 'Uncategorized' %>
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                 $<%= presentation.price || '0.00' %>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-900">
                 <%= presentation.user_presentations.count %>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="px-4 py-4 whitespace-nowrap">
                 <% if presentation.published? %>
                   <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">Published</span>
                 <% else %>
                   <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">Draft</span>
                 <% end %>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
                 <div class="flex items-center gap-2">
                   <%= link_to "View", admin_presentation_path(presentation), class: "text-whiskey-600 hover:text-whiskey-900" %>
                   <%= link_to "Edit", edit_admin_presentation_path(presentation), class: "text-whiskey-600 hover:text-whiskey-900" %>
@@ -84,7 +80,7 @@
       </div>
       <h3 class="text-lg font-medium text-gray-900 mb-2">No presentations yet</h3>
       <p class="text-gray-500 mb-6">Get started by creating your first presentation.</p>
-      <%= link_to new_admin_presentation_path, class: "inline-flex items-center gap-2 px-6 py-3 bg-whiskey-600 text-white font-semibold rounded-xl hover:bg-whiskey-700 transition shadow-sm" do %>
+      <%= link_to new_admin_presentation_path, class: "inline-flex items-center gap-2 px-4 py-3 bg-whiskey-600 text-white font-semibold rounded-xl hover:bg-whiskey-700 transition shadow-sm" do %>
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
         </svg>

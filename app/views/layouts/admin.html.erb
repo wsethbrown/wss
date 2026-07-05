@@ -17,8 +17,9 @@
   </head>
 
   <body class="bg-whiskey-50 font-sans">
-    <div class="flex min-h-screen">
-      <!-- Sidebar -->
+    <div class="min-h-screen">
+      <!-- Sidebar (fixed, out of flow — main clears it with ml-60 only; a flex-1
+           sibling would take full viewport width and overflow right by 240px) -->
       <aside class="fixed inset-y-0 left-0 z-40 flex w-60 flex-col bg-char">
         <%= link_to admin_root_path, class: "flex items-center gap-3 border-b border-oak-edge px-5 py-4" do %>
           <%= image_tag "wss-logo.jpg", alt: "", class: "h-9 w-auto rounded-lg" %>
@@ -65,7 +66,7 @@
       </aside>
 
       <!-- Main -->
-      <main class="ml-60 flex-1 px-8 py-8">
+      <main class="ml-60 min-w-0 px-8 py-8">
         <%= render 'shared/admin_breadcrumbs' %>
 
         <% if notice %>
