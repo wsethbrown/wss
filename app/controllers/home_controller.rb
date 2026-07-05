@@ -19,6 +19,9 @@ class HomeController < ApplicationController
   end
 
   def fetch_stripe_products
+    # Tests must be deterministic and offline: real keys in .env would
+    # otherwise make these requests hit live Stripe from the test suite.
+    return fallback_products if Rails.env.test?
     return fallback_products unless Stripe.api_key.present?
 
     begin
