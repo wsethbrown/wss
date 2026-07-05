@@ -260,7 +260,18 @@
           </ul>
 
           <div>
-            <% if user_signed_in? %>
+            <% if user_signed_in? && current_user.subscription_active? %>
+              <%# Members don't need three checkout buttons. Mark their plan;
+                  changes happen from the account page. %>
+              <% if current_user.subscription_plan == product[:id] %>
+                <div class="w-full rounded-xl border-2 border-whiskey-400 bg-whiskey-50 px-6 py-3 text-center text-base font-semibold text-whiskey-800">
+                  Your current plan
+                </div>
+              <% else %>
+                <%= link_to 'Manage in your account', account_path(anchor: 'subscription'),
+                    class: "block w-full rounded-xl border border-gray-300 px-6 py-3 text-center text-base font-semibold text-gray-700 transition hover:bg-gray-50" %>
+              <% end %>
+            <% elsif user_signed_in? %>
               <%= form_with url: subscriptions_checkout_path, method: :post, local: true, data: { turbo: false } do |f| %>
                 <%= f.hidden_field :price_id, value: product[:id] %>
                 <%= f.submit "Get Started", class: "w-full cursor-pointer rounded-xl px-6 py-3 text-base font-semibold text-white transition focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2 #{product[:popular] ? 'bg-whiskey-600 hover:bg-whiskey-700' : 'bg-gray-900 hover:bg-gray-800'}" %>

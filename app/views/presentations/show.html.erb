@@ -38,9 +38,20 @@
 
     <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
       <% if user_signed_in? && @presentation.purchased_by?(current_user) %>
-        <a href="#deck-story" class="inline-flex items-center justify-center gap-2 rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char">
-          Start reading
-        </a>
+        <%# Owners: open the real deck when the file exists; otherwise read the story. %>
+        <% if @presentation.pdf_file.attached? && @full_story %>
+          <%= link_to full_presentation_presentation_downloads_path(@presentation),
+              class: "inline-flex items-center justify-center gap-2 rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char" do %>
+            Open the deck
+          <% end %>
+          <a href="#deck-story" class="inline-flex items-center justify-center gap-2 rounded-xl border border-cream/25 px-7 py-3.5 text-base font-semibold text-cream/90 transition hover:border-cream/50 hover:text-cream focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char">
+            Read the story
+          </a>
+        <% else %>
+          <a href="#deck-story" class="inline-flex items-center justify-center gap-2 rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char">
+            Read the story
+          </a>
+        <% end %>
       <% else %>
         <%= link_to new_presentation_purchase_path(@presentation),
             class: "inline-flex items-center justify-center gap-2 rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char" do %>
@@ -94,7 +105,7 @@
         <% end %>
 
         <!-- The Story — narrative deck content, rendered from Markdown -->
-        <section class="mb-16" id="deck-story">
+        <section class="mb-16 scroll-mt-24" id="deck-story">
           <p class="eyebrow text-whiskey-600 mb-2">The story</p>
           <h2 class="font-display text-3xl font-semibold text-gray-900 mb-3">Inside this deck</h2>
           <div class="rule-double text-whiskey-800 mb-10"></div>
@@ -340,51 +351,48 @@
                   Reactivate membership
                 <% end %>
               <% else %>
-                <!-- Downloads Section -->
-                <div class="bg-whiskey-50 rounded-2xl p-4 mb-4">
-                  <h4 class="eyebrow text-whiskey-700 mb-3">Downloads</h4>
-                  <div class="space-y-2">
-                    <% if @presentation.pdf_file.attached? %>
-                      <%= link_to full_presentation_presentation_downloads_path(@presentation), 
-                          class: "flex items-center justify-between p-2 bg-white border border-gray-200 rounded-lg hover:border-whiskey-400 transition text-sm" do %>
-                        <span class="font-medium text-gray-700">Full Presentation</span>
-                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-                        </svg>
+                <%# Downloads: one list built from whatever files exist. The box only
+                    renders when there is something to download — an empty labeled box
+                    reads as broken. %>
+                <% downloads = [
+                  ['Full presentation', (full_presentation_presentation_downloads_path(@presentation) if @presentation.pdf_file.attached?)],
+                  ['Speaker notes',     (speaker_notes_presentation_downloads_path(@presentation) if @presentation.speaker_notes.attached?)],
+                  ['Outline',           (outline_presentation_downloads_path(@presentation) if @presentation.outline_file.attached?)],
+                  ['Whiskey list',      (recommendations_presentation_downloads_path(@presentation) if @presentation.recommendations_sheet.attached?)]
+                ].select { |_, path| path } %>
+
+                <% if downloads.any? %>
+                  <div class="bg-whiskey-50 rounded-2xl p-4 mb-4">
+                    <h4 class="eyebrow text-whiskey-700 mb-3">Downloads</h4>
+                    <div class="space-y-2">
+                      <% downloads.each do |label, path| %>
+                        <%= link_to path,
+                            class: "flex items-center justify-between p-2 bg-white border border-gray-200 rounded-lg hover:border-whiskey-400 transition text-sm" do %>
+                          <span class="font-medium text-gray-700"><%= label %></span>
+                          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                          </svg>
+                        <% end %>
                       <% end %>
-                    <% end %>
-                    
-                    <% if @presentation.speaker_notes.attached? %>
-                      <%= link_to speaker_notes_presentation_downloads_path(@presentation), 
-                          class: "flex items-center justify-between p-2 bg-white border border-gray-200 rounded-lg hover:border-whiskey-400 transition text-sm" do %>
-                        <span class="font-medium text-gray-700">Speaker Notes</span>
-                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-                        </svg>
+                      <% if @presentation.supplemental_materials.attached? %>
+                        <p class="eyebrow pt-2 text-whiskey-700/70">Extras</p>
+                        <% @presentation.supplemental_materials.each do |material| %>
+                          <%= link_to rails_blob_path(material, disposition: 'attachment'),
+                              class: "flex items-center justify-between p-2 bg-white border border-gray-200 rounded-lg hover:border-whiskey-400 transition text-sm" do %>
+                            <span class="truncate font-medium text-gray-700"><%= material.filename %></span>
+                            <svg class="w-4 h-4 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
+                            </svg>
+                          <% end %>
+                        <% end %>
                       <% end %>
-                    <% end %>
-                    
-                    <% if @presentation.outline_file.attached? %>
-                      <%= link_to outline_presentation_downloads_path(@presentation), 
-                          class: "flex items-center justify-between p-2 bg-white border border-gray-200 rounded-lg hover:border-whiskey-400 transition text-sm" do %>
-                        <span class="font-medium text-gray-700">Outline</span>
-                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-                        </svg>
-                      <% end %>
-                    <% end %>
-                    
-                    <% if @presentation.recommendations_sheet.attached? %>
-                      <%= link_to recommendations_presentation_downloads_path(@presentation), 
-                          class: "flex items-center justify-between p-2 bg-white border border-gray-200 rounded-lg hover:border-whiskey-400 transition text-sm" do %>
-                        <span class="font-medium text-gray-700">Whiskey List</span>
-                        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-                        </svg>
-                      <% end %>
-                    <% end %>
+                    </div>
                   </div>
-                </div>
+                <% else %>
+                  <p class="mb-4 rounded-2xl bg-whiskey-50 p-4 text-center text-sm text-gray-600">
+                    The downloadable files for this deck are still being prepared.
+                  </p>
+                <% end %>
               <% end %>
             <% elsif user_signed_in? %>
               <!-- Not purchased yet -->

@@ -134,8 +134,9 @@ with turbo_stream updates; event show has date/location/RSVP panels;
 emoji stripped, display type on titles.
 
 **Gaps:**
-- Top-level app/views/events/index.html.erb exists but no route renders it
-  (only nested + top-level show). Delete the view or add a "my events" page.
+- events#index IS routed (nested: /societies/:id/events) — earlier draft of
+  this note claimed otherwise. A cross-society "my events" page still doesn't
+  exist and would be useful (all upcoming events for my societies).
 - No calendar export (.ics) — small, high-value for a meetup product.
 - No event reminders (needs a Solid Queue job + mailer; ActivityLog's
   `event_rsvp` type was never emitted anywhere either).

@@ -43,7 +43,8 @@
               <svg class="h-4 w-4 text-whiskey-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"></path>
               </svg>
-              Founded by <%= link_to @society.creator.full_name, profile_path(@society.creator), class: "font-semibold text-whiskey-300 hover:text-whiskey-200" %>
+              Founded by <%= link_to @society.creator.full_name, profile_path(@society.creator), class: "font-semibold text-whiskey-300 hover:text-whiskey-200" %>,
+              <%= @society.created_at.strftime("%B %Y") %>
             </span>
           </div>
         </div>
@@ -233,34 +234,32 @@
           </div>
         </div>
 
-        <!-- Society Stats -->
-        <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900">Society Stats</h2>
+        <%# Next tasting — the one thing a member actually needs from the sidebar.
+            (Replaced the old "Society Stats" card: member/event counts already
+            live in the masthead, role counts are visible in the member list.) %>
+        <% next_event = @society.upcoming_events.first %>
+        <div class="overflow-hidden rounded-lg bg-char shadow-sm">
+          <div class="border-b border-oak-edge px-6 py-4">
+            <h2 class="eyebrow text-whiskey-300/90">Next tasting</h2>
           </div>
           <div class="p-6">
-            <div class="space-y-4">
-              <div class="flex justify-between">
-                <span class="text-sm text-gray-600">Total Members</span>
-                <span class="text-sm font-semibold text-gray-900"><%= @society.member_count %></span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-sm text-gray-600">Total Events</span>
-                <span class="text-sm font-semibold text-gray-900"><%= @society.events.count %></span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-sm text-gray-600">Admins</span>
-                <span class="text-sm font-semibold text-gray-900"><%= @society.admin_count %></span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-sm text-gray-600">Officers</span>
-                <span class="text-sm font-semibold text-gray-900"><%= @society.officer_count %></span>
-              </div>
-              <div class="flex justify-between">
-                <span class="text-sm text-gray-600">Created</span>
-                <span class="text-sm font-semibold text-gray-900"><%= @society.created_at.strftime("%B %Y") %></span>
-              </div>
-            </div>
+            <% if next_event %>
+              <p class="font-display text-xl font-semibold leading-snug text-cream"><%= next_event.title %></p>
+              <p class="mt-2 text-sm text-cream/70">
+                <%= next_event.start_time.strftime("%A, %B %-d at %-l:%M %p") %>
+                <% if next_event.location.present? %>
+                  <span class="block mt-0.5"><%= next_event.location %></span>
+                <% end %>
+              </p>
+              <%= link_to 'View & RSVP', society_event_path(@society, next_event),
+                  class: 'mt-5 block w-full rounded-xl bg-whiskey-500 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-whiskey-400' %>
+            <% else %>
+              <p class="text-sm text-cream/70">Nothing on the calendar yet.</p>
+              <% if user_signed_in? && @society.can_manage?(current_user) %>
+                <%= link_to 'Schedule a tasting', new_society_event_path(@society),
+                    class: 'mt-4 block w-full rounded-xl bg-whiskey-500 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-whiskey-400' %>
+              <% end %>
+            <% end %>
           </div>
         </div>
 
