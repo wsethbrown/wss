@@ -53,7 +53,10 @@ class SocietyPolicy < ApplicationPolicy
 
   def join?
     return false unless user
-    !record.has_member?(user)
+    # Private societies are invite-only: membership comes from the society's own
+    # admins, never from a self-serve join. Without the public? check anyone
+    # signed in could POST /societies/:id/join straight past the privacy flag.
+    record.public? && !record.has_member?(user)
   end
 
   # Anyone but the creator may leave a society they belong to.

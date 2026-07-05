@@ -1,257 +1,79 @@
 <% content_for :title, "#{@society.name} - Whiskey Share Society" %>
 
-<div class="min-h-screen bg-gray-50">
-  <!-- Full Width Banner Section -->
-  <% if @society.banner_image.attached? %>
-    <div class="relative h-64 md:h-80 w-full overflow-hidden">
-      <!-- Banner Image -->
-      <%= image_tag @society.banner_image, 
-          class: "absolute inset-0 w-full h-full object-cover", 
-          style: "object-position: #{@society.banner_position || 'center center'}; transform: scale(1.1);" %>
-      <!-- Strong dark overlay for text readability -->
-      <div class="absolute inset-0 bg-gradient-to-t from-black/95 via-black/80 to-black/70"></div>
-      <!-- Additional overlay for extra contrast -->
-      <div class="absolute inset-0 bg-black/40"></div>
-      
-      <!-- Banner Content -->
-      <div class="relative z-10 h-full flex items-end">
-        <div class="w-full px-4 sm:px-6 lg:px-8 py-8">
-          <div class="flex items-start justify-between">
-            <div class="flex items-start space-x-6">
-              <!-- Society Icon -->
-              <% if @society.profile_picture.attached? %>
-                <div class="w-20 h-20 rounded-xl border-4 border-white/20 backdrop-blur-sm overflow-hidden">
-                  <%= render 'shared/society_icon', society: @society, size: 'large' %>
-                </div>
-              <% else %>
-                <div class="w-20 h-20 bg-gradient-to-br from-whiskey-500 to-whiskey-500 rounded-xl flex items-center justify-center border-4 border-white/20 backdrop-blur-sm">
-                  <%= render 'shared/society_icon', society: @society, size: 'large' %>
-                </div>
-              <% end %>
-              
-              <div class="flex-1">
-                <div class="flex items-center space-x-3 mb-2">
-                  <h1 class="text-3xl font-bold text-white" style="text-shadow: 2px 2px 4px rgba(0,0,0,0.8), 1px 1px 2px rgba(0,0,0,0.9);"><%= @society.name %></h1>
-                  <% if @society.private? %>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-900/80 backdrop-blur-md border border-white/40 text-white shadow-lg">
-                      <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                      </svg>
-                      Private
-                    </span>
-                  <% else %>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-500 border border-yellow-400 text-black shadow-lg">
-                      <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                      Public
-                    </span>
-                  <% end %>
-                </div>
-                
-                <p class="text-white mb-4 leading-relaxed font-medium" style="text-shadow: 1px 1px 3px rgba(0,0,0,0.8);"><%= @society.description %></p>
-                
-                <div class="flex items-center space-x-6 text-sm text-white font-medium" style="text-shadow: 1px 1px 2px rgba(0,0,0,0.8);">
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2 shadow-lg border-2 border-white">
-                      <span class="text-lg">👥</span>
-                    </div>
-                    <%= @society.member_count %> members
-                  </div>
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2 shadow-lg border-2 border-white">
-                      <span class="text-lg">📅</span>
-                    </div>
-                    <%= @society.events.count %> events
-                  </div>
-                  <% if @society.location.present? %>
-                    <div class="flex items-center">
-                      <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2 shadow-lg border-2 border-white">
-                        <span class="text-lg">📍</span>
-                      </div>
-                      <%= @society.location %>
-                    </div>
-                  <% end %>
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2 shadow-lg border-2 border-white">
-                      <span class="text-lg">👤</span>
-                    </div>
-                    Created by <%= link_to @society.creator.full_name, profile_path(@society.creator), class: "text-white hover:text-yellow-300 font-bold underline", style: "text-shadow: 1px 1px 2px rgba(0,0,0,0.8);" %>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Action Buttons -->
-            <div class="flex items-center space-x-3">
-              <% if user_signed_in? %>
-                <% if @society.has_member?(current_user) %>
-                  <% membership = current_user.society_memberships.find_by(society: @society) %>
-                  <% if membership&.admin? %>
-                    <span class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-whiskey-600 border border-whiskey-500 text-white shadow-lg">
-                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 713.138-3.138z"></path>
-                      </svg>
-                      Admin
-                    </span>
-                    <%= link_to "Edit Society", edit_society_path(@society), 
-                        class: "inline-flex items-center px-4 py-2 bg-black/50 backdrop-blur-md border border-white/40 rounded-md shadow-lg text-sm font-medium text-white hover:bg-black/70 hover:shadow-xl transition-all" %>
-                  <% elsif membership&.officer? %>
-                    <span class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-blue-900/80 backdrop-blur-md border border-white/40 text-white shadow-lg">
-                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 713.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 713.138-3.138z"></path>
-                      </svg>
-                      Society Officer
-                    </span>
-                  <% else %>
-                    <span class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-yellow-500 border border-yellow-400 text-black shadow-lg">
-                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                      </svg>
-                      Member
-                    </span>
-                  <% end %>
-                <% else %>
-                  <% if @society.public? %>
-                    <%= button_to "Join Society", join_society_path(@society), 
-                        method: :post,
-                        class: "inline-flex items-center px-4 py-2 bg-green-600 border-2 border-green-400 rounded-md shadow-xl text-sm font-bold text-white hover:bg-green-700 hover:border-green-300 transition-all",
-                        style: "text-shadow: 1px 1px 2px rgba(0,0,0,0.5);" %>
-                  <% else %>
-                    <%= link_to "Apply to Join", "#", 
-                        class: "inline-flex items-center px-4 py-2 bg-yellow-600 border-2 border-yellow-400 rounded-md shadow-xl text-sm font-bold text-white hover:bg-yellow-700 hover:border-yellow-300 transition-all",
-                        style: "text-shadow: 1px 1px 2px rgba(0,0,0,0.5);" %>
-                  <% end %>
-                <% end %>
-              <% else %>
-                <%= link_to "Sign In to Join", new_user_session_path, 
-                    class: "inline-flex items-center px-4 py-2 bg-blue-600 border-2 border-blue-400 rounded-md shadow-xl text-sm font-bold text-white hover:bg-blue-700 hover:border-blue-300 transition-all",
-                    style: "text-shadow: 1px 1px 2px rgba(0,0,0,0.5);" %>
-              <% end %>
-            </div>
+<div class="min-h-screen bg-whiskey-50">
+  <%# Masthead — one header for every society. The banner image, when present,
+      sits behind a char gradient; without one, the char label stands alone. %>
+  <div class="relative w-full overflow-hidden bg-char pt-16">
+    <% if @society.banner_image.attached? %>
+      <%= image_tag @society.banner_image,
+          class: "absolute inset-0 h-full w-full object-cover",
+          style: "object-position: #{@society.banner_position || 'center center'};" %>
+      <div class="absolute inset-0 bg-gradient-to-t from-char via-char/80 to-char/60"></div>
+    <% else %>
+      <div class="pointer-events-none absolute inset-0" aria-hidden="true"
+           style="background: radial-gradient(ellipse 70% 50% at 50% 110%, rgba(201, 136, 74, 0.22), transparent 70%);"></div>
+    <% end %>
+
+    <div class="relative z-10 mx-auto max-w-6xl px-6 py-16">
+      <div class="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
+        <div class="max-w-2xl">
+          <p class="eyebrow mb-3 text-whiskey-300/90">
+            <%= @society.private? ? 'Private society' : 'Public society' %><%= " · #{@society.location}" if @society.location.present? %>
+          </p>
+          <div class="rule-double mb-6 w-20 text-whiskey-300"></div>
+          <h1 class="font-display text-4xl font-semibold leading-tight text-cream md:text-5xl"><%= @society.name %></h1>
+          <% if @society.description.present? %>
+            <p class="mt-4 text-lg leading-relaxed text-cream/70"><%= @society.description %></p>
+          <% end %>
+
+          <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-cream/60">
+            <span class="inline-flex items-center gap-2">
+              <svg class="h-4 w-4 text-whiskey-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"></path>
+              </svg>
+              <%= pluralize(@society.member_count, 'member') %>
+            </span>
+            <span class="inline-flex items-center gap-2">
+              <svg class="h-4 w-4 text-whiskey-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"></path>
+              </svg>
+              <%= pluralize(@society.events.count, 'event') %>
+            </span>
+            <span class="inline-flex items-center gap-2">
+              <svg class="h-4 w-4 text-whiskey-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"></path>
+              </svg>
+              Founded by <%= link_to @society.creator.full_name, profile_path(@society.creator), class: "font-semibold text-whiskey-300 hover:text-whiskey-200" %>
+            </span>
           </div>
+        </div>
+
+        <%# Membership state / actions %>
+        <div class="flex flex-wrap items-center gap-3 md:justify-end">
+          <% if user_signed_in? %>
+            <% membership = current_user.society_memberships.find_by(society: @society) %>
+            <% if membership %>
+              <span class="eyebrow rounded-full border border-whiskey-500/40 bg-whiskey-500/10 px-4 py-2 text-whiskey-200">
+                <%= membership.admin? ? 'Society admin' : (membership.officer? ? 'Officer' : 'Member') %>
+              </span>
+              <% if policy(@society).edit? %>
+                <%= link_to "Edit society", edit_society_path(@society),
+                    class: "inline-flex items-center rounded-xl border border-cream/25 px-5 py-2.5 text-sm font-semibold text-cream/90 transition hover:border-cream/50 hover:text-cream" %>
+              <% end %>
+            <% elsif policy(@society).join? %>
+              <%= button_to "Join this society", join_society_path(@society), method: :post,
+                  class: "inline-flex cursor-pointer items-center rounded-xl bg-whiskey-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400" %>
+            <% elsif @society.private? %>
+              <span class="eyebrow rounded-full border border-cream/20 px-4 py-2 text-cream/60">Invite only</span>
+            <% end %>
+          <% else %>
+            <%= link_to "Sign in to join", auth_path,
+                class: "inline-flex items-center rounded-xl bg-whiskey-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400" %>
+          <% end %>
         </div>
       </div>
     </div>
-  <% else %>
-    <!-- Default Header without Banner -->
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div class="bg-white shadow-sm rounded-lg overflow-hidden mb-8">
-        <div class="px-6 py-8">
-          <div class="flex items-start justify-between">
-            <div class="flex items-start space-x-6">
-              <!-- Society Icon -->
-              <% if @society.profile_picture.attached? %>
-                <div class="w-20 h-20 rounded-xl overflow-hidden">
-                  <%= render 'shared/society_icon', society: @society, size: 'large' %>
-                </div>
-              <% else %>
-                <div class="w-20 h-20 bg-gradient-to-br from-whiskey-500 to-whiskey-500 rounded-xl flex items-center justify-center">
-                  <%= render 'shared/society_icon', society: @society, size: 'large' %>
-                </div>
-              <% end %>
-              
-              <div class="flex-1">
-                <div class="flex items-center space-x-3 mb-2">
-                  <h1 class="text-3xl font-bold text-gray-900"><%= @society.name %></h1>
-                  <% if @society.private? %>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
-                      <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                      </svg>
-                      Private
-                    </span>
-                  <% else %>
-                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
-                      <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                      </svg>
-                      Public
-                    </span>
-                  <% end %>
-                </div>
-                
-                <p class="text-gray-600 mb-4 leading-relaxed"><%= @society.description %></p>
-                
-                <div class="flex items-center space-x-6 text-sm text-gray-500">
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2 shadow-lg border-2 border-white">
-                      <span class="text-lg">👥</span>
-                    </div>
-                    <%= @society.member_count %> members
-                  </div>
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2 shadow-lg border-2 border-white">
-                      <span class="text-lg">📅</span>
-                    </div>
-                    <%= @society.events.count %> events
-                  </div>
-                  <% if @society.location.present? %>
-                    <div class="flex items-center">
-                      <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2 shadow-lg border-2 border-white">
-                        <span class="text-lg">📍</span>
-                      </div>
-                      <%= @society.location %>
-                    </div>
-                  <% end %>
-                  <div class="flex items-center">
-                    <div class="w-8 h-8 bg-white rounded-full flex items-center justify-center mr-2 shadow-lg border-2 border-white">
-                      <span class="text-lg">👤</span>
-                    </div>
-                    Created by <%= link_to @society.creator.full_name, profile_path(@society.creator), class: "text-whiskey-600 hover:text-whiskey-500 font-medium" %>
-                  </div>
-                </div>
-              </div>
-            </div>
-            
-            <!-- Action Buttons -->
-            <div class="flex items-center space-x-3">
-              <% if user_signed_in? %>
-                <% if @society.has_member?(current_user) %>
-                  <% membership = current_user.society_memberships.find_by(society: @society) %>
-                  <% if membership&.admin? %>
-                    <span class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-whiskey-100 text-whiskey-800">
-                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 714.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 713.138-3.138z"></path>
-                      </svg>
-                      Admin
-                    </span>
-                    <%= link_to "Edit Society", edit_society_path(@society), 
-                        class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" %>
-                  <% elsif membership&.officer? %>
-                    <span class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-blue-100 text-blue-800">
-                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 714.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 713.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 713.138-3.138z"></path>
-                      </svg>
-                      Society Officer
-                    </span>
-                  <% else %>
-                    <span class="inline-flex items-center px-3 py-2 rounded-md text-sm font-medium bg-green-100 text-green-800">
-                      <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 714.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 713.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 713.138-3.138z"></path>
-                      </svg>
-                      Member
-                    </span>
-                  <% end %>
-                <% else %>
-                  <% if @society.private? %>
-                    <%= button_to "Request to Join", join_society_path(@society), method: :post,
-                        class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-whiskey-600 hover:bg-whiskey-700" %>
-                  <% else %>
-                    <%= button_to "Join Society", join_society_path(@society), method: :post,
-                        class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-whiskey-600 hover:bg-whiskey-700" %>
-                  <% end %>
-                <% end %>
-              <% else %>
-                <%= link_to "Sign In to Join", auth_path,
-                    class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-whiskey-600 hover:bg-whiskey-700" %>
-              <% end %>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  <% end %>
+  </div>
 
   <!-- Main Content Section -->
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">

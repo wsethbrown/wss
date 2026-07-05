@@ -12,7 +12,7 @@
         <ol class="inline-flex items-center space-x-1 md:space-x-3">
           <li class="inline-flex items-center">
             <%= link_to society_path(@event.society), class: "inline-flex items-center text-sm font-medium text-gray-700 hover:text-whiskey-600" do %>
-              🏛️ <%= @event.society.name %>
+              <%= @event.society.name %>
             <% end %>
           </li>
           <li>
@@ -30,10 +30,10 @@
         <div class="flex-1">
           <!-- Event Title & Society -->
           <div class="flex items-center space-x-4 mb-4">
-            <h1 class="text-4xl font-bold text-gray-900"><%= @event.title %></h1>
+            <h1 class="font-display text-4xl font-semibold text-gray-900"><%= @event.title %></h1>
             <%= link_to @event.society, 
                 class: "inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-whiskey-100 text-whiskey-800 hover:bg-whiskey-200 transition-colors" do %>
-              🏛️ <%= @event.society.name %>
+              <%= @event.society.name %>
             <% end %>
           </div>
 
@@ -41,7 +41,7 @@
           <div class="flex items-center space-x-4 mb-6">
             <% if @event.upcoming? %>
               <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                ⏰ Upcoming
+                Upcoming
               </span>
             <% elsif @event.ongoing? %>
               <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
@@ -49,7 +49,7 @@
               </span>
             <% else %>
               <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-                ✅ Completed
+                Completed
               </span>
             <% end %>
 

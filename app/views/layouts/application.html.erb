@@ -137,17 +137,14 @@
       </div>
     <% end %>
 
-    <!-- Main Content -->
-    <% if controller_name == 'home' && action_name == 'index' %>
-      <main class="min-h-[80vh] w-full">
-        <%= yield %>
-      </main>
-    <% elsif controller_name == 'societies' && action_name == 'index' %>
-      <main class="min-h-[80vh] w-full">
-        <%= yield %>
-      </main>
-    <% elsif controller_name == 'presentations' %>
-      <main class="min-h-[80vh] w-full <%= 'pt-20' unless notice || alert %>">
+    <!-- Main Content. Pages that open with a full-bleed char masthead manage
+         their own width and top padding; everything else gets the standard
+         constrained container. -->
+    <% full_bleed = (controller_name == 'home' && action_name == 'index') ||
+                    (controller_name == 'societies' && %w[index show].include?(action_name)) ||
+                    controller_name == 'presentations' %>
+    <% if full_bleed %>
+      <main class="min-h-[80vh] w-full <%= 'pt-20' if controller_name == 'presentations' && !(notice || alert) %>">
         <%= yield %>
       </main>
     <% else %>

@@ -54,6 +54,35 @@ configured. Brakeman: **0 security warnings**. To reproduce: `docker compose up 
 placeholders — checkout cannot succeed until then), Google OAuth credentials, renewed Apple key
 (revoke the leaked one), production deploy config.
 
+**Third pass (visual carte blanche + audits):**
+- **Society privacy hole fixed:** `SocietyPolicy#join?` ignored the privacy flag — anyone signed
+  in could POST `/societies/:id/join` into a private society. Now public-only; private societies
+  show an "Invite only" state (there is no application flow yet — `SocietyApplication` exists as a
+  model but has no routes/UI; build it if self-serve requests are wanted).
+- Society show page rebuilt: the two duplicated header variants (emoji icons, yellow/green one-off
+  buttons, inline text-shadows) became one char masthead with banner-image support. Killed two
+  live bugs there: "Apply to Join" linked to `#`, and the banner variant linked
+  `new_user_session_path`, which doesn't exist (500 for signed-out visitors). Emoji stripped from
+  event/society templates; full-bleed layout handling centralized in the application layout.
+- **Dev CLI (`./wss`)**: rewritten for Docker Compose v2 — `wss up|start`, `down|stop`, `restart`,
+  `logs`, `console`, `bash`, `test`, `db migrate|seed|reset|console`, `setup`, `clean`, `status`.
+
+**Admin tracking review (assessment delivered to owner; implementation NOT yet done — candidate
+next work):**
+- `ActivityLog` is unreliable: 4 emitted event types (`presentation_downloaded`,
+  `presentation_preview_downloaded`, `subscription_paused`, `subscription_resumed`) fail the
+  model's type-list validation and are silently swallowed — never recorded. Login logging covers
+  password only (not magic link / Google). IP + user agent are stored twice per row.
+- `presentation_viewed` logs one row per authenticated page view (IP+UA) — already 56% of all
+  activity rows; recommend cutting it (use a counter if popularity is ever wanted).
+- Downloads are triple-tracked (ActivityLog broken, DownloadLog works, download_count column).
+  Keep `DownloadLog` only.
+- Recommendation on record: retire ActivityLog; every event worth keeping has a first-class home
+  (CreditTransaction, UserPresentation, Stripe, DownloadLog, Devise trackable).
+- Management gaps: admin user form permits direct `:credits` edits (bypasses the ledger — remove
+  it; use Credits→adjust); no admin moderation for societies/events; no UI to grant/revoke
+  `is_admin`.
+
 **Done (see git log on the branch):**
 - **Phase 0 (critical security) — COMPLETE.** Deleted the three auth-bypass controllers
   (`TestCallbackController`, `AppleAuthController`, `AppleDirectController`) and their routes; two of
