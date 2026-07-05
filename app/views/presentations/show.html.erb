@@ -107,9 +107,38 @@
             </div>
 
             <% if @presentation.content.present? %>
-              <div class="prose-deck prose-deck--dropcap">
-                <%= render_markdown(@presentation.content) %>
-              </div>
+              <% if @full_story %>
+                <div class="prose-deck prose-deck--dropcap">
+                  <%= render_markdown(@presentation.content) %>
+                </div>
+              <% else %>
+                <%# Teaser: the opening of the story, cut at the source so the
+                    rest never reaches the page. Fades into the purchase CTA. %>
+                <div class="relative">
+                  <div class="prose-deck prose-deck--dropcap">
+                    <%= preview_markdown(@presentation.content) %>
+                  </div>
+                  <% if story_truncated?(@presentation.content) %>
+                    <div class="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white to-transparent" aria-hidden="true"></div>
+                  <% end %>
+                </div>
+                <% if story_truncated?(@presentation.content) %>
+                  <div class="mt-2 rounded-2xl border border-whiskey-200 bg-whiskey-50 p-8 text-center">
+                    <p class="font-display text-xl font-semibold text-gray-900">The story keeps going.</p>
+                    <p class="mt-2 text-gray-600">Get the deck to read the rest — slides, script, and downloads included.</p>
+                    <%= link_to user_signed_in? ? new_presentation_purchase_path(@presentation) : auth_path,
+                        class: 'mt-6 inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-7 py-3 font-semibold text-white transition hover:bg-whiskey-700' do %>
+                      <%= if !user_signed_in?
+                            'Sign in to get this deck'
+                          elsif @presentation.free?
+                            'Add to my library — free'
+                          else
+                            "Get this deck — #{@presentation.formatted_price}"
+                          end %>
+                    <% end %>
+                  </div>
+                <% end %>
+              <% end %>
             <% else %>
               <p class="prose-deck"><%= @presentation.description %></p>
             <% end %>
@@ -409,3 +438,24 @@
     </div>
   </div>
 </div>
+
+<!-- More from the library — never dead-end a reader -->
+<% if @more_decks&.any? %>
+  <section class="w-full bg-whiskey-50 px-4 py-16">
+    <div class="mx-auto max-w-6xl">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p class="eyebrow mb-2 text-whiskey-600">Keep pouring</p>
+          <h2 class="font-display text-3xl font-semibold text-gray-900">More from the library</h2>
+        </div>
+        <%= link_to 'See all decks →', presentations_path, class: 'text-sm font-semibold text-whiskey-700 transition hover:text-whiskey-600' %>
+      </div>
+      <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <% @more_decks.each do |deck| %>
+          <%= render 'presentations/deck_card', deck: deck,
+              owned: user_signed_in? && deck.purchased_by?(current_user) %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+<% end %>

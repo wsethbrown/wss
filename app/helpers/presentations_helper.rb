@@ -29,4 +29,21 @@ module PresentationsHelper
       attributes: %w[href rel target src alt]
     )
   end
+
+  # A teaser of the deck's story for readers without access: roughly the first
+  # third of the source, cut at a line boundary so the Markdown still parses.
+  # Truncating the SOURCE (not hiding rendered HTML with CSS) means the rest of
+  # the story never reaches the page at all.
+  def preview_markdown(text, max_lines: 24)
+    return "".html_safe if text.blank?
+
+    lines = text.lines
+    teaser = lines.first(max_lines).join
+    render_markdown(teaser)
+  end
+
+  # True when the teaser actually hides something (no fade/CTA otherwise).
+  def story_truncated?(text, max_lines: 24)
+    text.present? && text.lines.count > max_lines
+  end
 end

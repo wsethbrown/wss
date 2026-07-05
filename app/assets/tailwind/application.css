@@ -114,6 +114,25 @@
   @media (prefers-reduced-motion: reduce) {
     .thread { animation: none; }
   }
+
+  /* Kaminari pagination */
+  .pagination {
+    @apply flex flex-wrap items-center justify-center gap-1 text-sm;
+  }
+  .pagination a,
+  .pagination .current,
+  .pagination .gap {
+    @apply inline-flex min-w-9 items-center justify-center rounded-lg px-3 py-2 font-medium;
+  }
+  .pagination a {
+    @apply text-gray-700 transition hover:bg-whiskey-100 hover:text-whiskey-800;
+  }
+  .pagination .current {
+    @apply bg-whiskey-600 text-white;
+  }
+  .pagination .gap {
+    @apply text-gray-400;
+  }
 }
 
 /* Deck reading experience -------------------------------------------------- */

@@ -4,41 +4,40 @@ class PresentationsController < ApplicationController
   before_action :set_presentation, only: [:show, :edit, :update, :destroy]
 
   def index
-    # Use database presentations
+    # The library is fully empty only when there are no published decks at all —
+    # distinct from "your filters matched nothing".
+    @library_empty = Presentation.published.none?
+
+    # Filter options come from the catalog itself, so a new category shows up
+    # automatically and an empty one never renders a dead filter.
+    @categories = Presentation.published.where.not(category: [nil, ''])
+                              .distinct.order(:category).pluck(:category)
+    @difficulties = %w[Beginner Intermediate Advanced] &
+                    Presentation.published.distinct.pluck(:difficulty).compact
+
     @presentations = Presentation.published.includes(:author)
-    
-    # Filter by search term
-    if params[:search].present?
-      @presentations = @presentations.search(params[:search])
-    end
+    @presentations = @presentations.search(params[:search])
+    @presentations = @presentations.by_category(params[:category])
+    @presentations = @presentations.by_difficulty(params[:difficulty])
 
-    # Filter by category
-    if params[:category].present?
-      @presentations = @presentations.by_category(params[:category])
-    end
+    @presentations = case params[:sort]
+                     when 'newest'     then @presentations.recent
+                     when 'price_low'  then @presentations.order(:price)
+                     when 'price_high' then @presentations.order(price: :desc)
+                     else                   @presentations.popular
+                     end
 
-    # Filter by difficulty
-    if params[:difficulty].present?
-      @presentations = @presentations.by_difficulty(params[:difficulty])
-    end
-
-    # Sort
-    case params[:sort]
-    when 'newest'
-      @presentations = @presentations.recent
-    when 'rating'
-      @presentations = @presentations.popular
-    when 'price_low'
-      @presentations = @presentations.order(:price)
-    when 'price_high'
-      @presentations = @presentations.order(price: :desc)
-    else # 'popular' - default
-      @presentations = @presentations.popular
-    end
+    @presentations = @presentations.page(params[:page]).per(12)
   end
 
   def show
     log_activity(:presentation_viewed, @presentation) if user_signed_in?
+
+    # Reading access: owners (with valid access) and admins read the whole
+    # story; everyone else gets a teaser that fades into the purchase CTA.
+    @full_story = user_signed_in? && @presentation.can_download_full_presentation?(current_user)
+
+    @more_decks = Presentation.published.where.not(id: @presentation.id).recent.limit(3)
   end
 
   def new
