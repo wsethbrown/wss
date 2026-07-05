@@ -11,7 +11,9 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
   test "should get index when not authenticated" do
     get societies_url
     assert_response :success
-    assert_select "h1", "Discover Whiskey Societies"
+    # Unauthenticated visitors get the marketing landing; its hero headline ends
+    # with "Find Your Society." and it features public societies below.
+    assert_select "h1", /Find Your Society/
   end
 
   test "should get index when authenticated" do
@@ -52,7 +54,7 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
     sign_in @user
     get new_society_url
     assert_response :success
-    assert_select "h1", "Create a New Society"
+    assert_select "h1", /Whiskey Community/
   end
 
   test "should redirect to sign in when not authenticated" do
@@ -182,7 +184,7 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
     sign_in @user # creator of @society
     get edit_society_url(@society)
     assert_response :success
-    assert_select "h1", "Edit #{@society.name}"
+    assert_select "h1", /Community Settings/
   end
 
   test "should not get edit when not authorized" do

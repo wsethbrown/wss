@@ -1,8 +1,12 @@
 class SocietiesController < ApplicationController
   include ActivityLogger
-  
+
   before_action :authenticate_user!, except: [:index, :show]
   before_action :set_society, only: [:show, :edit, :update, :destroy]
+
+  # Society-specific authorization failures redirect back to the listing with a
+  # message describing the attempted action, rather than the app-wide default.
+  rescue_from Pundit::NotAuthorizedError, with: :society_not_authorized
 
   def index
     if user_signed_in?
@@ -38,6 +42,7 @@ class SocietiesController < ApplicationController
   end
 
   def show
+    authorize @society
     @upcoming_events = @society.upcoming_events.limit(5)
     @past_events = @society.past_events.limit(5)
     @recent_members = @society.members.limit(10)
@@ -109,6 +114,17 @@ class SocietiesController < ApplicationController
   end
 
   private
+
+  def society_not_authorized
+    message =
+      case action_name
+      when "show"                     then "You are not authorized to view this society."
+      when "edit", "update"           then "You are not authorized to edit this society."
+      when "destroy"                  then "You are not authorized to delete this society."
+      else                                 "You are not authorized to perform this action."
+      end
+    redirect_to societies_url, alert: message
+  end
 
   def set_society
     @society = Society.with_attached_profile_picture.with_attached_banner_image.find(params[:id])

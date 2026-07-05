@@ -471,7 +471,7 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         <% if @societies.any? %>
           <% @societies.limit(6).each do |society| %>
-            <div class="bg-gray-50 rounded-2xl border border-gray-200 p-6">
+            <div class="society-card bg-gray-50 rounded-2xl border border-gray-200 p-6">
               <div class="flex items-center gap-3 mb-4">
                 <div class="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl flex items-center justify-center">
                   <%= render 'shared/society_icon', society: society %>

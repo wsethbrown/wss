@@ -39,7 +39,7 @@
             </div>
             <ul class="list-disc list-inside text-red-700 space-y-1">
               <% @society.errors.full_messages.each do |message| %>
-                <li><%= message %></li>
+                <li class="error-message"><%= message %></li>
               <% end %>
             </ul>
           </div>
