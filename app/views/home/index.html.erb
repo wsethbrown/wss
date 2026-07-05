@@ -1033,7 +1033,7 @@
     </div>
 
     <!-- Pricing Cards with modern glassmorphism -->
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
+    <div id="plan-cards" class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
       <% @stripe_products.each_with_index do |product, index| %>
         <div class="group relative flex flex-col <%= product[:popular] ? 'bg-gradient-to-br from-amber-50/80 via-yellow-50/60 to-orange-50/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-amber-200/30 transform scale-105 hover:scale-110' : 'bg-white/60 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 hover:bg-white/80 hover:shadow-2xl hover:-translate-y-2' %> p-8 transition-all duration-500 cursor-pointer" onclick="var form = this.querySelector('form'); if(form) form.submit(); else window.location.href='<%= auth_path %>';">
           <!-- Glassmorphism overlay -->

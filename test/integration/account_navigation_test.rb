@@ -57,9 +57,9 @@ class AccountNavigationTest < ActionDispatch::IntegrationTest
     
     assert_response :success
     
-    # Profile tab should have active classes
-    assert_select '[data-tab="profile"].text-indigo-600'
-    assert_select '[data-tab="profile"].bg-indigo-50'
+    # Profile tab should have active classes (brand "whiskey" accent)
+    assert_select '[data-tab="profile"].text-whiskey-600'
+    assert_select '[data-tab="profile"].bg-whiskey-50'
   end
 
   test "account details section contains expected content" do
@@ -72,6 +72,7 @@ class AccountNavigationTest < ActionDispatch::IntegrationTest
     assert_select '#account-details-content', text: /Account Details/
     assert_select '#account-details-content', text: /Email Address/
     assert_select '#account-details-content', text: /Password & Security/
-    assert_select '#account-details-content', text: @user.email
+    # Substring match: the container holds much more text than just the email.
+    assert_select '#account-details-content', text: /#{Regexp.escape(@user.email)}/
   end
 end

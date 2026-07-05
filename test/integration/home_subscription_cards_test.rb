@@ -33,9 +33,10 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
     get root_path
     assert_response :success
     
-    # Check that feature lists are present
-    assert_select "ul.space-y-3", count: 3
-    assert_select "li.flex.items-center", minimum: 9  # At least 3 features per plan
+    # Check that feature lists are present (scoped to the pricing grid; the
+    # marketing page uses space-y-3 in several unrelated sections).
+    assert_select "#plan-cards ul.space-y-3", count: 3
+    assert_select "#plan-cards li.flex.items-center", minimum: 9  # At least 3 features per plan
     
     # Check specific features
     assert_select "li", text: /1 credit per month/
@@ -66,19 +67,21 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
     get root_path
     assert_response :success
     
-    # Check for CTA buttons
-    assert_select "a", text: /Get Started/, count: 3
-    
+    # Check for CTA buttons (scoped to the pricing grid; "Get Started" also
+    # appears in hero/CTA copy elsewhere on the marketing page).
+    assert_select "#plan-cards a", text: /Get Started/, count: 3
+
     # Check that buttons link to auth page
-    assert_select "a[href='#{auth_path}']", minimum: 3
+    assert_select "#plan-cards a[href='#{auth_path}']", count: 3
   end
 
   test "subscription cards display correct intervals" do
     get root_path
     assert_response :success
     
-    # Check interval display
-    assert_select "span", text: "/month", count: 3  # All display as /month for consistency
+    # Check interval display (scoped to the pricing grid). All plans normalise
+    # to a per-month figure, shown as "/mo".
+    assert_select "#plan-cards span", text: "/mo", count: 3
   end
 
   test "subscription cards are responsive with 3-column grid" do

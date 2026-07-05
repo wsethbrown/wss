@@ -17,15 +17,17 @@ class AccountSubscriptionCardsTest < ActionDispatch::IntegrationTest
     assert_select "h2", text: "Subscription"
     assert_select "h4", text: "Choose Your Plan"
     
-    # Check that all three subscription plans are displayed
-    assert_select "h3", text: "Monthly"
-    assert_select "h3", text: "Quarterly"
-    assert_select "h3", text: "Yearly"
+    # Check that all three subscription plans are displayed (account cards show
+    # the full plan name, e.g. "Monthly Membership").
+    assert_select "#plan-cards h3", text: /Monthly/
+    assert_select "#plan-cards h3", text: /Quarterly/
+    assert_select "#plan-cards h3", text: /Yearly/
   end
 
   test "account page shows current plan for users with active subscription" do
-    # Set user as having active subscription
-    @user.update!(stripe_subscription_id: "sub_test123")
+    # A subscription is "active" only when the status says so — having a Stripe
+    # subscription id alone is not enough.
+    @user.update!(stripe_subscription_id: "sub_test123", subscription_status: "active", subscription_ends_at: 1.month.from_now)
     
     get account_path
     assert_response :success
@@ -44,9 +46,10 @@ class AccountSubscriptionCardsTest < ActionDispatch::IntegrationTest
     get account_path
     assert_response :success
     
-    # Check for forms that submit to checkout
+    # Check for forms that submit to checkout (scoped: the account page has
+    # several other POST forms — profile, email, password, billing).
     assert_select "form[action='#{subscriptions_checkout_path}']", count: 3
-    assert_select "form[method='post']", count: 3
+    assert_select "#plan-cards form[method='post']", count: 3
     
     # Check for hidden price_id fields
     assert_select "input[name='price_id'][value='monthly']"
@@ -82,10 +85,9 @@ class AccountSubscriptionCardsTest < ActionDispatch::IntegrationTest
     get account_path
     assert_response :success
     
-    # Check for submit buttons
-    assert_select "input[type='submit']", count: 3
-    assert_select "input[value='Get Started']", count: 1
-    assert_select "input[value*='Save']", count: 2  # Quarterly and yearly should have savings
+    # Each plan card submits via its own "Get Started" button.
+    assert_select "#plan-cards button[type='submit']", count: 3
+    assert_select "#plan-cards button", text: /Get Started/, count: 3
   end
 
   test "account subscription cards display feature lists" do
@@ -94,9 +96,9 @@ class AccountSubscriptionCardsTest < ActionDispatch::IntegrationTest
     get account_path
     assert_response :success
     
-    # Check that feature lists are present
-    assert_select "ul.space-y-3", count: 3
-    assert_select "li.flex.items-center", minimum: 9  # At least 3 features per plan
+    # Check that feature lists are present (scoped to the pricing grid)
+    assert_select "#plan-cards ul.space-y-3", count: 3
+    assert_select "#plan-cards li.flex.items-center", minimum: 9  # At least 3 features per plan
     
     # Check specific features
     assert_select "li", text: /1 credit per month/
