@@ -273,16 +273,30 @@ Devise.setup do |config|
   # up on your models and hooks.
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
   
-  # Configure OAuth providers
-  config.omniauth :google_oauth2, 
-    ENV['GOOGLE_CLIENT_ID'], 
-    ENV['GOOGLE_CLIENT_SECRET'],
-    {
-      scope: 'email,profile',
-      prompt: 'select_account',
-      name: 'google_oauth2',
-      origin_param: 'origin'
-    }
+  # Google OAuth. Real credentials come from GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET
+  # (see .env.example for how to create them). Outside production we fall back to
+  # dummy values so the strategy is always registered — routes exist and OmniAuth
+  # test mode works — while the sign-in button itself is only shown when real
+  # credentials are configured (see AuthHelper#google_sign_in_available?).
+  # In production an unconfigured provider is simply not registered.
+  google_id     = ENV['GOOGLE_CLIENT_ID'].presence
+  google_secret = ENV['GOOGLE_CLIENT_SECRET'].presence
+  unless Rails.env.production?
+    google_id     ||= 'google-client-id-not-configured'
+    google_secret ||= 'google-client-secret-not-configured'
+  end
+
+  if google_id && google_secret
+    config.omniauth :google_oauth2,
+      google_id,
+      google_secret,
+      {
+        scope: 'email,profile',
+        prompt: 'select_account',
+        name: 'google_oauth2',
+        origin_param: 'origin'
+      }
+  end
     
   # Apple "Sign in with Apple" via the omniauth-apple strategy, which verifies the
   # Apple ID token signature for us. Registered only when all required credentials are
