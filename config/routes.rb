@@ -27,6 +27,10 @@ Rails.application.routes.draw do
   # Single root for all users
   root to: 'home#index'
 
+  # The signed-in landing page. /dashboard and /account render the same account
+  # surface; /dashboard is the canonical post-authentication destination.
+  get "dashboard", to: "account#index", as: :dashboard
+
   # Account
   get "account", to: "account#index"
   patch "account/profile", to: "account#update_profile"

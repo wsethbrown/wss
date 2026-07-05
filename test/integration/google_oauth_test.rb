@@ -21,8 +21,9 @@ class GoogleOAuthTest < ActionDispatch::IntegrationTest
     get auth_path
     assert_response :success
     
-    # The page should contain the Google OAuth button
-    assert_select "a[href='#{user_google_oauth2_omniauth_authorize_path}']"
+    # The page should contain the Google OAuth button as a POST form
+    # (omniauth-rails_csrf_protection requires POST initiation).
+    assert_select "form[action='#{user_google_oauth2_omniauth_authorize_path}'] button", /Continue with Google/
     
     # Clicking the Google OAuth button should redirect to Google (or callback in test mode)
     post user_google_oauth2_omniauth_authorize_path

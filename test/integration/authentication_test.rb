@@ -48,7 +48,9 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     get auth_path
 
     assert_response :success
-    assert_select "a[href*='/users/auth/google_oauth2']"
+    # OmniAuth initiation must be POST (omniauth-rails_csrf_protection), so the
+    # control is a button_to form, not an <a> link.
+    assert_select "form[action*='/users/auth/google_oauth2'] button", /Continue with Google/
   end
 
   test "apple oauth button appears only when Apple Sign In is configured" do
@@ -103,8 +105,9 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h2", "Join the Society"
     assert_select "button", "Sign Up"
-    assert_select "a", "Continue with Google"
-    assert_select "a", "Continue with Apple"
+    # OAuth controls are POST forms (CSRF-protected), not links. Apple only
+    # renders when configured, so it is asserted in its own dedicated test.
+    assert_select "form[action*='/users/auth/google_oauth2'] button", /Continue with Google/
   end
 
   test "dashboard shows user profile information" do
@@ -119,6 +122,8 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "input[value=?]", @user.first_name
     assert_select "input[value=?]", @user.last_name
-    assert_select "input[value=?]", @user.email
+    # Email is display-only on the profile (changing it goes through the
+    # separate re-verification flow), so it renders as text, not an input.
+    assert_match @user.email, response.body
   end
 end

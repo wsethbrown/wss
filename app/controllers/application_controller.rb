@@ -43,8 +43,8 @@ class ApplicationController < ActionController::Base
     redirect_to auth_path, alert: "Your session expired. Please try again."
   end
 
-  # Redirect to account after sign in
+  # Redirect to the dashboard after sign in / sign up.
   def after_sign_in_path_for(resource)
-    account_path
+    dashboard_path
   end
 end

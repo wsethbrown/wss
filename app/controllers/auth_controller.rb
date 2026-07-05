@@ -17,10 +17,13 @@ class AuthController < ApplicationController
         warden.set_user(user, scope: :user)
         user.remember_me! if params[:user][:remember_me] == '1'
         log_activity(:login, nil, { method: 'password' })
-        redirect_to account_path, notice: 'Signed in successfully'
+        redirect_to dashboard_path, notice: 'Signed in successfully'
       end
     else
-      redirect_to auth_path, alert: 'Invalid email or password'
+      # Re-render the auth page with a 422 so Turbo swaps in the error state
+      # instead of following a redirect (which loses the entered email).
+      flash.now[:alert] = 'Invalid Email or password'
+      render :unified, status: :unprocessable_entity
     end
   end
 
