@@ -7,9 +7,11 @@ module PresentationsHelper
   def render_markdown(text)
     return "".html_safe if text.blank?
 
+    # No hard_wrap: authors hard-wrap their Markdown source, and turning every
+    # newline into <br> shredded paragraphs into ragged lines. Standard
+    # Markdown treats single newlines as soft.
     renderer = Redcarpet::Render::HTML.new(
       filter_html: true,
-      hard_wrap: true,
       link_attributes: { rel: "noopener noreferrer", target: "_blank" }
     )
     markdown = Redcarpet::Markdown.new(
