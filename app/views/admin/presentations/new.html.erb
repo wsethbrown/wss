@@ -27,6 +27,26 @@
   <p class="text-gray-600">Create a new whiskey presentation for the platform.</p>
 </div>
 
+<!-- Import from a deck file: parses the .pptx into a pre-filled draft. -->
+<div class="mb-8 rounded-2xl border-2 border-dashed border-whiskey-300 bg-whiskey-50 p-6">
+  <div class="flex flex-wrap items-center justify-between gap-4">
+    <div>
+      <h2 class="font-display text-lg font-semibold text-gray-900">Start from your deck file</h2>
+      <p class="mt-1 text-sm text-gray-600">
+        Upload the .pptx and we'll draft the title, story skeleton, slide-by-slide
+        preview, and images from it — then you polish and publish.
+      </p>
+    </div>
+    <%= form_with url: import_admin_presentations_path, method: :post, multipart: true, data: { turbo: false }, class: "flex items-center gap-3" do |f| %>
+      <%= f.file_field :deck_file, accept: ".pptx", required: true,
+          class: "text-sm text-gray-700 file:mr-3 file:rounded-lg file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-semibold file:text-whiskey-800" %>
+      <%= f.submit "Import draft", class: "cursor-pointer rounded-xl bg-whiskey-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-whiskey-700" %>
+    <% end %>
+  </div>
+</div>
+
+<div class="text-center text-sm font-semibold uppercase tracking-wide text-gray-400 mb-8">or fill it in from scratch</div>
+
 <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
   <%= render 'form', presentation: @presentation, submit_text: 'Create Presentation' %>
 </div>

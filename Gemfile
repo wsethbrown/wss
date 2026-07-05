@@ -99,3 +99,6 @@ gem "stripe", "~> 10.0"
 
 # Markdown rendering for narrative deck content
 gem "redcarpet", "~> 3.6"
+
+# Reading .pptx files for deck import (a .pptx is a zip of XML)
+gem "rubyzip", "~> 2.3", require: "zip"

@@ -79,7 +79,9 @@ Rails.application.routes.draw do
   # Admin panel
   namespace :admin do
     get 'dashboard', to: 'dashboard#index'
-    resources :presentations
+    resources :presentations do
+      collection { post :import }
+    end
     resources :users, only: [:index, :show, :edit, :update]
     resources :subscriptions, only: [:index, :edit, :update] do
       member do
