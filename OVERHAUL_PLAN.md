@@ -50,9 +50,13 @@ configured. Brakeman: **0 security warnings**. To reproduce: `docker compose up 
   (was a 204). Every admin page verified rendering.
 - Test suite fully reconciled: 177 runs, 0 failures, 0 errors.
 
-**Remaining owner actions (not code):** real Stripe keys + price IDs in `.env` (current values are
-placeholders — checkout cannot succeed until then), Google OAuth credentials, renewed Apple key
-(revoke the leaked one), production deploy config.
+**Remaining owner actions (not code):**
+- ~~Stripe keys~~ DONE (test mode): real test keys + price IDs live in local `.env`; live pricing
+  renders and checkout reaches Stripe. Still needed: `stripe listen` webhook secret for local
+  fulfillment, and eventually live-mode keys.
+- ~~Google OAuth~~ DONE: client secret generated, localhost URIs added, full sign-in verified
+  end-to-end. (The older lost secret `****JW_R` is still enabled in the console — delete it there.)
+- Renewed Apple key (revoke the leaked one), production deploy config.
 
 **Third pass (visual carte blanche + audits):**
 - **Society privacy hole fixed:** `SocietyPolicy#join?` ignored the privacy flag — anyone signed
