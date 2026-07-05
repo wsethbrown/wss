@@ -23,25 +23,29 @@ class Admin::PresentationsController < Admin::BaseController
   # file attached and fields pre-filled, then land on the edit form to polish.
   def import
     file = params[:deck_file]
-    unless file.respond_to?(:read) && file.original_filename.to_s.end_with?('.pptx')
-      redirect_to new_admin_presentation_path, alert: 'Choose a .pptx file to import' and return
+    content_type = file.respond_to?(:original_filename) && DeckImport.content_type_for(file.original_filename)
+    unless file.respond_to?(:read) && content_type
+      redirect_to new_admin_presentation_path, alert: 'Choose a .pptx, .ppt, or .pdf file to import' and return
     end
 
-    parsed = DeckImport.parse(file.read)
+    # Read the upload ONCE; every consumer gets its own copy. Re-reading the
+    # request tempfile after attach caused ActiveStorage::IntegrityError (the
+    # blob checksummed one read and uploaded another).
+    data = file.read
+    parsed = DeckImport.parse(data, file.original_filename)
 
     deck = Presentation.new(
       author: current_user,
       title: parsed.title,
       description: parsed.description,
-      content: parsed.content.presence || parsed.description,
+      content: parsed.content.presence || parsed.description.presence || parsed.title,
       slides_preview: parsed.slides_preview,
       price: 0,
       published: false
     )
 
-    file.rewind
-    deck.pdf_file.attach(io: file, filename: file.original_filename,
-                         content_type: 'application/vnd.openxmlformats-officedocument.presentationml.presentation')
+    deck.pdf_file.attach(io: StringIO.new(data), filename: file.original_filename,
+                         content_type: content_type)
 
     if (cover = parsed.images.first)
       deck.featured_image.attach(io: StringIO.new(cover[:data]), filename: cover[:filename])
@@ -50,8 +54,7 @@ class Admin::PresentationsController < Admin::BaseController
       deck.preview_images.attach(io: StringIO.new(img[:data]), filename: img[:filename])
     end
 
-    file.rewind
-    DeckImport.render_slides(file.read).each do |s|
+    DeckImport.render_slides(data, file.original_filename).each do |s|
       deck.slide_images.attach(io: StringIO.new(s[:data]), filename: s[:filename], content_type: "image/png")
     end
 

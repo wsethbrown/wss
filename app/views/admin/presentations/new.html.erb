@@ -33,12 +33,12 @@
     <div>
       <h2 class="font-display text-lg font-semibold text-gray-900">Start from your deck file</h2>
       <p class="mt-1 text-sm text-gray-600">
-        Upload the .pptx and we'll draft the title, story skeleton, slide-by-slide
+        Upload the .pptx, .ppt, or .pdf and we'll draft the title, story skeleton, slide-by-slide
         preview, and images from it — then you polish and publish.
       </p>
     </div>
     <%= form_with url: import_admin_presentations_path, method: :post, multipart: true, data: { turbo: false }, class: "flex items-center gap-3" do |f| %>
-      <%= f.file_field :deck_file, accept: ".pptx", required: true,
+      <%= f.file_field :deck_file, accept: ".pptx,.ppt,.pdf", required: true,
           class: "text-sm text-gray-700 file:mr-3 file:rounded-lg file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-semibold file:text-whiskey-800" %>
       <%= f.submit "Import draft", class: "cursor-pointer rounded-xl bg-whiskey-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-whiskey-700" %>
     <% end %>
