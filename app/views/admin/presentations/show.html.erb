@@ -45,81 +45,134 @@
     <!-- Description -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
       <h2 class="text-lg font-semibold text-gray-900 mb-3">Description</h2>
-      <p class="text-gray-700"><%= @presentation.description || "No description provided." %></p>
+      <p class="text-gray-700"><%= @presentation.description.presence || "No description provided." %></p>
     </div>
 
-    <!-- Content Preview -->
+    <!-- The Story — rendered exactly as buyers read it -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-3">Content Preview</h2>
-      <div class="prose prose-sm max-w-none text-gray-700">
-        <%= simple_format(truncate(@presentation.content || "No content yet.", length: 500)) %>
+      <div class="mb-4 flex items-baseline justify-between">
+        <h2 class="text-lg font-semibold text-gray-900">The story</h2>
+        <span class="text-xs text-gray-400"><%= pluralize(@presentation.content.to_s.lines.count, 'source line') %> · rendered as on the deck page</span>
       </div>
+      <% if @presentation.content.present? %>
+        <div class="prose-deck">
+          <%= render_markdown(@presentation.content) %>
+        </div>
+      <% else %>
+        <p class="text-sm text-gray-500">No story yet — add it in the editor.</p>
+      <% end %>
     </div>
 
-    <!-- Whiskey Recommendations -->
-    <% if @presentation.whiskey_recommendations.present? %>
+    <!-- Rendered slides -->
+    <% if @presentation.slide_images.attached? %>
       <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-3">Whiskey Recommendations</h2>
-        <div class="prose prose-sm max-w-none text-gray-700">
-          <%= simple_format(@presentation.whiskey_recommendations) %>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Slides (<%= @presentation.slide_images.count %>)</h2>
+        <div class="grid grid-cols-2 gap-4 md:grid-cols-3">
+          <% @presentation.slide_images.order(:id).each_with_index do |slide, i| %>
+            <figure>
+              <%= image_tag slide, alt: "Slide #{i + 1}", loading: 'lazy', class: 'w-full rounded-lg border border-gray-200' %>
+              <figcaption class="mt-1 text-center text-xs text-gray-400"><%= i + 1 %></figcaption>
+            </figure>
+          <% end %>
+        </div>
+      </div>
+    <% elsif @presentation.pdf_file.attached? %>
+      <div class="rounded-2xl border border-whiskey-200 bg-whiskey-50 p-6 text-sm text-whiskey-900">
+        Slide previews are rendering in the background — refresh in a moment.
+      </div>
+    <% end %>
+
+    <!-- Bottle list, parsed -->
+    <% recs = @presentation.parsed_whiskey_recommendations %>
+    <% if recs.any? %>
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Whiskey recommendations</h2>
+        <div class="overflow-x-auto">
+          <table class="min-w-full text-sm">
+            <thead>
+              <tr class="text-left text-xs font-semibold uppercase tracking-wider text-gray-500">
+                <th class="pb-2 pr-4">Bottle</th><th class="pb-2 pr-4">Region</th>
+                <th class="pb-2 pr-4">Price</th><th class="pb-2 pr-4">Style</th><th class="pb-2">Notes</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-100">
+              <% recs.each do |r| %>
+                <tr>
+                  <td class="py-2 pr-4 font-medium text-gray-900"><%= r[:name] %></td>
+                  <td class="py-2 pr-4 text-gray-600"><%= r[:region] %></td>
+                  <td class="py-2 pr-4 text-gray-600"><%= r[:price] %></td>
+                  <td class="py-2 pr-4 text-gray-600"><%= r[:style] %></td>
+                  <td class="py-2 text-gray-600"><%= r[:notes] %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
         </div>
       </div>
     <% end %>
 
-    <!-- Tasting Notes -->
-    <% if @presentation.tasting_notes.present? %>
+    <!-- Tasting notes -->
+    <% tasting = { 'Nose' => @presentation.nose_notes, 'Palate' => @presentation.palate_notes,
+                   'Finish' => @presentation.finish_notes, 'Body' => @presentation.body_notes }.compact_blank %>
+    <% if tasting.any? %>
       <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-        <h2 class="text-lg font-semibold text-gray-900 mb-3">Tasting Notes</h2>
-        <div class="prose prose-sm max-w-none text-gray-700">
-          <%= simple_format(@presentation.tasting_notes) %>
-        </div>
+        <h2 class="text-lg font-semibold text-gray-900 mb-4">Tasting notes</h2>
+        <dl class="grid grid-cols-1 gap-4 md:grid-cols-2">
+          <% tasting.each do |label, notes| %>
+            <div>
+              <dt class="text-xs font-semibold uppercase tracking-wider text-whiskey-700"><%= label %></dt>
+              <dd class="mt-1 text-gray-700"><%= notes %></dd>
+            </div>
+          <% end %>
+        </dl>
       </div>
     <% end %>
 
-    <!-- Uploaded Files -->
+    <!-- Complete file inventory -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">Uploaded Files</h2>
-      
-      <% if @presentation.featured_image.attached? %>
-        <div class="mb-4">
-          <h3 class="text-sm font-medium text-gray-700 mb-2">Featured Image</h3>
-          <%= image_tag @presentation.featured_image, class: "w-full rounded-lg shadow-sm" %>
-        </div>
-      <% end %>
-      
-      <% if @presentation.pdf_file.attached? %>
-        <div class="mb-4">
-          <h3 class="text-sm font-medium text-gray-700 mb-2">Presentation PDF</h3>
-          <div class="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-            <svg class="w-5 h-5 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h8l4 4v10a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd" />
-            </svg>
-            <span class="text-sm text-gray-700"><%= @presentation.pdf_file.filename %></span>
-            <span class="text-xs text-gray-500">(<%= number_to_human_size(@presentation.pdf_file.byte_size) %>)</span>
-          </div>
-        </div>
-      <% end %>
-      
-      <% if @presentation.supplemental_materials.attached? %>
-        <div>
-          <h3 class="text-sm font-medium text-gray-700 mb-2">Supplemental Materials</h3>
-          <ul class="space-y-2">
-            <% @presentation.supplemental_materials.each do |material| %>
-              <li class="flex items-center gap-2 p-3 bg-gray-50 rounded-lg">
-                <svg class="w-5 h-5 text-gray-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M8 4a3 3 0 00-3 3v4a5 5 0 0010 0V7a1 1 0 112 0v4a7 7 0 11-14 0V7a5 5 0 0110 0v4a3 3 0 01-6 0V7a1 1 0 012 0v4a1 1 0 102 0V7a3 3 0 00-3-3z" clip-rule="evenodd" />
-                </svg>
-                <span class="text-sm text-gray-700"><%= material.filename %></span>
-                <span class="text-xs text-gray-500">(<%= number_to_human_size(material.byte_size) %>)</span>
-              </li>
+      <h2 class="text-lg font-semibold text-gray-900 mb-4">Files</h2>
+
+      <% file_rows = [
+        ['Deck file (buyers download)', @presentation.pdf_file],
+        ['Sneak peek',                  @presentation.sneak_peek_file],
+        ['Speaker notes',               @presentation.speaker_notes],
+        ['Outline',                     @presentation.outline_file],
+        ['Recommendations sheet',       @presentation.recommendations_sheet]
+      ] %>
+      <ul class="space-y-2">
+        <% file_rows.each do |label, attachment| %>
+          <li class="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-sm">
+            <span class="font-medium text-gray-700"><%= label %></span>
+            <% if attachment.attached? %>
+              <span class="text-gray-600"><%= attachment.filename %> <span class="text-xs text-gray-400">(<%= number_to_human_size(attachment.byte_size) %>)</span></span>
+            <% else %>
+              <span class="text-xs text-gray-400">not uploaded</span>
             <% end %>
-          </ul>
-        </div>
-      <% end %>
-      
-      <% unless @presentation.featured_image.attached? || @presentation.pdf_file.attached? || @presentation.supplemental_materials.attached? %>
-        <p class="text-sm text-gray-500">No files uploaded yet.</p>
-      <% end %>
+          </li>
+        <% end %>
+        <% @presentation.supplemental_materials.each do |m| %>
+          <li class="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 text-sm">
+            <span class="font-medium text-gray-700">Extra</span>
+            <span class="text-gray-600"><%= m.filename %> <span class="text-xs text-gray-400">(<%= number_to_human_size(m.byte_size) %>)</span></span>
+          </li>
+        <% end %>
+      </ul>
+
+      <!-- Images -->
+      <div class="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
+        <% if @presentation.featured_image.attached? %>
+          <figure>
+            <%= image_tag @presentation.featured_image, class: 'aspect-video w-full rounded-lg border border-gray-200 object-cover' %>
+            <figcaption class="mt-1 text-center text-xs text-gray-400">Cover</figcaption>
+          </figure>
+        <% end %>
+        <% @presentation.ordered_preview_images.each_with_index do |img, i| %>
+          <figure>
+            <%= image_tag img, class: 'aspect-video w-full rounded-lg border border-gray-200 object-cover' %>
+            <figcaption class="mt-1 text-center text-xs text-gray-400">Preview <%= i + 1 %></figcaption>
+          </figure>
+        <% end %>
+      </div>
     </div>
   </div>
 

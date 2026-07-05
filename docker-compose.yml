@@ -59,6 +59,25 @@ services:
     extra_hosts:
       - "dev.whiskeysharesociety.com:127.0.0.1"
 
+  jobs:
+    build:
+      context: .
+      dockerfile: Dockerfile.dev
+    command: bundle exec rake solid_queue:start
+    env_file:
+      - .env
+    environment:
+      RAILS_ENV: development
+      DATABASE_URL: postgresql://wss:password@db:5432/wss_development
+      REDIS_URL: redis://redis:6379/0
+    volumes:
+      - .:/rails
+      - bundle_cache:/usr/local/bundle
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
   stripe-cli:
     image: stripe/stripe-cli:latest
     command: listen --forward-to web:3000/webhooks/stripe --skip-verify

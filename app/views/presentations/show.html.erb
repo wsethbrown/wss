@@ -214,7 +214,7 @@
             <p class="eyebrow text-whiskey-600 mb-2">The slides</p>
             <h2 class="font-display text-3xl font-semibold text-gray-900 mb-3">Inside the deck, as presented</h2>
             <div class="rule-double text-whiskey-800 mb-8"></div>
-            <% slides = @presentation.slide_images.order(:filename) %>
+            <% slides = @presentation.slide_images.order(:id) %>
             <% visible = @full_story ? slides : slides.first(3) %>
             <div class="space-y-6">
               <% visible.each_with_index do |slide, i| %>
