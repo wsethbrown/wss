@@ -1,28 +1,20 @@
-require 'test_helper'
+require "test_helper"
 
 class SocietyProfilePictureTest < ActiveSupport::TestCase
-  test "should handle HEIC profile pictures" do
-    society = Society.find(2)
-    
-    # Check if profile picture is attached
+  # Was an exploratory script (Society.find(2) + puts) that depended on a HEIC
+  # image existing in the dev database. Rewritten as a self-contained test of
+  # the profile-picture attachment itself. Variant/format conversion is not
+  # exercised here because it needs libvips/libheif, which the CI image omits.
+  test "society can attach and expose a profile picture" do
+    society = societies(:whiskey_lovers)
+
+    society.profile_picture.attach(
+      io: File.open(Rails.root.join("app/assets/images/wss-logo.jpg")),
+      filename: "wss-logo.jpg",
+      content_type: "image/jpeg"
+    )
+
     assert society.profile_picture.attached?, "Profile picture should be attached"
-    
-    # Check content type
-    content_type = society.profile_picture.blob.content_type
-    puts "Content type: #{content_type}"
-    
-    # Check if it's HEIC
-    is_heic = content_type == "image/heic" || content_type == "image/heif"
-    puts "Is HEIC: #{is_heic}"
-    
-    if is_heic
-      # Try to create a variant
-      variant = society.profile_picture.variant(resize_to_fill: [160, 160], format: :jpeg)
-      puts "Variant key: #{variant.key}"
-      
-      # Try to process the variant
-      variant.processed
-      puts "Variant processed successfully"
-    end
+    assert_equal "image/jpeg", society.profile_picture.blob.content_type
   end
 end

@@ -1,0 +1,20 @@
+# Each society's creator is an active admin member — this mirrors the
+# Society#add_creator_as_admin callback, which fixtures bypass. Without these,
+# fixture societies have zero members and creators appear to have no membership.
+whiskey_lovers_john:
+  user: john
+  society: whiskey_lovers
+  role: admin
+  status: active
+
+bourbon_club_jane:
+  user: jane
+  society: bourbon_club
+  role: admin
+  status: active
+
+single_malt_admin:
+  user: admin
+  society: single_malt
+  role: admin
+  status: active

@@ -13,7 +13,7 @@ class SocietyCreationTest < ActionDispatch::IntegrationTest
     # Visit new society page
     get new_society_path
     assert_response :success
-    assert_select "h1", "Create a New Society"
+    assert_select "h1", /Whiskey Community/
     assert_select "form[action='#{societies_path}']"
     
     # Fill and submit form
@@ -145,23 +145,23 @@ class SocietyCreationTest < ActionDispatch::IntegrationTest
     # Unauthenticated user should only see public societies
     get societies_path
     assert_response :success
-    assert_select "h2", text: public_society.name
-    assert_select "h2", text: private_society.name, count: 0
+    assert_select "h3", text: public_society.name
+    assert_select "h3", text: private_society.name, count: 0
     
     # Authenticated non-member should only see public societies
     sign_in @jane
     get societies_path
     assert_response :success
-    assert_select "h2", text: public_society.name
-    assert_select "h2", text: private_society.name, count: 0
+    assert_select "h3", text: public_society.name
+    assert_select "h3", text: private_society.name, count: 0
     
     # Society creator should see both
     delete destroy_user_session_path
     sign_in @user
     get societies_path
     assert_response :success
-    assert_select "h2", text: public_society.name
-    assert_select "h2", text: private_society.name
+    assert_select "h3", text: public_society.name
+    assert_select "h3", text: private_society.name
     
     # Add jane as member of private society
     private_society.society_memberships.create!(user: @jane, role: :member, status: :active)
@@ -171,8 +171,8 @@ class SocietyCreationTest < ActionDispatch::IntegrationTest
     sign_in @jane
     get societies_path
     assert_response :success
-    assert_select "h2", text: public_society.name
-    assert_select "h2", text: private_society.name
+    assert_select "h3", text: public_society.name
+    assert_select "h3", text: private_society.name
   end
 
   test "society editing permissions" do
@@ -189,7 +189,7 @@ class SocietyCreationTest < ActionDispatch::IntegrationTest
     # Creator should be able to edit
     get edit_society_path(society)
     assert_response :success
-    assert_select "h1", "Edit #{society.name}"
+    assert_select "h1", /Community Settings/
     
     # Update society
     patch society_path(society), params: {
