@@ -177,47 +177,75 @@
         </section>
         <% end %>
 
-        <!-- Presentation Overview -->
-        <section class="mb-16">
-          <h2 class="text-3xl font-bold text-gray-900 mb-8">Presentation Overview</h2>
-          <div class="prose prose-lg max-w-none">
+        <!-- The Story — narrative deck content, rendered from Markdown -->
+        <section class="mb-16" id="deck-story">
+          <p class="eyebrow text-whiskey-600 mb-2">The story</p>
+          <h2 class="font-display text-3xl font-semibold text-gray-900 mb-3">Inside this deck</h2>
+          <div class="rule-double text-whiskey-800 mb-10"></div>
+
+          <div class="relative pl-6 md:pl-10">
+            <%# The thread: a thin amber line that fills as you read — the narrative
+                spine connecting the pour to its story. %>
+            <div class="absolute left-0 top-1 bottom-1 w-[2px] rounded bg-whiskey-100" aria-hidden="true">
+              <div id="deck-thread" class="w-full rounded bg-gradient-to-b from-whiskey-300 to-whiskey-600 transition-[height] duration-150 ease-out" style="height: 0%"></div>
+            </div>
+
             <% if @presentation.content.present? %>
-              <%= simple_format(@presentation.content) %>
+              <div class="prose-deck prose-deck--dropcap">
+                <%= render_markdown(@presentation.content) %>
+              </div>
             <% else %>
-              <p class="text-gray-700 leading-relaxed"><%= @presentation.description %></p>
+              <p class="prose-deck"><%= @presentation.description %></p>
             <% end %>
           </div>
         </section>
 
-        <!-- Tasting Notes (if present) -->
+        <script>
+          // Fill the story thread to match reading progress through the section.
+          (function () {
+            function initDeckThread() {
+              const story = document.getElementById('deck-story');
+              const thread = document.getElementById('deck-thread');
+              if (!story || !thread) return;
+
+              function update() {
+                const rect = story.getBoundingClientRect();
+                const viewport = window.innerHeight;
+                const total = rect.height - viewport * 0.5;
+                const progress = total > 0 ? Math.min(1, Math.max(0, (viewport * 0.5 - rect.top) / total)) : 1;
+                thread.style.height = (progress * 100).toFixed(1) + '%';
+              }
+
+              update();
+              window.addEventListener('scroll', update, { passive: true });
+              window.addEventListener('resize', update, { passive: true });
+            }
+            document.addEventListener('turbo:load', initDeckThread);
+            document.addEventListener('DOMContentLoaded', initDeckThread);
+          })();
+        </script>
+
+        <!-- Tasting Notes (if present) — set like the back of a label -->
         <% if @presentation.nose_notes.present? || @presentation.palate_notes.present? || @presentation.finish_notes.present? || @presentation.body_notes.present? %>
           <section class="mb-16">
-            <h2 class="text-3xl font-bold text-gray-900 mb-8">What You'll Taste</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <% if @presentation.nose_notes.present? %>
-                <div class="bg-blue-50 rounded-2xl p-6">
-                  <h4 class="font-semibold text-blue-900 mb-3">Nose</h4>
-                  <p class="text-blue-700"><%= @presentation.nose_notes %></p>
-                </div>
-              <% end %>
-              <% if @presentation.palate_notes.present? %>
-                <div class="bg-green-50 rounded-2xl p-6">
-                  <h4 class="font-semibold text-green-900 mb-3">Palate</h4>
-                  <p class="text-green-700"><%= @presentation.palate_notes %></p>
-                </div>
-              <% end %>
-              <% if @presentation.finish_notes.present? %>
-                <div class="bg-amber-50 rounded-2xl p-6">
-                  <h4 class="font-semibold text-amber-900 mb-3">Finish</h4>
-                  <p class="text-amber-700"><%= @presentation.finish_notes %></p>
-                </div>
-              <% end %>
-              <% if @presentation.body_notes.present? %>
-                <div class="bg-purple-50 rounded-2xl p-6">
-                  <h4 class="font-semibold text-purple-900 mb-3">Body</h4>
-                  <p class="text-purple-700"><%= @presentation.body_notes %></p>
-                </div>
-              <% end %>
+            <p class="eyebrow text-whiskey-600 mb-2">Tasting notes</p>
+            <h2 class="font-display text-3xl font-semibold text-gray-900 mb-3">What you'll taste</h2>
+            <div class="rule-double text-whiskey-800 mb-8"></div>
+            <div class="rounded-2xl border border-whiskey-200 bg-whiskey-50 p-8">
+              <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
+                <% {
+                  "Nose"   => @presentation.nose_notes,
+                  "Palate" => @presentation.palate_notes,
+                  "Finish" => @presentation.finish_notes,
+                  "Body"   => @presentation.body_notes
+                }.each do |label, notes| %>
+                  <% next if notes.blank? %>
+                  <div>
+                    <dt class="eyebrow text-whiskey-700 mb-1"><%= label %></dt>
+                    <dd class="font-reading text-lg text-gray-800 leading-relaxed"><%= notes %></dd>
+                  </div>
+                <% end %>
+              </dl>
             </div>
           </section>
         <% end %>
@@ -293,39 +321,8 @@
           </section>
         <% end %>
 
-        <!-- Reviews -->
-        <section class="mb-16">
-          <h2 class="text-3xl font-bold text-gray-900 mb-8">Customer Reviews</h2>
-          <div class="space-y-6">
-            <% [
-              { name: "Sarah M.", rating: 5, date: "2 weeks ago", text: "Perfect for our whiskey club! The slides are beautiful and the script is easy to follow. Our members learned so much about Scotch whisky." },
-              { name: "Michael R.", rating: 5, date: "1 month ago", text: "As a beginner, this presentation was exactly what I needed. Clear explanations and great whiskey recommendations. Highly recommend!" },
-              { name: "Jennifer L.", rating: 4, date: "3 weeks ago", text: "Great content and well-structured. The regional breakdown was particularly helpful. Would love to see more presentations like this." }
-            ].each do |review| %>
-              <div class="bg-gray-50 rounded-2xl p-6">
-                <div class="flex items-center justify-between mb-3">
-                  <div class="flex items-center gap-3">
-                    <div class="w-10 h-10 bg-blue-500 rounded-full flex items-center justify-center">
-                      <span class="text-white font-semibold"><%= review[:name].split(' ').first[0] %></span>
-                    </div>
-                    <div>
-                      <h4 class="font-semibold text-gray-900"><%= review[:name] %></h4>
-                      <div class="flex items-center gap-1">
-                        <% review[:rating].times do %>
-                          <svg class="w-4 h-4 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
-                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z"></path>
-                          </svg>
-                        <% end %>
-                        <span class="text-sm text-gray-500 ml-2"><%= review[:date] %></span>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <p class="text-gray-700"><%= review[:text] %></p>
-              </div>
-            <% end %>
-          </div>
-        </section>
+        <%# Reviews intentionally removed: the previous section rendered hard-coded
+            fictional testimonials. When a real Review model exists, rebuild here. %>
       </div>
 
       <!-- Right Column - Sidebar -->

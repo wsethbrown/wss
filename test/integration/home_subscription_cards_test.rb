@@ -53,14 +53,15 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
     assert_select "div", text: /Save 31%/
   end
 
-  test "subscription cards have proper glassmorphism styling" do
+  test "subscription cards have brand card styling" do
     get root_path
     assert_response :success
-    
-    # Check for glassmorphism CSS classes
-    assert_select "div.backdrop-blur-xl", minimum: 3
+
+    # Plan cards are white label-style cards; the popular plan is set off with a
+    # whiskey border (see app/views/home/index.html.erb pricing section).
     assert_select "div.rounded-3xl", minimum: 3
     assert_select "div.shadow-xl", minimum: 3
+    assert_select "#plan-cards div.border-whiskey-400", count: 1
   end
 
   test "subscription cards have Get Started buttons" do

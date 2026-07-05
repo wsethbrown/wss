@@ -2,6 +2,7 @@ class HomeController < ApplicationController
   def index
     # Fetch Stripe products for pricing display
     @stripe_products = fetch_stripe_products
+    @featured_presentations = Presentation.published.recent.limit(3)
   end
 
   private

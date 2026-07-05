@@ -96,3 +96,6 @@ gem "rqrcode", "~> 2.2"
 
 # Stripe payment processing
 gem "stripe", "~> 10.0"
+
+# Markdown rendering for narrative deck content
+gem "redcarpet", "~> 3.6"

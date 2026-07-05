@@ -3,12 +3,24 @@
 /*
   Whiskey Share Society design system.
 
-  A single warm "whiskey" accent (oak/amber) replaces the previous mix of indigo
-  (nav) and amber (auth) so the whole app reads as one intentional brand. An editorial
-  serif is reserved for narrative deck headings — the storytelling that is WSS's soul.
+  Identity: a two-surface world drawn from the product itself.
+    — "char"  : the tasting room. Dark barrel-char brown for narrative surfaces
+                (nav, hero, deck reader chrome, footer). Amber is the pour.
+    — "paper" : the label. Warm cream/white for utility surfaces (catalog,
+                forms, account, admin) with whiskey-label details: small-caps
+                eyebrows, thin double rules, stamp badges.
 
-  Tailwind v4 exposes @theme tokens as utilities automatically, e.g. bg-whiskey-600,
-  text-whiskey-700, so existing views can adopt them incrementally.
+  Signature motif: the THREAD — a thin amber line that connects a pour to its
+  story (the founding ritual). It underlines the hero headline, connects the
+  how-it-works steps, and tracks reading progress in the deck reader.
+
+  Type:
+    — Display : Fraunces (engraved whiskey-label soul), headings only.
+    — UI/body : Instrument Sans.
+    — Reading : Source Serif 4, deck content only (.prose-deck).
+
+  Tailwind v4 exposes @theme tokens as utilities automatically, e.g.
+  bg-whiskey-600, bg-char, font-display.
 */
 @theme {
   --color-whiskey-50: #fbf6ef;
@@ -23,8 +35,17 @@
   --color-whiskey-900: #582f1e;
   --color-whiskey-950: #32180e;
 
-  /* Editorial serif for narrative headings; system fallbacks so no web font is required. */
+  /* Dark narrative surfaces */
+  --color-char: #191009;      /* barrel char — page-level dark */
+  --color-oak: #261a10;       /* elevated dark surface */
+  --color-oak-edge: #3d2c1c;  /* hairline borders on dark */
+
+  /* Text on dark */
+  --color-cream: #f6edda;
+
   --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
+  --font-reading: "Source Serif 4", Georgia, "Times New Roman", serif;
 }
 
 @layer components {
@@ -55,7 +76,132 @@
   .badge-whiskey {
     @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium bg-whiskey-100 text-whiskey-800;
   }
+
+  /* Label vernacular ------------------------------------------------------- */
+
+  /* Small-caps letterspaced eyebrow, as on a whiskey label's top line. */
+  .eyebrow {
+    @apply text-[0.6875rem] font-semibold uppercase tracking-[0.18em];
+  }
+
+  /* Thin double rule, as under a label's masthead. */
+  .rule-double {
+    border-top: 1px solid currentColor;
+    position: relative;
+    opacity: 0.35;
+  }
+  .rule-double::after {
+    content: "";
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 3px;
+    border-top: 1px solid currentColor;
+  }
+
+  /* The thread — the signature amber line. Draws in on load where used. */
+  .thread {
+    display: block;
+    height: 2px;
+    background: linear-gradient(90deg, var(--color-whiskey-400), var(--color-whiskey-600));
+    transform-origin: left center;
+    animation: thread-draw 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
+  }
+  @keyframes thread-draw {
+    from { transform: scaleX(0); }
+    to   { transform: scaleX(1); }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .thread { animation: none; }
+  }
 }
 
-/* The --font-display theme token above auto-generates a `font-display` utility
-   (Tailwind v4), so narrative headings can use class="font-display". */
+/* Deck reading experience -------------------------------------------------- */
+/* Applied to rendered Markdown. Editorial column: Source Serif body, Fraunces
+   headings, a drop cap opening the story, and label-style section rules. */
+.prose-deck {
+  font-family: var(--font-reading);
+  font-size: 1.125rem;
+  line-height: 1.8;
+  color: #33271c;
+  max-width: 65ch;
+}
+.prose-deck > :first-child { margin-top: 0; }
+.prose-deck h1,
+.prose-deck h2,
+.prose-deck h3,
+.prose-deck h4 {
+  font-family: var(--font-display);
+  color: #241a10;
+  line-height: 1.2;
+  font-weight: 600;
+}
+.prose-deck h1 { font-size: 2rem;    margin: 2.5rem 0 1rem; }
+.prose-deck h2 { font-size: 1.5rem;  margin: 2.5rem 0 0.75rem; padding-top: 1.5rem; border-top: 1px solid #e5d9c3; }
+.prose-deck h3 { font-size: 1.1875rem; margin: 1.75rem 0 0.5rem; color: var(--color-whiskey-700); }
+.prose-deck h4 { font-size: 1.0625rem; margin: 1.5rem 0 0.5rem; }
+.prose-deck p  { margin: 0 0 1.25rem; }
+.prose-deck a  { color: var(--color-whiskey-700); text-decoration: underline; text-underline-offset: 3px; }
+.prose-deck a:hover { color: var(--color-whiskey-600); }
+.prose-deck strong { color: #241a10; }
+.prose-deck ul, .prose-deck ol { margin: 0 0 1.25rem; padding-left: 1.5rem; }
+.prose-deck ul { list-style: disc; }
+.prose-deck ol { list-style: decimal; }
+.prose-deck li { margin-bottom: 0.375rem; }
+.prose-deck blockquote {
+  margin: 1.75rem 0;
+  padding: 0.25rem 0 0.25rem 1.25rem;
+  border-left: 2px solid var(--color-whiskey-400);
+  font-style: italic;
+  color: #5c4a35;
+}
+.prose-deck hr {
+  border: none;
+  border-top: 1px solid #e5d9c3;
+  margin: 2.5rem auto;
+  width: 8rem;
+}
+.prose-deck code {
+  font-size: 0.9em;
+  background: #f4ecdd;
+  border-radius: 0.25rem;
+  padding: 0.1em 0.35em;
+}
+.prose-deck pre {
+  background: #f4ecdd;
+  border-radius: 0.5rem;
+  padding: 1rem;
+  overflow-x: auto;
+  margin: 0 0 1.25rem;
+}
+.prose-deck table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 0 0 1.5rem;
+  font-size: 1rem;
+}
+.prose-deck th {
+  font-family: var(--font-sans);
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  text-align: left;
+  color: #6b5942;
+  border-bottom: 2px solid #e5d9c3;
+  padding: 0.5rem 0.75rem 0.5rem 0;
+}
+.prose-deck td {
+  border-bottom: 1px solid #efe6d2;
+  padding: 0.625rem 0.75rem 0.625rem 0;
+  vertical-align: top;
+}
+/* Drop cap opens the story. */
+.prose-deck--dropcap > p:first-of-type::first-letter {
+  font-family: var(--font-display);
+  font-weight: 600;
+  font-size: 3.4em;
+  line-height: 0.85;
+  float: left;
+  padding: 0.08em 0.12em 0 0;
+  color: var(--color-whiskey-600);
+}

@@ -1,1059 +1,248 @@
-<!-- Enhanced Hero Section -->
-<section class="relative min-h-screen flex w-full overflow-hidden bg-gradient-to-br from-slate-900 via-blue-900 to-whiskey-900 pt-16">
-  <!-- Animated Background Elements -->
-  <div class="absolute inset-0 pointer-events-none">
-    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-blue-400/10 rounded-full blur-3xl animate-pulse"></div>
-    <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-whiskey-400/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
-    <div class="absolute top-1/2 left-1/2 w-64 h-64 bg-purple-400/10 rounded-full blur-2xl animate-bounce delay-500"></div>
-    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent opacity-20"></div>
+<%# Homepage. Two-surface system: char (the tasting room) for narrative sections,
+    paper (the label) for utility. Signature motif: the amber thread. %>
+
+<!-- ============================================================ Hero -->
+<section class="relative flex min-h-[92svh] w-full items-center justify-center overflow-hidden bg-char pt-16">
+  <%# Candlelight: one quiet radial glow, no animated blobs. %>
+  <div class="pointer-events-none absolute inset-0" aria-hidden="true"
+       style="background: radial-gradient(ellipse 70% 45% at 50% 105%, rgba(201, 136, 74, 0.28), transparent 70%);"></div>
+
+  <div class="relative z-10 mx-auto max-w-3xl px-6 py-24 text-center">
+    <p class="eyebrow mb-4 text-whiskey-300/90">The Whiskey Share Society &middot; Est. 2019</p>
+    <div class="rule-double mx-auto mb-10 w-24 text-whiskey-300"></div>
+
+    <h1 class="font-display text-5xl font-semibold leading-[1.05] text-cream sm:text-6xl lg:text-7xl">
+      Every pour has<br>
+      <span class="relative inline-block whitespace-nowrap">
+        a story.
+        <span class="thread absolute -bottom-2 left-0 right-0 sm:-bottom-3" aria-hidden="true"></span>
+      </span>
+    </h1>
+
+    <p class="mx-auto mt-8 max-w-xl text-lg leading-relaxed text-cream/70 sm:text-xl">
+      Narrative tasting decks for whiskey nights that hold together —
+      the research done, the script written, the bottles picked.
+    </p>
+
+    <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+      <%= link_to 'Browse the decks', presentations_path,
+          class: 'inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char' %>
+      <%= link_to 'See how it works', '#how-it-works',
+          class: 'inline-flex items-center justify-center rounded-xl border border-cream/25 px-7 py-3.5 text-base font-semibold text-cream/90 transition hover:border-cream/50 hover:text-cream focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char' %>
+    </div>
+
+    <p class="mt-12 text-sm tracking-wide text-cream/50">
+      One credit a month with membership &middot; Or buy any deck outright
+    </p>
   </div>
+</section>
 
-  <!-- Left Column: Enhanced Text Content -->
-  <div class="relative w-full lg:w-1/2 flex items-center z-10">
-    <div class="px-8 lg:px-16 py-24 w-full max-w-2xl">
-
-      <h1 class="text-6xl md:text-8xl font-black tracking-tight mb-8 leading-[0.9]">
-        <span class="block text-white drop-shadow-2xl">Discover.</span>
-        <span class="block text-white drop-shadow-2xl">Share.</span>
-        <span class="block bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-400 bg-clip-text text-transparent drop-shadow-lg">Savor.</span>
-        <span class="block text-2xl md:text-4xl font-bold text-blue-200 mt-4">Whiskey, Together.</span>
-      </h1>
-
-      <p class="text-xl md:text-2xl text-blue-100 mb-12 leading-relaxed font-medium max-w-lg">
-        Transform any gathering into a <strong class="text-white">world-class whiskey experience</strong> with our ready-made presentations and vibrant community.
+<!-- ============================================== How it works (pinned) -->
+<section id="how-it-works" class="w-full bg-char md:grid md:grid-cols-2">
+  <%# Left panel pins while the steps scroll. Grid + self-start is the reliable
+      sticky pattern; on mobile it stacks and flows normally. %>
+  <div class="flex items-center px-6 py-20 md:sticky md:top-0 md:h-screen md:self-start md:px-12 lg:px-16">
+    <div class="max-w-md">
+      <p class="eyebrow mb-4 text-whiskey-300/90">How it works</p>
+      <h2 class="font-display text-4xl font-semibold leading-tight text-cream lg:text-5xl">
+        From bottle to story in three steps.
+      </h2>
+      <p class="mt-6 text-lg leading-relaxed text-cream/70">
+        Each deck is a narrative — a thread connecting every pour to the people,
+        places, and history behind it. You bring the bottle; the deck carries the night.
       </p>
 
-      <!-- Enhanced CTA Section -->
-      <div class="space-y-6">
-        <%= link_to auth_path, class: 'group inline-flex items-center gap-3 px-10 py-5 rounded-full bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 text-black text-xl font-bold shadow-2xl hover:shadow-yellow-500/25 transition-all duration-200 hover:-translate-y-0.5 transform' do %>
-          <span>Get Started</span>
-          <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-          </svg>
+      <%# The thread, vertical: three stations for three steps. %>
+      <div class="mt-10 flex items-center gap-4" aria-hidden="true">
+        <span class="font-display text-sm text-whiskey-300">01</span>
+        <span class="h-px flex-1 bg-gradient-to-r from-whiskey-400/70 to-whiskey-400/10"></span>
+        <span class="font-display text-sm text-whiskey-300/70">02</span>
+        <span class="h-px flex-1 bg-gradient-to-r from-whiskey-400/40 to-whiskey-400/10"></span>
+        <span class="font-display text-sm text-whiskey-300/50">03</span>
+      </div>
+
+      <div class="mt-10">
+        <%= link_to 'Start with a deck', presentations_path,
+            class: 'inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-6 py-3 text-base font-semibold text-white transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char' %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Right: the three steps, on paper -->
+  <div class="bg-whiskey-50">
+    <% [
+      {
+        number: "01",
+        title: "Pick a deck",
+        body: "Browse the library and choose the story you want to tell — bourbon, scotch, rye, or something stranger. Filter by difficulty and budget.",
+        points: [ "Slides plus a full speaker script",
+                  "A bottle list for every budget",
+                  "Tasting mats and notes as PDFs" ]
+      },
+      {
+        number: "02",
+        title: "Gather your society",
+        body: "Start a private society for your friends or join a public one near you. Schedule the night, share the link, and RSVPs take care of themselves.",
+        points: [ "Public and private societies",
+                  "Events with RSVPs built in",
+                  "Roles for organizers and officers" ]
+      },
+      {
+        number: "03",
+        title: "Pour and present",
+        body: "Follow the thread from first nose to final pour. The script keeps the room moving; the tasting notes keep it honest.",
+        points: [ "45–60 minute runtime, easy to trim",
+                  "Guided tasting for each bottle",
+                  "Written for first-timers and collectors alike" ]
+      }
+    ].each do |step| %>
+      <div class="flex min-h-[85vh] items-center justify-center px-6 py-20 md:px-12">
+        <div class="max-w-md">
+          <div class="flex items-baseline gap-4">
+            <span class="font-display text-6xl font-semibold text-whiskey-200"><%= step[:number] %></span>
+            <span class="thread w-16 self-center" aria-hidden="true"></span>
+          </div>
+          <h3 class="mt-6 font-display text-3xl font-semibold text-gray-900"><%= step[:title] %></h3>
+          <p class="mt-4 text-lg leading-relaxed text-gray-600"><%= step[:body] %></p>
+          <ul class="mt-8 space-y-3">
+            <% step[:points].each do |point| %>
+              <li class="flex items-center gap-3 rounded-xl border border-whiskey-100 bg-white px-4 py-3">
+                <svg class="h-4 w-4 flex-shrink-0 text-whiskey-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                </svg>
+                <span class="font-medium text-gray-800"><%= point %></span>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    <% end %>
+
+    <!-- Closing beat of the split -->
+    <div class="flex min-h-[60vh] items-center justify-center px-6 py-20 md:px-12">
+      <div class="max-w-md text-center">
+        <h3 class="font-display text-3xl font-semibold text-gray-900">That's the whole ritual.</h3>
+        <p class="mt-4 text-lg text-gray-600">Pick your first deck and set a date — the rest is poured, not planned.</p>
+        <div class="mt-8">
+          <%= link_to 'Browse the decks', presentations_path,
+              class: 'inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-7 py-3.5 text-base font-semibold text-white transition hover:bg-whiskey-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2' %>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ==================================================== The ritual -->
+<section class="w-full bg-white px-6 py-24 sm:py-32">
+  <div class="mx-auto grid max-w-6xl items-center gap-16 lg:grid-cols-2">
+    <div>
+      <p class="eyebrow mb-4 text-whiskey-600">Why we exist</p>
+      <h2 class="font-display text-4xl font-semibold leading-tight text-gray-900 lg:text-5xl">
+        Born from a monthly ritual.
+      </h2>
+      <div class="rule-double mt-6 w-24 text-whiskey-800"></div>
+      <p class="mt-8 text-lg leading-relaxed text-gray-600">
+        The Society started as a circle of friends. Each month one of us drew a topic,
+        did the research, bought the bottle, and told its story over a deck of slides.
+        The rule was simple: no fact sheets. A deck had to follow a thread.
+      </p>
+      <p class="mt-4 text-lg leading-relaxed text-gray-600">
+        Societies are that ritual, kept intact: a group, a calendar, and a reason to
+        gather. Make yours private for the group chat, or public for your city.
+      </p>
+      <div class="mt-10">
+        <%= link_to 'Find your society', societies_path,
+            class: 'inline-flex items-center justify-center rounded-xl border border-whiskey-300 bg-white px-6 py-3 text-base font-semibold text-whiskey-800 transition hover:bg-whiskey-50 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2' %>
+      </div>
+    </div>
+
+    <%# The house rules, set like the back label of a bottle. %>
+    <div class="rounded-2xl border border-whiskey-200 bg-whiskey-50 p-10 shadow-sm">
+      <p class="eyebrow text-center text-whiskey-600">House rules</p>
+      <div class="rule-double mx-auto mt-3 w-16 text-whiskey-700"></div>
+      <ol class="mt-8 space-y-6">
+        <% [
+          "One presenter a month — everyone takes a turn.",
+          "Research your topic like you mean it.",
+          "Choose the bottle that belongs to the story.",
+          "No fact sheets. Follow the thread."
+        ].each_with_index do |rule, i| %>
+          <li class="flex gap-4">
+            <span class="font-display text-2xl font-semibold text-whiskey-300"><%= format('%02d', i + 1) %></span>
+            <span class="pt-1 font-reading text-lg text-gray-800"><%= rule %></span>
+          </li>
         <% end %>
-
-        <div class="flex items-center gap-8 text-blue-200">
-          <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-            </svg>
-            <span class="font-medium">No experience needed</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-            </svg>
-            <span class="font-medium">Ready in minutes</span>
-          </div>
-        </div>
-
-        <div class="pt-4 border-t border-white/20">
-          <span class="text-blue-200">Already a member? </span>
-          <%= link_to 'Log in', auth_path, class: 'text-white font-semibold hover:text-yellow-400 transition-colors duration-300 underline decoration-2 underline-offset-4' %>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Right Column: Enhanced Logo Display -->
-  <div class="hidden lg:flex w-1/2 items-center justify-center relative">
-    <!-- Glowing backdrop -->
-    <div class="absolute inset-0 bg-gradient-to-l from-white/10 to-transparent backdrop-blur-sm"></div>
-
-    <div class="relative group">
-      <!-- Animated glow ring -->
-      <div class="absolute -inset-8 bg-gradient-to-r from-yellow-400/20 via-amber-400/30 to-orange-400/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-700"></div>
-
-      <!-- Logo container with glassmorphism -->
-      <div class="relative p-8 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl group-hover:scale-105 transition-transform duration-500">
-        <%= image_tag "wss-logo.jpg", alt: "Whiskey Share Society", class: "h-80 w-80 object-cover rounded-2xl shadow-xl" %>
-
-        <!-- Floating elements around logo -->
-        <div class="absolute -top-4 -right-4 w-8 h-8 bg-yellow-400 rounded-full opacity-80 animate-ping"></div>
-        <div class="absolute -bottom-4 -left-4 w-6 h-6 bg-amber-400 rounded-full opacity-60 animate-pulse delay-300"></div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Mobile: Enhanced Logo Section -->
-  <div class="lg:hidden w-full flex flex-col items-center justify-center py-16 bg-gradient-to-t from-black/20 to-transparent">
-    <div class="relative group">
-      <div class="absolute -inset-4 bg-gradient-to-r from-yellow-400/20 to-orange-400/20 rounded-2xl blur-xl opacity-50"></div>
-      <div class="relative p-4 rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20">
-        <%= image_tag "wss-logo.jpg", alt: "Whiskey Share Society", class: "h-64 w-64 object-cover rounded-xl shadow-lg" %>
-      </div>
-    </div>
-  </div>
-
-  <!-- Scroll indicator -->
-  <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 flex flex-col items-center gap-2 text-white/60 animate-bounce">
-    <span class="text-sm font-medium">Scroll to explore</span>
-    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3"></path>
-    </svg>
-  </div>
-</section>
-
-<!-- How it Works Section - Simple Split Screen -->
-<section id="how-it-works-section" class="relative w-full">
-  <div class="flex w-full min-h-screen">
-    <!-- Left Side - Sticky -->
-    <div class="w-1/2 sticky top-0 h-screen bg-gradient-to-br from-blue-600 via-whiskey-700 to-purple-800 text-white flex items-center">
-      <!-- Background Effects -->
-      <div class="absolute inset-0 pointer-events-none">
-        <div class="absolute top-1/4 left-1/4 w-32 h-32 bg-white/10 rounded-full blur-3xl animate-pulse"></div>
-        <div class="absolute bottom-1/4 right-1/4 w-24 h-24 bg-yellow-400/20 rounded-full blur-2xl animate-pulse delay-1000"></div>
-        <div class="absolute top-1/2 left-1/2 w-16 h-16 bg-purple-200/20 rounded-full blur-xl animate-bounce delay-500"></div>
-      </div>
-
-      <div class="relative z-10 px-8 lg:px-12">
-        <!-- Hero Content -->
-        <div class="mb-8">
-          <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white/90 font-semibold text-sm mb-6">
-            <span class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></span>
-            Simple Process
-          </div>
-          <h2 class="text-4xl lg:text-6xl font-extrabold mb-6 leading-tight">
-            How it Works
-          </h2>
-          <p class="text-xl lg:text-2xl text-blue-100 mb-8 leading-relaxed max-w-md">
-            Transform any gathering into a world-class whiskey experience in just three simple steps.
-          </p>
-        </div>
-
-        <!-- Key Benefits -->
-        <div class="space-y-4 mb-8">
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-green-400 flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-              </svg>
-            </div>
-            <span class="text-white/90 font-medium">No experience required</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-green-400 flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-              </svg>
-            </div>
-            <span class="text-white/90 font-medium">Professional presentations included</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <div class="w-8 h-8 rounded-full bg-green-400 flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-              </svg>
-            </div>
-            <span class="text-white/90 font-medium">Ready in under 30 minutes</span>
-          </div>
-        </div>
-
-        <!-- Call to Action -->
-        <div class="pt-8 border-t border-white/20">
-          <%= link_to 'Sign up Now', auth_path, class: 'inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white text-blue-700 font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5' %>
-        </div>
-      </div>
-    </div>
-
-    <!-- Right Side - Scrollable Steps -->
-    <div class="w-1/2">
-      <!-- Step 1: Pick a Presentation -->
-      <div class="min-h-screen bg-gradient-to-br from-emerald-50 via-white to-teal-50 flex items-center justify-center">
-        <div class="max-w-lg px-8">
-          <div class="flex items-center gap-4 mb-8">
-            <div class="text-6xl font-black text-emerald-200">01</div>
-            <div class="p-4 bg-white rounded-2xl shadow-lg">
-              <svg class="w-10 h-10 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
-              </svg>
-            </div>
-          </div>
-          <h3 class="text-4xl font-bold text-emerald-800 mb-6">Pick a Presentation</h3>
-          <p class="text-xl text-emerald-700 mb-8 leading-relaxed">
-            Choose from our curated library of <strong>12 professional presentations</strong> covering every whiskey type—from smooth bourbons to complex single malts. Each presentation includes expert slides, a detailed script, and carefully selected whiskey recommendations across all price ranges.
-          </p>
-          <div class="space-y-4">
-            <div class="flex items-center gap-4 p-4 bg-white/80 rounded-xl shadow-sm">
-              <span class="text-2xl">📊</span>
-              <span class="font-semibold text-emerald-800">Professional slides & script</span>
-            </div>
-            <div class="flex items-center gap-4 p-4 bg-white/80 rounded-xl shadow-sm">
-              <span class="text-2xl">🥃</span>
-              <span class="font-semibold text-emerald-800">Curated whiskey selections</span>
-            </div>
-            <div class="flex items-center gap-4 p-4 bg-white/80 rounded-xl shadow-sm">
-              <span class="text-2xl">💰</span>
-              <span class="font-semibold text-emerald-800">Options for every budget</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 2: Invite Your Friends -->
-      <div class="min-h-screen bg-gradient-to-br from-blue-50 via-white to-whiskey-50 flex items-center justify-center">
-        <div class="max-w-lg px-8">
-          <div class="flex items-center gap-4 mb-8">
-            <div class="text-6xl font-black text-blue-200">02</div>
-            <div class="p-4 bg-white rounded-2xl shadow-lg">
-              <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8h2a2 2 0 012 2v6a2 2 0 01-2 2h-2v4l-4-4H9a1.994 1.994 0 01-1.414-.586m0 0L11 14h4a2 2 0 002-2V6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2v4l.586-.586z"></path>
-              </svg>
-            </div>
-          </div>
-          <h3 class="text-4xl font-bold text-blue-800 mb-6">Invite Your Friends</h3>
-          <p class="text-xl text-blue-700 mb-8 leading-relaxed">
-            Create your society and send invitations with a single click. Whether you're hosting <strong>5 friends or 50 members</strong>, our platform makes it effortless to organize your whiskey community. Perfect for beginners and experts alike!
-          </p>
-          <div class="space-y-4">
-            <div class="flex items-center gap-4 p-4 bg-white/80 rounded-xl shadow-sm">
-              <span class="text-2xl">📧</span>
-              <span class="font-semibold text-blue-800">One-click invitations</span>
-            </div>
-            <div class="flex items-center gap-4 p-4 bg-white/80 rounded-xl shadow-sm">
-              <span class="text-2xl">🔗</span>
-              <span class="font-semibold text-blue-800">Shareable society links</span>
-            </div>
-            <div class="flex items-center gap-4 p-4 bg-white/80 rounded-xl shadow-sm">
-              <span class="text-2xl">👥</span>
-              <span class="font-semibold text-blue-800">Public & private groups</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Step 3: Host Your Whiskey Night -->
-      <div class="min-h-screen bg-gradient-to-br from-purple-50 via-white to-pink-50 flex items-center justify-center">
-        <div class="max-w-lg px-8">
-          <div class="flex items-center gap-4 mb-8">
-            <div class="text-6xl font-black text-purple-200">03</div>
-            <div class="p-4 bg-white rounded-2xl shadow-lg">
-              <svg class="w-10 h-10 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
-              </svg>
-            </div>
-          </div>
-          <h3 class="text-4xl font-bold text-purple-800 mb-6">Host Your Whiskey Night</h3>
-          <p class="text-xl text-purple-700 mb-8 leading-relaxed">
-            Follow our expert script to guide your guests through an unforgettable tasting experience. From <strong>tasting notes to flavor profiles</strong>, everything is prepared for you. Just pour, present, and enjoy the conversation!
-          </p>
-          <div class="space-y-4">
-            <div class="flex items-center gap-4 p-4 bg-white/80 rounded-xl shadow-sm">
-              <span class="text-2xl">🎯</span>
-              <span class="font-semibold text-purple-800">Step-by-step guidance</span>
-            </div>
-            <div class="flex items-center gap-4 p-4 bg-white/80 rounded-xl shadow-sm">
-              <span class="text-2xl">📖</span>
-              <span class="font-semibold text-purple-800">Expert tasting notes</span>
-            </div>
-            <div class="flex items-center gap-4 p-4 bg-white/80 rounded-xl shadow-sm">
-              <span class="text-2xl">🌟</span>
-              <span class="font-semibold text-purple-800">Memorable experiences</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Final Call to Action -->
-      <div class="min-h-screen bg-gradient-to-br from-amber-50 via-white to-orange-50 flex items-center justify-center">
-        <div class="max-w-lg px-8 text-center">
-          <div class="mb-8">
-            <h3 class="text-4xl font-bold text-gray-900 mb-6">Ready to Get Started?</h3>
-            <p class="text-xl text-gray-600 leading-relaxed">
-              Join thousands of whiskey enthusiasts who are already hosting amazing tastings with our platform.
-            </p>
-          </div>
-          <div class="flex flex-col gap-4">
-            <%= link_to 'Browse Presentations', presentations_path, class: 'inline-flex items-center justify-center gap-2 px-8 py-4 rounded-full bg-white text-blue-600 font-bold text-lg shadow-lg border-2 border-blue-600 hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5' %>
-          </div>
-        </div>
-      </div>
+      </ol>
     </div>
   </div>
 </section>
 
-<!-- Enhanced Societies Overview Section -->
-<section id="societies-overview" class="relative w-full py-32 px-4 overflow-hidden">
-  <!-- Enhanced Background -->
-  <div class="absolute inset-0 bg-gradient-to-br from-amber-50 via-white to-orange-50"></div>
-  <div class="absolute inset-0 pointer-events-none">
-    <div class="absolute top-1/4 left-1/6 w-40 h-40 bg-amber-200/20 rounded-full blur-3xl animate-pulse"></div>
-    <div class="absolute bottom-1/4 right-1/6 w-32 h-32 bg-orange-200/25 rounded-full blur-2xl animate-pulse delay-1000"></div>
-    <div class="absolute top-1/2 left-1/2 w-24 h-24 bg-yellow-200/15 rounded-full blur-xl animate-bounce delay-500"></div>
-    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-amber-100/30 to-transparent"></div>
-  </div>
-
-  <div class="max-w-7xl mx-auto relative z-10">
-    <!-- Enhanced Section Header -->
-    <div class="text-center mb-20">
-      <div class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-amber-100/80 backdrop-blur-sm border border-amber-200/50 text-amber-800 font-bold text-sm mb-8 shadow-lg">
-        <span class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
-        <span>🥃 Community Hub</span>
+<!-- ================================================= Featured decks -->
+<% if @featured_presentations&.any? %>
+  <section class="w-full bg-whiskey-50 px-6 py-24 sm:py-32">
+    <div class="mx-auto max-w-6xl">
+      <div class="flex flex-wrap items-end justify-between gap-6">
+        <div>
+          <p class="eyebrow mb-4 text-whiskey-600">From the library</p>
+          <h2 class="font-display text-4xl font-semibold text-gray-900">Latest decks</h2>
+        </div>
+        <%= link_to 'See the full library →', presentations_path,
+            class: 'text-base font-semibold text-whiskey-700 transition hover:text-whiskey-600' %>
       </div>
 
-      <h2 class="text-6xl md:text-7xl font-black tracking-tight mb-8 leading-tight">
-        <span class="block bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 bg-clip-text text-transparent">Societies:</span>
-        <span class="block text-gray-900">Where Whiskey Meets Community</span>
-      </h2>
-
-      <p class="text-2xl md:text-3xl text-gray-700 mb-8 max-w-4xl mx-auto leading-relaxed font-medium">
-        Join a vibrant world of whiskey lovers. <strong class="text-amber-700">Subscribe to unlock exclusive clubs</strong>, RSVP to tastings, and connect with a passionate community.
-      </p>
-
-      <div class="flex items-center justify-center gap-8 text-lg text-gray-600">
-        <div class="flex items-center gap-2">
-          <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-          <span class="font-semibold">1,200+ Members</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="w-2 h-2 bg-blue-500 rounded-full"></div>
-          <span class="font-semibold">50+ Active Societies</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="w-2 h-2 bg-purple-500 rounded-full"></div>
-          <span class="font-semibold">Weekly Events</span>
-        </div>
-      </div>
-    </div>
-
-    <!-- Enhanced Feature Cards -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-      <!-- Public Societies Card -->
-      <div class="group relative">
-        <!-- Animated background -->
-        <div class="absolute -inset-4 bg-gradient-to-r from-blue-400/20 via-whiskey-400/20 to-purple-400/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-        <div class="relative h-full p-10 rounded-3xl bg-gradient-to-br from-blue-50/80 via-white to-whiskey-50/80 backdrop-blur-xl border border-white/20 shadow-xl group-hover:shadow-2xl group-hover:-translate-y-2 transition-all duration-500">
-          <!-- Icon with enhanced styling -->
-          <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-blue-500 to-whiskey-600 flex items-center justify-center mb-8 shadow-lg group-hover:scale-110 transition-transform duration-300">
-            <span class="text-4xl">🌐</span>
-          </div>
-
-          <h3 class="text-3xl font-bold text-gray-900 mb-4">Public Societies</h3>
-          <p class="text-lg text-gray-700 mb-6 leading-relaxed">Join instantly and discover open clubs where beginners and experts share their passion. Meet new friends and RSVP to public events with a single click.</p>
-
-          <!-- Enhanced feature list -->
-          <div class="space-y-3">
-            <div class="flex items-center gap-3">
-              <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
-                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
+      <div class="mt-12 grid gap-8 md:grid-cols-3">
+        <% @featured_presentations.each do |deck| %>
+          <%= link_to presentation_path(deck), class: 'group block' do %>
+            <article class="flex h-full flex-col overflow-hidden rounded-2xl border border-whiskey-200 bg-white shadow-sm transition group-hover:-translate-y-1 group-hover:shadow-md">
+              <% if deck.featured_image.attached? %>
+                <%= image_tag deck.featured_image, alt: deck.title, class: 'aspect-[16/9] w-full object-cover' %>
+              <% else %>
+                <%# Typographic cover, like a label. %>
+                <div class="flex aspect-[16/9] w-full items-center justify-center bg-char px-6 text-center">
+                  <span class="font-display text-2xl font-semibold leading-snug text-cream"><%= deck.title %></span>
+                </div>
+              <% end %>
+              <div class="flex flex-1 flex-col p-6">
+                <p class="eyebrow text-whiskey-600"><%= deck.category.presence || 'Whiskey' %><%= " · #{deck.difficulty}" if deck.difficulty.present? %></p>
+                <h3 class="mt-2 font-display text-xl font-semibold text-gray-900"><%= deck.title %></h3>
+                <p class="mt-2 line-clamp-3 text-gray-600"><%= deck.excerpt(140) %></p>
+                <div class="mt-auto flex items-center justify-between pt-6">
+                  <span class="font-semibold text-gray-900"><%= deck.formatted_price %></span>
+                  <span class="text-sm font-semibold text-whiskey-700">Read the story →</span>
+                </div>
               </div>
-              <span class="font-semibold text-gray-800">Instant access</span>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
-                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <span class="font-semibold text-gray-800">Open to all levels</span>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="w-6 h-6 rounded-full bg-green-100 flex items-center justify-center">
-                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <span class="font-semibold text-gray-800">Regular events</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Private Societies Card -->
-      <div class="group relative lg:scale-105">
-        <!-- Enhanced glow for featured card -->
-        <div class="absolute -inset-6 bg-gradient-to-r from-amber-400/30 via-orange-400/30 to-red-400/30 rounded-3xl blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-        <div class="relative h-full p-10 rounded-3xl bg-gradient-to-br from-amber-50/90 via-white to-orange-50/90 backdrop-blur-xl border-2 border-amber-200/50 shadow-2xl group-hover:shadow-3xl group-hover:-translate-y-3 transition-all duration-500">
-          <!-- Premium badge -->
-          <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
-            <span class="bg-gradient-to-r from-amber-500 to-orange-500 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
-              <span class="mr-2">⭐</span>Premium
-            </span>
-          </div>
-
-          <!-- Icon with enhanced styling -->
-          <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center mb-8 shadow-lg group-hover:scale-110 transition-transform duration-300">
-            <span class="text-4xl">🔒</span>
-          </div>
-
-          <h3 class="text-3xl font-bold text-gray-900 mb-4">Private Societies</h3>
-          <p class="text-lg text-gray-700 mb-6 leading-relaxed">Apply to join exclusive, curated clubs where admins and officers review applications. Experience premium tastings in intimate settings.</p>
-
-          <!-- Enhanced feature list -->
-          <div class="space-y-3">
-            <div class="flex items-center gap-3">
-              <div class="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
-                <svg class="w-4 h-4 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <span class="font-semibold text-gray-800">Curated membership</span>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
-                <svg class="w-4 h-4 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <span class="font-semibold text-gray-800">Exclusive events</span>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="w-6 h-6 rounded-full bg-amber-100 flex items-center justify-center">
-                <svg class="w-4 h-4 text-amber-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <span class="font-semibold text-gray-800">Premium spirits</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Events & Community Card -->
-      <div class="group relative">
-        <!-- Animated background -->
-        <div class="absolute -inset-4 bg-gradient-to-r from-purple-400/20 via-pink-400/20 to-red-400/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-        <div class="relative h-full p-10 rounded-3xl bg-gradient-to-br from-purple-50/80 via-white to-pink-50/80 backdrop-blur-xl border border-white/20 shadow-xl group-hover:shadow-2xl group-hover:-translate-y-2 transition-all duration-500">
-          <!-- Icon with enhanced styling -->
-          <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-600 flex items-center justify-center mb-8 shadow-lg group-hover:scale-110 transition-transform duration-300">
-            <span class="text-4xl">🥃</span>
-          </div>
-
-          <h3 class="text-3xl font-bold text-gray-900 mb-4">Events & Community</h3>
-          <p class="text-lg text-gray-700 mb-6 leading-relaxed">See upcoming tastings, RSVP with confidence, and join lively forums. Societies are the beating heart of our whiskey community.</p>
-
-          <!-- Enhanced feature list -->
-          <div class="space-y-3">
-            <div class="flex items-center gap-3">
-              <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center">
-                <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <span class="font-semibold text-gray-800">Weekly tastings</span>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center">
-                <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <span class="font-semibold text-gray-800">Active forums</span>
-            </div>
-            <div class="flex items-center gap-3">
-              <div class="w-6 h-6 rounded-full bg-purple-100 flex items-center justify-center">
-                <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <span class="font-semibold text-gray-800">Expert guidance</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Enhanced Call to Action -->
-    <div class="text-center">
-      <div class="mb-8">
-        <p class="text-xl text-gray-600 mb-6">Ready to join the most passionate whiskey community?</p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <%= link_to auth_path, class: 'group inline-flex items-center gap-3 px-12 py-6 rounded-full bg-gradient-to-r from-amber-500 via-orange-500 to-red-500 text-white text-2xl font-bold shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5' do %>
-            <span>Subscribe & Join the Community</span>
-            <svg class="w-6 h-6 group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-            </svg>
+            </article>
           <% end %>
-
-          <%= link_to societies_path, class: 'inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white text-gray-700 font-semibold border-2 border-gray-300 hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5' do %>
-            <span>Browse Societies</span>
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-            </svg>
-          <% end %>
-        </div>
-      </div>
-
-      <!-- Trust indicators -->
-      <div class="flex flex-wrap justify-center items-center gap-8 text-sm text-gray-500">
-        <div class="flex items-center gap-2">
-          <div class="w-3 h-3 bg-green-400 rounded-full"></div>
-          <span>30-day satisfaction guarantee</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="w-3 h-3 bg-blue-400 rounded-full"></div>
-          <span>Cancel anytime</span>
-        </div>
-        <div class="flex items-center gap-2">
-          <div class="w-3 h-3 bg-purple-400 rounded-full"></div>
-          <span>Join 1,200+ members</span>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- Social Proof & Testimonials Section -->
-<section id="testimonials" class="relative w-full py-32 px-4 overflow-hidden bg-gradient-to-br from-slate-900 via-gray-900 to-whiskey-900">
-  <!-- Background Effects -->
-  <div class="absolute inset-0 pointer-events-none">
-    <div class="absolute top-1/4 left-1/6 w-48 h-48 bg-blue-400/10 rounded-full blur-3xl animate-pulse"></div>
-    <div class="absolute bottom-1/4 right-1/6 w-40 h-40 bg-purple-400/15 rounded-full blur-2xl animate-pulse delay-1000"></div>
-    <div class="absolute top-1/2 left-1/2 w-32 h-32 bg-amber-400/10 rounded-full blur-xl animate-bounce delay-500"></div>
-    <div class="absolute inset-0 bg-gradient-to-r from-transparent via-white/5 to-transparent"></div>
-  </div>
-
-  <div class="max-w-7xl mx-auto relative z-10">
-    <!-- Section Header -->
-    <div class="text-center mb-20">
-      <div class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-white/10 backdrop-blur-xl border border-white/20 text-white/90 font-bold text-sm mb-8 shadow-lg">
-        <span class="w-2 h-2 bg-yellow-400 rounded-full animate-pulse"></span>
-        <span>⭐ Member Stories</span>
-      </div>
-
-      <h2 class="text-6xl md:text-7xl font-black tracking-tight mb-8 leading-tight text-white">
-        <span class="block">Thousands of</span>
-        <span class="block bg-gradient-to-r from-yellow-400 via-amber-400 to-orange-400 bg-clip-text text-transparent">Unforgettable</span>
-        <span class="block">Whiskey Nights</span>
-      </h2>
-
-      <p class="text-2xl md:text-3xl text-blue-100 mb-8 max-w-4xl mx-auto leading-relaxed font-medium">
-        From complete beginners to seasoned connoisseurs, our members are hosting <strong class="text-white">amazing whiskey experiences</strong> every single day.
-      </p>
-
-      <!-- Stats Bar -->
-      <div class="flex flex-wrap justify-center items-center gap-12 text-white">
-        <div class="text-center">
-          <div class="text-4xl md:text-5xl font-black text-yellow-400 mb-2">4.9★</div>
-          <div class="text-lg font-semibold text-blue-200">Average Rating</div>
-        </div>
-        <div class="text-center">
-          <div class="text-4xl md:text-5xl font-black text-yellow-400 mb-2">2,500+</div>
-          <div class="text-lg font-semibold text-blue-200">Events Hosted</div>
-        </div>
-        <div class="text-center">
-          <div class="text-4xl md:text-5xl font-black text-yellow-400 mb-2">98%</div>
-          <div class="text-lg font-semibold text-blue-200">Would Recommend</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Testimonials Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-      <!-- Testimonial 1 -->
-      <div class="group relative">
-        <div class="absolute -inset-4 bg-gradient-to-r from-blue-400/20 to-purple-400/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-        <div class="relative h-full p-8 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl group-hover:shadow-2xl group-hover:-translate-y-2 transition-all duration-500">
-          <!-- Quote -->
-          <div class="mb-6">
-            <svg class="w-8 h-8 text-yellow-400 mb-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-            </svg>
-            <p class="text-xl text-white leading-relaxed mb-6">
-              "I went from knowing nothing about whiskey to confidently hosting a 12-person tasting for my birthday. The presentations are <strong class="text-yellow-400">absolutely incredible</strong> - my friends are still talking about it weeks later!"
-            </p>
-          </div>
-
-          <!-- Author -->
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-full bg-gradient-to-r from-blue-400 to-purple-500 flex items-center justify-center font-bold text-white">
-              SM
-            </div>
-            <div>
-              <div class="font-bold text-white">Sarah Martinez</div>
-              <div class="text-blue-200 text-sm">Birthday Host • San Francisco</div>
-              <div class="flex gap-1 mt-1">
-                <span class="text-yellow-400">★★★★★</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Testimonial 2 -->
-      <div class="group relative lg:scale-105">
-        <div class="absolute -inset-6 bg-gradient-to-r from-amber-400/30 to-orange-400/30 rounded-3xl blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-        <div class="relative h-full p-8 rounded-3xl bg-white/15 backdrop-blur-xl border-2 border-yellow-400/30 shadow-2xl group-hover:shadow-3xl group-hover:-translate-y-3 transition-all duration-500">
-          <!-- Featured badge -->
-          <div class="absolute -top-4 left-1/2 transform -translate-x-1/2">
-            <span class="bg-gradient-to-r from-yellow-400 to-orange-500 text-black px-6 py-2 rounded-full text-sm font-bold shadow-lg">
-              <span class="mr-2">🏆</span>Featured Story
-            </span>
-          </div>
-
-          <!-- Quote -->
-          <div class="mb-6 mt-4">
-            <svg class="w-8 h-8 text-yellow-400 mb-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-            </svg>
-            <p class="text-xl text-white leading-relaxed mb-6">
-              "Our corporate team used WSS for our quarterly event. <strong class="text-yellow-400">30 employees</strong> from different departments bonded over whiskey like never before. The presentations made everyone feel like experts!"
-            </p>
-          </div>
-
-          <!-- Author -->
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-full bg-gradient-to-r from-amber-400 to-orange-500 flex items-center justify-center font-bold text-black">
-              MJ
-            </div>
-            <div>
-              <div class="font-bold text-white">Michael Johnson</div>
-              <div class="text-blue-200 text-sm">HR Director • Austin Society</div>
-              <div class="flex gap-1 mt-1">
-                <span class="text-yellow-400">★★★★★</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Testimonial 3 -->
-      <div class="group relative">
-        <div class="absolute -inset-4 bg-gradient-to-r from-purple-400/20 to-pink-400/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-        <div class="relative h-full p-8 rounded-3xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-xl group-hover:shadow-2xl group-hover:-translate-y-2 transition-all duration-500">
-          <!-- Quote -->
-          <div class="mb-6">
-            <svg class="w-8 h-8 text-yellow-400 mb-4" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clip-rule="evenodd"></path>
-            </svg>
-            <p class="text-xl text-white leading-relaxed mb-6">
-              "The <strong class="text-yellow-400">Scottish Whisky Deep Dive</strong> presentation was phenomenal. My wife and I learned so much, and we've already planned our next tasting using the Irish Whiskey guide!"
-            </p>
-          </div>
-
-          <!-- Author -->
-          <div class="flex items-center gap-4">
-            <div class="w-12 h-12 rounded-full bg-gradient-to-r from-purple-400 to-pink-500 flex items-center justify-center font-bold text-white">
-              DK
-            </div>
-            <div>
-              <div class="font-bold text-white">David Kim</div>
-              <div class="text-blue-200 text-sm">Date Night Host • Denver</div>
-              <div class="flex gap-1 mt-1">
-                <span class="text-yellow-400">★★★★★</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bottom CTA -->
-    <div class="text-center">
-      <p class="text-xl text-blue-100 mb-8">Join thousands of whiskey enthusiasts creating unforgettable memories</p>
-      <%= link_to auth_path, class: 'group inline-flex items-center gap-3 px-10 py-5 rounded-full bg-gradient-to-r from-yellow-400 via-amber-500 to-orange-500 text-black text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5' do %>
-        <span>Start Your Whiskey Journey</span>
-        <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
-          <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-        </svg>
-      <% end %>
-    </div>
-  </div>
-</section>
-
-<!-- Presentation Preview Section -->
-<section id="presentation-preview" class="relative w-full py-32 px-4 overflow-hidden bg-gradient-to-br from-emerald-50 via-white to-teal-50">
-  <!-- Background Effects -->
-  <div class="absolute inset-0 pointer-events-none">
-    <div class="absolute top-1/4 left-1/6 w-40 h-40 bg-emerald-200/20 rounded-full blur-3xl animate-pulse"></div>
-    <div class="absolute bottom-1/4 right-1/6 w-32 h-32 bg-teal-200/25 rounded-full blur-2xl animate-pulse delay-1000"></div>
-    <div class="absolute top-1/2 left-1/2 w-24 h-24 bg-green-200/15 rounded-full blur-xl animate-bounce delay-500"></div>
-  </div>
-
-  <div class="max-w-7xl mx-auto relative z-10">
-    <!-- Section Header -->
-    <div class="text-center mb-20">
-      <div class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-emerald-100/80 backdrop-blur-sm border border-emerald-200/50 text-emerald-800 font-bold text-sm mb-8 shadow-lg">
-        <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-        <span>📚 Featured Content</span>
-      </div>
-
-      <h2 class="text-6xl md:text-7xl font-black tracking-tight mb-8 leading-tight">
-        <span class="block text-gray-900">Professional</span>
-        <span class="block bg-gradient-to-r from-emerald-600 via-teal-600 to-green-600 bg-clip-text text-transparent">Presentations</span>
-        <span class="block text-gray-900">Preview</span>
-      </h2>
-
-      <p class="text-2xl md:text-3xl text-gray-700 mb-8 max-w-4xl mx-auto leading-relaxed font-medium">
-        Get a taste of our <strong class="text-emerald-700">world-class presentations</strong>. Each one includes expert slides, detailed scripts, and carefully curated whiskey recommendations.
-      </p>
-    </div>
-
-    <!-- Presentation Cards -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-16">
-      <!-- Bourbon Basics -->
-      <div class="group relative">
-        <div class="absolute -inset-4 bg-gradient-to-r from-amber-400/20 to-orange-400/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-        <div class="relative h-full rounded-3xl bg-white/90 backdrop-blur-xl border border-white/50 shadow-xl group-hover:shadow-2xl group-hover:-translate-y-2 transition-all duration-500 overflow-hidden">
-          <!-- Preview Image/Icon -->
-          <div class="h-48 bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center">
-            <div class="text-8xl">🥃</div>
-          </div>
-
-          <div class="p-8">
-            <div class="flex items-center gap-2 mb-4">
-              <span class="px-3 py-1 bg-amber-100 text-amber-800 rounded-full text-sm font-semibold">Beginner Friendly</span>
-              <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">45 mins</span>
-            </div>
-
-            <h3 class="text-2xl font-bold text-gray-900 mb-4">Bourbon Basics: From Grain to Glass</h3>
-            <p class="text-gray-600 mb-6 leading-relaxed">Discover the rich history and flavors of America's native spirit. Perfect for beginners and bourbon lovers alike.</p>
-
-            <!-- Preview Features -->
-            <div class="space-y-3 mb-6">
-              <div class="flex items-center gap-3">
-                <div class="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center">
-                  <svg class="w-3 h-3 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                  </svg>
-                </div>
-                <span class="text-sm font-medium text-gray-700">15 expertly crafted slides</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center">
-                  <svg class="w-3 h-3 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                  </svg>
-                </div>
-                <span class="text-sm font-medium text-gray-700">6 bourbon recommendations ($-$$$)</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="w-5 h-5 rounded-full bg-emerald-100 flex items-center justify-center">
-                  <svg class="w-3 h-3 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                  </svg>
-                </div>
-                <span class="text-sm font-medium text-gray-700">Complete hosting script</span>
-              </div>
-            </div>
-
-            <button class="w-full py-3 bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold rounded-xl hover:from-amber-600 hover:to-orange-600 transition-all duration-300">
-              Preview This Presentation
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Scottish Whisky Deep Dive -->
-      <div class="group relative lg:scale-105">
-        <div class="absolute -inset-6 bg-gradient-to-r from-blue-400/30 to-purple-400/30 rounded-3xl blur-2xl opacity-60 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-        <div class="relative h-full rounded-3xl bg-white/95 backdrop-blur-xl border-2 border-blue-200/50 shadow-2xl group-hover:shadow-3xl group-hover:-translate-y-3 transition-all duration-500 overflow-hidden">
-          <!-- Popular badge -->
-          <div class="absolute -top-4 left-1/2 transform -translate-x-1/2 z-10">
-            <span class="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg">
-              <span class="mr-2">🔥</span>Most Popular
-            </span>
-          </div>
-
-          <!-- Preview Image/Icon -->
-          <div class="h-48 bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-            <div class="text-8xl">🏴󠁧󠁢󠁳󠁣󠁴󠁿</div>
-          </div>
-
-          <div class="p-8 pt-12">
-            <div class="flex items-center gap-2 mb-4">
-              <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">Intermediate</span>
-              <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">60 mins</span>
-            </div>
-
-            <h3 class="text-2xl font-bold text-gray-900 mb-4">Scottish Whisky Deep Dive</h3>
-            <p class="text-gray-600 mb-6 leading-relaxed">Journey through Scotland's whisky regions and discover the complex flavors that make each dram unique.</p>
-
-            <!-- Preview Features -->
-            <div class="space-y-3 mb-6">
-              <div class="flex items-center gap-3">
-                <div class="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center">
-                  <svg class="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                  </svg>
-                </div>
-                <span class="text-sm font-medium text-gray-700">25 detailed slides with maps</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center">
-                  <svg class="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                  </svg>
-                </div>
-                <span class="text-sm font-medium text-gray-700">8 regional representatives</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="w-5 h-5 rounded-full bg-blue-100 flex items-center justify-center">
-                  <svg class="w-3 h-3 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                  </svg>
-                </div>
-                <span class="text-sm font-medium text-gray-700">Flavor wheel & tasting notes</span>
-              </div>
-            </div>
-
-            <button class="w-full py-3 bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold rounded-xl hover:from-blue-600 hover:to-purple-700 transition-all duration-300">
-              Preview This Presentation
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Japanese Whisky Journey -->
-      <div class="group relative">
-        <div class="absolute -inset-4 bg-gradient-to-r from-red-400/20 to-pink-400/20 rounded-3xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
-
-        <div class="relative h-full rounded-3xl bg-white/90 backdrop-blur-xl border border-white/50 shadow-xl group-hover:shadow-2xl group-hover:-translate-y-2 transition-all duration-500 overflow-hidden">
-          <!-- Preview Image/Icon -->
-          <div class="h-48 bg-gradient-to-br from-red-500 to-pink-600 flex items-center justify-center">
-            <div class="text-8xl">🇯🇵</div>
-          </div>
-
-          <div class="p-8">
-            <div class="flex items-center gap-2 mb-4">
-              <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-semibold">Advanced</span>
-              <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-semibold">50 mins</span>
-            </div>
-
-            <h3 class="text-2xl font-bold text-gray-900 mb-4">Japanese Whisky Journey</h3>
-            <p class="text-gray-600 mb-6 leading-relaxed">Explore the artistry and precision of Japanese whisky-making, from traditional methods to modern innovations.</p>
-
-            <!-- Preview Features -->
-            <div class="space-y-3 mb-6">
-              <div class="flex items-center gap-3">
-                <div class="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center">
-                  <svg class="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                  </svg>
-                </div>
-                <span class="text-sm font-medium text-gray-700">20 slides with distillery stories</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center">
-                  <svg class="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                  </svg>
-                </div>
-                <span class="text-sm font-medium text-gray-700">5 premium selections</span>
-              </div>
-              <div class="flex items-center gap-3">
-                <div class="w-5 h-5 rounded-full bg-red-100 flex items-center justify-center">
-                  <svg class="w-3 h-3 text-red-600" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                  </svg>
-                </div>
-                <span class="text-sm font-medium text-gray-700">Cultural context & history</span>
-              </div>
-            </div>
-
-            <button class="w-full py-3 bg-gradient-to-r from-red-500 to-pink-600 text-white font-semibold rounded-xl hover:from-red-600 hover:to-pink-700 transition-all duration-300">
-              Preview This Presentation
-            </button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bottom Section -->
-    <div class="text-center">
-      <div class="mb-8">
-        <p class="text-xl text-gray-600 mb-6">12 expertly crafted presentations covering every whiskey style</p>
-        <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-          <%= link_to presentations_path, class: 'group inline-flex items-center gap-3 px-10 py-5 rounded-full bg-gradient-to-r from-emerald-500 via-teal-500 to-green-500 text-white text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5' do %>
-            <span>Browse All Presentations</span>
-            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-            </svg>
-          <% end %>
-
-          <button class="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white text-gray-700 font-semibold border-2 border-gray-300 hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5">
-            <span>Try Sample Presentation</span>
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-7 4h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2z"></path>
-            </svg>
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
-</section>
-
-<!-- FAQ Section -->
-<section id="faq" class="relative w-full py-32 px-4 overflow-hidden bg-gradient-to-br from-whiskey-50 via-white to-purple-50">
-  <!-- Background Effects -->
-  <div class="absolute inset-0 pointer-events-none">
-    <div class="absolute top-1/4 left-1/6 w-40 h-40 bg-whiskey-200/20 rounded-full blur-3xl animate-pulse"></div>
-    <div class="absolute bottom-1/4 right-1/6 w-32 h-32 bg-purple-200/25 rounded-full blur-2xl animate-pulse delay-1000"></div>
-    <div class="absolute top-1/2 left-1/2 w-24 h-24 bg-blue-200/15 rounded-full blur-xl animate-bounce delay-500"></div>
-  </div>
-
-  <div class="max-w-4xl mx-auto relative z-10">
-    <!-- Section Header -->
-    <div class="text-center mb-20">
-      <div class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-whiskey-100/80 backdrop-blur-sm border border-whiskey-200/50 text-whiskey-800 font-bold text-sm mb-8 shadow-lg">
-        <span class="w-2 h-2 bg-whiskey-500 rounded-full animate-pulse"></span>
-        <span>❓ Common Questions</span>
-      </div>
-
-      <h2 class="text-6xl md:text-7xl font-black tracking-tight mb-8 leading-tight">
-        <span class="block text-gray-900">Everything You</span>
-        <span class="block bg-gradient-to-r from-whiskey-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">Need to Know</span>
-      </h2>
-
-      <p class="text-2xl md:text-3xl text-gray-700 mb-8 max-w-3xl mx-auto leading-relaxed font-medium">
-        Got questions? We've got answers. Here are the most common questions from new members.
-      </p>
-    </div>
-
-    <!-- FAQ Items -->
-    <div class="space-y-6">
-      <!-- FAQ 1 -->
-      <div class="group bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300">
-        <div class="flex items-start gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-r from-whiskey-500 to-purple-600 flex items-center justify-center flex-shrink-0">
-            <span class="text-2xl">🤔</span>
-          </div>
-          <div class="flex-1">
-            <h3 class="text-2xl font-bold text-gray-900 mb-4">What if I'm a complete whiskey beginner?</h3>
-            <p class="text-lg text-gray-700 leading-relaxed">
-              Perfect! Our presentations are designed for <strong>all experience levels</strong>. We have beginner-friendly presentations like "Bourbon Basics" that start with the fundamentals. Plus, every presentation includes detailed scripts that make you sound like an expert, even if you're just starting out.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- FAQ 2 -->
-      <div class="group bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300">
-        <div class="flex items-start gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-r from-emerald-500 to-teal-600 flex items-center justify-center flex-shrink-0">
-            <span class="text-2xl">⏰</span>
-          </div>
-          <div class="flex-1">
-            <h3 class="text-2xl font-bold text-gray-900 mb-4">How long are the presentations?</h3>
-            <p class="text-lg text-gray-700 leading-relaxed">
-              Most presentations run <strong>45-60 minutes</strong>, perfect for a relaxed evening with friends. They're structured so you can easily adjust the timing - spend more time on tastings or discussions if your group is engaged, or keep it shorter for casual gatherings.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- FAQ 3 -->
-      <div class="group bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300">
-        <div class="flex items-start gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-r from-amber-500 to-orange-600 flex items-center justify-center flex-shrink-0">
-            <span class="text-2xl">🛠️</span>
-          </div>
-          <div class="flex-1">
-            <h3 class="text-2xl font-bold text-gray-900 mb-4">What equipment do I need?</h3>
-            <p class="text-lg text-gray-700 leading-relaxed">
-              Just the basics! You'll need <strong>whiskey glasses</strong> (any will work), <strong>water for rinsing</strong>, and the whiskey bottles from our recommendations. We provide tasting mats and notes as downloadable PDFs. No fancy equipment required - just enthusiasm!
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- FAQ 4 -->
-      <div class="group bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300">
-        <div class="flex items-start gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-r from-purple-500 to-pink-600 flex items-center justify-center flex-shrink-0">
-            <span class="text-2xl">✏️</span>
-          </div>
-          <div class="flex-1">
-            <h3 class="text-2xl font-bold text-gray-900 mb-4">Can I customize the presentations?</h3>
-            <p class="text-lg text-gray-700 leading-relaxed">
-              Absolutely! While our presentations work perfectly as-is, you can <strong>easily customize them</strong>. Substitute whiskeys based on your budget or availability, skip sections, or add your own personal touches. The presentations are designed to be flexible guides, not rigid scripts.
-            </p>
-          </div>
-        </div>
-      </div>
-
-      <!-- FAQ 5 -->
-      <div class="group bg-white/80 backdrop-blur-xl border border-white/50 rounded-3xl p-8 shadow-lg hover:shadow-xl transition-all duration-300">
-        <div class="flex items-start gap-4">
-          <div class="w-12 h-12 rounded-2xl bg-gradient-to-r from-blue-500 to-whiskey-600 flex items-center justify-center flex-shrink-0">
-            <span class="text-2xl">💰</span>
-          </div>
-          <div class="flex-1">
-            <h3 class="text-2xl font-bold text-gray-900 mb-4">How much do the whiskeys cost?</h3>
-            <p class="text-lg text-gray-700 leading-relaxed">
-              We provide recommendations across <strong>all price ranges</strong> ($, $$, $$$). You can host a great tasting for as little as $60-80 total, or go premium with bottles in the $200+ range. Every presentation includes budget-friendly alternatives that still deliver an amazing experience.
-            </p>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Bottom CTA -->
-    <div class="text-center mt-16">
-      <p class="text-xl text-gray-600 mb-8">Still have questions? Our community is here to help!</p>
-      <div class="flex flex-col sm:flex-row gap-4 justify-center items-center">
-        <%= link_to auth_path, class: 'group inline-flex items-center gap-3 px-10 py-5 rounded-full bg-gradient-to-r from-whiskey-500 via-purple-500 to-pink-500 text-white text-xl font-bold shadow-lg hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5' do %>
-          <span>Get Started Today</span>
-          <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-          </svg>
         <% end %>
-
-        <button class="inline-flex items-center gap-2 px-8 py-4 rounded-full bg-white text-gray-700 font-semibold border-2 border-gray-300 hover:shadow-xl transition-all duration-200 hover:-translate-y-0.5">
-          <span>Contact Support</span>
-          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-          </svg>
-        </button>
       </div>
     </div>
-  </div>
-</section>
+  </section>
+<% end %>
 
-<!-- Pricing Section -->
-<section id="pricing" class="relative w-full py-24 px-4 bg-gradient-to-br from-slate-50 via-white to-blue-50 overflow-hidden">
-  <!-- Animated background elements -->
-  <div class="absolute inset-0 pointer-events-none">
-    <div class="absolute top-20 left-10 w-32 h-32 bg-blue-200/30 rounded-full blur-xl animate-pulse"></div>
-    <div class="absolute bottom-20 right-10 w-24 h-24 bg-whiskey-200/40 rounded-full blur-xl animate-pulse delay-1000"></div>
-    <div class="absolute top-1/2 left-1/4 w-16 h-16 bg-purple-200/30 rounded-full blur-lg animate-bounce delay-500"></div>
-  </div>
-
-  <div class="max-w-6xl mx-auto relative z-10">
-    <!-- Section Header with enhanced typography -->
-    <div class="text-center mb-20">
-      <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-100/50 backdrop-blur-sm border border-blue-200/50 text-blue-700 font-semibold text-sm mb-6">
-        <span class="w-2 h-2 bg-blue-500 rounded-full animate-pulse"></span>
-        Pricing Plans
-      </div>
-      <h2 class="text-5xl md:text-6xl font-extrabold tracking-tight text-gray-900 mb-6 bg-gradient-to-r from-gray-900 via-blue-800 to-whiskey-900 bg-clip-text text-transparent">
-        Choose Your Whiskey Journey
-      </h2>
-      <p class="text-xl md:text-2xl text-gray-600 max-w-3xl mx-auto leading-relaxed">Unlock unlimited presentations, exclusive societies, and a world of whiskey experiences. Join the community today.</p>
+<!-- ======================================================= Pricing -->
+<section id="pricing" class="w-full bg-white px-6 py-24 sm:py-32">
+  <div class="mx-auto max-w-6xl">
+    <div class="mx-auto max-w-2xl text-center">
+      <p class="eyebrow mb-4 text-whiskey-600">Membership</p>
+      <h2 class="font-display text-4xl font-semibold text-gray-900 sm:text-5xl">Choose your pour.</h2>
+      <p class="mt-6 text-lg text-gray-600">
+        Every plan earns one deck credit a month and full run of the societies.
+        Prefer to commit? The longer pours cost less.
+      </p>
     </div>
 
-    <!-- Pricing Cards with modern glassmorphism -->
-    <div id="plan-cards" class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-16">
-      <% @stripe_products.each_with_index do |product, index| %>
-        <div class="group relative flex flex-col <%= product[:popular] ? 'bg-gradient-to-br from-amber-50/80 via-yellow-50/60 to-orange-50/80 backdrop-blur-xl rounded-3xl shadow-2xl border border-amber-200/30 transform scale-105 hover:scale-110' : 'bg-white/60 backdrop-blur-xl rounded-3xl shadow-xl border border-white/20 hover:bg-white/80 hover:shadow-2xl hover:-translate-y-2' %> p-8 transition-all duration-500 cursor-pointer" onclick="var form = this.querySelector('form'); if(form) form.submit(); else window.location.href='<%= auth_path %>';">
-          <!-- Glassmorphism overlay -->
-          <div class="absolute inset-0 rounded-3xl pointer-events-none <%= product[:popular] ? 'bg-gradient-to-br from-amber-100/40 via-white/20 to-orange-100/40' : 'bg-gradient-to-br from-blue-50/50 via-white/30 to-whiskey-50/50' %> opacity-80 group-hover:opacity-100 transition-opacity duration-500"></div>
-          
-          <!-- Animated border -->
-          <div class="absolute inset-0 rounded-3xl <%= product[:popular] ? 'bg-gradient-to-r from-amber-400/30 via-yellow-400/30 to-orange-400/30' : 'bg-gradient-to-r from-blue-400/20 via-purple-400/20 to-whiskey-400/20' %> opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-sm <%= product[:popular] ? 'animate-pulse' : '' %>"></div>
-          
-          <!-- Popular badge -->
+    <div id="plan-cards" class="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3">
+      <% @stripe_products.each do |product| %>
+        <div class="relative flex flex-col rounded-3xl bg-white p-8 shadow-xl transition hover:-translate-y-1 hover:shadow-2xl <%= product[:popular] ? 'border-2 border-whiskey-400' : 'border border-gray-200' %>">
           <% if product[:popular] %>
-            <div class="absolute -top-5 left-1/2 transform -translate-x-1/2">
-              <span class="bg-gradient-to-r from-amber-600 to-orange-600 text-white px-6 py-2 rounded-full text-sm font-bold shadow-lg backdrop-blur-sm border border-amber-500/20">
-                <span class="mr-2">🏆</span>Best Value
-              </span>
+            <div class="absolute -top-4 left-1/2 -translate-x-1/2">
+              <span class="eyebrow rounded-full border border-whiskey-500 bg-whiskey-600 px-4 py-1.5 text-white shadow-sm">Best Value</span>
             </div>
           <% end %>
-          
-          <div class="relative z-10 text-center mb-8">
-            <h3 class="text-2xl font-bold text-gray-900 mb-2"><%= product[:name].gsub(' Membership', '') %></h3>
-            <p class="text-gray-600 mb-4"><%= 
+
+          <div class="text-center">
+            <h3 class="font-display text-2xl font-semibold text-gray-900"><%= product[:name].gsub(' Membership', '') %></h3>
+            <p class="mt-1 text-gray-500"><%=
               case product[:id]
               when 'monthly' then 'Perfect for trying it out'
               when 'quarterly' then 'Great value'
@@ -1061,68 +250,106 @@
               else 'Best value for committed members'
               end
             %></p>
-            <div class="mb-6">
-              <div class="flex justify-center">
-                <span class="text-5xl font-extrabold <%= product[:popular] ? 'bg-gradient-to-r from-amber-600 to-orange-700 bg-clip-text text-transparent' : 'bg-gradient-to-r from-gray-900 to-blue-800 bg-clip-text text-transparent' %>">$<%= sprintf('%.2f', product[:price] / 100.0) %></span>
-                <span class="text-gray-400 ml-1 text-lg self-end pb-1">/mo</span>
+
+            <div class="mt-6">
+              <div class="flex items-end justify-center">
+                <span class="font-display text-5xl font-semibold <%= product[:popular] ? 'text-whiskey-700' : 'text-gray-900' %>">$<%= sprintf('%.2f', product[:price] / 100.0) %></span>
+                <span class="ml-1 pb-1 text-lg text-gray-400">/mo</span>
               </div>
               <% if product[:id] == 'quarterly' || product[:id] == 'yearly' %>
-                <div class="text-sm text-gray-500 mt-1">
-                  billed <%= product[:id] == 'quarterly' ? 'quarterly' : 'annually' %>
-                </div>
+                <div class="mt-1 text-sm text-gray-500">billed <%= product[:id] == 'quarterly' ? 'quarterly' : 'annually' %></div>
               <% end %>
               <% if product[:savings] %>
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-green-100 text-green-700 font-semibold text-sm mt-2">
-                  <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-                  Save <%= product[:savings] %>
-                </div>
+                <div class="mt-3 inline-flex items-center rounded-full bg-whiskey-100 px-3 py-1 text-sm font-semibold text-whiskey-800">Save <%= product[:savings] %></div>
               <% end %>
             </div>
           </div>
-          
-          <ul class="space-y-3 text-sm text-gray-600 mb-8 flex-grow">
+
+          <div class="rule-double mx-auto my-8 w-16 text-whiskey-300"></div>
+
+          <ul class="mb-8 flex-grow space-y-3 text-sm text-gray-600">
             <% product[:features].reject { |f| f.include?('%') || f.downcase.include?('save') || f.downcase.include?('savings') }.each do |feature| %>
               <li class="flex items-center">
-                <svg class="w-4 h-4 text-green-500 mr-3" fill="currentColor" viewBox="0 0 20 20">
+                <svg class="mr-3 h-4 w-4 flex-shrink-0 text-whiskey-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                 </svg>
                 <%= feature %>
               </li>
             <% end %>
           </ul>
-          
-          <!-- CTA Button -->
-          <div class="mt-8" onclick="event.stopPropagation();">
+
+          <div>
             <% if user_signed_in? %>
               <%= form_with url: subscriptions_checkout_path, method: :post, local: true, data: { turbo: false } do |f| %>
                 <%= f.hidden_field :price_id, value: product[:id] %>
-                <%= f.submit "Get Started", class: "w-full inline-flex justify-center items-center px-6 py-3 border border-transparent rounded-full shadow-sm text-base font-medium text-white #{product[:popular] ? 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700' : 'bg-gradient-to-r from-blue-600 to-whiskey-600 hover:from-blue-700 hover:to-whiskey-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-whiskey-500 transition-all duration-200 cursor-pointer" %>
+                <%= f.submit "Get Started", class: "w-full cursor-pointer rounded-xl px-6 py-3 text-base font-semibold text-white transition focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2 #{product[:popular] ? 'bg-whiskey-600 hover:bg-whiskey-700' : 'bg-gray-900 hover:bg-gray-800'}" %>
               <% end %>
             <% else %>
-              <%= link_to auth_path, class: "w-full inline-flex justify-center items-center px-6 py-3 border border-transparent rounded-full shadow-sm text-base font-medium text-white #{product[:popular] ? 'bg-gradient-to-r from-amber-600 to-orange-600 hover:from-amber-700 hover:to-orange-700' : 'bg-gradient-to-r from-blue-600 to-whiskey-600 hover:from-blue-700 hover:to-whiskey-700'} focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-whiskey-500 transition-all duration-200" do %>
-                Get Started
-              <% end %>
+              <%= link_to 'Get Started', auth_path,
+                  class: "block w-full rounded-xl px-6 py-3 text-center text-base font-semibold text-white transition focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2 #{product[:popular] ? 'bg-whiskey-600 hover:bg-whiskey-700' : 'bg-gray-900 hover:bg-gray-800'}" %>
             <% end %>
           </div>
         </div>
-      <% end %>    </div>
+      <% end %>
+    </div>
+
+    <p class="mt-10 text-center text-sm text-gray-500">
+      Credits unlock any deck while your membership is active. Decks bought outright are yours for good.
+    </p>
   </div>
 </section>
 
-<style>
-  /* Simple Split-Screen CSS */
-  @media (max-width: 768px) {
-    #how-it-works-section .flex {
-      flex-direction: column;
-    }
+<!-- ========================================================== FAQ -->
+<section id="faq" class="w-full bg-char px-6 py-24 sm:py-32">
+  <div class="mx-auto max-w-3xl">
+    <div class="text-center">
+      <p class="eyebrow mb-4 text-whiskey-300/90">Before you pour</p>
+      <h2 class="font-display text-4xl font-semibold text-cream sm:text-5xl">Questions, answered.</h2>
+    </div>
 
-    #how-it-works-section .w-1\/2 {
-      width: 100%;
-    }
+    <div class="mt-14 space-y-4">
+      <% [
+        {
+          q: "What if I'm a complete whiskey beginner?",
+          a: "Perfect — the decks are written for every experience level. Start with something like Bourbon Basics: the script covers the fundamentals and makes you sound like you've done this before, because the research already has."
+        },
+        {
+          q: "How long is a deck?",
+          a: "Most run 45–60 minutes, built for a relaxed evening. The structure bends: linger on a tasting when the room is into it, or trim sections for a casual night."
+        },
+        {
+          q: "What equipment do I need?",
+          a: "Glasses, water for rinsing, and the bottles from the deck's list. Tasting mats and notes come as downloadable PDFs. Nothing fancy required."
+        },
+        {
+          q: "Can I customize a deck?",
+          a: "Yes. Swap bottles for budget or availability, skip sections, add your own chapter. Decks are guides with a spine, not scripts you owe obedience to."
+        },
+        {
+          q: "How much do the whiskeys cost?",
+          a: "Every deck recommends bottles across price ranges. You can host a full tasting for $60–80 total, or go deep with bottles north of $200 — there's a version of the night for both."
+        }
+      ].each do |faq| %>
+        <details class="group rounded-2xl border border-oak-edge bg-oak transition hover:border-whiskey-700 open:border-whiskey-700">
+          <summary class="flex cursor-pointer list-none items-center justify-between gap-4 px-6 py-5 [&::-webkit-details-marker]:hidden">
+            <h3 class="font-display text-lg font-semibold text-cream"><%= faq[:q] %></h3>
+            <svg class="h-5 w-5 flex-shrink-0 text-whiskey-300 transition-transform group-open:rotate-45" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15"></path>
+            </svg>
+          </summary>
+          <p class="px-6 pb-6 leading-relaxed text-cream/70"><%= faq[:a] %></p>
+        </details>
+      <% end %>
+    </div>
 
-    #how-it-works-section .sticky {
-      position: relative;
-      height: auto;
-    }
-  }
-</style>
+    <div class="mt-16 text-center">
+      <% if user_signed_in? %>
+        <%= link_to 'Browse the decks', presentations_path,
+            class: 'inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char' %>
+      <% else %>
+        <%= link_to 'Join the Society', auth_path,
+            class: 'inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-8 py-4 text-lg font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char' %>
+      <% end %>
+    </div>
+  </div>
+</section>
