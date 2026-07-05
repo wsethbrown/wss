@@ -1,137 +1,97 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>WSS Admin Panel</title>
+    <title>WSS Admin<%= " — #{content_for(:title)}" if content_for?(:title) %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
-    
-    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900&family=Instrument+Sans:ital,wght@0,400..700&display=swap" rel="stylesheet">
+
+    <%# The old layout linked `:app`, which doesn't exist — admin rendered unstyled. %>
+    <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
+    <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
   </head>
 
-  <body class="bg-gray-50">
-    <!-- Admin Navigation -->
-    <nav class="bg-white shadow-sm border-b border-gray-200">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex justify-between h-16">
-          <div class="flex items-center">
-            <%= link_to admin_root_path, class: "flex items-center gap-3" do %>
-              <div class="w-8 h-8 bg-black rounded-full flex items-center justify-center">
-                <span class="text-white font-bold text-sm">A</span>
-              </div>
-              <span class="text-xl font-bold text-gray-900">WSS Admin</span>
-            <% end %>
+  <body class="bg-whiskey-50 font-sans">
+    <div class="flex min-h-screen">
+      <!-- Sidebar -->
+      <aside class="fixed inset-y-0 left-0 z-40 flex w-60 flex-col bg-char">
+        <%= link_to admin_root_path, class: "flex items-center gap-3 border-b border-oak-edge px-5 py-4" do %>
+          <%= image_tag "wss-logo.jpg", alt: "", class: "h-9 w-auto rounded-lg" %>
+          <div>
+            <span class="block font-display text-lg font-semibold leading-tight text-cream">WSS Admin</span>
+            <span class="eyebrow text-whiskey-300/70">Back of house</span>
           </div>
-          
-          <div class="flex items-center gap-6">
-            <%= link_to admin_root_path, class: "flex items-center gap-2 text-gray-700 hover:text-black font-medium transition-colors" do %>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path>
-              </svg>
-              Dashboard
-            <% end %>
-            <%= link_to admin_presentations_path, class: "flex items-center gap-2 text-gray-700 hover:text-black font-medium transition-colors" do %>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
-              </svg>
-              Presentations
-            <% end %>
-            <%= link_to admin_users_path, class: "flex items-center gap-2 text-gray-700 hover:text-black font-medium transition-colors" do %>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-              </svg>
-              Users
-            <% end %>
-            <%= link_to admin_subscriptions_path, class: "flex items-center gap-2 text-gray-700 hover:text-black font-medium transition-colors" do %>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"></path>
-              </svg>
-              Subscriptions
-            <% end %>
-            <%= link_to admin_credits_path, class: "flex items-center gap-2 text-gray-700 hover:text-black font-medium transition-colors" do %>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              Credits
-            <% end %>
-            <%= link_to admin_activities_path, class: "flex items-center gap-2 text-gray-700 hover:text-black font-medium transition-colors" do %>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-              Activity
-            <% end %>
-            <%= link_to admin_downloads_analytics_path, class: "flex items-center gap-2 text-gray-700 hover:text-black font-medium transition-colors" do %>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-              </svg>
-              Analytics
-            <% end %>
-            <div class="h-6 w-px bg-gray-300"></div>
-            <%= link_to root_path, class: "flex items-center gap-2 text-blue-600 hover:text-blue-700 font-medium transition-colors" do %>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
-              </svg>
-              Back to Site
-            <% end %>
-            <%= button_to destroy_user_session_path, method: :delete, class: "flex items-center gap-2 text-red-600 hover:text-red-700 font-medium transition-colors cursor-pointer" do %>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
-              </svg>
-              Logout
-            <% end %>
-          </div>
-        </div>
-      </div>
-    </nav>
+        <% end %>
 
-    <!-- Main Content -->
-    <main class="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:px-8">
-      <!-- Breadcrumbs -->
-      <%= render 'shared/admin_breadcrumbs' %>
-      
-      <!-- Flash Messages -->
-      <% if notice %>
-        <div class="mb-6 rounded-xl bg-green-50 border border-green-200 p-4" data-controller="flash">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="flex-shrink-0">
-                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
+        <nav class="flex-1 space-y-1 overflow-y-auto p-3">
+          <% {
+            "Dashboard"     => [admin_root_path,                'M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6'],
+            "Decks"         => [admin_presentations_path,       'M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z'],
+            "Users"         => [admin_users_path,               'M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z'],
+            "Subscriptions" => [admin_subscriptions_path,       'M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z'],
+            "Credits"       => [admin_credits_path,             'M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z'],
+            "Activity"      => [admin_activities_path,          'M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z'],
+            "Analytics"     => [admin_downloads_analytics_path, 'M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z']
+          }.each do |label, (path, icon)| %>
+            <% active = request.path == path || (path != admin_root_path && request.path.start_with?(path)) %>
+            <%= link_to path, class: "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition #{active ? 'bg-whiskey-500/15 text-whiskey-200' : 'text-cream/70 hover:bg-oak hover:text-cream'}" do %>
+              <svg class="h-5 w-5 flex-shrink-0 <%= active ? 'text-whiskey-300' : 'text-cream/50' %>" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="<%= icon %>"></path>
+              </svg>
+              <%= label %>
+            <% end %>
+          <% end %>
+        </nav>
+
+        <div class="space-y-1 border-t border-oak-edge p-3">
+          <%= link_to root_path, class: "flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-cream/70 transition hover:bg-oak hover:text-cream" do %>
+            <svg class="h-5 w-5 text-cream/50" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path>
+            </svg>
+            Back to site
+          <% end %>
+          <%= button_to destroy_user_session_path, method: :delete, class: "flex w-full cursor-pointer items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-cream/50 transition hover:bg-oak hover:text-red-400" do %>
+            <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"></path>
+            </svg>
+            Sign out
+          <% end %>
+        </div>
+      </aside>
+
+      <!-- Main -->
+      <main class="ml-60 flex-1 px-8 py-8">
+        <%= render 'shared/admin_breadcrumbs' %>
+
+        <% if notice %>
+          <div class="mb-6 rounded-xl bg-green-50 border border-green-200 p-4" data-controller="flash">
+            <div class="flex items-center justify-between">
               <p class="text-sm font-medium text-green-800"><%= notice %></p>
+              <button type="button" data-action="click->flash#dismiss" class="text-green-600 hover:text-green-800" aria-label="Dismiss">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
             </div>
-            <button type="button" data-action="click->flash#dismiss" class="text-green-600 hover:text-green-800">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
           </div>
-        </div>
-      <% end %>
-      
-      <% if alert %>
-        <div class="mb-6 rounded-xl bg-red-50 border border-red-200 p-4" data-controller="flash">
-          <div class="flex items-center justify-between">
-            <div class="flex items-center gap-3">
-              <div class="flex-shrink-0">
-                <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-              </div>
-              <p class="text-sm font-medium text-red-800"><%= alert %></p>
-            </div>
-            <button type="button" data-action="click->flash#dismiss" class="text-red-600 hover:text-red-800">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </button>
-          </div>
-        </div>
-      <% end %>
+        <% end %>
 
-      <%= yield %>
-    </main>
+        <% if alert %>
+          <div class="mb-6 rounded-xl bg-red-50 border border-red-200 p-4" data-controller="flash">
+            <div class="flex items-center justify-between">
+              <p class="text-sm font-medium text-red-800"><%= alert %></p>
+              <button type="button" data-action="click->flash#dismiss" class="text-red-600 hover:text-red-800" aria-label="Dismiss">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+            </div>
+          </div>
+        <% end %>
+
+        <%= yield %>
+      </main>
+    </div>
   </body>
 </html>
