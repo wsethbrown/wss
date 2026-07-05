@@ -54,13 +54,11 @@ class Admin::PresentationsController < Admin::BaseController
       deck.preview_images.attach(io: StringIO.new(img[:data]), filename: img[:filename])
     end
 
-    DeckImport.render_slides(data, file.original_filename).each do |s|
-      deck.slide_images.attach(io: StringIO.new(s[:data]), filename: s[:filename], content_type: "image/png")
-    end
-
     if deck.save
+      # Slide rendering (LibreOffice) is slow and heavy — do it off the request.
+      DeckSlideRenderJob.perform_later(deck.id)
       redirect_to edit_admin_presentation_path(deck),
-                  notice: 'Draft imported from your deck — review each section, set a price, then publish.'
+                  notice: 'Draft imported — the slide previews are rendering and will appear shortly. Review each section, set a price, then publish.'
     else
       redirect_to new_admin_presentation_path,
                   alert: "Import failed: #{deck.errors.full_messages.to_sentence}"

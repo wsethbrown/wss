@@ -200,6 +200,28 @@ verified rendering.
 - Dashboard "Recent Signups" panel has a stray blue button; icon colors are
   off-palette (blue/purple/yellow tints). Cosmetic.
 
+## 10b. Deck import + slide rendering (build/infra notes)
+
+- Import accepts .pptx (full XML parse), .ppt and .pdf (LibreOffice→PDF→text via
+  pdftotext for the draft). DeckImport.parse takes BYTES + filename — read the
+  upload ONCE and hand each consumer a fresh StringIO (re-reading the request
+  tempfile after an attach caused ActiveStorage::IntegrityError).
+- Slide rendering (soffice --convert-to pdf, then pdftoppm) is HEAVY: it must
+  run OFF the web request — DeckSlideRenderJob does it. Running soffice inside
+  the dev web (foreman) process crashed the container: the memory spike killed
+  the tailwindcss:watch process and foreman cascades SIGTERM to all. The job
+  keeps it out of the web worker.
+- Dev now runs Solid Queue (not :async): `config/initializers/solid_queue_dev.rb`
+  points it at the primary DB, Procfile.dev has a `jobs:` process, and the
+  queue schema was loaded into wss_development. Production already runs Solid
+  Queue in its own DB + process (Kamal), so slide rendering is isolated there.
+- LibreOffice + poppler-utils + fonts-liberation are in BOTH the canonical
+  `Dockerfile` (Debian, the one Kamal builds) and `Dockerfile.dev`.
+  NOTE: `Dockerfile.prod` is a STALE Alpine/Ruby-3.2 artifact, unused — delete it.
+- New attachment: Presentation#slide_images (rendered pages, ordered by
+  filename). The deck page shows first 3 to non-owners, all to owners; falls
+  back to the text outline when no renders exist.
+
 ## 11. Deck authoring flow (/admin/presentations/new)
 
 **State & design intent:** The form (admin/presentations/_form.html.erb) is
