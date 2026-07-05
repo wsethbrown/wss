@@ -247,10 +247,20 @@ If the formats ever get painful, the right move is JSONB columns
 (whiskey_recommendations_json already exists as precedent) with a data
 migration from the parsers in Presentation (parsed_slides_preview etc.).
 
-**Gaps:**
-- No live Markdown preview for the story field; a small side-by-side
-  preview (Stimulus + the existing render path via a preview endpoint)
-  would help a lot.
+**Gaps (owner-requested, scoped, not yet built):**
+- STORY EDITOR: replace the raw textarea with a proper Markdown editor —
+  recommended: EasyMDE (importmap-pin it, no build step) with a preview pane
+  wired to a small POST /admin/presentations/preview endpoint that runs
+  render_markdown, so preview matches the real reader exactly. Also show a
+  marker at line 24 (the non-owner teaser cut).
+- DECK TAGS: owner wants tags alongside categories. Tag model already exists
+  (used for user tags with a category column). Plan: presentation_tags join
+  table + tag-input (comma/datalist) on the form + tag chips on deck cards +
+  tag filter on the library. Reuse Tag.find_or_create_by(name:, category:
+  'deck').
+- Category is now free-text with datalist suggestions (existing categories +
+  defaults) — new categories like Cocktails just work; library filters
+  already derive from data.
 - No draft/publish workflow beyond the `published` checkbox (no preview-as-
   member link on the edit page; add one: it's just the public URL).
 - Slide preview rows don't support drag reorder (up/down buttons only).
