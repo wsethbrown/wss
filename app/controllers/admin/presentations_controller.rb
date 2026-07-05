@@ -47,10 +47,14 @@ class Admin::PresentationsController < Admin::BaseController
     deck.pdf_file.attach(io: StringIO.new(data), filename: file.original_filename,
                          content_type: content_type)
 
-    if (cover = parsed.images.first)
+    # Model validations cap images at 5MB — oversized embeds (full-res photos
+    # are common in decks) must not sink the import. Use the largest that fits;
+    # no cover just means the typographic char cover.
+    usable_images = parsed.images.select { |i| i[:data].bytesize <= 5.megabytes }
+    if (cover = usable_images.first)
       deck.featured_image.attach(io: StringIO.new(cover[:data]), filename: cover[:filename])
     end
-    parsed.images.drop(1).first(3).each do |img|
+    usable_images.drop(1).first(3).each do |img|
       deck.preview_images.attach(io: StringIO.new(img[:data]), filename: img[:filename])
     end
 
