@@ -16,3 +16,15 @@ admin:
   first_name: Admin
   last_name: User
   is_admin: true
+
+seth:
+  email: seth@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'password') %>
+  first_name: Seth
+  last_name: Brown
+
+one:
+  email: one@example.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'password') %>
+  first_name: One
+  last_name: User

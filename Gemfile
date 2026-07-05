@@ -61,6 +61,13 @@ group :development, :test do
   gem "selenium-webdriver"
 end
 
+group :test do
+  # assert_select / assigns() / assert_template in controller & integration tests
+  gem "rails-controller-testing"
+  # `.stubs`/`.expects` mocking used across the Stripe and subscription tests
+  gem "mocha"
+end
+
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"

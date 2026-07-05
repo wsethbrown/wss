@@ -1,6 +1,8 @@
 ENV["RAILS_ENV"] ||= "test"
 require_relative "../config/environment"
 require "rails/test_help"
+require "mocha/minitest"
+require "ostruct" # Ruby 3.4+ no longer autoloads OpenStruct; some tests build mock Stripe objects with it
 
 # Configure OmniAuth for testing
 OmniAuth.config.test_mode = true

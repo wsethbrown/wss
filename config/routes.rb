@@ -8,8 +8,12 @@ Rails.application.routes.draw do
   }, skip: [:sessions]
 
   devise_scope :user do
+    # Devise's :sessions module is skipped in favour of the unified auth page,
+    # but we keep the conventional Devise helper names so links/tests using
+    # new_user_session_path / user_session_path still resolve.
+    get    '/users/sign_in', to: 'auth#unified', as: 'new_user_session'
     # Custom password sign-in (adds 2FA + remember-me handling on top of Devise)
-    post '/users/sign_in', to: 'auth#sign_in', as: 'user_session'
+    post   '/users/sign_in', to: 'auth#sign_in', as: 'user_session'
     delete '/users/sign_out', to: 'auth#logout', as: 'destroy_user_session'
   end
 

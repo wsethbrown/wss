@@ -1,13 +1,19 @@
 class SocietyPolicy < ApplicationPolicy
-  # NOTE: Up to Pundit v2.3.1, the inheritance was declared as
-  # `Scope < Scope` rather than `Scope < ApplicationPolicy::Scope`.
-  # In most cases the behavior will be identical, but if updating existing
-  # code, beware of possible changes to the ancestors:
-  # https://gist.github.com/Burgestrand/4b4bc22f31c8a95c425fc0e30d7ef1f5
-
   class Scope < ApplicationPolicy::Scope
+    # Anonymous visitors see only public societies. Authenticated users
+    # additionally see private societies they created or are an *active* member
+    # of. Previously this returned `scope.all`, leaking every private society
+    # into public listings.
     def resolve
-      scope.all
+      return scope.where(is_private: false) unless user
+
+      scope.left_outer_joins(:society_memberships)
+           .where(
+             "societies.is_private = FALSE OR societies.creator_id = :uid OR " \
+             "(society_memberships.user_id = :uid AND society_memberships.status = 'active')",
+             uid: user.id
+           )
+           .distinct
     end
   end
 
@@ -15,8 +21,13 @@ class SocietyPolicy < ApplicationPolicy
     true
   end
 
+  # Public societies are visible to anyone. Private societies are visible only
+  # to the creator, a manager, a global admin, or an active member.
   def show?
-    true
+    return true unless record.is_private
+    return false unless user
+
+    owner_or_manager? || record.has_member?(user)
   end
 
   def new?
@@ -27,28 +38,38 @@ class SocietyPolicy < ApplicationPolicy
     user.present?
   end
 
-  def update?
-    return false unless user.present?
-    user.admin? || record.has_admin?(user)
+  # Creators, society admins/officers, and global admins may edit.
+  def edit?
+    owner_or_manager?
   end
+  alias_method :update?, :edit?
 
+  # Destroying a society is reserved for its creator (and global admins as a
+  # superuser escape hatch) — not delegated society admins.
   def destroy?
-    return false unless user.present?
-    user.admin? || record.has_admin?(user)
+    return false unless user
+    record.creator_id == user.id || user.admin?
   end
 
   def join?
-    return false unless user.present?
+    return false unless user
     !record.has_member?(user)
   end
 
+  # Anyone but the creator may leave a society they belong to.
   def leave?
-    return false unless user.present?
-    record.has_member?(user) && !record.has_admin?(user)
+    return false unless user
+    record.has_member?(user) && record.creator_id != user.id
   end
 
   def manage_members?
-    return false unless user.present?
-    user.admin? || record.has_admin?(user)
+    owner_or_manager?
+  end
+
+  private
+
+  def owner_or_manager?
+    return false unless user && record.is_a?(Society)
+    record.creator_id == user.id || user.admin? || record.can_manage?(user)
   end
 end

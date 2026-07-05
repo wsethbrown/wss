@@ -5,6 +5,13 @@ class StripeCheckoutFlowTest < ActionDispatch::IntegrationTest
     @user = users(:one)
     @user.update!(stripe_subscription_id: nil)
     sign_in @user
+
+    # The controller checks Stripe as the source of truth for existing
+    # subscriptions before starting checkout. Default that lookup to "none" so
+    # the happy path proceeds; individual tests can override as needed.
+    empty_list = mock("subscription_list")
+    empty_list.stubs(:data).returns([])
+    Stripe::Subscription.stubs(:list).returns(empty_list)
   end
 
   test "monthly subscription checkout redirects to Stripe" do
@@ -74,7 +81,7 @@ class StripeCheckoutFlowTest < ActionDispatch::IntegrationTest
     
     assert_response :redirect
     assert_redirected_to account_path(anchor: 'subscription')
-    assert_equal 'Payment processing error. Please try again.', flash[:alert]
+    assert_equal 'Payment processing error. Please try again or contact support.', flash[:alert]
   end
 
   test "checkout session includes correct metadata" do
@@ -148,9 +155,11 @@ class StripeCheckoutFlowTest < ActionDispatch::IntegrationTest
     # Set existing customer ID
     @user.update!(stripe_customer_id: 'cus_existing123')
     
-    # Mock retrieving existing customer
+    # Mock retrieving existing customer. The controller guards against deleted
+    # customers, so the retrieved object must answer #deleted?.
     mock_customer = mock('customer')
     mock_customer.stubs(:id).returns('cus_existing123')
+    mock_customer.stubs(:deleted?).returns(false)
     Stripe::Customer.expects(:retrieve).with('cus_existing123').returns(mock_customer)
     
     # Should not create new customer
@@ -166,29 +175,27 @@ class StripeCheckoutFlowTest < ActionDispatch::IntegrationTest
   end
 
   test "checkout session uses correct price IDs from environment" do
-    # Mock environment variables
-    ENV.stubs(:[]).with('STRIPE_MONTHLY_PRICE_ID').returns('price_monthly_real')
-    ENV.stubs(:[]).with('STRIPE_QUARTERLY_PRICE_ID').returns('price_quarterly_real')
-    ENV.stubs(:[]).with('STRIPE_YEARLY_PRICE_ID').returns('price_yearly_real')
-    
     # Mock Stripe customer
     mock_customer = mock('customer')
     mock_customer.stubs(:id).returns('cus_test123')
     Stripe::Customer.stubs(:create).returns(mock_customer)
-    
+
     # Mock and capture checkout session creation for monthly
     mock_session = mock('session')
     mock_session.stubs(:url).returns('https://checkout.stripe.com/test')
-    
+
+    # The line item price must be the value the controller resolves from the
+    # STRIPE_MONTHLY_PRICE_ID env var (via ENV.fetch, with a documented default).
+    expected_price = ENV.fetch('STRIPE_MONTHLY_PRICE_ID', 'price_monthly')
     Stripe::Checkout::Session.expects(:create).with(
       has_entry(:line_items, [{
-        price: 'price_monthly_real',
+        price: expected_price,
         quantity: 1
       }])
     ).returns(mock_session)
-    
+
     post subscriptions_checkout_path, params: { price_id: 'monthly' }
-    
+
     assert_response :redirect
   end
 

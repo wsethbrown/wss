@@ -79,10 +79,12 @@ class SubscriptionsController < ApplicationController
           quantity: 1
         } ],
         mode: "subscription",
-        success_url: presentations_url + "?subscription=success",
+        success_url: account_url + "?subscription=success#subscription",
         cancel_url: account_url + "?subscription=cancelled#subscription",
         metadata: {
-          user_id: current_user.id,
+          # Stripe stores metadata values as strings; be explicit so the value
+          # round-trips identically when the webhook reads it back.
+          user_id: current_user.id.to_s,
           plan: price_id
         }
       })
@@ -213,6 +215,66 @@ class SubscriptionsController < ApplicationController
     end
   end
 
+  # NOTE: pause/resume must live above `private` — they are routed actions
+  # (POST /subscriptions/pause|resume). They were previously defined below the
+  # `private` keyword, which made them non-public and 404'd the live feature.
+  def pause
+    unless current_user.stripe_subscription_id.present?
+      redirect_to account_path(anchor: "subscription"), alert: "No active subscription found."
+      return
+    end
+
+    begin
+      # Pause payment collection using Stripe API
+      Stripe::Subscription.update(
+        current_user.stripe_subscription_id,
+        {
+          pause_collection: {
+            behavior: 'keep_as_draft',
+            resumes_at: 1.month.from_now.to_i  # Auto-resume after 1 month
+          }
+        }
+      )
+
+      current_user.update!(
+        subscription_paused_at: Time.current,
+        subscription_status: 'paused'
+      )
+
+      Rails.logger.info "User #{current_user.email} paused subscription #{current_user.stripe_subscription_id}"
+      redirect_to account_path(anchor: "subscription"), notice: "Subscription paused successfully. Billing will resume automatically in 1 month."
+    rescue Stripe::StripeError => e
+      Rails.logger.error "Stripe pause error: #{e.message}"
+      redirect_to account_path(anchor: "subscription"), alert: "Unable to pause subscription. Please try again."
+    end
+  end
+
+  def resume
+    unless current_user.stripe_subscription_id.present?
+      redirect_to account_path(anchor: "subscription"), alert: "No active subscription found."
+      return
+    end
+
+    begin
+      # Resume payment collection using Stripe API
+      Stripe::Subscription.update(
+        current_user.stripe_subscription_id,
+        { pause_collection: '' }  # Empty string removes the pause
+      )
+
+      current_user.update!(
+        subscription_paused_at: nil,
+        subscription_status: 'active'
+      )
+
+      Rails.logger.info "User #{current_user.email} resumed subscription #{current_user.stripe_subscription_id}"
+      redirect_to account_path(anchor: "subscription"), notice: "Subscription resumed successfully. Billing will continue normally."
+    rescue Stripe::StripeError => e
+      Rails.logger.error "Stripe resume error: #{e.message}"
+      redirect_to account_path(anchor: "subscription"), alert: "Unable to resume subscription. Please try again."
+    end
+  end
+
   private
 
   def get_or_create_stripe_customer
@@ -250,7 +312,7 @@ class SubscriptionsController < ApplicationController
         email: current_user.email,
         name: current_user.full_name,
         metadata: {
-          user_id: current_user.id
+          user_id: current_user.id.to_s
         }
       })
 
@@ -294,66 +356,4 @@ class SubscriptionsController < ApplicationController
     ]
   end
 
-  def pause
-    unless current_user.stripe_subscription_id.present?
-      redirect_to account_path(anchor: "subscription"), alert: "No active subscription found."
-      return
-    end
-
-    begin
-      # Pause payment collection using Stripe API
-      subscription = Stripe::Subscription.update(
-        current_user.stripe_subscription_id,
-        {
-          pause_collection: {
-            behavior: 'keep_as_draft',
-            resumes_at: 1.month.from_now.to_i  # Auto-resume after 1 month
-          }
-        }
-      )
-
-      # Update user's pause status
-      current_user.update!(
-        subscription_paused_at: Time.current,
-        subscription_status: 'paused'
-      )
-
-      Rails.logger.info "User #{current_user.email} paused subscription #{current_user.stripe_subscription_id}"
-      redirect_to account_path(anchor: "subscription"), notice: "Subscription paused successfully. Billing will resume automatically in 1 month."
-
-    rescue Stripe::StripeError => e
-      Rails.logger.error "Stripe pause error: #{e.message}"
-      redirect_to account_path(anchor: "subscription"), alert: "Unable to pause subscription. Please try again."
-    end
-  end
-
-  def resume
-    unless current_user.stripe_subscription_id.present?
-      redirect_to account_path(anchor: "subscription"), alert: "No active subscription found."
-      return
-    end
-
-    begin
-      # Resume payment collection using Stripe API
-      subscription = Stripe::Subscription.update(
-        current_user.stripe_subscription_id,
-        {
-          pause_collection: ''  # Empty string removes the pause
-        }
-      )
-
-      # Update user's pause status
-      current_user.update!(
-        subscription_paused_at: nil,
-        subscription_status: 'active'
-      )
-
-      Rails.logger.info "User #{current_user.email} resumed subscription #{current_user.stripe_subscription_id}"
-      redirect_to account_path(anchor: "subscription"), notice: "Subscription resumed successfully. Billing will continue normally."
-
-    rescue Stripe::StripeError => e
-      Rails.logger.error "Stripe resume error: #{e.message}"
-      redirect_to account_path(anchor: "subscription"), alert: "Unable to resume subscription. Please try again."
-    end
-  end
 end
