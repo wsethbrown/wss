@@ -113,6 +113,33 @@ class SocietiesController < ApplicationController
     end
   end
 
+  # Join via invite link — valid for private societies (the link IS the invite).
+  def join_by_invite
+    unless user_signed_in?
+      redirect_to auth_path, alert: "Sign in to accept this invite" and return
+    end
+
+    society = Society.find_by(invite_token: params[:token])
+    unless society
+      redirect_to societies_path, alert: "That invite link is no longer valid" and return
+    end
+
+    if society.has_member?(current_user)
+      redirect_to society, notice: "You are already a member" and return
+    end
+
+    society.society_memberships.create!(user: current_user, role: :member, status: :active)
+    log_activity(:society_joined, society)
+    redirect_to society, notice: "Welcome to #{society.name}!"
+  end
+
+  def regenerate_invite
+    society = Society.find(params[:id])
+    authorize society, :manage_members?
+    society.regenerate_invite_token!
+    redirect_to society, notice: "New invite link generated — old links no longer work."
+  end
+
   private
 
   def society_not_authorized

@@ -77,6 +77,16 @@ class Society < ApplicationRecord
     society_applications.where(status: 'pending')
   end
 
+  # Shareable invite link token. Lazily generated; regenerating revokes old links.
+  def invite_token!
+    update!(invite_token: SecureRandom.urlsafe_base64(12)) if invite_token.blank?
+    invite_token
+  end
+
+  def regenerate_invite_token!
+    update!(invite_token: SecureRandom.urlsafe_base64(12))
+  end
+
   def public?
     !is_private
   end

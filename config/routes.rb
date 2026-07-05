@@ -57,10 +57,14 @@ Rails.application.routes.draw do
   # Stripe webhooks
   post "webhooks/stripe", to: "webhooks#stripe"
 
+  # Invite links: joining via a valid token works for private societies too.
+  get "invite/:token", to: "societies#join_by_invite", as: :society_invite
+
   # Societies
   resources :societies do
     member do
       post :join
+      post :regenerate_invite
       delete :leave
     end
     
@@ -69,6 +73,9 @@ Rails.application.routes.draw do
       resources :event_rsvps, only: [:create, :update, :destroy]
     end
   end
+
+  # Society member management (remove / change role) by society managers.
+  resources :society_memberships, only: [:update, :destroy]
   
   # Keep top-level event routes for existing functionality
   # but they should redirect to the society page
