@@ -14,7 +14,7 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div>
       <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.text_field :title, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "e.g., Introduction to Scotch Whisky" %>
+      <%= form.text_field :title, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "e.g., Introduction to Scotch Whisky" %>
     </div>
 
     <div>
@@ -30,12 +30,12 @@
             ['General Education', 'General Education']
           ], presentation.category),
           { include_blank: 'Select a category' },
-          { class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
+          { class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" } %>
     </div>
 
     <div>
       <%= form.label :price, class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.number_field :price, step: 0.01, min: 0, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "9.99" %>
+      <%= form.number_field :price, step: 0.01, min: 0, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "9.99" %>
     </div>
 
     <div>
@@ -47,12 +47,12 @@
             ['Advanced', 'Advanced']
           ], presentation.difficulty),
           { include_blank: 'Select difficulty level' },
-          { class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
+          { class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" } %>
     </div>
 
     <div>
       <%= form.label :duration, class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.text_field :duration, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "45 min" %>
+      <%= form.text_field :duration, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "45 min" %>
     </div>
 
     <div class="md:col-span-2">
@@ -63,20 +63,24 @@
           <%= image_tag presentation.featured_image, class: "h-32 w-auto rounded-lg border border-gray-200" %>
         </div>
       <% end %>
-      <%= form.file_field :featured_image, accept: "image/jpeg,image/jpg,image/png,image/gif,image/webp", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+      <%= form.file_field :featured_image, accept: "image/jpeg,image/jpg,image/png,image/gif,image/webp", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
       <p class="text-xs text-gray-500 mt-1">Banner image for the presentation page (JPEG, PNG, GIF, or WebP, max 5MB)</p>
     </div>
   </div>
 
   <div>
     <%= form.label :description, class: "block text-sm font-medium text-gray-700 mb-2" %>
-    <%= form.text_area :description, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "Brief description of what this presentation covers..." %>
+    <%= form.text_area :description, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "Brief description of what this presentation covers..." %>
   </div>
 
   <div>
-    <%= form.label :content, "Presentation Overview", class: "block text-sm font-medium text-gray-700 mb-2" %>
-    <%= form.text_area :content, rows: 10, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "Full presentation overview and content. This appears in the 'Presentation Overview' section..." %>
-    <p class="text-xs text-gray-500 mt-1">This will be displayed in the Presentation Overview section on the detail page</p>
+    <%= form.label :content, "The story (Markdown)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+    <%= form.text_area :content, rows: 14, class: "w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "# The thread\n\nOpen with the hook — why this bottle, why this story...\n\n## First chapter\nUse ## headings for chapters. **Bold**, *italics*, lists, and > quotes all work." %>
+    <p class="text-xs text-gray-500 mt-1">
+      Markdown. Renders as the "Inside this deck" reading experience. Buyers see it all;
+      non-owners see roughly the first 24 lines before it fades into the purchase prompt —
+      make those lines earn the sale.
+    </p>
   </div>
 
   <!-- What You'll Learn Section -->
@@ -120,7 +124,7 @@
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">Title</label>
             <input type="text" 
-                   class="learning-title w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                   class="learning-title w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
                    placeholder="e.g., Rye Whiskey Foundations"
                    data-action="input->what-youll-learn#fieldChanged">
           </div>
@@ -128,7 +132,7 @@
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">Description</label>
             <textarea 
-                   class="learning-description w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                   class="learning-description w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
                    rows="2"
                    placeholder="e.g., Understand what sets rye whiskey apart, including mash bills, legal definitions, and signature characteristics."
                    data-action="input->what-youll-learn#fieldChanged"></textarea>
@@ -138,10 +142,73 @@
     </template>
   </div>
 
-  <div>
-    <%= form.label :slides_preview, "Slides Preview", class: "block text-sm font-medium text-gray-700 mb-2" %>
-    <%= form.text_area :slides_preview, rows: 8, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "Slide 1|Introduction|Welcome and overview|5 min\nSlide 2|Topic Name|Description of slide content|8 min\n..." %>
-    <p class="text-xs text-gray-500 mt-1">Enter slide information in format: Slide Number|Title|Description|Duration (one per line)</p>
+  <!-- Slide-by-Slide Preview Section -->
+  <div class="border-t border-gray-200 pt-6" data-controller="slides-preview">
+    <h3 class="text-lg font-semibold text-gray-900 mb-1">Slide-by-Slide Preview</h3>
+    <p class="text-sm text-gray-600 mb-4">
+      The outline buyers see before purchasing — one row per slide or chapter.
+      Numbers come from the order; use the arrows to rearrange.
+    </p>
+
+    <%= form.hidden_field :slides_preview, id: 'slides_preview_hidden' %>
+    <input type="hidden" id="existing-slides-preview" value="<%= presentation.slides_preview %>" />
+
+    <div data-slides-preview-target="container" class="space-y-3 mb-4"></div>
+
+    <button type="button"
+            data-action="click->slides-preview#addSlide"
+            class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
+      </svg>
+      Add slide
+    </button>
+
+    <template data-slides-preview-target="template">
+      <div class="slide-item p-4 bg-gray-50 rounded-lg border border-gray-200">
+        <div class="flex justify-between items-center mb-3">
+          <h4 class="slide-number text-sm font-semibold text-whiskey-700">Slide</h4>
+          <div class="flex items-center gap-1">
+            <button type="button" data-action="click->slides-preview#moveUp"
+                    class="rounded p-1.5 text-gray-400 hover:bg-gray-200 hover:text-gray-700 transition" aria-label="Move up">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"></path></svg>
+            </button>
+            <button type="button" data-action="click->slides-preview#moveDown"
+                    class="rounded p-1.5 text-gray-400 hover:bg-gray-200 hover:text-gray-700 transition" aria-label="Move down">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path></svg>
+            </button>
+            <button type="button" data-action="click->slides-preview#removeSlide"
+                    class="rounded p-1.5 text-red-500 hover:bg-red-50 hover:text-red-700 transition" aria-label="Remove slide">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 gap-3 md:grid-cols-[1fr_2fr_8rem]">
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Title</label>
+            <input type="text"
+                   class="slide-title w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
+                   placeholder="e.g., The Five Regions"
+                   data-action="input->slides-preview#fieldChanged">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">What it covers</label>
+            <input type="text"
+                   class="slide-description w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
+                   placeholder="e.g., How geography shapes each region's flavor"
+                   data-action="input->slides-preview#fieldChanged">
+          </div>
+          <div>
+            <label class="block text-xs font-medium text-gray-600 mb-1">Time</label>
+            <input type="text"
+                   class="slide-duration w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
+                   placeholder="8 min"
+                   data-action="input->slides-preview#fieldChanged">
+          </div>
+        </div>
+      </div>
+    </template>
   </div>
 
   <!-- What You'll Taste Section -->
@@ -151,25 +218,25 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
         <%= form.label :nose_notes, "Nose", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= form.text_area :nose_notes, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "e.g., Vanilla, honey, light oak, subtle fruit notes" %>
+        <%= form.text_area :nose_notes, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "e.g., Vanilla, honey, light oak, subtle fruit notes" %>
         <p class="text-xs text-gray-500 mt-1">Aromas and scents detected</p>
       </div>
 
       <div>
         <%= form.label :palate_notes, "Palate", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= form.text_area :palate_notes, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "e.g., Smooth, balanced, with notes of caramel and spice" %>
+        <%= form.text_area :palate_notes, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "e.g., Smooth, balanced, with notes of caramel and spice" %>
         <p class="text-xs text-gray-500 mt-1">Flavors on the tongue</p>
       </div>
 
       <div>
         <%= form.label :finish_notes, "Finish", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= form.text_area :finish_notes, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "e.g., Medium length with warming oak and gentle smoke" %>
+        <%= form.text_area :finish_notes, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "e.g., Medium length with warming oak and gentle smoke" %>
         <p class="text-xs text-gray-500 mt-1">Aftertaste and duration</p>
       </div>
 
       <div>
         <%= form.label :body_notes, "Body", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= form.text_area :body_notes, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500", placeholder: "e.g., Medium-bodied with a smooth, approachable texture" %>
+        <%= form.text_area :body_notes, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "e.g., Medium-bodied with a smooth, approachable texture" %>
         <p class="text-xs text-gray-500 mt-1">Mouthfeel and texture</p>
       </div>
     </div>
@@ -216,7 +283,7 @@
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">Whiskey Name</label>
             <input type="text" 
-                   class="whiskey-name w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                   class="whiskey-name w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
                    placeholder="e.g., Glenfiddich 12 Year"
                    data-action="input->whiskey-recommendations#fieldChanged">
           </div>
@@ -224,7 +291,7 @@
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">Region</label>
             <input type="text" 
-                   class="whiskey-region w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                   class="whiskey-region w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
                    placeholder="e.g., Speyside"
                    data-action="input->whiskey-recommendations#fieldChanged">
           </div>
@@ -232,7 +299,7 @@
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">Price</label>
             <input type="text" 
-                   class="whiskey-price w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                   class="whiskey-price w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
                    placeholder="e.g., $45"
                    data-action="input->whiskey-recommendations#fieldChanged">
           </div>
@@ -240,7 +307,7 @@
           <div>
             <label class="block text-xs font-medium text-gray-600 mb-1">Style</label>
             <input type="text" 
-                   class="whiskey-style w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                   class="whiskey-style w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
                    placeholder="e.g., Light & Fruity"
                    data-action="input->whiskey-recommendations#fieldChanged">
           </div>
@@ -248,7 +315,7 @@
           <div class="md:col-span-2">
             <label class="block text-xs font-medium text-gray-600 mb-1">Tasting Notes</label>
             <input type="text" 
-                   class="whiskey-notes w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                   class="whiskey-notes w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
                    placeholder="e.g., Pear, oak, subtle spice"
                    data-action="input->whiskey-recommendations#fieldChanged">
           </div>
@@ -277,7 +344,7 @@
             </div>
           </div>
         <% end %>
-        <%= form.file_field :preview_images, multiple: true, accept: "image/jpeg,image/jpg,image/png,image/gif,image/webp", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        <%= form.file_field :preview_images, multiple: true, accept: "image/jpeg,image/jpg,image/png,image/gif,image/webp", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
         <p class="text-xs text-gray-500 mt-1">Upload up to 3 preview images that users can view before purchasing. Images will be shown in the order selected. (JPEG, PNG, GIF, or WebP, max 5MB each)</p>
       </div>
 
@@ -286,7 +353,7 @@
         <% if presentation.pdf_file.attached? %>
           <p class="text-sm text-gray-600 mb-2">Current file: <%= presentation.pdf_file.filename %></p>
         <% end %>
-        <%= form.file_field :pdf_file, accept: "application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-powerpoint", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        <%= form.file_field :pdf_file, accept: "application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-powerpoint", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
         <p class="text-xs text-gray-500 mt-1">Main presentation file in PDF or PowerPoint format (max 50MB)</p>
       </div>
 
@@ -302,7 +369,7 @@
             </ul>
           </div>
         <% end %>
-        <%= form.file_field :supplemental_materials, multiple: true, accept: "application/pdf,image/jpeg,image/jpg,image/png,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        <%= form.file_field :supplemental_materials, multiple: true, accept: "application/pdf,image/jpeg,image/jpg,image/png,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
         <p class="text-xs text-gray-500 mt-1">Additional materials like speaker notes, outlines, or whiskey recommendation sheets (PDF, images, or PowerPoint, max 25MB each)</p>
       </div>
     </div>
@@ -319,7 +386,7 @@
         <% if presentation.sneak_peek_file.attached? %>
           <p class="text-sm text-gray-600 mb-2">Current file: <%= presentation.sneak_peek_file.filename %></p>
         <% end %>
-        <%= form.file_field :sneak_peek_file, accept: "application/pdf", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        <%= form.file_field :sneak_peek_file, accept: "application/pdf", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
         <p class="text-xs text-gray-500 mt-1">Free preview version (PDF, first few slides)</p>
       </div>
 
@@ -329,7 +396,7 @@
         <% if presentation.speaker_notes.attached? %>
           <p class="text-sm text-gray-600 mb-2">Current file: <%= presentation.speaker_notes.filename %></p>
         <% end %>
-        <%= form.file_field :speaker_notes, accept: "application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        <%= form.file_field :speaker_notes, accept: "application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
         <p class="text-xs text-gray-500 mt-1">Detailed speaker notes (PDF or Word)</p>
       </div>
 
@@ -339,7 +406,7 @@
         <% if presentation.outline_file.attached? %>
           <p class="text-sm text-gray-600 mb-2">Current file: <%= presentation.outline_file.filename %></p>
         <% end %>
-        <%= form.file_field :outline_file, accept: "application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        <%= form.file_field :outline_file, accept: "application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
         <p class="text-xs text-gray-500 mt-1">Presentation outline (PDF or Word)</p>
       </div>
 
@@ -349,19 +416,19 @@
         <% if presentation.recommendations_sheet.attached? %>
           <p class="text-sm text-gray-600 mb-2">Current file: <%= presentation.recommendations_sheet.filename %></p>
         <% end %>
-        <%= form.file_field :recommendations_sheet, accept: "application/pdf", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
+        <%= form.file_field :recommendations_sheet, accept: "application/pdf", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
         <p class="text-xs text-gray-500 mt-1">Printable whiskey recommendations (PDF)</p>
       </div>
     </div>
   </div>
 
   <div class="flex items-center">
-    <%= form.check_box :published, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+    <%= form.check_box :published, class: "h-4 w-4 text-whiskey-600 focus:ring-whiskey-500 border-gray-300 rounded" %>
     <%= form.label :published, "Publish immediately", class: "ml-2 block text-sm text-gray-700" %>
   </div>
 
   <div class="flex items-center gap-4 pt-6 border-t border-gray-200">
-    <%= form.submit submit_text, class: "px-6 py-3 bg-black text-white font-semibold rounded-xl hover:bg-gray-800 transition" %>
+    <%= form.submit submit_text, class: "px-6 py-3 bg-whiskey-600 text-white font-semibold rounded-xl hover:bg-whiskey-700 transition" %>
     <%= link_to "Cancel", admin_presentations_path, class: "px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition" %>
   </div>
 <% end %>
