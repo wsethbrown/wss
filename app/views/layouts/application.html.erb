@@ -144,7 +144,10 @@
                     (controller_name == 'societies' && %w[index show].include?(action_name)) ||
                     controller_name == 'presentations' %>
     <% if full_bleed %>
-      <main class="min-h-[80vh] w-full <%= 'pt-20' if controller_name == 'presentations' && !(notice || alert) %>">
+      <%# No top padding here: every full-bleed page opens with a char masthead
+          that clears the fixed nav itself (pt-16/pt-28). Layout padding on top
+          of that rendered as a white strip above the masthead. %>
+      <main class="min-h-[80vh] w-full">
         <%= yield %>
       </main>
     <% else %>
