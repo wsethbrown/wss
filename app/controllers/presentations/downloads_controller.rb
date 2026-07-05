@@ -8,7 +8,6 @@ class Presentations::DownloadsController < ApplicationController
     if @presentation.sneak_peek_file.attached?
       # Log activity and download
       if user_signed_in?
-        log_activity(:presentation_preview_downloaded, @presentation)
         track_download('sneak_peek')
       end
       
@@ -22,7 +21,6 @@ class Presentations::DownloadsController < ApplicationController
   def full_presentation
     if @presentation.pdf_file.attached?
       @presentation.increment_download_count!
-      log_activity(:presentation_downloaded, @presentation, { file_type: 'full_presentation' })
       track_download('full_presentation')
       
       redirect_to rails_blob_url(@presentation.pdf_file)
@@ -33,7 +31,6 @@ class Presentations::DownloadsController < ApplicationController
   
   def speaker_notes
     if @presentation.speaker_notes.attached?
-      log_activity(:presentation_downloaded, @presentation, { file_type: 'speaker_notes' })
       track_download('speaker_notes')
       
       redirect_to rails_blob_url(@presentation.speaker_notes)
@@ -44,7 +41,6 @@ class Presentations::DownloadsController < ApplicationController
   
   def outline
     if @presentation.outline_file.attached?
-      log_activity(:presentation_downloaded, @presentation, { file_type: 'outline' })
       track_download('outline')
       
       redirect_to rails_blob_url(@presentation.outline_file)
@@ -55,7 +51,6 @@ class Presentations::DownloadsController < ApplicationController
   
   def recommendations
     if @presentation.recommendations_sheet.attached?
-      log_activity(:presentation_downloaded, @presentation, { file_type: 'recommendations' })
       track_download('recommendations')
       
       redirect_to rails_blob_url(@presentation.recommendations_sheet)

@@ -1,4 +1,6 @@
 class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
+  include ActivityLogger
+
   # Apple posts its callback as a form; skip forgery protection for that provider only.
   protect_from_forgery except: [:apple]
 
@@ -34,6 +36,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
 
     if @user.persisted?
       sign_in @user, event: :authentication
+      log_activity(:login, nil, { method: provider.downcase })
       redirect_to after_sign_in_path_for(@user), notice: "Successfully signed in with #{provider}!"
     else
       session["devise.oauth_data"] = auth.except(:extra)

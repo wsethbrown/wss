@@ -3,8 +3,14 @@ class ProfilesController < ApplicationController
   before_action :set_user, only: [:show]
 
   def show
-    # Users can view their own profile and other users' profiles
-    # This will show the public profile view
+    # Membership in a PRIVATE society is not public record: profiles list only
+    # public societies (plus all of your own when viewing yourself).
+    @visible_societies =
+      if @user == current_user
+        @user.member_societies.includes(:creator)
+      else
+        @user.member_societies.where(is_private: false).includes(:creator)
+      end
   end
 
   private

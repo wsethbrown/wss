@@ -29,7 +29,7 @@
               <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-3-3.87M9 20H4v-2a3 3 0 013-3.87m6 0A4 4 0 005 16m6-4a4 4 0 100-8 4 4 0 000 8zm6 4a3 3 0 00-3-3.87"></path>
               </svg>
-              <span><%= @user.member_societies.count %> societies</span>
+              <span><%= pluralize(@visible_societies.count, "society") %></span>
             </div>
             <div class="flex items-center">
               <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -56,7 +56,7 @@
         <!-- Societies Section -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 class="text-xl font-semibold text-gray-900 mb-4">Societies</h2>
-          <% user_societies = @user.member_societies.includes(:creator) %>
+          <% user_societies = @visible_societies %>
           <% if user_societies.any? %>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <% user_societies.each do |society| %>

@@ -82,7 +82,6 @@ class Admin::UsersController < Admin::BaseController
       :first_name, 
       :last_name, 
       :email, 
-      :credits,
       :bio
     )
   end

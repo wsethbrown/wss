@@ -2,18 +2,23 @@ class ActivityLog < ApplicationRecord
   belongs_to :user
   belongs_to :trackable, polymorphic: true, optional: true
 
-  # Activity types
+  # Activity types. Keep this list in lockstep with what controllers emit —
+  # the inclusion validation below SILENTLY discards unknown types (the logger
+  # swallows the error), which is how paused/resumed events went unrecorded
+  # for months. presentation_viewed was retired (per-view rows, unused);
+  # downloads live in DownloadLog, not here.
   ACTIVITY_TYPES = {
     login: 'User Login',
     logout: 'User Logout',
     presentation_purchased: 'Presentation Purchased',
-    presentation_viewed: 'Presentation Viewed',
     society_joined: 'Society Joined',
     society_left: 'Society Left',
     event_rsvp: 'Event RSVP',
     profile_updated: 'Profile Updated',
     subscription_created: 'Subscription Created',
     subscription_canceled: 'Subscription Canceled',
+    subscription_paused: 'Subscription Paused',
+    subscription_resumed: 'Subscription Resumed',
     credits_used: 'Credits Used',
     credits_added: 'Credits Added'
   }.freeze
@@ -47,15 +52,15 @@ class ActivityLog < ApplicationRecord
     end
   end
 
-  # Class method to log activities
-  def self.log_activity(user, activity_type, trackable = nil, metadata = {})
+  # Class method to log activities. IP/UA live in their own columns only.
+  def self.log_activity(user, activity_type, trackable = nil, metadata = {}, ip_address: nil, user_agent: nil)
     create!(
       user: user,
       activity_type: activity_type.to_s,
       trackable: trackable,
       metadata: metadata,
-      ip_address: metadata[:ip_address],
-      user_agent: metadata[:user_agent]
+      ip_address: ip_address || metadata[:ip_address],
+      user_agent: user_agent || metadata[:user_agent]
     )
   end
 end

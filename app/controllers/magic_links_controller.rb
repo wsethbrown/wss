@@ -1,4 +1,6 @@
 class MagicLinksController < ApplicationController
+  include ActivityLogger
+
   # Sending and consuming links are public; both are rate-limited by the token expiry.
   skip_before_action :verify_authenticity_token, only: [:create]
 
@@ -17,6 +19,7 @@ class MagicLinksController < ApplicationController
 
     if user
       sign_in(user)
+      log_activity(:login, nil, { method: 'magic_link' })
       redirect_to account_path, notice: "You're signed in. Welcome back!"
     else
       redirect_to auth_path, alert: "That magic link is invalid or has expired. Please request a new one."

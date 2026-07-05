@@ -1,4 +1,6 @@
 class EventRsvpsController < ApplicationController
+  include ActivityLogger
+
   before_action :set_event
   before_action :set_rsvp, only: [:update, :destroy]
 
@@ -10,6 +12,7 @@ class EventRsvpsController < ApplicationController
     authorize @rsvp, :create?
 
     if @rsvp.save
+      log_activity(:event_rsvp, @event, { status: status })
       @success_message = rsvp_success_message(status)
       @event.reload # Reload to get fresh RSVP data
       respond_to do |format|

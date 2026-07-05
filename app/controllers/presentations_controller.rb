@@ -31,7 +31,8 @@ class PresentationsController < ApplicationController
   end
 
   def show
-    log_activity(:presentation_viewed, @presentation) if user_signed_in?
+    # Page views are deliberately not logged: one ActivityLog row (with IP+UA)
+    # per authenticated view was over half the table and nothing consumed it.
 
     # Reading access: owners (with valid access) and admins read the whole
     # story; everyone else gets a teaser that fades into the purchase CTA.
