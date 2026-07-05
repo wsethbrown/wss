@@ -109,7 +109,8 @@ Rails.application.routes.draw do
     root to: 'dashboard#index'
   end
 
-  # Presentations
+  # Presentations. All purchasing goes through the nested purchases controller —
+  # a single flow for credit, paid (Stripe checkout), and free decks.
   resources :presentations do
     resources :purchases, only: [ :new, :create ], controller: 'presentations/purchases'
     resources :downloads, only: [], controller: 'presentations/downloads' do
@@ -120,10 +121,6 @@ Rails.application.routes.draw do
         get :outline
         get :recommendations
       end
-    end
-    member do
-      get :purchase_options
-      post :purchase
     end
   end
 

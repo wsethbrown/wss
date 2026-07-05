@@ -1,214 +1,111 @@
-<div class="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 py-12 px-4 sm:px-6 lg:px-8">
-  <div class="max-w-3xl mx-auto">
-    <!-- Back button -->
+<div class="min-h-screen bg-whiskey-50 py-12 px-4 pt-28 sm:px-6 lg:px-8">
+  <div class="max-w-2xl mx-auto">
+    <!-- Back link -->
     <div class="mb-6">
-      <%= link_to presentation_path(@presentation), class: "inline-flex items-center text-sm text-gray-600 hover:text-gray-900" do %>
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+      <%= link_to presentation_path(@presentation), class: "inline-flex items-center text-sm font-medium text-whiskey-700 hover:text-whiskey-600 transition" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
         </svg>
-        Back to presentation
+        Back to the deck
       <% end %>
     </div>
 
-    <!-- Purchase Options Card -->
-    <div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+    <div class="overflow-hidden rounded-2xl border border-whiskey-200 bg-white shadow-sm">
       <!-- Header -->
-      <div class="bg-gradient-to-r from-whiskey-600 to-purple-600 px-8 py-6">
-        <h1 class="text-2xl font-bold text-white">Choose Your Purchase Method</h1>
-        <p class="text-whiskey-100 mt-2">Get instant access to this presentation</p>
+      <div class="bg-char px-8 py-6">
+        <p class="eyebrow text-whiskey-300/90"><%= @presentation.free? ? 'Free deck' : 'Get this deck' %></p>
+        <h1 class="mt-1 font-display text-2xl font-semibold text-cream"><%= @presentation.title %></h1>
       </div>
 
-      <!-- Presentation Info -->
-      <div class="border-b border-gray-200 px-8 py-6">
-        <div class="flex items-start space-x-4">
-          <div class="w-16 h-16 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center flex-shrink-0">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-            </svg>
-          </div>
-          <div class="flex-1">
-            <h2 class="text-xl font-semibold text-gray-900"><%= @presentation.title %></h2>
-            <p class="text-gray-600 mt-1"><%= @presentation.excerpt(100) %></p>
-            <div class="mt-3 flex items-center space-x-4 text-sm text-gray-500">
-              <span class="flex items-center">
-                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <%= @presentation.reading_time %> min read
-              </span>
-              <% if @presentation.difficulty.present? %>
-                <span class="flex items-center">
-                  <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-                  </svg>
-                  <%= @presentation.difficulty %>
-                </span>
-              <% end %>
-            </div>
-          </div>
+      <!-- Deck summary -->
+      <div class="border-b border-whiskey-100 px-8 py-5">
+        <p class="text-gray-600"><%= @presentation.excerpt(140) %></p>
+        <div class="mt-3 flex items-center gap-4 text-sm text-gray-500">
+          <span><%= @presentation.reading_time %> min read</span>
+          <% if @presentation.difficulty.present? %>
+            <span aria-hidden="true">&middot;</span>
+            <span><%= @presentation.difficulty %></span>
+          <% end %>
+          <% if @presentation.category.present? %>
+            <span aria-hidden="true">&middot;</span>
+            <span><%= @presentation.category %></span>
+          <% end %>
         </div>
       </div>
 
-      <!-- Purchase Options -->
       <div class="p-8">
-        <%= form_with url: presentation_purchases_path(@presentation), local: true, data: { turbo: false } do |f| %>
-          <div class="space-y-4">
-            
-            <% if @has_credits && @user_subscription_active %>
-              <!-- Credit Purchase Option -->
-              <label class="relative block cursor-pointer" onclick="selectPurchaseMethod('credit')">
-                <input type="radio" name="purchase_method" value="credit" id="credit_option" class="peer sr-only" checked>
-                <div class="border-2 border-gray-200 rounded-xl p-6 transition-all hover:border-gray-300" id="credit_option_div">
-                  <div class="flex items-start">
-                    <div class="flex items-center h-5">
-                      <div class="w-4 h-4 border-2 border-gray-300 rounded-full transition-all" id="credit_radio"></div>
+        <% if @presentation.free? %>
+          <%# ------------------------------------------------ Free deck %>
+          <p class="text-gray-700">
+            This deck is free for everyone. Add it to your library and it's yours for good —
+            slides, script, and downloads included.
+          </p>
+          <%= form_with url: presentation_purchases_path(@presentation), local: true, data: { turbo: false } do |f| %>
+            <%= f.submit "Add to my library — free",
+                class: "mt-8 w-full cursor-pointer rounded-xl bg-whiskey-600 px-6 py-4 text-lg font-semibold text-white transition hover:bg-whiskey-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2" %>
+          <% end %>
+        <% else %>
+          <%# --------------------------------------- Paid deck: pick a method %>
+          <%= form_with url: presentation_purchases_path(@presentation), local: true, data: { turbo: false } do |f| %>
+            <fieldset class="space-y-4">
+              <legend class="sr-only">Purchase method</legend>
+
+              <% if @can_use_credit %>
+                <label class="block cursor-pointer">
+                  <input type="radio" name="purchase_method" value="credit" class="peer sr-only" checked>
+                  <div class="rounded-xl border-2 border-whiskey-100 p-6 transition hover:border-whiskey-300 peer-checked:border-whiskey-600 peer-checked:bg-whiskey-50 peer-focus-visible:ring-2 peer-focus-visible:ring-whiskey-500 peer-focus-visible:ring-offset-2">
+                    <div class="flex items-start justify-between gap-4">
+                      <div>
+                        <h3 class="text-lg font-semibold text-gray-900">Use a credit</h3>
+                        <p class="mt-1 text-gray-600">You have <%= current_user.credits %> credit<%= 's' if current_user.credits != 1 %>. Access lasts as long as your membership.</p>
+                      </div>
+                      <div class="text-right shrink-0">
+                        <span class="font-display text-2xl font-semibold text-whiskey-700">1 credit</span>
+                        <p class="text-sm text-gray-500">No charge</p>
+                      </div>
                     </div>
-                    <div class="ml-3 flex-1">
-                      <div class="flex items-center justify-between">
-                        <div>
-                          <h3 class="text-lg font-semibold text-gray-900">Use Subscription Credit</h3>
-                          <p class="text-gray-600 mt-1">You have <%= current_user.credits %> credit<%= 's' if current_user.credits != 1 %> available</p>
-                        </div>
-                        <div class="text-right">
-                          <span class="text-2xl font-bold text-whiskey-600">1 Credit</span>
-                          <p class="text-sm text-gray-500">No charge</p>
-                        </div>
-                      </div>
-                      <div class="mt-3 flex items-center text-sm text-whiskey-600">
-                        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                        Recommended: Save money with your subscription
-                      </div>
+                  </div>
+                </label>
+              <% end %>
+
+              <label class="block cursor-pointer">
+                <input type="radio" name="purchase_method" value="direct" class="peer sr-only" <%= 'checked' unless @can_use_credit %>>
+                <div class="rounded-xl border-2 border-whiskey-100 p-6 transition hover:border-whiskey-300 peer-checked:border-whiskey-600 peer-checked:bg-whiskey-50 peer-focus-visible:ring-2 peer-focus-visible:ring-whiskey-500 peer-focus-visible:ring-offset-2">
+                  <div class="flex items-start justify-between gap-4">
+                    <div>
+                      <h3 class="text-lg font-semibold text-gray-900">Buy it outright</h3>
+                      <p class="mt-1 text-gray-600">One-time payment. Yours for good, membership or not.</p>
+                    </div>
+                    <div class="text-right shrink-0">
+                      <span class="font-display text-2xl font-semibold text-gray-900"><%= @presentation.formatted_price %></span>
+                      <p class="text-sm text-gray-500">One-time</p>
                     </div>
                   </div>
                 </div>
               </label>
-            <% end %>
+            </fieldset>
 
-            <!-- Direct Purchase Option -->
-            <label class="relative block cursor-pointer" onclick="selectPurchaseMethod('direct')">
-              <input type="radio" name="purchase_method" value="direct" id="direct_option" class="peer sr-only" <%= 'checked' unless (@has_credits && @user_subscription_active) %>>
-              <div class="border-2 border-gray-200 rounded-xl p-6 transition-all hover:border-gray-300" id="direct_option_div">
-                <div class="flex items-start">
-                  <div class="flex items-center h-5">
-                    <div class="w-4 h-4 border-2 border-gray-300 rounded-full transition-all" id="direct_radio"></div>
-                  </div>
-                  <div class="ml-3 flex-1">
-                    <div class="flex items-center justify-between">
-                      <div>
-                        <h3 class="text-lg font-semibold text-gray-900">Buy Direct</h3>
-                        <p class="text-gray-600 mt-1">One-time purchase, lifetime access</p>
-                      </div>
-                      <div class="text-right">
-                        <span class="text-2xl font-bold text-gray-900"><%= @presentation.formatted_price %></span>
-                        <p class="text-sm text-gray-500">One-time payment</p>
-                      </div>
-                    </div>
-                    <% unless @user_subscription_active %>
-                      <div class="mt-3 bg-amber-50 border border-amber-200 rounded-lg p-3">
-                        <p class="text-sm text-amber-800">
-                          <strong>Save with a subscription!</strong> Get 1 presentation credit every month plus access to exclusive content.
-                          <%= link_to "Learn more", root_path(anchor: "pricing"), class: "underline hover:text-amber-900" %>
-                        </p>
-                      </div>
-                    <% end %>
-                  </div>
-                </div>
-              </div>
-            </label>
-
-            <% unless @has_credits || @user_subscription_active %>
-              <!-- No subscription info -->
-              <div class="mt-6 bg-gradient-to-r from-whiskey-50 to-purple-50 rounded-xl p-6 border border-whiskey-200">
-                <div class="flex items-start">
-                  <svg class="w-6 h-6 text-whiskey-600 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  <div class="ml-3">
-                    <h4 class="font-semibold text-whiskey-900">Did you know?</h4>
-                    <p class="text-whiskey-700 mt-1">With a subscription, you get 1 credit every month to use on any presentation, plus exclusive member benefits.</p>
-                    <%= link_to "View subscription plans", root_path(anchor: "pricing"), class: "inline-flex items-center mt-2 text-whiskey-600 hover:text-whiskey-700 font-medium" %>
-                  </div>
-                </div>
+            <% unless current_user.subscription_active? %>
+              <div class="mt-6 rounded-xl border border-whiskey-200 bg-whiskey-50 p-5">
+                <p class="text-sm text-whiskey-900">
+                  <strong>Members get a deck credit every month</strong> — most months, that
+                  makes the membership cheaper than one deck.
+                  <%= link_to "See membership plans", root_path(anchor: "pricing"), class: "font-semibold underline underline-offset-2 hover:text-whiskey-700" %>
+                </p>
               </div>
             <% end %>
-          </div>
 
-          <!-- Submit Button -->
-          <div class="mt-8">
-            <%= f.submit "Continue to Payment", class: "w-full py-4 px-6 border border-transparent rounded-xl shadow-lg text-lg font-semibold text-white bg-gradient-to-r from-whiskey-600 to-purple-600 hover:from-whiskey-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-whiskey-500 cursor-pointer", style: "transition: background 0.2s ease; transform: none !important;" %>
-          </div>
+            <%= f.submit "Continue", class: "mt-8 w-full cursor-pointer rounded-xl bg-whiskey-600 px-6 py-4 text-lg font-semibold text-white transition hover:bg-whiskey-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2" %>
+          <% end %>
+
+          <p class="mt-5 flex items-center justify-center gap-2 text-sm text-gray-500">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
+            </svg>
+            Secure payment by Stripe — cards, Apple Pay, and more
+          </p>
         <% end %>
-
-        <!-- Security Notice -->
-        <div class="mt-6 flex items-center justify-center text-sm text-gray-500">
-          <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-          </svg>
-          Secure payment powered by Stripe
-        </div>
       </div>
     </div>
   </div>
 </div>
-
-
-<script>
-function selectPurchaseMethod(method) {
-  // Update radio buttons
-  if (document.getElementById('credit_option')) {
-    document.getElementById('credit_option').checked = (method === 'credit');
-  }
-  document.getElementById('direct_option').checked = (method === 'direct');
-  
-  // Update visual states
-  if (method === 'credit') {
-    // Credit option selected
-    document.getElementById('credit_option_div').classList.add('border-whiskey-600', 'bg-whiskey-50');
-    document.getElementById('credit_option_div').classList.remove('border-gray-200');
-    document.getElementById('credit_radio').classList.add('border-whiskey-600', 'bg-whiskey-600');
-    document.getElementById('credit_radio').classList.remove('border-gray-300');
-    
-    // Direct option deselected
-    document.getElementById('direct_option_div').classList.remove('border-whiskey-600', 'bg-whiskey-50');
-    document.getElementById('direct_option_div').classList.add('border-gray-200');
-    document.getElementById('direct_radio').classList.remove('border-whiskey-600', 'bg-whiskey-600');
-    document.getElementById('direct_radio').classList.add('border-gray-300');
-  } else {
-    // Direct option selected
-    document.getElementById('direct_option_div').classList.add('border-whiskey-600', 'bg-whiskey-50');
-    document.getElementById('direct_option_div').classList.remove('border-gray-200');
-    document.getElementById('direct_radio').classList.add('border-whiskey-600', 'bg-whiskey-600');
-    document.getElementById('direct_radio').classList.remove('border-gray-300');
-    
-    // Credit option deselected (if it exists)
-    if (document.getElementById('credit_option_div')) {
-      document.getElementById('credit_option_div').classList.remove('border-whiskey-600', 'bg-whiskey-50');
-      document.getElementById('credit_option_div').classList.add('border-gray-200');
-      document.getElementById('credit_radio').classList.remove('border-whiskey-600', 'bg-whiskey-600');
-      document.getElementById('credit_radio').classList.add('border-gray-300');
-    }
-  }
-}
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', function() {
-  // Check which options are available and select the appropriate one
-  const hasCreditOption = document.getElementById('credit_option') !== null;
-  const hasDirectOption = document.getElementById('direct_option') !== null;
-  
-  <% if @has_credits && @user_subscription_active %>
-    // User has credits, select credit option
-    selectPurchaseMethod('credit');
-  <% else %>
-    // No credits or no subscription, select direct option
-    selectPurchaseMethod('direct');
-  <% end %>
-  
-  // If only one option is available, ensure it's selected
-  if (!hasCreditOption && hasDirectOption) {
-    selectPurchaseMethod('direct');
-  }
-});
-</script>

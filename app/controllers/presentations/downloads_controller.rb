@@ -71,12 +71,18 @@ class Presentations::DownloadsController < ApplicationController
   end
   
   def check_access
-    unless user_signed_in? && @presentation.can_download_full_presentation?(current_user)
-      if !user_signed_in?
-        redirect_to auth_path, alert: 'Please sign in to download this file'
-      else
-        redirect_to new_presentation_purchase_path(@presentation), alert: 'Please purchase this presentation to download files'
-      end
+    return if user_signed_in? && @presentation.can_download_full_presentation?(current_user)
+
+    if !user_signed_in?
+      redirect_to auth_path, alert: 'Sign in to download this file'
+    elsif @presentation.purchased_by?(current_user)
+      # Owns the deck via a credit but the membership has lapsed — downloads
+      # come back when the membership does.
+      redirect_to root_path(anchor: 'pricing'),
+                  alert: 'This deck was unlocked with a credit — reactivate your membership to download it'
+    else
+      redirect_to new_presentation_purchase_path(@presentation),
+                  alert: 'Get this deck to download its files'
     end
   end
   

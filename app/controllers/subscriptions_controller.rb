@@ -68,12 +68,12 @@ class SubscriptionsController < ApplicationController
         )
       end
 
-      # Create Stripe checkout session
+      # Create Stripe checkout session. payment_method_types is intentionally
+      # omitted: Checkout then offers every method enabled in the Stripe
+      # Dashboard (card, Apple Pay, Link, ...). automatic_payment_methods is a
+      # PaymentIntents-only parameter and is rejected by the Checkout API.
       session = Stripe::Checkout::Session.create({
         customer: customer.id,
-        # Surface every payment method enabled in the Stripe Dashboard (card, Apple Pay,
-        # Link, etc.) instead of hard-coding card only.
-        automatic_payment_methods: { enabled: true },
         line_items: [ {
           price: price_ids[price_id],
           quantity: 1

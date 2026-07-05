@@ -79,7 +79,11 @@ class Presentation < ApplicationRecord
 
   def can_download_full_presentation?(user)
     return false unless user
-    purchased_by?(user) || user.admin?
+    return true if user.admin?
+
+    # Delegates to the access rule that understands purchase types: direct
+    # purchases are forever, credit purchases require an active subscription.
+    user.can_access_presentation?(id)
   end
 
   def can_download_speaker_notes?(user)
