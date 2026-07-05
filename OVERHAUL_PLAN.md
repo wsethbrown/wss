@@ -15,29 +15,44 @@
 
 ---
 
-## ★ STATUS — what the outgoing engineer (Fable) already did
+## ★ STATUS — overhaul complete (Fable + Opus)
 
-I executed the highest-priority phases on branch **`overhaul/full-refresh`** (8 commits on top of
-`main`).
+All phases executed on branch **`overhaul/full-refresh`**, pushed to
+`origin/overhaul/full-refresh` (github.com/wsethbrown/wss). Ready to merge to `main`.
 
-**Verified in Docker (Ruby 3.4.3 + Postgres 15) — this is not just syntax-checked.** Migrations
-apply cleanly, Tailwind v4 compiles the new design system, and the full suite runs. Measured results:
+**Final verified state (Docker, Ruby 3.4.3 + Postgres 15):**
 
 | | failures | errors | skips | runs |
 |---|---|---|---|---|
 | `main` (baseline) | 59 | 55 | 0 | 173 |
-| `overhaul/full-refresh` | **44** | **55** | 9 | 177 |
+| `overhaul/full-refresh` (final) | **0** | **0** | 9 | 177 |
 
-My changes **removed 15 failures and introduced zero regressions**; all 19 of my new tests (credit
-ledger, webhook idempotency, magic links) pass; the 9 skips are the Apple OmniAuth tests, correctly
-gated on Apple being configured. **The remaining 44/55 red is pre-existing test drift that predates
-this work** — tests reference routes that don't exist (`dashboard_path`, `new_user_session_path`),
-old view copy ("Discover Whiskey Societies"), CSS selectors the app dropped (`.society-card`,
-`.error-message`), a Google button test asserting an `<a>` where the view renders a `button_to`
-form, and the missing `rails-controller-testing` gem. **Opus: reconciling this stale suite with the
-current app is a real Phase 8 task — but note it was already broken on `main`; you are not chasing my
-changes.** To reproduce: `docker compose up -d db` then
+The 9 skips are the Apple OmniAuth tests, intentionally gated until `APPLE_*` credentials are
+configured. Brakeman: **0 security warnings**. To reproduce: `docker compose up -d db` then
 `docker compose run --rm -e RAILS_ENV=test -e DATABASE_URL="postgresql://wss:password@db:5432/wss_test" web bash -c "bin/rails db:test:prepare && bin/rails test"`.
+
+**Completed beyond the original phases (second pass, verified in the browser end-to-end):**
+- Google OAuth diagnosed (empty credentials in `.env`) and made honest: strategy registered per
+  environment, button gated on real credentials, exact console setup steps in `.env.example`.
+  **Owner action: paste real GOOGLE_CLIENT_ID/SECRET into `.env`, then `./wss restart`.**
+- Deck content renders as an editorial reading experience (redcarpet + sanitized
+  `render_markdown`, `.prose-deck` with drop cap, amber-thread reading progress).
+- Full visual system shipped: char/paper two-surface identity, Fraunces / Instrument Sans /
+  Source Serif 4, homepage rewritten (pinned how-it-works fixed), library rebuilt (JS-modal cards
+  → real links with ownership badges), societies/events/account/auth reskinned.
+- Purchase flow unified and audited state-by-state; free decks claimable without Stripe; credit
+  spending consistently requires an active membership; **fixed a real access bug** (lapsed members
+  could download credit-purchased files); Checkout offers all dashboard payment methods.
+- All fabricated content removed (fake testimonials, reviews, member stats, money-back guarantee,
+  reviewless star ratings, dead wishlist buttons, dead footer links, Unsplash hotlink).
+- Admin panel: root cause of unusability was `stylesheet_link_tag :app` (nonexistent) — admin
+  rendered with no CSS. Rebuilt as a char sidebar shell; added the missing credit-ledger view
+  (was a 204). Every admin page verified rendering.
+- Test suite fully reconciled: 177 runs, 0 failures, 0 errors.
+
+**Remaining owner actions (not code):** real Stripe keys + price IDs in `.env` (current values are
+placeholders — checkout cannot succeed until then), Google OAuth credentials, renewed Apple key
+(revoke the leaked one), production deploy config.
 
 **Done (see git log on the branch):**
 - **Phase 0 (critical security) — COMPLETE.** Deleted the three auth-bypass controllers
