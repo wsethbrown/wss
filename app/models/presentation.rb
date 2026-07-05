@@ -1,4 +1,9 @@
 class Presentation < ApplicationRecord
+  # One number for every deck-image size rule (validations + import filter).
+  # Big enough for full-res deck photography; downscaling via libvips is the
+  # eventual polish (see SECTION_NOTES).
+  MAX_IMAGE_SIZE = 15.megabytes
+
   belongs_to :author, class_name: 'User'
   has_many :user_presentations, dependent: :destroy
   has_many :purchasers, through: :user_presentations, source: :user
@@ -238,8 +243,8 @@ class Presentation < ApplicationRecord
       errors.add(:featured_image, 'must be a valid image format (JPEG, PNG, GIF, or WebP)')
     end
 
-    if featured_image.byte_size > 5.megabytes
-      errors.add(:featured_image, 'must be less than 5MB')
+    if featured_image.byte_size > MAX_IMAGE_SIZE
+      errors.add(:featured_image, 'must be less than 15MB')
     end
   end
 
@@ -287,8 +292,8 @@ class Presentation < ApplicationRecord
         errors.add(:preview_images, 'must be valid image formats (JPEG, PNG, GIF, or WebP)')
       end
 
-      if image.byte_size > 5.megabytes
-        errors.add(:preview_images, 'must be less than 5MB each')
+      if image.byte_size > MAX_IMAGE_SIZE
+        errors.add(:preview_images, 'must be less than 15MB each')
       end
     end
   end
