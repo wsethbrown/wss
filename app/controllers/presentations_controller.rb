@@ -1,5 +1,6 @@
 class PresentationsController < ApplicationController
   include ActivityLogger
+  include DesignPreview
   
   before_action :set_presentation, only: [:show, :present, :edit, :update, :destroy]
 
@@ -28,6 +29,8 @@ class PresentationsController < ApplicationController
                      end
 
     @presentations = @presentations.page(params[:page]).per(12)
+
+    maybe_render_next
   end
 
   def show

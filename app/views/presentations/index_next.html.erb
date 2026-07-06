@@ -1,0 +1,92 @@
+<%# NEXT-DESIGN PREVIEW (?design=next): the library as a whiskey SHELF —
+    cover-forward mosaic, featured deck oversized, no card grid. %>
+
+<div class="fixed bottom-4 left-4 z-50 rounded-full bg-char px-4 py-2 text-xs font-semibold text-whiskey-300 shadow-lg">
+  Viewing: next design · <%= link_to 'back to current', presentations_path, class: 'underline text-cream' %>
+</div>
+
+<section class="w-full bg-char px-4 pb-10 pt-28">
+  <div class="mx-auto max-w-6xl">
+    <div class="flex flex-wrap items-end justify-between gap-6">
+      <div>
+        <p class="eyebrow mb-3 text-whiskey-300/90">The library</p>
+        <h1 class="font-display text-5xl font-semibold text-cream">The shelf</h1>
+      </div>
+      <%# One quiet bar: search + category + sort collapse together. %>
+      <%= form_with url: presentations_path(design: 'next'), method: :get, local: true, class: "flex flex-wrap items-center gap-2" do |form| %>
+        <%= form.search_field :search, value: params[:search], placeholder: "Search...",
+            class: "w-44 rounded-lg border border-oak-edge bg-oak px-3 py-2 text-sm text-cream placeholder-cream/40 focus:border-whiskey-500 focus:outline-none" %>
+        <%= form.select :category, options_for_select([['All', '']] + @categories.map { |c| [c, c] }, params[:category]), {},
+            class: "rounded-lg border border-oak-edge bg-oak px-3 py-2 text-sm text-cream focus:outline-none" %>
+        <%= form.select :sort, options_for_select([['Popular', 'popular'], ['Newest', 'newest'], ['Price ↑', 'price_low'], ['Price ↓', 'price_high']], params[:sort]), {},
+            class: "rounded-lg border border-oak-edge bg-oak px-3 py-2 text-sm text-cream focus:outline-none" %>
+        <%= form.hidden_field :design, value: 'next' %>
+        <%= form.submit "Go", class: "cursor-pointer rounded-lg bg-whiskey-500 px-4 py-2 text-sm font-semibold text-white hover:bg-whiskey-400" %>
+      <% end %>
+    </div>
+  </div>
+</section>
+
+<section class="w-full bg-char px-4 pb-24">
+  <div class="mx-auto max-w-6xl">
+    <% decks = @presentations.to_a %>
+    <% featured, rest = decks.first, decks.drop(1) %>
+
+    <% if featured %>
+      <%# The featured pour: oversized, spotlit. %>
+      <%= link_to presentation_path(featured), class: 'group block' do %>
+        <div class="grid items-stretch gap-0 overflow-hidden rounded-2xl border border-oak-edge md:grid-cols-5">
+          <div class="relative md:col-span-3">
+            <% if featured.featured_image.attached? %>
+              <%= image_tag featured.featured_image, alt: featured.title, class: 'h-full min-h-72 w-full object-cover transition duration-500 group-hover:scale-[1.02]' %>
+              <div class="absolute inset-0 bg-gradient-to-r from-transparent to-char/60"></div>
+            <% else %>
+              <div class="flex h-full min-h-72 items-center justify-center bg-oak px-8 text-center">
+                <span class="font-display text-4xl font-semibold text-cream"><%= featured.title %></span>
+              </div>
+            <% end %>
+          </div>
+          <div class="flex flex-col justify-center bg-oak p-10 md:col-span-2">
+            <p class="eyebrow text-whiskey-300"><%= featured.category.presence || 'Whiskey' %><%= " · #{featured.difficulty}" if featured.difficulty.present? %></p>
+            <div class="rule-double my-4 w-14 text-whiskey-400"></div>
+            <h2 class="font-display text-3xl font-semibold leading-tight text-cream"><%= featured.title %></h2>
+            <p class="mt-4 line-clamp-3 text-cream/70"><%= featured.excerpt(160) %></p>
+            <p class="mt-6 font-display text-2xl text-whiskey-300"><%= featured.formatted_price %></p>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+
+    <%# The shelf: tall covers in a tight row, like bottles/spines. %>
+    <% if rest.any? %>
+      <div class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
+        <% rest.each do |deck| %>
+          <%= link_to presentation_path(deck), class: 'group block' do %>
+            <div class="relative aspect-[3/4] overflow-hidden rounded-xl border border-oak-edge">
+              <% if deck.featured_image.attached? %>
+                <%= image_tag deck.featured_image, alt: deck.title, class: 'absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]' %>
+                <div class="absolute inset-0 bg-gradient-to-t from-char via-char/30 to-transparent"></div>
+              <% else %>
+                <div class="absolute inset-0 bg-oak"></div>
+                <div class="pointer-events-none absolute inset-0" style="background: radial-gradient(ellipse 80% 50% at 50% 110%, rgba(201,136,74,.25), transparent 70%);"></div>
+              <% end %>
+              <div class="absolute inset-x-0 bottom-0 p-4">
+                <p class="eyebrow text-[0.6rem] text-whiskey-300"><%= deck.category.presence || 'Whiskey' %></p>
+                <h3 class="mt-1 font-display text-lg font-semibold leading-snug text-cream"><%= deck.title %></h3>
+                <p class="mt-1 text-sm font-semibold text-cream/70"><%= deck.formatted_price %></p>
+              </div>
+              <% if user_signed_in? && deck.purchased_by?(current_user) %>
+                <span class="eyebrow absolute right-3 top-3 rounded-full bg-whiskey-500/90 px-2.5 py-1 text-[0.6rem] text-white">Yours</span>
+              <% end %>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% if decks.empty? %>
+      <p class="py-16 text-center text-cream/60">Nothing on the shelf matches — <%= link_to 'clear filters', presentations_path(design: 'next'), class: 'text-whiskey-300 underline' %>.</p>
+    <% end %>
+    <div class="mt-10"><%= paginate @presentations if @presentations.respond_to?(:total_pages) %></div>
+  </div>
+</section>
