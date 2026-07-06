@@ -6,12 +6,12 @@ experience. The current site is page-templated: every page is masthead +
 white cards. Starting over, I'd design around the three operations and what
 each is FOR:
 
-## 1. Choosing a story → the shelf, not the catalog
-End goal: the feeling of scanning a whiskey shelf, not filtering a SaaS grid.
-- Library becomes cover-forward: tall deck "spines"/covers at varying visual
-  weight (featured deck oversized), category as small stamped labels.
-- Kill the uniform 3-col card grid; use an editorial mosaic. Search/filters
-  collapse into one quiet bar.
+## 1. Choosing a story — REJECTED by owner (July 2026), do not re-propose
+The "shelf" concept (skeuomorphic planks, book spines, brass plaques) was
+built as a preview and firmly rejected: it reads as costume, not design, and
+violates the system's own principle that structure should carry information.
+The CURRENT library design stays. If the library ever needs evolution, it
+should be editorial (typography/layout weight), never literal skeuomorphism.
 
 ## 2. Reading/presenting → the site IS the venue (better end goal)
 Today the deck page sells a FILE. But we already render every slide
