@@ -57,30 +57,53 @@
       <% end %>
     <% end %>
 
-    <%# The shelf: tall covers in a tight row, like bottles/spines. %>
-    <% if rest.any? %>
-      <div class="mt-4 grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4">
-        <% rest.each do |deck| %>
-          <%= link_to presentation_path(deck), class: 'group block' do %>
-            <div class="relative aspect-[3/4] overflow-hidden rounded-xl border border-oak-edge">
+    <%# The shelf, literally: category rows of spines standing on a plank.
+        Covers face front; coverless decks are narrow book spines with
+        vertical titles. Varied heights + baseline + shadow = a real shelf. %>
+    <% rest.group_by { |d| d.category.presence || 'Whiskey' }.sort.each do |category, shelf_decks| %>
+      <div class="mt-14">
+        <%# Brass section plaque %>
+        <div class="mb-0 flex justify-center">
+          <span class="eyebrow rounded-sm border border-whiskey-500/50 bg-gradient-to-b from-whiskey-400/30 to-whiskey-600/30 px-4 py-1.5 text-whiskey-200 shadow-inner"><%= category %></span>
+        </div>
+        <div class="flex items-end justify-center gap-5 px-6 pt-8">
+          <% shelf_decks.each_with_index do |deck, i| %>
+            <% h = [56, 64, 60, 68, 58][i % 5] %>
+            <%= link_to presentation_path(deck), class: 'group block transition duration-300 hover:-translate-y-2' do %>
               <% if deck.featured_image.attached? %>
-                <%= image_tag deck.featured_image, alt: deck.title, class: 'absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-[1.04]' %>
-                <div class="absolute inset-0 bg-gradient-to-t from-char via-char/30 to-transparent"></div>
+                <%# Front-facing cover leaning on the shelf %>
+                <div class="relative w-40 overflow-hidden rounded-sm shadow-[0_18px_24px_-12px_rgba(0,0,0,.8)]" style="height: <%= h * 4 %>px">
+                  <%= image_tag deck.featured_image, alt: deck.title, class: 'absolute inset-0 h-full w-full object-cover' %>
+                  <div class="absolute inset-0 bg-gradient-to-t from-char/90 via-transparent to-transparent"></div>
+                  <div class="absolute inset-x-0 bottom-0 p-3">
+                    <h3 class="font-display text-sm font-semibold leading-snug text-cream"><%= deck.title %></h3>
+                    <p class="text-xs font-semibold text-whiskey-300"><%= deck.formatted_price %></p>
+                  </div>
+                  <% if user_signed_in? && deck.purchased_by?(current_user) %>
+                    <span class="eyebrow absolute right-2 top-2 rounded-full bg-whiskey-500/90 px-2 py-0.5 text-[0.55rem] text-white">Yours</span>
+                  <% end %>
+                </div>
               <% else %>
-                <div class="absolute inset-0 bg-oak"></div>
-                <div class="pointer-events-none absolute inset-0" style="background: radial-gradient(ellipse 80% 50% at 50% 110%, rgba(201,136,74,.25), transparent 70%);"></div>
+                <%# Book spine: narrow, vertical title, embossed rules %>
+                <div class="relative w-16 rounded-sm border-x border-t border-whiskey-900 bg-gradient-to-r from-whiskey-950 via-oak to-whiskey-950 shadow-[0_18px_24px_-12px_rgba(0,0,0,.8)]" style="height: <%= h * 4 %>px">
+                  <div class="absolute inset-x-3 top-4 border-t-2 border-whiskey-500/60"></div>
+                  <div class="absolute inset-x-3 top-6 border-t border-whiskey-500/40"></div>
+                  <div class="absolute inset-0 flex items-center justify-center p-2">
+                    <h3 class="font-display text-sm font-semibold leading-tight text-cream [writing-mode:vertical-rl]"><%= deck.title.truncate(42) %></h3>
+                  </div>
+                  <div class="absolute inset-x-3 bottom-8 border-t border-whiskey-500/40"></div>
+                  <p class="absolute inset-x-0 bottom-2 text-center text-[0.6rem] font-semibold text-whiskey-300"><%= deck.formatted_price %></p>
+                  <% if user_signed_in? && deck.purchased_by?(current_user) %>
+                    <span class="absolute -right-1 top-2 h-2 w-2 rounded-full bg-whiskey-400" title="Yours"></span>
+                  <% end %>
+                </div>
               <% end %>
-              <div class="absolute inset-x-0 bottom-0 p-4">
-                <p class="eyebrow text-[0.6rem] text-whiskey-300"><%= deck.category.presence || 'Whiskey' %></p>
-                <h3 class="mt-1 font-display text-lg font-semibold leading-snug text-cream"><%= deck.title %></h3>
-                <p class="mt-1 text-sm font-semibold text-cream/70"><%= deck.formatted_price %></p>
-              </div>
-              <% if user_signed_in? && deck.purchased_by?(current_user) %>
-                <span class="eyebrow absolute right-3 top-3 rounded-full bg-whiskey-500/90 px-2.5 py-1 text-[0.6rem] text-white">Yours</span>
-              <% end %>
-            </div>
+            <% end %>
           <% end %>
-        <% end %>
+        </div>
+        <%# The plank %>
+        <div class="mx-auto h-3 max-w-4xl rounded-sm bg-gradient-to-b from-whiskey-800 to-whiskey-950 shadow-[0_10px_20px_rgba(0,0,0,.6)]"></div>
+        <div class="mx-auto h-1 max-w-3xl bg-char/80"></div>
       </div>
     <% end %>
 
