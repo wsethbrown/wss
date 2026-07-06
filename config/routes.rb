@@ -121,6 +121,7 @@ Rails.application.routes.draw do
   # Presentations. All purchasing goes through the nested purchases controller —
   # a single flow for credit, paid (Stripe checkout), and free decks.
   resources :presentations do
+    member { get :present }
     resources :purchases, only: [ :new, :create ], controller: 'presentations/purchases'
     resources :downloads, only: [], controller: 'presentations/downloads' do
       collection do

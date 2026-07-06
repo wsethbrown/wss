@@ -1,7 +1,7 @@
 class PresentationsController < ApplicationController
   include ActivityLogger
   
-  before_action :set_presentation, only: [:show, :edit, :update, :destroy]
+  before_action :set_presentation, only: [:show, :present, :edit, :update, :destroy]
 
   def index
     # The library is fully empty only when there are no published decks at all —
@@ -39,6 +39,15 @@ class PresentationsController < ApplicationController
     @full_story = user_signed_in? && @presentation.can_download_full_presentation?(current_user)
 
     @more_decks = Presentation.published.where.not(id: @presentation.id).recent.limit(3)
+  end
+
+  # Full-screen in-browser slide player — the tasting venue. Owners/admins only.
+  def present
+    unless user_signed_in? && @presentation.can_download_full_presentation?(current_user) &&
+           @presentation.slide_images.attached?
+      redirect_to presentation_path(@presentation) and return
+    end
+    render layout: false
   end
 
   def new

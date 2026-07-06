@@ -40,6 +40,10 @@
       <% if user_signed_in? && @presentation.purchased_by?(current_user) %>
         <%# Owners: open the real deck when the file exists; otherwise read the story. %>
         <% if @presentation.pdf_file.attached? && @full_story %>
+          <% if @presentation.slide_images.attached? %>
+            <%= link_to "Present", present_presentation_path(@presentation),
+                class: "inline-flex items-center justify-center gap-2 rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400" %>
+          <% end %>
           <%= link_to full_presentation_presentation_downloads_path(@presentation),
               class: "inline-flex items-center justify-center gap-2 rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char" do %>
             Open the deck
