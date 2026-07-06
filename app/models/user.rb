@@ -232,6 +232,11 @@ class User < ApplicationRecord
     end
   end
 
+  # TOTP secret and backup codes are encrypted at rest (ActiveRecord encryption;
+  # keys in env — see config/initializers/active_record_encryption.rb).
+  encrypts :otp_secret_key
+  encrypts :backup_codes
+
   # 2FA helper methods
   def two_factor_enabled?
     otp_enabled? && otp_secret_key.present?
