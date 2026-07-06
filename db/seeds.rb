@@ -86,8 +86,6 @@ if Rails.env.development?
       p.price = presentation_data[:price]
       p.duration = presentation_data[:duration]
       p.difficulty = presentation_data[:difficulty]
-      p.rating = presentation_data[:rating]
-      p.review_count = presentation_data[:review_count]
       p.image = presentation_data[:image]
       p.published = presentation_data[:published]
       
