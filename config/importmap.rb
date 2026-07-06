@@ -5,3 +5,6 @@ pin "@hotwired/turbo-rails", to: "turbo.min.js"
 pin "@hotwired/stimulus", to: "stimulus.min.js"
 pin "@hotwired/stimulus-loading", to: "stimulus-loading.js"
 pin_all_from "app/javascript/controllers", under: "controllers"
+
+# Markdown editor for the admin deck story field (ESM build via jsdelivr).
+pin "easymde", to: "https://cdn.jsdelivr.net/npm/easymde@2.18.0/+esm"

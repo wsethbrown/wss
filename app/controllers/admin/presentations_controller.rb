@@ -71,6 +71,12 @@ class Admin::PresentationsController < Admin::BaseController
     redirect_to new_admin_presentation_path, alert: "Couldn't read that file as a deck: #{e.message}"
   end
 
+  # Server-side Markdown preview for the story editor — same pipeline the
+  # public reader uses, so the preview is exact.
+  def preview
+    render html: helpers.render_markdown(params[:content].to_s), layout: false
+  end
+
   def create
     @presentation = Presentation.new(presentation_params)
     @presentation.author = current_user
