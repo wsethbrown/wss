@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_05_184038) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_05_231022) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -126,6 +126,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_05_184038) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.index ["society_id"], name: "index_forums_on_society_id"
+  end
+
+  create_table "presentation_tags", force: :cascade do |t|
+    t.bigint "presentation_id", null: false
+    t.bigint "tag_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["presentation_id", "tag_id"], name: "index_presentation_tags_on_presentation_id_and_tag_id", unique: true
+    t.index ["presentation_id"], name: "index_presentation_tags_on_presentation_id"
+    t.index ["tag_id"], name: "index_presentation_tags_on_tag_id"
   end
 
   create_table "presentations", force: :cascade do |t|
@@ -418,6 +428,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_05_184038) do
   add_foreign_key "events", "societies"
   add_foreign_key "events", "users", column: "organizer_id"
   add_foreign_key "forums", "societies"
+  add_foreign_key "presentation_tags", "presentations"
+  add_foreign_key "presentation_tags", "tags"
   add_foreign_key "presentations", "users", column: "author_id"
   add_foreign_key "societies", "users", column: "creator_id"
   add_foreign_key "society_applications", "societies"

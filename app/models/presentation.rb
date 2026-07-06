@@ -6,6 +6,8 @@ class Presentation < ApplicationRecord
 
   belongs_to :author, class_name: 'User'
   has_many :user_presentations, dependent: :destroy
+  has_many :presentation_tags, dependent: :destroy
+  has_many :tags, through: :presentation_tags
   has_many :purchasers, through: :user_presentations, source: :user
 
   # Active Storage attachments
@@ -44,8 +46,20 @@ class Presentation < ApplicationRecord
   scope :by_category, ->(category) { where(category: category) if category.present? }
   scope :by_difficulty, ->(difficulty) { where(difficulty: difficulty) if difficulty.present? }
   scope :search, ->(query) { where('title ILIKE ? OR description ILIKE ?', "%#{query}%", "%#{query}%") if query.present? }
+  scope :by_tag, ->(tag_name) { joins(:tags).where(tags: { name: tag_name }) if tag_name.present? }
   scope :recent, -> { order(created_at: :desc) }
   scope :popular, -> { order(rating: :desc, review_count: :desc) }
+
+  # Comma-separated tag editing ("smoky, islay, beginner friendly"). Tags are
+  # normalized lowercase; find-or-create under the 'deck' tag category.
+  def tag_names
+    tags.pluck(:name).join(', ')
+  end
+
+  def tag_names=(value)
+    names = value.to_s.split(',').map { |n| n.strip.downcase }.reject(&:blank?).uniq.first(10)
+    self.tags = names.map { |n| Tag.find_or_create_by(name: n) { |t| t.category = 'deck' } }
+  end
 
   # Instance methods
   def free?

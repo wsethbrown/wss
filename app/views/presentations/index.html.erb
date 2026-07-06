@@ -61,7 +61,20 @@
 <!-- Catalog -->
 <section class="w-full bg-white px-4 py-14">
   <div class="mx-auto max-w-6xl">
-    <% filtering = params[:search].present? || params[:category].present? || params[:difficulty].present? %>
+    <%# Popular tags as one quiet clickable row. %>
+    <% if @popular_tags.any? %>
+      <div class="mb-8 flex flex-wrap items-center gap-2">
+        <span class="eyebrow text-gray-400">Tags</span>
+        <% @popular_tags.each do |tag| %>
+          <% active = params[:tag] == tag.name %>
+          <%= link_to tag.name,
+              presentations_path(request.query_parameters.except('tag', 'page').merge(active ? {} : { tag: tag.name })),
+              class: "rounded-full px-3 py-1 text-sm font-medium transition #{active ? 'bg-whiskey-600 text-white' : 'bg-whiskey-100 text-whiskey-800 hover:bg-whiskey-200'}" %>
+        <% end %>
+      </div>
+    <% end %>
+
+    <% filtering = params[:search].present? || params[:category].present? || params[:difficulty].present? || params[:tag].present? %>
     <div class="mb-8 flex items-baseline justify-between">
       <p class="text-gray-600">
         <%= pluralize(@presentations.total_count, 'deck') %><%= " matching your filters" if filtering %>

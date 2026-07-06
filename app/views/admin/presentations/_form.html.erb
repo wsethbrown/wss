@@ -33,6 +33,13 @@
       </datalist>
     </div>
 
+    <div class="md:col-span-2">
+      <%= form.label :tag_names, "Tags", class: "block text-sm font-medium text-gray-700 mb-2" %>
+      <%= form.text_field :tag_names, placeholder: "smoky, islay, blind tasting",
+          class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+      <p class="text-xs text-gray-500 mt-1">Comma-separated, up to 10. Lowercased automatically; buyers can filter the library by tag.</p>
+    </div>
+
     <div>
       <%= form.label :price, class: "block text-sm font-medium text-gray-700 mb-2" %>
       <%= form.number_field :price, step: 0.01, min: 0, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "9.99" %>

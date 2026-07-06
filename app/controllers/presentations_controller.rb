@@ -13,6 +13,8 @@ class PresentationsController < ApplicationController
     # automatically and an empty one never renders a dead filter.
     @categories = Presentation.published.where.not(category: [nil, ''])
                               .distinct.order(:category).pluck(:category)
+    @popular_tags = Tag.joins(:presentation_tags).group('tags.id')
+                       .order(Arel.sql('COUNT(presentation_tags.id) DESC')).limit(12)
     @difficulties = %w[Beginner Intermediate Advanced] &
                     Presentation.published.distinct.pluck(:difficulty).compact
 
@@ -20,6 +22,7 @@ class PresentationsController < ApplicationController
     @presentations = @presentations.search(params[:search])
     @presentations = @presentations.by_category(params[:category])
     @presentations = @presentations.by_difficulty(params[:difficulty])
+    @presentations = @presentations.by_tag(params[:tag])
 
     @presentations = case params[:sort]
                      when 'newest'     then @presentations.recent

@@ -160,6 +160,7 @@ class Admin::PresentationsController < Admin::BaseController
       :description, 
       :content, 
       :category, 
+      :tag_names,
       :price, 
       :duration,
       :difficulty,
