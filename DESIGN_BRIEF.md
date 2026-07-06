@@ -38,3 +38,15 @@ view. Boxes only for genuinely interactive clusters.
 ## Build order for a fresh session
 1. Present mode (below — built) → 2. Library shelf → 3. Deck page two-act
 restructure → 4. Society ticket/timeline → 5. De-card pass site-wide.
+
+## Implementation directive (owner-approved): build as PREVIEW, don't replace
+The owner wants the new design built ALONGSIDE the current one for comparison:
+- Convention: `?design=next` on any page renders the `_next` template variant
+  (e.g. presentations/index_next.html.erb) via a small controller concern
+  (`render "index_next" if params[:design] == "next"` guarded to admins).
+- Current templates stay untouched. A small floating "Viewing: next design"
+  badge with a link back keeps the two states obvious.
+- Build order: library shelf → deck two-act page → society ticket/timeline →
+  de-carded home. Present mode is already live at /presentations/:id/present.
+- When approved: promote by renaming _next templates over the originals in
+  one commit per page (easy rollback).
