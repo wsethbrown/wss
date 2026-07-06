@@ -1,0 +1,48 @@
+<%# Extracted from account/index (account tab panel: billing). %>
+        <div id="billing-content" class="tab-content hidden min-h-[600px]">
+          <div class="space-y-8">
+            <div class="pb-6 border-b border-gray-200">
+              <h2 class="text-2xl font-bold text-gray-900 mb-2">Billing</h2>
+              <p class="text-gray-600">Manage your payment method, invoices, and billing details</p>
+            </div>
+
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+              <h3 class="text-lg font-medium text-gray-900 mb-2">Payment &amp; invoices</h3>
+              <% if current_user.stripe_customer_id.present? %>
+                <p class="text-sm text-gray-600 mb-4">
+                  Update your card, download invoices, and review your billing history
+                  in the secure Stripe billing portal.
+                </p>
+                <%= button_to "Manage billing in Stripe", subscriptions_portal_path, method: :post,
+                      class: "inline-flex items-center px-4 py-2 rounded-md bg-whiskey-600 text-white text-sm font-medium hover:bg-whiskey-700" %>
+              <% else %>
+                <p class="text-sm text-gray-600">
+                  You don't have any billing history yet. Start a subscription to manage
+                  billing here.
+                  <%= link_to "View plans", "#subscription", class: "text-whiskey-600 font-medium hover:underline", data: { tab_link: "subscription" } %>
+                </p>
+              <% end %>
+            </div>
+
+            <div class="bg-white rounded-lg border border-gray-200 p-6">
+              <h3 class="text-lg font-medium text-gray-900 mb-2">Current status</h3>
+              <dl class="text-sm text-gray-700 space-y-2">
+                <div class="flex justify-between">
+                  <dt class="text-gray-500">Plan</dt>
+                  <dd class="font-medium"><%= current_user.subscription_plan&.titleize || "None" %></dd>
+                </div>
+                <div class="flex justify-between">
+                  <dt class="text-gray-500">Status</dt>
+                  <dd class="font-medium"><%= current_user.subscription_status_display %></dd>
+                </div>
+                <% if current_user.subscription_ends_at.present? %>
+                  <div class="flex justify-between">
+                    <dt class="text-gray-500"><%= current_user.cancel_at_period_end? ? "Access ends" : "Renews" %></dt>
+                    <dd class="font-medium"><%= current_user.subscription_ends_at.strftime("%B %d, %Y") %></dd>
+                  </div>
+                <% end %>
+              </dl>
+            </div>
+          </div>
+        </div>
+

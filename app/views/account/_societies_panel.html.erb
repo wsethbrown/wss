@@ -1,0 +1,71 @@
+<%# Extracted from account/index (account tab panel: societies). %>
+        <div id="societies-content" class="tab-content hidden min-h-[600px]">
+          <div class="space-y-8">
+            <div class="pb-6 border-b border-gray-200">
+              <h2 class="text-2xl font-bold text-gray-900 mb-2">My Societies</h2>
+              <p class="text-gray-600">Manage your whiskey societies and memberships</p>
+            </div>
+            
+            <% user_societies = current_user.member_societies.includes(:creator) %>
+            <% if user_societies.any? %>
+              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <% user_societies.each do |society| %>
+                  <a href="<%= society_path(society) %>" class="block bg-white border border-gray-200 rounded-lg p-4 hover:shadow-md hover:border-whiskey-300 transition-all duration-200 group">
+                    <div class="text-center">
+                      <!-- Society Icon -->
+                      <div class="w-16 h-16 bg-gradient-to-br from-whiskey-500 to-whiskey-500 rounded-xl flex items-center justify-center mx-auto mb-3 group-hover:scale-105 transition-transform">
+                        <%= render 'shared/society_icon', society: society %>
+                      </div>
+                      
+                      <!-- Society Name & Role Badge -->
+                      <div class="mb-3">
+                        <h3 class="text-base font-semibold text-gray-900 mb-2 group-hover:text-whiskey-600 transition-colors"><%= society.name %></h3>
+                            <% membership = current_user.society_memberships.find_by(society: society) %>
+                            <% if membership&.admin? %>
+                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-whiskey-100 text-whiskey-800">Creator</span>
+                            <% elsif membership&.officer? %>
+                              <span class="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-800">Officer</span>
+                            <% end %>
+                      </div>
+                      
+                      <!-- Society Description -->
+                      <p class="text-sm text-gray-600 mb-4 line-clamp-2 leading-relaxed">
+                        <%= truncate(society.description, length: 80) %>
+                      </p>
+                      
+                      <!-- Society Stats -->
+                      <div class="flex justify-center space-x-6 text-xs text-gray-500">
+                        <div class="flex items-center">
+                          <%= render 'shared/user_group_icon', size: 'small' %>
+                          <span><%= society.society_memberships.active.count %></span>
+                        </div>
+                        <div class="flex items-center">
+                          <svg class="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                          </svg>
+                          <span><%= society.events.count %></span>
+                        </div>
+                      </div>
+                    </div>
+                  </a>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="text-center py-12">
+                <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-3-3.87M9 20H4v-2a3 3 0 013-3.87m6 0A4 4 0 005 16m6-4a4 4 0 100-8 4 4 0 000 8zm6 4a3 3 0 00-3-3.87"></path>
+                </svg>
+                <h3 class="text-lg font-medium text-gray-900 mb-2">No societies yet</h3>
+                <p class="text-gray-500 mb-4">You haven't joined any whiskey societies yet.</p>
+                <a href="<%= societies_path %>" class="inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-whiskey-600 hover:bg-whiskey-700 transition-colors">
+                  <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                  </svg>
+                  Discover Societies
+                </a>
+              </div>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- Presentations Tab Content -->

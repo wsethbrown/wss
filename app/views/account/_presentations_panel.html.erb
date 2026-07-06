@@ -1,0 +1,38 @@
+<%# My decks — same cards as the library, with access-state notes. %>
+<div id="presentations-content" class="tab-content hidden min-h-[600px]">
+  <div class="space-y-8">
+    <div class="pb-6 border-b border-gray-200">
+      <h2 class="text-2xl font-bold text-gray-900 mb-2">My Presentations</h2>
+      <p class="text-gray-600">Every deck in your library</p>
+    </div>
+
+    <% my_purchases = current_user.user_presentations.includes(presentation: :author).order(purchased_at: :desc) %>
+    <% if my_purchases.any? %>
+      <div class="grid gap-8 sm:grid-cols-2">
+        <% my_purchases.each do |purchase| %>
+          <% deck = purchase.presentation %>
+          <% next unless deck %>
+          <div>
+            <%= render 'presentations/deck_card', deck: deck, owned: true %>
+            <p class="mt-2 text-center text-xs text-gray-500">
+              <% if purchase.purchase_type == 'direct' %>
+                Bought outright — yours for good
+              <% elsif current_user.subscription_active? %>
+                Unlocked with a credit · active with your membership
+              <% else %>
+                <span class="font-semibold text-whiskey-700">Membership paused — <%= link_to 'reactivate to read', root_path(anchor: 'pricing'), class: 'underline' %></span>
+              <% end %>
+            </p>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <div class="py-12 text-center">
+        <p class="font-display text-xl font-semibold text-gray-900">No decks yet.</p>
+        <p class="mt-2 text-gray-600">Your library starts with your first deck — browse the collection.</p>
+        <%= link_to 'Browse the decks', presentations_path,
+            class: 'mt-6 inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-6 py-3 font-semibold text-white transition hover:bg-whiskey-700' %>
+      </div>
+    <% end %>
+  </div>
+</div>
