@@ -50,8 +50,6 @@ if Rails.env.development?
       price: 9.99,
       duration: "45 min",
       difficulty: "Beginner",
-      rating: 4.8,
-      review_count: 127,
       image: "scotch-intro",
       published: true
     },
@@ -63,8 +61,6 @@ if Rails.env.development?
       price: 12.99,
       duration: "60 min",
       difficulty: "Intermediate",
-      rating: 4.9,
-      review_count: 89,
       image: "bourbon-guide",
       published: true
     },
@@ -76,8 +72,6 @@ if Rails.env.development?
       price: 14.99,
       duration: "75 min",
       difficulty: "Advanced",
-      rating: 4.7,
-      review_count: 156,
       image: "japanese-whisky",
       published: true
     }

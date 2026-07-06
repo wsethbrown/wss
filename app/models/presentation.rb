@@ -30,7 +30,6 @@ class Presentation < ApplicationRecord
   validates :price, numericality: { greater_than_or_equal_to: 0 }
   validates :category, length: { maximum: 100 }
   validates :difficulty, inclusion: { in: %w[Beginner Intermediate Advanced], allow_blank: true }
-  validates :rating, numericality: { greater_than_or_equal_to: 0, less_than_or_equal_to: 5 }, allow_nil: true
 
   # File attachment validations
   validate :featured_image_validation
@@ -48,7 +47,7 @@ class Presentation < ApplicationRecord
   scope :search, ->(query) { where('title ILIKE ? OR description ILIKE ?', "%#{query}%", "%#{query}%") if query.present? }
   scope :by_tag, ->(tag_name) { joins(:tags).where(tags: { name: tag_name }) if tag_name.present? }
   scope :recent, -> { order(created_at: :desc) }
-  scope :popular, -> { order(rating: :desc, review_count: :desc) }
+  scope :popular, -> { left_joins(:user_presentations).group(:id).order(Arel.sql("COUNT(user_presentations.id) DESC"), created_at: :desc) }
 
   # Comma-separated tag editing ("smoky, islay, beginner friendly"). Tags are
   # normalized lowercase; find-or-create under the 'deck' tag category.
