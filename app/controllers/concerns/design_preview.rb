@@ -7,7 +7,10 @@ module DesignPreview
   private
 
   def render_next_design?(action = action_name)
-    params[:design] == "next" && current_user&.admin? &&
+    # Open to everyone in development (any browser/session can compare);
+    # admin-only in production so visitors never stumble into previews.
+    allowed = Rails.env.development? || current_user&.admin?
+    params[:design] == "next" && allowed &&
       lookup_context.exists?("#{action}_next", lookup_context.prefixes, false)
   end
 
