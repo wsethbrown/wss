@@ -38,5 +38,13 @@ class BottleCreationTest < ActionDispatch::IntegrationTest
       post bottles_path, params: { bottle: { name: "" } }
     end
     assert_response :unprocessable_entity
+    assert_match(/can(&#39;|')t be blank/, response.body)
+  end
+
+  test "requires sign in for create" do
+    assert_no_difference "Bottle.count" do
+      post bottles_path, params: { bottle: { name: "Sneaky Bottle" } }
+    end
+    assert_redirected_to new_user_session_path
   end
 end

@@ -25,7 +25,12 @@ class BottlesController < ApplicationController
 
     # Soft dedup: same search the autocomplete uses. The user can click an
     # existing bottle instead, or confirm theirs is genuinely different.
-    @near_matches = params[:confirmed_duplicate] == "1" ? [] : Bottle.search(@bottle.name).limit(5)
+    @near_matches =
+      if params[:confirmed_duplicate] == "1" || @bottle.name.blank?
+        []
+      else
+        Bottle.search(@bottle.name).limit(5)
+      end
     if @near_matches.any?
       render :new, status: :unprocessable_entity
       return
