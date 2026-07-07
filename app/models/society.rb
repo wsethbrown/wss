@@ -14,6 +14,7 @@ class Society < ApplicationRecord
   has_many :officers, -> { where(society_memberships: { role: 'officer', status: 'active' }) },
            through: :society_memberships, source: :user
   has_many :society_applications, dependent: :destroy
+  has_many :favorites, as: :favoritable, dependent: :destroy
 
   # Validations
   validates :name, presence: true, length: { minimum: 2, maximum: 100 }

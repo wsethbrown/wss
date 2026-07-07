@@ -104,6 +104,10 @@ class User < ApplicationRecord
   has_many :credit_transactions, dependent: :destroy
   has_many :activity_logs, dependent: :destroy
   has_many :reviews, dependent: :destroy
+  has_many :favorites, dependent: :destroy
+  has_many :favorited_societies, -> { where(favorites: { favoritable_type: "Society" }) }, through: :favorites, source: :favoritable, source_type: "Society"
+  has_many :favorited_users, -> { where(favorites: { favoritable_type: "User" }) }, through: :favorites, source: :favoritable, source_type: "User"
+  has_many :favorited_by_records, class_name: "Favorite", as: :favoritable, dependent: :destroy # cleans up favorites OF this user
 
   # Validations
   validates :email, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
@@ -146,6 +150,8 @@ class User < ApplicationRecord
   def pending_application_for?(society)
     society_applications.exists?(society: society, status: "pending")
   end
+
+  def favorite?(record) = favorites.exists?(favoritable: record)
 
   def rsvped_to?(event)
     event_rsvps.exists?(event: event, status: "confirmed")

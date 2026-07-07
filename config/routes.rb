@@ -142,6 +142,9 @@ Rails.application.routes.draw do
   # Profiles
   resources :profiles, only: [:show]
 
+  # Favorites
+  resources :favorites, only: [:create, :destroy]
+
   # Bottles
   resources :bottles, only: [:show, :new, :create], param: :id do
     collection { get :search }

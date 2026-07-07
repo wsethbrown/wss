@@ -17,6 +17,8 @@ class ProfilesController < ApplicationController
       end
 
     @tastings = @user.reviews.includes(:bottle, event: [:society, :event_bottles]).recent_first.limit(20)
+
+    @favorites = @user == current_user ? current_user.favorites.includes(:favoritable).order(created_at: :desc).select { |f| f.favoritable.is_a?(User) || Pundit.policy(current_user, f.favoritable).show? } : []
   end
 
   private

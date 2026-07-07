@@ -1,0 +1,10 @@
+<% if user_signed_in? && favoritable != current_user %>
+  <% existing = current_user.favorites.find_by(favoritable: favoritable) %>
+  <% if existing %>
+    <%= button_to "★ Favorited", favorite_path(existing), method: :delete,
+        class: "inline-flex cursor-pointer items-center rounded-xl border border-whiskey-300 bg-whiskey-50 px-4 py-2 text-sm font-semibold text-whiskey-800 transition hover:bg-whiskey-100" %>
+  <% else %>
+    <%= button_to "☆ Favorite", favorites_path(favoritable_type: favoritable.class.name, favoritable_id: favoritable.id), method: :post,
+        class: "inline-flex cursor-pointer items-center rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:border-whiskey-300 hover:text-whiskey-700" %>
+  <% end %>
+<% end %>

@@ -71,6 +71,7 @@
             <%= link_to "Sign in to join", auth_path,
                 class: "inline-flex items-center rounded-xl bg-whiskey-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400" %>
           <% end %>
+          <%= render "favorites/button", favoritable: @society %>
         </div>
       </div>
     </div>

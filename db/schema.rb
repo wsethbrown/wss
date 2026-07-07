@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_07_170731) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_07_193710) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -146,6 +146,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_170731) do
     t.index ["society_id"], name: "index_events_on_society_id"
     t.index ["start_time"], name: "index_events_on_start_time"
     t.index ["title"], name: "index_events_on_title"
+  end
+
+  create_table "favorites", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.string "favoritable_type", null: false
+    t.bigint "favoritable_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["favoritable_type", "favoritable_id"], name: "index_favorites_on_favoritable"
+    t.index ["user_id", "favoritable_type", "favoritable_id"], name: "index_favorites_on_user_and_favoritable", unique: true
+    t.index ["user_id"], name: "index_favorites_on_user_id"
   end
 
   create_table "presentation_tags", force: :cascade do |t|
@@ -469,6 +480,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_170731) do
   add_foreign_key "event_rsvps", "users"
   add_foreign_key "events", "societies"
   add_foreign_key "events", "users", column: "organizer_id"
+  add_foreign_key "favorites", "users"
   add_foreign_key "presentation_tags", "presentations"
   add_foreign_key "presentation_tags", "tags"
   add_foreign_key "presentations", "users", column: "author_id"
