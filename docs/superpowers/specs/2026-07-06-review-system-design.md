@@ -158,3 +158,22 @@ no counter caches until performance demands them).
 - Flavor-profile attributes and flavor search
 - Photos on reviews
 - Any use of reviews on deck pages (Phase 3+)
+
+## Addendum (2026-07-07, owner-approved): bottle images & detail enrichment
+
+Queued as its own phase after Phase 2 (events/societies). Decisions:
+
+- Reviews gain ONE optional attached photo.
+- A bottle's default label image is DERIVED: the photo from its
+  highest-rated review that has one (ties → most recent). Admins can pin an
+  explicit label image, which beats the derived default; admins can delete
+  a review's photo, the review, or both.
+- No photo anywhere → a designed SVG placeholder (WSS linework bottle
+  silhouette, tinted deterministically by style). Never a blank square, and
+  no external/scraped imagery — licensing.
+- Bottle detail enrichment (Distiller-style details page): optional
+  `description` (text), `age_statement`, `cask_type`, `cost_tier`
+  (1–5, rendered as $ glyphs) columns on bottles.
+- Per-review photos are thereby UN-deferred from the original deferred list;
+  moderation surface is the admin Bottles section (which also hosts the
+  future merge tool).
