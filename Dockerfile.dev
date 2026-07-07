@@ -10,6 +10,10 @@ RUN apt-get update -qq && \
     libreoffice-impress \
     poppler-utils \
     fonts-liberation \
+    fonts-crosextra-carlito \
+    fonts-crosextra-caladea \
+    fonts-dejavu-core \
+    fonts-noto-core \
     nodejs \
     npm \
     && rm -rf /var/lib/apt/lists/*
