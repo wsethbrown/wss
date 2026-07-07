@@ -46,6 +46,18 @@ class SocietiesController < ApplicationController
     @upcoming_events = @society.upcoming_events.limit(5)
     @past_events = @society.past_events.limit(5)
     @recent_members = @society.members.limit(10)
+
+    # The review board: bottles ranked by THIS society's event reviews only
+    # (spec's aggregation table — solo reviews never count here). Inherits
+    # the page's visibility from `authorize @society` above; no new gate.
+    @review_board = Bottle
+      .joins(reviews: :event)
+      .where(events: { society_id: @society.id })
+      .select("bottles.*, AVG(reviews.rating) AS board_avg, COUNT(DISTINCT reviews.user_id) AS board_reviewers")
+      .group("bottles.id")
+      .order(Arel.sql("board_avg DESC, bottles.name ASC"))
+    @board_reviews = Review.joins(:event).where(events: { society_id: @society.id })
+                           .includes(:user).recent_first.group_by(&:bottle_id)
   end
 
   def new

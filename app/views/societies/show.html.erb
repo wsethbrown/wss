@@ -177,6 +177,47 @@
           </div>
         <% end %>
 
+        <% if @review_board.any? %>
+          <!-- The review board -->
+          <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h2 class="text-lg font-semibold text-gray-900">The review board</h2>
+              <p class="mt-1 text-sm text-gray-500">Every bottle poured at our events, ranked by the room.</p>
+            </div>
+            <div class="divide-y divide-gray-100">
+              <% @review_board.each do |bottle| %>
+                <div class="px-6 py-4">
+                  <div class="flex flex-wrap items-baseline justify-between gap-2">
+                    <%= link_to bottle.display_name, bottle_path(bottle), class: "font-display text-lg font-semibold text-gray-900 hover:text-whiskey-700" %>
+                    <span class="flex items-center gap-2 whitespace-nowrap text-sm text-gray-500">
+                      <span class="font-semibold text-gray-900"><%= number_with_precision(bottle.board_avg, precision: 2, strip_insignificant_zeros: true) %></span>
+                      <%= render "bottles/rating", value: bottle.board_avg.to_f %>
+                      <%= pluralize(bottle.board_reviewers, "reviewer") %>
+                    </span>
+                  </div>
+                  <% member_reviews = @board_reviews[bottle.id] || [] %>
+                  <% if member_reviews.any? %>
+                    <details class="mt-2">
+                      <summary class="cursor-pointer text-sm font-semibold text-whiskey-700 hover:text-whiskey-600">Member reviews</summary>
+                      <div class="mt-2 space-y-2">
+                        <% member_reviews.each do |review| %>
+                          <div class="rounded-lg bg-whiskey-50 p-3">
+                            <div class="flex flex-wrap items-baseline justify-between gap-2">
+                              <span class="text-sm font-semibold text-gray-900"><%= review.user.first_name %> <%= review.user.last_name %></span>
+                              <%= render "bottles/rating", value: review.rating.to_f %>
+                            </div>
+                            <% if review.notes.present? %><p class="mt-1 text-sm text-gray-600"><%= review.notes %></p><% end %>
+                          </div>
+                        <% end %>
+                      </div>
+                    </details>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
         <!-- Recent Activity or Society Description -->
         <div class="bg-white shadow-sm rounded-lg overflow-hidden">
           <div class="px-6 py-4 border-b border-gray-200">
