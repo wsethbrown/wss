@@ -25,7 +25,7 @@
       <%= @review.user.first_name %> <%= @review.user.last_name %> ·
       <%= @review.created_at.strftime("%B %-d, %Y") %><% if @review.price_paid %> &middot; paid <%= number_to_currency(@review.price_paid, precision: 0) %><% end %>
     </p>
-    <div class="mt-4 flex justify-center"><%= render "review_votes/button", review: @review %></div>
+    
   </div>
 </section>
 
@@ -88,6 +88,7 @@
     </div>
 
     <div class="mt-10 flex items-center gap-4 border-t border-gray-100 pt-6">
+      <%= render "review_votes/button", review: @review %>
       <%= link_to "All tastings of #{@review.bottle.name} →", bottle_path(@review.bottle), class: "font-semibold text-whiskey-700 hover:text-whiskey-600" %>
       <% if @review.user == current_user %>
         <%= link_to "Edit your review", edit_review_path(@review), class: "ml-auto rounded-xl bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-200" %>

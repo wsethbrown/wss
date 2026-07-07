@@ -6,7 +6,7 @@ class ReviewVotesControllerTest < ActionDispatch::IntegrationTest
     assert_difference "ReviewVote.count", 1 do
       post review_votes_path, params: { review_id: reviews(:john_spring_ardbeg).id }
     end
-    assert_redirected_to review_path(reviews(:john_spring_ardbeg))
+    assert_response :redirect # html fallback goes back, never into the review)
   end
 
   test "cannot vote for your own review" do

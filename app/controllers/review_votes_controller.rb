@@ -4,10 +4,10 @@ class ReviewVotesController < ApplicationController
   def create
     review = Review.find(params[:review_id])
     vote = current_user.review_votes.find_or_initialize_by(review: review)
-    if vote.persisted? || vote.save
-      redirect_to review_path(review), notice: "Voted."
-    else
-      redirect_to review_path(review), alert: vote.errors.full_messages.to_sentence
+    vote.persisted? || vote.save
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.replace(helpers.dom_id(review, :vote), partial: "review_votes/button", locals: { review: review.reload }) }
+      format.html { redirect_back fallback_location: bottle_path(review.bottle) }
     end
   end
 
@@ -15,6 +15,9 @@ class ReviewVotesController < ApplicationController
     vote = current_user.review_votes.find(params[:id])
     review = vote.review
     vote.destroy
-    redirect_to review_path(review)
+    respond_to do |format|
+      format.turbo_stream { render turbo_stream: turbo_stream.replace(helpers.dom_id(review, :vote), partial: "review_votes/button", locals: { review: review.reload }) }
+      format.html { redirect_back fallback_location: bottle_path(review.bottle) }
+    end
   end
 end

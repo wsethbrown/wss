@@ -94,7 +94,7 @@
               <%= render "bottles/rating", value: review.rating.to_f %>
             </div>
             <%= render "reviews/event_card", review: review %>
-            <div class="mt-3"><%= render "review_votes/button", review: review %></div>
+            
             <% if review.notes.present? %><p class="mt-3 line-clamp-4 text-gray-700"><%= review.notes %></p><% end %>
             <% tasting = { "Nose" => review.nose, "Palate" => review.palate, "Finish" => review.finish, "Body" => review.body_notes }.compact_blank %>
             <% if tasting.any? %>
@@ -112,7 +112,10 @@
               </div>
             <% end %>
             <div class="mt-3 flex items-center justify-between">
-              <p class="text-sm text-gray-400"><%= review.created_at.strftime("%B %-d, %Y") %></p>
+              <span class="flex items-center gap-4">
+                <%= render "review_votes/button", review: review %>
+                <p class="text-sm text-gray-400"><%= review.created_at.strftime("%B %-d, %Y") %></p>
+              </span>
               <span class="flex items-center gap-4">
                 <% if review.user == current_user %>
                   <%= link_to "Edit", edit_review_path(review), class: "text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>
