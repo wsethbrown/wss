@@ -21,7 +21,23 @@ class Bottle < ApplicationRecord
     [name, distillery].compact_blank.join(" — ")
   end
 
+  # The public score: each reviewer counts once, via their latest tasting
+  # (re-tastes at events arrive in Phase 2 and refresh their contribution).
+  def average_rating
+    latest_per_user.average(:rating)&.to_f&.round(2)
+  end
+
+  def reviewer_count
+    reviews.distinct.count(:user_id)
+  end
+
   private
+
+  def latest_per_user
+    reviews.where(
+      id: reviews.select("DISTINCT ON (user_id) id").order(:user_id, created_at: :desc)
+    )
+  end
 
   def generate_slug
     return if slug.present? || name.blank?
