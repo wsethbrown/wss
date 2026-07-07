@@ -18,6 +18,19 @@ class Review < ApplicationRecord
 
   scope :recent_first, -> { order(created_at: :desc) }
 
+  # Tastings ranked by thumbs-up received in the trailing window — a delta
+  # ranking, distinct from the lifetime votes_count counter cache used on
+  # bottle pages. LEFT JOIN keeps zero-vote reviews (sorted last); ties break
+  # newest-first per the addendum.
+  def self.hot_ranked(since: 30.days.ago, limit: 30)
+    select("reviews.*, COUNT(recent_votes.id) AS recent_votes_count")
+      .joins("LEFT JOIN review_votes recent_votes ON recent_votes.review_id = reviews.id AND recent_votes.created_at >= #{connection.quote(since)}")
+      .group("reviews.id")
+      .order("recent_votes_count DESC, reviews.created_at DESC")
+      .includes(:user, :bottle, event: [:society, :event_bottles])
+      .limit(limit)
+  end
+
   # Reviews from bookmarked people/societies: latest by favorited users, plus
   # reviews tied to favorited societies' events. Deduped.
   def self.for_circle(user, limit: 5)

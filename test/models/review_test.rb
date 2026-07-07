@@ -62,6 +62,20 @@ class ReviewTest < ActiveSupport::TestCase
     assert_in_delta 2.0, bottle.average_rating, 0.001
     assert_equal 1, bottle.reviewer_count
   end
+
+  test "hot_ranked orders by votes within the window, ties newest first" do
+    old_review, new_review = reviews(:john_spring_glendronach), reviews(:john_spring_four_roses)
+    ReviewVote.create!(user: users(:seth), review: old_review)
+    ReviewVote.where(review: old_review).update_all(created_at: 45.days.ago) # push outside the window
+    ReviewVote.create!(user: users(:jane), review: new_review) # in-window
+
+    ranked = Review.hot_ranked.to_a
+    assert_operator ranked.index(new_review), :<, ranked.index(old_review)
+  end
+
+  test "hot_ranked includes zero-vote reviews (LEFT JOIN)" do
+    assert_includes Review.hot_ranked.to_a, reviews(:seth_spring_glendronach)
+  end
 end
 
 class ReviewDescriptorTest < ActiveSupport::TestCase

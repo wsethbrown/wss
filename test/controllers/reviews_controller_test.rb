@@ -37,4 +37,16 @@ class ReviewsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h2", text: /circle/i
   end
+
+  test "?feed=hot renders hot tastings ranked by recent votes" do
+    get reviews_path(feed: "hot")
+    assert_response :success
+    assert_select "h2", text: /hot/i
+  end
+
+  test "feed pills appear near the tastings heading" do
+    get reviews_path
+    assert_select "a", text: "Latest"
+    assert_select "a", text: "Hot"
+  end
 end
