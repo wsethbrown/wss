@@ -10,6 +10,23 @@
     </div>
   <% end %>
 
+  <%# ── Authoring guide: sections mirror the buyer-facing deck page, top to
+      bottom. Every section says WHERE buyers see it. ── %>
+  <nav class="sticky top-0 z-10 -mx-8 mb-2 border-b border-gray-200 bg-white/95 px-8 py-3 backdrop-blur">
+    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
+      <span class="eyebrow text-gray-400">Jump to</span>
+      <% [['The cover', 'f-cover'], ['The pitch', 'f-pitch'], ['The story', 'f-story'],
+          ['The slides', 'f-slides'], ['The tasting', 'f-tasting'], ['Files', 'f-files']].each do |label, anchor| %>
+        <a href="#<%= anchor %>" class="font-medium text-whiskey-700 hover:text-whiskey-600"><%= label %></a>
+      <% end %>
+    </div>
+  </nav>
+
+  <!-- ═══ 1 · THE COVER ═══ -->
+  <div id="f-cover" class="scroll-mt-20">
+    <h3 class="font-display text-xl font-semibold text-gray-900">1 · The cover</h3>
+    <p class="mb-5 mt-1 text-sm text-gray-500">Appears on: the library card, the deck page hero, and search filters.</p>
+  </div>
   <!-- Basic Information -->
   <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
     <div>
@@ -77,11 +94,14 @@
 
   <div>
     <%= form.label :description, class: "block text-sm font-medium text-gray-700 mb-2" %>
+    <p class="-mt-1 mb-2 text-xs text-gray-500">One or two sentences. Appears on: the library card and under the deck page title.</p>
     <%= form.text_area :description, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "Brief description of what this presentation covers..." %>
   </div>
 
-  <div>
-    <%= form.label :content, "The story (Markdown)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+  <div id="f-story" class="scroll-mt-20 border-t border-gray-200 pt-6">
+    <h3 class="font-display text-xl font-semibold text-gray-900">3 · The story</h3>
+    <p class="mb-4 mt-1 text-sm text-gray-500">Appears on: the deck page reading experience. Buyers read it all; <span class="font-semibold">non-buyers see only the first ~24 lines</span> — the fade-out is where the sale happens. Use the eye icon in the toolbar to preview exactly what buyers see.</p>
+    <%= form.label :content, "Story text (Markdown)", class: "block text-sm font-medium text-gray-700 mb-2" %>
     <%= form.text_area :content, rows: 14,
         data: { controller: "markdown-editor", markdown_editor_preview_url_value: preview_admin_presentations_path },
         class: "w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "# The thread\n\nOpen with the hook — why this bottle, why this story...\n\n## First chapter\nUse ## headings for chapters. **Bold**, *italics*, lists, and > quotes all work." %>
@@ -94,7 +114,10 @@
 
   <!-- What You'll Learn Section -->
   <div class="border-t border-gray-200 pt-6" data-controller="what-youll-learn">
-    <h3 class="text-lg font-semibold text-gray-900 mb-4">What You'll Learn</h3>
+    <div id="f-pitch" class="scroll-mt-20">
+      <h3 class="font-display text-xl font-semibold text-gray-900">2 · The pitch — what you'll learn</h3>
+      <p class="mb-4 mt-1 text-sm text-gray-500">Appears on: the deck page "takeaways" grid. Three or four concrete points sell better than six vague ones.</p>
+    </div>
     
     <!-- Hidden field to store the formatted content -->
     <%= form.hidden_field :what_youll_learn, id: 'what_youll_learn_hidden' %>
@@ -153,7 +176,9 @@
 
   <!-- Slide-by-Slide Preview Section -->
   <div class="border-t border-gray-200 pt-6" data-controller="slides-preview">
-    <h3 class="text-lg font-semibold text-gray-900 mb-1">Slide-by-Slide Preview</h3>
+    <div id="f-slides" class="scroll-mt-20">
+      <h3 class="font-display text-xl font-semibold text-gray-900">4 · The slides — outline</h3>
+    </div>
     <p class="text-sm text-gray-600 mb-4">
       The outline buyers see before purchasing — one row per slide or chapter.
       Numbers come from the order; use the arrows to rearrange.
@@ -222,7 +247,10 @@
 
   <!-- What You'll Taste Section -->
   <div class="border-t border-gray-200 pt-6">
-    <h3 class="text-lg font-semibold text-gray-900 mb-4">What You'll Taste</h3>
+    <div id="f-tasting" class="scroll-mt-20">
+      <h3 class="font-display text-xl font-semibold text-gray-900">5 · The tasting — what you'll taste</h3>
+      <p class="mb-4 mt-1 text-sm text-gray-500">Appears on: the deck page tasting section, set like a back label. Describe the flight as a whole.</p>
+    </div>
     
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
       <div>
@@ -253,7 +281,8 @@
 
   <!-- Recommended Whiskeys Section -->
   <div class="border-t border-gray-200 pt-6" data-controller="whiskey-recommendations">
-    <h3 class="text-lg font-semibold text-gray-900 mb-4">Recommended Whiskeys</h3>
+    <h3 class="font-display text-xl font-semibold text-gray-900">5b · The bottle list</h3>
+    <p class="mb-4 mt-1 text-sm text-gray-500">Appears on: the deck page bottle cards AND the buyer's "what you get" manifest (with a bottle count). Name, region, price, style, notes per pour.</p>
     
     <!-- Hidden field to store the formatted recommendations -->
     <%= form.hidden_field :whiskey_recommendations, id: 'whiskey_recommendations_hidden' %>
@@ -335,7 +364,10 @@
 
   <!-- File Uploads Section -->
   <div class="border-t border-gray-200 pt-6">
-    <h3 class="text-lg font-semibold text-gray-900 mb-4">Presentation Files</h3>
+    <div id="f-files" class="scroll-mt-20">
+      <h3 class="font-display text-xl font-semibold text-gray-900">6 · Files</h3>
+      <p class="mb-4 mt-1 text-sm text-gray-500">The deck file is REQUIRED to publish — it's what buyers download, and slides render from it automatically after import. Every attached extra appears in the buyer's "what you get" list.</p>
+    </div>
 
     <div class="space-y-4">
       <div>
