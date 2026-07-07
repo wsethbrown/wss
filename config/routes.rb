@@ -87,7 +87,7 @@ Rails.application.routes.draw do
   namespace :admin do
     get 'dashboard', to: 'dashboard#index'
     resources :presentations do
-      collection { post :import; post :preview }
+      collection { post :import }
       member { post :publish; post :unpublish; post :render_slides }
     end
     resources :users, only: [:index, :show, :edit, :update]

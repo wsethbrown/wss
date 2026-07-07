@@ -64,3 +64,16 @@ Design rules learned the hard way:
   legacy `whiskey_*` names; only labels changed.
 - `Presentation#duration_label` renders duration everywhere ("20" → "20 min");
   never interpolate raw `duration` into buyer copy.
+
+## The story editor (chapter cards)
+
+`story_chapters_controller.js` presents `presentation.content` (one Markdown
+string, `## ` headings = chapters) as chapter cards: title + body per card,
+reorder/remove/add, plus a raw-Markdown toggle for power edits. Every edit
+serializes back into the hidden content field — the server format never
+changed, and EasyMDE was removed with it (controller, importmap pin, CDN CSS,
+and the server preview route all deleted; "Preview as buyer" is the preview).
+
+The amber marker between cards shows where the free teaser cuts off. It
+mirrors `PresentationsHelper#preview_markdown` (first 24 SOURCE lines) — if
+that number changes, change `TEASER_LINES` in the Stimulus controller too.

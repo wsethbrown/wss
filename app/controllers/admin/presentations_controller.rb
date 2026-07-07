@@ -70,10 +70,6 @@ class Admin::PresentationsController < Admin::BaseController
 
   # Server-side Markdown preview for the story editor — same pipeline the
   # public reader uses, so the preview is exact.
-  def preview
-    render html: helpers.render_markdown(params[:content].to_s), layout: false
-  end
-
   def create
     @presentation = Presentation.new(presentation_params)
     @presentation.author = current_user
