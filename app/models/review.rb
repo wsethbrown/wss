@@ -66,6 +66,18 @@ class Review < ApplicationRecord
     words.filter_map { |w| WORD_TO_FAMILY[w] }.tally
   end
 
+  # 0..1 intensity per family for drawing: the hand-set wheel verbatim when
+  # present, otherwise word counts normalized against the strongest family.
+  def wheel_display_profile
+    wheel = wheel_values
+    return wheel if wheel.any?
+
+    counts = flavor_profile
+    return {} if counts.empty?
+    max = counts.values.max.to_f
+    counts.transform_values { |n| (n / max).round(3) }
+  end
+
   # Reviews whose tasting text mentions EVERY given tag. A tag may be a
   # descriptor word ("peat") or a whole family ("smoky" = any of its words).
   scope :tagged, ->(tags) {
