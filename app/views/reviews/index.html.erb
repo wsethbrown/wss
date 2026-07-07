@@ -20,12 +20,16 @@
                class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-whiskey-500">
         <div data-bottle-search-target="results"
              class="absolute inset-x-0 top-full z-20 mt-1 hidden overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"></div>
+        <%= select_tag :sort,
+            options_for_select([["Top rated", "top"], ["Most reviewed", "reviewed"], ["A–Z", "az"], ["Recently added", "newest"]], @sort),
+            onchange: "this.form.requestSubmit()", "aria-label": "Sort bottles",
+            class: "mt-3 rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
       <% end %>
       <%= link_to "Add a review", start_reviews_path, class: "rounded-xl bg-whiskey-600 px-5 py-3 font-semibold text-white transition hover:bg-whiskey-700" %>
     </div>
 
     <p class="mb-8 text-gray-600">
-      <%= pluralize(@bottles.count, "bottle") %><%= " matching \"#{params[:q]}\"" if params[:q].present? %>
+      <%= pluralize(@bottles.count(:all), "bottle") %><%= " matching \"#{params[:q]}\"" if params[:q].present? %>
     </p>
 
     <div class="divide-y divide-gray-100 rounded-2xl border border-gray-200 bg-white shadow-sm">
@@ -45,10 +49,10 @@
           <div class="shrink-0 whitespace-nowrap text-right">
             <% if bottle.average_rating %>
               <div>
-                <span class="font-semibold text-gray-900"><%= number_with_precision(bottle.average_rating, precision: 2, strip_insignificant_zeros: true) %></span>
-                <%= render "bottles/rating", value: bottle.average_rating %>
+                <span class="font-semibold text-gray-900"><%= number_with_precision(bottle.avg_rating, precision: 2, strip_insignificant_zeros: true) %></span>
+                <%= render "bottles/rating", value: bottle.avg_rating&.to_f %>
               </div>
-              <p class="text-sm text-gray-400"><%= pluralize(bottle.reviewer_count, "reviewer") %></p>
+              <p class="text-sm text-gray-400"><%= pluralize(bottle.reviewers, "reviewer") %></p>
             <% else %>
               <%= render "bottles/rating", value: nil %>
             <% end %>

@@ -5,7 +5,8 @@ class ReviewsController < ApplicationController
   before_action :set_review, only: [:edit, :update, :destroy]
 
   def index
-    @bottles = Bottle.order(:name)
+    @sort = Bottle::SORTS.key?(params[:sort]) ? params[:sort] : "top"
+    @bottles = Bottle.with_score.order(Arel.sql(Bottle::SORTS.fetch(@sort)))
     @bottles = @bottles.search(params[:q]) if params[:q].present?
     # The record covers the people as well as the pours: a search also turns
     # up societies (policy-scoped — private ones stay invisible to outsiders).

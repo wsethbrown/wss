@@ -17,6 +17,29 @@ class Bottle < ApplicationRecord
     where("bottles.name ILIKE :q OR bottles.distillery ILIKE :q", q: q)
   end
 
+  # Aggregate columns (avg_rating, reviewers) computed in SQL with the SAME
+  # latest-per-user semantics as #average_rating — one query for a whole page
+  # of rows, and sortable. Rows respond to #avg_rating / #reviewers.
+  scope :with_score, -> {
+    select("bottles.*, agg.avg_rating, agg.reviewers").joins(<<~SQL)
+      LEFT JOIN LATERAL (
+        SELECT AVG(latest.rating) AS avg_rating, COUNT(*) AS reviewers
+        FROM (
+          SELECT DISTINCT ON (user_id) rating
+          FROM reviews WHERE reviews.bottle_id = bottles.id
+          ORDER BY user_id, created_at DESC, id DESC
+        ) latest
+      ) agg ON TRUE
+    SQL
+  }
+
+  SORTS = {
+    "top"      => "agg.avg_rating DESC NULLS LAST, bottles.name ASC",
+    "reviewed" => "agg.reviewers DESC, bottles.name ASC",
+    "az"       => "bottles.name ASC",
+    "newest"   => "bottles.created_at DESC"
+  }.freeze
+
   def display_name
     [name, distillery].compact_blank.join(" — ")
   end
