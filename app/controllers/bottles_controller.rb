@@ -10,7 +10,7 @@ class BottlesController < ApplicationController
   def search
     bottles = Bottle.search(params[:q]).order(:name).limit(8)
     render json: bottles.map { |b|
-      { name: b.name, display_name: b.display_name, url: bottle_path(b) }
+      { name: b.name, display_name: b.display_name, url: bottle_path(b), review_url: new_bottle_review_path(b) }
     }
   end
 

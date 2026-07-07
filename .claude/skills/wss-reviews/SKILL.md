@@ -70,6 +70,12 @@ read it before extending anything here).
 
 /reviews search covers bottles AND societies: `policy_scope(Society).search(q)`
 renders a "Societies" result group (private societies stay invisible to
-non-members — the policy scope, not the view, enforces it). The JSON
-autocomplete remains bottle-only on purpose: its job is feeding the
-review/add-bottle flow.
+non-members — the policy scope, not the view, enforces it; same scope backs
+the grouped JSON at GET /reviews/search).
+
+Two dropdown modes in bottle_search_controller.js:
+- grouped (the /reviews page): entity-grouped Bottles/Societies results, NO
+  add-a-bottle row — a society name or typo must never become a catalog entry.
+- picker (GET /reviews/start, authed "Add a review" flow): bottle rows link
+  straight to that bottle's review form (review_url in /bottles/search JSON);
+  the "+ Add … as a new bottle" escape lives HERE, where intent is explicit.

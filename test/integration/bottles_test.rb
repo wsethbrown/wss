@@ -26,6 +26,33 @@ class BottlesTest < ActionDispatch::IntegrationTest
     assert_no_match "Exclusive Bourbon Club", response.body
   end
 
+  test "section search JSON groups bottles and societies, policy-scoped" do
+    get search_reviews_path(q: "society", format: :json)
+    assert_response :success
+    body = response.parsed_body
+    assert_includes body["societies"].map { |s| s["label"] }, "Whiskey Lovers Society"
+
+    get search_reviews_path(q: "bourbon club", format: :json)
+    assert_response :success
+    assert_empty response.parsed_body["societies"], "private society leaked to signed-out search"
+  end
+
+  test "start-a-review picker requires sign in, then renders" do
+    get start_reviews_path
+    assert_redirected_to new_user_session_path
+
+    sign_in users(:jane)
+    get start_reviews_path
+    assert_response :success
+    assert_match "What did you taste?", response.body
+  end
+
+  test "bottle search JSON includes the review shortcut url" do
+    get search_bottles_path(q: "eagle", format: :json)
+    match = response.parsed_body.find { |b| b["name"] == "Eagle Rare 10" }
+    assert_match %r{/bottles/.+/reviews/new}, match["review_url"]
+  end
+
   test "search endpoint returns JSON matches" do
     get search_bottles_path(q: "eagle", format: :json)
     assert_response :success

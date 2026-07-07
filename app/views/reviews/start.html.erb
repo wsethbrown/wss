@@ -1,0 +1,25 @@
+<% content_for :title, "Add a review - Whiskey Share Society" %>
+
+<section class="w-full bg-whiskey-50 px-4 py-14">
+  <div class="mx-auto max-w-xl">
+    <p class="eyebrow text-whiskey-600">The tasting record</p>
+    <h1 class="mt-1 font-display text-3xl font-semibold text-gray-900">What did you taste?</h1>
+    <p class="mb-8 mt-3 text-gray-600">
+      Find the bottle and go straight to your review — or add it to the record
+      if we don't have it yet.
+    </p>
+
+    <div class="relative" data-controller="bottle-search" data-bottle-search-url-value="<%= search_bottles_path %>">
+      <input type="search" placeholder="Start typing a bottle or distillery…" autocomplete="off" autofocus
+             data-bottle-search-target="input" data-action="input->bottle-search#query"
+             class="w-full rounded-xl border border-gray-300 bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-whiskey-500">
+      <div data-bottle-search-target="results"
+           class="absolute inset-x-0 top-full z-20 mt-1 hidden overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"></div>
+    </div>
+
+    <p class="mt-6 text-sm text-gray-500">
+      Picking a bottle opens your review. Ratings run half a star to five;
+      the tasting fields — nose, palate, finish, body — are optional.
+    </p>
+  </div>
+</section>

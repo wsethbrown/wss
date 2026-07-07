@@ -12,7 +12,7 @@
 <section class="w-full bg-white px-4 py-14">
   <div class="mx-auto max-w-6xl">
     <div class="mb-10 flex flex-wrap items-center justify-between gap-4"
-         data-controller="bottle-search" data-bottle-search-url-value="<%= search_bottles_path %>">
+         data-controller="bottle-search" data-bottle-search-url-value="<%= search_reviews_path %>" data-bottle-search-grouped-value="true">
       <%= form_with url: reviews_path, method: :get, class: "relative w-full max-w-xl" do %>
         <input type="search" name="q" value="<%= params[:q] %>" placeholder="Search bottles, distilleries, or societies…"
                autocomplete="off"
@@ -21,9 +21,7 @@
         <div data-bottle-search-target="results"
              class="absolute inset-x-0 top-full z-20 mt-1 hidden overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"></div>
       <% end %>
-      <% if user_signed_in? %>
-        <%= link_to "Add a bottle", new_bottle_path, class: "rounded-xl bg-whiskey-600 px-5 py-3 font-semibold text-white transition hover:bg-whiskey-700" %>
-      <% end %>
+      <%= link_to "Add a review", start_reviews_path, class: "rounded-xl bg-whiskey-600 px-5 py-3 font-semibold text-white transition hover:bg-whiskey-700" %>
     </div>
 
     <p class="mb-8 text-gray-600">

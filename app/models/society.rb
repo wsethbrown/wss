@@ -26,7 +26,7 @@ class Society < ApplicationRecord
   scope :public_societies, -> { where(is_private: false) }
   scope :private_societies, -> { where(is_private: true) }
   scope :by_location, ->(location) { where('location ILIKE ?', "%#{location}%") if location.present? }
-  scope :search, ->(query) { where('name ILIKE ? OR description ILIKE ?', "%#{query}%", "%#{query}%") if query.present? }
+  scope :search, ->(query) { where('name ILIKE :q OR description ILIKE :q', q: "%#{sanitize_sql_like(query)}%") if query.present? }
 
   # Callbacks
   after_create :add_creator_as_admin
