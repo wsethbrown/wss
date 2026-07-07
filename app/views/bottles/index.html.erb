@@ -29,16 +29,29 @@
       <%= pluralize(@bottles.count, "bottle") %><%= " matching \"#{params[:q]}\"" if params[:q].present? %>
     </p>
 
-    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+    <div class="divide-y divide-gray-100 rounded-2xl border border-gray-200 bg-white shadow-sm">
       <% @bottles.each do |bottle| %>
-        <%= link_to bottle_path(bottle), class: "group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:border-whiskey-300 hover:shadow-md" do %>
-          <p class="eyebrow text-whiskey-600"><%= [bottle.style, bottle.region].compact_blank.join(" · ").presence || "Bottle" %></p>
-          <h2 class="mt-2 font-display text-xl font-semibold text-gray-900 group-hover:text-whiskey-800"><%= bottle.name %></h2>
-          <% if bottle.distillery.present? %><p class="mt-1 text-sm text-gray-500"><%= bottle.distillery %></p><% end %>
-          <div class="mt-4 flex items-center justify-between">
-            <%= render "bottles/rating", value: bottle.average_rating %>
-            <% if bottle.reviewer_count.positive? %>
-              <span class="text-sm text-gray-500"><%= pluralize(bottle.reviewer_count, "reviewer") %></span>
+        <%= link_to bottle_path(bottle), class: "flex items-center justify-between gap-4 px-5 py-4 transition hover:bg-whiskey-50" do %>
+          <div class="min-w-0">
+            <h2 class="truncate font-display text-lg font-semibold text-gray-900"><%= bottle.name %></h2>
+            <p class="mt-1 truncate text-sm">
+              <% meta = [] %>
+              <% if [bottle.style, bottle.region].compact_blank.any? %>
+                <% meta << content_tag(:span, [bottle.style, bottle.region].compact_blank.join(" · "), class: "text-whiskey-700 font-medium") %>
+              <% end %>
+              <% meta << content_tag(:span, bottle.distillery, class: "text-gray-500") if bottle.distillery.present? %>
+              <%= safe_join(meta, " · ") %>
+            </p>
+          </div>
+          <div class="shrink-0 whitespace-nowrap text-right">
+            <% if bottle.average_rating %>
+              <div>
+                <span class="font-semibold text-gray-900"><%= number_with_precision(bottle.average_rating, precision: 2, strip_insignificant_zeros: true) %></span>
+                <%= render "bottles/rating", value: bottle.average_rating %>
+              </div>
+              <p class="text-sm text-gray-400"><%= pluralize(bottle.reviewer_count, "reviewer") %></p>
+            <% else %>
+              <%= render "bottles/rating", value: nil %>
             <% end %>
           </div>
         <% end %>

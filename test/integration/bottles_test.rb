@@ -27,8 +27,22 @@ class BottlesTest < ActionDispatch::IntegrationTest
     get bottle_path(bottles(:eagle_rare))
     assert_response :success
     assert_match "Eagle Rare 10", response.body
-    assert_match "4.0", response.body            # aggregate from the one fixture review
+    assert_select "div.mt-6 span.font-semibold.text-cream", text: "4" # strip_insignificant_zeros: 4.0 -> "4"
     assert_match "Cherry and oak", response.body # the review feed
+  end
+
+  test "bottle page shows honest fractional average and doesn't lose a star glyph" do
+    Review.create!(
+      user: users(:jane),
+      bottle: bottles(:eagle_rare),
+      rating: 4.5,
+      notes: "Baking spice, big vanilla."
+    )
+
+    get bottle_path(bottles(:eagle_rare))
+    assert_response :success
+    assert_match "4.25", response.body # true average of 4.0 and 4.5
+    assert_select "div.mt-6 span[aria-label=\"4.25 out of 5\"]", text: "★★★★½"
   end
 
   test "unknown slug 404s" do
