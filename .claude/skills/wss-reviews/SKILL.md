@@ -160,3 +160,41 @@ tag_picker_controller → one combined tags URL) and the palate wheel
 (reviews/_palate_wheel — server-side SVG, segments = families, opacity =
 strength, lit segments link to the family's tag view). Tags are computed
 from text, never stored — edit the lexicon freely.
+
+## What exists (Phase 3 — the social layer)
+
+- **Favorites** (`Favorite`): A user's private bookmark on a `Society` or
+  `User` (polymorphic `favoritable`). Visible only to the owner
+  (ProfilesController loads `@favorites` on your own profile only).
+  Uniqueness validated on `(user_id, favoritable_type, favoritable_id)`.
+  Self-favoriting blocked by validation (`favoritable.id != user.id`).
+  Favoriting a `Society` is gated by `SocietyPolicy#show?` at creation time.
+  Controller is idempotent: `create` uses `find_or_create_by` and surfaces
+  alerts (already favorited, access denied); `destroy` is explicit.
+- **Review votes** (`ReviewVote`): Thumbs-up only, no downvotes. One per user
+  per review; no self-votes (validated in the model). Maintains
+  `reviews.votes_count` via counter_cache for bottle-page ordering. Controller
+  is Turbo-framed (inline button swaps in place, never navigates);
+  idempotent (create: find_or_create_by; destroy: none-safe). The hot feed
+  (see below) needs a real join for 30-day windows, not the counter cache.
+- **Bottle page tastings order**: `Bottle#tasting_reviews` ordered by
+  `votes_count DESC, created_at DESC`. Vote count surfaces on review cards.
+- **/reviews feed enhancements**:
+  - Three pill controls: **Latest** (default, all reviews sorted by created_at
+    DESC), **Circle** (only reviews from favorited users + events from
+    favorited societies, via `current_user.circle_reviews`; inner join of
+    users.id IN (favorites.favoritable_id WHERE type=User) OR events from
+    societies in (favorites.favoritable_id WHERE type=Society); applies same
+    filters/search/tags/distillery as Latest), **Hot** (trailing-30-day vote
+    count via a condition IN THE JOIN on ReviewVote.created_at — zero-vote
+    reviews included; same filters/search/tags/distillery as Latest).
+  - Pills are independent of `/reviews?q=&tags=&distillery=&sort=` — the
+    query params apply to whichever feed is active.
+  - Veiled partials (reviews/_event_card, reviews/_event_line) are unchanged
+    and reused across all three feeds.
+- **Demo seeds**: `db/seeds.rb` includes a social-layer block (development
+  only) seeding favorites (jane→john, jane→single_malt, seth→whiskey_lovers)
+  and review votes (jane & seth vote on john's ardbeg & eagle_rare reviews,
+  skipping self-votes). Idempotent via find_or_create_by; verified by running
+  db:seed twice with no duplicates or errors.
+- **Implemented 2026-07-07**. See `docs/superpowers/plans/2026-07-07-review-system-social.md`.

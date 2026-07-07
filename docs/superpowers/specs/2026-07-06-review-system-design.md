@@ -217,6 +217,8 @@ search" from the original deferred list, in this constrained form.
   the trailing 30 days (delta window), ties → newest. Presented beside the
   existing sort control, not replacing it.
 
+**Implemented 2026-07-07.** See `.claude/skills/wss-reviews/SKILL.md` (Social layer section).
+
 ## Addendum (2026-07-07, owner-approved): review images, refined
 
 Supersedes the earlier derived-label rule's mechanism details:

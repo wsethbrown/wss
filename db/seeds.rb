@@ -275,3 +275,36 @@ end
   next unless bottle && user
   Review.where(bottle: bottle, user: user).find_each { |r| r.update!(fields) }
 end
+
+# --- Social layer demo data (Phase 3-social) ----------------------------------
+if Rails.env.development?
+  jane = User.find_by(email: "jane@example.com")
+  john = User.find_by(email: "john@example.com")
+  seth = User.find_by(email: "seth@example.com")
+
+  single_malt = Society.find_by(name: "Single Malt Appreciation")
+  whiskey_lovers = Society.find_by(name: "Whiskey Lovers Society")
+
+  # Demo favorites: jane favors john (user) and single_malt (society),
+  # seth favors whiskey_lovers (society).
+  if jane && john && single_malt
+    jane.favorites.find_or_create_by!(favoritable: john)
+    jane.favorites.find_or_create_by!(favoritable: single_malt)
+  end
+  if seth && whiskey_lovers
+    seth.favorites.find_or_create_by!(favoritable: whiskey_lovers)
+  end
+
+  # Demo review votes: jane and seth vote on john's reviews (except self-votes).
+  # Find john's reviews on Ardbeg 10 and Eagle Rare 10.
+  john_ardbeg_review = Review.find_by(user: john, bottle: Bottle.find_by(name: "Ardbeg 10"))
+  john_eagle_review = Review.find_by(user: john, bottle: Bottle.find_by(name: "Eagle Rare 10"))
+
+  [john_ardbeg_review, john_eagle_review].compact.each do |review|
+    [jane, seth].compact.each do |voter|
+      voter.review_votes.find_or_create_by!(review: review) unless review.user_id == voter.id
+    end
+  end
+
+  puts "Social layer demo data: favorites and review votes seeded"
+end
