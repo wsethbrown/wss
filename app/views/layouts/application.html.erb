@@ -69,6 +69,7 @@
         <div class="hidden md:flex gap-2 items-center">
           <%= nav_link_to 'Societies', societies_path %>
           <%= nav_link_to 'Decks', presentations_path %>
+          <%= nav_link_to 'Reviews', reviews_path %>
           <% if user_signed_in? %>
             <% if current_user.subscription_active? && current_user.credits > 0 %>
               <div class="ml-2 flex items-center gap-2 rounded-full border border-whiskey-500/40 bg-whiskey-500/10 px-3 py-1">
@@ -109,6 +110,7 @@
           <div class="absolute right-0 mt-2 w-56 rounded-2xl border border-oak-edge bg-char p-2 shadow-xl">
             <%= link_to 'Societies', societies_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
             <%= link_to 'Decks', presentations_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
+            <%= link_to 'Reviews', reviews_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
             <% if user_signed_in? %>
               <%= link_to 'Account', account_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
               <%= link_to 'Sign Out', destroy_user_session_path, data: { 'turbo-method': :delete, 'turbo-confirm': 'Are you sure you want to sign out?' }, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/60 hover:bg-oak' %>

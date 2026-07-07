@@ -53,6 +53,25 @@
           </div>
         <% end %>
 
+        <!-- Tastings Section -->
+        <% if @tastings.any? %>
+          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-4">Tastings</h2>
+            <div class="space-y-3">
+              <% @tastings.each do |review| %>
+                <div class="flex flex-wrap items-baseline justify-between gap-2 border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                  <%= link_to review.bottle.display_name, bottle_path(review.bottle), class: "font-medium text-gray-900 hover:text-whiskey-700" %>
+                  <span class="flex items-center gap-2 text-sm text-gray-500">
+                    <%= render "bottles/rating", value: review.rating.to_f %>
+                    <%# Event/society provenance badges arrive in Phase 2. %>
+                    <%= review.created_at.strftime("%b %Y") %>
+                  </span>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
         <!-- Societies Section -->
         <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
           <h2 class="text-xl font-semibold text-gray-900 mb-4">Societies</h2>

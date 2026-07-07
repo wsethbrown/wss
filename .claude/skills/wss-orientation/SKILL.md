@@ -37,6 +37,10 @@ PostgreSQL, Hotwire, Tailwind v4, Devise+Pundit, Stripe, Solid Queue, Docker.
 - wss-societies — privacy model, invites, member management
 - wss-admin — admin panel structure and its traps
 - wss-production-launch — the launch runbook and current deploy state
+- wss-reviews — bottle catalog, solo reviews, aggregation rules, Phase 2/3
+  roadmap
+  - Reviews (/reviews): public bottle library + tastings; bottle pages at
+    /bottles/<slug> — see wss-reviews skill.
 
 ## Key models (30-second data model)
 User (credits cache, subscription_* fields, is_admin) · Presentation (deck:

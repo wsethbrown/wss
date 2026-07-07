@@ -15,6 +15,8 @@ class ProfilesController < ApplicationController
              .or(@user.member_societies.where(id: current_user.member_societies.select(:id)))
              .distinct.includes(:creator)
       end
+
+    @tastings = @user.reviews.includes(:bottle).recent_first.limit(20)
   end
 
   private
