@@ -36,6 +36,13 @@
     </script>
 
     <style>
+      /* Smooth-scroll in-page anchors (e.g. hero "See how it works", deck
+         "Read the story"), but not for users who prefer reduced motion. */
+      @media (prefers-reduced-motion: no-preference) {
+        html {
+          scroll-behavior: smooth;
+        }
+      }
       /* Sticky-footer layout. NOTE: keep body free of `height: 100%` and of any
          overflow that creates a scroll container (overflow-x: hidden would),
          or position: sticky descendants stop sticking. `clip` is safe. */
