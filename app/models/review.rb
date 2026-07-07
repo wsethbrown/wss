@@ -18,6 +18,21 @@ class Review < ApplicationRecord
 
   scope :recent_first, -> { order(created_at: :desc) }
 
+  # Reviews from bookmarked people/societies: latest by favorited users, plus
+  # reviews tied to favorited societies' events. Deduped.
+  def self.for_circle(user, limit: 5)
+    user_ids, society_ids = user.favorited_users.ids, user.favorited_societies.ids
+    return none if user_ids.empty? && society_ids.empty?
+
+    review_ids = []
+    review_ids.concat(where(user_id: user_ids).pluck(:id)) if user_ids.any?
+    review_ids.concat(joins(:event).where(events: { society_id: society_ids }).pluck(:id)) if society_ids.any?
+
+    return none if review_ids.empty?
+
+    where(id: review_ids.uniq).includes(:user, :bottle, event: [:society, :event_bottles]).recent_first.limit(limit)
+  end
+
   # A tasting outside any event.
   def solo? = event_id.nil?
 

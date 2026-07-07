@@ -23,6 +23,9 @@ class ReviewsController < ApplicationController
       else
         Review.includes(:user, :bottle, event: [:society, :event_bottles]).recent_first.limit(10)
       end
+    @circle_reviews = current_user ? Review.for_circle(current_user) : nil
+    @feed = params[:feed] if %w[circle hot].include?(params[:feed])
+    @circle_feed_reviews = Review.for_circle(current_user, limit: 50) if @feed == "circle" && current_user
   end
 
   # Entity-grouped autocomplete for the section search: bottles and societies,

@@ -1,0 +1,8 @@
+<%= link_to review_path(review), class: "block rounded-xl border border-gray-100 p-3 transition hover:border-whiskey-200 hover:bg-whiskey-50" do %>
+  <div class="flex items-baseline justify-between gap-2">
+    <span class="truncate font-semibold text-gray-900"><%= review.bottle.display_name %></span>
+    <%= render "bottles/rating", value: review.rating.to_f %>
+  </div>
+  <p class="mt-1 text-sm text-gray-500"><%= review.user.first_name %> · <%= time_ago_in_words(review.created_at) %> ago</p>
+  <%= render "reviews/event_line", review: review %>
+<% end %>
