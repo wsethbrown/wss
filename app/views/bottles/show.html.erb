@@ -90,7 +90,7 @@
         <% @reviews.each do |review| %>
           <article class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <div class="flex flex-wrap items-baseline justify-between gap-2">
-              <span class="font-semibold text-gray-900"><%= review.user.first_name %> <%= review.user.last_name %></span>
+              <%= link_to "#{review.user.first_name} #{review.user.last_name}", profile_path(review.user), class: "font-semibold text-gray-900 hover:text-whiskey-700" %>
               <%= render "bottles/rating", value: review.rating.to_f %>
             </div>
             <%= render "reviews/event_card", review: review %>
