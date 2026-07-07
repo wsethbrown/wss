@@ -6,12 +6,19 @@ class ReviewsController < ApplicationController
 
   def index
     @sort = Bottle::SORTS.key?(params[:sort]) ? params[:sort] : "top"
+    @tags = params[:tags].to_s.split(",").map { |t| t.downcase.strip }.compact_blank.uniq.first(6)
     @bottles = Bottle.with_score.order(Arel.sql(Bottle::SORTS.fetch(@sort)))
     @bottles = @bottles.search(params[:q]) if params[:q].present?
+    @bottles = @bottles.where(id: Review.tagged(@tags).select(:bottle_id)) if @tags.any?
     # The record covers the people as well as the pours: a search also turns
     # up societies (policy-scoped — private ones stay invisible to outsiders).
     @societies = params[:q].present? ? policy_scope(Society).search(params[:q]).order(:name).limit(6) : Society.none
-    @recent_reviews = Review.includes(:user, :bottle, event: [:society, :event_bottles]).recent_first.limit(10)
+    @recent_reviews =
+      if @tags.any?
+        Review.tagged(@tags).includes(:user, :bottle, event: [:society, :event_bottles]).recent_first.limit(30)
+      else
+        Review.includes(:user, :bottle, event: [:society, :event_bottles]).recent_first.limit(10)
+      end
   end
 
   # Entity-grouped autocomplete for the section search: bottles and societies,

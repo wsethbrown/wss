@@ -260,3 +260,18 @@ if Rails.env.development?
   end
   puts "Review demo chain: #{night.title} — #{night.event_bottles.count} pours, #{night.reviews.count} event reviews"
 end
+
+
+# Tasting fields for the demo reviews (idempotent: plain updates).
+{
+  ["Ardbeg 10", "john@example.com"]    => { nose: "Peat smoke, iodine, pear", palate: "Campfire ash, vanilla, brine", finish: "Long, smoky, salted lemon", body_notes: "Oily, coating" },
+  ["Ardbeg 10", "seth@example.com"]    => { nose: "Bonfire and seaweed", palate: "Smoke, honey, black pepper", finish: "Ash and citrus", body_notes: "Full" },
+  ["GlenDronach 12", "john@example.com"] => { nose: "Sherry, raisin, fig", palate: "Caramel, plum, walnut", finish: "Dry oak, gentle spice", body_notes: "Medium, silky" },
+  ["GlenDronach 12", "seth@example.com"] => { nose: "Toffee and cherry", palate: "Chocolate, raisin", finish: "Short, sweet", body_notes: "Thin" },
+  ["Four Roses Small Batch", "john@example.com"] => { nose: "Rye spice, caramel", palate: "Cinnamon, vanilla, oak", finish: "Warm pepper", body_notes: "Medium" }
+}.each do |(bottle_name, email), fields|
+  bottle = Bottle.find_by(name: bottle_name)
+  user = User.find_by(email: email)
+  next unless bottle && user
+  Review.where(bottle: bottle, user: user).find_each { |r| r.update!(fields) }
+end

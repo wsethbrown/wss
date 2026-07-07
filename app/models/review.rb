@@ -19,6 +19,51 @@ class Review < ApplicationRecord
   # A tasting outside any event.
   def solo? = event_id.nil?
 
+  # ── Flavor descriptors ──────────────────────────────────────────────────
+  # The tasting fields are free text; this curated lexicon lifts known
+  # descriptor words out of them, each belonging to a flavor family. Tags are
+  # computed, never stored — the text stays the source of truth.
+  DESCRIPTOR_LEXICON = {
+    "smoky"   => %w[peat peaty smoke smoky campfire ash char tar iodine bonfire],
+    "sweet"   => %w[honey caramel toffee vanilla chocolate butterscotch molasses sweet sugar maple],
+    "fruity"  => %w[cherry apple pear citrus orange lemon berry berries raisin fig plum apricot banana tropical fruit fruity],
+    "spicy"   => %w[pepper peppery spice spicy cinnamon clove ginger nutmeg rye anise],
+    "floral"  => %w[floral heather rose lavender blossom perfume],
+    "oaky"    => %w[oak oaky wood woody cedar tannin barrel resin],
+    "grainy"  => %w[malt malty grain cereal biscuit bread corn dough],
+    "coastal" => %w[brine briny salt salty sea maritime seaweed mineral],
+    "rich"    => %w[leather tobacco coffee nut nutty almond walnut earthy cocoa espresso]
+  }.freeze
+
+  WORD_TO_FAMILY = DESCRIPTOR_LEXICON.flat_map { |fam, words| words.map { |w| [w, fam] } }.to_h.freeze
+
+  def tasting_text
+    [nose, palate, finish, body_notes].compact_blank.join(" ")
+  end
+
+  # => { "peat" => "smoky", "honey" => "sweet", ... } for words present.
+  def descriptor_tags
+    words = tasting_text.downcase.scan(/[a-z]+/)
+    words.uniq.filter_map { |w| [w, WORD_TO_FAMILY[w]] if WORD_TO_FAMILY.key?(w) }.to_h
+  end
+
+  # => { "smoky" => 3, "sweet" => 1 } — strength per family, for the wheel.
+  def flavor_profile
+    words = tasting_text.downcase.scan(/[a-z]+/)
+    words.filter_map { |w| WORD_TO_FAMILY[w] }.tally
+  end
+
+  # Reviews whose tasting text mentions EVERY given tag. A tag may be a
+  # descriptor word ("peat") or a whole family ("smoky" = any of its words).
+  scope :tagged, ->(tags) {
+    Array(tags).reduce(all) do |rel, tag|
+      tag = tag.to_s.downcase.strip
+      words = DESCRIPTOR_LEXICON.key?(tag) ? DESCRIPTOR_LEXICON[tag] | [tag] : [tag]
+      pattern = '\\m(' + words.map { |w| Regexp.escape(w) }.join("|") + ")"
+      rel.where("concat_ws(' ', nose, palate, finish, body_notes) ~* ?", pattern)
+    end
+  }
+
   private
 
   # Event reviews are the society's record of the night — they only exist for

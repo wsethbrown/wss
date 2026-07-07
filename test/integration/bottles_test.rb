@@ -93,6 +93,17 @@ class BottlesTest < ActionDispatch::IntegrationTest
     assert_match "Eagle Rare 10", response.body
   end
 
+  test "flavor tags filter the tasting record" do
+    get reviews_path(tags: "toffee,cherry")
+    assert_response :success
+    assert_match "Eagle Rare 10", response.body
+    assert_match "tasting of toffee", response.body # active chip
+    assert_no_match "Lagavulin 16", response.body   # no reviews at all
+
+    get review_path(reviews(:john_eagle_rare))
+    assert_select "a[href=?]", reviews_path(tags: "toffee"), text: "toffee"
+  end
+
   test "unknown slug 404s" do
     get bottle_path(id: "not-a-bottle")
     assert_response :not_found

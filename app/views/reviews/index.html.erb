@@ -30,9 +30,21 @@
       <%= link_to "Add a review", start_reviews_path, class: "whitespace-nowrap rounded-xl bg-whiskey-600 px-5 py-3 font-semibold text-white transition hover:bg-whiskey-700" %>
     </div>
 
-    <p class="mb-8 text-gray-600">
-      <%= pluralize(@bottles.count(:all), "bottle") %><%= " matching \"#{params[:q]}\"" if params[:q].present? %>
-    </p>
+    <div class="mb-8 flex flex-wrap items-center gap-2 text-gray-600">
+      <span><%= pluralize(@bottles.count(:all), "bottle") %><%= " matching \"#{params[:q]}\"" if params[:q].present? %></span>
+      <% @tags.each do |tag| %>
+        <span class="inline-flex items-center gap-1.5 rounded-full bg-whiskey-600 py-1 pl-3 pr-1.5 text-sm font-medium text-white">
+          tasting of <%= tag %>
+          <%= link_to reviews_path(request.query_parameters.merge("tags" => (@tags - [tag]).join(",")).compact_blank),
+              class: "rounded-full p-0.5 transition hover:bg-whiskey-500", "aria-label": "Remove #{tag}" do %>
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+          <% end %>
+        </span>
+      <% end %>
+      <% if @tags.any? %>
+        <%= link_to "Clear tags", reviews_path(request.query_parameters.except("tags")), class: "text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>
+      <% end %>
+    </div>
 
     <div class="divide-y divide-gray-100 rounded-2xl border border-gray-200 bg-white shadow-sm">
       <% @bottles.each do |bottle| %>
@@ -85,10 +97,10 @@
       </div>
     <% end %>
 
-    <% if @recent_reviews.any? && params[:q].blank? %>
+    <% if @recent_reviews.any? && (params[:q].blank? || @tags.any?) %>
       <div class="mt-16">
         <p class="eyebrow text-whiskey-600">Fresh pours</p>
-        <h2 class="mb-6 mt-1 font-display text-2xl font-semibold text-gray-900">Latest tastings</h2>
+        <h2 class="mb-6 mt-1 font-display text-2xl font-semibold text-gray-900"><%= @tags.any? ? "Tastings of #{@tags.join(" + ")}" : "Latest tastings" %></h2>
         <div class="grid gap-4 sm:grid-cols-2">
           <% @recent_reviews.each do |review| %>
             <%= link_to review_path(review), class: "group flex h-56 flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:border-whiskey-300 hover:shadow-md" do %>

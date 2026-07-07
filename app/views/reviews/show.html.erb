@@ -25,11 +25,34 @@
 
     <% tasting = { "Nose" => @review.nose, "Palate" => @review.palate, "Finish" => @review.finish, "Body" => @review.body_notes }.compact_blank %>
     <% if tasting.any? %>
-      <dl class="mt-10 grid grid-cols-2 gap-x-8 gap-y-5 border-t border-gray-100 pt-8 sm:grid-cols-4">
-        <% tasting.each do |label, text| %>
-          <div><dt class="eyebrow text-whiskey-700"><%= label %></dt><dd class="mt-1 text-gray-600"><%= text %></dd></div>
+      <div class="mt-10 border-t border-gray-100 pt-8">
+        <p class="eyebrow text-whiskey-600">The tasting</p>
+        <dl class="mt-4 grid grid-cols-2 gap-x-8 gap-y-5 sm:grid-cols-4">
+          <% tasting.each do |label, text| %>
+            <div><dt class="eyebrow text-whiskey-700"><%= label %></dt><dd class="mt-1 text-gray-600"><%= text %></dd></div>
+          <% end %>
+        </dl>
+
+        <% tags = @review.descriptor_tags %>
+        <% if tags.any? %>
+          <div class="mt-8 grid items-start gap-8 sm:grid-cols-[1fr_16rem]">
+            <div data-controller="tag-picker">
+              <p class="eyebrow text-gray-400">Flavor tags</p>
+              <p class="mt-1 text-sm text-gray-500">Pulled from the words above. Pick one or several to find whiskeys that taste like this.</p>
+              <div class="mt-3 flex flex-wrap gap-2">
+                <% tags.each do |word, family| %>
+                  <a href="<%= reviews_path(tags: word) %>" data-tag-picker-target="chip" data-tag="<%= word %>" data-on="0"
+                     data-action="click->tag-picker#toggle" title="<%= family %> family"
+                     class="rounded-full bg-whiskey-100 px-3 py-1 text-sm font-medium text-whiskey-800 transition hover:bg-whiskey-200"><%= word %></a>
+                <% end %>
+              </div>
+              <a href="#" data-tag-picker-target="go"
+                 class="mt-4 hidden inline-block font-semibold text-whiskey-700 hover:text-whiskey-600"></a>
+            </div>
+            <%= render "reviews/palate_wheel", review: @review %>
+          </div>
         <% end %>
-      </dl>
+      </div>
     <% end %>
 
     <%= render "reviews/event_card", review: @review %>

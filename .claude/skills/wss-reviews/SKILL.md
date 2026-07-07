@@ -147,3 +147,16 @@ Three dropdown modes in bottle_search_controller.js:
 - fill (the event pour form — a hidden `bottleId` target is present): rows
   fill the hidden bottle_id instead of navigating; the add-new escape carries
   `return_to` (internal paths only) so organizers land back on the event.
+
+## Flavor descriptors, tags, and the palate wheel
+
+`Review::DESCRIPTOR_LEXICON` (9 families × curated words) lifts descriptors
+from the FOUR TASTING FIELDS ONLY (never notes): `descriptor_tags` (word →
+family), `flavor_profile` (family → strength), `Review.tagged(tags)` (AND
+semantics; a family name matches any of its words; Postgres `~*` with `\m`
+word boundary). /reviews?tags=a,b filters bottles+feed with removable chips.
+Review pages render clickable tag chips (multi-select via
+tag_picker_controller → one combined tags URL) and the palate wheel
+(reviews/_palate_wheel — server-side SVG, segments = families, opacity =
+strength, lit segments link to the family's tag view). Tags are computed
+from text, never stored — edit the lexicon freely.

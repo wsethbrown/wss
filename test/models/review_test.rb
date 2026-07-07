@@ -63,3 +63,22 @@ class ReviewTest < ActiveSupport::TestCase
     assert_equal 1, bottle.reviewer_count
   end
 end
+
+class ReviewDescriptorTest < ActiveSupport::TestCase
+  test "descriptor_tags lifts lexicon words from tasting fields only" do
+    r = Review.new(nose: "Peat smoke and honey", palate: "brine, vanilla",
+                   notes: "cherry bomb (notes are NOT scanned)")
+    assert_equal({ "peat" => "smoky", "smoke" => "smoky", "honey" => "sweet",
+                   "brine" => "coastal", "vanilla" => "sweet" }, r.descriptor_tags)
+    assert_equal({ "smoky" => 2, "sweet" => 2, "coastal" => 1 }, r.flavor_profile)
+  end
+
+  test "tagged scope matches all given tags, words and families alike" do
+    r = reviews(:john_eagle_rare) # nose "Toffee, orange peel", palate "Cherry, leather"
+    assert_includes Review.tagged(["toffee"]), r
+    assert_includes Review.tagged(["toffee", "cherry"]), r
+    assert_includes Review.tagged(["sweet"]), r          # family covers toffee
+    assert_not_includes Review.tagged(["peat"]), r
+    assert_not_includes Review.tagged(["toffee", "peat"]), r # ALL must match
+  end
+end
