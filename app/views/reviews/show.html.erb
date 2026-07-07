@@ -60,7 +60,7 @@
 
         <% tags = @review.descriptor_tags %>
         <% if tags.any? %>
-          <div class="mt-8">
+          <div class="mt-8 grid items-start gap-8 sm:grid-cols-[1fr_16rem]">
             <div data-controller="tag-picker">
               <p class="eyebrow text-gray-400">Flavor tags</p>
               <p class="mt-1 text-sm text-gray-500">Pulled from the words above. Pick one or several to find whiskeys that taste like this.</p>
@@ -74,6 +74,7 @@
               <a href="#" data-tag-picker-target="go"
                  class="mt-4 hidden inline-block font-semibold text-whiskey-700 hover:text-whiskey-600"></a>
             </div>
+            <%= render "reviews/palate_wheel", review: @review %>
           </div>
         <% end %>
       </div>
@@ -82,7 +83,7 @@
     <%= render "reviews/event_card", review: @review %>
 
     <div class="mt-12 border-t border-gray-100 pt-8">
-      <%= render "reviews/palate_wheel", review: @review %>
+      <%= render "bottles/flavor_wave", bottle: @review.bottle %>
     </div>
 
     <div class="mt-10 flex items-center gap-4 border-t border-gray-100 pt-6">

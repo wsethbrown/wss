@@ -48,8 +48,20 @@ class Review < ApplicationRecord
     words.uniq.filter_map { |w| [w, WORD_TO_FAMILY[w]] if WORD_TO_FAMILY.key?(w) }.to_h
   end
 
+  # Hand-set wheel intensities win over word counts: the reviewer said so.
+  def wheel_values
+    flavor_wheel.to_h.filter_map { |fam, v|
+      [fam, v.to_f.clamp(0.0, 1.0)] if DESCRIPTOR_LEXICON.key?(fam) && v.to_f.positive?
+    }.to_h
+  end
+
   # => { "smoky" => 3, "sweet" => 1 } — strength per family, for the wheel.
   def flavor_profile
+    wheel = wheel_values
+    # Scale 0..1 dial values into pseudo-counts so wheels and waves mix
+    # hand-set and word-derived tastings on one axis.
+    return wheel.transform_values { |v| (v * 3).round(2) } if wheel.any?
+
     words = tasting_text.downcase.scan(/[a-z]+/)
     words.filter_map { |w| WORD_TO_FAMILY[w] }.tally
   end

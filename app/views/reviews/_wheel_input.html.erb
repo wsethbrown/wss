@@ -1,0 +1,35 @@
+<%# locals: form, review — the wheel as an input. Hidden inputs carry
+    review[flavor_wheel][family] = 0..1; the Stimulus controller paints
+    annular fills as you drag. %>
+<div data-controller="wheel-input" class="mx-auto max-w-xs select-none">
+  <% families = Review::DESCRIPTOR_LEXICON.keys %>
+  <% values = review.wheel_values %>
+  <% families.each do |family| %>
+    <input type="hidden" name="review[flavor_wheel][<%= family %>]" value="<%= values[family] || 0 %>"
+           data-wheel-input-target="input" data-family="<%= family %>">
+  <% end %>
+  <svg viewBox="-110 -110 220 220" class="touch-none" data-wheel-input-target="svg"
+       data-action="pointerdown->wheel-input#down pointermove->wheel-input#move pointerup->wheel-input#up pointerleave->wheel-input#up">
+    <% step = 360.0 / families.size %>
+    <% families.each_with_index do |family, i| %>
+      <% a0 = (-90 + i * step) * Math::PI / 180 %>
+      <% a1 = (-90 + (i + 1) * step) * Math::PI / 180 %>
+      <% path = "M0,0 L#{(96 * Math.cos(a0)).round(2)},#{(96 * Math.sin(a0)).round(2)} A96,96 0 0 1 #{(96 * Math.cos(a1)).round(2)},#{(96 * Math.sin(a1)).round(2)} Z" %>
+      <path d="<%= path %>" fill="#f2e8dc" stroke="#fff" stroke-width="1.5"></path>
+    <% end %>
+    <% families.each_with_index do |family, i| %>
+      <path data-wheel-input-target="fill" data-family="<%= family %>" d=""
+            fill="#a05c28" fill-opacity="0.85" stroke="#fff" stroke-width="1" pointer-events="none"></path>
+    <% end %>
+    <% families.each_with_index do |family, i| %>
+      <% mid = (-90 + (i + 0.5) * step) * Math::PI / 180 %>
+      <text data-wheel-input-target="label" x="<%= (66 * Math.cos(mid)).round(1) %>" y="<%= (66 * Math.sin(mid)).round(1) %>"
+            text-anchor="middle" dominant-baseline="middle" font-size="9" fill="#4b2e12"
+            pointer-events="none" style="fill-opacity: 0.5"><%= family %></text>
+    <% end %>
+    <circle r="22" fill="#fff" pointer-events="none"></circle>
+    <text text-anchor="middle" dominant-baseline="middle" font-size="7" letter-spacing="1.5"
+          fill="#a05c28" font-weight="600" pointer-events="none">PALATE</text>
+  </svg>
+  <p class="mt-1 text-center text-xs text-gray-400">Drag each flavor out as far as it goes.</p>
+</div>

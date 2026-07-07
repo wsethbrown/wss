@@ -62,3 +62,17 @@ class ReviewFormStarsTest < ActionDispatch::IntegrationTest
     assert_select "button[data-value='5.0']"
   end
 end
+
+class ReviewWheelInputTest < ActionDispatch::IntegrationTest
+  test "hand-set wheel intensities persist and override word counts" do
+    sign_in users(:jane)
+    post bottle_reviews_path(bottles(:lagavulin)), params: { review: {
+      rating: "4.0", nose: "honey everywhere",
+      flavor_wheel: { "smoky" => "0.9", "sweet" => "0.3", "floral" => "0" }
+    } }
+    review = Review.last
+    assert_equal({ "smoky" => 0.9, "sweet" => 0.3 }, review.wheel_values)
+    # Override: profile comes from the wheel, not the 'honey' in the nose.
+    assert_equal({ "smoky" => 2.7, "sweet" => 0.9 }, review.flavor_profile)
+  end
+end
