@@ -14,7 +14,6 @@ class Presentation < ApplicationRecord
   has_one_attached :featured_image
   has_one_attached :pdf_file
   has_many_attached :supplemental_materials
-  has_many_attached :preview_images
   has_many_attached :slide_images   # rendered pages of the deck, in order
 
   # Specific file types for better organization
@@ -42,7 +41,6 @@ class Presentation < ApplicationRecord
   validate :featured_image_validation
   validate :pdf_file_validation
   validate :supplemental_materials_validation
-  validate :preview_images_validation
 
   # Scopes
   scope :free, -> { where(price: 0) }
@@ -182,12 +180,6 @@ class Presentation < ApplicationRecord
         notes: parts[4]&.strip
       }
     end.compact
-  end
-
-  # Get preview images in consistent order (by blob id)
-  def ordered_preview_images
-    return [] unless preview_images.attached?
-    preview_images.order(:id)
   end
 
   # Parse what you'll learn into array of points
@@ -336,21 +328,4 @@ class Presentation < ApplicationRecord
     end
   end
 
-  def preview_images_validation
-    return unless preview_images.attached?
-
-    if preview_images.count > 3
-      errors.add(:preview_images, 'maximum 3 preview images allowed')
-    end
-
-    preview_images.each do |image|
-      unless image.content_type.in?(%w[image/jpeg image/jpg image/png image/gif image/webp])
-        errors.add(:preview_images, 'must be valid image formats (JPEG, PNG, GIF, or WebP)')
-      end
-
-      if image.byte_size > MAX_IMAGE_SIZE
-        errors.add(:preview_images, 'must be less than 15MB each')
-      end
-    end
-  end
 end
