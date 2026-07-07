@@ -19,6 +19,10 @@ class EventsController < ApplicationController
     @yes_attendees = @event.yes_attendees
     @maybe_attendees = @event.maybe_attendees
     @no_attendees = @event.no_attendees
+    @pour_reviews = @event.reviews.includes(:user).recent_first.group_by(&:bottle_id)
+    @my_event_reviews = user_signed_in? ? @event.reviews.where(user: current_user).index_by(&:bottle_id) : {}
+    @can_review_pours = user_signed_in? && @event.pours_revealed? &&
+                        @event.event_rsvps.exists?(user: current_user, status: "yes")
   end
 
   def new

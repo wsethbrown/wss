@@ -1,5 +1,7 @@
 <%# The night's lineup. Visibility: Event#pours_visible_to? decides;
-    management: EventPolicy#update? (organizer / society admins). %>
+    management: EventPolicy#update? (organizer / society admins).
+    Group means use ONLY event-tagged reviews (@pour_reviews) — a solo
+    review of the same bottle never counts toward the night. %>
 <div class="bg-white shadow-sm rounded-lg overflow-hidden mt-8">
   <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
     <h2 class="text-lg font-semibold text-gray-900">The pours</h2>
@@ -15,18 +17,52 @@
     <% else %>
       <ol class="space-y-3">
         <% @pours.each do |pour| %>
+          <% night_reviews = @pour_reviews[pour.bottle_id] || [] %>
           <li class="rounded-lg border border-gray-200 p-4">
             <div class="flex flex-wrap items-baseline justify-between gap-2">
               <div class="min-w-0">
                 <%= link_to pour.bottle.display_name, bottle_path(pour.bottle), class: "font-display text-lg font-semibold text-gray-900 hover:text-whiskey-700" %>
                 <% if pour.label.present? %><p class="mt-0.5 text-sm text-whiskey-700"><%= pour.label %></p><% end %>
               </div>
-              <% if user_signed_in? && policy(@event).update? %>
-                <%= button_to "Remove", event_event_bottle_path(@event, pour), method: :delete,
-                    form: { data: { turbo_confirm: "Remove #{pour.bottle.name} from the pour list?" } },
-                    class: "cursor-pointer text-sm font-semibold text-red-600 hover:text-red-700" %>
-              <% end %>
+              <div class="flex shrink-0 items-center gap-3">
+                <% if night_reviews.any? %>
+                  <% mean = (night_reviews.sum(&:rating) / night_reviews.size).to_f.round(2) %>
+                  <span class="font-semibold text-gray-900"><%= number_with_precision(mean, precision: 2, strip_insignificant_zeros: true) %></span>
+                  <%= render "bottles/rating", value: mean %>
+                <% end %>
+                <% if @can_review_pours %>
+                  <% if (mine = @my_event_reviews[pour.bottle_id]) %>
+                    <%= link_to "Edit your review", edit_review_path(mine), class: "text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>
+                  <% else %>
+                    <%= link_to "Review this pour", new_event_review_path(@event, bottle_id: pour.bottle.to_param),
+                        class: "rounded-xl bg-whiskey-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-whiskey-700" %>
+                  <% end %>
+                <% end %>
+                <% if user_signed_in? && policy(@event).update? %>
+                  <%= button_to "Remove", event_event_bottle_path(@event, pour), method: :delete,
+                      form: { data: { turbo_confirm: "Remove #{pour.bottle.name} from the pour list?" } },
+                      class: "cursor-pointer text-sm font-semibold text-red-600 hover:text-red-700" %>
+                <% end %>
+              </div>
             </div>
+            <% if night_reviews.any? %>
+              <details class="mt-3 border-t border-gray-100 pt-3">
+                <summary class="cursor-pointer text-sm font-semibold text-whiskey-700 hover:text-whiskey-600">
+                  <%= pluralize(night_reviews.size, "review") %> from the night
+                </summary>
+                <div class="mt-3 space-y-3">
+                  <% night_reviews.each do |review| %>
+                    <div class="rounded-lg bg-whiskey-50 p-3">
+                      <div class="flex flex-wrap items-baseline justify-between gap-2">
+                        <span class="text-sm font-semibold text-gray-900"><%= review.user.first_name %> <%= review.user.last_name %></span>
+                        <%= render "bottles/rating", value: review.rating.to_f %>
+                      </div>
+                      <% if review.notes.present? %><p class="mt-1 text-sm text-gray-600"><%= review.notes %></p><% end %>
+                    </div>
+                  <% end %>
+                </div>
+              </details>
+            <% end %>
           </li>
         <% end %>
       </ol>

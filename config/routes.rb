@@ -83,6 +83,8 @@ Rails.application.routes.draw do
     resources :event_rsvps, only: [:create, :update, :destroy]
     # The pour list (organizer/society admins manage it; everyone reads it).
     resources :event_bottles, only: [:create, :destroy], module: :events
+    # Event-tagged reviews; the bottle rides along as ?bottle_id=<slug>.
+    resources :reviews, only: [:new, :create], module: :events
   end
 
   # Admin panel

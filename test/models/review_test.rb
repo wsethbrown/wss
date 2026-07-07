@@ -54,6 +54,8 @@ class ReviewTest < ActiveSupport::TestCase
       end_time: 1.day.from_now + 2.hours
     )
 
+    event.event_bottles.create!(bottle: bottle, position: 1)
+    event.event_rsvps.create!(user: users(:john), status: "yes")
     newer_review = Review.create!(user: users(:john), bottle: bottle, event: event, rating: 2.0)
     newer_review.update_column(:created_at, 1.day.ago)
 
