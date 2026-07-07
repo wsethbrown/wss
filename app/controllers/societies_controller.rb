@@ -50,9 +50,21 @@ class SocietiesController < ApplicationController
     # The review board: bottles ranked by THIS society's event reviews only
     # (spec's aggregation table — solo reviews never count here). Inherits
     # the page's visibility from `authorize @society` above; no new gate.
+    # Board math (owner decision 2026-07-07): each member counts once per
+    # bottle — their LATEST review at this society's events. A re-taster's
+    # newer score replaces their older one instead of double-weighting them,
+    # and "N reviewers" is exactly the mean's denominator.
+    latest_per_member = <<~SQL
+      INNER JOIN (
+        SELECT DISTINCT ON (reviews.user_id, reviews.bottle_id) reviews.id
+        FROM reviews
+        INNER JOIN events ON events.id = reviews.event_id
+        WHERE events.society_id = #{@society.id.to_i}
+        ORDER BY reviews.user_id, reviews.bottle_id, reviews.created_at DESC, reviews.id DESC
+      ) latest ON latest.id = reviews.id
+    SQL
     @review_board = Bottle
-      .joins(reviews: :event)
-      .where(events: { society_id: @society.id })
+      .joins(:reviews).joins(latest_per_member)
       .select("bottles.*, AVG(reviews.rating) AS board_avg, COUNT(DISTINCT reviews.user_id) AS board_reviewers")
       .group("bottles.id")
       .order(Arel.sql("board_avg DESC, bottles.name ASC"))
