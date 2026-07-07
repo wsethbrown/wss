@@ -199,3 +199,20 @@ suggestions on bottle pages ranked by shared-descriptor weight; (b) simple
 infographics (descriptor frequency bars per bottle — "what 12 reviewers
 smell"). Sequenced after the images/enrichment phase. UN-defers "flavor
 search" from the original deferred list, in this constrained form.
+
+## Addendum (2026-07-07, owner-approved): the social layer (Phase 3-social)
+
+- `favorites`: user → favoritable (polymorphic: Society or User), unique per
+  pair. Favorite buttons on society pages and profiles. A user's favorites
+  are PRIVATE to them (visible on their own profile only, with unfavorite).
+- "From your circle" on /reviews (signed-in): a sidebar column of the latest
+  reviews by favorited users plus reviews tied to favorited societies'
+  events; "see all" drills into /reviews?feed=circle (full filtered feed).
+  Empty state invites favoriting.
+- `review_votes`: user → review, unique, thumbs-UP only (no downvotes);
+  counter cache reviews.votes_count. Voters can't vote their own review.
+  Thumb button on review cards and pages.
+- Bottle page tastings order: votes_count DESC, then newest.
+- "Hot" feed on /reviews (?feed=hot): tastings ranked by votes received in
+  the trailing 30 days (delta window), ties → newest. Presented beside the
+  existing sort control, not replacing it.
