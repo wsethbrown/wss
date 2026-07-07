@@ -138,6 +138,13 @@ Rails.application.routes.draw do
   # Profiles
   resources :profiles, only: [:show]
 
+  # Bottles
+  resources :bottles, only: [:index, :show, :new, :create], param: :id do
+    collection { get :search }
+    resources :reviews, only: [:new, :create], module: :bottles
+  end
+  resources :reviews, only: [:edit, :update, :destroy]
+
   # Health check
   get "health" => "application#health"
   get "up" => "rails/health#show", as: :rails_health_check

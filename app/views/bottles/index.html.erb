@@ -1,0 +1,67 @@
+<% content_for :title, "Bottles - Whiskey Share Society" %>
+
+<section class="w-full bg-char px-4 py-16 text-center">
+  <p class="eyebrow mb-4 text-whiskey-300/90">The pours, on the record</p>
+  <h1 class="font-display text-4xl font-semibold text-cream sm:text-5xl">The bottle library</h1>
+  <p class="mx-auto mt-4 max-w-2xl text-cream/80">
+    Every bottle the society has tasted and rated — add yours, and say what you found in the glass.
+  </p>
+</section>
+
+<section class="w-full bg-white px-4 py-14">
+  <div class="mx-auto max-w-6xl">
+    <div class="mb-10 flex flex-wrap items-center justify-between gap-4"
+         data-controller="bottle-search" data-bottle-search-url-value="<%= search_bottles_path %>">
+      <%= form_with url: bottles_path, method: :get, class: "relative w-full max-w-xl" do %>
+        <input type="search" name="q" value="<%= params[:q] %>" placeholder="Search bottles or distilleries…"
+               autocomplete="off"
+               data-bottle-search-target="input" data-action="input->bottle-search#query"
+               class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-whiskey-500">
+        <div data-bottle-search-target="results"
+             class="absolute inset-x-0 top-full z-20 mt-1 hidden overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"></div>
+      <% end %>
+      <% if user_signed_in? %>
+        <%= link_to "Add a bottle", new_bottle_path, class: "rounded-xl bg-whiskey-600 px-5 py-3 font-semibold text-white transition hover:bg-whiskey-700" %>
+      <% end %>
+    </div>
+
+    <p class="mb-8 text-gray-600">
+      <%= pluralize(@bottles.count, "bottle") %><%= " matching \"#{params[:q]}\"" if params[:q].present? %>
+    </p>
+
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <% @bottles.each do |bottle| %>
+        <%= link_to bottle_path(bottle), class: "group rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:border-whiskey-300 hover:shadow-md" do %>
+          <p class="eyebrow text-whiskey-600"><%= [bottle.style, bottle.region].compact_blank.join(" · ").presence || "Bottle" %></p>
+          <h2 class="mt-2 font-display text-xl font-semibold text-gray-900 group-hover:text-whiskey-800"><%= bottle.name %></h2>
+          <% if bottle.distillery.present? %><p class="mt-1 text-sm text-gray-500"><%= bottle.distillery %></p><% end %>
+          <div class="mt-4 flex items-center justify-between">
+            <%= render "bottles/rating", value: bottle.average_rating %>
+            <% if bottle.reviewer_count.positive? %>
+              <span class="text-sm text-gray-500"><%= pluralize(bottle.reviewer_count, "reviewer") %></span>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+
+    <% if @recent_reviews.any? && params[:q].blank? %>
+      <div class="mt-16">
+        <p class="eyebrow text-whiskey-600">Fresh pours</p>
+        <h2 class="mb-6 mt-1 font-display text-2xl font-semibold text-gray-900">Latest tastings</h2>
+        <div class="space-y-4">
+          <% @recent_reviews.each do |review| %>
+            <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+              <div class="flex flex-wrap items-baseline justify-between gap-2">
+                <%= link_to review.bottle.display_name, bottle_path(review.bottle), class: "font-display text-lg font-semibold text-gray-900 hover:text-whiskey-700" %>
+                <%= render "bottles/rating", value: review.rating.to_f %>
+              </div>
+              <% if review.notes.present? %><p class="mt-2 text-gray-600"><%= truncate(review.notes, length: 200) %></p><% end %>
+              <p class="mt-2 text-sm text-gray-400"><%= review.user.first_name %> · <%= time_ago_in_words(review.created_at) %> ago</p>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</section>

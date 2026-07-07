@@ -1,0 +1,8 @@
+<%# locals: value (Float 0.5..5.0 or nil) %>
+<% if value %>
+  <span class="whitespace-nowrap text-whiskey-600" aria-label="<%= value %> out of 5">
+    <%= "★" * value.floor %><%= "½" if (value % 1) >= 0.5 %><span class="text-whiskey-200"><%= "★" * (5 - value.ceil) %></span>
+  </span>
+<% else %>
+  <span class="text-sm text-gray-400">No tastings yet</span>
+<% end %>
