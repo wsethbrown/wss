@@ -1,0 +1,62 @@
+<%# The night's lineup. Visibility: Event#pours_visible_to? decides;
+    management: EventPolicy#update? (organizer / society admins). %>
+<div class="bg-white shadow-sm rounded-lg overflow-hidden mt-8">
+  <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
+    <h2 class="text-lg font-semibold text-gray-900">The pours</h2>
+    <% if @event.pours_hidden_until_complete? && !@event.pours_revealed? %>
+      <span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-gray-500">Secret until the night ends</span>
+    <% end %>
+  </div>
+  <div class="p-6">
+    <% if !@pours_visible %>
+      <p class="text-gray-500 italic">The pours are a secret until the night ends.</p>
+    <% elsif @pours.none? %>
+      <p class="text-gray-500 italic">No pours on the list yet.</p>
+    <% else %>
+      <ol class="space-y-3">
+        <% @pours.each do |pour| %>
+          <li class="rounded-lg border border-gray-200 p-4">
+            <div class="flex flex-wrap items-baseline justify-between gap-2">
+              <div class="min-w-0">
+                <%= link_to pour.bottle.display_name, bottle_path(pour.bottle), class: "font-display text-lg font-semibold text-gray-900 hover:text-whiskey-700" %>
+                <% if pour.label.present? %><p class="mt-0.5 text-sm text-whiskey-700"><%= pour.label %></p><% end %>
+              </div>
+              <% if user_signed_in? && policy(@event).update? %>
+                <%= button_to "Remove", event_event_bottle_path(@event, pour), method: :delete,
+                    form: { data: { turbo_confirm: "Remove #{pour.bottle.name} from the pour list?" } },
+                    class: "cursor-pointer text-sm font-semibold text-red-600 hover:text-red-700" %>
+              <% end %>
+            </div>
+          </li>
+        <% end %>
+      </ol>
+    <% end %>
+
+    <% if user_signed_in? && policy(@event).update? %>
+      <div class="mt-6 border-t border-gray-100 pt-6">
+        <%= form_with url: event_event_bottles_path(@event), method: :post, class: "space-y-3" do %>
+          <div class="relative" data-controller="bottle-search"
+               data-bottle-search-url-value="<%= search_bottles_path %>"
+               data-bottle-search-return-to-value="<%= society_event_path(@event.society, @event) %>">
+            <input type="search" placeholder="Add a pour — search bottles or distilleries…" autocomplete="off"
+                   data-bottle-search-target="input" data-action="input->bottle-search#query"
+                   class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-whiskey-500">
+            <input type="hidden" name="event_bottle[bottle_id]" data-bottle-search-target="bottleId">
+            <div data-bottle-search-target="results"
+                 class="absolute inset-x-0 top-full z-20 mt-1 hidden overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"></div>
+          </div>
+          <div class="flex items-center gap-3">
+            <input type="text" name="event_bottle[label]" placeholder="Label (optional — "the blind", "pour #3")"
+                   class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500">
+            <%= submit_tag "Add pour", class: "cursor-pointer shrink-0 rounded-xl bg-whiskey-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-whiskey-700" %>
+          </div>
+        <% end %>
+
+        <%= button_to (@event.pours_hidden_until_complete? ? "Reveal the pours now" : "Keep the pours secret until the night ends"),
+            society_event_path(@event.society, @event), method: :patch,
+            params: { event: { pours_hidden_until_complete: !@event.pours_hidden_until_complete? } },
+            class: "mt-4 cursor-pointer text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>
+      </div>
+    <% end %>
+  </div>
+</div>

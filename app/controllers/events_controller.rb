@@ -13,6 +13,8 @@ class EventsController < ApplicationController
   end
 
   def show
+    @pours = @event.event_bottles.ordered.includes(:bottle)
+    @pours_visible = @event.pours_visible_to?(current_user)
     @rsvps = @event.event_rsvps.includes(:user)
     @yes_attendees = @event.yes_attendees
     @maybe_attendees = @event.maybe_attendees
@@ -92,6 +94,7 @@ class EventsController < ApplicationController
   end
 
   def event_params
-    params.require(:event).permit(:title, :description, :location, :start_time, :end_time, :society_id)
+    params.require(:event).permit(:title, :description, :location, :start_time, :end_time,
+                                  :society_id, :pours_hidden_until_complete)
   end
 end

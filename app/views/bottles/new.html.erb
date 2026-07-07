@@ -24,6 +24,7 @@
         </div>
       <% end %>
       <% if @near_matches.any? %><input type="hidden" name="confirmed_duplicate" value="1"><% end %>
+      <% if @return_to %><input type="hidden" name="return_to" value="<%= @return_to %>"><% end %>
 
       <div>
         <%= form.label :name, "Bottle name", class: "mb-2 block text-sm font-medium text-gray-700" %>

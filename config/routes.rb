@@ -81,6 +81,8 @@ Rails.application.routes.draw do
   # but they should redirect to the society page
   resources :events, only: [:show] do
     resources :event_rsvps, only: [:create, :update, :destroy]
+    # The pour list (organizer/society admins manage it; everyone reads it).
+    resources :event_bottles, only: [:create, :destroy], module: :events
   end
 
   # Admin panel
