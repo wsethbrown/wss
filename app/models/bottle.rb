@@ -40,6 +40,14 @@ class Bottle < ApplicationRecord
     "newest"   => "bottles.created_at DESC"
   }.freeze
 
+  # Aggregated flavor families across every tasting of this bottle —
+  # the community's palate, summed from Review#flavor_profile.
+  def flavor_profile
+    reviews.map(&:flavor_profile).each_with_object(Hash.new(0)) do |profile, sum|
+      profile.each { |family, n| sum[family] += n }
+    end
+  end
+
   def display_name
     [name, distillery].compact_blank.join(" — ")
   end

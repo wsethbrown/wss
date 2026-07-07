@@ -119,6 +119,13 @@ class BottlesTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", reviews_path(distillery: "Buffalo Trace"), text: "Buffalo Trace"
   end
 
+  test "bottle page draws the community flavor wave with clickable families" do
+    get bottle_path(bottles(:eagle_rare)) # john's fields: toffee/cherry/oak/leather...
+    assert_response :success
+    assert_match "Flavor profile", response.body
+    assert_select "a[href=?] text", reviews_path(tags: "sweet")
+  end
+
   test "unknown slug 404s" do
     get bottle_path(id: "not-a-bottle")
     assert_response :not_found

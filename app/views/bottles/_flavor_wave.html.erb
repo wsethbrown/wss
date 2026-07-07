@@ -1,0 +1,48 @@
+<%# locals: bottle — the community's aggregated palate as a smooth wave over
+    the nine flavor families. Not per-review (that's the wheel): this sums
+    every tasting's words. Labels click through to the family tag view. %>
+<% profile = bottle.flavor_profile %>
+<% if profile.any? %>
+  <% families = Review::DESCRIPTOR_LEXICON.keys %>
+  <% max = profile.values.max.to_f %>
+  <% top = profile.sort_by { |_, n| -n }.first(2).select { |_, n| n.positive? }.map(&:first) %>
+  <section class="w-full bg-char px-4 py-12">
+    <div class="mx-auto max-w-3xl text-center">
+      <p class="eyebrow text-whiskey-300/80">Flavor profile</p>
+      <h2 class="mt-1 font-display text-3xl font-semibold capitalize text-cream"><%= top.join(" & ") %></h2>
+
+      <%
+        w, base, amp = 720, 150, 110
+        xs = families.each_with_index.map { |_, i| 50 + i * ((w - 100) / (families.size - 1.0)) }
+        ys = families.map { |f| base - ((profile[f] || 0) / max) * amp - 6 }
+        pts = xs.zip(ys)
+        path = "M#{pts[0][0].round(1)},#{pts[0][1].round(1)}"
+        pts.each_cons(2).with_index do |(a, b), i|
+          p0 = pts[[i - 1, 0].max]; p3 = pts[[i + 2, pts.size - 1].min]
+          c1x = a[0] + (b[0] - p0[0]) / 6.0; c1y = a[1] + (b[1] - p0[1]) / 6.0
+          c2x = b[0] - (p3[0] - a[0]) / 6.0; c2y = b[1] - (p3[1] - a[1]) / 6.0
+          path += " C#{c1x.round(1)},#{c1y.round(1)} #{c2x.round(1)},#{c2y.round(1)} #{b[0].round(1)},#{b[1].round(1)}"
+        end
+      %>
+      <svg viewBox="0 0 <%= w %> 210" class="mt-6 w-full" role="img" aria-label="Flavor profile: strongest in <%= top.join(' and ') %>">
+        <% pts.each_with_index do |(x, y), i| %>
+          <line x1="<%= x %>" y1="<%= y %>" x2="<%= x %>" y2="<%= base %>" stroke="#8a6b4f" stroke-opacity="0.55" stroke-width="1.5"></line>
+        <% end %>
+        <path d="<%= path %>" fill="none" stroke="#d29a5b" stroke-width="4.5" stroke-linecap="round"></path>
+        <% families.each_with_index do |family, i| %>
+          <% strong = top.include?(family) %>
+          <a href="<%= reviews_path(tags: family) %>">
+            <text x="<%= xs[i] %>" y="<%= base + (i.even? ? 22 : 42) %>" text-anchor="middle"
+                  font-size="12" letter-spacing="1"
+                  fill="<%= strong ? '#f3e3cd' : '#c9b8a4' %>"
+                  fill-opacity="<%= strong ? 1 : 0.55 %>" font-weight="<%= strong ? 700 : 500 %>"
+                  style="text-transform: uppercase"><%= family.upcase %></text>
+          </a>
+        <% end %>
+      </svg>
+      <p class="mt-3 text-sm text-cream/50">
+        Drawn from what <%= pluralize(bottle.reviewer_count, "reviewer") %> actually wrote — tap a family to chase it.
+      </p>
+    </div>
+  </section>
+<% end %>
