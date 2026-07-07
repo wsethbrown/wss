@@ -1,30 +1,30 @@
 <% content_for :title, "#{@bottle.name} - Whiskey Share Society" %>
 
-<section class="w-full bg-char px-4 py-16">
+<section class="w-full bg-char px-4 pb-8 pt-24">
   <div class="mx-auto max-w-3xl text-center">
     <p class="eyebrow mb-4 text-whiskey-300/90">
       <%= [@bottle.style, @bottle.region, (@bottle.abv && "#{@bottle.abv.to_f % 1 == 0 ? @bottle.abv.to_i : @bottle.abv}% ABV")].compact_blank.join(" · ").presence || "Bottle" %>
     </p>
-    <div class="mb-6 flex justify-center">
-      <div class="rounded-2xl bg-cream/95 px-7 py-5">
-        <%= render "bottles/placeholder", bottle: @bottle, size: "h-28" %>
+    <div class="mb-4 flex justify-center">
+      <div class="rounded-2xl bg-cream/95 px-5 py-3">
+        <%= render "bottles/placeholder", bottle: @bottle, size: "h-16" %>
       </div>
     </div>
-    <h1 class="font-display text-4xl font-semibold text-cream sm:text-5xl"><%= @bottle.name %></h1>
+    <h1 class="font-display text-3xl font-semibold text-cream sm:text-4xl"><%= @bottle.name %></h1>
     <% if @bottle.distillery.present? %>
-      <p class="mt-3 text-lg text-cream/80">
+      <p class="mt-2 text-cream/80">
         <%= link_to @bottle.distillery, reviews_path(distillery: @bottle.distillery),
             class: "underline decoration-cream/30 underline-offset-4 transition hover:text-whiskey-200" %>
       </p>
     <% end %>
-    <div class="mt-6 flex items-center justify-center gap-3 text-xl">
+    <div class="mt-4 flex items-center justify-center gap-3 text-lg">
       <%= render "bottles/rating", value: @bottle.average_rating %>
       <% if @bottle.average_rating %>
         <span class="font-semibold text-cream"><%= number_with_precision(@bottle.average_rating, precision: 2, strip_insignificant_zeros: true) %></span>
         <span class="text-cream/60">· <%= pluralize(@bottle.reviewer_count, "reviewer") %></span>
       <% end %>
     </div>
-    <div class="mt-8">
+    <div class="mt-5">
       <% if !user_signed_in? %>
         <%= link_to "Sign in to review this bottle", new_user_session_path, class: "inline-flex rounded-xl bg-whiskey-500 px-6 py-3 font-semibold text-white transition hover:bg-whiskey-400" %>
       <% elsif @my_review %>

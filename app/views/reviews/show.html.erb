@@ -1,11 +1,11 @@
 <% content_for :title, "#{@review.user.first_name}'s tasting of #{@review.bottle.name} - Whiskey Share Society" %>
 
-<section class="w-full bg-char px-4 py-14">
+<section class="w-full bg-char px-4 pb-10 pt-24">
   <div class="mx-auto max-w-2xl text-center">
     <p class="eyebrow mb-3 text-whiskey-300/90">A tasting, on the record</p>
-    <div class="mb-5 flex justify-center">
-      <div class="rounded-2xl bg-cream/95 px-6 py-4">
-        <%= render "bottles/placeholder", bottle: @review.bottle, size: "h-24" %>
+    <div class="mb-4 flex justify-center">
+      <div class="rounded-2xl bg-cream/95 px-5 py-3">
+        <%= render "bottles/placeholder", bottle: @review.bottle, size: "h-14" %>
       </div>
     </div>
     <h1 class="font-display text-3xl font-semibold text-cream sm:text-4xl">

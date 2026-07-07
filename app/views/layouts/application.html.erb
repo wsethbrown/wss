@@ -144,7 +144,9 @@
          constrained container. -->
     <% full_bleed = (controller_name == 'home' && action_name == 'index') ||
                     (controller_name == 'societies' && %w[index show].include?(action_name)) ||
-                    controller_name == 'presentations' %>
+                    controller_name == 'presentations' ||
+                    (controller_name == 'reviews' && %w[index show].include?(action_name)) ||
+                    (controller_name == 'bottles' && action_name == 'show') %>
     <% if full_bleed %>
       <%# No top padding here: every full-bleed page opens with a char masthead
           that clears the fixed nav itself (pt-16/pt-28). Layout padding on top
