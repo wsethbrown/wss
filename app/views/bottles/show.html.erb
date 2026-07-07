@@ -19,6 +19,15 @@
           <span class="font-semibold text-cream"><%= number_with_precision(@bottle.average_rating, precision: 2, strip_insignificant_zeros: true) %></span>
           <span class="text-cream/60">· <%= pluralize(@bottle.reviewer_count, "reviewer") %></span>
         <% end %>
+        <% if (prices = @bottle.price_summary) %>
+          <span class="text-cream/60">&middot;
+            <% if prices[:median] %>
+              ~<%= number_to_currency(prices[:median], precision: 0) %>
+            <% else %>
+              most paid <%= number_to_currency(prices[:low], precision: 0) %>&ndash;<%= number_to_currency(prices[:high], precision: 0) %>
+            <% end %>
+          </span>
+        <% end %>
       </div>
     </div>
     <div class="shrink-0">

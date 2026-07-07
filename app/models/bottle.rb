@@ -48,6 +48,17 @@ class Bottle < ApplicationRecord
     end
   end
 
+  # What people actually paid, outlier-proof: median alone for thin data,
+  # the interquartile range ("most paid $45-60") once 4+ prices exist.
+  # Region-aware buckets are a possible later refinement.
+  def price_summary
+    prices = reviews.where.not(price_paid: nil).order(:price_paid).pluck(:price_paid).map(&:to_f)
+    return nil if prices.empty?
+    return { median: percentile(prices, 0.5), count: prices.size } if prices.size < 4
+
+    { low: percentile(prices, 0.25), high: percentile(prices, 0.75), count: prices.size }
+  end
+
   def display_name
     [name, distillery].compact_blank.join(" — ")
   end
@@ -63,6 +74,12 @@ class Bottle < ApplicationRecord
   end
 
   private
+
+  def percentile(sorted, p)
+    idx = (sorted.size - 1) * p
+    lo, hi = sorted[idx.floor], sorted[idx.ceil]
+    lo + (hi - lo) * (idx - idx.floor)
+  end
 
   def latest_per_user
     reviews.where(

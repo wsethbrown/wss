@@ -17,7 +17,7 @@ class ReviewsTest < ActionDispatch::IntegrationTest
     review = Review.last
     assert_equal users(:jane), review.user
     assert review.solo?
-    assert_redirected_to bottle_path(bottles(:lagavulin))
+    assert_redirected_to review_path(review) # straight to your own tasting
   end
 
   test "second solo review of the same bottle is rejected" do
@@ -31,7 +31,7 @@ class ReviewsTest < ActionDispatch::IntegrationTest
   test "author can edit their review" do
     sign_in users(:john)
     patch review_path(reviews(:john_eagle_rare)), params: { review: { rating: "3.5", notes: "Revisited: softer than I remembered." } }
-    assert_redirected_to bottle_path(bottles(:eagle_rare))
+    assert_redirected_to review_path(reviews(:john_eagle_rare))
     assert_equal 3.5, reviews(:john_eagle_rare).reload.rating.to_f
   end
 

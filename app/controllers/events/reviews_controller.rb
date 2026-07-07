@@ -31,6 +31,6 @@ class Events::ReviewsController < ApplicationController
   end
 
   def review_params
-    params.require(:review).permit(:rating, :notes, :nose, :palate, :finish, :body_notes)
+    params.require(:review).permit(:rating, :notes, :nose, :palate, :finish, :body_notes, :price_paid)
   end
 end

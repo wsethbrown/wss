@@ -23,7 +23,7 @@
     </div>
     <p class="mt-3 text-cream/70">
       <%= @review.user.first_name %> <%= @review.user.last_name %> ·
-      <%= @review.created_at.strftime("%B %-d, %Y") %>
+      <%= @review.created_at.strftime("%B %-d, %Y") %><% if @review.price_paid %> &middot; paid <%= number_to_currency(@review.price_paid, precision: 0) %><% end %>
     </p>
   </div>
 </section>

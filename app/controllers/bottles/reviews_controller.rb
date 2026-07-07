@@ -13,7 +13,7 @@ class Bottles::ReviewsController < ApplicationController
     @review.user = current_user
 
     if @review.save
-      redirect_to bottle_path(@bottle), notice: "Your tasting is on the record."
+      redirect_to review_path(@review), notice: "Your tasting is on the record."
     else
       render :new, status: :unprocessable_entity
     end
@@ -26,6 +26,6 @@ class Bottles::ReviewsController < ApplicationController
   end
 
   def review_params
-    params.require(:review).permit(:rating, :notes, :nose, :palate, :finish, :body_notes)
+    params.require(:review).permit(:rating, :notes, :nose, :palate, :finish, :body_notes, :price_paid)
   end
 end

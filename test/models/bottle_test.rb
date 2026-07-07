@@ -31,3 +31,21 @@ class BottleTest < ActiveSupport::TestCase
     assert_equal "Housemade Amaro", Bottle.new(name: "Housemade Amaro").display_name
   end
 end
+
+class BottlePriceSummaryTest < ActiveSupport::TestCase
+  test "price summary: nil, median when thin, IQR when 4+" do
+    bottle = bottles(:lagavulin)
+    assert_nil bottle.price_summary
+
+    r1 = Review.create!(user: users(:jane), bottle: bottle, rating: 4.0, price_paid: 90)
+    assert_equal({ median: 90.0, count: 1 }, bottle.price_summary)
+
+    Review.create!(user: users(:john), bottle: bottle, rating: 4.0, price_paid: 70)
+    Review.create!(user: users(:seth), bottle: bottle, rating: 4.0, price_paid: 80)
+    Review.create!(user: users(:admin), bottle: bottle, rating: 4.0, price_paid: 300) # the airport bottle
+    summary = bottle.price_summary
+    assert_equal 4, summary[:count]
+    assert_in_delta 77.5, summary[:low], 0.01
+    assert_in_delta 142.5, summary[:high], 0.01 # IQR blunts but includes the outlier's pull
+  end
+end

@@ -53,7 +53,7 @@ class ReviewsController < ApplicationController
 
   def update
     if @review.update(review_params)
-      redirect_to bottle_path(@review.bottle), notice: "Review updated."
+      redirect_to review_path(@review), notice: "Review updated."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -71,6 +71,6 @@ class ReviewsController < ApplicationController
   end
 
   def review_params
-    params.require(:review).permit(:rating, :notes, :nose, :palate, :finish, :body_notes)
+    params.require(:review).permit(:rating, :notes, :nose, :palate, :finish, :body_notes, :price_paid)
   end
 end

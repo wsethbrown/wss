@@ -7,6 +7,7 @@ class Review < ApplicationRecord
 
   validates :rating, presence: true, inclusion: { in: VALID_RATINGS }
   validates :notes, length: { maximum: 5_000 }
+  validates :price_paid, numericality: { greater_than: 0, less_than: 100_000 }, allow_nil: true
   validates :nose, :palate, :finish, :body_notes, length: { maximum: 500 }
   validates :bottle_id, uniqueness: {
     scope: [:user_id, :event_id],
