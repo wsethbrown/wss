@@ -2,31 +2,23 @@
 
 > **For agentic workers:** REQUIRED SUB-SKILL: use superpowers:subagent-driven-development or superpowers:executing-plans to run this task-by-task. `- [ ]` = tracked step.
 
-**Goal:** the image addenda (2026-07-07, owner-approved) at the end of
-`docs/superpowers/specs/2026-07-06-review-system-design.md` — the "refined" review-images
-addendum supersedes the first's mechanism; the newest addendum adds a creator upload tier:
+**Goal:** the image addenda (2026-07-07, owner-approved) at the end of `docs/superpowers/specs/2026-07-06-review-system-design.md` — "refined" review-images addendum supersedes the first's mechanism; newest addendum adds a creator upload tier:
 
 - A review carries up to 3 attached images; the FIRST is that review's hero.
-- `/bottles/<slug>` default image = admin pin > hero of the bottle's TOP-RATED review
-  with an image (tie → most `votes_count`, then newest) > creator's `label_image`
-  (set on the add-a-bottle form) > SVG placeholder (`bottles/_placeholder`, the floor
-  — never blank, no scraped imagery).
-- Upload on the review form (new + edit) and the add-a-bottle form: image content
-  types only, 15MB cap each, vips downscale on ingest (`image_processing` +
-  `ruby-vips` already in Gemfile.lock).
-- Admin moderation: delete image / review / both, from the admin panel.
+- `/bottles/<slug>` image = admin pin > hero of the TOP-RATED review with an image (tie → most `votes_count`, then newest) > creator's `label_image` (add-a-bottle form) > SVG placeholder (`bottles/_placeholder`, the floor — never blank, no scraped imagery).
+- Upload on review form (new+edit) and add-a-bottle form: image content types only, 15MB cap each, vips downscale on ingest (`image_processing`+`ruby-vips` already in Gemfile.lock).
+- Admin moderation: delete image/review/both, from the admin panel.
 - Ghost-edits corrections (same newest addendum) are OUT of scope — separate future plan.
 
-**Stack:** Rails 8.0.2, Postgres 15, Hotwire, Tailwind v4, Devise, Pundit, Minitest+fixtures, Active Storage (Disk in dev, R2 planned for prod — no service change here).
+**Stack:** Rails 8.0.2, Postgres 15, Hotwire, Tailwind v4, Devise, Pundit, Minitest+fixtures, Active Storage (Disk in dev, R2 planned for prod).
 
 ## Global constraints
 
 - Docker-only: `docker compose exec -T web bin/rails ...` for every migration/test/generator. Never run `bin/rails` on the host.
-- **Schema dump rides with the migration commit.** Active Storage attachments need NO migration (attachment/blob/variant tables already exist from Rails' base install). If any task adds a real column, `git add db/schema.rb` in the same commit.
-- **True baseline (verified this session, branch `overhaul/full-refresh`, `docker compose exec -T web bin/rails test`): 295 runs, 1101 assertions, 1 failures, 3 errors, 9 skips.** NOT green — pre-existing breakage in `Review.for_circle` (`#or` structural-incompatibility) and `Favorite` (validation regressions) from the prior social-layer phase, outside this plan's scope. No task here may add new failures/errors; the 1F/3E carries forward untouched. Report deltas as "baseline + N new tests, same 1F/3E."
-- Design tokens: white/whiskey-50 surfaces, `.eyebrow` kickers, `font-display` headings, `rounded-2xl border border-gray-200 bg-white shadow-sm` public cards, `rounded-lg`/`rounded-xl` admin cards matching `app/views/admin/presentations/_form.html.erb`. Rating: always `bottles/_rating` partial + `number_with_precision(value, precision: 2, strip_insignificant_zeros: true)`.
-- `has_many_attached :images` on `Review`, `has_one_attached :pinned_label_image` on `Bottle`.
-- Admin house pattern (`Admin::PresentationsController`): `Admin::BaseController` (`authenticate_admin!` + `layout "admin"`), `form.file_field :x, accept:, multiple: true`, content-type/size validated in the model, destructive actions as separate member routes (not folded into `update`).
+- **Schema dump rides with the migration commit.** Active Storage attachments need NO migration (tables already exist). If any task adds a real column, `git add db/schema.rb` in the same commit.
+- **True baseline (verified this session, branch `overhaul/full-refresh`): 295 runs, 1101 assertions, 1 failures, 3 errors, 9 skips.** NOT green — pre-existing breakage in `Review.for_circle` (`#or` structural-incompatibility) and `Favorite` (validation regressions) from the prior social-layer phase, outside scope. No task may add new failures/errors; report deltas as "baseline + N new tests, same 1F/3E."
+- Design tokens: white/whiskey-50 surfaces, `.eyebrow` kickers, `font-display` headings, `rounded-2xl border border-gray-200 bg-white shadow-sm` public cards, `rounded-lg`/`rounded-xl` admin cards matching `admin/presentations/_form.html.erb`. Rating: always `bottles/_rating` + `number_with_precision(value, precision: 2, strip_insignificant_zeros: true)`.
+- Admin house pattern (`Admin::PresentationsController`): `Admin::BaseController` (`authenticate_admin!` + `layout "admin"`), `form.file_field :x, accept:, multiple: true`, content-type/size validated in the model, destructive actions as separate member routes.
 - Verify libvips before Task 1 Step 2: `docker compose exec -T web bin/rails runner "puts Vips::VERSION"`.
 
 ---
@@ -130,15 +122,7 @@ Add to `private`:
   end
 ```
 
-Run `docker compose exec -T web bin/rails test test/models/review_images_test.rb` — 6 runs green. Then full suite:
-
-```
-docker compose exec -T web bin/rails test
-```
-
-Expect **301 runs** (295 + 6), same 1 failure/3 errors, 9 skips.
-
-Commit: `Review images: has_many_attached with count/type/size validation`
+Run `docker compose exec -T web bin/rails test test/models/review_images_test.rb` — 6 runs green, then `docker compose exec -T web bin/rails test` — expect **301 runs** (295 + 6), same 1F/3E. Commit: `Review images: has_many_attached with count/type/size validation`
 
 - [ ] **Step 3 — permit `images` in every review-creating/updating controller.** `app/controllers/reviews_controller.rb`, `app/controllers/bottles/reviews_controller.rb`, `app/controllers/events/reviews_controller.rb` — same one-line change in each `review_params`:
 
@@ -184,19 +168,13 @@ class ReviewsControllerImagesTest < ActionDispatch::IntegrationTest
 end
 ```
 
-Run, expect green (uses Step 3's wiring). If `sign_in` helper differs from the project's Devise test helper, match whatever `test/controllers/reviews_controller_test.rb` already uses instead of guessing.
-
-Run full suite — expect **303 runs** (301 + 2), same 1F/3E baseline carried.
-
-Commit: `Permit review image uploads on create and edit (bottle, event, and edit forms)`
+Run, expect green (match whatever Devise `sign_in` helper `test/controllers/reviews_controller_test.rb` already uses, not a guess). Full suite: expect **303 runs** (301 + 2), same 1F/3E. Commit: `Permit review image uploads on create and edit (bottle, event, and edit forms)`
 
 - [ ] **Step 5 — form + review-page gallery (view-only).** `app/views/reviews/_form.html.erb` — before the submit row, add a "Photos (optional, up to 3 — the first becomes this tasting's cover photo)" block: if `review.persisted? && review.images.attached?`, show existing thumbs (`image_tag image.variant(:thumb), class: "h-20 w-20 rounded-lg object-cover ring-1 ring-gray-200"`) in a `flex flex-wrap gap-3` row; below it `form.file_field :images, multiple: true, accept: "image/jpeg,image/jpg,image/png,image/gif,image/webp"` styled like the existing text inputs (`rounded-lg border border-gray-300`).
 
 `app/views/reviews/show.html.erb` — after the tasting-fields block and before `<%= render "reviews/event_card" %>`, add (only `if @review.images.attached?`) a "Photos" `.eyebrow` section: `grid grid-cols-2 gap-3 sm:grid-cols-3` of `image_tag image.variant(:thumb), class: "aspect-square w-full rounded-xl object-cover ring-1 ring-gray-200"` per image.
 
-Run full suite (view-only change, sanity check nothing broke): expect **303 runs**, same 1F/3E baseline.
-
-Commit: `Review form uploads photos; review page renders the gallery`
+Run full suite (view-only, sanity check): expect **303 runs**, same 1F/3E baseline. Commit: `Review form uploads photos; review page renders the gallery`
 
 ---
 
@@ -286,9 +264,7 @@ Add a public method (near `average_rating`):
   end
 ```
 
-Run model test — green (8 runs). Full suite — expect **311 runs** (303 + 8), same 1F/3E baseline.
-
-Commit: `Bottle#display_image: pin > top-rated review photo > creator label_image > nil`
+Run model test — green (8 runs). Full suite: expect **311 runs** (303 + 8), same 1F/3E. Commit: `Bottle#display_image: pin > top-rated review photo > creator label_image > nil`
 
 - [ ] **Step 3 — creator upload on "Add a bottle".** `app/controllers/bottles_controller.rb` — add `:label_image` to `bottle_params`:
 
@@ -308,17 +284,13 @@ Add a failing/passing controller test to `test/controllers/bottles_controller_te
   end
 ```
 
-Run `docker compose exec -T web bin/rails test test/controllers/bottles_controller_test.rb test/models/bottle_display_image_test.rb` — green. Full suite: expect **312 runs** (311 + 1), same 1F/3E baseline.
-
-Commit: `Add-a-bottle form uploads the creator's label_image`
+Run `docker compose exec -T web bin/rails test test/controllers/bottles_controller_test.rb test/models/bottle_display_image_test.rb` — green. Full suite: expect **312 runs** (311 + 1), same 1F/3E. Commit: `Add-a-bottle form uploads the creator's label_image`
 
 - [ ] **Step 4 — identity band + review-page cover + row thumbnails (view-only).** `app/views/bottles/show.html.erb` — in the identity band, replace the unconditional `render "bottles/placeholder"` with: `image_tag @bottle.display_image.variant(:thumb), class: "h-14 w-14 rounded-lg object-cover"` when `@bottle.display_image` is present, else the existing placeholder render unchanged. Same conditional swap in `app/views/reviews/show.html.erb`'s hero block (`@review.bottle`, `h-14`).
 
 `app/views/reviews/index.html.erb` — bottle row loop: wrap the existing `<div class="min-w-0">` in a new `flex items-center gap-3` div, and before it add the same conditional (`display_image` present → `image_tag img.variant(:thumb), class: "h-10 w-10 shrink-0 rounded-lg object-cover"`, else placeholder at `size: "h-10"`). Close the added wrapper right before the existing `shrink-0 whitespace-nowrap text-right` block. One query per row at the 10-row page size is acceptable; do not eager-load further without a real N+1 complaint. This is additive markup around existing content — check indentation against the live file, not a rewrite.
 
-Run full suite (view-only): expect **312 runs**, same 1F/3E baseline. Spot-check: `docker compose exec -T web bin/rails runner "puts Bottle.first.display_image.inspect"`; load `/reviews` and a bottle page in browser if available.
-
-Commit: `Bottle identity band, review hero, and review-row thumbnails use the derived image`
+Run full suite (view-only): expect **312 runs**, same 1F/3E baseline. Spot-check: `docker compose exec -T web bin/rails runner "puts Bottle.first.display_image.inspect"`. Commit: `Bottle identity band, review hero, and review-row thumbnails use the derived image`
 
 ---
 
@@ -482,9 +454,7 @@ end
             "Bottles"       => [admin_bottles_path,             'M9 3v2m6-2v2M5 7h14M5 7l1 12a2 2 0 002 2h8a2 2 0 002-2l1-12M5 7h14'],
 ```
 
-Run `docker compose exec -T web bin/rails test test/controllers/admin/bottles_controller_test.rb` — 7 runs green. Full suite: expect **319 runs** (312 + 7), same 1F/3E baseline.
-
-Commit: `Admin bottle moderation: pin/unpin label image, delete review photos or the review`
+Run `docker compose exec -T web bin/rails test test/controllers/admin/bottles_controller_test.rb` — 7 runs green. Full suite: expect **319 runs** (312 + 7), same 1F/3E. Commit: `Admin bottle moderation: pin/unpin label image, delete review photos or the review`
 
 ---
 
