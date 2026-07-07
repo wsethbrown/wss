@@ -1,0 +1,25 @@
+spring_blind_pour_one:
+  event: spring_blind
+  bottle: ardbeg_10
+  position: 1
+  label: "Pour #1 — the blind"
+
+spring_blind_pour_two:
+  event: spring_blind
+  bottle: glendronach_12
+  position: 2
+
+spring_blind_pour_three:
+  event: spring_blind
+  bottle: four_roses_sb
+  position: 3
+
+mystery_flight_pour_one:
+  event: mystery_flight
+  bottle: lagavulin
+  position: 1
+
+allocated_night_pour_one:
+  event: allocated_night
+  bottle: four_roses_sb
+  position: 1

@@ -18,3 +18,15 @@ single_malt_admin:
   society: single_malt
   role: admin
   status: active
+
+single_malt_john:
+  user: john
+  society: single_malt
+  role: member
+  status: active
+
+single_malt_seth:
+  user: seth
+  society: single_malt
+  role: member
+  status: active

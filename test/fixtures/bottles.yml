@@ -13,3 +13,27 @@ lagavulin:
   style: Single Malt Scotch
   abv: 43.0
   slug: lagavulin-16-lagavulin
+
+ardbeg_10:
+  name: Ardbeg 10
+  distillery: Ardbeg
+  region: Islay
+  style: Single Malt Scotch
+  abv: 46.0
+  slug: ardbeg-10-ardbeg
+
+glendronach_12:
+  name: GlenDronach 12
+  distillery: GlenDronach
+  region: Highlands
+  style: Single Malt Scotch
+  abv: 43.0
+  slug: glendronach-12-glendronach
+
+four_roses_sb:
+  name: Four Roses Small Batch
+  distillery: Four Roses
+  region: Kentucky
+  style: Bourbon
+  abv: 45.0
+  slug: four-roses-small-batch-four-roses

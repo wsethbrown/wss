@@ -5,6 +5,10 @@ class Event < ApplicationRecord
   # Associations
   has_many :event_rsvps, dependent: :destroy
   has_many :attendees, through: :event_rsvps, source: :user
+  # Reviews are members' words — an event that has them can't be deleted.
+  has_many :reviews, dependent: :restrict_with_error
+  has_many :event_bottles, dependent: :destroy
+  has_many :pour_bottles, through: :event_bottles, source: :bottle
 
   # Validations
   validates :title, presence: true, length: { minimum: 2, maximum: 200 }
@@ -100,6 +104,25 @@ class Event < ApplicationRecord
     return nil unless user
     rsvp = event_rsvps.find_by(user: user)
     rsvp&.status
+  end
+
+  # --- Pours (review system Phase 2) ---
+
+  # Secret pours auto-reveal once the night ends; non-secret pours are
+  # always revealed (even before the event happens).
+  def pours_revealed?
+    !pours_hidden_until_complete? || (end_time.present? && end_time <= Time.current)
+  end
+
+  def pours_visible_to?(user)
+    pours_revealed? || managed_by?(user)
+  end
+
+  # Mirrors EventPolicy#update? — the people who run the night.
+  def managed_by?(user)
+    return false unless user
+
+    user.admin? || organizer_id == user.id || society.has_admin?(user)
   end
 
   private

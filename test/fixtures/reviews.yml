@@ -7,3 +7,45 @@ john_eagle_rare:
   palate: Cherry, leather
   finish: Long, drying oak
   body_notes: Medium, silky
+
+john_spring_ardbeg:
+  user: john
+  bottle: ardbeg_10
+  event: spring_blind
+  rating: 4.5
+  notes: Smoke first, then pears — the blind fooled nobody.
+
+john_spring_glendronach:
+  user: john
+  bottle: glendronach_12
+  event: spring_blind
+  rating: 3.5
+  notes: Sherry-sweet, a little thin on the finish.
+
+john_spring_four_roses:
+  user: john
+  bottle: four_roses_sb
+  event: spring_blind
+  rating: 4.0
+  notes: Rye spice over caramel. Crowd-pleaser.
+
+seth_spring_ardbeg:
+  user: seth
+  bottle: ardbeg_10
+  event: spring_blind
+  rating: 4.0
+  notes: Campfire in a glass. I said 4, I meant it.
+
+seth_spring_glendronach:
+  user: seth
+  bottle: glendronach_12
+  event: spring_blind
+  rating: 3.0
+  notes: Fine, but I came for the peat.
+
+jane_allocated_four_roses:
+  user: jane
+  bottle: four_roses_sb
+  event: allocated_night
+  rating: 5.0
+  notes: Even better from a private stash.

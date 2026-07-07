@@ -78,8 +78,11 @@ class EventsController < ApplicationController
   def destroy
     authorize @event
 
-    @event.destroy
-    redirect_to events_url, notice: 'Event was successfully deleted.'
+    if @event.destroy
+      redirect_to events_url, notice: 'Event was successfully deleted.'
+    else
+      redirect_to society_event_path(@event.society, @event), alert: @event.errors.full_messages.to_sentence
+    end
   end
 
   private

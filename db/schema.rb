@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_07_032431) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_07_125726) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -104,6 +104,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_032431) do
     t.index ["user_id"], name: "index_download_logs_on_user_id"
   end
 
+  create_table "event_bottles", force: :cascade do |t|
+    t.bigint "event_id", null: false
+    t.bigint "bottle_id", null: false
+    t.integer "position", null: false
+    t.string "label"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bottle_id"], name: "index_event_bottles_on_bottle_id"
+    t.index ["event_id", "bottle_id"], name: "index_event_bottles_on_event_id_and_bottle_id", unique: true
+    t.index ["event_id", "position"], name: "index_event_bottles_on_event_id_and_position"
+    t.index ["event_id"], name: "index_event_bottles_on_event_id"
+  end
+
   create_table "event_rsvps", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "event_id", null: false
@@ -126,6 +139,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_032431) do
     t.bigint "organizer_id", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.boolean "pours_hidden_until_complete", default: false, null: false
     t.index ["location"], name: "index_events_on_location"
     t.index ["organizer_id"], name: "index_events_on_organizer_id"
     t.index ["society_id", "start_time"], name: "index_events_on_society_id_and_start_time"
@@ -447,6 +461,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_032431) do
   add_foreign_key "credit_transactions", "users"
   add_foreign_key "download_logs", "presentations"
   add_foreign_key "download_logs", "users"
+  add_foreign_key "event_bottles", "bottles"
+  add_foreign_key "event_bottles", "events"
   add_foreign_key "event_rsvps", "events"
   add_foreign_key "event_rsvps", "users"
   add_foreign_key "events", "societies"

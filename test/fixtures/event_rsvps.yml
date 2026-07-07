@@ -1,0 +1,19 @@
+john_spring_blind:
+  user: john
+  event: spring_blind
+  status: "yes"
+
+seth_spring_blind:
+  user: seth
+  event: spring_blind
+  status: "yes"
+
+seth_mystery_flight:
+  user: seth
+  event: mystery_flight
+  status: "yes"
+
+jane_allocated_night:
+  user: jane
+  event: allocated_night
+  status: "yes"

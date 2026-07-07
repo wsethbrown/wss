@@ -1,0 +1,32 @@
+# The demo chain (public society): a completed night with three pours,
+# reviewed by john and seth. Society: single_malt — NOT whiskey_lovers,
+# whose membership counts are pinned by society_test.
+spring_blind:
+  society: single_malt
+  organizer: admin
+  title: The Spring Blind Flight
+  description: Three brown-bagged pours, scored before the reveal.
+  location: The back room at The Old Pal
+  start_time: <%= 3.weeks.ago.to_fs(:db) %>
+  end_time: <%= (3.weeks.ago + 2.hours).to_fs(:db) %>
+
+# Upcoming event with the secret toggle on — pours hidden until it ends.
+mystery_flight:
+  society: single_malt
+  organizer: admin
+  title: The Mystery Flight
+  description: Brown bags only. No hints before the night.
+  location: Online
+  start_time: <%= 2.weeks.from_now.to_fs(:db) %>
+  end_time: <%= (2.weeks.from_now + 2.hours).to_fs(:db) %>
+  pours_hidden_until_complete: true
+
+# A private society's completed night — exercises provenance veiling.
+allocated_night:
+  society: bourbon_club
+  organizer: jane
+  title: Allocated Bottles Night
+  description: Private pours for the club.
+  location: Louisville, KY
+  start_time: <%= 2.weeks.ago.to_fs(:db) %>
+  end_time: <%= (2.weeks.ago + 2.hours).to_fs(:db) %>
