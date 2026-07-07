@@ -9,7 +9,6 @@ class GoogleOAuthTest < ActionDispatch::IntegrationTest
     Dir.glob("#{Rails.root}/tmp/mail/*").each { |file| File.delete(file) }
     
     # Ensure we start with a clean database state
-    User.destroy_all
   end
 
   def teardown
@@ -70,14 +69,14 @@ class GoogleOAuthTest < ActionDispatch::IntegrationTest
     # Set up Google OAuth mock
     setup_oauth_mock(:google_oauth2, :success)
     
-    # Simulate the OAuth callback
-    post user_google_oauth2_omniauth_callback_path
-    
+    # Simulate the OAuth callback — must sign in the existing user,
+    # not create a new one.
+    assert_no_difference "User.count" do
+      post user_google_oauth2_omniauth_callback_path
+    end
+
     # Should redirect to account page
     assert_redirected_to account_path
-    
-    # Should not create a new user
-    assert_equal 1, User.count
     
     # Should sign in the existing user
     follow_redirect!

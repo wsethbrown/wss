@@ -177,3 +177,14 @@ Queued as its own phase after Phase 2 (events/societies). Decisions:
 - Per-review photos are thereby UN-deferred from the original deferred list;
   moderation surface is the admin Bottles section (which also hosts the
   future merge tool).
+
+## Addendum (2026-07-07, owner-approved): private-society veiling, refined
+
+What privacy protects on a private society: joining without an invite,
+member lists, and the event calendar. It does NOT hide that a tasting
+happened. Therefore a review tied to a private society's event MAY show
+the event's name and date (and the deck used, once Phase 3 links decks) —
+but the SOCIETY stays hidden: no society name, no society link, and no
+link into the society's event page (which would reveal it). Public
+societies keep the fully linked event card. This supersedes the original
+"generic badge only" veiling rule.
