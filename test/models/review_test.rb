@@ -40,4 +40,24 @@ class ReviewTest < ActiveSupport::TestCase
     assert_nil bottles(:lagavulin).average_rating
     assert_equal 0, bottles(:lagavulin).reviewer_count
   end
+
+  test "average_rating uses only a user's newer review when they reviewed the same bottle twice" do
+    bottle = bottles(:eagle_rare) # fixture review: john at 4.0, created via fixtures (treated as older)
+    old_review = reviews(:john_eagle_rare)
+    old_review.update_column(:created_at, 2.days.ago)
+
+    event = Event.create!(
+      society: societies(:whiskey_lovers),
+      organizer: users(:john),
+      title: "Eagle Rare Re-tasting",
+      start_time: 1.day.from_now,
+      end_time: 1.day.from_now + 2.hours
+    )
+
+    newer_review = Review.create!(user: users(:john), bottle: bottle, event: event, rating: 2.0)
+    newer_review.update_column(:created_at, 1.day.ago)
+
+    assert_in_delta 2.0, bottle.average_rating, 0.001
+    assert_equal 1, bottle.reviewer_count
+  end
 end

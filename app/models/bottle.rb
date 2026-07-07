@@ -35,7 +35,7 @@ class Bottle < ApplicationRecord
 
   def latest_per_user
     reviews.where(
-      id: reviews.select("DISTINCT ON (user_id) id").order(:user_id, created_at: :desc)
+      id: reviews.select("DISTINCT ON (user_id) id").order(:user_id, created_at: :desc, id: :desc)
     )
   end
 
