@@ -166,12 +166,6 @@
             <figcaption class="mt-1 text-center text-xs text-gray-400">Cover</figcaption>
           </figure>
         <% end %>
-        <% @presentation.ordered_preview_images.each_with_index do |img, i| %>
-          <figure>
-            <%= image_tag img, class: 'aspect-video w-full rounded-lg border border-gray-200 object-cover' %>
-            <figcaption class="mt-1 text-center text-xs text-gray-400">Preview <%= i + 1 %></figcaption>
-          </figure>
-        <% end %>
       </div>
     </div>
   </div>
