@@ -1,0 +1,26 @@
+<%# locals: review
+    Where this tasting happened. Public society → a clickable event card
+    (title, date, society, pour count), linking out to the event page.
+    Private society → the SAME card shape (title + date) but UNLINKED, with
+    no society name/link anywhere — the society line reads "A private
+    society" instead. Solo → nothing. The rule is society.public?, NOT a
+    per-viewer policy — private context is veiled for everyone, members and
+    authors included (owner directive, 2026-07-07). %>
+<% if review.event %>
+  <% event = review.event %>
+  <% if event.society.public? %>
+    <%= link_to society_event_path(event.society, event),
+        class: "mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-whiskey-200 bg-whiskey-50 px-4 py-2.5 text-sm transition hover:border-whiskey-300 hover:bg-whiskey-100" do %>
+      <span class="font-semibold text-whiskey-800"><%= event.title %></span>
+      <span class="text-gray-500"><%= event.start_time.strftime("%B %-d, %Y") %></span>
+      <span class="text-gray-500"><%= event.society.name %></span>
+      <span class="text-gray-500"><%= pluralize(event.event_bottles.size, "pour") %></span>
+    <% end %>
+  <% else %>
+    <div class="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-gray-200 bg-gray-50 px-4 py-2.5 text-sm">
+      <span class="font-semibold text-gray-700"><%= event.title %></span>
+      <span class="text-gray-500"><%= event.start_time.strftime("%B %-d, %Y") %></span>
+      <span class="text-gray-500">A private society</span>
+    </div>
+  <% end %>
+<% end %>

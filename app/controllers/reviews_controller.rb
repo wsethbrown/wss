@@ -11,7 +11,7 @@ class ReviewsController < ApplicationController
     # The record covers the people as well as the pours: a search also turns
     # up societies (policy-scoped — private ones stay invisible to outsiders).
     @societies = params[:q].present? ? policy_scope(Society).search(params[:q]).order(:name).limit(6) : Society.none
-    @recent_reviews = Review.includes(:user, :bottle).recent_first.limit(10)
+    @recent_reviews = Review.includes(:user, :bottle, event: [:society, :event_bottles]).recent_first.limit(10)
   end
 
   # Entity-grouped autocomplete for the section search: bottles and societies,
@@ -33,7 +33,7 @@ class ReviewsController < ApplicationController
 
   # A review's own page — the drill-down target for every clamped card.
   def show
-    @review = Review.includes(:user, :bottle, :event).find(params[:id])
+    @review = Review.includes(:user, :bottle, event: [:society, :event_bottles]).find(params[:id])
   end
 
   def edit; end

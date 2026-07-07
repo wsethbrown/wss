@@ -16,7 +16,7 @@ class ProfilesController < ApplicationController
              .distinct.includes(:creator)
       end
 
-    @tastings = @user.reviews.includes(:bottle).recent_first.limit(20)
+    @tastings = @user.reviews.includes(:bottle, event: [:society, :event_bottles]).recent_first.limit(20)
   end
 
   private

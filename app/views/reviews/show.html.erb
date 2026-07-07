@@ -32,7 +32,7 @@
       </dl>
     <% end %>
 
-    <%# The event provenance card renders here once Phase 2 Task 4 lands. %>
+    <%= render "reviews/event_card", review: @review %>
 
     <div class="mt-10 flex items-center gap-4 border-t border-gray-100 pt-6">
       <%= link_to "All tastings of #{@review.bottle.name} →", bottle_path(@review.bottle), class: "font-semibold text-whiskey-700 hover:text-whiskey-600" %>

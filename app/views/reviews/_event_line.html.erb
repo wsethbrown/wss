@@ -1,0 +1,21 @@
+<%# locals: review
+    A non-link provenance line for surfaces where the review card is ITSELF
+    inside an <a> (the reviews#index "Latest tastings" feed) — a nested <a>
+    to the event would be invalid HTML, so this renders plain text with a
+    calendar glyph instead. The drill-down to the event happens via the
+    review's own page. Same veiling rule as reviews/_event_card: private
+    societies show the event title but never the society name
+    (owner directive, 2026-07-07). %>
+<% if review.event %>
+  <% event = review.event %>
+  <p class="mt-2 flex items-center gap-1.5 text-sm text-gray-500">
+    <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+    </svg>
+    <% if event.society.public? %>
+      <span>Tasted at <%= event.title %> · <%= event.society.name %></span>
+    <% else %>
+      <span>Tasted at <%= event.title %> · A private society</span>
+    <% end %>
+  </p>
+<% end %>

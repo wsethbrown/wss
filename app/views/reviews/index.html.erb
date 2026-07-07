@@ -101,6 +101,7 @@
               <% elsif (peek = { "Nose" => review.nose, "Palate" => review.palate, "Finish" => review.finish }.compact_blank).any? %>
                 <p class="mt-3 line-clamp-4 text-gray-600"><%= peek.map { |l, t| "#{l}: #{t}" }.join(" · ") %></p>
               <% end %>
+              <%= render "reviews/event_line", review: review %>
               <div class="mt-auto flex items-center justify-between pt-4">
                 <span class="text-sm text-gray-400"><%= review.user.first_name %> · <%= time_ago_in_words(review.created_at) %> ago</span>
                 <span class="text-sm font-semibold text-whiskey-700">Read the tasting →</span>
