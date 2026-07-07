@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_07_193710) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_07_220836) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -202,6 +202,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_193710) do
     t.index ["whiskey_recommendations_json"], name: "index_presentations_on_whiskey_recommendations_json", using: :gin
   end
 
+  create_table "review_votes", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "review_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["review_id"], name: "index_review_votes_on_review_id"
+    t.index ["user_id", "review_id"], name: "index_review_votes_on_user_id_and_review_id", unique: true
+    t.index ["user_id"], name: "index_review_votes_on_user_id"
+  end
+
   create_table "reviews", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "bottle_id", null: false
@@ -216,6 +226,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_193710) do
     t.datetime "updated_at", null: false
     t.decimal "price_paid", precision: 8, scale: 2
     t.jsonb "flavor_wheel", default: {}, null: false
+    t.integer "votes_count", default: 0, null: false
     t.index ["bottle_id"], name: "index_reviews_on_bottle_id"
     t.index ["event_id"], name: "index_reviews_on_event_id"
     t.index ["user_id", "bottle_id", "event_id"], name: "index_reviews_on_user_id_and_bottle_id_and_event_id", unique: true
@@ -484,6 +495,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_193710) do
   add_foreign_key "presentation_tags", "presentations"
   add_foreign_key "presentation_tags", "tags"
   add_foreign_key "presentations", "users", column: "author_id"
+  add_foreign_key "review_votes", "reviews"
+  add_foreign_key "review_votes", "users"
   add_foreign_key "reviews", "bottles"
   add_foreign_key "reviews", "events"
   add_foreign_key "reviews", "users"

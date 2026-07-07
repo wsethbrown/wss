@@ -145,6 +145,9 @@ Rails.application.routes.draw do
   # Favorites
   resources :favorites, only: [:create, :destroy]
 
+  # Review votes (thumbs-up only)
+  resources :review_votes, only: [:create, :destroy]
+
   # Bottles
   resources :bottles, only: [:show, :new, :create], param: :id do
     collection { get :search }

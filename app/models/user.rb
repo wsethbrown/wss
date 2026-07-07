@@ -104,6 +104,7 @@ class User < ApplicationRecord
   has_many :credit_transactions, dependent: :destroy
   has_many :activity_logs, dependent: :destroy
   has_many :reviews, dependent: :destroy
+  has_many :review_votes, dependent: :destroy
   has_many :favorites, dependent: :destroy
   has_many :favorited_societies, -> { where(favorites: { favoritable_type: "Society" }) }, through: :favorites, source: :favoritable, source_type: "Society"
   has_many :favorited_users, -> { where(favorites: { favoritable_type: "User" }) }, through: :favorites, source: :favoritable, source_type: "User"

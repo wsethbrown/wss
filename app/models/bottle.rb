@@ -61,7 +61,7 @@ class Bottle < ApplicationRecord
 
   # The community's most-used descriptor words across this bottle's
   # tastings — the left rail's tag cloud.
-  def top_descriptors(limit = 10)
+  def top_descriptors(limit = 5)
     reviews.flat_map { |r| r.descriptor_tags.keys }.tally
            .sort_by { |word, n| [-n, word] }.first(limit).map(&:first)
   end

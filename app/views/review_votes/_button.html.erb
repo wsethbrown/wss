@@ -1,0 +1,12 @@
+<% if user_signed_in? && review.user_id != current_user.id %>
+  <% existing = current_user.review_votes.find_by(review: review) %>
+  <% if existing %>
+    <%= button_to "👍 #{review.votes_count}", review_vote_path(existing), method: :delete,
+        class: "inline-flex cursor-pointer items-center gap-1 rounded-full border border-whiskey-300 bg-whiskey-50 px-3 py-1 text-sm font-semibold text-whiskey-800 transition hover:bg-whiskey-100" %>
+  <% else %>
+    <%= button_to "👍 #{review.votes_count}", review_votes_path(review_id: review.id), method: :post,
+        class: "inline-flex cursor-pointer items-center gap-1 rounded-full border border-gray-300 px-3 py-1 text-sm font-semibold text-gray-600 transition hover:border-whiskey-300 hover:text-whiskey-700" %>
+  <% end %>
+<% else %>
+  <span class="inline-flex items-center gap-1 rounded-full border border-gray-200 px-3 py-1 text-sm font-semibold text-gray-500">👍 <%= review.votes_count %></span>
+<% end %>

@@ -25,6 +25,7 @@
       <%= @review.user.first_name %> <%= @review.user.last_name %> ·
       <%= @review.created_at.strftime("%B %-d, %Y") %><% if @review.price_paid %> &middot; paid <%= number_to_currency(@review.price_paid, precision: 0) %><% end %>
     </p>
+    <div class="mt-4 flex justify-center"><%= render "review_votes/button", review: @review %></div>
   </div>
 </section>
 

@@ -4,6 +4,7 @@ class Review < ApplicationRecord
   belongs_to :user
   belongs_to :bottle
   belongs_to :event, optional: true
+  has_many :review_votes, dependent: :destroy
 
   validates :rating, presence: true, inclusion: { in: VALID_RATINGS }
   validates :notes, length: { maximum: 5_000 }
