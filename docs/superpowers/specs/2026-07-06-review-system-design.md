@@ -228,3 +228,21 @@ Supersedes the earlier derived-label rule's mechanism details:
 - Upload happens on the review form (new+edit), image content types only,
   15MB cap each, vips downscaling on ingest when available. Admin
   moderation (delete image/review/both) per the earlier addendum.
+
+## Addendum (2026-07-07, owner-approved): bottle image at creation; data corrections
+
+- "Add a bottle" gains an optional image upload (the creator's label shot).
+  Bottle display priority: admin pin > top-rated review hero > creator's
+  label_image > SVG placeholder.
+- Corrections for wrong bottle info, two tiers:
+  1. ADMIN EDIT: full edit of bottle fields from the admin bottles surface.
+  2. GHOST EDITS (community): signed-in users "suggest a correction" on a
+     bottle page (whitelisted fields: name/distillery/region/style/abv;
+     pre-filled form, changed fields become per-field proposals in a
+     bottle_edits table — bottle, user, field, proposed_value; one live
+     proposal per user/field/bottle). When N DISTINCT users propose the
+     IDENTICAL field+value, it auto-applies and clears competing proposals
+     for that field. N is configurable (Rails config), DEFAULT 3 while the
+     community is small — owner's "100" is the eventual-scale intent, not
+     a launch value. Admins see pending proposals and can apply/reject
+     instantly. Applied edits are logged (who proposed, when applied).
