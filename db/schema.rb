@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_06_085725) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_07_031626) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -57,6 +57,21 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_06_085725) do
     t.index ["trackable_type", "trackable_id"], name: "index_activity_logs_on_trackable"
     t.index ["user_id", "created_at"], name: "index_activity_logs_on_user_id_and_created_at"
     t.index ["user_id"], name: "index_activity_logs_on_user_id"
+  end
+
+  create_table "bottles", force: :cascade do |t|
+    t.string "name", null: false
+    t.string "distillery"
+    t.string "region"
+    t.string "style"
+    t.decimal "abv", precision: 4, scale: 1
+    t.string "slug", null: false
+    t.bigint "created_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "lower((name)::text), lower((COALESCE(distillery, ''::character varying))::text)", name: "index_bottles_on_lower_name_distillery"
+    t.index ["created_by_id"], name: "index_bottles_on_created_by_id"
+    t.index ["slug"], name: "index_bottles_on_slug", unique: true
   end
 
   create_table "credit_transactions", force: :cascade do |t|
@@ -408,6 +423,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_06_085725) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "activity_logs", "users"
+  add_foreign_key "bottles", "users", column: "created_by_id"
   add_foreign_key "credit_transactions", "presentations"
   add_foreign_key "credit_transactions", "users"
   add_foreign_key "download_logs", "presentations"

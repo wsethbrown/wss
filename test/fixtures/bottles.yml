@@ -1,0 +1,15 @@
+eagle_rare:
+  name: Eagle Rare 10
+  distillery: Buffalo Trace
+  region: Kentucky
+  style: Bourbon
+  abv: 45.0
+  slug: eagle-rare-10-buffalo-trace-1
+
+lagavulin:
+  name: Lagavulin 16
+  distillery: Lagavulin
+  region: Islay
+  style: Single Malt Scotch
+  abv: 43.0
+  slug: lagavulin-16-lagavulin
