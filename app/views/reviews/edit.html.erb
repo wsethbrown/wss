@@ -1,0 +1,12 @@
+<% content_for :title, "Edit review - Whiskey Share Society" %>
+
+<section class="w-full bg-whiskey-50 px-4 py-14">
+  <div class="mx-auto max-w-xl">
+    <p class="eyebrow text-whiskey-600"><%= @review.bottle.display_name %></p>
+    <h1 class="mb-8 mt-1 font-display text-3xl font-semibold text-gray-900">Edit your tasting</h1>
+    <%= render "reviews/form", review: @review, url: review_path(@review) %>
+    <%= button_to "Delete this review", review_path(@review), method: :delete,
+        form: { data: { turbo_confirm: "Remove your review of #{@review.bottle.name}?" } },
+        class: "mt-4 cursor-pointer text-sm font-semibold text-red-600 hover:text-red-700" %>
+  </div>
+</section>

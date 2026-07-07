@@ -1,0 +1,9 @@
+<% content_for :title, "Review #{@bottle.name} - Whiskey Share Society" %>
+
+<section class="w-full bg-whiskey-50 px-4 py-14">
+  <div class="mx-auto max-w-xl">
+    <p class="eyebrow text-whiskey-600"><%= @bottle.display_name %></p>
+    <h1 class="mb-8 mt-1 font-display text-3xl font-semibold text-gray-900">Your tasting</h1>
+    <%= render "reviews/form", review: @review, url: bottle_reviews_path(@bottle) %>
+  </div>
+</section>
