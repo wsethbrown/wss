@@ -39,7 +39,6 @@ services:
     environment:
       RAILS_ENV: development
       RAILS_LOG_TO_STDOUT: "true"
-      DATABASE_URL: postgresql://wss:password@db:5432/wss_development
       DATABASE_HOST: db
       DATABASE_USERNAME: wss
       DATABASE_PASSWORD: password
@@ -68,7 +67,6 @@ services:
       - .env
     environment:
       RAILS_ENV: development
-      DATABASE_URL: postgresql://wss:password@db:5432/wss_development
       REDIS_URL: redis://redis:6379/0
     volumes:
       - .:/rails

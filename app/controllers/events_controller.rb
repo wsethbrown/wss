@@ -2,7 +2,7 @@ class EventsController < ApplicationController
   before_action :set_event, only: [:show, :edit, :update, :destroy]
 
   def index
-    @events = Event.includes(:society, :organizer, :event_rsvps)
+    @events = policy_scope(Event).includes(:society, :organizer, :event_rsvps)
                    .search(params[:search])
                    .by_society(params[:society_id])
                    .order(:start_time)
@@ -13,6 +13,7 @@ class EventsController < ApplicationController
   end
 
   def show
+    authorize @event
     @pours = @event.event_bottles.ordered.includes(:bottle)
     @pours_visible = @event.pours_visible_to?(current_user)
     @rsvps = @event.event_rsvps.includes(:user)
@@ -98,7 +99,11 @@ class EventsController < ApplicationController
   end
 
   def event_params
-    params.require(:event).permit(:title, :description, :location, :start_time, :end_time,
-                                  :society_id, :pours_hidden_until_complete)
+    # society_id is permitted only on create (the nested form); update must not
+    # re-home an event — that would re-attribute its reviews/board rows and
+    # switch their veiling.
+    permitted = [:title, :description, :location, :start_time, :end_time, :pours_hidden_until_complete]
+    permitted << :society_id if action_name == "create" || action_name == "new"
+    params.require(:event).permit(*permitted)
   end
 end

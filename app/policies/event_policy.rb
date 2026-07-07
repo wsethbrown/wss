@@ -6,8 +6,11 @@ class EventPolicy < ApplicationPolicy
   # https://gist.github.com/Burgestrand/4b4bc22f31c8a95c425fc0e30d7ef1f5
 
   class Scope < ApplicationPolicy::Scope
+    # An event is only as visible as its society: private societies' calendars
+    # are not public record (owner directive, 2026-07-07). Reuses the society
+    # scope so the two rules can't drift.
     def resolve
-      scope.all
+      scope.where(society_id: SocietyPolicy::Scope.new(user, Society).resolve.select(:id))
     end
   end
 
@@ -16,7 +19,7 @@ class EventPolicy < ApplicationPolicy
   end
 
   def show?
-    true
+    SocietyPolicy.new(user, record.society).show?
   end
 
   def create?

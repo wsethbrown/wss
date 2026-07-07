@@ -65,3 +65,37 @@ class EventReviewsTest < ActionDispatch::IntegrationTest
     assert_response :unprocessable_entity
   end
 end
+
+class EventPrivacyTest < ActionDispatch::IntegrationTest
+  # The veil showed a private event's title; the event PAGE must not then
+  # hand over the society, members, and pours (owner directive: member
+  # lists and event calendars are private).
+  test "a private society's event page is not reachable by outsiders" do
+    event = events(:allocated_night)
+    get society_event_path(event.society, event)
+    assert_redirected_to root_path
+
+    sign_in users(:seth) # not a bourbon_club member
+    get society_event_path(event.society, event)
+    assert_response :redirect
+  end
+
+  test "members still see their private society's event" do
+    event = events(:allocated_night)
+    sign_in users(:jane) # bourbon_club creator
+    get society_event_path(event.society, event)
+    assert_response :success
+    assert_match event.title, response.body
+  end
+
+  test "the event policy scope hides private societies' events from outsiders" do
+    # The index view is a scaffold stub today; the scope is the guard that
+    # matters (and will keep any future listing honest).
+    anonymous = EventPolicy::Scope.new(nil, Event).resolve
+    assert_not_includes anonymous, events(:allocated_night)
+    assert_includes anonymous, events(:spring_blind)
+
+    member = EventPolicy::Scope.new(users(:jane), Event).resolve # bourbon_club creator
+    assert_includes member, events(:allocated_night)
+  end
+end
