@@ -149,7 +149,7 @@ Rails.application.routes.draw do
   end
   # The review section: /reviews is the public library page (search +
   # latest tastings); individual bottles live at /bottles/:slug.
-  resources :reviews, only: [:index, :edit, :update, :destroy] do
+  resources :reviews, only: [:index, :show, :edit, :update, :destroy] do
     collection { get :search; get :start }
   end
 

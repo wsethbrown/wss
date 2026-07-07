@@ -1,0 +1,44 @@
+<% content_for :title, "#{@review.user.first_name}'s tasting of #{@review.bottle.name} - Whiskey Share Society" %>
+
+<section class="w-full bg-char px-4 py-14">
+  <div class="mx-auto max-w-2xl text-center">
+    <p class="eyebrow mb-3 text-whiskey-300/90">A tasting, on the record</p>
+    <h1 class="font-display text-3xl font-semibold text-cream sm:text-4xl">
+      <%= link_to @review.bottle.display_name, bottle_path(@review.bottle), class: "transition hover:text-whiskey-200" %>
+    </h1>
+    <div class="mt-5 flex items-center justify-center gap-3 text-xl">
+      <%= render "bottles/rating", value: @review.rating.to_f %>
+      <span class="font-semibold text-cream"><%= number_with_precision(@review.rating, precision: 2, strip_insignificant_zeros: true) %></span>
+    </div>
+    <p class="mt-3 text-cream/70">
+      <%= @review.user.first_name %> <%= @review.user.last_name %> ·
+      <%= @review.created_at.strftime("%B %-d, %Y") %>
+    </p>
+  </div>
+</section>
+
+<section class="w-full bg-white px-4 py-12">
+  <div class="mx-auto max-w-2xl">
+    <% if @review.notes.present? %>
+      <p class="whitespace-pre-line text-lg leading-relaxed text-gray-700"><%= @review.notes %></p>
+    <% end %>
+
+    <% tasting = { "Nose" => @review.nose, "Palate" => @review.palate, "Finish" => @review.finish, "Body" => @review.body_notes }.compact_blank %>
+    <% if tasting.any? %>
+      <dl class="mt-10 grid grid-cols-2 gap-x-8 gap-y-5 border-t border-gray-100 pt-8 sm:grid-cols-4">
+        <% tasting.each do |label, text| %>
+          <div><dt class="eyebrow text-whiskey-700"><%= label %></dt><dd class="mt-1 text-gray-600"><%= text %></dd></div>
+        <% end %>
+      </dl>
+    <% end %>
+
+    <%# The event provenance card renders here once Phase 2 Task 4 lands. %>
+
+    <div class="mt-10 flex items-center gap-4 border-t border-gray-100 pt-6">
+      <%= link_to "All tastings of #{@review.bottle.name} →", bottle_path(@review.bottle), class: "font-semibold text-whiskey-700 hover:text-whiskey-600" %>
+      <% if @review.user == current_user %>
+        <%= link_to "Edit your review", edit_review_path(@review), class: "ml-auto rounded-xl bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-200" %>
+      <% end %>
+    </div>
+  </div>
+</section>

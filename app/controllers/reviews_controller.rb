@@ -1,7 +1,7 @@
 # The public review section (/reviews): bottle search plus the latest
 # tastings feed. Member actions (edit/update/destroy) for solo reviews.
 class ReviewsController < ApplicationController
-  before_action :authenticate_user!, except: [:index, :search]
+  before_action :authenticate_user!, except: [:index, :search, :show]
   before_action :set_review, only: [:edit, :update, :destroy]
 
   def index
@@ -30,6 +30,11 @@ class ReviewsController < ApplicationController
   # Start a review: pick the bottle you tasted (or add it). The picker's
   # autocomplete links straight into each bottle's review form.
   def start; end
+
+  # A review's own page — the drill-down target for every clamped card.
+  def show
+    @review = Review.includes(:user, :bottle, :event).find(params[:id])
+  end
 
   def edit; end
 

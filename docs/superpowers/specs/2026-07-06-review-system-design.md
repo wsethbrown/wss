@@ -188,3 +188,14 @@ but the SOCIETY stays hidden: no society name, no society link, and no
 link into the society's event page (which would reveal it). Public
 societies keep the fully linked event card. This supersedes the original
 "generic badge only" veiling rule.
+
+## Addendum (2026-07-07, owner idea, design queued): flavor-profile similarity
+
+Reviews' nose/palate/finish/body fields are free text today. Future phase:
+tokenize them into descriptor tags (a curated whiskey-descriptor lexicon —
+peat, honey, cherry, oak... — matched against the text, not free tagging),
+store as review_descriptors, and drive: (a) "tastes like" similar-bottle
+suggestions on bottle pages ranked by shared-descriptor weight; (b) simple
+infographics (descriptor frequency bars per bottle — "what 12 reviewers
+smell"). Sequenced after the images/enrichment phase. UN-defers "flavor
+search" from the original deferred list, in this constrained form.

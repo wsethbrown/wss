@@ -13,19 +13,21 @@
   <div class="mx-auto max-w-6xl">
     <div class="mb-10 flex flex-wrap items-center justify-between gap-4"
          data-controller="bottle-search" data-bottle-search-url-value="<%= search_reviews_path %>" data-bottle-search-grouped-value="true">
-      <%= form_with url: reviews_path, method: :get, class: "relative w-full max-w-xl" do %>
+      <%= form_with url: reviews_path, method: :get, class: "flex flex-1 items-start gap-3" do %>
+        <div class="relative w-full max-w-xl">
         <input type="search" name="q" value="<%= params[:q] %>" placeholder="Search bottles, distilleries, or societies…"
                autocomplete="off"
                data-bottle-search-target="input" data-action="input->bottle-search#query"
                class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-whiskey-500">
         <div data-bottle-search-target="results"
              class="absolute inset-x-0 top-full z-20 mt-1 hidden overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"></div>
+        </div>
         <%= select_tag :sort,
             options_for_select([["Top rated", "top"], ["Most reviewed", "reviewed"], ["A–Z", "az"], ["Recently added", "newest"]], @sort),
             onchange: "this.form.requestSubmit()", "aria-label": "Sort bottles",
-            class: "mt-3 rounded-xl border border-gray-300 bg-white px-3 py-2 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+            class: "rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
       <% end %>
-      <%= link_to "Add a review", start_reviews_path, class: "rounded-xl bg-whiskey-600 px-5 py-3 font-semibold text-white transition hover:bg-whiskey-700" %>
+      <%= link_to "Add a review", start_reviews_path, class: "whitespace-nowrap rounded-xl bg-whiskey-600 px-5 py-3 font-semibold text-white transition hover:bg-whiskey-700" %>
     </div>
 
     <p class="mb-8 text-gray-600">
@@ -87,18 +89,24 @@
       <div class="mt-16">
         <p class="eyebrow text-whiskey-600">Fresh pours</p>
         <h2 class="mb-6 mt-1 font-display text-2xl font-semibold text-gray-900">Latest tastings</h2>
-        <div class="space-y-4">
+        <div class="grid gap-4 sm:grid-cols-2">
           <% @recent_reviews.each do |review| %>
-            <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+            <%= link_to review_path(review), class: "group flex h-56 flex-col rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition hover:border-whiskey-300 hover:shadow-md" do %>
               <div class="flex flex-wrap items-baseline justify-between gap-2">
-                <%= link_to review.bottle.display_name, bottle_path(review.bottle), class: "font-display text-lg font-semibold text-gray-900 hover:text-whiskey-700" %>
+                <span class="font-display text-lg font-semibold text-gray-900 group-hover:text-whiskey-800"><%= review.bottle.display_name %></span>
                 <%= render "bottles/rating", value: review.rating.to_f %>
               </div>
-              <% if review.notes.present? %><p class="mt-2 text-gray-600"><%= truncate(review.notes, length: 200) %></p><% end %>
-              <p class="mt-2 text-sm text-gray-400"><%= review.user.first_name %> · <%= time_ago_in_words(review.created_at) %> ago</p>
-            </div>
+              <% if review.notes.present? %>
+                <p class="mt-3 line-clamp-4 text-gray-600"><%= review.notes %></p>
+              <% elsif (peek = { "Nose" => review.nose, "Palate" => review.palate, "Finish" => review.finish }.compact_blank).any? %>
+                <p class="mt-3 line-clamp-4 text-gray-600"><%= peek.map { |l, t| "#{l}: #{t}" }.join(" · ") %></p>
+              <% end %>
+              <div class="mt-auto flex items-center justify-between pt-4">
+                <span class="text-sm text-gray-400"><%= review.user.first_name %> · <%= time_ago_in_words(review.created_at) %> ago</span>
+                <span class="text-sm font-semibold text-whiskey-700">Read the tasting →</span>
+              </div>
+            <% end %>
           <% end %>
-        </div>
       </div>
     <% end %>
   </div>

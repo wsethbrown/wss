@@ -82,6 +82,17 @@ class BottlesTest < ActionDispatch::IntegrationTest
     assert_select "div.mt-6 span[aria-label=\"4.25 out of 5\"]", text: "★★★★½"
   end
 
+  test "a review has its own page, publicly readable and linked from the feed" do
+    review = reviews(:john_eagle_rare)
+    get reviews_path
+    assert_select "a[href=?]", review_path(review)
+
+    get review_path(review)
+    assert_response :success
+    assert_match "Cherry and oak", response.body
+    assert_match "Eagle Rare 10", response.body
+  end
+
   test "unknown slug 404s" do
     get bottle_path(id: "not-a-bottle")
     assert_response :not_found
