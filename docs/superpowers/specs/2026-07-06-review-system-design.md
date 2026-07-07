@@ -216,3 +216,15 @@ search" from the original deferred list, in this constrained form.
 - "Hot" feed on /reviews (?feed=hot): tastings ranked by votes received in
   the trailing 30 days (delta window), ties → newest. Presented beside the
   existing sort control, not replacing it.
+
+## Addendum (2026-07-07, owner-approved): review images, refined
+
+Supersedes the earlier derived-label rule's mechanism details:
+- A review carries UP TO 3 attached images; the FIRST is that review's
+  "hero image" (shown on its review page and cards where images render).
+- The bottle's default image on /bottles/<slug> is the hero image of its
+  TOP-RATED review that has one (ties → most votes, then newest). Admin
+  pin still overrides; the linework SVG placeholder remains the floor.
+- Upload happens on the review form (new+edit), image content types only,
+  15MB cap each, vips downscaling on ingest when available. Admin
+  moderation (delete image/review/both) per the earlier addendum.
