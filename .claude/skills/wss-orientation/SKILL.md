@@ -41,6 +41,7 @@ PostgreSQL, Hotwire, Tailwind v4, Devise+Pundit, Stripe, Solid Queue, Docker.
   roadmap
   - Reviews (/reviews): public bottle library + tastings; bottle pages at
     /bottles/<slug> — see wss-reviews skill.
+  - Event pours & society boards: events list ordered pours (optional secret-until-end toggle), RSVP'd members review them, societies rank the results — see wss-reviews skill.
 
 ## Key models (30-second data model)
 User (credits cache, subscription_* fields, is_admin) · Presentation (deck:

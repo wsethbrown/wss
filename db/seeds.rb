@@ -196,4 +196,67 @@ if Rails.env.development?
     end
     puts "Created event: #{event.title}"
   end
+
+  # --- Review-system demo chain (Phase 2) -----------------------------------
+  # A completed public-society night with three pours and two reviewers, so
+  # bottle pages, /reviews, the event page, and the society review board all
+  # have provenance to show: review card → event page → society board.
+  athens = societies[0] # Athens Whiskey Society (public)
+
+  pour_specs = [
+    { name: "Ardbeg 10", distillery: "Ardbeg", region: "Islay",
+      style: "Single Malt Scotch", abv: 46.0, label: "Pour #1 — the blind" },
+    { name: "GlenDronach 12", distillery: "GlenDronach", region: "Highlands",
+      style: "Single Malt Scotch", abv: 43.0, label: nil },
+    { name: "Four Roses Small Batch", distillery: "Four Roses", region: "Kentucky",
+      style: "Bourbon", abv: 45.0, label: nil }
+  ]
+
+  night = athens.events.find_or_create_by!(title: "March: The Blind Islay Flight") do |e|
+    e.description = "Three brown-bagged pours, scored before the reveal."
+    e.location    = "Athens, GA"
+    e.organizer   = athens.creator
+    e.start_time  = 3.weeks.ago
+    e.end_time    = 3.weeks.ago + 2.hours
+  end
+
+  pours = pour_specs.each_with_index.map do |spec, i|
+    bottle = Bottle.find_or_create_by!(name: spec[:name], distillery: spec[:distillery]) do |b|
+      b.region = spec[:region]
+      b.style  = spec[:style]
+      b.abv    = spec[:abv]
+    end
+    night.event_bottles.find_or_create_by!(bottle: bottle) do |eb|
+      eb.position = i + 1
+      eb.label    = spec[:label]
+    end
+    bottle
+  end
+
+  # Dev shortcut, mirroring the presentation-seed publish bypass: the "no
+  # RSVP after the event" rule doesn't apply to seeded history, so skip
+  # validations for these two RSVPs only.
+  [admin_user, test_user].each do |member|
+    rsvp = night.event_rsvps.find_or_initialize_by(user: member)
+    rsvp.status = "yes"
+    rsvp.save!(validate: false)
+  end
+
+  # Event reviews pass every real gate (pours listed + revealed, RSVPs yes).
+  scores = {
+    admin_user => { pours[0] => [4.5, "Smoke first, then pears — the blind fooled nobody."],
+                    pours[1] => [3.5, "Sherry-sweet, a little thin on the finish."],
+                    pours[2] => [4.0, "Rye spice over caramel. Crowd-pleaser."] },
+    test_user  => { pours[0] => [4.0, "Campfire in a glass."],
+                    pours[1] => [3.0, "Fine, but I came for the peat."] }
+  }
+  scores.each do |member, ratings|
+    ratings.each do |bottle, (rating, notes)|
+      Review.find_or_create_by!(user: member, bottle: bottle, event: night) do |r|
+        r.rating = rating
+        r.notes  = notes
+      end
+    end
+  end
+  puts "Review demo chain: #{night.title} — #{night.event_bottles.count} pours, #{night.reviews.count} event reviews"
 end
