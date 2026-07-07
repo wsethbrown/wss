@@ -236,18 +236,33 @@
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
       <h2 class="text-lg font-semibold text-gray-900 mb-4">Actions</h2>
       <div class="space-y-3">
-        <%# Publishing is explicit and gated on the deck file. %>
+        <%# Publishing is explicit and gated on the deck file + rendered slide previews. %>
         <% if @presentation.published? %>
           <%= button_to "Unpublish (back to draft)", unpublish_admin_presentation_path(@presentation), method: :post,
               class: "block w-full cursor-pointer text-center px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200" %>
-        <% elsif @presentation.pdf_file.attached? %>
-          <%= button_to "Publish to the library", publish_admin_presentation_path(@presentation), method: :post,
-              class: "block w-full cursor-pointer text-center px-4 py-2 bg-whiskey-600 text-white font-semibold rounded-lg hover:bg-whiskey-700" %>
-        <% else %>
+        <% elsif !@presentation.pdf_file.attached? %>
           <div class="rounded-lg border border-whiskey-200 bg-whiskey-50 px-4 py-3 text-sm text-whiskey-900">
             <span class="font-semibold">Draft.</span> Attach the deck file
             (the presentation buyers download) in the editor to enable publishing.
           </div>
+        <% elsif @presentation.slides_rendered? %>
+          <%= button_to "Publish to the library", publish_admin_presentation_path(@presentation), method: :post,
+              class: "block w-full cursor-pointer text-center px-4 py-2 bg-whiskey-600 text-white font-semibold rounded-lg hover:bg-whiskey-700" %>
+        <% elsif @presentation.slide_render_pending? %>
+          <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <span class="font-semibold">Rendering slide previews&hellip;</span>
+            Usually under a minute. Publishing unlocks when they're ready — refresh to check.
+          </div>
+        <% else %>
+          <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+            <span class="font-semibold">No slide previews.</span> The render didn't run
+            or failed. Re-render below, then publish.
+          </div>
+        <% end %>
+
+        <% if @presentation.pdf_file.attached? && !@presentation.slide_render_pending? %>
+          <%= button_to "Re-render slide previews", render_slides_admin_presentation_path(@presentation), method: :post,
+              class: "block w-full cursor-pointer text-center px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200" %>
         <% end %>
         <%= link_to "View on Site", presentation_path(@presentation), 
             target: "_blank",

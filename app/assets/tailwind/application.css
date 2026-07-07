@@ -1,5 +1,9 @@
 @import "tailwindcss";
 
+/* Tailwind v4 scans project files for class names; binary fonts in
+   docker/fonts crash the scanner (RangeError: out of range code points). */
+@source not "../../../docker";
+
 /*
   Whiskey Share Society design system.
 

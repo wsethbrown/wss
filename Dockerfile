@@ -16,8 +16,15 @@ WORKDIR /rails
 
 # Install base packages
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client libreoffice-impress poppler-utils fonts-liberation fonts-crosextra-carlito fonts-crosextra-caladea fonts-dejavu-core fonts-noto-core && \
+    apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client libreoffice-impress poppler-utils fonts-liberation fonts-crosextra-carlito fonts-crosextra-caladea fonts-dejavu-core fonts-noto-core fonts-adf-gillius && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# Deck fonts: Gelasio (metric-compatible Georgia, OFL) plus substitution
+# rules mapping Georgia/Gill Sans to installed lookalikes — without them
+# LibreOffice renders those decks with broken metrics.
+COPY docker/fonts/Gelasio*.ttf /usr/local/share/fonts/
+COPY docker/fonts/60-wss-substitutes.conf /etc/fonts/conf.d/
+RUN fc-cache -f
 
 # Set production environment
 ENV RAILS_ENV="production" \

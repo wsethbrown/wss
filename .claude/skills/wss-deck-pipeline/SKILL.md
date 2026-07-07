@@ -63,3 +63,33 @@ speaker_notes/outline_file/recommendations_sheet (owner downloads) ·
 supplemental_materials (owner "Extras") · featured_image (cover) ·
 preview_images (≤3) · slide_images (rendered pages). Downloads box renders
 ONLY when files exist; otherwise an honest "being prepared" note.
+
+## Slide rendering: fonts and the publish gate
+
+Rendered slides looked mangled ("Bar dst own") whenever a deck used a font the
+container lacked — LibreOffice substitutes with wrong metrics. Both images now
+install metric-compatible substitutes: Carlito (Calibri), Caladea (Cambria),
+Gelasio (Georgia, shipped in `docker/fonts/`), Gillius ADF (Gill Sans), plus
+DejaVu/Noto. `docker/fonts/60-wss-substitutes.conf` maps Georgia/Gill Sans by
+name. If a new deck renders with broken spacing, check its fonts
+(`grep -ohE 'typeface="[^"]+"' ppt/slides/*.xml | sort | uniq -c` on the
+unzipped pptx) and add a substitute + mapping the same way.
+
+Two traps encountered here:
+- Tailwind v4's precompile scanner crashes (`RangeError ... code points`) on
+  binary files it can't skip. `docker/` is excluded via `@source not` in
+  `app/assets/tailwind/application.css`, and `storage/*` is in `.dockerignore`
+  (Active Storage blobs are extensionless, so the scanner can't skip them by
+  extension — and dev blobs never belong in an image anyway).
+- `docker compose build web` does NOT rebuild the `jobs` image even though both
+  use Dockerfile.dev — each service tags its own image. Build both:
+  `docker compose build web jobs`.
+
+Publishing requires the deck file AND rendered slide previews
+(`Presentation#ready_to_publish`): `slides_rendered?` = slide_images attached;
+`slide_render_pending?` = an unfinished, non-failed DeckSlideRenderJob for this
+deck in Solid Queue. Renders enqueue automatically on import, on create with a
+deck file, and on update that replaces the deck file; admins can also force one
+via the "Re-render slide previews" button (POST render_slides). The admin show
+page's Actions panel walks the states: no file → rendering → ready to publish →
+published.

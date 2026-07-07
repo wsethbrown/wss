@@ -88,6 +88,7 @@ class Admin::PresentationsController < Admin::BaseController
     process_whiskey_recommendations(@presentation)
 
     if @presentation.save
+      DeckSlideRenderJob.perform_later(@presentation.id) if @presentation.pdf_file.attached?
       redirect_to admin_presentation_path(@presentation), notice: 'Presentation created successfully.'
     else
       render :new, status: :unprocessable_entity
@@ -105,6 +106,8 @@ class Admin::PresentationsController < Admin::BaseController
     process_whiskey_recommendations(@presentation)
     
     if @presentation.update(presentation_params)
+      # A new deck file makes the old slide previews stale — re-render.
+      DeckSlideRenderJob.perform_later(@presentation.id) if presentation_params[:pdf_file].present?
       redirect_to admin_presentation_path(@presentation), notice: 'Presentation updated successfully.'
     else
       render :edit, status: :unprocessable_entity
@@ -124,6 +127,14 @@ class Admin::PresentationsController < Admin::BaseController
   def unpublish
     @presentation.update_columns(published: false)
     redirect_to admin_presentation_path(@presentation), notice: 'Unpublished — the deck is back to draft.'
+  end
+
+  # Slide previews normally render automatically on import/upload; this is
+  # the manual retry for renders that failed or never ran.
+  def render_slides
+    DeckSlideRenderJob.perform_later(@presentation.id)
+    redirect_to admin_presentation_path(@presentation),
+                notice: 'Slide render queued — previews refresh in about a minute.'
   end
 
   def destroy

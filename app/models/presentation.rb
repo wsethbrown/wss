@@ -31,10 +31,12 @@ class Presentation < ApplicationRecord
   validates :category, length: { maximum: 100 }
   validates :difficulty, inclusion: { in: %w[Beginner Intermediate Advanced], allow_blank: true }
 
-  # Publishing gate: a deck cannot go live without the file buyers download.
-  # Validated on the draft->published transition only, so unrelated edits to
-  # legacy published records don't get stuck.
-  validate :deck_file_required_to_publish, if: -> { published? && will_save_change_to_published? }
+  # Publishing gate: a deck cannot go live without the file buyers download
+  # and its rendered slide previews (the buyer page leans on the slide strip;
+  # publishing mid-render would ship an empty preview). Validated on the
+  # draft->published transition only, so unrelated edits to legacy published
+  # records don't get stuck.
+  validate :ready_to_publish, if: -> { published? && will_save_change_to_published? }
 
   # File attachment validations
   validate :featured_image_validation
@@ -252,10 +254,35 @@ class Presentation < ApplicationRecord
     end.compact
   end
 
+  # Slide previews rendered by DeckSlideRenderJob (LibreOffice, jobs
+  # container). The publish gate and admin UI both key off these.
+  def slides_rendered?
+    slide_images.attached?
+  end
+
+  def slide_render_pending?
+    SolidQueue::Job.where(class_name: "DeckSlideRenderJob", finished_at: nil)
+                   .where.not(id: SolidQueue::FailedExecution.select(:job_id))
+                   .any? { |job| job.arguments.dig("arguments", 0) == id }
+  rescue NameError
+    false # Solid Queue absent (e.g. some test setups): treat as no pending render
+  end
+
   private
 
-  def deck_file_required_to_publish
-    errors.add(:base, "Attach the deck file (the presentation buyers download) before publishing") unless pdf_file.attached?
+  def ready_to_publish
+    unless pdf_file.attached?
+      errors.add(:base, "Attach the deck file (the presentation buyers download) before publishing")
+      return
+    end
+
+    return if slides_rendered?
+
+    if slide_render_pending?
+      errors.add(:base, "Slide previews are still rendering — publish once they finish (usually under a minute)")
+    else
+      errors.add(:base, "No slide previews have been rendered for this deck — re-render them, then publish")
+    end
   end
 
   def featured_image_validation

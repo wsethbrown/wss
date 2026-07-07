@@ -14,9 +14,17 @@ RUN apt-get update -qq && \
     fonts-crosextra-caladea \
     fonts-dejavu-core \
     fonts-noto-core \
+    fonts-adf-gillius \
     nodejs \
     npm \
     && rm -rf /var/lib/apt/lists/*
+
+# Deck fonts: Gelasio (metric-compatible Georgia, OFL) plus substitution
+# rules mapping Georgia/Gill Sans to installed lookalikes — without them
+# LibreOffice renders those decks with broken metrics.
+COPY docker/fonts/Gelasio*.ttf /usr/local/share/fonts/
+COPY docker/fonts/60-wss-substitutes.conf /etc/fonts/conf.d/
+RUN fc-cache -f
 
 # Set working directory
 WORKDIR /rails

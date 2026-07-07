@@ -47,3 +47,6 @@ coverage/
 Dockerfile
 docker-compose*.yml
 .dockerignore
+# Active Storage blobs (dev uploads — never belong in the image; extensionless
+# binaries also crash the Tailwind v4 source scanner during precompile)
+storage/*
