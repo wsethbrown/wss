@@ -52,4 +52,16 @@ class EventReviewsTest < ActionDispatch::IntegrationTest
     end
     assert_response :unprocessable_entity
   end
+
+  test "reviewing a bottle not on the pour list is rejected, not 404" do
+    # john RSVP'd yes for spring_blind (ardbeg/glendronach/four_roses).
+    # Attempt to review lagavulin (exists globally, but not on spring_blind's pour list).
+    # Should return unprocessable_entity (model gate fires), not 404.
+    sign_in users(:john)
+    assert_no_difference "Review.count" do
+      post event_reviews_path(events(:spring_blind), bottle_id: bottles(:lagavulin).slug),
+           params: { review: { rating: "4.0" } }
+    end
+    assert_response :unprocessable_entity
+  end
 end
