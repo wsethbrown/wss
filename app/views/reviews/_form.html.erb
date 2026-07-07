@@ -6,12 +6,32 @@
     </div>
   <% end %>
 
-  <div>
+  <div data-controller="star-rating">
     <%= form.label :rating, class: "mb-2 block text-sm font-medium text-gray-700" %>
-    <%= form.select :rating,
-        options_for_select(Review::VALID_RATINGS.reverse.map { |r| ["#{format('%g', r)} / 5", r] }, review.rating&.to_f),
-        { include_blank: "Pick a rating" },
-        { class: "w-full rounded-lg border border-gray-300 bg-white px-3 py-2 focus:outline-none focus:ring-2 focus:ring-whiskey-500" } %>
+    <%= form.hidden_field :rating, data: { star_rating_target: "value" } %>
+    <div class="flex items-center gap-3">
+      <div class="flex" data-action="mouseleave->star-rating#restore">
+        <% 5.times do |i| %>
+          <span class="relative h-9 w-9" data-star-rating-target="star">
+            <svg viewBox="0 0 24 24" class="absolute inset-0 h-9 w-9 text-gray-200" fill="currentColor" aria-hidden="true">
+              <path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/>
+            </svg>
+            <span data-fill class="absolute inset-y-0 left-0 overflow-hidden" style="width: 0%">
+              <svg viewBox="0 0 24 24" class="h-9 w-9 text-whiskey-500" fill="currentColor" aria-hidden="true">
+                <path d="M12 2l2.9 6.3 6.9.8-5.1 4.7 1.4 6.8L12 17.2 5.9 20.6l1.4-6.8L2.2 9.1l6.9-.8z"/>
+              </svg>
+            </span>
+            <button type="button" class="absolute inset-y-0 left-0 w-1/2 cursor-pointer"
+                    data-value="<%= i + 0.5 %>" aria-label="Rate <%= i + 0.5 %> out of 5"
+                    data-action="click->star-rating#set mouseenter->star-rating#preview focus->star-rating#preview blur->star-rating#restore"></button>
+            <button type="button" class="absolute inset-y-0 right-0 w-1/2 cursor-pointer"
+                    data-value="<%= (i + 1).to_f %>" aria-label="Rate <%= i + 1 %> out of 5"
+                    data-action="click->star-rating#set mouseenter->star-rating#preview focus->star-rating#preview blur->star-rating#restore"></button>
+          </span>
+        <% end %>
+      </div>
+      <span class="text-sm font-medium text-gray-500" data-star-rating-target="label"></span>
+    </div>
   </div>
 
   <div>

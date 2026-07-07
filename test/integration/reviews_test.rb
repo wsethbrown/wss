@@ -50,3 +50,15 @@ class ReviewsTest < ActionDispatch::IntegrationTest
     assert_redirected_to bottle_path(bottles(:eagle_rare))
   end
 end
+
+class ReviewFormStarsTest < ActionDispatch::IntegrationTest
+  test "the review form renders the half-star widget with a hidden rating field" do
+    sign_in users(:jane)
+    get new_bottle_review_path(bottles(:lagavulin))
+    assert_response :success
+    assert_select "[data-controller=star-rating]"
+    assert_select "input[type=hidden][name=?]", "review[rating]"
+    assert_select "button[data-value='0.5']"
+    assert_select "button[data-value='5.0']"
+  end
+end
