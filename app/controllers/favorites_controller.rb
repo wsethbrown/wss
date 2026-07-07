@@ -5,8 +5,12 @@ class FavoritesController < ApplicationController
 
   def create
     favoritable = favoritable_class.find(params[:favoritable_id])
-    current_user.favorites.build(favoritable: favoritable).save
-    redirect_back_or_to favoritable
+    favorite = current_user.favorites.find_or_initialize_by(favoritable: favoritable)
+    if favorite.persisted? || favorite.save
+      redirect_back_or_to favoritable, notice: "Favorited."
+    else
+      redirect_back_or_to favoritable, alert: favorite.errors.full_messages.to_sentence
+    end
   end
 
   def destroy
@@ -18,6 +22,12 @@ class FavoritesController < ApplicationController
 
   private
 
-  def favoritable_class = params[:favoritable_type] == "User" ? User : Society
-  def redirect_back_or_to(f) = redirect_to(f.is_a?(User) ? profile_path(f) : society_path(f))
+  def favoritable_class
+    case params[:favoritable_type]
+    when "User" then User
+    when "Society" then Society
+    else raise ActiveRecord::RecordNotFound
+    end
+  end
+  def redirect_back_or_to(f, **options) = redirect_to(f.is_a?(User) ? profile_path(f) : society_path(f), **options)
 end
