@@ -3,7 +3,7 @@ class BottlesController < ApplicationController
 
   def show
     @bottle = Bottle.find_by!(slug: params[:id])
-    @reviews = @bottle.reviews.includes(:user, event: [:society, :event_bottles]).order(votes_count: :desc, created_at: :desc)
+    @reviews = @bottle.reviews.includes(:user, event: [:society, :event_bottles]).order(votes_count: :desc, created_at: :desc).page(params[:page]).per(10)
     @my_review = current_user && @bottle.reviews.find_by(user: current_user, event_id: nil)
   end
 

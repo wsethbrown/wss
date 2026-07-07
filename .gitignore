@@ -51,3 +51,4 @@ claude-swarm.log
 # Stripe webhook logs and PID files
 stripe-webhooks.log
 .stripe_pid
+.DS_Store

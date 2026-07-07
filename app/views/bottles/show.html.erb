@@ -46,8 +46,7 @@
     tastings scroll on the right — reviews visible from the first paint. %>
 <section class="w-full bg-white px-4 py-10">
   <div class="mx-auto grid max-w-6xl items-start gap-10 lg:grid-cols-2">
-    <div class="space-y-6 lg:sticky lg:top-[12.5rem]">
-      <%= render "bottles/flavor_wave", bottle: @bottle %>
+    <div class="space-y-6 lg:sticky lg:top-[12.5rem] lg:max-h-[calc(100vh-13.5rem)] lg:overflow-y-auto lg:pb-4">
       <% facts = { "Style" => @bottle.style, "Region" => @bottle.region,
                    "Distillery" => @bottle.distillery,
                    "ABV" => (@bottle.abv && "#{@bottle.abv.to_f % 1 == 0 ? @bottle.abv.to_i : @bottle.abv}%") }.compact_blank %>
@@ -72,6 +71,7 @@
               <% end %>
             </div>
           <% end %>
+      <%= render "bottles/flavor_wave", bottle: @bottle %>
         </div>
       <% end %>
     </div>
@@ -123,6 +123,7 @@
           </article>
         <% end %>
       </div>
+      <div class="mt-8"><%= paginate @reviews if @reviews.respond_to?(:total_pages) %></div>
     </div>
   </div>
 </section>
