@@ -10,12 +10,16 @@ class ReviewsController < ApplicationController
     @bottles = Bottle.with_score.order(Arel.sql(Bottle::SORTS.fetch(@sort)))
     @bottles = @bottles.search(params[:q]) if params[:q].present?
     @bottles = @bottles.where(id: Review.tagged(@tags).select(:bottle_id)) if @tags.any?
+    @distillery = params[:distillery].to_s.strip.presence
+    @bottles = @bottles.where("bottles.distillery ILIKE ?", @distillery) if @distillery
     # The record covers the people as well as the pours: a search also turns
     # up societies (policy-scoped — private ones stay invisible to outsiders).
     @societies = params[:q].present? ? policy_scope(Society).search(params[:q]).order(:name).limit(6) : Society.none
     @recent_reviews =
-      if @tags.any?
-        Review.tagged(@tags).includes(:user, :bottle, event: [:society, :event_bottles]).recent_first.limit(30)
+      if @tags.any? || @distillery
+        feed = @tags.any? ? Review.tagged(@tags) : Review.all
+        feed = feed.joins(:bottle).where("bottles.distillery ILIKE ?", @distillery) if @distillery
+        feed.includes(:user, :bottle, event: [:society, :event_bottles]).recent_first.limit(30)
       else
         Review.includes(:user, :bottle, event: [:society, :event_bottles]).recent_first.limit(10)
       end
@@ -28,7 +32,9 @@ class ReviewsController < ApplicationController
     q = params[:q].to_s.strip
     bottles  = q.length >= 2 ? Bottle.search(q).order(:name).limit(6) : Bottle.none
     societies = q.length >= 2 ? policy_scope(Society).search(q).order(:name).limit(4) : Society.none
+    distilleries = q.length >= 2 ? Bottle.where("distillery ILIKE ?", "%#{Bottle.sanitize_sql_like(q)}%").distinct.order(:distillery).limit(4).pluck(:distillery) : []
     render json: {
+      distilleries: distilleries.map { |d| { label: "#{d} — Distillery", url: reviews_path(distillery: d) } },
       bottles:   bottles.map { |b| { label: b.display_name, url: bottle_path(b) } },
       societies: societies.map { |s| { label: s.name, url: society_path(s) } }
     }

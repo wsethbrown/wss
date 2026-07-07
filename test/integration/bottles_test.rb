@@ -104,6 +104,21 @@ class BottlesTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", reviews_path(tags: "toffee"), text: "toffee"
   end
 
+  test "distillery is a first-class filter and search group" do
+    get reviews_path(distillery: "Buffalo Trace")
+    assert_response :success
+    assert_match "Eagle Rare 10", response.body
+    assert_match "from Buffalo Trace", response.body # active chip
+    assert_no_match "Lagavulin 16", response.body
+
+    get search_reviews_path(q: "buffalo", format: :json)
+    labels = response.parsed_body["distilleries"].map { |d| d["label"] }
+    assert_includes labels, "Buffalo Trace — Distillery"
+
+    get bottle_path(bottles(:eagle_rare))
+    assert_select "a[href=?]", reviews_path(distillery: "Buffalo Trace"), text: "Buffalo Trace"
+  end
+
   test "unknown slug 404s" do
     get bottle_path(id: "not-a-bottle")
     assert_response :not_found

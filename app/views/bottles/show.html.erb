@@ -5,8 +5,18 @@
     <p class="eyebrow mb-4 text-whiskey-300/90">
       <%= [@bottle.style, @bottle.region, (@bottle.abv && "#{@bottle.abv.to_f % 1 == 0 ? @bottle.abv.to_i : @bottle.abv}% ABV")].compact_blank.join(" · ").presence || "Bottle" %>
     </p>
+    <div class="mb-6 flex justify-center">
+      <div class="rounded-2xl bg-cream/95 px-7 py-5">
+        <%= render "bottles/placeholder", bottle: @bottle, size: "h-28" %>
+      </div>
+    </div>
     <h1 class="font-display text-4xl font-semibold text-cream sm:text-5xl"><%= @bottle.name %></h1>
-    <% if @bottle.distillery.present? %><p class="mt-3 text-lg text-cream/80"><%= @bottle.distillery %></p><% end %>
+    <% if @bottle.distillery.present? %>
+      <p class="mt-3 text-lg text-cream/80">
+        <%= link_to @bottle.distillery, reviews_path(distillery: @bottle.distillery),
+            class: "underline decoration-cream/30 underline-offset-4 transition hover:text-whiskey-200" %>
+      </p>
+    <% end %>
     <div class="mt-6 flex items-center justify-center gap-3 text-xl">
       <%= render "bottles/rating", value: @bottle.average_rating %>
       <% if @bottle.average_rating %>

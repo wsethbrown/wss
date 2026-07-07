@@ -42,7 +42,7 @@ export default class extends Controller {
 
   renderGroups(data) {
     this.resultsTarget.textContent = ""
-    const groups = [["Bottles", data.bottles], ["Societies", data.societies]]
+    const groups = [["Distilleries", data.distilleries], ["Bottles", data.bottles], ["Societies", data.societies]]
     let any = false
     for (const [heading, items] of groups) {
       if (!items?.length) continue
