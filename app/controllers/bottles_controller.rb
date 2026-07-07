@@ -1,12 +1,6 @@
 class BottlesController < ApplicationController
   before_action :authenticate_user!, only: [:new, :create]
 
-  def index
-    @bottles = Bottle.order(:name)
-    @bottles = @bottles.search(params[:q]) if params[:q].present?
-    @recent_reviews = Review.includes(:user, :bottle).recent_first.limit(10)
-  end
-
   def show
     @bottle = Bottle.find_by!(slug: params[:id])
     @reviews = @bottle.reviews.includes(:user).recent_first

@@ -2,7 +2,7 @@ require "test_helper"
 
 class BottlesTest < ActionDispatch::IntegrationTest
   test "index lists bottles and recent reviews, signed out" do
-    get bottles_path
+    get reviews_path
     assert_response :success
     assert_select "h1", text: /The bottle library/i
     assert_match "Eagle Rare 10", response.body
@@ -10,7 +10,7 @@ class BottlesTest < ActionDispatch::IntegrationTest
   end
 
   test "index filters by search term" do
-    get bottles_path(q: "lagavulin")
+    get reviews_path(q: "lagavulin")
     assert_response :success
     assert_match "Lagavulin 16", response.body
     assert_no_match "Eagle Rare 10", response.body

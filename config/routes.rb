@@ -139,11 +139,13 @@ Rails.application.routes.draw do
   resources :profiles, only: [:show]
 
   # Bottles
-  resources :bottles, only: [:index, :show, :new, :create], param: :id do
+  resources :bottles, only: [:show, :new, :create], param: :id do
     collection { get :search }
     resources :reviews, only: [:new, :create], module: :bottles
   end
-  resources :reviews, only: [:edit, :update, :destroy]
+  # The review section: /reviews is the public library page (search +
+  # latest tastings); individual bottles live at /bottles/:slug.
+  resources :reviews, only: [:index, :edit, :update, :destroy]
 
   # Health check
   get "health" => "application#health"

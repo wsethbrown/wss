@@ -12,7 +12,7 @@
   <div class="mx-auto max-w-6xl">
     <div class="mb-10 flex flex-wrap items-center justify-between gap-4"
          data-controller="bottle-search" data-bottle-search-url-value="<%= search_bottles_path %>">
-      <%= form_with url: bottles_path, method: :get, class: "relative w-full max-w-xl" do %>
+      <%= form_with url: reviews_path, method: :get, class: "relative w-full max-w-xl" do %>
         <input type="search" name="q" value="<%= params[:q] %>" placeholder="Search bottles or distilleries…"
                autocomplete="off"
                data-bottle-search-target="input" data-action="input->bottle-search#query"
