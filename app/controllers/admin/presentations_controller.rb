@@ -54,9 +54,6 @@ class Admin::PresentationsController < Admin::BaseController
     if (cover = usable_images.first)
       deck.featured_image.attach(io: StringIO.new(cover[:data]), filename: cover[:filename])
     end
-    usable_images.drop(1).first(3).each do |img|
-      deck.preview_images.attach(io: StringIO.new(img[:data]), filename: img[:filename])
-    end
 
     if deck.save
       # Slide rendering (LibreOffice) is slow and heavy — do it off the request.
@@ -153,11 +150,6 @@ class Admin::PresentationsController < Admin::BaseController
   end
   
   def handle_file_uploads(presentation)
-    # Handle preview images - remove empty strings from array
-    if params[:presentation][:preview_images].present?
-      params[:presentation][:preview_images].reject!(&:blank?)
-    end
-    
     # Handle supplemental materials - remove empty strings from array
     if params[:presentation][:supplemental_materials].present?
       params[:presentation][:supplemental_materials].reject!(&:blank?)
@@ -204,7 +196,6 @@ class Admin::PresentationsController < Admin::BaseController
       :finish_notes,
       :body_notes,
       :what_youll_learn,
-      :slides_preview,
       :image,
       :featured_image,
       :pdf_file,
@@ -212,8 +203,7 @@ class Admin::PresentationsController < Admin::BaseController
       :speaker_notes,
       :outline_file,
       :recommendations_sheet,
-      supplemental_materials: [],
-      preview_images: []
+      supplemental_materials: []
     )
   end
 end

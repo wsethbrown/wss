@@ -19,7 +19,7 @@
   <% end %>
   <div class="relative z-10 mx-auto max-w-4xl px-4 py-20">
     <p class="eyebrow mb-4 text-whiskey-300/90">
-      <%= [@presentation.category.presence, @presentation.difficulty.presence, @presentation.duration.presence,
+      <%= [@presentation.category.presence, @presentation.difficulty.presence, @presentation.duration_label.presence,
            (@presentation.slide_images.attached? ? "#{@presentation.slide_images.count} slides" : nil)].compact.join(' · ') %>
     </p>
     <div class="rule-double mx-auto mb-8 w-20 text-whiskey-300"></div>

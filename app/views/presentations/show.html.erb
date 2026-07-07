@@ -31,7 +31,7 @@
 
   <div class="relative z-10 mx-auto max-w-4xl px-4 py-20">
     <p class="eyebrow mb-4 text-whiskey-300/90">
-      <%= [@presentation.category.presence, @presentation.difficulty.presence, @presentation.duration.presence,
+      <%= [@presentation.category.presence, @presentation.difficulty.presence, @presentation.duration_label.presence,
            (@presentation.slide_images.attached? ? "#{@presentation.slide_images.count} slides" : nil)].compact.join(' · ') %>
     </p>
     <div class="rule-double mx-auto mb-8 w-20 text-whiskey-300"></div>
@@ -268,7 +268,8 @@
         <!-- Whiskey Recommendations -->
         <% if @presentation.parsed_whiskey_recommendations.any? %>
           <section class="mb-16">
-            <h2 class="font-display text-3xl font-semibold text-gray-900 mb-8">Recommended Whiskeys</h2>
+            <p class="eyebrow text-whiskey-600 mb-2">The pour list</p>
+            <h2 class="font-display text-3xl font-semibold text-gray-900 mb-8">What to pour</h2>
             <p class="text-gray-700 mb-8">These carefully selected bottles are perfect for tasting alongside this presentation. Each represents a different region and style of <%= @presentation.category || 'whiskey' %>.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -338,7 +339,7 @@
                   <svg class="w-5 h-5 text-whiskey-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                   </svg>
-                  <span class="text-gray-700"><%= @presentation.duration %> presentation</span>
+                  <span class="text-gray-700"><%= @presentation.duration_label %> presentation</span>
                 </div>
               <% end %>
               <div class="flex items-center gap-3">

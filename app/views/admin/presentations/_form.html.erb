@@ -1,6 +1,27 @@
-<%= form_with model: [:admin, presentation], local: true, class: "space-y-6" do |form| %>
+<%# The authoring flow mirrors the buyer page top to bottom — same sections,
+    same order, same numbering. The right rail is the map: it shows what the
+    buyer page will actually render given what's filled in, and is the fastest
+    honest answer to "is this deck ready to sell?" %>
+<%
+  takeaways_count = presentation.parsed_what_youll_learn.size
+  pours_count     = presentation.parsed_whiskey_recommendations.size
+  story_words     = presentation.content.to_s.split.size
+  tasting_notes_n = [presentation.nose_notes, presentation.palate_notes,
+                     presentation.finish_notes, presentation.body_notes].count(&:present?)
+  slides_count    = presentation.slide_images.attached? ? presentation.slide_images.count : 0
+  extras_count    = [presentation.sneak_peek_file, presentation.speaker_notes,
+                     presentation.outline_file, presentation.recommendations_sheet].count(&:attached?) +
+                    (presentation.supplemental_materials.attached? ? presentation.supplemental_materials.count : 0)
+
+  dot = ->(state) {
+    color = { on: "bg-green-500", auto: "bg-whiskey-400", off: "bg-gray-300", need: "bg-red-400" }.fetch(state)
+    %(<span class="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full #{color}"></span>).html_safe
+  }
+%>
+
+<%= form_with model: [:admin, presentation], local: true, html: { id: "deck-form" } do |form| %>
   <% if presentation.errors.any? %>
-    <div class="rounded-lg bg-red-50 border border-red-200 text-red-800 px-4 py-3">
+    <div class="mb-6 rounded-lg bg-red-50 border border-red-200 text-red-800 px-4 py-3">
       <h4 class="font-bold">Please fix the following errors:</h4>
       <ul class="list-disc list-inside mt-2">
         <% presentation.errors.full_messages.each do |message| %>
@@ -10,466 +31,395 @@
     </div>
   <% end %>
 
-  <%# ── Authoring guide: sections mirror the buyer-facing deck page, top to
-      bottom. Every section says WHERE buyers see it. ── %>
-  <nav class="sticky top-0 z-10 -mx-8 mb-2 border-b border-gray-200 bg-white/95 px-8 py-3 backdrop-blur">
-    <div class="flex flex-wrap items-center gap-x-4 gap-y-1 text-sm">
-      <span class="eyebrow text-gray-400">Jump to</span>
-      <% [['The cover', 'f-cover'], ['The pitch', 'f-pitch'], ['The story', 'f-story'],
-          ['The slides', 'f-slides'], ['The tasting', 'f-tasting'], ['Files', 'f-files']].each do |label, anchor| %>
-        <a href="#<%= anchor %>" class="font-medium text-whiskey-700 hover:text-whiskey-600"><%= label %></a>
-      <% end %>
-    </div>
-  </nav>
+  <div class="lg:grid lg:grid-cols-[minmax(0,1fr)_19rem] lg:items-start lg:gap-6">
+    <div class="min-w-0 space-y-6">
 
-  <!-- ═══ 1 · THE COVER ═══ -->
-  <div id="f-cover" class="scroll-mt-20">
-    <h3 class="font-display text-xl font-semibold text-gray-900">1 · The cover</h3>
-    <p class="mb-5 mt-1 text-sm text-gray-500">Appears on: the library card, the deck page hero, and search filters.</p>
-  </div>
-  <!-- Basic Information -->
-  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-    <div>
-      <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.text_field :title, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "e.g., Introduction to Scotch Whisky" %>
-    </div>
+      <!-- ═══ 1 · THE COVER ═══ -->
+      <section id="f-cover" class="scroll-mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h3 class="font-display text-xl font-semibold text-gray-900">1 · The cover</h3>
+        <p class="mb-5 mt-1 text-sm text-gray-500">Appears on: the library card, the deck page hero, and search filters.</p>
 
-    <div>
-      <%= form.label :category, class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%# Free-text with suggestions: pick an existing category or type a new
-          one — the catalog's filter options derive from actual deck data. %>
-      <%= form.text_field :category, list: 'category-options',
-          placeholder: 'Pick or type a category',
-          class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
-      <datalist id="category-options">
-        <% (Presentation.distinct.pluck(:category).compact +
-            ['Scotch Whisky', 'Bourbon', 'Irish Whiskey', 'Japanese Whisky',
-             'Rye Whiskey', 'Canadian Whisky', 'Cocktails', 'General Education']).uniq.sort.each do |c| %>
-          <option value="<%= c %>"><%= c %></option>
-        <% end %>
-      </datalist>
-    </div>
-
-    <div class="md:col-span-2">
-      <%= form.label :tag_names, "Tags", class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.text_field :tag_names, placeholder: "smoky, islay, blind tasting",
-          class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
-      <p class="text-xs text-gray-500 mt-1">Comma-separated, up to 10. Lowercased automatically; buyers can filter the library by tag.</p>
-    </div>
-
-    <div>
-      <%= form.label :price, class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.number_field :price, step: 0.01, min: 0, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "9.99" %>
-    </div>
-
-    <div>
-      <%= form.label :difficulty, class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.select :difficulty, 
-          options_for_select([
-            ['Beginner', 'Beginner'],
-            ['Intermediate', 'Intermediate'],
-            ['Advanced', 'Advanced']
-          ], presentation.difficulty),
-          { include_blank: 'Select difficulty level' },
-          { class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" } %>
-    </div>
-
-    <div>
-      <%= form.label :duration, class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <%= form.text_field :duration, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "45 min" %>
-    </div>
-
-    <div class="md:col-span-2">
-      <%= form.label :featured_image, "Banner Image", class: "block text-sm font-medium text-gray-700 mb-2" %>
-      <% if presentation.featured_image.attached? %>
-        <div class="mb-3">
-          <p class="text-sm text-gray-600 mb-2">Current banner:</p>
-          <%= image_tag presentation.featured_image, class: "h-32 w-auto rounded-lg border border-gray-200" %>
-        </div>
-      <% end %>
-      <%= form.file_field :featured_image, accept: "image/jpeg,image/jpg,image/png,image/gif,image/webp", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
-      <p class="text-xs text-gray-500 mt-1">Banner image for the presentation page (JPEG, PNG, GIF, or WebP, max 15MB)</p>
-    </div>
-  </div>
-
-  <div>
-    <%= form.label :description, class: "block text-sm font-medium text-gray-700 mb-2" %>
-    <p class="-mt-1 mb-2 text-xs text-gray-500">One or two sentences. Appears on: the library card and under the deck page title.</p>
-    <%= form.text_area :description, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "Brief description of what this presentation covers..." %>
-  </div>
-
-  <div id="f-story" class="scroll-mt-20 border-t border-gray-200 pt-6">
-    <h3 class="font-display text-xl font-semibold text-gray-900">3 · The story</h3>
-    <p class="mb-4 mt-1 text-sm text-gray-500">Appears on: the deck page reading experience. Buyers read it all; <span class="font-semibold">non-buyers see only the first ~24 lines</span> — the fade-out is where the sale happens. Use the eye icon in the toolbar to preview exactly what buyers see.</p>
-    <%= form.label :content, "Story text (Markdown)", class: "block text-sm font-medium text-gray-700 mb-2" %>
-    <%= form.text_area :content, rows: 14,
-        data: { controller: "markdown-editor", markdown_editor_preview_url_value: preview_admin_presentations_path },
-        class: "w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "# The thread\n\nOpen with the hook — why this bottle, why this story...\n\n## First chapter\nUse ## headings for chapters. **Bold**, *italics*, lists, and > quotes all work." %>
-    <p class="text-xs text-gray-500 mt-1">
-      Markdown. Renders as the "Inside this deck" reading experience. Buyers see it all;
-      non-owners see roughly the first 24 lines before it fades into the purchase prompt —
-      make those lines earn the sale.
-    </p>
-  </div>
-
-  <!-- What You'll Learn Section -->
-  <div class="border-t border-gray-200 pt-6" data-controller="what-youll-learn">
-    <div id="f-pitch" class="scroll-mt-20">
-      <h3 class="font-display text-xl font-semibold text-gray-900">2 · The pitch — what you'll learn</h3>
-      <p class="mb-4 mt-1 text-sm text-gray-500">Appears on: the deck page "takeaways" grid. Three or four concrete points sell better than six vague ones.</p>
-    </div>
-    
-    <!-- Hidden field to store the formatted content -->
-    <%= form.hidden_field :what_youll_learn, id: 'what_youll_learn_hidden' %>
-    <input type="hidden" id="existing-what-youll-learn" value="<%= presentation.what_youll_learn %>" />
-    
-    <!-- Container for dynamic learning points -->
-    <div data-what-youll-learn-target="container" class="space-y-4 mb-4">
-      <!-- Learning points will be added here dynamically -->
-    </div>
-    
-    <!-- Add button -->
-    <button type="button" 
-            data-action="click->what-youll-learn#addLearningPoint" 
-            class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-      </svg>
-      Add Learning Point
-    </button>
-    
-    <!-- Template for new learning point items -->
-    <template data-what-youll-learn-target="template">
-      <div class="learning-point-item p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <div class="flex justify-between items-start mb-3">
-          <h4 class="text-sm font-medium text-gray-700">Learning Point</h4>
-          <button type="button"
-                  data-action="click->what-youll-learn#removeLearningPoint"
-                  class="text-red-600 hover:text-red-800 transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        </div>
-        
-        <div class="space-y-3">
-          <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Title</label>
-            <input type="text" 
-                   class="learning-title w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
-                   placeholder="e.g., Rye Whiskey Foundations"
-                   data-action="input->what-youll-learn#fieldChanged">
-          </div>
-          
-          <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Description</label>
-            <textarea 
-                   class="learning-description w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
-                   rows="2"
-                   placeholder="e.g., Understand what sets rye whiskey apart, including mash bills, legal definitions, and signature characteristics."
-                   data-action="input->what-youll-learn#fieldChanged"></textarea>
-          </div>
-        </div>
-      </div>
-    </template>
-  </div>
-
-  <!-- Slide-by-Slide Preview Section -->
-  <div class="border-t border-gray-200 pt-6" data-controller="slides-preview">
-    <div id="f-slides" class="scroll-mt-20">
-      <h3 class="font-display text-xl font-semibold text-gray-900">4 · The slides — outline</h3>
-    </div>
-    <p class="text-sm text-gray-600 mb-4">
-      The outline buyers see before purchasing — one row per slide or chapter.
-      Numbers come from the order; use the arrows to rearrange.
-    </p>
-
-    <%= form.hidden_field :slides_preview, id: 'slides_preview_hidden' %>
-    <input type="hidden" id="existing-slides-preview" value="<%= presentation.slides_preview %>" />
-
-    <div data-slides-preview-target="container" class="space-y-3 mb-4"></div>
-
-    <button type="button"
-            data-action="click->slides-preview#addSlide"
-            class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-      </svg>
-      Add slide
-    </button>
-
-    <template data-slides-preview-target="template">
-      <div class="slide-item p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <div class="flex justify-between items-center mb-3">
-          <h4 class="slide-number text-sm font-semibold text-whiskey-700">Slide</h4>
-          <div class="flex items-center gap-1">
-            <button type="button" data-action="click->slides-preview#moveUp"
-                    class="rounded p-1.5 text-gray-400 hover:bg-gray-200 hover:text-gray-700 transition" aria-label="Move up">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"></path></svg>
-            </button>
-            <button type="button" data-action="click->slides-preview#moveDown"
-                    class="rounded p-1.5 text-gray-400 hover:bg-gray-200 hover:text-gray-700 transition" aria-label="Move down">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path></svg>
-            </button>
-            <button type="button" data-action="click->slides-preview#removeSlide"
-                    class="rounded p-1.5 text-red-500 hover:bg-red-50 hover:text-red-700 transition" aria-label="Remove slide">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-          </div>
-        </div>
-
-        <div class="grid grid-cols-1 gap-3 md:grid-cols-[1fr_2fr_8rem]">
-          <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Title</label>
-            <input type="text"
-                   class="slide-title w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
-                   placeholder="e.g., The Five Regions"
-                   data-action="input->slides-preview#fieldChanged">
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">What it covers</label>
-            <input type="text"
-                   class="slide-description w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
-                   placeholder="e.g., How geography shapes each region's flavor"
-                   data-action="input->slides-preview#fieldChanged">
-          </div>
-          <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Time</label>
-            <input type="text"
-                   class="slide-duration w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
-                   placeholder="8 min"
-                   data-action="input->slides-preview#fieldChanged">
-          </div>
-        </div>
-      </div>
-    </template>
-  </div>
-
-  <!-- What You'll Taste Section -->
-  <div class="border-t border-gray-200 pt-6">
-    <div id="f-tasting" class="scroll-mt-20">
-      <h3 class="font-display text-xl font-semibold text-gray-900">5 · The tasting — what you'll taste</h3>
-      <p class="mb-4 mt-1 text-sm text-gray-500">Appears on: the deck page tasting section, set like a back label. Describe the flight as a whole.</p>
-    </div>
-    
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <div>
-        <%= form.label :nose_notes, "Nose", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= form.text_area :nose_notes, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "e.g., Vanilla, honey, light oak, subtle fruit notes" %>
-        <p class="text-xs text-gray-500 mt-1">Aromas and scents detected</p>
-      </div>
-
-      <div>
-        <%= form.label :palate_notes, "Palate", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= form.text_area :palate_notes, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "e.g., Smooth, balanced, with notes of caramel and spice" %>
-        <p class="text-xs text-gray-500 mt-1">Flavors on the tongue</p>
-      </div>
-
-      <div>
-        <%= form.label :finish_notes, "Finish", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= form.text_area :finish_notes, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "e.g., Medium length with warming oak and gentle smoke" %>
-        <p class="text-xs text-gray-500 mt-1">Aftertaste and duration</p>
-      </div>
-
-      <div>
-        <%= form.label :body_notes, "Body", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <%= form.text_area :body_notes, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "e.g., Medium-bodied with a smooth, approachable texture" %>
-        <p class="text-xs text-gray-500 mt-1">Mouthfeel and texture</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Recommended Whiskeys Section -->
-  <div class="border-t border-gray-200 pt-6" data-controller="whiskey-recommendations">
-    <h3 class="font-display text-xl font-semibold text-gray-900">5b · The bottle list</h3>
-    <p class="mb-4 mt-1 text-sm text-gray-500">Appears on: the deck page bottle cards AND the buyer's "what you get" manifest (with a bottle count). Name, region, price, style, notes per pour.</p>
-    
-    <!-- Hidden field to store the formatted recommendations -->
-    <%= form.hidden_field :whiskey_recommendations, id: 'whiskey_recommendations_hidden' %>
-    <input type="hidden" id="existing-recommendations" value="<%= presentation.whiskey_recommendations %>" />
-    
-    <!-- Container for dynamic recommendations -->
-    <div data-whiskey-recommendations-target="container" class="space-y-4 mb-4">
-      <!-- Recommendations will be added here dynamically -->
-    </div>
-    
-    <!-- Add button -->
-    <button type="button" 
-            data-action="click->whiskey-recommendations#addRecommendation" 
-            class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-      </svg>
-      Add Whiskey Recommendation
-    </button>
-    
-    <!-- Template for new recommendation items -->
-    <template data-whiskey-recommendations-target="template">
-      <div class="recommendation-item p-4 bg-gray-50 rounded-lg border border-gray-200">
-        <div class="flex justify-between items-start mb-3">
-          <h4 class="text-sm font-medium text-gray-700">Whiskey Recommendation</h4>
-          <button type="button"
-                  data-action="click->whiskey-recommendations#removeRecommendation"
-                  class="text-red-600 hover:text-red-800 transition">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
-            </svg>
-          </button>
-        </div>
-        
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-          <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Whiskey Name</label>
-            <input type="text" 
-                   class="whiskey-name w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
-                   placeholder="e.g., Glenfiddich 12 Year"
-                   data-action="input->whiskey-recommendations#fieldChanged">
-          </div>
-          
-          <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Region</label>
-            <input type="text" 
-                   class="whiskey-region w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
-                   placeholder="e.g., Speyside"
-                   data-action="input->whiskey-recommendations#fieldChanged">
-          </div>
-          
-          <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Price</label>
-            <input type="text" 
-                   class="whiskey-price w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
-                   placeholder="e.g., $45"
-                   data-action="input->whiskey-recommendations#fieldChanged">
-          </div>
-          
-          <div>
-            <label class="block text-xs font-medium text-gray-600 mb-1">Style</label>
-            <input type="text" 
-                   class="whiskey-style w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
-                   placeholder="e.g., Light & Fruity"
-                   data-action="input->whiskey-recommendations#fieldChanged">
-          </div>
-          
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
           <div class="md:col-span-2">
-            <label class="block text-xs font-medium text-gray-600 mb-1">Tasting Notes</label>
-            <input type="text" 
-                   class="whiskey-notes w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
-                   placeholder="e.g., Pear, oak, subtle spice"
-                   data-action="input->whiskey-recommendations#fieldChanged">
+            <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_field :title, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "e.g., Introduction to Scotch Whisky" %>
+          </div>
+
+          <div class="md:col-span-2">
+            <%= form.label :description, "Description — the one-line pitch", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_area :description, rows: 2, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "One or two sentences under the title — why THIS deck, in the buyer's language." %>
+            <p class="mt-1 text-xs text-gray-500">Shows under the title on the hero and on every library card. This line does the most selling per word on the site.</p>
+          </div>
+
+          <div>
+            <%= form.label :category, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_field :category, list: 'category-options',
+                placeholder: 'Pick or type a category',
+                class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+            <datalist id="category-options">
+              <% (Presentation.distinct.pluck(:category).compact +
+                  ['Scotch Whisky', 'Bourbon', 'Irish Whiskey', 'Japanese Whisky',
+                   'Rye Whiskey', 'Canadian Whisky', 'Cocktails', 'General Education']).uniq.sort.each do |c| %>
+                <option value="<%= c %>"><%= c %></option>
+              <% end %>
+            </datalist>
+          </div>
+
+          <div>
+            <%= form.label :difficulty, class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.select :difficulty,
+                options_for_select([['Beginner', 'Beginner'], ['Intermediate', 'Intermediate'], ['Advanced', 'Advanced']], presentation.difficulty),
+                { include_blank: 'Select difficulty level' },
+                { class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" } %>
+          </div>
+
+          <div>
+            <%= form.label :price, "Price (USD)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.number_field :price, step: 0.01, min: 0, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "9.99" %>
+            <p class="mt-1 text-xs text-gray-500">0 makes the deck free to claim.</p>
+          </div>
+
+          <div>
+            <%= form.label :duration, "Running time", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_field :duration, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "45 min" %>
+            <p class="mt-1 text-xs text-gray-500">How long the night runs when presented. A bare number reads as minutes.</p>
+          </div>
+
+          <div class="md:col-span-2">
+            <%= form.label :tag_names, "Tags", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_field :tag_names, placeholder: "smoky, islay, blind tasting",
+                class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+            <p class="mt-1 text-xs text-gray-500">Comma-separated, up to 10. Lowercased automatically; buyers can filter the library by tag.</p>
+          </div>
+
+          <div class="md:col-span-2">
+            <%= form.label :featured_image, "Banner image", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <% if presentation.featured_image.attached? %>
+              <div class="mb-3">
+                <%= image_tag presentation.featured_image, class: "h-32 w-auto rounded-lg border border-gray-200" %>
+              </div>
+            <% end %>
+            <%= form.file_field :featured_image, accept: "image/jpeg,image/jpg,image/png,image/gif,image/webp", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+            <p class="mt-1 text-xs text-gray-500">Sits behind the hero title. Landscape works best (JPEG, PNG, GIF, or WebP, max 15MB).</p>
           </div>
         </div>
-      </div>
-    </template>
-  </div>
+      </section>
 
-  <!-- File Uploads Section -->
-  <div class="border-t border-gray-200 pt-6">
-    <div id="f-files" class="scroll-mt-20">
-      <h3 class="font-display text-xl font-semibold text-gray-900">6 · Files</h3>
-      <p class="mb-4 mt-1 text-sm text-gray-500">The deck file is REQUIRED to publish — it's what buyers download, and slides render from it automatically after import. Every attached extra appears in the buyer's "what you get" list.</p>
-    </div>
+      <!-- ═══ 2 · THE TAKEAWAYS ═══ -->
+      <section id="f-pitch" class="scroll-mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm" data-controller="what-youll-learn">
+        <h3 class="font-display text-xl font-semibold text-gray-900">2 · The takeaways — what you'll learn</h3>
+        <p class="mb-5 mt-1 text-sm text-gray-500">Appears on: the "What you'll learn" grid, right under the hero. Three or four concrete points sell better than six vague ones. Empty = the section is hidden.</p>
 
-    <div class="space-y-4">
-      <div>
-        <%= form.label :preview_images, "Preview Images (Sneak Peek)", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <% if presentation.preview_images.attached? %>
-          <div class="mb-3">
-            <p class="text-sm text-gray-600 mb-2">Current preview images (shown in order):</p>
-            <div class="flex gap-3">
-              <% presentation.ordered_preview_images.each_with_index do |image, index| %>
-                <div class="relative">
-                  <%= image_tag image, class: "h-20 w-auto rounded border border-gray-200" %>
-                  <span class="absolute -top-2 -left-2 w-6 h-6 bg-whiskey-600 text-white text-xs font-bold rounded-full flex items-center justify-center"><%= index + 1 %></span>
-                </div>
-              <% end %>
+        <%= form.hidden_field :what_youll_learn, id: 'what_youll_learn_hidden' %>
+        <input type="hidden" id="existing-what-youll-learn" value="<%= presentation.what_youll_learn %>" />
+
+        <div data-what-youll-learn-target="container" class="space-y-4 mb-4"></div>
+
+        <button type="button"
+                data-action="click->what-youll-learn#addLearningPoint"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+          Add takeaway
+        </button>
+
+        <template data-what-youll-learn-target="template">
+          <div class="learning-point-item p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div class="flex justify-between items-start mb-3">
+              <h4 class="text-sm font-medium text-gray-700">Takeaway</h4>
+              <button type="button"
+                      data-action="click->what-youll-learn#removeLearningPoint"
+                      class="text-red-600 hover:text-red-800 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+            </div>
+            <div class="space-y-3">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Title</label>
+                <input type="text"
+                       class="learning-title w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
+                       placeholder="e.g., Rye Whiskey Foundations"
+                       data-action="input->what-youll-learn#fieldChanged">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Description</label>
+                <textarea
+                       class="learning-description w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
+                       rows="2"
+                       placeholder="e.g., What sets rye apart — mash bills, legal definitions, and signature character."
+                       data-action="input->what-youll-learn#fieldChanged"></textarea>
+              </div>
             </div>
           </div>
-        <% end %>
-        <%= form.file_field :preview_images, multiple: true, accept: "image/jpeg,image/jpg,image/png,image/gif,image/webp", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
-        <p class="text-xs text-gray-500 mt-1">Upload up to 3 preview images that users can view before purchasing. Images will be shown in the order selected. (JPEG, PNG, GIF, or WebP, max 15MB each)</p>
-      </div>
+        </template>
+      </section>
 
-      <div>
-        <%= form.label :pdf_file, "Presentation File", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <% if presentation.pdf_file.attached? %>
-          <p class="text-sm text-gray-600 mb-2">Current file: <%= presentation.pdf_file.filename %></p>
-        <% end %>
-        <%= form.file_field :pdf_file, accept: "application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-powerpoint", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
-        <p class="text-xs text-gray-500 mt-1">Main presentation file in PDF or PowerPoint format (max 50MB)</p>
-      </div>
+      <!-- ═══ 3 · THE STORY ═══ -->
+      <section id="f-story" class="scroll-mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h3 class="font-display text-xl font-semibold text-gray-900">3 · The story</h3>
+        <p class="mb-4 mt-1 text-sm text-gray-500">
+          Appears on: the "Inside this deck" reading experience. Buyers read it all;
+          <span class="font-semibold">non-buyers see only the first ~24 lines</span> before it fades
+          into the purchase prompt — the fade-out is where the sale happens. Use the eye icon in the
+          toolbar to preview exactly what buyers see.
+        </p>
+        <%= form.text_area :content, rows: 14,
+            data: { controller: "markdown-editor", markdown_editor_preview_url_value: preview_admin_presentations_path },
+            class: "w-full px-3 py-2 border border-gray-300 rounded-lg font-mono text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "# The thread\n\nOpen with the hook — why this bottle, why this story...\n\n## First chapter\nUse ## headings for chapters. **Bold**, *italics*, lists, and > quotes all work." %>
+        <p class="mt-2 text-xs text-gray-500">
+          Imported decks land here as a rough skeleton — one block per slide. Rewrite it as prose:
+          keep the ## chapter headings, cut slide fragments that don't read as sentences.
+        </p>
+      </section>
 
-      <div>
-        <%= form.label :supplemental_materials, "Additional Materials", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <% if presentation.supplemental_materials.attached? %>
-          <div class="mb-2">
-            <p class="text-sm text-gray-600 mb-1">Current files:</p>
-            <ul class="text-sm text-gray-500 list-disc list-inside">
-              <% presentation.supplemental_materials.each do |material| %>
-                <li><%= material.filename %></li>
-              <% end %>
-            </ul>
+      <!-- ═══ 4 · WHAT YOU'LL TASTE ═══ -->
+      <section id="f-tasting" class="scroll-mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h3 class="font-display text-xl font-semibold text-gray-900">4 · What you'll taste <span class="ml-1 align-middle text-xs font-sans font-medium uppercase tracking-wide text-gray-400">optional</span></h3>
+        <p class="mb-5 mt-1 text-sm text-gray-500">
+          Appears on: the tasting section, set like a back label. One profile for the whole flight —
+          works the same for whiskey, cocktails, or wine. Leave all four empty to hide the section.
+        </p>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+          <% {
+            nose_notes:   ["Nose",   "e.g., Vanilla, honey, light oak, subtle fruit", "Aromas, before the first sip"],
+            palate_notes: ["Palate", "e.g., Smooth and balanced — caramel, then spice", "Flavors on the tongue"],
+            finish_notes: ["Finish", "e.g., Medium length, warming oak, gentle smoke", "The aftertaste, and how long it lasts"],
+            body_notes:   ["Body",   "e.g., Medium-bodied, smooth, approachable", "Mouthfeel and texture"]
+          }.each do |field, (label, placeholder, hint)| %>
+            <div>
+              <%= form.label field, label, class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <%= form.text_area field, rows: 3, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: placeholder %>
+              <p class="mt-1 text-xs text-gray-500"><%= hint %></p>
+            </div>
+          <% end %>
+        </div>
+      </section>
+
+      <!-- ═══ 5 · THE SLIDES ═══ -->
+      <section id="f-slides" class="scroll-mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h3 class="font-display text-xl font-semibold text-gray-900">5 · The slides &amp; the deck file</h3>
+        <p class="mb-5 mt-1 text-sm text-gray-500">
+          Appears on: the full-slide preview strip and the slide count in the hero.
+          <span class="font-semibold">Nothing to write here</span> — slides render automatically
+          from the deck file, and re-render whenever you replace it.
+        </p>
+
+        <div class="mb-6">
+          <%= form.label :pdf_file, "The deck file — required to publish", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <% if presentation.pdf_file.attached? %>
+            <p class="mb-2 text-sm text-gray-600">Current file: <span class="font-medium"><%= presentation.pdf_file.filename %></span></p>
+          <% end %>
+          <%= form.file_field :pdf_file, accept: "application/pdf,application/vnd.openxmlformats-officedocument.presentationml.presentation,application/vnd.ms-powerpoint", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+          <p class="mt-1 text-xs text-gray-500">This is what buyers download. PDF or PowerPoint, max 50MB.</p>
+        </div>
+
+        <% if presentation.slide_images.attached? %>
+          <% slides = presentation.slide_images.order(:id) %>
+          <div class="grid grid-cols-4 gap-3">
+            <% slides.first(8).each_with_index do |slide, i| %>
+              <figure>
+                <%= image_tag slide, class: "aspect-video w-full rounded-lg border border-gray-200 object-cover" %>
+                <figcaption class="mt-1 text-center text-xs text-gray-400"><%= i + 1 %></figcaption>
+              </figure>
+            <% end %>
+          </div>
+          <% if slides.size > 8 %>
+            <p class="mt-2 text-xs text-gray-500">+ <%= slides.size - 8 %> more — buyers see all <%= slides.size %> full-size.</p>
+          <% end %>
+        <% elsif presentation.slide_render_pending? %>
+          <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
+            <span class="font-semibold">Rendering slide previews&hellip;</span> usually under a minute. Reload to see them.
+          </div>
+        <% elsif presentation.pdf_file.attached? %>
+          <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">
+            <span class="font-semibold">No slide previews yet.</span> Use "Re-render slide previews"
+            on the deck's admin page, or re-upload the file above.
           </div>
         <% end %>
-        <%= form.file_field :supplemental_materials, multiple: true, accept: "application/pdf,image/jpeg,image/jpg,image/png,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
-        <p class="text-xs text-gray-500 mt-1">Additional materials like speaker notes, outlines, or whiskey recommendation sheets (PDF, images, or PowerPoint, max 25MB each)</p>
+      </section>
+
+      <!-- ═══ 6 · THE POUR LIST ═══ -->
+      <section id="f-pours" class="scroll-mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm" data-controller="whiskey-recommendations">
+        <h3 class="font-display text-xl font-semibold text-gray-900">6 · The pour list <span class="ml-1 align-middle text-xs font-sans font-medium uppercase tracking-wide text-gray-400">optional</span></h3>
+        <p class="mb-5 mt-1 text-sm text-gray-500">
+          Appears on: the "What to pour" cards, and in the buyer's "what you get" manifest with a count.
+          Bottles, cocktails, or anything else the night pours — one card each, with where to find it
+          and what it costs. Empty = the section is hidden.
+        </p>
+
+        <%= form.hidden_field :whiskey_recommendations, id: 'whiskey_recommendations_hidden' %>
+        <input type="hidden" id="existing-recommendations" value="<%= presentation.whiskey_recommendations %>" />
+
+        <div data-whiskey-recommendations-target="container" class="space-y-4 mb-4"></div>
+
+        <button type="button"
+                data-action="click->whiskey-recommendations#addRecommendation"
+                class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition">
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+          Add a pour
+        </button>
+
+        <template data-whiskey-recommendations-target="template">
+          <div class="recommendation-item p-4 bg-gray-50 rounded-lg border border-gray-200">
+            <div class="flex justify-between items-start mb-3">
+              <h4 class="text-sm font-medium text-gray-700">Pour</h4>
+              <button type="button"
+                      data-action="click->whiskey-recommendations#removeRecommendation"
+                      class="text-red-600 hover:text-red-800 transition">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+              </button>
+            </div>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Name</label>
+                <input type="text"
+                       class="whiskey-name w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
+                       placeholder="e.g., Glenfiddich 12 — or Mint Julep"
+                       data-action="input->whiskey-recommendations#fieldChanged">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Origin</label>
+                <input type="text"
+                       class="whiskey-region w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
+                       placeholder="e.g., Speyside — or Kentucky, 1803"
+                       data-action="input->whiskey-recommendations#fieldChanged">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Price</label>
+                <input type="text"
+                       class="whiskey-price w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
+                       placeholder="e.g., $45"
+                       data-action="input->whiskey-recommendations#fieldChanged">
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-600 mb-1">Style</label>
+                <input type="text"
+                       class="whiskey-style w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
+                       placeholder="e.g., Light &amp; Fruity"
+                       data-action="input->whiskey-recommendations#fieldChanged">
+              </div>
+              <div class="md:col-span-2">
+                <label class="block text-xs font-medium text-gray-600 mb-1">Notes</label>
+                <input type="text"
+                       class="whiskey-notes w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
+                       placeholder="e.g., Pear, oak, subtle spice — pour it for the 1820s chapter"
+                       data-action="input->whiskey-recommendations#fieldChanged">
+              </div>
+            </div>
+          </div>
+        </template>
+      </section>
+
+      <!-- ═══ 7 · WHAT BUYERS DOWNLOAD ═══ -->
+      <section id="f-files" class="scroll-mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+        <h3 class="font-display text-xl font-semibold text-gray-900">7 · What buyers download</h3>
+        <p class="mb-5 mt-1 text-sm text-gray-500">
+          Appears on: the buyer's "what you get" list before purchase, and their downloads after.
+          The deck file lives in section 5; everything here is optional extras.
+        </p>
+
+        <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+          <% {
+            sneak_peek_file:       ["Free sample", "application/pdf", "A few slides as a PDF — downloadable by anyone, before buying."],
+            speaker_notes:         ["Speaker notes", "application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document", "How to present each chapter (PDF or Word)."],
+            outline_file:          ["Outline", "application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document", "The one-page run of show (PDF or Word)."],
+            recommendations_sheet: ["Printable pour list", "application/pdf", "The pour list as a shopping-trip PDF."]
+          }.each do |field, (label, accept, hint)| %>
+            <div>
+              <%= form.label field, label, class: "block text-sm font-medium text-gray-700 mb-2" %>
+              <% if presentation.public_send(field).attached? %>
+                <p class="mb-2 text-sm text-gray-600">Current: <span class="font-medium"><%= presentation.public_send(field).filename %></span></p>
+              <% end %>
+              <%= form.file_field field, accept: accept, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+              <p class="mt-1 text-xs text-gray-500"><%= hint %></p>
+            </div>
+          <% end %>
+
+          <div class="md:col-span-2">
+            <%= form.label :supplemental_materials, "Anything else", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <% if presentation.supplemental_materials.attached? %>
+              <ul class="mb-2 list-inside list-disc text-sm text-gray-500">
+                <% presentation.supplemental_materials.each do |material| %>
+                  <li><%= material.filename %></li>
+                <% end %>
+              </ul>
+            <% end %>
+            <%= form.file_field :supplemental_materials, multiple: true, accept: "application/pdf,image/jpeg,image/jpg,image/png,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+            <p class="mt-1 text-xs text-gray-500">Tasting mats, score sheets, blind-tasting wraps — each shows up by name in the buyer's downloads (max 25MB each).</p>
+          </div>
+        </div>
+      </section>
+
+      <div class="flex items-center gap-4 pb-2">
+        <%= form.submit submit_text, class: "cursor-pointer px-6 py-3 bg-whiskey-600 text-white font-semibold rounded-xl hover:bg-whiskey-700 transition" %>
+        <%= link_to "Cancel", presentation.persisted? ? admin_presentation_path(presentation) : admin_presentations_path,
+            class: "px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition" %>
       </div>
     </div>
-  </div>
 
-  <!-- Specific Downloadable Files Section -->
-  <div class="border-t border-gray-200 pt-6">
-    <h3 class="text-lg font-semibold text-gray-900 mb-4">Downloadable Resources</h3>
-    <p class="text-sm text-gray-600 mb-4">These files will be available for download after purchase</p>
-    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-      <!-- Sneak Peek File -->
-      <div>
-        <%= form.label :sneak_peek_file, "Sneak Peek File", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <% if presentation.sneak_peek_file.attached? %>
-          <p class="text-sm text-gray-600 mb-2">Current file: <%= presentation.sneak_peek_file.filename %></p>
-        <% end %>
-        <%= form.file_field :sneak_peek_file, accept: "application/pdf", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
-        <p class="text-xs text-gray-500 mt-1">Free preview version (PDF, first few slides)</p>
+    <!-- ═══ THE MAP: what the buyer page will render ═══ -->
+    <aside class="mt-6 lg:sticky lg:top-8 lg:mt-0">
+      <div class="rounded-2xl border border-gray-200 bg-white p-5 shadow-sm">
+        <p class="eyebrow text-gray-400">The buyer page</p>
+        <h4 class="mt-1 font-display text-lg font-semibold text-gray-900">What renders now</h4>
+
+        <ol class="mt-4 space-y-3 text-sm">
+          <li class="flex gap-2.5">
+            <%= dot.call(presentation.title.present? && presentation.description.present? ? :on : :need) %>
+            <span><a href="#f-cover" class="font-medium text-gray-900 hover:text-whiskey-700">The cover</a><br>
+              <span class="text-gray-500"><%= presentation.description.present? ? "title, pitch line & price" : "needs the one-line pitch" %></span></span>
+          </li>
+          <li class="flex gap-2.5">
+            <%= dot.call(takeaways_count.positive? ? :on : :off) %>
+            <span><a href="#f-pitch" class="font-medium text-gray-900 hover:text-whiskey-700">The takeaways</a><br>
+              <span class="text-gray-500"><%= takeaways_count.positive? ? pluralize(takeaways_count, "point") : "hidden — none yet" %></span></span>
+          </li>
+          <li class="flex gap-2.5">
+            <%= dot.call(story_words > 40 ? :on : :need) %>
+            <span><a href="#f-story" class="font-medium text-gray-900 hover:text-whiskey-700">The story</a><br>
+              <span class="text-gray-500"><%= story_words > 40 ? "#{number_with_delimiter(story_words)} words · ~#{presentation.reading_time} min read" : "too short — the teaser is the pitch" %></span></span>
+          </li>
+          <li class="flex gap-2.5">
+            <%= dot.call(tasting_notes_n.positive? ? :on : :off) %>
+            <span><a href="#f-tasting" class="font-medium text-gray-900 hover:text-whiskey-700">What you'll taste</a><br>
+              <span class="text-gray-500"><%= tasting_notes_n.positive? ? "#{tasting_notes_n} of 4 notes" : "hidden — empty" %></span></span>
+          </li>
+          <li class="flex gap-2.5">
+            <%= dot.call(slides_count.positive? ? :auto : :need) %>
+            <span><a href="#f-slides" class="font-medium text-gray-900 hover:text-whiskey-700">The slides</a><br>
+              <span class="text-gray-500">
+                <% if slides_count.positive? %><%= slides_count %> rendered · automatic
+                <% elsif presentation.persisted? && presentation.slide_render_pending? %>rendering&hellip;
+                <% elsif presentation.pdf_file.attached? %>not rendered yet
+                <% else %>needs the deck file<% end %>
+              </span></span>
+          </li>
+          <li class="flex gap-2.5">
+            <%= dot.call(pours_count.positive? ? :on : :off) %>
+            <span><a href="#f-pours" class="font-medium text-gray-900 hover:text-whiskey-700">The pour list</a><br>
+              <span class="text-gray-500"><%= pours_count.positive? ? pluralize(pours_count, "pour") : "hidden — empty" %></span></span>
+          </li>
+          <li class="flex gap-2.5">
+            <%= dot.call(presentation.pdf_file.attached? ? :on : :need) %>
+            <span><a href="#f-files" class="font-medium text-gray-900 hover:text-whiskey-700">What you get</a><br>
+              <span class="text-gray-500">
+                <% if presentation.pdf_file.attached? %>the deck<%= extras_count.positive? ? " + #{pluralize(extras_count, 'extra')}" : "" %>
+                <% else %>no deck file — required to publish<% end %>
+              </span></span>
+          </li>
+        </ol>
+
+        <div class="mt-5 space-y-2 border-t border-gray-100 pt-4">
+          <%= form.submit submit_text, class: "block w-full cursor-pointer rounded-xl bg-whiskey-600 px-4 py-2.5 text-center font-semibold text-white transition hover:bg-whiskey-700" %>
+          <% if presentation.persisted? %>
+            <%= link_to "Preview as buyer ↗", presentation_path(presentation), target: "_blank",
+                class: "block w-full rounded-xl bg-gray-100 px-4 py-2.5 text-center font-medium text-gray-700 transition hover:bg-gray-200" %>
+            <p class="text-center text-xs text-gray-400">
+              <%= presentation.published? ? "Live in the library" : "Draft — publish from the deck's admin page" %>
+            </p>
+          <% end %>
+        </div>
       </div>
-
-      <!-- Speaker Notes -->
-      <div>
-        <%= form.label :speaker_notes, "Speaker Notes", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <% if presentation.speaker_notes.attached? %>
-          <p class="text-sm text-gray-600 mb-2">Current file: <%= presentation.speaker_notes.filename %></p>
-        <% end %>
-        <%= form.file_field :speaker_notes, accept: "application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
-        <p class="text-xs text-gray-500 mt-1">Detailed speaker notes (PDF or Word)</p>
-      </div>
-
-      <!-- Outline File -->
-      <div>
-        <%= form.label :outline_file, "Presentation Outline", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <% if presentation.outline_file.attached? %>
-          <p class="text-sm text-gray-600 mb-2">Current file: <%= presentation.outline_file.filename %></p>
-        <% end %>
-        <%= form.file_field :outline_file, accept: "application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
-        <p class="text-xs text-gray-500 mt-1">Presentation outline (PDF or Word)</p>
-      </div>
-
-      <!-- Recommendations Sheet -->
-      <div>
-        <%= form.label :recommendations_sheet, "Whiskey Recommendations PDF", class: "block text-sm font-medium text-gray-700 mb-2" %>
-        <% if presentation.recommendations_sheet.attached? %>
-          <p class="text-sm text-gray-600 mb-2">Current file: <%= presentation.recommendations_sheet.filename %></p>
-        <% end %>
-        <%= form.file_field :recommendations_sheet, accept: "application/pdf", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
-        <p class="text-xs text-gray-500 mt-1">Printable whiskey recommendations (PDF)</p>
-      </div>
-    </div>
-  </div>
-
-  <p class="text-sm text-gray-500">
-    Decks are saved as <span class="font-semibold">drafts</span>. Publish from the deck's admin page
-    once the deck file is attached and everything reads right.
-  </p>
-
-  <div class="flex items-center gap-4 pt-6 border-t border-gray-200">
-    <%= form.submit submit_text, class: "px-6 py-3 bg-whiskey-600 text-white font-semibold rounded-xl hover:bg-whiskey-700 transition" %>
-    <%= link_to "Cancel", admin_presentations_path, class: "px-6 py-3 bg-gray-100 text-gray-700 font-semibold rounded-xl hover:bg-gray-200 transition" %>
+    </aside>
   </div>
 <% end %>

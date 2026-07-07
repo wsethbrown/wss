@@ -30,9 +30,7 @@
     <% end %>
     <h1 class="text-3xl font-bold text-gray-900">Edit Presentation</h1>
   </div>
-  <p class="text-gray-600">Update presentation details and content.</p>
+  <p class="text-gray-600">Each section mirrors the buyer page, top to bottom — the rail on the right shows what will actually render.</p>
 </div>
 
-<div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-8">
-  <%= render 'form', presentation: @presentation, submit_text: 'Update Presentation' %>
-</div>
+<%= render 'form', presentation: @presentation, submit_text: 'Save deck' %>

@@ -42,3 +42,25 @@ ActivityLog is CURATED, not a firehose:
   type to ActivityLog::ACTIVITY_TYPES in the same commit, or it never
   records.
 - IP/UA live in dedicated columns only (not duplicated into metadata JSON).
+
+## The deck form (admin/presentations/_form)
+
+The form mirrors the buyer page top to bottom — seven numbered sections in the
+exact order buyers scroll them, each annotated "Appears on:". The sticky right
+rail ("The buyer page / What renders now") recomputes per render: green = will
+render, gray = section hidden because empty (takeaways/tasting/pours hide when
+blank), red = blocks the sale (missing pitch line or deck file), amber = slides
+(automatic). Keep that rail honest — if you add a buyer-page section, add its
+rail row and its form section in page order.
+
+Design rules learned the hard way:
+- There is NO manual slide-outline builder. Slides render from the deck file;
+  `slides_preview` is a legacy column still written by DeckImport and rendered
+  only as a fallback for unrendered drafts (which can't be published anyway).
+  Don't resurrect the builder.
+- `preview_images` is dead — never shown to buyers; removed from form/permit.
+- Copy must stay topic-generic ("the pour list", "what to pour", origin) —
+  decks cover cocktails and more, not just whiskey. Storage keys keep the
+  legacy `whiskey_*` names; only labels changed.
+- `Presentation#duration_label` renders duration everywhere ("20" → "20 min");
+  never interpolate raw `duration` into buyer copy.

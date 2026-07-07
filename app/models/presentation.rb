@@ -86,6 +86,13 @@ class Presentation < ApplicationRecord
     description.length > length ? "#{description[0...length]}..." : description
   end
 
+  # Duration as buyers should read it: a bare number means minutes.
+  # (Admins type "20" as often as "45 min" — don't render naked digits.)
+  def duration_label
+    return if duration.blank?
+    duration.match?(/\A\s*\d+\s*\z/) ? "#{duration.strip} min" : duration
+  end
+
   def reading_time
     return 0 if content.blank?
     words = content.split.length
