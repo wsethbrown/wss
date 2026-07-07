@@ -1,87 +1,90 @@
 <% content_for :title, "#{@bottle.name} - Whiskey Share Society" %>
 
-<section class="w-full bg-char px-4 pb-8 pt-24">
-  <div class="mx-auto max-w-3xl text-center">
-    <p class="eyebrow mb-4 text-whiskey-300/90">
-      <%= [@bottle.style, @bottle.region, (@bottle.abv && "#{@bottle.abv.to_f % 1 == 0 ? @bottle.abv.to_i : @bottle.abv}% ABV")].compact_blank.join(" · ").presence || "Bottle" %>
-    </p>
-    <div class="mb-4 flex justify-center">
-      <div class="rounded-2xl bg-cream/95 px-5 py-3">
-        <%= render "bottles/placeholder", bottle: @bottle, size: "h-16" %>
+<%# Slim identity band: everything a visitor needs in one glance, no scroll tax. %>
+<section class="w-full bg-char px-4 pb-6 pt-24">
+  <div class="mx-auto flex max-w-6xl flex-col items-center gap-5 sm:flex-row sm:items-center">
+    <div class="shrink-0 rounded-2xl bg-cream/95 px-4 py-2.5">
+      <%= render "bottles/placeholder", bottle: @bottle, size: "h-14" %>
+    </div>
+    <div class="min-w-0 flex-1 text-center sm:text-left">
+      <p class="eyebrow text-whiskey-300/90">
+        <%= [@bottle.style, @bottle.region, (@bottle.abv && "#{@bottle.abv.to_f % 1 == 0 ? @bottle.abv.to_i : @bottle.abv}% ABV")].compact_blank.join(" · ").presence || "Bottle" %>
+      </p>
+      <h1 class="mt-1 font-display text-3xl font-semibold text-cream">
+        <%= @bottle.name %><% if @bottle.distillery.present? %><span class="text-cream/50"> · </span><%= link_to @bottle.distillery, reviews_path(distillery: @bottle.distillery), class: "text-2xl text-cream/80 underline decoration-cream/30 underline-offset-4 transition hover:text-whiskey-200" %><% end %>
+      </h1>
+      <div class="mt-2 flex items-center justify-center gap-2 sm:justify-start">
+        <%= render "bottles/rating", value: @bottle.average_rating %>
+        <% if @bottle.average_rating %>
+          <span class="font-semibold text-cream"><%= number_with_precision(@bottle.average_rating, precision: 2, strip_insignificant_zeros: true) %></span>
+          <span class="text-cream/60">· <%= pluralize(@bottle.reviewer_count, "reviewer") %></span>
+        <% end %>
       </div>
     </div>
-    <h1 class="font-display text-3xl font-semibold text-cream sm:text-4xl"><%= @bottle.name %></h1>
-    <% if @bottle.distillery.present? %>
-      <p class="mt-2 text-cream/80">
-        <%= link_to @bottle.distillery, reviews_path(distillery: @bottle.distillery),
-            class: "underline decoration-cream/30 underline-offset-4 transition hover:text-whiskey-200" %>
-      </p>
-    <% end %>
-    <div class="mt-4 flex items-center justify-center gap-3 text-lg">
-      <%= render "bottles/rating", value: @bottle.average_rating %>
-      <% if @bottle.average_rating %>
-        <span class="font-semibold text-cream"><%= number_with_precision(@bottle.average_rating, precision: 2, strip_insignificant_zeros: true) %></span>
-        <span class="text-cream/60">· <%= pluralize(@bottle.reviewer_count, "reviewer") %></span>
-      <% end %>
-    </div>
-    <div class="mt-5">
+    <div class="shrink-0">
       <% if !user_signed_in? %>
-        <%= link_to "Sign in to review this bottle", new_user_session_path, class: "inline-flex rounded-xl bg-whiskey-500 px-6 py-3 font-semibold text-white transition hover:bg-whiskey-400" %>
+        <%= link_to "Sign in to review", new_user_session_path, class: "inline-flex rounded-xl bg-whiskey-500 px-5 py-2.5 font-semibold text-white transition hover:bg-whiskey-400" %>
       <% elsif @my_review %>
-        <%= link_to "Update your review", edit_review_path(@my_review), class: "inline-flex rounded-xl bg-whiskey-500 px-6 py-3 font-semibold text-white transition hover:bg-whiskey-400" %>
+        <%= link_to "Update your review", edit_review_path(@my_review), class: "inline-flex rounded-xl bg-whiskey-500 px-5 py-2.5 font-semibold text-white transition hover:bg-whiskey-400" %>
       <% else %>
-        <%= link_to "Review this bottle", new_bottle_review_path(@bottle), class: "inline-flex rounded-xl bg-whiskey-500 px-6 py-3 font-semibold text-white transition hover:bg-whiskey-400" %>
+        <%= link_to "Review this bottle", new_bottle_review_path(@bottle), class: "inline-flex rounded-xl bg-whiskey-500 px-5 py-2.5 font-semibold text-white transition hover:bg-whiskey-400" %>
       <% end %>
     </div>
   </div>
 </section>
 
-<%= render "bottles/flavor_wave", bottle: @bottle %>
+<%# 50/50 below the band: the room's palate stays put on the left while the
+    tastings scroll on the right — reviews visible from the first paint. %>
+<section class="w-full bg-white px-4 py-10">
+  <div class="mx-auto grid max-w-6xl items-start gap-10 lg:grid-cols-2">
+    <div class="lg:sticky lg:top-24">
+      <%= render "bottles/flavor_wave", bottle: @bottle %>
+    </div>
 
-<section class="w-full bg-white px-4 py-14">
-  <div class="mx-auto max-w-3xl">
-    <p class="eyebrow text-whiskey-600">On the record</p>
-    <h2 class="mb-8 mt-1 font-display text-2xl font-semibold text-gray-900">Tastings</h2>
+    <div>
+      <p class="eyebrow text-whiskey-600">On the record</p>
+      <h2 class="mb-6 mt-1 font-display text-2xl font-semibold text-gray-900">Tastings</h2>
 
-    <% if @reviews.none? %>
-      <p class="text-gray-600">No one has reviewed this bottle yet. Be the first pour.</p>
-    <% end %>
-
-    <div class="space-y-6">
-      <% @reviews.each do |review| %>
-        <article class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-          <div class="flex flex-wrap items-baseline justify-between gap-2">
-            <span class="font-semibold text-gray-900"><%= review.user.first_name %> <%= review.user.last_name %></span>
-            <%= render "bottles/rating", value: review.rating.to_f %>
-          </div>
-          <%= render "reviews/event_card", review: review %>
-          <% if review.notes.present? %><p class="mt-3 line-clamp-4 text-gray-700"><%= review.notes %></p><% end %>
-          <% tasting = { "Nose" => review.nose, "Palate" => review.palate, "Finish" => review.finish, "Body" => review.body_notes }.compact_blank %>
-          <% if tasting.any? %>
-            <dl class="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 border-t border-gray-100 pt-4 sm:grid-cols-4">
-              <% tasting.each do |label, text| %>
-                <div><dt class="eyebrow text-whiskey-700"><%= label %></dt><dd class="mt-1 text-sm text-gray-600"><%= text %></dd></div>
-              <% end %>
-            </dl>
-          <% end %>
-          <% if (tags = review.descriptor_tags).any? %>
-            <div class="mt-3 flex flex-wrap gap-1.5">
-              <% tags.each_key do |word| %>
-                <%= link_to word, reviews_path(tags: word), class: "rounded-full bg-whiskey-100 px-2 py-0.5 text-xs font-medium text-whiskey-800 transition hover:bg-whiskey-200" %>
-              <% end %>
-            </div>
-          <% end %>
-          <div class="mt-3 flex items-center justify-between">
-            <p class="text-sm text-gray-400"><%= review.created_at.strftime("%B %-d, %Y") %></p>
-            <span class="flex items-center gap-4">
-              <% if review.user == current_user %>
-                <%= link_to "Edit", edit_review_path(review), class: "text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>
-              <% end %>
-              <%= link_to "Read the full tasting →", review_path(review), class: "text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>
-            </span>
-          </div>
-        </article>
+      <% if @reviews.none? %>
+        <p class="text-gray-600">No one has reviewed this bottle yet. Be the first pour.</p>
       <% end %>
+
+      <div class="space-y-6">
+        <% @reviews.each do |review| %>
+          <article class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+            <div class="flex flex-wrap items-baseline justify-between gap-2">
+              <span class="font-semibold text-gray-900"><%= review.user.first_name %> <%= review.user.last_name %></span>
+              <%= render "bottles/rating", value: review.rating.to_f %>
+            </div>
+            <%= render "reviews/event_card", review: review %>
+            <% if review.notes.present? %><p class="mt-3 line-clamp-4 text-gray-700"><%= review.notes %></p><% end %>
+            <% tasting = { "Nose" => review.nose, "Palate" => review.palate, "Finish" => review.finish, "Body" => review.body_notes }.compact_blank %>
+            <% if tasting.any? %>
+              <dl class="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 border-t border-gray-100 pt-4">
+                <% tasting.each do |label, text| %>
+                  <div><dt class="eyebrow text-whiskey-700"><%= label %></dt><dd class="mt-1 text-sm text-gray-600"><%= text %></dd></div>
+                <% end %>
+              </dl>
+            <% end %>
+            <% if (tags = review.descriptor_tags).any? %>
+              <div class="mt-3 flex flex-wrap gap-1.5">
+                <% tags.each_key do |word| %>
+                  <%= link_to word, reviews_path(tags: word), class: "rounded-full bg-whiskey-100 px-2 py-0.5 text-xs font-medium text-whiskey-800 transition hover:bg-whiskey-200" %>
+                <% end %>
+              </div>
+            <% end %>
+            <div class="mt-3 flex items-center justify-between">
+              <p class="text-sm text-gray-400"><%= review.created_at.strftime("%B %-d, %Y") %></p>
+              <span class="flex items-center gap-4">
+                <% if review.user == current_user %>
+                  <%= link_to "Edit", edit_review_path(review), class: "text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>
+                <% end %>
+                <%= link_to "Read the full tasting →", review_path(review), class: "text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>
+              </span>
+            </div>
+          </article>
+        <% end %>
+      </div>
     </div>
   </div>
 </section>
