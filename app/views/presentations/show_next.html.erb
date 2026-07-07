@@ -1,0 +1,278 @@
+<%# NEXT-DESIGN PREVIEW (?design=next): the deck page as a scroll NARRATIVE —
+    no sidebar; full-bleed acts alternating char/paper, homepage rhythm.
+    Act 1 cover → offer band → takeaways → slides (dark, large) → story →
+    tasting spread → final CTA → more decks. %>
+<% owned_purchase = user_signed_in? ? current_user.user_presentations.find_by(presentation_id: @presentation.id) : nil %>
+
+<div class="fixed bottom-4 left-4 z-50 rounded-full bg-char px-4 py-2 text-xs font-semibold text-whiskey-300 shadow-lg">
+  Viewing: next design · <%= link_to 'back to current', presentation_path(@presentation), class: 'underline text-cream' %>
+</div>
+
+<!-- ACT 1 · The cover (unchanged identity) -->
+<div class="relative flex min-h-[70vh] w-full flex-col items-center justify-center overflow-hidden bg-char pt-16 text-center <%= 'bg-cover bg-center' if @presentation.featured_image.attached? %>"
+     <% if @presentation.featured_image.attached? %>style="background-image: url('<%= url_for(@presentation.featured_image) %>')"<% end %>>
+  <% if @presentation.featured_image.attached? %>
+    <div class="absolute inset-0 bg-gradient-to-t from-char via-char/60 to-char/40"></div>
+  <% else %>
+    <div class="pointer-events-none absolute inset-0" aria-hidden="true"
+         style="background: radial-gradient(ellipse 70% 45% at 50% 108%, rgba(201,136,74,.25), transparent 70%);"></div>
+  <% end %>
+  <div class="relative z-10 mx-auto max-w-4xl px-4 py-20">
+    <p class="eyebrow mb-4 text-whiskey-300/90">
+      <%= [@presentation.category.presence, @presentation.difficulty.presence, @presentation.duration.presence,
+           (@presentation.slide_images.attached? ? "#{@presentation.slide_images.count} slides" : nil)].compact.join(' · ') %>
+    </p>
+    <div class="rule-double mx-auto mb-8 w-20 text-whiskey-300"></div>
+    <h1 class="font-display text-4xl font-semibold leading-tight text-cream md:text-6xl"><%= @presentation.title %></h1>
+    <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-cream/70 md:text-xl"><%= @presentation.description %></p>
+    <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+      <% if owned_purchase && @presentation.slide_images.attached? && @full_story %>
+        <%= link_to 'Present', present_presentation_path(@presentation),
+            class: "inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400" %>
+        <a href="#deck-story" class="inline-flex items-center justify-center rounded-xl border border-cream/25 px-7 py-3.5 text-base font-semibold text-cream/90 transition hover:border-cream/50 hover:text-cream">Read the story</a>
+      <% elsif owned_purchase %>
+        <a href="#deck-story" class="inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400">Read the story</a>
+      <% else %>
+        <a href="#offer" class="inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400">
+          <%= @presentation.free? ? 'Add to my library — free' : "Get this deck — #{@presentation.formatted_price}" %>
+        </a>
+      <% end %>
+    </div>
+  </div>
+</div>
+
+<!-- ACT 2 · The offer / ownership band -->
+<section id="offer" class="w-full scroll-mt-16 bg-whiskey-50 px-4 py-20">
+  <div class="mx-auto max-w-3xl text-center">
+    <% if owned_purchase %>
+      <p class="eyebrow mb-3 text-whiskey-600">In your library</p>
+      <h2 class="font-display text-3xl font-semibold text-gray-900">
+        <%= owned_purchase.purchase_type == 'direct' ? 'Yours for good.' : 'Unlocked with your membership.' %>
+      </h2>
+      <% downloads = [
+        ['Full presentation', (full_presentation_presentation_downloads_path(@presentation) if @presentation.pdf_file.attached?)],
+        ['Speaker notes',     (speaker_notes_presentation_downloads_path(@presentation) if @presentation.speaker_notes.attached?)],
+        ['Outline',           (outline_presentation_downloads_path(@presentation) if @presentation.outline_file.attached?)],
+        ['Whiskey list',      (recommendations_presentation_downloads_path(@presentation) if @presentation.recommendations_sheet.attached?)]
+      ].select { |_, p| p } %>
+      <% if downloads.any? %>
+        <div class="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <% downloads.each do |label, path| %>
+            <%= link_to label, path, class: 'rounded-xl border border-whiskey-300 bg-white px-5 py-2.5 text-sm font-semibold text-whiskey-800 transition hover:bg-whiskey-100' %>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="mt-6 text-gray-600">The downloadable files are still being prepared.</p>
+      <% end %>
+    <% else %>
+      <p class="eyebrow mb-3 text-whiskey-600">The deck</p>
+      <h2 class="font-display text-4xl font-semibold text-gray-900"><%= @presentation.formatted_price %><span class="ml-2 align-middle text-base font-sans font-normal text-gray-500"><%= @presentation.free? ? 'free for everyone' : 'one-time purchase' %></span></h2>
+      <% manifest = [
+        (@presentation.slide_images.attached? ? "The full deck — #{@presentation.slide_images.count} slides" : (@presentation.pdf_file.attached? ? "The full presentation file" : nil)),
+        ("The story — #{@presentation.reading_time} min read" if @presentation.content.present?),
+        ("Speaker script" if @presentation.speaker_notes.attached?),
+        ("Presentation outline" if @presentation.outline_file.attached?),
+        ("Printable whiskey list" if @presentation.recommendations_sheet.attached?),
+        ("Bottle list — #{@presentation.parsed_whiskey_recommendations.size} pours with tasting notes" if @presentation.parsed_whiskey_recommendations.any?)
+      ].compact %>
+      <div class="mx-auto mt-8 grid max-w-xl gap-x-8 gap-y-3 text-left sm:grid-cols-2">
+        <% manifest.each do |item| %>
+          <div class="flex items-start gap-2 text-gray-700">
+            <svg class="mt-1 h-4 w-4 flex-shrink-0 text-whiskey-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+            <%= item %>
+          </div>
+        <% end %>
+      </div>
+      <% if user_signed_in? && current_user.subscription_active? && current_user.credits > 0 && !@presentation.free? %>
+        <p class="mt-6 inline-flex rounded-full bg-whiskey-100 px-4 py-1.5 text-sm font-semibold text-whiskey-800">or 1 credit — you have <%= current_user.credits %></p>
+      <% end %>
+      <div class="mt-8">
+        <%= link_to user_signed_in? ? new_presentation_purchase_path(@presentation) : auth_path,
+            class: 'inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-10 py-4 text-lg font-semibold text-white transition hover:bg-whiskey-700' do %>
+          <%= user_signed_in? ? (@presentation.free? ? 'Add to my library' : 'Get this deck') : 'Sign in to get this deck' %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</section>
+
+<!-- ACT 3 · Takeaways -->
+<% if @presentation.parsed_what_youll_learn.any? %>
+  <section class="w-full bg-white px-4 py-20">
+    <div class="mx-auto max-w-4xl">
+      <p class="eyebrow mb-2 text-center text-whiskey-600">The takeaways</p>
+      <h2 class="text-center font-display text-3xl font-semibold text-gray-900">What you'll learn</h2>
+      <div class="rule-double mx-auto mt-4 mb-10 w-20 text-whiskey-800"></div>
+      <div class="grid gap-6 md:grid-cols-2">
+        <% @presentation.parsed_what_youll_learn.each do |point| %>
+          <div class="flex items-start gap-4">
+            <div class="mt-1 flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-whiskey-500">
+              <svg class="h-4 w-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            </div>
+            <div>
+              <% if point.is_a?(Hash) && point[:title] %>
+                <h3 class="font-semibold text-gray-900"><%= point[:title] %></h3>
+                <p class="mt-1 text-sm text-gray-600"><%= point[:description] %></p>
+              <% else %>
+                <p class="text-gray-900"><%= point %></p>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+<% end %>
+
+<!-- ACT 4 · The slides, in the dark (presentation-room feel) -->
+<% if @presentation.slide_images.attached? %>
+  <section class="w-full bg-char px-4 py-20">
+    <div class="mx-auto max-w-4xl">
+      <p class="eyebrow mb-2 text-center text-whiskey-300/90">The slides</p>
+      <h2 class="text-center font-display text-3xl font-semibold text-cream">Inside the deck, as presented</h2>
+      <div class="rule-double mx-auto mt-4 mb-10 w-20 text-whiskey-300"></div>
+      <% slides = @presentation.slide_images.order(:id) %>
+      <% visible = @full_story ? slides : slides.first(3) %>
+      <div class="space-y-8">
+        <% visible.each_with_index do |slide, i| %>
+          <figure>
+            <%= image_tag slide, alt: "Slide #{i + 1}", loading: 'lazy', class: 'w-full rounded-xl shadow-[0_20px_50px_rgba(0,0,0,.5)]' %>
+            <figcaption class="eyebrow mt-3 text-center text-cream/40">Slide <%= i + 1 %> of <%= slides.size %></figcaption>
+          </figure>
+        <% end %>
+      </div>
+      <% unless @full_story || slides.size <= 3 %>
+        <div class="mt-12 text-center">
+          <p class="font-display text-2xl font-semibold text-cream"><%= slides.size - 3 %> more slides in the full deck.</p>
+          <a href="#offer" class="mt-6 inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-8 py-3.5 font-semibold text-white transition hover:bg-whiskey-400">Get the deck</a>
+        </div>
+      <% end %>
+    </div>
+  </section>
+<% end %>
+
+<!-- ACT 5 · The story (centered reading column) -->
+<section id="deck-story" class="w-full scroll-mt-24 bg-white px-4 py-20">
+  <div class="mx-auto max-w-2xl">
+    <p class="eyebrow mb-2 text-whiskey-600">The story</p>
+    <h2 class="font-display text-3xl font-semibold text-gray-900">Read it like a chapter</h2>
+    <div class="rule-double mt-4 mb-10 text-whiskey-800"></div>
+    <div class="relative pl-6 md:pl-10">
+      <div class="absolute left-0 top-1 bottom-1 w-[2px] rounded bg-whiskey-100" aria-hidden="true">
+        <div id="deck-thread" class="w-full rounded bg-gradient-to-b from-whiskey-300 to-whiskey-600 transition-[height] duration-150 ease-out" style="height: 0%"></div>
+      </div>
+      <% if @presentation.content.present? %>
+        <% if @full_story %>
+          <div class="prose-deck prose-deck--dropcap"><%= render_markdown(@presentation.content) %></div>
+        <% else %>
+          <div class="relative">
+            <div class="prose-deck prose-deck--dropcap"><%= preview_markdown(@presentation.content) %></div>
+            <% if story_truncated?(@presentation.content) %>
+              <div class="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white to-transparent" aria-hidden="true"></div>
+            <% end %>
+          </div>
+          <% if story_truncated?(@presentation.content) %>
+            <div class="mt-2 text-center">
+              <p class="font-display text-xl font-semibold text-gray-900">The story keeps going.</p>
+              <a href="#offer" class="mt-4 inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-7 py-3 font-semibold text-white transition hover:bg-whiskey-700">Get the deck to keep reading</a>
+            </div>
+          <% end %>
+        <% end %>
+      <% else %>
+        <p class="prose-deck"><%= @presentation.description %></p>
+      <% end %>
+    </div>
+    <div class="mt-10 flex items-center gap-3 border-t border-whiskey-100 pt-6 text-sm text-gray-500">
+      <div class="flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold text-white" style="background-color: <%= @presentation.author.avatar_color %>"><%= @presentation.author.initials %></div>
+      Written and presented by <span class="font-semibold text-gray-700"><%= @presentation.author.full_name %></span>
+    </div>
+  </div>
+</section>
+<script>
+  (function () {
+    function initDeckThread() {
+      const story = document.getElementById('deck-story'), thread = document.getElementById('deck-thread');
+      if (!story || !thread) return;
+      function update() {
+        const r = story.getBoundingClientRect(), vh = window.innerHeight, total = r.height - vh * .5;
+        thread.style.height = ((total > 0 ? Math.min(1, Math.max(0, (vh * .5 - r.top) / total)) : 1) * 100).toFixed(1) + '%';
+      }
+      update();
+      window.addEventListener('scroll', update, { passive: true });
+    }
+    document.addEventListener('turbo:load', initDeckThread);
+    document.addEventListener('DOMContentLoaded', initDeckThread);
+  })();
+</script>
+
+<!-- ACT 6 · The tasting spread -->
+<% tasting = { 'Nose' => @presentation.nose_notes, 'Palate' => @presentation.palate_notes,
+               'Finish' => @presentation.finish_notes, 'Body' => @presentation.body_notes }.compact_blank %>
+<% recs = @presentation.parsed_whiskey_recommendations %>
+<% if tasting.any? || recs.any? %>
+  <section class="w-full bg-whiskey-50 px-4 py-20">
+    <div class="mx-auto max-w-4xl">
+      <p class="eyebrow mb-2 text-center text-whiskey-600">The tasting</p>
+      <h2 class="text-center font-display text-3xl font-semibold text-gray-900">What's in the glass</h2>
+      <div class="rule-double mx-auto mt-4 mb-10 w-20 text-whiskey-800"></div>
+      <% if tasting.any? %>
+        <dl class="mx-auto grid max-w-3xl gap-x-10 gap-y-6 sm:grid-cols-2">
+          <% tasting.each do |label, notes| %>
+            <div>
+              <dt class="eyebrow text-whiskey-700"><%= label %></dt>
+              <dd class="mt-1 font-reading text-lg leading-relaxed text-gray-800"><%= notes %></dd>
+            </div>
+          <% end %>
+        </dl>
+      <% end %>
+      <% if recs.any? %>
+        <div class="mt-12 grid gap-6 md:grid-cols-<%= [recs.size, 3].min %>">
+          <% recs.each do |r| %>
+            <div class="rounded-2xl border border-whiskey-200 bg-white p-6">
+              <p class="eyebrow text-whiskey-600"><%= r[:region] %></p>
+              <h3 class="mt-1 font-display text-lg font-semibold leading-snug text-gray-900"><%= r[:name] %></h3>
+              <p class="mt-1 text-sm text-gray-500"><%= r[:style] %><%= " · #{r[:price]}" if r[:price].present? && r[:price] != '$—' %></p>
+              <% if r[:notes].present? %><p class="mt-3 font-reading text-gray-700"><%= r[:notes] %></p><% end %>
+            </div>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  </section>
+<% end %>
+
+<!-- ACT 7 · Final pour (CTA) -->
+<% unless owned_purchase %>
+  <section class="w-full bg-char px-4 py-20 text-center">
+    <div class="mx-auto max-w-2xl">
+      <h2 class="font-display text-3xl font-semibold text-cream">Pour this one for your people.</h2>
+      <p class="mt-4 text-cream/70"><%= @presentation.title %> — <%= @presentation.formatted_price %><%= ', or 1 membership credit' unless @presentation.free? %>.</p>
+      <div class="mt-8">
+        <%= link_to user_signed_in? ? new_presentation_purchase_path(@presentation) : auth_path,
+            class: 'inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-10 py-4 text-lg font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400' do %>
+          <%= user_signed_in? ? 'Get this deck' : 'Sign in to get this deck' %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+<% end %>
+
+<!-- More from the library -->
+<% if @more_decks&.any? %>
+  <section class="w-full bg-white px-4 py-16">
+    <div class="mx-auto max-w-6xl">
+      <div class="flex flex-wrap items-end justify-between gap-4">
+        <div>
+          <p class="eyebrow mb-2 text-whiskey-600">Keep pouring</p>
+          <h2 class="font-display text-3xl font-semibold text-gray-900">More from the library</h2>
+        </div>
+        <%= link_to 'See all decks →', presentations_path, class: 'text-sm font-semibold text-whiskey-700 transition hover:text-whiskey-600' %>
+      </div>
+      <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+        <% @more_decks.each do |deck| %>
+          <%= render 'presentations/deck_card', deck: deck, owned: user_signed_in? && deck.purchased_by?(current_user) %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+<% end %>

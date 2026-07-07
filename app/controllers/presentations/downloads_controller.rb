@@ -63,6 +63,8 @@ class Presentations::DownloadsController < ApplicationController
   
   def set_presentation
     @presentation = Presentation.find(params[:presentation_id])
+    # Drafts are not for sale/download: 404 for non-admins (see PresentationsController).
+    raise ActiveRecord::RecordNotFound unless @presentation.published? || current_user&.admin?
   end
   
   def check_access

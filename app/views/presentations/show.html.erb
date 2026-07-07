@@ -13,6 +13,12 @@
   </div>
 <% end %>
 
+<% unless @presentation.published? %>
+  <div class="fixed inset-x-0 top-16 z-40 bg-whiskey-600 px-4 py-2 text-center text-sm font-semibold text-white">
+    Draft — visible to admins only. Customers get a 404 until this deck is published.
+  </div>
+<% end %>
+
 <!-- Hero: the deck's cover. Featured image when present, otherwise the char label. -->
 <div class="relative flex min-h-[60vh] w-full flex-col items-center justify-center overflow-hidden bg-char pt-16 text-center <%= 'bg-cover bg-center' if @presentation.featured_image.attached? %>"
      <% if @presentation.featured_image.attached? %>style="background-image: url('<%= url_for(@presentation.featured_image) %>')"<% end %>>

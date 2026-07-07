@@ -45,6 +45,8 @@ class PresentationsController < ApplicationController
     @full_story = user_signed_in? && @presentation.can_download_full_presentation?(current_user)
 
     @more_decks = Presentation.published.where.not(id: @presentation.id).recent.limit(3)
+
+    maybe_render_next
   end
 
   # Full-screen in-browser slide player — the tasting venue. Owners/admins only.
@@ -97,6 +99,13 @@ class PresentationsController < ApplicationController
 
   def set_presentation
     @presentation = Presentation.find(params[:id])
+    ensure_deck_visible!
+  end
+
+  # Drafts exist only in the admin panel: to customers they 404 as if they
+  # don't exist (no existence leak). Admins see them with a draft banner.
+  def ensure_deck_visible!
+    raise ActiveRecord::RecordNotFound unless @presentation.published? || current_user&.admin?
   end
 
   def presentation_params
