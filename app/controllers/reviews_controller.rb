@@ -7,6 +7,9 @@ class ReviewsController < ApplicationController
   def index
     @bottles = Bottle.order(:name)
     @bottles = @bottles.search(params[:q]) if params[:q].present?
+    # The record covers the people as well as the pours: a search also turns
+    # up societies (policy-scoped — private ones stay invisible to outsiders).
+    @societies = params[:q].present? ? policy_scope(Society).search(params[:q]).order(:name).limit(6) : Society.none
     @recent_reviews = Review.includes(:user, :bottle).recent_first.limit(10)
   end
 

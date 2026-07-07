@@ -4,7 +4,7 @@ class BottlesTest < ActionDispatch::IntegrationTest
   test "index lists bottles and recent reviews, signed out" do
     get reviews_path
     assert_response :success
-    assert_select "h1", text: /The bottle library/i
+    assert_select "h1", text: /The tasting record/i
     assert_match "Eagle Rare 10", response.body
     assert_match "Cherry and oak", response.body # recent review feed
   end
@@ -14,6 +14,16 @@ class BottlesTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match "Lagavulin 16", response.body
     assert_no_match "Eagle Rare 10", response.body
+  end
+
+  test "search also finds public societies, never private ones for outsiders" do
+    get reviews_path(q: "society") # matches public "Whiskey Lovers Society"
+    assert_response :success
+    assert_match "Whiskey Lovers Society", response.body
+
+    get reviews_path(q: "bourbon club") # matches only the private club
+    assert_response :success
+    assert_no_match "Exclusive Bourbon Club", response.body
   end
 
   test "search endpoint returns JSON matches" do

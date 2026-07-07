@@ -1,10 +1,11 @@
-<% content_for :title, "Bottles - Whiskey Share Society" %>
+<% content_for :title, "Reviews - Whiskey Share Society" %>
 
 <section class="w-full bg-char px-4 py-16 text-center">
   <p class="eyebrow mb-4 text-whiskey-300/90">The pours, on the record</p>
-  <h1 class="font-display text-4xl font-semibold text-cream sm:text-5xl">The bottle library</h1>
+  <h1 class="font-display text-4xl font-semibold text-cream sm:text-5xl">The tasting record</h1>
   <p class="mx-auto mt-4 max-w-2xl text-cream/80">
-    Every bottle the society has tasted and rated — add yours, and say what you found in the glass.
+    Every bottle we've tasted and rated, and the societies doing the tasting —
+    search either, and say what you found in the glass.
   </p>
 </section>
 
@@ -13,7 +14,7 @@
     <div class="mb-10 flex flex-wrap items-center justify-between gap-4"
          data-controller="bottle-search" data-bottle-search-url-value="<%= search_bottles_path %>">
       <%= form_with url: reviews_path, method: :get, class: "relative w-full max-w-xl" do %>
-        <input type="search" name="q" value="<%= params[:q] %>" placeholder="Search bottles or distilleries…"
+        <input type="search" name="q" value="<%= params[:q] %>" placeholder="Search bottles, distilleries, or societies…"
                autocomplete="off"
                data-bottle-search-target="input" data-action="input->bottle-search#query"
                class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-whiskey-500">
@@ -57,6 +58,28 @@
         <% end %>
       <% end %>
     </div>
+
+    <% if @societies.any? %>
+      <div class="mt-12">
+        <p class="eyebrow text-whiskey-600">The company</p>
+        <h2 class="mb-6 mt-1 font-display text-2xl font-semibold text-gray-900">Societies</h2>
+        <div class="divide-y divide-gray-100 rounded-2xl border border-gray-200 bg-white shadow-sm">
+          <% @societies.each do |society| %>
+            <%= link_to society_path(society), class: "flex items-center justify-between px-5 py-4 transition hover:bg-whiskey-50" do %>
+              <span>
+                <span class="block font-display text-lg font-semibold text-gray-900"><%= society.name %></span>
+                <span class="block text-sm text-gray-500">
+                  <%= [society.location.presence, pluralize(society.members.count, "member")].compact.join(" · ") %>
+                </span>
+              </span>
+              <% if society.is_private? %>
+                <span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-gray-500">Private</span>
+              <% end %>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
 
     <% if @recent_reviews.any? && params[:q].blank? %>
       <div class="mt-16">

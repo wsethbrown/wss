@@ -65,3 +65,11 @@ read it before extending anything here).
   replaying migrations. A missing/stale dump makes every parallel test
   worker error out while a single-file run (which doesn't reload the test
   DB) still passes, which is a confusing false-green signal.
+
+## Section search scope
+
+/reviews search covers bottles AND societies: `policy_scope(Society).search(q)`
+renders a "Societies" result group (private societies stay invisible to
+non-members — the policy scope, not the view, enforces it). The JSON
+autocomplete remains bottle-only on purpose: its job is feeding the
+review/add-bottle flow.
