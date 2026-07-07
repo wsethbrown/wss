@@ -14,12 +14,33 @@ class BottlesController < ApplicationController
     }
   end
 
-  # new/create arrive in Task 4; stubs keep the routes honest until then.
   def new
     @bottle = Bottle.new(name: params[:name])
+    @near_matches = []
   end
 
   def create
-    head :unprocessable_entity
+    @bottle = Bottle.new(bottle_params)
+    @bottle.created_by = current_user
+
+    # Soft dedup: same search the autocomplete uses. The user can click an
+    # existing bottle instead, or confirm theirs is genuinely different.
+    @near_matches = params[:confirmed_duplicate] == "1" ? [] : Bottle.search(@bottle.name).limit(5)
+    if @near_matches.any?
+      render :new, status: :unprocessable_entity
+      return
+    end
+
+    if @bottle.save
+      redirect_to bottle_path(@bottle), notice: "#{@bottle.name} is on the shelf — add your tasting."
+    else
+      render :new, status: :unprocessable_entity
+    end
+  end
+
+  private
+
+  def bottle_params
+    params.require(:bottle).permit(:name, :distillery, :region, :style, :abv)
   end
 end

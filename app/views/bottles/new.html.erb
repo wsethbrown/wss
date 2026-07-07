@@ -1,0 +1,57 @@
+<% content_for :title, "Add a bottle - Whiskey Share Society" %>
+
+<section class="w-full bg-whiskey-50 px-4 py-14">
+  <div class="mx-auto max-w-xl">
+    <p class="eyebrow text-whiskey-600">The bottle library</p>
+    <h1 class="mb-8 mt-1 font-display text-3xl font-semibold text-gray-900">Add a bottle</h1>
+
+    <% if @near_matches.any? %>
+      <div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+        <p class="font-semibold text-amber-900">Is it one of these?</p>
+        <ul class="mt-3 space-y-2">
+          <% @near_matches.each do |match| %>
+            <li><%= link_to match.display_name, bottle_path(match), class: "font-medium text-whiskey-700 underline-offset-2 hover:underline" %></li>
+          <% end %>
+        </ul>
+        <p class="mt-3 text-sm text-amber-800">If yours is genuinely different, save again and it'll go through.</p>
+      </div>
+    <% end %>
+
+    <%= form_with model: @bottle, class: "space-y-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm" do |form| %>
+      <% if @bottle.errors.any? %>
+        <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
+          <%= @bottle.errors.full_messages.to_sentence %>
+        </div>
+      <% end %>
+      <% if @near_matches.any? %><input type="hidden" name="confirmed_duplicate" value="1"><% end %>
+
+      <div>
+        <%= form.label :name, "Bottle name", class: "mb-2 block text-sm font-medium text-gray-700" %>
+        <%= form.text_field :name, placeholder: "e.g., Eagle Rare 10", class: "w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+      </div>
+      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div>
+          <%= form.label :distillery, class: "mb-2 block text-sm font-medium text-gray-700" %>
+          <%= form.text_field :distillery, placeholder: "e.g., Buffalo Trace", class: "w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+        </div>
+        <div>
+          <%= form.label :region, class: "mb-2 block text-sm font-medium text-gray-700" %>
+          <%= form.text_field :region, placeholder: "e.g., Kentucky · Islay", class: "w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+        </div>
+        <div>
+          <%= form.label :style, class: "mb-2 block text-sm font-medium text-gray-700" %>
+          <%= form.text_field :style, placeholder: "e.g., Bourbon · Single Malt", class: "w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+        </div>
+        <div>
+          <%= form.label :abv, "ABV %", class: "mb-2 block text-sm font-medium text-gray-700" %>
+          <%= form.number_field :abv, step: 0.1, min: 0, max: 99, placeholder: "45.0", class: "w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 pt-2">
+        <%= form.submit "Add the bottle", class: "cursor-pointer rounded-xl bg-whiskey-600 px-6 py-3 font-semibold text-white transition hover:bg-whiskey-700" %>
+        <%= link_to "Cancel", reviews_path, class: "rounded-xl bg-gray-100 px-6 py-3 font-semibold text-gray-700 transition hover:bg-gray-200" %>
+      </div>
+    <% end %>
+  </div>
+</section>
