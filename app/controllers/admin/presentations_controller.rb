@@ -1,5 +1,5 @@
 class Admin::PresentationsController < Admin::BaseController
-  before_action :set_presentation, only: [:show, :edit, :update, :destroy]
+  before_action :set_presentation, only: [:show, :edit, :update, :destroy, :publish, :unpublish]
   
   # Temporary fix for schema caching issue
   before_action :reset_column_information, only: [:new, :create, :edit, :update]
@@ -111,6 +111,21 @@ class Admin::PresentationsController < Admin::BaseController
     end
   end
 
+  # Publishing is an explicit action, never a form side-effect. The model
+  # blocks publishing without the buyer-download deck file.
+  def publish
+    if @presentation.update(published: true)
+      redirect_to admin_presentation_path(@presentation), notice: 'Published — the deck is live in the library.'
+    else
+      redirect_to admin_presentation_path(@presentation), alert: @presentation.errors.full_messages.to_sentence
+    end
+  end
+
+  def unpublish
+    @presentation.update_columns(published: false)
+    redirect_to admin_presentation_path(@presentation), notice: 'Unpublished — the deck is back to draft.'
+  end
+
   def destroy
     @presentation.destroy!
     redirect_to admin_presentations_path, notice: 'Presentation deleted successfully.'
@@ -170,7 +185,6 @@ class Admin::PresentationsController < Admin::BaseController
       :price, 
       :duration,
       :difficulty,
-      :published,
       :whiskey_recommendations,
       :whiskey_recommendations_json,
       :tasting_notes,

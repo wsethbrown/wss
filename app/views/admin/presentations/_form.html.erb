@@ -431,10 +431,10 @@
     </div>
   </div>
 
-  <div class="flex items-center">
-    <%= form.check_box :published, class: "h-4 w-4 text-whiskey-600 focus:ring-whiskey-500 border-gray-300 rounded" %>
-    <%= form.label :published, "Publish immediately", class: "ml-2 block text-sm text-gray-700" %>
-  </div>
+  <p class="text-sm text-gray-500">
+    Decks are saved as <span class="font-semibold">drafts</span>. Publish from the deck's admin page
+    once the deck file is attached and everything reads right.
+  </p>
 
   <div class="flex items-center gap-4 pt-6 border-t border-gray-200">
     <%= form.submit submit_text, class: "px-6 py-3 bg-whiskey-600 text-white font-semibold rounded-xl hover:bg-whiskey-700 transition" %>

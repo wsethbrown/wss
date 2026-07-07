@@ -25,7 +25,8 @@
 
   <div class="relative z-10 mx-auto max-w-4xl px-4 py-20">
     <p class="eyebrow mb-4 text-whiskey-300/90">
-      <%= [@presentation.category.presence, @presentation.difficulty.presence, @presentation.duration.presence].compact.join(' · ') %>
+      <%= [@presentation.category.presence, @presentation.difficulty.presence, @presentation.duration.presence,
+           (@presentation.slide_images.attached? ? "#{@presentation.slide_images.count} slides" : nil)].compact.join(' · ') %>
     </p>
     <div class="rule-double mx-auto mb-8 w-20 text-whiskey-300"></div>
 
@@ -410,15 +411,41 @@
                   </p>
                 <% end %>
               <% end %>
-            <% elsif user_signed_in? %>
-              <!-- Not purchased yet -->
-              <%= link_to new_presentation_purchase_path(@presentation), class: "block w-full bg-whiskey-600 text-white font-semibold py-4 px-6 rounded-2xl hover:bg-whiskey-700 transition mb-4 text-center" do %>
-                <%= @presentation.free? ? 'Add to my library' : 'Get this deck' %>
+            <% end %>
+
+            <% unless owned_purchase %>
+              <%# What you get — an honest manifest built ONLY from what exists. %>
+              <% manifest = [
+                (@presentation.slide_images.attached? ? "The full deck — #{@presentation.slide_images.count} slides" : (@presentation.pdf_file.attached? ? "The full presentation file" : nil)),
+                ("The story — #{@presentation.reading_time} min read" if @presentation.content.present?),
+                ("Speaker script" if @presentation.speaker_notes.attached?),
+                ("Presentation outline" if @presentation.outline_file.attached?),
+                ("Printable whiskey list" if @presentation.recommendations_sheet.attached?),
+                ("Bottle list — #{@presentation.parsed_whiskey_recommendations.size} pours with tasting notes" if @presentation.parsed_whiskey_recommendations.any?)
+              ].compact %>
+              <% if manifest.any? %>
+                <div class="mb-6 rounded-2xl bg-whiskey-50 p-4">
+                  <h4 class="eyebrow mb-3 text-whiskey-700">What you get</h4>
+                  <ul class="space-y-2">
+                    <% manifest.each do |item| %>
+                      <li class="flex items-start gap-2 text-sm text-gray-700">
+                        <svg class="mt-0.5 h-4 w-4 flex-shrink-0 text-whiskey-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                        </svg>
+                        <%= item %>
+                      </li>
+                    <% end %>
+                  </ul>
+                </div>
               <% end %>
-            <% else %>
-              <!-- Signed out -->
-              <%= link_to auth_path, class: "block w-full bg-whiskey-600 text-white font-semibold py-4 px-6 rounded-2xl hover:bg-whiskey-700 transition mb-4 text-center" do %>
-                Sign in to get this deck
+              <% if user_signed_in? %>
+                <%= link_to new_presentation_purchase_path(@presentation), class: "block w-full bg-whiskey-600 text-white font-semibold py-4 px-6 rounded-2xl hover:bg-whiskey-700 transition mb-4 text-center" do %>
+                  <%= @presentation.free? ? 'Add to my library' : 'Get this deck' %>
+                <% end %>
+              <% else %>
+                <%= link_to auth_path, class: "block w-full bg-whiskey-600 text-white font-semibold py-4 px-6 rounded-2xl hover:bg-whiskey-700 transition mb-4 text-center" do %>
+                  Sign in to get this deck
+                <% end %>
               <% end %>
             <% end %>
 

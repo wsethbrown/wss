@@ -31,6 +31,11 @@ class Presentation < ApplicationRecord
   validates :category, length: { maximum: 100 }
   validates :difficulty, inclusion: { in: %w[Beginner Intermediate Advanced], allow_blank: true }
 
+  # Publishing gate: a deck cannot go live without the file buyers download.
+  # Validated on the draft->published transition only, so unrelated edits to
+  # legacy published records don't get stuck.
+  validate :deck_file_required_to_publish, if: -> { published? && will_save_change_to_published? }
+
   # File attachment validations
   validate :featured_image_validation
   validate :pdf_file_validation
@@ -248,6 +253,10 @@ class Presentation < ApplicationRecord
   end
 
   private
+
+  def deck_file_required_to_publish
+    errors.add(:base, "Attach the deck file (the presentation buyers download) before publishing") unless pdf_file.attached?
+  end
 
   def featured_image_validation
     return unless featured_image.attached?

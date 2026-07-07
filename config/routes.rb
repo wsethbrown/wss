@@ -88,6 +88,7 @@ Rails.application.routes.draw do
     get 'dashboard', to: 'dashboard#index'
     resources :presentations do
       collection { post :import; post :preview }
+      member { post :publish; post :unpublish }
     end
     resources :users, only: [:index, :show, :edit, :update]
     resources :subscriptions, only: [:index, :edit, :update] do

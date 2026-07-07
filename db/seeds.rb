@@ -87,7 +87,9 @@ if Rails.env.development?
       p.duration = presentation_data[:duration]
       p.difficulty = presentation_data[:difficulty]
       p.image = presentation_data[:image]
-      p.published = presentation_data[:published]
+      # Seed decks have no files; bypass the publish gate (dev-only shortcut).
+      p.save!(validate: false) if p.new_record?
+      p.update_columns(published: presentation_data[:published])
       
       # Add tasting notes for first presentation
       if presentation_data[:title] == "Introduction to Scotch Whisky"
