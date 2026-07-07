@@ -75,12 +75,30 @@
     <% end %>
 
     <% filtering = params[:search].present? || params[:category].present? || params[:difficulty].present? || params[:tag].present? %>
-    <div class="mb-8 flex items-baseline justify-between">
-      <p class="text-gray-600">
-        <%= pluralize(@presentations.total_count, 'deck') %><%= " matching your filters" if filtering %>
-      </p>
+    <%# Landing here from a deck's "Filed under" link must not feel like being
+        teleported to a random shelf: the header names the active filter, and
+        each filter chip carries its own ×. %>
+    <div class="mb-8 flex flex-wrap items-center justify-between gap-3">
+      <div class="flex flex-wrap items-center gap-2 text-gray-600">
+        <span><%= pluralize(@presentations.total_count, 'deck') %></span>
+        <% {
+          tag:        ->(v) { %(tagged “#{v}”) },
+          category:   ->(v) { v },
+          difficulty: ->(v) { v },
+          search:     ->(v) { %(matching “#{v}”) }
+        }.each do |param, label| %>
+          <% next if params[param].blank? %>
+          <span class="inline-flex items-center gap-1.5 rounded-full bg-whiskey-600 py-1 pl-3 pr-1.5 text-sm font-medium text-white">
+            <%= label.call(params[param]) %>
+            <%= link_to presentations_path(request.query_parameters.except(param.to_s, 'page')),
+                class: "rounded-full p-0.5 transition hover:bg-whiskey-500", "aria-label": "Remove this filter" do %>
+              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+            <% end %>
+          </span>
+        <% end %>
+      </div>
       <% if filtering %>
-        <%= link_to 'Clear filters', presentations_path, class: 'text-sm font-semibold text-whiskey-700 hover:text-whiskey-600' %>
+        <%= link_to 'Clear all filters', presentations_path, class: 'text-sm font-semibold text-whiskey-700 hover:text-whiskey-600' %>
       <% end %>
     </div>
 

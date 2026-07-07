@@ -23,13 +23,6 @@
       <p class="eyebrow text-whiskey-600"><%= deck.category.presence || 'Whiskey' %><%= " · #{deck.difficulty}" if deck.difficulty.present? %></p>
       <h3 class="mt-2 font-display text-xl font-semibold text-gray-900"><%= deck.title %></h3>
       <p class="mt-2 line-clamp-3 text-gray-600"><%= deck.excerpt(140) %></p>
-      <% if deck.tags.any? %>
-        <div class="mt-3 flex flex-wrap gap-1.5">
-          <% deck.tags.first(4).each do |tag| %>
-            <span class="rounded-full bg-whiskey-100 px-2 py-0.5 text-xs font-medium text-whiskey-800"><%= tag.name %></span>
-          <% end %>
-        </div>
-      <% end %>
       <div class="mt-auto flex items-center justify-between pt-6">
         <span class="font-semibold text-gray-900"><%= owned ? 'Read it again' : deck.formatted_price %></span>
         <span class="text-sm font-semibold text-whiskey-700">Read the story →</span>

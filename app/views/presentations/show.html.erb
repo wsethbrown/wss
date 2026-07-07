@@ -301,6 +301,19 @@
           </section>
         <% end %>
 
+        <%# Tags live here, not on library cards: they're a "where next?" device
+            for a reader who finished the teaser, each linking to the library
+            filtered by that tag. %>
+        <% if @presentation.tags.any? %>
+          <div class="mb-16 flex flex-wrap items-center gap-2">
+            <span class="eyebrow text-gray-400">Filed under</span>
+            <% @presentation.tags.each do |tag| %>
+              <%= link_to tag.name, presentations_path(tag: tag.name),
+                  class: "rounded-full bg-whiskey-100 px-3 py-1 text-sm font-medium text-whiskey-800 transition hover:bg-whiskey-200" %>
+            <% end %>
+          </div>
+        <% end %>
+
         <%# Reviews intentionally removed: the previous section rendered hard-coded
             fictional testimonials. When a real Review model exists, rebuild here. %>
       </div>
