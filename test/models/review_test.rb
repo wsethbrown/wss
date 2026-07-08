@@ -50,7 +50,7 @@ class ReviewTest < ActiveSupport::TestCase
       society: societies(:whiskey_lovers),
       organizer: users(:john),
       title: "Eagle Rare Re-tasting",
-      start_time: 1.day.from_now,
+      start_time: 3.days.from_now, # comfortably outside the 24h RSVP cutoff
       end_time: 1.day.from_now + 2.hours
     )
 
