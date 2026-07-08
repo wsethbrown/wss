@@ -72,6 +72,16 @@ class Bottles::EditsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "clearing a populated field proposes nothing instead of dead-ending on a 422" do
+    assert_no_difference "BottleEdit.count" do
+      post bottle_edits_path(@bottle), params: { bottle_edit: {
+        name: "", distillery: @bottle.distillery,
+        region: @bottle.region, style: @bottle.style, abv: @bottle.abv.to_s
+      } }
+    end
+    assert_redirected_to bottle_path(@bottle)
+  end
+
   test "a different value on an already-proposed field replaces the user's pending suggestion" do
     edit = BottleEdit.create!(bottle: @bottle, user: users(:john), field: "region", proposed_value: "Highlands")
     assert_no_difference "BottleEdit.count" do

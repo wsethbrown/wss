@@ -19,7 +19,10 @@ class BottleEdit < ApplicationRecord
 
   validates :field, inclusion: { in: FIELDS }
   validates :status, inclusion: { in: STATUSES }
-  validates :proposed_value, presence: true
+  # Length cap: the whitelisted bottle columns cap at 200; without a cap
+  # here a signed-in user could store multi-MB strings that the admin
+  # proposals page then renders inline.
+  validates :proposed_value, presence: true, length: { maximum: 500 }
   validates :user_id, uniqueness: {
     scope: [ :bottle_id, :field ],
     conditions: -> { where(status: "pending") },

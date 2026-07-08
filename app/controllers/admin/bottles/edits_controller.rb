@@ -41,7 +41,10 @@ class Admin::Bottles::EditsController < Admin::BaseController
     @bottle = Bottle.find_by!(slug: params[:bottle_id])
   end
 
+  # Scoped to pending: acting on an already-resolved proposal from a stale
+  # admin page must 404, not flip an applied row to rejected (which would
+  # leave applied_at set on a "rejected" row — audit trail mangled).
   def set_edit
-    @edit = @bottle.bottle_edits.find(params[:id])
+    @edit = @bottle.bottle_edits.pending.find(params[:id])
   end
 end

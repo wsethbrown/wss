@@ -64,6 +64,12 @@ class BottleEditTest < ActiveSupport::TestCase
     assert_equal 3, Rails.application.config.x.bottle_edits.auto_apply_threshold
   end
 
+  test "proposed_value is capped so nobody can store a multi-megabyte proposal" do
+    edit = BottleEdit.new(bottle: @bottle, user: users(:john), field: "name", proposed_value: "a" * 501)
+    assert_not edit.valid?
+    assert_includes edit.errors[:proposed_value], "is too long (maximum is 500 characters)"
+  end
+
   test "proposed_value normalizes on save so every write path groups identically" do
     edit = BottleEdit.create!(bottle: @bottle, user: users(:john), field: "abv", proposed_value: "45")
     assert_equal "45.0", edit.proposed_value

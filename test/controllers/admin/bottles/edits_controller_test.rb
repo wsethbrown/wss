@@ -69,4 +69,22 @@ class Admin::Bottles::EditsControllerTest < ActionDispatch::IntegrationTest
     post apply_admin_bottle_edit_path(other_bottle, edit)
     assert_response :not_found
   end
+
+  test "rejecting an already-resolved proposal from a stale page 404s instead of mangling the audit trail" do
+    edit = BottleEdit.create!(bottle: @bottle, user: users(:john), field: "region", proposed_value: "Highlands")
+    edit.update!(status: "applied", applied_at: Time.current, applied_by: users(:admin))
+
+    delete admin_bottle_edit_path(@bottle, edit)
+    assert_response :not_found
+    assert_equal "applied", edit.reload.status
+  end
+
+  test "applying an already-resolved proposal from a stale page 404s" do
+    edit = BottleEdit.create!(bottle: @bottle, user: users(:john), field: "region", proposed_value: "Highlands")
+    edit.update!(status: "rejected")
+
+    post apply_admin_bottle_edit_path(@bottle, edit)
+    assert_response :not_found
+    assert_not_equal "Highlands", @bottle.reload.region
+  end
 end

@@ -18,6 +18,10 @@ class Bottles::EditsController < ApplicationController
       next if submitted.nil?
 
       normalized = BottleEdits::Normalize.for_storage(field, submitted)
+      # Clearing a field isn't a proposable correction — a blank value would
+      # fail the row's presence validation and dead-end the whole submit.
+      next if normalized.blank?
+
       current = BottleEdits::Normalize.for_storage(field, @bottle[field])
       next if normalized == current
 
