@@ -333,7 +333,15 @@ db_operations() {
             mkdir -p tmp/db_backups
             local backup_file="tmp/db_backups/wss_development_$(date +%Y%m%d_%H%M%S).sql.gz"
             log_info "Backing up wss_development to ${backup_file}..."
+            set -o pipefail
             docker-compose exec -T db pg_dump -U wss wss_development | gzip > "$backup_file"
+            local dump_status=$?
+            set +o pipefail
+            if [[ $dump_status -ne 0 ]]; then
+                log_error "pg_dump failed (exit ${dump_status}) — backup at ${backup_file} is incomplete/empty and has been removed"
+                rm -f "$backup_file"
+                exit 1
+            fi
             log_info "Backup complete: $(du -h "$backup_file" | cut -f1)"
             ;;
         reset)
