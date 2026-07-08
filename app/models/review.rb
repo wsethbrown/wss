@@ -1,10 +1,17 @@
 class Review < ApplicationRecord
   VALID_RATINGS = (1..10).map { |n| n / 2.0 }.freeze # 0.5 .. 5.0 in half steps
+  MAX_IMAGES = 3
+  MAX_IMAGE_SIZE = 15.megabytes
+  ALLOWED_IMAGE_TYPES = %w[image/jpeg image/jpg image/png image/gif image/webp].freeze
 
   belongs_to :user
   belongs_to :bottle
   belongs_to :event, optional: true
   has_many :review_votes, dependent: :destroy
+
+  has_many_attached :images do |attachable|
+    attachable.variant :thumb, resize_to_fill: [400, 400], saver: { quality: 80 }
+  end
 
   validates :rating, presence: true, inclusion: { in: VALID_RATINGS }
   validates :notes, length: { maximum: 5_000 }
@@ -15,6 +22,7 @@ class Review < ApplicationRecord
     message: "already has your review — edit it instead"
   }
   validate :event_review_gates, on: :create, if: -> { event.present? }
+  validate :images_are_valid
 
   scope :recent_first, -> { order(created_at: :desc) }
 
@@ -118,7 +126,22 @@ class Review < ApplicationRecord
     end
   }
 
+  # First upload wins — shown on the review page and feeds Bottle#display_image.
+  def hero_image
+    images.attached? ? images.first : nil
+  end
+
   private
+
+  def images_are_valid
+    return unless images.attached?
+
+    errors.add(:images, "can have at most #{MAX_IMAGES} photos") if images.size > MAX_IMAGES
+    images.each do |image|
+      errors.add(:images, "must be an image (JPEG, PNG, GIF, or WEBP)") unless image.content_type.in?(ALLOWED_IMAGE_TYPES)
+      errors.add(:images, "each photo must be #{MAX_IMAGE_SIZE / 1.megabyte}MB or smaller") if image.byte_size > MAX_IMAGE_SIZE
+    end
+  end
 
   # Event reviews are the society's record of the night — they only exist for
   # bottles that were actually poured, written by people who actually said
