@@ -39,7 +39,7 @@
     <h1 class="font-display text-4xl font-semibold leading-tight text-cream md:text-6xl">
       <%= @presentation.title %>
     </h1>
-    <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-cream/70 md:text-xl">
+    <p class="mx-auto mt-6 max-w-2xl whitespace-pre-line text-lg leading-relaxed text-cream/70 md:text-xl">
       <%= @presentation.description %>
     </p>
 
@@ -162,7 +162,7 @@
                 <% end %>
               <% end %>
             <% else %>
-              <p class="prose-deck"><%= @presentation.description %></p>
+              <p class="prose-deck whitespace-pre-line"><%= @presentation.description %></p>
             <% end %>
           </div>
         </section>
