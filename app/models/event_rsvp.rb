@@ -9,6 +9,7 @@ class EventRsvp < ApplicationRecord
   validates :user_id, uniqueness: { scope: :event_id, message: 'has already RSVPed to this event' }
   validates :status, presence: true, inclusion: { in: statuses.keys }
   validate :event_not_past
+  validate :rsvp_window_open
 
   # Note: Rails generates scopes automatically for enums
   # .yes, .maybe, .no are available
@@ -32,7 +33,7 @@ class EventRsvp < ApplicationRecord
   end
 
   def can_change_response?
-    event.upcoming?
+    event.upcoming? && !event.rsvp_closed?
   end
 
   private
@@ -41,6 +42,14 @@ class EventRsvp < ApplicationRecord
     return unless event
     if event.past?
       errors.add(:base, 'Cannot RSVP to past events')
+    end
+  end
+
+  # The kitchen needs a headcount: RSVPs close a day before the night.
+  def rsvp_window_open
+    return unless event
+    if event.rsvp_closed? && !event.past?
+      errors.add(:base, 'RSVPs close 24 hours before the event')
     end
   end
 end

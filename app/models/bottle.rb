@@ -13,6 +13,8 @@ class Bottle < ApplicationRecord
   def to_param = slug
 
   def self.search(term)
+    return none if term.blank? # '%%' would match every bottle
+
     q = "%#{sanitize_sql_like(term.to_s.strip)}%"
     where("bottles.name ILIKE :q OR bottles.distillery ILIKE :q", q: q)
   end

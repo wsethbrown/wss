@@ -94,9 +94,13 @@ class Event < ApplicationRecord
     (end_time - start_time) / 1.hour
   end
 
+  def rsvp_closed?
+    start_time <= 24.hours.from_now
+  end
+
   def can_rsvp?(user)
     return false unless user
-    return false if past?
+    return false if past? || rsvp_closed?
     !event_rsvps.exists?(user: user)
   end
 

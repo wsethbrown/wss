@@ -50,3 +50,22 @@ class EventReviewTest < ActiveSupport::TestCase
     assert_includes review.errors[:base], "The pours haven't been revealed yet"
   end
 end
+
+class RsvpCutoffTest < ActiveSupport::TestCase
+  test "RSVPs close 24 hours before the event" do
+    society = societies(:single_malt)
+    soon = Event.create!(society: society, organizer: users(:admin), title: "Tomorrow Night",
+                         location: "The bar", description: "Short notice",
+                         start_time: 12.hours.from_now, end_time: 14.hours.from_now)
+    rsvp = EventRsvp.new(event: soon, user: users(:john), status: "yes")
+    assert_not rsvp.valid?
+    assert_includes rsvp.errors[:base], "RSVPs close 24 hours before the event"
+    assert soon.rsvp_closed?
+    assert_not soon.can_rsvp?(users(:john))
+  end
+
+  test "RSVPs stay open with more than a day's notice" do
+    rsvp = EventRsvp.new(event: events(:mystery_flight), user: users(:jane), status: "maybe")
+    assert rsvp.valid?, rsvp.errors.full_messages.to_sentence
+  end
+end
