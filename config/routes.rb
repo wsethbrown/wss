@@ -117,7 +117,7 @@ Rails.application.routes.draw do
     resources :activities, only: [:index, :show]
 
     # Bottles moderation
-    resources :bottles, only: [:index, :show] do
+    resources :bottles, only: [:index, :show, :edit, :update] do
       member do
         patch :pin_image
         delete :unpin_image

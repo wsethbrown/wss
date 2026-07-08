@@ -19,6 +19,13 @@ class BottleTest < ActiveSupport::TestCase
     assert_equal "lagavulin-16-2", second.slug
   end
 
+  test "updating name or distillery after creation does not regenerate the slug" do
+    bottle = bottles(:eagle_rare)
+    original_slug = bottle.slug
+    bottle.update!(name: "Eagle Rare Renamed", distillery: "New Distillery Co")
+    assert_equal original_slug, bottle.slug
+  end
+
   test "search matches name and distillery case-insensitively" do
     eagle = bottles(:eagle_rare)
     assert_includes Bottle.search("eagle"), eagle

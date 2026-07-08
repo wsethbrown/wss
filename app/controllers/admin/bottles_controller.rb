@@ -1,5 +1,6 @@
 # app/controllers/admin/bottles_controller.rb
-# Pin/unpin the label image. Delete flows live in Bottles::ReviewsController.
+# Pin/unpin the label image, full-field edit. Delete flows live in
+# Bottles::ReviewsController. Ghost-edit proposal review lives on #show.
 class Admin::BottlesController < Admin::BaseController
   before_action :set_bottle, except: [ :index ]
 
@@ -9,6 +10,17 @@ class Admin::BottlesController < Admin::BaseController
 
   def show
     @reviews = @bottle.reviews.includes(:user, images_attachments: :blob).order(created_at: :desc)
+  end
+
+  def edit
+  end
+
+  def update
+    if @bottle.update(bottle_edit_params)
+      redirect_to admin_bottle_path(@bottle), notice: "Bottle updated."
+    else
+      render :edit, status: :unprocessable_entity
+    end
   end
 
   def pin_image
@@ -33,5 +45,11 @@ class Admin::BottlesController < Admin::BaseController
 
   def bottle_params
     params.require(:bottle).permit(:pinned_label_image)
+  end
+
+  # Same five fields the ghost-edit whitelist uses (Task 2) — slug and
+  # created_by_id are deliberately never permitted here.
+  def bottle_edit_params
+    params.require(:bottle).permit(:name, :distillery, :region, :style, :abv)
   end
 end

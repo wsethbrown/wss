@@ -96,4 +96,49 @@ class Admin::BottlesControllerTest < ActionDispatch::IntegrationTest
       assert_response :not_found
     end
   end
+
+  test "admin can view the edit form" do
+    get edit_admin_bottle_path(bottles(:eagle_rare))
+    assert_response :success
+    assert_select "input[name='bottle[name]'][value=?]", bottles(:eagle_rare).name
+  end
+
+  test "admin can update bottle fields" do
+    bottle = bottles(:eagle_rare)
+    patch admin_bottle_path(bottle), params: { bottle: {
+      name: "Eagle Rare 10 Year", distillery: "Buffalo Trace Distillery",
+      region: "Kentucky", style: "Bourbon", abv: "45.5"
+    } }
+    assert_redirected_to admin_bottle_path(bottle)
+    bottle.reload
+    assert_equal "Eagle Rare 10 Year", bottle.name
+    assert_equal "Buffalo Trace Distillery", bottle.distillery
+    assert_equal "45.5".to_d, bottle.abv
+  end
+
+  test "admin edit renaming a bottle does not change its slug" do
+    bottle = bottles(:eagle_rare)
+    original_slug = bottle.slug
+    patch admin_bottle_path(bottle), params: { bottle: { name: "Totally Different Name" } }
+    assert_equal original_slug, bottle.reload.slug
+    assert_equal "Totally Different Name", bottle.name
+  end
+
+  test "admin update with invalid data re-renders the edit form" do
+    bottle = bottles(:eagle_rare)
+    patch admin_bottle_path(bottle), params: { bottle: { name: "", abv: "500" } }
+    assert_response :unprocessable_entity
+    assert_not_equal "", bottle.reload.name
+  end
+
+  test "non-admin cannot edit or update a bottle" do
+    sign_out users(:admin)
+    sign_in users(:john)
+    bottle = bottles(:eagle_rare)
+    get edit_admin_bottle_path(bottle)
+    assert_redirected_to root_path
+    patch admin_bottle_path(bottle), params: { bottle: { name: "Hijacked" } }
+    assert_redirected_to root_path
+    assert_not_equal "Hijacked", bottle.reload.name
+  end
 end

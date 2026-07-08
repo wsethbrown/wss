@@ -10,6 +10,7 @@
     <h1 class="text-3xl font-bold text-gray-900"><%= @bottle.name %></h1>
   </div>
   <%= link_to "View bottle", bottle_path(@bottle), class: "text-whiskey-600 hover:text-whiskey-700" %>
+  <%= link_to "Edit bottle", edit_admin_bottle_path(@bottle), class: "ml-4 text-whiskey-600 hover:text-whiskey-700" %>
 </div>
 
 <!-- Label Image Card -->
