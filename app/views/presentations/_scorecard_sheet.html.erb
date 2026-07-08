@@ -1,0 +1,31 @@
+<%# locals: presentation, pours (array of {name,region,style,price,notes}), blank %>
+<header class="flex items-start justify-between gap-6 border-b border-gray-200 pb-5">
+  <div class="min-w-0">
+    <p class="font-sans text-xs font-semibold uppercase tracking-[0.2em] text-whiskey-700">Tasting Scorecard</p>
+    <h1 class="mt-1 font-display text-3xl font-semibold leading-tight text-gray-900">
+      <%= blank ? "Your tasting night" : presentation.title %>
+    </h1>
+    <p class="mt-1 text-sm text-gray-500">
+      <%= blank ? "Write in each pour as you go, then rate it." : "Rate each pour as you taste it." %>
+    </p>
+  </div>
+  <div class="shrink-0 text-right">
+    <%= image_tag "wss-logo.jpg", alt: "Whiskey Share Society", class: "ml-auto h-14 w-auto rounded" %>
+  </div>
+</header>
+
+<div class="mt-4 flex flex-wrap items-center justify-between gap-x-6 gap-y-2 text-xs text-gray-500">
+  <span class="flex items-center gap-1">Taster<span class="inline-block w-40 border-b border-gray-300">&nbsp;</span></span>
+  <span class="flex items-center gap-1">Date<span class="inline-block w-28 border-b border-gray-300">&nbsp;</span></span>
+  <span class="flex items-center gap-1.5">
+    Rate 1<span class="pip"></span>&nbsp;&rarr;&nbsp;5<span class="pip" style="background:#7a5c34"></span>
+  </span>
+</div>
+
+<div class="mt-6">
+  <%= render "presentations/scorecard_table", pours: pours, blank_rows: 8 %>
+</div>
+
+<footer class="mt-8 border-t border-gray-200 pt-3 text-center text-xs text-gray-400">
+  whiskeysharesociety.com<%= blank ? "" : " · #{presentation.title}" %>
+</footer>

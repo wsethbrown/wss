@@ -141,6 +141,8 @@ Rails.application.routes.draw do
   # a single flow for credit, paid (Stripe checkout), and free decks.
   resources :presentations do
     member { get :present }
+    # Printable tasting scorecard — generated from the pour list, print-to-PDF.
+    member { get :scorecard }
     resources :purchases, only: [ :new, :create ], controller: 'presentations/purchases'
     resources :downloads, only: [], controller: 'presentations/downloads' do
       collection do
