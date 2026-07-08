@@ -154,6 +154,10 @@ class User < ApplicationRecord
 
   def favorite?(record) = favorites.exists?(favoritable: record)
 
+  # How many members follow (favorite) this user. The count is public; who
+  # follows whom stays private — favorites are only ever listed to their owner.
+  def followers_count = favorited_by_records.count
+
   def rsvped_to?(event)
     event_rsvps.exists?(event: event, status: "confirmed")
   end
