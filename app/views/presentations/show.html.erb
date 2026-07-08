@@ -217,18 +217,21 @@
           </section>
         <% end %>
 
-        <!-- The Slides — rendered pages of the actual deck. Non-owners see the
-             first three; owners see every slide. Falls back to the text outline
-             (and legacy preview images) when no renders exist. -->
+        <!-- The Slides — a teaser for non-owners ONLY. We never show the whole
+             deck here: the preview caps below the slide count and the last one
+             fades into the buy prompt. Owners skip this section entirely — they
+             open the deck itself. Falls back to the text outline when no
+             renders exist. -->
+        <% unless @full_story %>
         <% if @presentation.slide_images.attached? %>
           <section class="mb-16">
             <p class="eyebrow text-whiskey-600 mb-2">The slides</p>
-            <h2 class="font-display text-3xl font-semibold text-gray-900 mb-3">Inside the deck, as presented</h2>
+            <h2 class="font-display text-3xl font-semibold text-gray-900 mb-3">Inside the deck</h2>
             <div class="rule-double text-whiskey-800 mb-8"></div>
             <% slides = @presentation.slide_images.order(:id) %>
             <% count = @presentation.effective_preview_slide_count %>
-            <% visible = @full_story ? slides : slides.first(count) %>
-            <% teasing = !@full_story && slides.size > count %>
+            <% visible = slides.first(count) %>
+            <% teasing = slides.size > count %>
             <div class="space-y-6">
               <% visible.each_with_index do |slide, i| %>
                 <% fade = teasing && i == visible.size - 1 %>
@@ -271,6 +274,7 @@
               <% end %>
             </div>
           </section>
+        <% end %>
         <% end %>
 
         <!-- Whiskey Recommendations -->

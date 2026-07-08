@@ -31,12 +31,22 @@ class DeckSlidePreviewTest < ActionDispatch::IntegrationTest
     assert_select "p", text: "1 more slides in the full deck."
   end
 
-  test "an owner or admin sees the whole deck with no paywall fade" do
+  test "the preview never reveals the whole deck, even if the count is set too high" do
+    deck = build_deck(preview_count: 99, slides: 3)
+
+    get presentation_path(deck)
+    assert_response :success
+    # Capped at total - 1: one slide is always withheld behind the fade.
+    assert_select "p", text: "1 more slides in the full deck."
+  end
+
+  test "an owner or admin sees no slide-preview section at all — they open the deck itself" do
     deck = build_deck(preview_count: 2, slides: 5)
     sign_in users(:admin)
 
     get presentation_path(deck)
     assert_response :success
+    assert_select "h2", text: "Inside the deck", count: 0
     assert_select "p", text: /more slides in the full deck/, count: 0
   end
 

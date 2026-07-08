@@ -260,13 +260,15 @@ class Presentation < ApplicationRecord
   end
 
   # How many rendered slides a non-buyer sees before the paywall fade.
-  # Clamped to the deck's actual slide count (min 1) so a stale or oversized
-  # admin value never over- or under-reveals. 0 when nothing is rendered yet.
+  # We never reveal the whole deck for free, so this always withholds at least
+  # the last slide (capped at total - 1). 0 when nothing is rendered yet; a
+  # lone-slide deck shows its one slide (nothing to hold back).
   def effective_preview_slide_count
     total = slide_images.attached? ? slide_images.count : 0
     return 0 if total.zero?
+    return 1 if total == 1
 
-    (preview_slide_count || 3).clamp(1, total)
+    [preview_slide_count || 3, total - 1].min.clamp(1, total - 1)
   end
 
   def slide_render_pending?
