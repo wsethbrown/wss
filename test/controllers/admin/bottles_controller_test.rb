@@ -58,4 +58,36 @@ class Admin::BottlesControllerTest < ActionDispatch::IntegrationTest
     get admin_bottles_path
     assert_redirected_to root_path
   end
+
+  test "non-admin cannot pin, unpin, or delete" do
+    sign_out users(:admin)
+    sign_in users(:john)
+    review = reviews(:john_eagle_rare)
+    bottle = review.bottle
+    review.images.attach(io: File.open(file_fixture("sample_review.jpg")), filename: "x.jpg", content_type: "image/jpeg")
+
+    assert_no_difference "Review.count" do
+      patch pin_image_admin_bottle_path(bottle), params: { bottle: { pinned_label_image: image_upload } }
+      assert_redirected_to root_path
+      delete unpin_image_admin_bottle_path(bottle)
+      assert_redirected_to root_path
+      delete destroy_image_admin_bottle_review_path(bottle, review)
+      assert_redirected_to root_path
+      delete admin_bottle_review_path(bottle, review)
+      assert_redirected_to root_path
+    end
+    assert_not bottle.reload.pinned_label_image.attached?
+    assert review.reload.images.attached?
+  end
+
+  test "a review addressed under the wrong bottle's URL is not found" do
+    other_bottle = bottles(:lagavulin)
+    review = reviews(:john_eagle_rare)
+    assert_not_equal other_bottle, review.bottle
+
+    assert_no_difference "Review.count" do
+      delete admin_bottle_review_path(other_bottle, review)
+      assert_response :not_found
+    end
+  end
 end

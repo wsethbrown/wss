@@ -4,7 +4,7 @@ class Admin::BottlesController < Admin::BaseController
   before_action :set_bottle, except: [:index]
 
   def index
-    @bottles = Bottle.order(:name)
+    @bottles = Bottle.with_score.order(:name)
   end
 
   def show
@@ -12,7 +12,7 @@ class Admin::BottlesController < Admin::BaseController
   end
 
   def pin_image
-    if params[:bottle][:pinned_label_image].blank?
+    if params.dig(:bottle, :pinned_label_image).blank?
       redirect_to admin_bottle_path(@bottle), alert: "Choose an image to pin."
     else
       @bottle.pinned_label_image.attach(bottle_params[:pinned_label_image])

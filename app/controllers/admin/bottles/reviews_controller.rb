@@ -4,19 +4,21 @@ class Admin::Bottles::ReviewsController < Admin::BaseController
   before_action :set_review
 
   def destroy
-    bottle = @review.bottle
     @review.destroy!
-    redirect_to admin_bottle_path(bottle), notice: "Review deleted."
+    redirect_to admin_bottle_path(@bottle), notice: "Review deleted."
   end
 
   def destroy_image
     @review.images.purge
-    redirect_to admin_bottle_path(@review.bottle), notice: "Review photos removed."
+    redirect_to admin_bottle_path(@bottle), notice: "Review photos removed."
   end
 
   private
 
+  # Scoped through the URL's bottle: a review addressed under the wrong
+  # bottle's URL must 404, not act on (and reveal) another bottle's review.
   def set_review
-    @review = Review.find(params[:id])
+    @bottle = Bottle.find_by!(slug: params[:bottle_id])
+    @review = @bottle.reviews.find(params[:id])
   end
 end
