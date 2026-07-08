@@ -17,21 +17,25 @@ class FavoritesController < ApplicationController
     favorite = current_user.favorites.find(params[:id]) # scoped to current_user: 404s on someone else's row
     favoritable = favorite.favoritable
     favorite.destroy
-    swap_button_or_redirect favoritable
+    swap_button_or_redirect favoritable, removed: favorite
   end
 
   private
 
   # The button flips in place (star fills/empties) — that IS the feedback,
   # so success carries no flash. Failures still redirect with an alert.
-  def swap_button_or_redirect(favoritable)
+  # On unfollow, a remove stream also clears the row on Account → Followed;
+  # each stream no-ops on pages where its target frame isn't present.
+  def swap_button_or_redirect(favoritable, removed: nil)
     respond_to do |format|
       format.turbo_stream do
-        render turbo_stream: turbo_stream.replace(
+        streams = [ turbo_stream.replace(
           helpers.dom_id(favoritable, :favorite),
           partial: "favorites/button",
           locals: { favoritable: favoritable, tone: params[:tone] == "dark" ? :dark : :light }
-        )
+        ) ]
+        streams << turbo_stream.remove(helpers.dom_id(removed)) if removed
+        render turbo_stream: streams
       end
       format.html { redirect_back_or_to favoritable }
     end

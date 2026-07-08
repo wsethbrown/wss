@@ -67,5 +67,8 @@ class BottleEditTest < ActiveSupport::TestCase
   test "proposed_value normalizes on save so every write path groups identically" do
     edit = BottleEdit.create!(bottle: @bottle, user: users(:john), field: "abv", proposed_value: "45")
     assert_equal "45.0", edit.proposed_value
+
+    trailing_zeros = BottleEdit.create!(bottle: @bottle, user: users(:jane), field: "abv", proposed_value: "45.00")
+    assert_equal "45.0", trailing_zeros.proposed_value
   end
 end

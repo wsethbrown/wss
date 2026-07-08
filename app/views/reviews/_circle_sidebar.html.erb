@@ -1,26 +1,14 @@
-<%# Locals: circle_reviews, circle_societies, circle_users (owner's own view —
-    favorites are private, and societies arrive policy-filtered). %>
-<% in_circle = circle_societies.any? || circle_users.any? %>
+<%# Locals: circle_reviews, in_circle (does the owner follow anyone?).
+    Who exactly is followed lives on Account → Followed, not here. %>
 <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
   <p class="eyebrow text-whiskey-600">From your circle</p>
   <h2 class="mb-4 mt-1 font-display text-lg font-semibold text-gray-900">Circle</h2>
-
-  <% if in_circle %>
-    <div class="mb-4 flex flex-wrap gap-1.5">
-      <% circle_societies.each do |society| %>
-        <%= link_to society.name, society_path(society), class: "rounded-full bg-whiskey-100 px-2.5 py-0.5 text-xs font-medium text-whiskey-800 transition hover:bg-whiskey-200" %>
-      <% end %>
-      <% circle_users.each do |member| %>
-        <%= link_to "#{member.first_name} #{member.last_name}", profile_path(member), class: "rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-700 transition hover:bg-gray-200" %>
-      <% end %>
-    </div>
-  <% end %>
-
   <% if circle_reviews.any? %>
     <div class="space-y-4"><%= render partial: "reviews/circle_row", collection: circle_reviews, as: :review %></div>
     <%= link_to "See all →", reviews_path(feed: "circle"), class: "mt-4 block text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>
   <% elsif in_circle %>
     <p class="text-sm text-gray-500">No pours from your circle yet — their next tastings will land here.</p>
+    <%= link_to "Manage who you follow", account_path(anchor: "followed"), class: "mt-2 inline-block text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>
   <% else %>
     <p class="text-sm text-gray-500">Favorite a society or a fellow taster to see their pours here.</p>
     <%= link_to "Browse societies", societies_path, class: "mt-2 inline-block text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>

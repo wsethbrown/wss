@@ -24,13 +24,9 @@ class ReviewsController < ApplicationController
         Review.includes(:user, :bottle, event: [:society, :event_bottles]).recent_first.limit(10)
       end
     @circle_reviews = current_user ? Review.for_circle(current_user) : nil
-    # Who's in the circle, shown even before they have pours — the feedback
-    # that favoriting worked. Societies re-checked at render time so one you
-    # can no longer see drops out (same staleness rule as the profile).
-    if current_user
-      @circle_societies = current_user.favorited_societies.order(:name).select { |s| policy(s).show? }
-      @circle_users = current_user.favorited_users.order(:first_name, :last_name)
-    end
+    # Distinguishes "nobody followed yet" from "followed, but no pours yet"
+    # in the circle empty states. Managing follows lives on Account → Followed.
+    @in_circle = current_user ? current_user.favorites.exists? : false
     @feed = params[:feed] if %w[circle hot].include?(params[:feed])
     @circle_feed_reviews = Review.for_circle(current_user, limit: 50) if @feed == "circle" && current_user
     @hot_reviews = Review.hot_ranked if @feed == "hot"

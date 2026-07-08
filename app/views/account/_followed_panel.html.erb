@@ -1,0 +1,44 @@
+<%# Extracted-panel pattern (account tab: followed). The one place to manage
+    favorites: unfollow in place, or click through to the society/profile.
+    Favorites are private to the owner; society rows re-check visibility so a
+    society you can no longer see drops out rather than leaking its name. %>
+        <div id="followed-content" class="tab-content hidden min-h-[600px]">
+          <div class="space-y-8">
+            <div class="pb-6 border-b border-gray-200">
+              <h2 class="text-2xl font-bold text-gray-900 mb-2">Followed</h2>
+              <p class="text-gray-600">Societies and tasters whose pours land in your circle</p>
+            </div>
+
+            <% favorites = current_user.favorites.includes(:favoritable).order(created_at: :desc) %>
+            <% visible = favorites.select { |f| !f.favoritable.is_a?(Society) || Pundit.policy(current_user, f.favoritable).show? } %>
+            <% if visible.any? %>
+              <div class="divide-y divide-gray-100 rounded-2xl border border-gray-200 bg-white shadow-sm">
+                <% visible.each do |favorite| %>
+                  <%= turbo_frame_tag dom_id(favorite) do %>
+                    <div class="flex items-center justify-between gap-4 px-5 py-4">
+                      <% if favorite.favoritable.is_a?(Society) %>
+                        <%= link_to society_path(favorite.favoritable), class: "min-w-0 flex-1", data: { turbo_frame: "_top" } do %>
+                          <p class="truncate font-semibold text-gray-900"><%= favorite.favoritable.name %></p>
+                          <p class="text-sm text-gray-500">Society</p>
+                        <% end %>
+                      <% else %>
+                        <%= link_to profile_path(favorite.favoritable), class: "min-w-0 flex-1", data: { turbo_frame: "_top" } do %>
+                          <p class="truncate font-semibold text-gray-900"><%= favorite.favoritable.first_name %> <%= favorite.favoritable.last_name %></p>
+                          <p class="text-sm text-gray-500">Taster</p>
+                        <% end %>
+                      <% end %>
+                      <%= button_to "Unfollow", favorite_path(favorite), method: :delete,
+                          class: "shrink-0 cursor-pointer rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-600 transition hover:border-red-300 hover:text-red-700" %>
+                    </div>
+                  <% end %>
+                <% end %>
+              </div>
+            <% else %>
+              <div class="rounded-2xl border border-gray-200 bg-white p-8 text-center shadow-sm">
+                <p class="text-gray-600">You're not following anyone yet.</p>
+                <p class="mt-1 text-sm text-gray-500">Favorite a society or a fellow taster and their pours will show up in your circle on the tasting record.</p>
+                <%= link_to "Browse societies", societies_path, class: "mt-4 inline-block text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>
+              </div>
+            <% end %>
+          </div>
+        </div>

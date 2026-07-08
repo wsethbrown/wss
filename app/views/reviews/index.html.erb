@@ -142,7 +142,7 @@
             <h2 class="mb-4 mt-1 font-display text-lg font-semibold text-gray-900">Your full circle feed</h2>
             <% if @circle_feed_reviews.any? %>
               <div class="space-y-4"><%= render partial: "reviews/circle_row", collection: @circle_feed_reviews, as: :review %></div>
-            <% elsif @circle_societies.any? || @circle_users.any? %>
+            <% elsif @in_circle %>
               <p class="text-sm text-gray-500">No pours from your circle yet — their next tastings will land here.</p>
             <% else %>
               <p class="text-sm text-gray-500">Favorite a society or a fellow taster to see their pours here.</p>
@@ -150,8 +150,7 @@
             <%= link_to "← Back to all tastings", reviews_path, class: "mt-4 block text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>
           </div>
         <% else %>
-          <%= render "reviews/circle_sidebar", circle_reviews: @circle_reviews,
-                     circle_societies: @circle_societies, circle_users: @circle_users %>
+          <%= render "reviews/circle_sidebar", circle_reviews: @circle_reviews, in_circle: @in_circle %>
         <% end %>
       </div>
     <% end %>
