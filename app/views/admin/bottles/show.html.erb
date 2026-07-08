@@ -42,6 +42,38 @@
   </div>
 </div>
 
+<!-- Pending Corrections -->
+<% if @pending_edits.any? %>
+  <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm mb-6">
+    <h2 class="text-lg font-semibold text-gray-900 mb-6">Suggested Corrections</h2>
+    <% @pending_edits.each do |field, edits| %>
+      <div class="mb-6 last:mb-0">
+        <h3 class="text-sm font-semibold text-gray-900 mb-3 capitalize"><%= field %></h3>
+        <div class="divide-y divide-gray-100 rounded-lg border border-gray-200">
+          <% edits.group_by(&:proposed_value).each do |value, value_edits| %>
+            <div class="flex items-center justify-between gap-4 p-4">
+              <div>
+                <p class="font-medium text-gray-900"><%= value %></p>
+                <p class="mt-1 text-sm text-gray-600">
+                  Proposed by <%= value_edits.map { |e| e.user.full_name }.to_sentence %>
+                  (<%= pluralize(value_edits.size, "vote") %>)
+                </p>
+              </div>
+              <div class="flex shrink-0 gap-2">
+                <%= button_to "Apply", apply_admin_bottle_edit_path(@bottle, value_edits.first), method: :post,
+                    class: "px-3 py-1 bg-green-50 text-green-700 font-medium rounded text-sm hover:bg-green-100 cursor-pointer" %>
+                <%= button_to "Reject", admin_bottle_edit_path(@bottle, value_edits.first), method: :delete,
+                    data: { turbo_confirm: "Reject this proposal?" },
+                    class: "px-3 py-1 bg-red-50 text-red-700 font-medium rounded text-sm hover:bg-red-100 cursor-pointer" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+<% end %>
+
 <!-- Reviews List -->
 <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
   <h2 class="text-lg font-semibold text-gray-900 mb-6">Reviews</h2>

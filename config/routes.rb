@@ -125,6 +125,9 @@ Rails.application.routes.draw do
       resources :reviews, only: [:destroy], module: :bottles do
         member { delete :destroy_image }
       end
+      resources :edits, only: [:destroy], module: :bottles do
+        member { post :apply }
+      end
     end
 
     # Analytics routes

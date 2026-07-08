@@ -10,6 +10,7 @@ class Admin::BottlesController < Admin::BaseController
 
   def show
     @reviews = @bottle.reviews.includes(:user, images_attachments: :blob).order(created_at: :desc)
+    @pending_edits = @bottle.bottle_edits.pending.includes(:user).group_by(&:field)
   end
 
   def edit
