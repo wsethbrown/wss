@@ -91,6 +91,7 @@
         <% end %>
       <% end %>
     </div>
+    <div class="mt-8"><%= paginate @bottles, param_name: :bottle_page if @bottles.respond_to?(:total_pages) %></div>
 
     <% if @societies.any? %>
       <div class="mt-12">

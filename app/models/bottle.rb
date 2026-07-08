@@ -112,6 +112,54 @@ class Bottle < ApplicationRecord
       end
   end
 
+  # Sets the same memo #display_image reads — lets batch preloading (see
+  # .preload_display_images) hand a bottle its precomputed answer so the
+  # reader never falls through to the per-bottle query path. nil is a valid
+  # assigned value (imageless bottle), same as the lazy path.
+  def display_image=(img)
+    @display_image = img
+  end
+
+  # Batch version of #display_image for list pages: one query to find each
+  # bottle's top review-with-images (same DISTINCT ON tie-break order as the
+  # instance method — rating desc, votes_count desc, created_at desc), one
+  # query to preload those candidate reviews' image attachments, then an
+  # in-memory walk assigning each bottle's memoized #display_image.
+  #
+  # Callers must preload pinned_label_image/label_image attachments on the
+  # collection themselves (e.g. .with_attached_pinned_label_image
+  # .with_attached_label_image) so the attached? checks below don't query.
+  def self.preload_display_images(bottles)
+    bottles = bottles.to_a
+    return bottles if bottles.empty?
+
+    ids = bottles.map(&:id)
+
+    candidates_by_bottle_id =
+      Review.joins(:images_attachments)
+            .where(bottle_id: ids)
+            .select("DISTINCT ON (reviews.bottle_id) reviews.*")
+            .order("reviews.bottle_id, reviews.rating DESC, reviews.votes_count DESC, reviews.created_at DESC")
+            .index_by(&:bottle_id)
+
+    ActiveRecord::Associations::Preloader.new(
+      records: candidates_by_bottle_id.values,
+      associations: { images_attachments: :blob }
+    ).call
+
+    bottles.each do |bottle|
+      bottle.display_image =
+        if bottle.pinned_label_image.attached?
+          bottle.pinned_label_image
+        else
+          candidate = candidates_by_bottle_id[bottle.id]
+          candidate&.hero_image || (bottle.label_image.attached? ? bottle.label_image : nil)
+        end
+    end
+
+    bottles
+  end
+
   private
 
   # Both label attachments share Review's image rules: same size cap, same

@@ -123,6 +123,23 @@ module ActiveSupport
     def clear_oauth_mocks
       OmniAuth.config.mock_auth.clear
     end
+
+    # Counts real SQL statements issued while the block runs (SCHEMA/CACHE
+    # notifications are excluded, since those don't hit the database).
+    # Used to prove N+1 fixes actually eliminated the per-row queries.
+    def count_sql_queries
+      count = 0
+      counter = lambda do |*, payload|
+        count += 1 unless payload[:name].in?(%w[SCHEMA CACHE])
+      end
+      ActiveSupport::Notifications.subscribed(counter, "sql.active_record") { yield }
+      count
+    end
+
+    def assert_no_queries(&block)
+      n = count_sql_queries(&block)
+      assert_equal 0, n, "expected no SQL queries, but #{n} were executed"
+    end
   end
 end
 

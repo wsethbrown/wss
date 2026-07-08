@@ -12,6 +12,11 @@ class ReviewsController < ApplicationController
     @bottles = @bottles.where(id: Review.tagged(@tags).select(:bottle_id)) if @tags.any?
     @distillery = params[:distillery].to_s.strip.presence
     @bottles = @bottles.where("bottles.distillery ILIKE ?", @distillery) if @distillery
+    # Separate param name from the tastings feed's params[:page] so the two
+    # pagination controls on this page can't collide.
+    @bottles = @bottles.with_attached_pinned_label_image.with_attached_label_image
+                        .page(params[:bottle_page]).per(24)
+    Bottle.preload_display_images(@bottles)
     # The record covers the people as well as the pours: a search also turns
     # up societies (policy-scoped — private ones stay invisible to outsiders).
     @societies = params[:q].present? ? policy_scope(Society).search(params[:q]).order(:name).limit(6) : Society.none
@@ -53,7 +58,7 @@ class ReviewsController < ApplicationController
 
   # A review's own page — the drill-down target for every clamped card.
   def show
-    @review = Review.includes(:user, :bottle, event: [:society, :event_bottles]).find(params[:id])
+    @review = Review.includes(:user, :bottle, event: [:society, :event_bottles], images_attachments: :blob).find(params[:id])
   end
 
   def edit; end
