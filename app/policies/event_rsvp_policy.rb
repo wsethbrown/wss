@@ -14,7 +14,7 @@ class EventRsvpPolicy < ApplicationPolicy
   def create?
     return false unless user.present?
     return false unless record.event.present?
-    
+
     # User must be able to RSVP to the event
     record.event.can_rsvp?(user)
   end
@@ -22,15 +22,15 @@ class EventRsvpPolicy < ApplicationPolicy
   def update?
     return false unless user.present?
     return false unless record.event.present?
-    
-    # User can only update their own RSVP
-    record.user == user && record.event.upcoming?
+
+    # User can only update their own RSVP, and only within the change window
+    record.user == user && record.can_change_response?
   end
 
   def destroy?
     return false unless user.present?
     return false unless record.event.present?
-    
+
     # User can only delete their own RSVP and only if event is upcoming
     record.user == user && record.can_change_response?
   end
@@ -40,7 +40,7 @@ class EventRsvpPolicy < ApplicationPolicy
     return true if user&.admin?
     return true if record.event.organizer == user
     return true if record.event.society.has_admin?(user)
-    
+
     # Users can view their own RSVP
     record.user == user
   end

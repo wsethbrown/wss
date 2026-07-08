@@ -101,9 +101,18 @@
         <div class="flex items-center space-x-3 ml-6">
           <% if user_signed_in? %>
             <!-- RSVP Buttons - Yes/Maybe/No -->
-            <% if @event.upcoming? %>
+            <% if @event.upcoming? && !@event.rsvp_closed? %>
               <% user_rsvp = @event.event_rsvps.find_by(user: current_user) %>
               <%= render "rsvp_buttons", event: @event, user_rsvp: user_rsvp %>
+            <% elsif @event.upcoming? %>
+              <% user_rsvp = @event.event_rsvps.find_by(user: current_user) %>
+              <% if user_rsvp %>
+                <span class="text-sm text-gray-500">
+                  Your RSVP: <span class="font-medium text-gray-700"><%= user_rsvp.status.capitalize %></span> — RSVPs closed
+                </span>
+              <% else %>
+                <span class="text-sm text-gray-500">RSVPs closed — they close 24 hours before the event</span>
+              <% end %>
             <% else %>
               <span class="text-sm text-gray-500">Event has ended</span>
             <% end %>

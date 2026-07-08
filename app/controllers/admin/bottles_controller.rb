@@ -21,7 +21,7 @@ class Admin::BottlesController < Admin::BaseController
   end
 
   def unpin_image
-    @bottle.pinned_label_image.purge
+    @bottle.pinned_label_image.purge_later
     redirect_to admin_bottle_path(@bottle), notice: "Pin removed — the derived image (or placeholder) shows again."
   end
 

@@ -9,7 +9,7 @@ class Admin::Bottles::ReviewsController < Admin::BaseController
   end
 
   def destroy_image
-    @review.images.purge
+    @review.images.purge_later
     redirect_to admin_bottle_path(@bottle), notice: "Review photos removed."
   end
 

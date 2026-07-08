@@ -1,6 +1,8 @@
 require "test_helper"
 
 class Admin::BottlesControllerTest < ActionDispatch::IntegrationTest
+  include ActiveJob::TestHelper
+
   setup { sign_in users(:admin) }
 
   def image_upload = fixture_file_upload("sample_review.jpg", "image/jpeg")
@@ -33,14 +35,18 @@ class Admin::BottlesControllerTest < ActionDispatch::IntegrationTest
   test "admin can unpin" do
     bottle = bottles(:eagle_rare)
     bottle.pinned_label_image.attach(io: File.open(file_fixture("sample_review.jpg")), filename: "p.jpg", content_type: "image/jpeg")
-    delete unpin_image_admin_bottle_path(bottle)
+    perform_enqueued_jobs do
+      delete unpin_image_admin_bottle_path(bottle)
+    end
     assert_not bottle.reload.pinned_label_image.attached?
   end
 
   test "admin can delete a review's images without deleting the review" do
     review = reviews(:john_eagle_rare)
     review.images.attach(io: File.open(file_fixture("sample_review.jpg")), filename: "x.jpg", content_type: "image/jpeg")
-    delete destroy_image_admin_bottle_review_path(review.bottle, review)
+    perform_enqueued_jobs do
+      delete destroy_image_admin_bottle_review_path(review.bottle, review)
+    end
     assert_redirected_to admin_bottle_path(review.bottle)
     assert_not review.reload.images.attached?
   end
