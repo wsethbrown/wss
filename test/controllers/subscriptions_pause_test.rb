@@ -2,6 +2,11 @@ require "test_helper"
 
 class SubscriptionsPauseTest < ActionDispatch::IntegrationTest
   def setup
+    # The pause test's mock expects resumes_at: 1.month.from_now.to_i, and the
+    # controller computes the same expression independently. Freeze the clock so
+    # both reads agree even when the request crosses a second boundary.
+    freeze_time
+
     @user = users(:seth)
     @user.update!(
       stripe_customer_id: "cus_test123",
