@@ -16,7 +16,7 @@ module BottleEdits
         format("%.1f", BigDecimal(value))
       rescue ArgumentError, TypeError
         value # invalid numeric text is stored as-is; Bottle's own
-              # numericality validation catches it if/when it's ever applied
+        # numericality validation catches it if/when it's ever applied
       end
     end
 
