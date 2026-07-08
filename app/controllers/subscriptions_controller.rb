@@ -339,7 +339,7 @@ class SubscriptionsController < ApplicationController
         price: 1299,
         interval: 'month',
         features: Membership::BENEFITS,
-        popular: true,
+        popular: false,
         price_id: ENV.fetch('STRIPE_QUARTERLY_PRICE_ID', 'price_quarterly'),
         savings: '19%'
       },
@@ -349,7 +349,7 @@ class SubscriptionsController < ApplicationController
         price: 1099,
         interval: 'month',
         features: Membership::BENEFITS,
-        popular: false,
+        popular: true,
         price_id: ENV.fetch('STRIPE_YEARLY_PRICE_ID', 'price_yearly'),
         savings: '31%'
       }

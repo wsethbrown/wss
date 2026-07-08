@@ -71,7 +71,7 @@ class HomeController < ApplicationController
                 interval: 'month',
                 display_interval: 'month',
                 features: (quarterly_price.product.metadata.to_h['features']&.split(',')&.map(&:strip) || Membership::BENEFITS).reject { |f| f.include?('%') || f.downcase.include?('save') || f.downcase.include?('savings') },
-                popular: quarterly_price.product.metadata.to_h.fetch('popular', 'true') == 'true',
+                popular: quarterly_price.product.metadata.to_h.fetch('popular', 'false') == 'true',
                 price_id: quarterly_price.id,
                 savings: quarterly_price.product.metadata.to_h.fetch('savings', '19%')
               }
@@ -101,7 +101,7 @@ class HomeController < ApplicationController
                 interval: 'month',
                 display_interval: 'month',
                 features: (yearly_price.product.metadata.to_h['features']&.split(',')&.map(&:strip) || Membership::BENEFITS).reject { |f| f.include?('%') || f.downcase.include?('save') || f.downcase.include?('savings') },
-                popular: yearly_price.product.metadata.to_h.fetch('popular', 'false') == 'true',
+                popular: yearly_price.product.metadata.to_h.fetch('popular', 'true') == 'true',
                 price_id: yearly_price.id,
                 savings: yearly_price.product.metadata.to_h.fetch('savings', '31%')
               }
@@ -152,7 +152,7 @@ class HomeController < ApplicationController
         price: 1299,
         interval: 'month',
         features: Membership::BENEFITS,
-        popular: true,
+        popular: false,
         price_id: ENV.fetch('STRIPE_QUARTERLY_PRICE_ID', 'price_quarterly'),
         savings: '19%'
       },
@@ -162,7 +162,7 @@ class HomeController < ApplicationController
         price: 1099,
         interval: 'month',
         features: Membership::BENEFITS,
-        popular: false,
+        popular: true,
         price_id: ENV.fetch('STRIPE_YEARLY_PRICE_ID', 'price_yearly'),
         savings: '31%'
       }

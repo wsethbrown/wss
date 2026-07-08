@@ -21,24 +21,24 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
     assert_select "span", text: "$10.99"  # Yearly
   end
 
-  test "home page shows quarterly as most popular" do
+  test "home page highlights a best-value plan" do
     get root_path
     assert_response :success
-    
-    # Check for "Most Popular" or "Best Value" badge
-    assert_select "span", text: /Best Value|Most Popular/
+
+    # One highlighted plan (yearly — the lowest per-month cost).
+    assert_select "span", text: /Best Value/
   end
 
-  test "home page shows one shared benefits list, not per-plan feature ladders" do
+  test "home page shows the free-vs-membership split, not per-plan feature ladders" do
     get root_path
     assert_response :success
 
-    # All tiers are identical, so benefits appear ONCE in a shared panel —
-    # never repeated per card, and never as invented tier-specific perks.
-    assert_select "h3", text: "Every membership includes"
+    # Cards carry no feature lists; benefits live in a free-vs-paid comparison.
     assert_select "#plan-cards ul", count: 0
-    assert_select "li", text: /One deck credit every month/, count: 1
-    assert_select "li", text: /The complete tasting record/, count: 1
+    assert_select "p", text: "Free with any account"
+    assert_select "p", text: "Membership adds"
+    assert_select "li", text: /Join any public society/
+    assert_select "li", text: /One deck credit every month/
   end
 
   test "home page shows savings indicators for quarterly and yearly" do

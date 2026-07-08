@@ -15,16 +15,22 @@
   <section class="relative w-full px-4 bg-whiskey-50 pb-16 pt-10">
     <div class="max-w-7xl mx-auto">
 
+      <%# Creating a society is a membership benefit (SocietyPolicy#create?).
+          Free accounts join societies but can't start one. %>
+      <% can_create_society = policy(Society).create? %>
+
       <!-- My Societies Section -->
       <% if @user_societies.any? %>
         <div class="mb-16">
           <div class="flex items-center justify-between mb-8">
             <h2 class="text-3xl font-bold text-gray-900">My Societies</h2>
-            <%= link_to new_society_path, class: 'inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-whiskey-600 text-white font-semibold hover:bg-whiskey-700 transition-all duration-200 shadow-lg hover:shadow-xl' do %>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-              </svg>
-              <span>Create Society</span>
+            <% if can_create_society %>
+              <%= link_to new_society_path, class: 'inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-whiskey-600 text-white font-semibold hover:bg-whiskey-700 transition-all duration-200 shadow-lg hover:shadow-xl' do %>
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+                </svg>
+                <span>Create Society</span>
+              <% end %>
             <% end %>
           </div>
 
@@ -68,13 +74,23 @@
         <div class="mb-10 flex flex-col items-center gap-4 rounded-2xl border border-whiskey-100 bg-white px-6 py-6 text-center sm:flex-row sm:justify-between sm:text-left">
           <div>
             <h2 class="text-xl font-bold text-gray-900">Start your whiskey journey</h2>
-            <p class="mt-1 text-gray-600">You haven't joined any societies yet — discover one below, or start your own.</p>
+            <% if can_create_society %>
+              <p class="mt-1 text-gray-600">You haven't joined any societies yet — discover one below, or start your own.</p>
+            <% else %>
+              <p class="mt-1 text-gray-600">You haven't joined any societies yet — discover one below. Starting your own society is a membership benefit.</p>
+            <% end %>
           </div>
-          <%= link_to new_society_path, class: 'inline-flex shrink-0 items-center gap-2 px-6 py-3 rounded-xl bg-whiskey-600 text-white font-semibold hover:bg-whiskey-700 transition-all duration-200 shadow-lg hover:shadow-xl' do %>
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-            </svg>
-            <span>Create a society</span>
+          <% if can_create_society %>
+            <%= link_to new_society_path, class: 'inline-flex shrink-0 items-center gap-2 px-6 py-3 rounded-xl bg-whiskey-600 text-white font-semibold hover:bg-whiskey-700 transition-all duration-200 shadow-lg hover:shadow-xl' do %>
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
+              </svg>
+              <span>Create a society</span>
+            <% end %>
+          <% else %>
+            <%= link_to account_path(anchor: 'subscription'), class: 'inline-flex shrink-0 items-center gap-2 px-6 py-3 rounded-xl border border-whiskey-300 text-whiskey-800 font-semibold hover:bg-whiskey-50 transition' do %>
+              <span>Become a member</span>
+            <% end %>
           <% end %>
         </div>
       <% end %>

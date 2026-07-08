@@ -317,20 +317,38 @@
       <% end %>
     </div>
 
-    <%# Benefits sit BELOW the cards so the actual choices are visible first.
-        One shared list — all tiers are identical, no per-card ladders. %>
-    <div class="mx-auto mt-12 max-w-3xl rounded-3xl border border-whiskey-100 bg-white p-8 shadow-sm sm:p-10">
-      <h3 class="text-center font-display text-xl font-semibold text-gray-900">Every membership includes</h3>
-      <ul class="mt-6 grid gap-x-8 gap-y-3 text-gray-700 sm:grid-cols-2">
-        <% Membership::BENEFITS.each do |benefit| %>
-          <li class="flex items-start gap-3">
-            <svg class="mt-1 h-4 w-4 flex-shrink-0 text-whiskey-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-            </svg>
-            <span><%= benefit %></span>
-          </li>
-        <% end %>
-      </ul>
+    <%# Free vs paid, side by side: the review section and joining societies
+        are free (that's the everyday reason to have an account); membership
+        adds deck credits and the ability to run your own society. %>
+    <div class="mx-auto mt-14 grid max-w-4xl gap-6 md:grid-cols-2">
+      <div class="rounded-3xl border border-gray-200 bg-white p-8 shadow-sm">
+        <p class="eyebrow text-gray-400">Free with any account</p>
+        <h3 class="mt-1 font-display text-lg font-semibold text-gray-900">No membership needed</h3>
+        <ul class="mt-5 space-y-3 text-gray-700">
+          <% Membership::FREE.each do |item| %>
+            <li class="flex items-start gap-3">
+              <svg class="mt-1 h-4 w-4 flex-shrink-0 text-gray-400" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <span><%= item %></span>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+      <div class="rounded-3xl border-2 border-whiskey-200 bg-white p-8 shadow-sm">
+        <p class="eyebrow text-whiskey-600">Membership adds</p>
+        <h3 class="mt-1 font-display text-lg font-semibold text-gray-900">Everything above, plus</h3>
+        <ul class="mt-5 space-y-3 text-gray-700">
+          <% Membership::BENEFITS.each do |benefit| %>
+            <li class="flex items-start gap-3">
+              <svg class="mt-1 h-4 w-4 flex-shrink-0 text-whiskey-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+              </svg>
+              <span><%= benefit %></span>
+            </li>
+          <% end %>
+        </ul>
+      </div>
     </div>
 
     <p class="mt-8 text-center text-sm text-gray-500">

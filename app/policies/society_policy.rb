@@ -34,8 +34,11 @@ class SocietyPolicy < ApplicationPolicy
     create?
   end
 
+  # Starting a society is a paid membership benefit — free accounts can JOIN
+  # societies but not create one. Global admins are exempt (superuser).
   def create?
-    user.present?
+    return false unless user
+    user.admin? || user.has_active_subscription?
   end
 
   # Creators, society admins/officers, and global admins may edit.

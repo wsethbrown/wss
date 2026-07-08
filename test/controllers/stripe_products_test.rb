@@ -35,17 +35,17 @@ class StripeProductsTest < ActiveSupport::TestCase
     assert_equal 'yearly', products[2][:id]
   end
 
-  test "should mark quarterly as popular" do
+  test "should mark yearly as the best value" do
     controller = HomeController.new
     products = controller.send(:fetch_stripe_products)
-    
+
     monthly = products.find { |p| p[:id] == 'monthly' }
     quarterly = products.find { |p| p[:id] == 'quarterly' }
     yearly = products.find { |p| p[:id] == 'yearly' }
-    
+
     assert_equal false, monthly[:popular]
-    assert_equal true, quarterly[:popular]
-    assert_equal false, yearly[:popular]
+    assert_equal false, quarterly[:popular]
+    assert_equal true, yearly[:popular]
   end
 
   test "should include savings for quarterly and yearly plans" do

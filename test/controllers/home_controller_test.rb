@@ -88,16 +88,17 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "fetch_stripe_products marks the quarterly plan as popular" do
+  test "fetch_stripe_products marks the yearly plan as the best value" do
     controller = HomeController.new
 
     products = controller.send(:fetch_stripe_products)
 
-    monthly_product = products.find { |p| p[:id] == 'monthly' }
     quarterly_product = products.find { |p| p[:id] == 'quarterly' }
+    yearly_product = products.find { |p| p[:id] == 'yearly' }
 
-    assert_equal false, monthly_product[:popular]
-    assert_equal true, quarterly_product[:popular]
+    # Yearly is the lowest per-month cost, so it carries the highlight.
+    assert_equal false, quarterly_product[:popular]
+    assert_equal true, yearly_product[:popular]
   end
 
   test "fetch_stripe_products includes savings for the quarterly and yearly plans" do

@@ -5,6 +5,8 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
     @user = users(:john)
     @society = societies(:whiskey_lovers)
     @admin_user = users(:admin)
+    # Creating/managing a society now requires an active membership.
+    @user.update!(subscription_status: "active", subscription_ends_at: 1.month.from_now)
   end
 
   # Index action tests
@@ -64,6 +66,17 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   # Create action tests
+  test "a signed-in non-member cannot create a society" do
+    non_member = users(:jane)
+    non_member.update!(subscription_status: nil)
+    sign_in non_member
+
+    assert_no_difference("Society.count") do
+      post societies_url, params: { society: { name: "Freeloaders", description: "For the unsubscribed" } }
+    end
+    assert_redirected_to societies_path
+  end
+
   test "should create society when authenticated with valid params" do
     sign_in @user
     

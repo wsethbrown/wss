@@ -4,6 +4,8 @@ class SocietyCreationTest < ActionDispatch::IntegrationTest
   def setup
     @user = users(:john)
     @jane = users(:jane)
+    # Creating a society now requires an active membership.
+    [@user, @jane].each { |u| u.update!(subscription_status: "active", subscription_ends_at: 1.month.from_now) }
   end
 
   test "complete society creation flow for authenticated user" do

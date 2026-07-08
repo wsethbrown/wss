@@ -36,18 +36,21 @@ class SocietyPolicyTest < ActiveSupport::TestCase
     assert SocietyPolicy.new(@user, @private_society).show?
   end
 
-  # New policy tests
-  test "new? should require authentication" do
+  # Create/new is a membership benefit — signed in is not enough.
+  test "new? follows create?: members and admins only" do
     assert_not SocietyPolicy.new(nil, Society).new?
-    assert SocietyPolicy.new(@user, Society).new?
-    assert SocietyPolicy.new(@other_user, Society).new?
+    @user.update!(subscription_status: "active", subscription_ends_at: 1.month.from_now)
+    assert SocietyPolicy.new(@user, Society).new?           # active member
+    assert_not SocietyPolicy.new(@other_user, Society).new? # signed in, no membership
+    assert SocietyPolicy.new(@admin_user, Society).new?     # admin
   end
 
-  # Create policy tests
-  test "create? should require authentication" do
+  test "create? requires an active membership (or admin)" do
     assert_not SocietyPolicy.new(nil, Society).create?
-    assert SocietyPolicy.new(@user, Society).create?
-    assert SocietyPolicy.new(@other_user, Society).create?
+    assert_not SocietyPolicy.new(@other_user, Society).create? # signed in, no membership
+    @user.update!(subscription_status: "active", subscription_ends_at: 1.month.from_now)
+    assert SocietyPolicy.new(@user, Society).create?           # active member
+    assert SocietyPolicy.new(@admin_user, Society).create?     # admin superuser
   end
 
   # Edit policy tests
@@ -196,8 +199,9 @@ class SocietyPolicyTest < ActiveSupport::TestCase
   end
 
   test "should handle nil society gracefully" do
+    @user.update!(subscription_status: "active", subscription_ends_at: 1.month.from_now)
     policy = SocietyPolicy.new(@user, nil)
-    
+
     assert policy.new?
     assert policy.create?
     assert policy.index?

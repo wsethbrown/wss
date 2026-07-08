@@ -1,20 +1,31 @@
-# The single source of truth for what a WSS membership includes.
+# The single source of truth for what a WSS membership includes, and what a
+# free account already gets.
 #
-# Every tier — monthly, quarterly, yearly — unlocks exactly the same thing;
-# they differ only in price and billing cadence. So there is ONE benefits
-# list, not three, and no tier "adds" anything the others lack. Keeping it
-# here stops invented perks (priority support, VIP events, a personal
-# curator — none of which exist) from creeping back into the pricing copy.
+# The tiers (monthly/quarterly/yearly) all unlock the SAME thing — they
+# differ only in price and billing cadence — so BENEFITS is one list, not
+# three, and no tier "adds" anything the others lack.
 #
-# Stripe product metadata may still override the per-tier `features` string
-# if a real per-tier difference is ever introduced; until then this is the
-# honest default everywhere plans are shown.
+# The paid/free split is deliberate: reviews are the sticky, everyday reason
+# to have an account, so the whole tasting record — joining societies,
+# writing and favoriting reviews, buying a deck outright — stays FREE.
+# Membership is for the things that cost us or that power users want:
+# a monthly deck credit and the ability to start and run a society.
+#
+# Keeping the lists here stops invented perks from creeping back into the
+# pricing copy; Stripe metadata may still override the per-tier features.
 module Membership
+  # What paid membership unlocks beyond a free account.
   BENEFITS = [
-    "One deck credit every month",
-    "Every narrative tasting deck to spend it on",
-    "Full society access — create, join, and host tasting nights",
-    "The complete tasting record — reviews, ratings, and flavor profiles",
-    "Keep your decks for as long as you're a member"
+    "One deck credit every month — unlock any narrative tasting deck",
+    "Create and run your own society — host tasting nights, manage members and events",
+    "Keep your credit-unlocked decks for as long as you're a member"
+  ].freeze
+
+  # What any free account can already do (no membership required).
+  FREE = [
+    "Join any public society",
+    "Write reviews, rate and favorite bottles",
+    "Follow the tasters and societies whose picks you trust",
+    "Buy any deck outright to own it forever"
   ].freeze
 end
