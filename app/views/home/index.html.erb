@@ -203,6 +203,42 @@
 <% end %>
 
 <!-- ======================================================= Pricing -->
+<!-- The societies -->
+<section class="w-full bg-char px-6 py-24 sm:py-32">
+  <div class="mx-auto max-w-3xl text-center">
+    <p class="eyebrow mb-4 text-whiskey-300/90">The company you keep</p>
+    <h2 class="font-display text-4xl font-semibold text-cream sm:text-5xl">Societies</h2>
+    <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-cream/80">
+      A deck is meant to be presented — to your people, around a table. Societies are
+      those tables: public ones you can join tonight, private ones that run on
+      invitations, each with its own calendar of tasting nights and its own record
+      of every pour the room has judged.
+    </p>
+    <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+      <%= link_to "Browse societies", societies_path, class: "inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-7 py-3.5 font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400" %>
+      <span class="text-cream/50"><%= pluralize(@society_count, "society") %> and counting</span>
+    </div>
+  </div>
+</section>
+
+<!-- The tasting record -->
+<section class="w-full bg-white px-6 py-24 sm:py-32">
+  <div class="mx-auto max-w-3xl text-center">
+    <p class="eyebrow mb-4 text-whiskey-600">The pours, on the record</p>
+    <h2 class="font-display text-4xl font-semibold text-gray-900 sm:text-5xl">The tasting record</h2>
+    <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-gray-600">
+      Every bottle the society tastes gets written down — nose, palate, finish, and
+      what the room actually paid. Flavor wheels drawn from reviewers' own words,
+      ratings that put the best tastings first, and a record you can search by
+      bottle, distillery, or the flavor you're chasing.
+    </p>
+    <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
+      <%= link_to "Read the record", reviews_path, class: "inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-7 py-3.5 font-semibold text-white transition hover:bg-whiskey-700" %>
+      <span class="text-gray-400"><%= pluralize(@tasting_count, "tasting") %> of <%= pluralize(@bottle_count, "bottle") %></span>
+    </div>
+  </div>
+</section>
+
 <section id="pricing" class="w-full bg-white px-6 py-24 sm:py-32">
   <div class="mx-auto max-w-6xl">
     <div class="mx-auto max-w-2xl text-center">
