@@ -3,10 +3,10 @@ class Bottle < ApplicationRecord
   has_many :reviews, dependent: :destroy
 
   has_one_attached :pinned_label_image do |attachable|
-    attachable.variant :thumb, resize_to_fill: [400, 400], saver: { quality: 80 }
+    attachable.variant :thumb, resize_to_fill: [ 400, 400 ], saver: { quality: 80 }
   end
   has_one_attached :label_image do |attachable|
-    attachable.variant :thumb, resize_to_fill: [400, 400], saver: { quality: 80 }
+    attachable.variant :thumb, resize_to_fill: [ 400, 400 ], saver: { quality: 80 }
   end
 
   validates :name, presence: true, length: { maximum: 200 }
@@ -72,11 +72,11 @@ class Bottle < ApplicationRecord
   # tastings — the left rail's tag cloud.
   def top_descriptors(limit = 5)
     reviews.flat_map { |r| r.descriptor_tags.keys }.tally
-           .sort_by { |word, n| [-n, word] }.first(limit).map(&:first)
+           .sort_by { |word, n| [ -n, word ] }.first(limit).map(&:first)
   end
 
   def display_name
-    [name, distillery].compact_blank.join(" — ")
+    [ name, distillery ].compact_blank.join(" — ")
   end
 
   # The public score: each reviewer counts once, via their latest tasting
@@ -126,7 +126,7 @@ class Bottle < ApplicationRecord
   def generate_slug
     return if slug.present? || name.blank?
 
-    base = [name, distillery].compact_blank.join(" ").parameterize
+    base = [ name, distillery ].compact_blank.join(" ").parameterize
     candidate = base
     n = 1
     candidate = "#{base}-#{n += 1}" while Bottle.exists?(slug: candidate)

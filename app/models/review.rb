@@ -10,7 +10,7 @@ class Review < ApplicationRecord
   has_many :review_votes, dependent: :destroy
 
   has_many_attached :images do |attachable|
-    attachable.variant :thumb, resize_to_fill: [400, 400], saver: { quality: 80 }
+    attachable.variant :thumb, resize_to_fill: [ 400, 400 ], saver: { quality: 80 }
   end
 
   validates :rating, presence: true, inclusion: { in: VALID_RATINGS }
@@ -18,7 +18,7 @@ class Review < ApplicationRecord
   validates :price_paid, numericality: { greater_than: 0, less_than: 100_000 }, allow_nil: true
   validates :nose, :palate, :finish, :body_notes, length: { maximum: 500 }
   validates :bottle_id, uniqueness: {
-    scope: [:user_id, :event_id],
+    scope: [ :user_id, :event_id ],
     message: "already has your review — edit it instead"
   }
   validate :event_review_gates, on: :create, if: -> { event.present? }
@@ -35,7 +35,7 @@ class Review < ApplicationRecord
       .joins("LEFT JOIN review_votes recent_votes ON recent_votes.review_id = reviews.id AND recent_votes.created_at >= #{connection.quote(since)}")
       .group("reviews.id")
       .order("recent_votes_count DESC, reviews.created_at DESC")
-      .includes(:user, :bottle, event: [:society, :event_bottles])
+      .includes(:user, :bottle, event: [ :society, :event_bottles ])
       .limit(limit)
   end
 
@@ -51,7 +51,7 @@ class Review < ApplicationRecord
 
     return none if review_ids.empty?
 
-    where(id: review_ids.uniq).includes(:user, :bottle, event: [:society, :event_bottles]).recent_first.limit(limit)
+    where(id: review_ids.uniq).includes(:user, :bottle, event: [ :society, :event_bottles ]).recent_first.limit(limit)
   end
 
   # A tasting outside any event.
@@ -73,22 +73,22 @@ class Review < ApplicationRecord
     "rich"    => %w[leather tobacco coffee nut nutty almond walnut earthy cocoa espresso]
   }.freeze
 
-  WORD_TO_FAMILY = DESCRIPTOR_LEXICON.flat_map { |fam, words| words.map { |w| [w, fam] } }.to_h.freeze
+  WORD_TO_FAMILY = DESCRIPTOR_LEXICON.flat_map { |fam, words| words.map { |w| [ w, fam ] } }.to_h.freeze
 
   def tasting_text
-    [nose, palate, finish, body_notes].compact_blank.join(" ")
+    [ nose, palate, finish, body_notes ].compact_blank.join(" ")
   end
 
   # => { "peat" => "smoky", "honey" => "sweet", ... } for words present.
   def descriptor_tags
     words = tasting_text.downcase.scan(/[a-z]+/)
-    words.uniq.filter_map { |w| [w, WORD_TO_FAMILY[w]] if WORD_TO_FAMILY.key?(w) }.to_h
+    words.uniq.filter_map { |w| [ w, WORD_TO_FAMILY[w] ] if WORD_TO_FAMILY.key?(w) }.to_h
   end
 
   # Hand-set wheel intensities win over word counts: the reviewer said so.
   def wheel_values
     flavor_wheel.to_h.filter_map { |fam, v|
-      [fam, v.to_f.clamp(0.0, 1.0)] if DESCRIPTOR_LEXICON.key?(fam) && v.to_f.positive?
+      [ fam, v.to_f.clamp(0.0, 1.0) ] if DESCRIPTOR_LEXICON.key?(fam) && v.to_f.positive?
     }.to_h
   end
 
@@ -120,7 +120,7 @@ class Review < ApplicationRecord
   scope :tagged, ->(tags) {
     Array(tags).reduce(all) do |rel, tag|
       tag = tag.to_s.downcase.strip
-      words = DESCRIPTOR_LEXICON.key?(tag) ? DESCRIPTOR_LEXICON[tag] | [tag] : [tag]
+      words = DESCRIPTOR_LEXICON.key?(tag) ? DESCRIPTOR_LEXICON[tag] | [ tag ] : [ tag ]
       pattern = '\\m(' + words.map { |w| Regexp.escape(w) }.join("|") + ")"
       rel.where("concat_ws(' ', nose, palate, finish, body_notes) ~* ?", pattern)
     end

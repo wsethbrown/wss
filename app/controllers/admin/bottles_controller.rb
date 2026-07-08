@@ -1,7 +1,7 @@
 # app/controllers/admin/bottles_controller.rb
 # Pin/unpin the label image. Delete flows live in Bottles::ReviewsController.
 class Admin::BottlesController < Admin::BaseController
-  before_action :set_bottle, except: [:index]
+  before_action :set_bottle, except: [ :index ]
 
   def index
     @bottles = Bottle.with_score.order(:name)
