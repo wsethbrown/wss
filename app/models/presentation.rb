@@ -259,6 +259,16 @@ class Presentation < ApplicationRecord
     slide_images.attached?
   end
 
+  # How many rendered slides a non-buyer sees before the paywall fade.
+  # Clamped to the deck's actual slide count (min 1) so a stale or oversized
+  # admin value never over- or under-reveals. 0 when nothing is rendered yet.
+  def effective_preview_slide_count
+    total = slide_images.attached? ? slide_images.count : 0
+    return 0 if total.zero?
+
+    (preview_slide_count || 3).clamp(1, total)
+  end
+
   def slide_render_pending?
     SolidQueue::Job.where(class_name: "DeckSlideRenderJob", finished_at: nil)
                    .where.not(id: SolidQueue::FailedExecution.select(:job_id))

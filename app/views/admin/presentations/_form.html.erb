@@ -298,6 +298,15 @@
             on the deck's admin page, or re-upload the file above.
           </div>
         <% end %>
+
+        <div class="mt-6 border-t border-gray-100 pt-5">
+          <%= form.label :preview_slide_count, "Free preview — slides shown before the buy prompt", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <div class="flex items-center gap-3">
+            <%= form.number_field :preview_slide_count, min: 1, value: presentation.preview_slide_count || 3, class: "w-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+            <span class="text-sm text-gray-500">of <%= presentation.slide_images.attached? ? presentation.slide_images.count : "&mdash;".html_safe %> rendered slides</span>
+          </div>
+          <p class="mt-1 text-xs text-gray-500">Non-buyers see the first N slides on the deck page; the last one fades into a &ldquo;get this deck&rdquo; prompt. Slide 1 is usually your title, so this replaces the old free-sample upload.</p>
+        </div>
       </section>
 
       <!-- ═══ 6 · THE POUR LIST ═══ -->
@@ -382,7 +391,6 @@
 
         <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
           <% {
-            sneak_peek_file:       ["Free sample", "application/pdf", "A few slides as a PDF — downloadable by anyone, before buying."],
             speaker_notes:         ["Speaker notes", "application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document", "How to present each chapter (PDF or Word)."],
             outline_file:          ["Outline", "application/pdf,application/vnd.openxmlformats-officedocument.wordprocessingml.document", "The one-page run of show (PDF or Word)."]
           }.each do |field, (label, accept, hint)| %>

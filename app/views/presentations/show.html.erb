@@ -226,25 +226,33 @@
             <h2 class="font-display text-3xl font-semibold text-gray-900 mb-3">Inside the deck, as presented</h2>
             <div class="rule-double text-whiskey-800 mb-8"></div>
             <% slides = @presentation.slide_images.order(:id) %>
-            <% visible = @full_story ? slides : slides.first(3) %>
+            <% count = @presentation.effective_preview_slide_count %>
+            <% visible = @full_story ? slides : slides.first(count) %>
+            <% teasing = !@full_story && slides.size > count %>
             <div class="space-y-6">
               <% visible.each_with_index do |slide, i| %>
-                <figure>
+                <% fade = teasing && i == visible.size - 1 %>
+                <figure class="<%= 'relative' if fade %>">
                   <%= image_tag slide, alt: "Slide #{i + 1}", loading: 'lazy',
                       class: 'w-full rounded-2xl border border-whiskey-200 shadow-sm' %>
-                  <figcaption class="eyebrow mt-2 text-center text-gray-400">Slide <%= i + 1 %> of <%= slides.size %></figcaption>
+                  <% if fade %>
+                    <%# The last free slide dissolves from about halfway down into
+                        the purchase prompt — the paywall, made of the deck itself. %>
+                    <div class="absolute inset-x-0 bottom-0 top-1/2 flex items-end justify-center rounded-b-2xl bg-gradient-to-b from-transparent via-white/85 to-white">
+                      <div class="mb-8 px-6 text-center">
+                        <p class="font-display text-xl font-semibold text-gray-900"><%= slides.size - count %> more slides in the full deck.</p>
+                        <%= link_to user_signed_in? ? new_presentation_purchase_path(@presentation) : auth_path,
+                            class: 'mt-4 inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-6 py-3 font-semibold text-white shadow-lg shadow-whiskey-950/20 transition hover:bg-whiskey-700' do %>
+                          <%= user_signed_in? ? 'Get this deck' : 'Sign in to get this deck' %>
+                        <% end %>
+                      </div>
+                    </div>
+                  <% else %>
+                    <figcaption class="eyebrow mt-2 text-center text-gray-400">Slide <%= i + 1 %> of <%= slides.size %></figcaption>
+                  <% end %>
                 </figure>
               <% end %>
             </div>
-            <% unless @full_story || slides.size <= 3 %>
-              <div class="mt-6 rounded-2xl border border-whiskey-200 bg-whiskey-50 p-6 text-center">
-                <p class="font-display text-lg font-semibold text-gray-900"><%= slides.size - 3 %> more slides in the full deck.</p>
-                <%= link_to user_signed_in? ? new_presentation_purchase_path(@presentation) : auth_path,
-                    class: 'mt-4 inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-6 py-3 font-semibold text-white transition hover:bg-whiskey-700' do %>
-                  <%= user_signed_in? ? 'Get this deck' : 'Sign in to get this deck' %>
-                <% end %>
-              </div>
-            <% end %>
           </section>
         <% elsif @presentation.parsed_slides_preview.any? %>
           <section class="mb-16">

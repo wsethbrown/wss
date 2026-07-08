@@ -195,7 +195,7 @@ class Admin::PresentationsController < Admin::BaseController
       :image,
       :featured_image,
       :pdf_file,
-      :sneak_peek_file,
+      :preview_slide_count,
       :speaker_notes,
       :outline_file,
       :recommendations_sheet,

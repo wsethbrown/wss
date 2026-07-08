@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_08_015811) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_08_135728) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -211,6 +211,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_08_015811) do
     t.jsonb "file_access_settings", default: {}
     t.integer "download_count", default: 0
     t.integer "preview_pages", default: 3
+    t.integer "preview_slide_count", default: 3, null: false
     t.index ["author_id"], name: "index_presentations_on_author_id"
     t.index ["category"], name: "index_presentations_on_category"
     t.index ["download_count"], name: "index_presentations_on_download_count"
