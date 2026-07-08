@@ -38,5 +38,11 @@ module Wss
 
     # Don't generate system test files.
     config.generators.system_tests = nil
+
+    # Ghost-edit corrections: how many DISTINCT users proposing the identical
+    # field+value auto-applies it. 3 while the community is small — the
+    # eventual-scale intent is much higher, tune via ENV/environment config
+    # later, never hardcode a "final" number here.
+    config.x.bottle_edits.auto_apply_threshold = 3
   end
 end

@@ -1,6 +1,7 @@
 class Bottle < ApplicationRecord
   belongs_to :created_by, class_name: "User", optional: true
   has_many :reviews, dependent: :destroy
+  has_many :bottle_edits, dependent: :destroy
 
   has_one_attached :pinned_label_image do |attachable|
     attachable.variant :thumb, resize_to_fill: [ 400, 400 ], saver: { quality: 80 }

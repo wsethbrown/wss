@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_07_220836) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_08_015811) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -57,6 +57,23 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_220836) do
     t.index ["trackable_type", "trackable_id"], name: "index_activity_logs_on_trackable"
     t.index ["user_id", "created_at"], name: "index_activity_logs_on_user_id_and_created_at"
     t.index ["user_id"], name: "index_activity_logs_on_user_id"
+  end
+
+  create_table "bottle_edits", force: :cascade do |t|
+    t.bigint "bottle_id", null: false
+    t.bigint "user_id", null: false
+    t.string "field", null: false
+    t.string "proposed_value", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "applied_at"
+    t.bigint "applied_by_id"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["applied_by_id"], name: "index_bottle_edits_on_applied_by_id"
+    t.index ["bottle_id", "field", "status"], name: "index_bottle_edits_on_bottle_field_status"
+    t.index ["bottle_id", "field", "user_id"], name: "index_bottle_edits_on_live_proposal", unique: true, where: "((status)::text = 'pending'::text)"
+    t.index ["bottle_id"], name: "index_bottle_edits_on_bottle_id"
+    t.index ["user_id"], name: "index_bottle_edits_on_user_id"
   end
 
   create_table "bottles", force: :cascade do |t|
@@ -480,6 +497,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_07_220836) do
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "activity_logs", "users"
+  add_foreign_key "bottle_edits", "bottles"
+  add_foreign_key "bottle_edits", "users"
+  add_foreign_key "bottle_edits", "users", column: "applied_by_id"
   add_foreign_key "bottles", "users", column: "created_by_id"
   add_foreign_key "credit_transactions", "presentations"
   add_foreign_key "credit_transactions", "users"
