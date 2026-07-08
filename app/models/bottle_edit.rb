@@ -11,6 +11,12 @@ class BottleEdit < ApplicationRecord
   belongs_to :user
   belongs_to :applied_by, class_name: "User", optional: true
 
+  # Normalization IS the grouping contract: identical proposals must store
+  # byte-identical proposed_value ("45"/"45.0"/"45.00" are ONE abv proposal).
+  # Controllers normalize too, but enforcing it here means no write path —
+  # console, import, future feature — can silently split a vote group.
+  before_validation :normalize_proposed_value
+
   validates :field, inclusion: { in: FIELDS }
   validates :status, inclusion: { in: STATUSES }
   validates :proposed_value, presence: true
@@ -22,4 +28,12 @@ class BottleEdit < ApplicationRecord
 
   scope :pending, -> { where(status: "pending") }
   scope :for_field, ->(field) { where(field: field) }
+
+  private
+
+  def normalize_proposed_value
+    return if field.blank? || proposed_value.blank?
+
+    self.proposed_value = BottleEdits::Normalize.for_storage(field, proposed_value)
+  end
 end

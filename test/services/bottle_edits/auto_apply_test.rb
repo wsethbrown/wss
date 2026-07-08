@@ -63,10 +63,30 @@ class BottleEdits::AutoApplyTest < ActiveSupport::TestCase
   end
 
   test "does not apply a value that would fail bottle validation" do
-    propose(users(:john), "abv", "500")
-    propose(users(:jane), "abv", "500")
-    propose(users(:seth), "abv", "500")
+    edits = [ users(:john), users(:jane), users(:seth) ].map { |u| propose(u, "abv", "500") }
     assert_not BottleEdits::AutoApply.call(bottle: @bottle, field: "abv")
     assert_not_equal "500".to_d, @bottle.reload.abv
+    # The transaction must leave every proposal untouched, not half-marked.
+    edits.each { |e| assert_equal "pending", e.reload.status }
+  end
+
+  test "when two groups tie on distinct users, the earliest-created group wins" do
+    config = Rails.application.config.x.bottle_edits
+    original = config.auto_apply_threshold
+    config.auto_apply_threshold = 2
+
+    older = [ propose(users(:john), "region", "Highlands"),
+              propose(users(:jane), "region", "Highlands") ]
+    newer = [ propose(users(:seth), "region", "Speyside"),
+              propose(users(:admin), "region", "Speyside") ]
+    older.each { |e| e.update_column(:created_at, 10.minutes.ago) }
+    newer.each { |e| e.update_column(:created_at, 5.minutes.ago) }
+
+    assert BottleEdits::AutoApply.call(bottle: @bottle, field: "region")
+    assert_equal "Highlands", @bottle.reload.region
+    older.each { |e| assert_equal "applied", e.reload.status }
+    newer.each { |e| assert_equal "rejected", e.reload.status }
+  ensure
+    config.auto_apply_threshold = original
   end
 end

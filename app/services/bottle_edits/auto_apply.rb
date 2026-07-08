@@ -14,10 +14,15 @@ module BottleEdits
     end
 
     def call
+      # MIN(created_at) rides along for the tie rule: most distinct users
+      # wins; a tie goes to the earliest-created group. Without it,
+      # Hash ordering out of GROUP BY is plan-dependent — nondeterministic.
       groups = BottleEdit.pending.for_field(@field).where(bottle: @bottle)
-                          .group(:proposed_value).distinct.count(:user_id)
+                          .group(:proposed_value)
+                          .pluck(Arel.sql("proposed_value, COUNT(DISTINCT user_id), MIN(created_at)"))
       threshold = Rails.application.config.x.bottle_edits.auto_apply_threshold
-      winning_value, distinct_count = groups.max_by { |_value, count| count }
+      winning_value, distinct_count, _earliest =
+        groups.min_by { |_value, count, earliest| [ -count, earliest ] }
       return false if winning_value.nil? || distinct_count < threshold
 
       apply(winning_value)
