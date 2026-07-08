@@ -51,7 +51,7 @@ class ReviewTest < ActiveSupport::TestCase
       organizer: users(:john),
       title: "Eagle Rare Re-tasting",
       start_time: 3.days.from_now, # comfortably outside the 24h RSVP cutoff
-      end_time: 1.day.from_now + 2.hours
+      end_time: 3.days.from_now + 2.hours
     )
 
     event.event_bottles.create!(bottle: bottle, position: 1)
