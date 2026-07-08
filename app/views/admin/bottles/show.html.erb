@@ -1,0 +1,87 @@
+<% content_for :title, "#{@bottle.name} - Admin" %>
+
+<div class="mb-8">
+  <div class="flex items-center gap-4 mb-4">
+    <%= link_to admin_bottles_path, class: "text-gray-500 hover:text-gray-700" do %>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+      </svg>
+    <% end %>
+    <h1 class="text-3xl font-bold text-gray-900"><%= @bottle.name %></h1>
+  </div>
+  <%= link_to "View bottle", bottle_path(@bottle), class: "text-whiskey-600 hover:text-whiskey-700" %>
+</div>
+
+<!-- Label Image Card -->
+<div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm mb-6">
+  <h2 class="text-lg font-semibold text-gray-900 mb-6">Label Image</h2>
+
+  <% if @bottle.pinned_label_image.attached? %>
+    <div class="mb-6">
+      <%= image_tag @bottle.pinned_label_image.variant(:thumb), class: "h-48 w-auto rounded-lg border border-gray-200" %>
+    </div>
+    <%= button_to "Unpin", unpin_image_admin_bottle_path(@bottle), method: :delete,
+        class: "px-4 py-2 bg-red-50 text-red-700 font-medium rounded-lg hover:bg-red-100 cursor-pointer mb-6" %>
+  <% else %>
+    <p class="text-gray-600 mb-6">No pinned label image. The derived image (or placeholder) is showing.</p>
+  <% end %>
+
+  <div class="border-t border-gray-200 pt-6">
+    <h3 class="text-sm font-semibold text-gray-900 mb-4">Pin a new image</h3>
+    <%= form_with url: pin_image_admin_bottle_path(@bottle), method: :patch, local: true do |f| %>
+      <div class="flex flex-col gap-4">
+        <%= f.file_field "bottle[pinned_label_image]", accept: "image/jpeg,image/jpg,image/png,image/gif,image/webp",
+            class: "block w-full text-sm text-gray-600
+            file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
+            file:text-sm file:font-semibold file:bg-whiskey-50 file:text-whiskey-700
+            hover:file:bg-whiskey-100" %>
+        <%= f.submit "Pin this image", class: "px-4 py-2 bg-whiskey-600 text-white font-medium rounded-lg hover:bg-whiskey-700 cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+</div>
+
+<!-- Reviews List -->
+<div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+  <h2 class="text-lg font-semibold text-gray-900 mb-6">Reviews</h2>
+
+  <% if @reviews.any? %>
+    <div class="divide-y divide-gray-100">
+      <% @reviews.each do |review| %>
+        <div class="py-6">
+          <div class="flex items-start justify-between">
+            <div>
+              <h3 class="text-sm font-medium text-gray-900">
+                <%= review.user.full_name %>
+              </h3>
+              <p class="mt-1 text-sm text-gray-600">
+                <%= number_with_precision(review.rating, precision: 2, strip_insignificant_zeros: true) %> • <%= review.created_at.strftime("%b %d, %Y") %>
+              </p>
+              <% if review.notes.present? %>
+                <p class="mt-2 text-sm text-gray-700"><%= truncate(review.notes, length: 200) %></p>
+              <% end %>
+            </div>
+            <div class="flex flex-col gap-2">
+              <% if review.images.attached? %>
+                <div class="flex gap-2 mb-2">
+                  <% review.images.each do |image| %>
+                    <figure>
+                      <%= image_tag image.variant(:thumb), class: "h-16 w-16 rounded object-cover border border-gray-200" %>
+                    </figure>
+                  <% end %>
+                </div>
+                <%= button_to "Remove photos", destroy_image_admin_bottle_review_path(@bottle, review), method: :delete,
+                    class: "px-3 py-1 bg-yellow-50 text-yellow-700 font-medium rounded text-sm hover:bg-yellow-100 cursor-pointer" %>
+              <% end %>
+              <%= button_to "Delete review", admin_bottle_review_path(@bottle, review), method: :delete,
+                  data: { turbo_confirm: "Delete this review?" },
+                  class: "px-3 py-1 bg-red-50 text-red-700 font-medium rounded text-sm hover:bg-red-100 cursor-pointer" %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% else %>
+    <p class="text-gray-600">No reviews yet.</p>
+  <% end %>
+</div>

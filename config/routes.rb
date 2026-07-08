@@ -115,11 +115,22 @@ Rails.application.routes.draw do
       end
     end
     resources :activities, only: [:index, :show]
-    
+
+    # Bottles moderation
+    resources :bottles, only: [:index, :show] do
+      member do
+        patch :pin_image
+        delete :unpin_image
+      end
+      resources :reviews, only: [:destroy], module: :bottles do
+        member { delete :destroy_image }
+      end
+    end
+
     # Analytics routes
     get 'analytics/downloads', to: 'analytics#downloads', as: 'downloads_analytics'
     get 'analytics/presentations/:id/downloads', to: 'analytics#presentation_downloads', as: 'presentation_downloads_analytics'
-    
+
     root to: 'dashboard#index'
   end
 

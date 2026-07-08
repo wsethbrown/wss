@@ -1,0 +1,41 @@
+<% content_for :title, "Admin - Bottles" %>
+
+<div class="flex justify-between items-center mb-8">
+  <div>
+    <h1 class="text-3xl font-bold text-gray-900">Bottles</h1>
+    <p class="mt-2 text-gray-600"><%= @bottles.count %> bottles total</p>
+  </div>
+</div>
+
+<div class="bg-white rounded-2xl shadow-sm border border-gray-200 overflow-hidden">
+  <% if @bottles.any? %>
+    <div class="divide-y divide-gray-100">
+      <% @bottles.each do |bottle| %>
+        <%= link_to admin_bottle_path(bottle), class: "block p-6 hover:bg-gray-50 transition" do %>
+          <div class="flex items-center justify-between">
+            <div>
+              <h3 class="text-lg font-semibold text-gray-900"><%= bottle.name %></h3>
+              <p class="mt-1 text-sm text-gray-600">
+                <%= pluralize(bottle.reviews.count, "review") %>
+              </p>
+            </div>
+            <% if bottle.pinned_label_image.attached? %>
+              <span class="rounded-full bg-whiskey-100 px-2.5 py-0.5 text-xs font-medium text-whiskey-800">
+                Pinned
+              </span>
+            <% end %>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="text-center py-12">
+      <div class="text-gray-500 mb-4">
+        <svg class="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 3v2m6-2v2M5 7h14M5 7l1 12a2 2 0 002 2h8a2 2 0 002-2l1-12M5 7h14"></path>
+        </svg>
+      </div>
+      <h3 class="text-lg font-medium text-gray-900 mb-2">No bottles yet</h3>
+    </div>
+  <% end %>
+</div>
