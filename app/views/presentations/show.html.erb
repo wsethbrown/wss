@@ -118,7 +118,7 @@
         <!-- The Story — narrative deck content, rendered from Markdown -->
         <section class="mb-16 scroll-mt-24" id="deck-story">
           <p class="eyebrow text-whiskey-600 mb-2">The story</p>
-          <h2 class="font-display text-3xl font-semibold text-gray-900 mb-3">Inside this deck</h2>
+          <h2 class="font-display text-3xl font-semibold text-gray-900 mb-3">How it reads</h2>
           <div class="rule-double text-whiskey-800 mb-10"></div>
 
           <div class="relative pl-6 md:pl-10">
@@ -241,7 +241,7 @@
                   <% if fade %>
                     <%# The last free slide dissolves from about halfway down into
                         the purchase prompt — the paywall, made of the deck itself. %>
-                    <div class="absolute inset-x-0 bottom-0 top-1/2 flex items-end justify-center rounded-b-2xl bg-gradient-to-b from-transparent via-white/85 to-white">
+                    <div class="absolute inset-x-0 bottom-0 top-1/2 flex items-end justify-center rounded-b-2xl bg-gradient-to-b from-transparent via-white via-30% to-white">
                       <div class="mb-8 px-6 text-center">
                         <p class="font-display text-xl font-semibold text-gray-900"><%= slides.size - count %> more slides in the full deck.</p>
                         <%= link_to user_signed_in? ? new_presentation_purchase_path(@presentation) : auth_path,
