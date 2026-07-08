@@ -13,6 +13,8 @@ class Bottle < ApplicationRecord
   validates :distillery, :region, :style, length: { maximum: 200 }
   validates :abv, numericality: { greater_than: 0, less_than: 100 }, allow_nil: true
   validates :slug, presence: true, uniqueness: true
+  validate :label_image_is_valid
+  validate :pinned_label_image_is_valid
 
   before_validation :generate_slug, on: :create
 
@@ -110,6 +112,28 @@ class Bottle < ApplicationRecord
   end
 
   private
+
+  # Both label attachments share Review's image rules: same size cap, same
+  # allowed types. Any signed-in user can upload label_image (add-a-bottle
+  # form), so it needs the same guardrails as review photos.
+  def label_image_is_valid
+    validate_image_attachment(:label_image, label_image)
+  end
+
+  def pinned_label_image_is_valid
+    validate_image_attachment(:pinned_label_image, pinned_label_image)
+  end
+
+  def validate_image_attachment(attribute, attachment)
+    return unless attachment.attached?
+
+    unless attachment.content_type.in?(Review::ALLOWED_IMAGE_TYPES)
+      errors.add(attribute, "must be an image (JPEG, PNG, GIF, or WEBP)")
+    end
+    if attachment.byte_size > Review::MAX_IMAGE_SIZE
+      errors.add(attribute, "must be #{Review::MAX_IMAGE_SIZE / 1.megabyte}MB or smaller")
+    end
+  end
 
   def percentile(sorted, p)
     idx = (sorted.size - 1) * p
