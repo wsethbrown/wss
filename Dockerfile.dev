@@ -6,6 +6,7 @@ RUN apt-get update -qq && \
     build-essential \
     libpq-dev \
     libyaml-dev \
+    libvips \
     postgresql-client \
     libreoffice-impress \
     poppler-utils \
