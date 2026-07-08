@@ -94,9 +94,10 @@
         number: "03",
         title: "Pour and present",
         body: "Follow the thread from first nose to final pour. The script keeps the room moving; the tasting notes keep it honest.",
-        points: [ "45–60 minute runtime, easy to trim",
+        points: [ "15-20 minute runtime, easy to trim",
                   "Guided tasting for each bottle",
-                  "Written for first-timers and collectors alike" ]
+                  "Written for first-timers and collectors alike",
+                  "Great memories waiting to be unlocked"]
       }
     ].each do |step| %>
       <div class="flex min-h-[85vh] items-center justify-center px-6 py-20 md:px-12">
@@ -125,7 +126,7 @@
     <div class="flex min-h-[60vh] items-center justify-center px-6 py-20 md:px-12">
       <div class="max-w-md text-center">
         <h3 class="font-display text-3xl font-semibold text-gray-900">That's the whole ritual.</h3>
-        <p class="mt-4 text-lg text-gray-600">Pick your first deck and set a date — the rest is poured, not planned.</p>
+        <p class="mt-4 text-lg text-gray-600">Pick your first deck and set a date. The rest is poured, not planned.</p>
         <div class="mt-8">
           <%= link_to 'Browse the decks', presentations_path,
               class: 'inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-7 py-3.5 text-base font-semibold text-white transition hover:bg-whiskey-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2' %>
@@ -146,12 +147,12 @@
       <div class="rule-double mt-6 w-24 text-whiskey-800"></div>
       <p class="mt-8 text-lg leading-relaxed text-gray-600">
         The Society started as a circle of friends. Each month one of us drew a topic,
-        did the research, bought the bottle, and told its story over a deck of slides.
-        The rule was simple: no fact sheets. A deck had to follow a thread.
+        did the research, bought the bottles, and told its story over a deck of slides.
+        The rules were simple: no fact sheets, tell a story, enjoy a wonderful night with great friends.
       </p>
       <p class="mt-4 text-lg leading-relaxed text-gray-600">
         Societies are that ritual, kept intact: a group, a calendar, and a reason to
-        gather. Make yours private for the group chat, or public for your city.
+        gather. Make yours private for your friends, or public for your city.
       </p>
       <div class="mt-10">
         <%= link_to 'Find your society', societies_path,
@@ -167,8 +168,8 @@
         <% [
           "One presenter a month — everyone takes a turn.",
           "Research your topic like you mean it.",
-          "Choose the bottle that belongs to the story.",
-          "No fact sheets. Follow the thread."
+          "Choose the bottles that belong to the story.",
+          "No dry fact sheets. Follow the narrative threads."
         ].each_with_index do |rule, i| %>
           <li class="flex gap-4">
             <span class="font-display text-2xl font-semibold text-whiskey-300"><%= format('%02d', i + 1) %></span>
@@ -209,15 +210,17 @@
   <div class="mx-auto max-w-3xl text-center">
     <p class="eyebrow mb-4 text-whiskey-300/90">The company you keep</p>
     <h2 class="font-display text-4xl font-semibold text-cream sm:text-5xl">Societies</h2>
-    <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-cream/80">
-      A deck is meant to be presented — to your people, around a table. Societies are
-      those tables: public ones open to new members, private ones that run on
-      invitations, each with its own calendar of tasting nights and its own record
-      of every pour the room has judged.
+    <%# Lead line set apart — its own paragraph, warmer than the body copy. %>
+    <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-whiskey-200">
+      A deck is meant to be presented to people around a table, sharing a space.
+    </p>
+    <p class="mx-auto mt-5 max-w-2xl text-lg leading-relaxed text-cream/80">
+      Societies are how those spaces organize: public ones open to new members,
+      private ones that run on invitations, each with its own calendar of tasting
+      nights and its own record of every pour the room has judged.
     </p>
     <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
       <%= link_to "Browse societies", societies_path, class: "inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-7 py-3.5 font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400" %>
-      <span class="text-cream/50"><%= pluralize(@society_count, "society") %> and counting</span>
     </div>
   </div>
 </section>
@@ -228,14 +231,17 @@
     <p class="eyebrow mb-4 text-whiskey-600">The pours, on the record</p>
     <h2 class="font-display text-4xl font-semibold text-gray-900 sm:text-5xl">The tasting record</h2>
     <p class="mx-auto mt-6 max-w-2xl text-lg leading-relaxed text-gray-600">
-      Every bottle the society tastes gets written down — nose, palate, finish, and
-      what the room actually paid. Flavor wheels drawn from reviewers' own words,
+      Every bottle the society tastes gets written down — nose, palate, finish, price, and personal thoughts.
+      Graphs and charts drawn from reviewers' own words to help visualize your taste preferences,
       ratings that put the best tastings first, and a record you can search by
       bottle, distillery, or the flavor you're chasing.
     </p>
+    <p class="mx-auto mt-8 max-w-2xl text-lg leading-relaxed text-gray-600">
+      Favorite another Member or a Society whose reviews you trust so their latest thoughts are
+      easy to find, helping you find your next favorite purchase.
+    </p>
     <div class="mt-10 flex flex-wrap items-center justify-center gap-4">
       <%= link_to "Read the record", reviews_path, class: "inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-7 py-3.5 font-semibold text-white transition hover:bg-whiskey-700" %>
-      <span class="text-gray-400"><%= pluralize(@tasting_count, "tasting") %> of <%= pluralize(@bottle_count, "bottle") %></span>
     </div>
   </div>
 </section>
@@ -346,7 +352,7 @@
         },
         {
           q: "How long is a deck?",
-          a: "Most run 45–60 minutes, built for a relaxed evening. The structure bends: linger on a tasting when the room is into it, or trim sections for a casual night."
+          a: "Most run 15–20 minutes, built for a relaxed evening. The structure bends: linger on a tasting when the room is into it, or trim sections for a casual night."
         },
         {
           q: "What equipment do I need?",

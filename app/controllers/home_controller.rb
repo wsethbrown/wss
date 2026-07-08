@@ -3,9 +3,6 @@ class HomeController < ApplicationController
     # Fetch Stripe products for pricing display
     @stripe_products = fetch_stripe_products
     @featured_presentations = Presentation.published.recent.limit(3)
-    @society_count = Society.count
-    @bottle_count = Bottle.count
-    @tasting_count = Review.count
   end
 
   private

@@ -1,6 +1,6 @@
 <% if user_signed_in? %>
   <!-- Simplified Header for Authenticated Users -->
-  <section class="relative w-full py-16 px-4 bg-char pt-20">
+  <section class="relative w-full px-4 bg-char pb-10 pt-24">
     <div class="max-w-7xl mx-auto text-center">
       <h1 class="text-4xl md:text-5xl font-display font-semibold text-white mb-4">
         Your Whiskey Societies
@@ -12,7 +12,7 @@
   </section>
 
   <!-- Main Content for Authenticated Users -->
-  <section class="relative w-full py-16 px-4 bg-whiskey-50">
+  <section class="relative w-full px-4 bg-whiskey-50 pb-16 pt-10">
     <div class="max-w-7xl mx-auto">
 
       <!-- My Societies Section -->
@@ -64,18 +64,17 @@
           </div>
         </div>
       <% else %>
-        <!-- Empty State for My Societies -->
-        <div class="text-center py-12 mb-16">
-          <div class="text-6xl mb-4">🥃</div>
-          <h2 class="text-2xl font-bold text-gray-900 mb-4">Start Your Whiskey Journey</h2>
-          <p class="text-gray-600 mb-6 max-w-md mx-auto">
-            You haven't joined any societies yet. Create your own or discover existing communities.
-          </p>
-          <%= link_to new_society_path, class: 'inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-whiskey-600 text-white font-semibold hover:bg-whiskey-700 transition-all duration-200 shadow-lg hover:shadow-xl' do %>
+        <!-- Empty State for My Societies — compact so Discover stays near the top -->
+        <div class="mb-10 flex flex-col items-center gap-4 rounded-2xl border border-whiskey-100 bg-white px-6 py-6 text-center sm:flex-row sm:justify-between sm:text-left">
+          <div>
+            <h2 class="text-xl font-bold text-gray-900">Start your whiskey journey</h2>
+            <p class="mt-1 text-gray-600">You haven't joined any societies yet — discover one below, or start your own.</p>
+          </div>
+          <%= link_to new_society_path, class: 'inline-flex shrink-0 items-center gap-2 px-6 py-3 rounded-xl bg-whiskey-600 text-white font-semibold hover:bg-whiskey-700 transition-all duration-200 shadow-lg hover:shadow-xl' do %>
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
             </svg>
-            <span>Create Your First Society</span>
+            <span>Create a society</span>
           <% end %>
         </div>
       <% end %>
