@@ -329,7 +329,7 @@ class SubscriptionsController < ApplicationController
         name: 'Monthly Membership',
         price: 1599,
         interval: 'month',
-        features: ['1 credit per month', 'Access to all society features', 'Monthly whiskey recommendations'],
+        features: Membership::BENEFITS,
         popular: false,
         price_id: ENV.fetch('STRIPE_MONTHLY_PRICE_ID', 'price_monthly')
       },
@@ -338,7 +338,7 @@ class SubscriptionsController < ApplicationController
         name: 'Quarterly Membership',
         price: 1299,
         interval: 'month',
-        features: ['Everything in Monthly', 'Priority support', 'Early access to new features'],
+        features: Membership::BENEFITS,
         popular: true,
         price_id: ENV.fetch('STRIPE_QUARTERLY_PRICE_ID', 'price_quarterly'),
         savings: '19%'
@@ -348,7 +348,7 @@ class SubscriptionsController < ApplicationController
         name: 'Yearly Membership',
         price: 1099,
         interval: 'month',
-        features: ['Everything in Quarterly', 'VIP access to exclusive events', 'Personal whisky curator'],
+        features: Membership::BENEFITS,
         popular: false,
         price_id: ENV.fetch('STRIPE_YEARLY_PRICE_ID', 'price_yearly'),
         savings: '31%'

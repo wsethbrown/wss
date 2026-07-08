@@ -29,19 +29,16 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
     assert_select "span", text: /Best Value|Most Popular/
   end
 
-  test "home page displays feature lists for each plan" do
+  test "home page shows one shared benefits list, not per-plan feature ladders" do
     get root_path
     assert_response :success
-    
-    # Check that feature lists are present (scoped to the pricing grid; the
-    # marketing page uses space-y-3 in several unrelated sections).
-    assert_select "#plan-cards ul.space-y-3", count: 3
-    assert_select "#plan-cards li.flex.items-center", minimum: 9  # At least 3 features per plan
-    
-    # Check specific features
-    assert_select "li", text: /1 credit per month/
-    assert_select "li", text: /Everything in Monthly/
-    assert_select "li", text: /Everything in Quarterly/
+
+    # All tiers are identical, so benefits appear ONCE in a shared panel —
+    # never repeated per card, and never as invented tier-specific perks.
+    assert_select "h3", text: "Every membership includes"
+    assert_select "#plan-cards ul", count: 0
+    assert_select "li", text: /One deck credit every month/, count: 1
+    assert_select "li", text: /The complete tasting record/, count: 1
   end
 
   test "home page shows savings indicators for quarterly and yearly" do
@@ -97,9 +94,10 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
     get root_path
     assert_response :success
     
-    # Check plan descriptions
-    assert_select "p", text: "Perfect for trying it out"
-    assert_select "p", text: "Great value"
-    assert_select "p", text: "Save 31%"
+    # Descriptions speak to commitment/cadence — the only real difference
+    # between tiers — not fabricated tiers of features.
+    assert_select "p", text: "Pay as you go, cancel anytime"
+    assert_select "p", text: "Billed every three months"
+    assert_select "p", text: "Billed once a year"
   end
 end

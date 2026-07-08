@@ -100,10 +100,11 @@ class AccountSubscriptionCardsTest < ActionDispatch::IntegrationTest
     assert_select "#plan-cards ul.space-y-3", count: 3
     assert_select "#plan-cards li.flex.items-center", minimum: 9  # At least 3 features per plan
     
-    # Check specific features
-    assert_select "li", text: /1 credit per month/
-    assert_select "li", text: /Everything in Monthly/
-    assert_select "li", text: /Everything in Quarterly/
+    # The honest shared benefits (same real list on every card — no invented
+    # tier perks).
+    assert_select "li", text: /One deck credit every month/
+    assert_select "li", text: /Full society access/
+    assert_select "li", text: /The complete tasting record/
   end
 
   test "account subscription cards use 3-column grid" do

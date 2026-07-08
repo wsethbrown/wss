@@ -314,7 +314,7 @@ class AccountController < ApplicationController
                 price: monthly_price.unit_amount,
                 interval: 'month',
                 display_interval: 'month',
-                features: monthly_price.product.metadata.to_h.fetch('features', '1 credit per month,Access to all society features,Monthly whiskey recommendations').split(',').map(&:strip),
+                features: (monthly_price.product.metadata.to_h['features']&.split(',')&.map(&:strip) || Membership::BENEFITS),
                 popular: monthly_price.product.metadata.to_h.fetch('popular', 'false') == 'true',
                 price_id: monthly_price.id
               }
@@ -344,7 +344,7 @@ class AccountController < ApplicationController
                 price: monthly_equivalent,
                 interval: 'month',
                 display_interval: 'month',
-                features: quarterly_price.product.metadata.to_h.fetch('features', 'Everything in Monthly,Priority support,Early access to new features').split(',').map(&:strip).reject { |f| f.include?('%') || f.downcase.include?('save') || f.downcase.include?('savings') },
+                features: (quarterly_price.product.metadata.to_h['features']&.split(',')&.map(&:strip) || Membership::BENEFITS).reject { |f| f.include?('%') || f.downcase.include?('save') || f.downcase.include?('savings') },
                 popular: quarterly_price.product.metadata.to_h.fetch('popular', 'true') == 'true',
                 price_id: quarterly_price.id,
                 savings: quarterly_price.product.metadata.to_h.fetch('savings', '19%')
@@ -374,7 +374,7 @@ class AccountController < ApplicationController
                 price: monthly_equivalent,
                 interval: 'month',
                 display_interval: 'month',
-                features: yearly_price.product.metadata.to_h.fetch('features', 'Everything in Quarterly,VIP access to exclusive events,Personal whisky curator').split(',').map(&:strip).reject { |f| f.include?('%') || f.downcase.include?('save') || f.downcase.include?('savings') },
+                features: (yearly_price.product.metadata.to_h['features']&.split(',')&.map(&:strip) || Membership::BENEFITS).reject { |f| f.include?('%') || f.downcase.include?('save') || f.downcase.include?('savings') },
                 popular: yearly_price.product.metadata.to_h.fetch('popular', 'false') == 'true',
                 price_id: yearly_price.id,
                 savings: yearly_price.product.metadata.to_h.fetch('savings', '31%')
@@ -416,7 +416,7 @@ class AccountController < ApplicationController
         name: 'Monthly Membership',
         price: 1599,
         interval: 'month',
-        features: ['1 credit per month', 'Access to all society features', 'Monthly whiskey recommendations'],
+        features: Membership::BENEFITS,
         popular: false,
         price_id: ENV.fetch('STRIPE_MONTHLY_PRICE_ID', 'price_monthly')
       },
@@ -425,7 +425,7 @@ class AccountController < ApplicationController
         name: 'Quarterly Membership',
         price: 1299,
         interval: 'month',
-        features: ['Everything in Monthly', 'Priority support', 'Early access to new features'],
+        features: Membership::BENEFITS,
         popular: true,
         price_id: ENV.fetch('STRIPE_QUARTERLY_PRICE_ID', 'price_quarterly'),
         savings: '19%'
@@ -435,7 +435,7 @@ class AccountController < ApplicationController
         name: 'Yearly Membership',
         price: 1099,
         interval: 'month',
-        features: ['Everything in Quarterly', 'VIP access to exclusive events', 'Personal whisky curator'],
+        features: Membership::BENEFITS,
         popular: false,
         price_id: ENV.fetch('STRIPE_YEARLY_PRICE_ID', 'price_yearly'),
         savings: '31%'

@@ -252,12 +252,28 @@
       <p class="eyebrow mb-4 text-whiskey-600">Membership</p>
       <h2 class="font-display text-4xl font-semibold text-gray-900 sm:text-5xl">Choose your pour.</h2>
       <p class="mt-6 text-lg text-gray-600">
-        Every plan earns one deck credit a month and full run of the societies.
-        Prefer to commit? The longer pours cost less.
+        Every membership unlocks the same thing — the plans differ only in how
+        long you commit and what you pay. The longer pours cost less.
       </p>
     </div>
 
-    <div id="plan-cards" class="mt-16 grid grid-cols-1 gap-8 md:grid-cols-3">
+    <%# One shared benefits list: all tiers are identical, so we say what
+        membership includes exactly once instead of pretending three ladders. %>
+    <div class="mx-auto mt-12 max-w-2xl rounded-3xl border border-whiskey-100 bg-white p-8 shadow-sm sm:p-10">
+      <h3 class="text-center font-display text-xl font-semibold text-gray-900">Every membership includes</h3>
+      <ul class="mt-6 grid gap-x-8 gap-y-3 text-gray-700 sm:grid-cols-2">
+        <% Membership::BENEFITS.each do |benefit| %>
+          <li class="flex items-start gap-3">
+            <svg class="mt-1 h-4 w-4 flex-shrink-0 text-whiskey-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+            <span><%= benefit %></span>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+
+    <div id="plan-cards" class="mt-12 grid grid-cols-1 gap-8 md:grid-cols-3">
       <% @stripe_products.each do |product| %>
         <div class="relative flex flex-col rounded-3xl bg-white p-8 shadow-xl transition hover:-translate-y-1 hover:shadow-2xl <%= product[:popular] ? 'border-2 border-whiskey-400' : 'border border-gray-200' %>">
           <% if product[:popular] %>
@@ -270,10 +286,10 @@
             <h3 class="font-display text-2xl font-semibold text-gray-900"><%= product[:name].gsub(' Membership', '') %></h3>
             <p class="mt-1 text-gray-500"><%=
               case product[:id]
-              when 'monthly' then 'Perfect for trying it out'
-              when 'quarterly' then 'Great value'
-              when 'yearly' then 'Save 31%'
-              else 'Best value for committed members'
+              when 'monthly' then 'Pay as you go, cancel anytime'
+              when 'quarterly' then 'Billed every three months'
+              when 'yearly' then 'Billed once a year'
+              else 'For committed members'
               end
             %></p>
 
@@ -291,20 +307,7 @@
             </div>
           </div>
 
-          <div class="rule-double mx-auto my-8 w-16 text-whiskey-300"></div>
-
-          <ul class="mb-8 flex-grow space-y-3 text-sm text-gray-600">
-            <% product[:features].reject { |f| f.include?('%') || f.downcase.include?('save') || f.downcase.include?('savings') }.each do |feature| %>
-              <li class="flex items-center">
-                <svg class="mr-3 h-4 w-4 flex-shrink-0 text-whiskey-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                </svg>
-                <%= feature %>
-              </li>
-            <% end %>
-          </ul>
-
-          <div>
+          <div class="mt-8">
             <% if user_signed_in? && current_user.subscription_active? %>
               <%# Members don't need three checkout buttons. Mark their plan;
                   changes happen from the account page. %>
