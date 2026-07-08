@@ -26,7 +26,10 @@
     <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
       <%= link_to 'Browse the decks', presentations_path,
           class: 'inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char' %>
+      <%# data-turbo=false: let the browser handle the in-page anchor natively so
+          CSS scroll-behavior: smooth applies. Turbo's own anchor scroll overshoots. %>
       <%= link_to 'See how it works', '#how-it-works',
+          data: { turbo: false },
           class: 'inline-flex items-center justify-center rounded-xl border border-cream/25 px-7 py-3.5 text-base font-semibold text-cream/90 transition hover:border-cream/50 hover:text-cream focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char' %>
     </div>
 

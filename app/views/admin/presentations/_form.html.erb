@@ -428,27 +428,27 @@
         <ol class="mt-4 space-y-3 text-sm">
           <li class="flex gap-2.5">
             <%= dot.call(presentation.title.present? && presentation.description.present? ? :on : :need) %>
-            <span><a href="#f-cover" class="font-medium text-gray-900 hover:text-whiskey-700">The cover</a><br>
+            <span><a href="#f-cover" data-turbo="false" class="font-medium text-gray-900 hover:text-whiskey-700">The cover</a><br>
               <span class="text-gray-500"><%= presentation.description.present? ? "title, pitch line & price" : "needs the one-line pitch" %></span></span>
           </li>
           <li class="flex gap-2.5">
             <%= dot.call(takeaways_count.positive? ? :on : :off) %>
-            <span><a href="#f-pitch" class="font-medium text-gray-900 hover:text-whiskey-700">The takeaways</a><br>
+            <span><a href="#f-pitch" data-turbo="false" class="font-medium text-gray-900 hover:text-whiskey-700">The takeaways</a><br>
               <span class="text-gray-500"><%= takeaways_count.positive? ? pluralize(takeaways_count, "point") : "hidden — none yet" %></span></span>
           </li>
           <li class="flex gap-2.5">
             <%= dot.call(story_words > 40 ? :on : :need) %>
-            <span><a href="#f-story" class="font-medium text-gray-900 hover:text-whiskey-700">The story</a><br>
+            <span><a href="#f-story" data-turbo="false" class="font-medium text-gray-900 hover:text-whiskey-700">The story</a><br>
               <span class="text-gray-500"><%= story_words > 40 ? "#{number_with_delimiter(story_words)} words · ~#{presentation.reading_time} min read" : "too short — the teaser is the pitch" %></span></span>
           </li>
           <li class="flex gap-2.5">
             <%= dot.call(tasting_notes_n.positive? ? :on : :off) %>
-            <span><a href="#f-tasting" class="font-medium text-gray-900 hover:text-whiskey-700">What you'll taste</a><br>
+            <span><a href="#f-tasting" data-turbo="false" class="font-medium text-gray-900 hover:text-whiskey-700">What you'll taste</a><br>
               <span class="text-gray-500"><%= tasting_notes_n.positive? ? "#{tasting_notes_n} of 4 notes" : "hidden — empty" %></span></span>
           </li>
           <li class="flex gap-2.5">
             <%= dot.call(slides_count.positive? ? :auto : :need) %>
-            <span><a href="#f-slides" class="font-medium text-gray-900 hover:text-whiskey-700">The slides</a><br>
+            <span><a href="#f-slides" data-turbo="false" class="font-medium text-gray-900 hover:text-whiskey-700">The slides</a><br>
               <span class="text-gray-500">
                 <% if slides_count.positive? %><%= slides_count %> rendered · automatic
                 <% elsif presentation.persisted? && presentation.slide_render_pending? %>rendering&hellip;
@@ -458,12 +458,12 @@
           </li>
           <li class="flex gap-2.5">
             <%= dot.call(pours_count.positive? ? :on : :off) %>
-            <span><a href="#f-pours" class="font-medium text-gray-900 hover:text-whiskey-700">The pour list</a><br>
+            <span><a href="#f-pours" data-turbo="false" class="font-medium text-gray-900 hover:text-whiskey-700">The pour list</a><br>
               <span class="text-gray-500"><%= pours_count.positive? ? pluralize(pours_count, "pour") : "hidden — empty" %></span></span>
           </li>
           <li class="flex gap-2.5">
             <%= dot.call(presentation.pdf_file.attached? ? :on : :need) %>
-            <span><a href="#f-files" class="font-medium text-gray-900 hover:text-whiskey-700">What you get</a><br>
+            <span><a href="#f-files" data-turbo="false" class="font-medium text-gray-900 hover:text-whiskey-700">What you get</a><br>
               <span class="text-gray-500">
                 <% if presentation.pdf_file.attached? %>the deck<%= extras_count.positive? ? " + #{pluralize(extras_count, 'extra')}" : "" %>
                 <% else %>no deck file — required to publish<% end %>

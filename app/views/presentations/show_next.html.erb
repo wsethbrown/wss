@@ -29,11 +29,11 @@
       <% if owned_purchase && @presentation.slide_images.attached? && @full_story %>
         <%= link_to 'Present', present_presentation_path(@presentation),
             class: "inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400" %>
-        <a href="#deck-story" class="inline-flex items-center justify-center rounded-xl border border-cream/25 px-7 py-3.5 text-base font-semibold text-cream/90 transition hover:border-cream/50 hover:text-cream">Read the story</a>
+        <a href="#deck-story" data-turbo="false" class="inline-flex items-center justify-center rounded-xl border border-cream/25 px-7 py-3.5 text-base font-semibold text-cream/90 transition hover:border-cream/50 hover:text-cream">Read the story</a>
       <% elsif owned_purchase %>
-        <a href="#deck-story" class="inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400">Read the story</a>
+        <a href="#deck-story" data-turbo="false" class="inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400">Read the story</a>
       <% else %>
-        <a href="#offer" class="inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400">
+        <a href="#offer" data-turbo="false" class="inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400">
           <%= @presentation.free? ? 'Add to my library — free' : "Get this deck — #{@presentation.formatted_price}" %>
         </a>
       <% end %>
@@ -144,7 +144,7 @@
       <% unless @full_story || slides.size <= 3 %>
         <div class="mt-12 text-center">
           <p class="font-display text-2xl font-semibold text-cream"><%= slides.size - 3 %> more slides in the full deck.</p>
-          <a href="#offer" class="mt-6 inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-8 py-3.5 font-semibold text-white transition hover:bg-whiskey-400">Get the deck</a>
+          <a href="#offer" data-turbo="false" class="mt-6 inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-8 py-3.5 font-semibold text-white transition hover:bg-whiskey-400">Get the deck</a>
         </div>
       <% end %>
     </div>
@@ -174,7 +174,7 @@
           <% if story_truncated?(@presentation.content) %>
             <div class="mt-2 text-center">
               <p class="font-display text-xl font-semibold text-gray-900">The story keeps going.</p>
-              <a href="#offer" class="mt-4 inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-7 py-3 font-semibold text-white transition hover:bg-whiskey-700">Get the deck to keep reading</a>
+              <a href="#offer" data-turbo="false" class="mt-4 inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-7 py-3 font-semibold text-white transition hover:bg-whiskey-700">Get the deck to keep reading</a>
             </div>
           <% end %>
         <% end %>
