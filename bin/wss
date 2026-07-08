@@ -57,8 +57,9 @@ ${YELLOW}Commands:${NC}
 ${YELLOW}Database Commands:${NC}
   wss db migrate         Run database migrations
   wss db seed            Seed database with sample data
-  wss db reset           Reset database (drop, create, migrate, seed)
+  wss db reset           Reset database (auto-backs up first, then drop, create, migrate, seed)
   wss db console         Open database console
+  wss db backup          pg_dump wss_development to tmp/db_backups/ (gzipped)
 
 ${YELLOW}Examples:${NC}
   wss start              # Start all services
@@ -328,7 +329,17 @@ db_operations() {
             log_info "Seeding database..."
             docker-compose exec web rails db:seed
             ;;
+        backup)
+            mkdir -p tmp/db_backups
+            local backup_file="tmp/db_backups/wss_development_$(date +%Y%m%d_%H%M%S).sql.gz"
+            log_info "Backing up wss_development to ${backup_file}..."
+            docker-compose exec -T db pg_dump -U wss wss_development | gzip > "$backup_file"
+            log_info "Backup complete: $(du -h "$backup_file" | cut -f1)"
+            ;;
         reset)
+            # A db:reset-class event wiped hand-entered dev data once
+            # (2026-07-07); never drop without a restorable snapshot.
+            db_operations db backup
             log_info "Resetting database..."
             docker-compose exec web rails db:reset
             ;;
@@ -338,7 +349,7 @@ db_operations() {
             ;;
         *)
             log_error "Unknown database command: $2"
-            log_info "Available: migrate, seed, reset, console"
+            log_info "Available: migrate, seed, reset, console, backup"
             exit 1
             ;;
     esac

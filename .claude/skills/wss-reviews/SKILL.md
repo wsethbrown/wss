@@ -184,12 +184,15 @@ from text, never stored — edit the lexicon freely.
     DESC), **Circle** (only reviews from favorited users + events from
     favorited societies, via `current_user.circle_reviews`; inner join of
     users.id IN (favorites.favoritable_id WHERE type=User) OR events from
-    societies in (favorites.favoritable_id WHERE type=Society); applies same
-    filters/search/tags/distillery as Latest), **Hot** (trailing-30-day vote
-    count via a condition IN THE JOIN on ReviewVote.created_at — zero-vote
-    reviews included; same filters/search/tags/distillery as Latest).
-  - Pills are independent of `/reviews?q=&tags=&distillery=&sort=` — the
-    query params apply to whichever feed is active.
+    societies in (favorites.favoritable_id WHERE type=Society)), **Hot**
+    (trailing-30-day vote count via a condition IN THE JOIN on
+    ReviewVote.created_at — zero-vote reviews included).
+  - CAUTION: search/tags/distillery filters apply ONLY to the Latest feed.
+    Circle and Hot ignore them (`hot_ranked` / `for_circle` take no filter
+    args), even though the pill links preserve query params in URLs — so
+    `/reviews?tags=smoky&feed=hot` silently ignores the tag. Filter
+    composition across feeds is unimplemented, not broken; implement in
+    the controller if ever needed.
   - Veiled partials (reviews/_event_card, reviews/_event_line) are unchanged
     and reused across all three feeds.
 - **Demo seeds**: `db/seeds.rb` includes a social-layer block (development
