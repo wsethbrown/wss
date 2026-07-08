@@ -49,3 +49,17 @@ jane_allocated_four_roses:
   event: allocated_night
   rating: 5.0
   notes: Even better from a private stash.
+
+seth_ardbeg_solo_low:
+  user: seth
+  bottle: ardbeg_10
+  rating: 3.5
+  notes: Testing tie-break with low votes.
+  votes_count: 1
+
+one_ardbeg_solo_high:
+  user: one
+  bottle: ardbeg_10
+  rating: 3.5
+  notes: Testing tie-break with high votes.
+  votes_count: 5
