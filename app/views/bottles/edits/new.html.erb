@@ -1,0 +1,47 @@
+<% content_for :title, "Suggest a correction - #{@bottle.name}" %>
+
+<section class="w-full bg-whiskey-50 px-4 py-14">
+  <div class="mx-auto max-w-xl">
+    <p class="eyebrow text-whiskey-600">Help keep the record straight</p>
+    <h1 class="mb-2 mt-1 font-display text-3xl font-semibold text-gray-900">Suggest a correction</h1>
+    <p class="mb-8 text-gray-600">
+      Change only what's wrong — fields you leave as-is are ignored. Once
+      enough members agree on a fix, it applies automatically.
+    </p>
+
+    <%= form_with url: bottle_edits_path(@bottle), method: :post, class: "space-y-5 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm" do %>
+      <div>
+        <label for="bottle_edit_name" class="mb-2 block text-sm font-medium text-gray-700">Bottle name</label>
+        <input type="text" name="bottle_edit[name]" id="bottle_edit_name" value="<%= @bottle.name %>"
+          class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-whiskey-500">
+      </div>
+      <div class="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <div>
+          <label for="bottle_edit_distillery" class="mb-2 block text-sm font-medium text-gray-700">Distillery</label>
+          <input type="text" name="bottle_edit[distillery]" id="bottle_edit_distillery" value="<%= @bottle.distillery %>"
+            class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-whiskey-500">
+        </div>
+        <div>
+          <label for="bottle_edit_region" class="mb-2 block text-sm font-medium text-gray-700">Region</label>
+          <input type="text" name="bottle_edit[region]" id="bottle_edit_region" value="<%= @bottle.region %>"
+            class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-whiskey-500">
+        </div>
+        <div>
+          <label for="bottle_edit_style" class="mb-2 block text-sm font-medium text-gray-700">Style</label>
+          <input type="text" name="bottle_edit[style]" id="bottle_edit_style" value="<%= @bottle.style %>"
+            class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-whiskey-500">
+        </div>
+        <div>
+          <label for="bottle_edit_abv" class="mb-2 block text-sm font-medium text-gray-700">ABV %</label>
+          <input type="number" step="0.1" min="0" max="99" name="bottle_edit[abv]" id="bottle_edit_abv" value="<%= @bottle.abv %>"
+            class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-whiskey-500">
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 pt-2">
+        <button type="submit" class="cursor-pointer rounded-xl bg-whiskey-600 px-6 py-3 font-semibold text-white transition hover:bg-whiskey-700">Submit correction</button>
+        <%= link_to "Cancel", bottle_path(@bottle), class: "rounded-xl bg-gray-100 px-6 py-3 font-semibold text-gray-700 transition hover:bg-gray-200" %>
+      </div>
+    <% end %>
+  </div>
+</section>

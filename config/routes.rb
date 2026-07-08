@@ -166,6 +166,7 @@ Rails.application.routes.draw do
   resources :bottles, only: [:show, :new, :create], param: :id do
     collection { get :search }
     resources :reviews, only: [:new, :create], module: :bottles
+    resources :edits, only: [:new, :create], module: :bottles
   end
   # The review section: /reviews is the public library page (search +
   # latest tastings); individual bottles live at /bottles/:slug.
