@@ -49,6 +49,11 @@
         </div>
       </div>
 
+      <div>
+        <%= form.label :label_image, "A photo of the bottle (optional)", class: "mb-2 block text-sm font-medium text-gray-700" %>
+        <%= form.file_field :label_image, accept: "image/jpeg,image/jpg,image/png,image/gif,image/webp", class: "w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+      </div>
+
       <div class="flex items-center gap-3 pt-2">
         <%= form.submit "Add the bottle", class: "cursor-pointer rounded-xl bg-whiskey-600 px-6 py-3 font-semibold text-white transition hover:bg-whiskey-700" %>
         <%= link_to "Cancel", reviews_path, class: "rounded-xl bg-gray-100 px-6 py-3 font-semibold text-gray-700 transition hover:bg-gray-200" %>

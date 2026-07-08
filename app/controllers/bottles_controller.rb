@@ -53,7 +53,7 @@ class BottlesController < ApplicationController
   private
 
   def bottle_params
-    params.require(:bottle).permit(:name, :distillery, :region, :style, :abv)
+    params.require(:bottle).permit(:name, :distillery, :region, :style, :abv, :label_image)
   end
 
   # Only same-app paths may round-trip through the add-a-bottle flow (e.g.
