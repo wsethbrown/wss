@@ -56,7 +56,8 @@ class ReviewsController < ApplicationController
   def edit; end
 
   def update
-    if @review.update(review_params)
+    @review.images.attach(review_params[:images]) if review_params[:images].present?
+    if @review.update(review_params.except(:images))
       redirect_to review_path(@review), notice: "Review updated."
     else
       render :edit, status: :unprocessable_entity
@@ -75,6 +76,6 @@ class ReviewsController < ApplicationController
   end
 
   def review_params
-    params.require(:review).permit(:rating, :notes, :nose, :palate, :finish, :body_notes, :price_paid, flavor_wheel: Review::DESCRIPTOR_LEXICON.keys)
+    params.require(:review).permit(:rating, :notes, :nose, :palate, :finish, :body_notes, :price_paid, flavor_wheel: Review::DESCRIPTOR_LEXICON.keys, images: [])
   end
 end
