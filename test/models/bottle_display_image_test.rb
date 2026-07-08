@@ -43,11 +43,12 @@ class BottleDisplayImageTest < ActiveSupport::TestCase
     assert_equal "review.jpg", bottle.reload.display_image.filename.to_s
   end
 
-  test "label_image variant is defined and responds to variant call" do
+  test "label_image :thumb variant actually transforms" do
     bottle = bottles(:lagavulin)
     bottle.label_image.attach(io: File.open(file_fixture("sample_review.jpg")), filename: "label.jpg", content_type: "image/jpeg")
-    # Variant resolves without error
-    variant = bottle.label_image.variant(:thumb)
-    assert_not_nil variant
+    # .processed forces the real vips transform — a lazy variant wrapper is
+    # never nil, so anything less asserts nothing.
+    processed = bottle.label_image.variant(:thumb).processed
+    assert processed.image.blob.byte_size.positive?
   end
 end

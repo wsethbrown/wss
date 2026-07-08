@@ -3,10 +3,10 @@ class Bottle < ApplicationRecord
   has_many :reviews, dependent: :destroy
 
   has_one_attached :pinned_label_image do |attachable|
-    attachable.variant :thumb, resize_to_limit: [400, 400], saver: { quality: 80 }
+    attachable.variant :thumb, resize_to_fill: [400, 400], saver: { quality: 80 }
   end
   has_one_attached :label_image do |attachable|
-    attachable.variant :thumb, resize_to_limit: [400, 400], saver: { quality: 80 }
+    attachable.variant :thumb, resize_to_fill: [400, 400], saver: { quality: 80 }
   end
 
   validates :name, presence: true, length: { maximum: 200 }
@@ -92,15 +92,21 @@ class Bottle < ApplicationRecord
   # /bottles/<slug> image: pin > top-rated review hero (ties: votes, newest)
   # > creator's label_image > nil (view falls back to the SVG placeholder).
   def display_image
-    return pinned_label_image if pinned_label_image.attached?
+    # Memoized — every call site checks presence then renders, and the lookup
+    # costs two queries. defined? because nil (imageless bottle) is a valid
+    # cached answer.
+    return @display_image if defined?(@display_image)
 
-    candidate = reviews.joins(:images_attachments)
-                        .distinct
-                        .order(rating: :desc, votes_count: :desc, created_at: :desc)
-                        .first
-    return candidate.hero_image if candidate
-
-    label_image.attached? ? label_image : nil
+    @display_image =
+      if pinned_label_image.attached?
+        pinned_label_image
+      else
+        candidate = reviews.joins(:images_attachments)
+                            .distinct
+                            .order(rating: :desc, votes_count: :desc, created_at: :desc)
+                            .first
+        candidate&.hero_image || (label_image.attached? ? label_image : nil)
+      end
   end
 
   private
