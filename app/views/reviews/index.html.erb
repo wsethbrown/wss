@@ -59,16 +59,23 @@
     <div class="divide-y divide-gray-100 rounded-2xl border border-gray-200 bg-white shadow-sm">
       <% @bottles.each do |bottle| %>
         <%= link_to bottle_path(bottle), class: "flex items-center justify-between gap-4 px-5 py-4 transition hover:bg-whiskey-50" do %>
-          <div class="min-w-0">
-            <h2 class="truncate font-display text-lg font-semibold text-gray-900"><%= bottle.name %></h2>
-            <p class="mt-1 truncate text-sm">
-              <% meta = [] %>
-              <% if [bottle.style, bottle.region].compact_blank.any? %>
-                <% meta << content_tag(:span, [bottle.style, bottle.region].compact_blank.join(" · "), class: "text-whiskey-700 font-medium") %>
-              <% end %>
-              <% meta << content_tag(:span, bottle.distillery, class: "text-gray-500") if bottle.distillery.present? %>
-              <%= safe_join(meta, " · ") %>
-            </p>
+          <div class="flex items-center gap-3">
+            <% if bottle.display_image %>
+              <%= image_tag bottle.display_image.variant(:thumb), class: "h-10 w-10 shrink-0 rounded-lg object-cover" %>
+            <% else %>
+              <%= render "bottles/placeholder", bottle: bottle, size: "h-10" %>
+            <% end %>
+            <div class="min-w-0">
+              <h2 class="truncate font-display text-lg font-semibold text-gray-900"><%= bottle.name %></h2>
+              <p class="mt-1 truncate text-sm">
+                <% meta = [] %>
+                <% if [bottle.style, bottle.region].compact_blank.any? %>
+                  <% meta << content_tag(:span, [bottle.style, bottle.region].compact_blank.join(" · "), class: "text-whiskey-700 font-medium") %>
+                <% end %>
+                <% meta << content_tag(:span, bottle.distillery, class: "text-gray-500") if bottle.distillery.present? %>
+                <%= safe_join(meta, " · ") %>
+              </p>
+            </div>
           </div>
           <div class="shrink-0 whitespace-nowrap text-right">
             <% if bottle.average_rating %>

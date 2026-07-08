@@ -5,7 +5,11 @@
     <p class="eyebrow mb-3 text-whiskey-300/90">A tasting, on the record</p>
     <div class="mb-4 flex justify-center">
       <div class="rounded-2xl bg-cream/95 px-5 py-3">
-        <%= render "bottles/placeholder", bottle: @review.bottle, size: "h-14" %>
+        <% if @review.bottle.display_image %>
+          <%= image_tag @review.bottle.display_image.variant(:thumb), class: "h-14 w-14 rounded-lg object-cover" %>
+        <% else %>
+          <%= render "bottles/placeholder", bottle: @review.bottle, size: "h-14" %>
+        <% end %>
       </div>
     </div>
     <h1 class="font-display text-3xl font-semibold text-cream sm:text-4xl">

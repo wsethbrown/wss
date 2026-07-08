@@ -4,7 +4,11 @@
 <section class="sticky top-0 z-30 w-full bg-char px-4 pb-5 pt-20 shadow-lg shadow-char/30">
   <div class="mx-auto flex max-w-6xl flex-col items-center gap-5 sm:flex-row sm:items-center">
     <div class="shrink-0 rounded-2xl bg-cream/95 px-4 py-2.5">
-      <%= render "bottles/placeholder", bottle: @bottle, size: "h-14" %>
+      <% if @bottle.display_image %>
+        <%= image_tag @bottle.display_image.variant(:thumb), class: "h-14 w-14 rounded-lg object-cover" %>
+      <% else %>
+        <%= render "bottles/placeholder", bottle: @bottle, size: "h-14" %>
+      <% end %>
     </div>
     <div class="min-w-0 flex-1 text-center sm:text-left">
       <p class="eyebrow text-whiskey-300/90">
