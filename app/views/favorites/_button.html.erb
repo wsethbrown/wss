@@ -1,10 +1,21 @@
+<%# Locals: favoritable; optional tone (:light default, :dark for dark heroes).
+    Toggles in place inside its turbo frame — no redirect, no flash toast. %>
 <% if user_signed_in? && favoritable != current_user %>
-  <% existing = current_user.favorites.find_by(favoritable: favoritable) %>
-  <% if existing %>
-    <%= button_to "★ Favorited", favorite_path(existing), method: :delete,
-        class: "inline-flex cursor-pointer items-center rounded-xl border border-whiskey-300 bg-whiskey-50 px-4 py-2 text-sm font-semibold text-whiskey-800 transition hover:bg-whiskey-100" %>
-  <% else %>
-    <%= button_to "☆ Favorite", favorites_path(favoritable_type: favoritable.class.name, favoritable_id: favoritable.id), method: :post,
-        class: "inline-flex cursor-pointer items-center rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:border-whiskey-300 hover:text-whiskey-700" %>
+  <% tone = local_assigns.fetch(:tone, :light).to_sym %>
+  <%= turbo_frame_tag dom_id(favoritable, :favorite) do %>
+    <% existing = current_user.favorites.find_by(favoritable: favoritable) %>
+    <% if existing %>
+      <%= button_to favorite_path(existing, tone: tone), method: :delete,
+          class: "inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-whiskey-300 bg-whiskey-50 px-4 py-2 text-sm font-semibold text-whiskey-800 transition hover:bg-whiskey-100" do %>
+        <span aria-hidden="true">★</span> Favorited
+      <% end %>
+    <% else %>
+      <%= button_to favorites_path(favoritable_type: favoritable.class.name, favoritable_id: favoritable.id, tone: tone), method: :post,
+          class: tone == :dark ?
+            "inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-cream/50 px-4 py-2 text-sm font-semibold text-cream transition hover:border-cream hover:bg-cream/10" :
+            "inline-flex cursor-pointer items-center gap-1.5 rounded-xl border border-gray-300 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:border-whiskey-300 hover:text-whiskey-700" do %>
+        <span aria-hidden="true">☆</span> Favorite
+      <% end %>
+    <% end %>
   <% end %>
 <% end %>

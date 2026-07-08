@@ -47,7 +47,9 @@ class FavoritesControllerTest < ActionDispatch::IntegrationTest
       post favorites_path, params: { favoritable_type: "Society", favoritable_id: societies(:whiskey_lovers).id }
     end
     assert_nil flash[:alert], "second favorite should not show an alert"
-    assert_equal "Favorited.", flash[:notice]
+    # Success is silent — the button flips in place; no flash toast.
+    assert_nil flash[:notice]
+    assert_redirected_to society_path(societies(:whiskey_lovers))
   end
 
   test "unknown favoritable_type 404s" do

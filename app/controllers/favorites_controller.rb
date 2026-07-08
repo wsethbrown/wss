@@ -7,7 +7,7 @@ class FavoritesController < ApplicationController
     favoritable = favoritable_class.find(params[:favoritable_id])
     favorite = current_user.favorites.find_or_initialize_by(favoritable: favoritable)
     if favorite.persisted? || favorite.save
-      redirect_back_or_to favoritable, notice: "Favorited."
+      swap_button_or_redirect favoritable
     else
       redirect_back_or_to favoritable, alert: favorite.errors.full_messages.to_sentence
     end
@@ -17,10 +17,25 @@ class FavoritesController < ApplicationController
     favorite = current_user.favorites.find(params[:id]) # scoped to current_user: 404s on someone else's row
     favoritable = favorite.favoritable
     favorite.destroy
-    redirect_back_or_to favoritable
+    swap_button_or_redirect favoritable
   end
 
   private
+
+  # The button flips in place (star fills/empties) — that IS the feedback,
+  # so success carries no flash. Failures still redirect with an alert.
+  def swap_button_or_redirect(favoritable)
+    respond_to do |format|
+      format.turbo_stream do
+        render turbo_stream: turbo_stream.replace(
+          helpers.dom_id(favoritable, :favorite),
+          partial: "favorites/button",
+          locals: { favoritable: favoritable, tone: params[:tone] == "dark" ? :dark : :light }
+        )
+      end
+      format.html { redirect_back_or_to favoritable }
+    end
+  end
 
   def favoritable_class
     case params[:favoritable_type]
