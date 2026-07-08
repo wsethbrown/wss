@@ -22,9 +22,16 @@ class Bottles::EditsController < ApplicationController
       next if normalized == current
 
       edit = @bottle.bottle_edits.pending.for_field(field).find_by(user: current_user)
-      next if edit # already has a live proposal on this field — resubmission is a no-op
+      if edit
+        # Same value again: no-op. A DIFFERENT value replaces their earlier
+        # suggestion — silently dropping it while saying "no changes" lies
+        # to the user about what got recorded.
+        next if edit.proposed_value == normalized
 
-      @bottle.bottle_edits.create!(user: current_user, field: field, proposed_value: normalized)
+        edit.update!(proposed_value: normalized)
+      else
+        @bottle.bottle_edits.create!(user: current_user, field: field, proposed_value: normalized)
+      end
       changed_fields << field
     end
 

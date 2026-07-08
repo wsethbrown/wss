@@ -72,6 +72,19 @@ class Bottles::EditsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "a different value on an already-proposed field replaces the user's pending suggestion" do
+    edit = BottleEdit.create!(bottle: @bottle, user: users(:john), field: "region", proposed_value: "Highlands")
+    assert_no_difference "BottleEdit.count" do
+      post bottle_edits_path(@bottle), params: { bottle_edit: {
+        name: @bottle.name, distillery: @bottle.distillery,
+        region: "Speyside", style: @bottle.style, abv: @bottle.abv.to_s
+      } }
+    end
+    assert_equal "Speyside", edit.reload.proposed_value
+    assert_equal "pending", edit.status
+    assert_match(/on the record/, flash[:notice])
+  end
+
   test "the third distinct user proposing the identical value auto-applies it" do
     BottleEdit.create!(bottle: @bottle, user: users(:jane), field: "region", proposed_value: "Highlands")
     BottleEdit.create!(bottle: @bottle, user: users(:seth), field: "region", proposed_value: "Highlands")
