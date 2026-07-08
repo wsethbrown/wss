@@ -81,6 +81,17 @@
       </div>
     <% end %>
 
+    <% if @review.images.attached? %>
+      <div class="mt-10 border-t border-gray-100 pt-8">
+        <p class="eyebrow text-whiskey-600">Photos</p>
+        <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
+          <% @review.images.each do |image| %>
+            <%= image_tag image.variant(:thumb), class: "aspect-square w-full rounded-xl object-cover ring-1 ring-gray-200" %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
     <%= render "reviews/event_card", review: @review %>
 
     <div class="mt-12 border-t border-gray-100 pt-8">
