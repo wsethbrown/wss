@@ -88,6 +88,20 @@ class Review < ApplicationRecord
     [ nose, palate, finish, body_notes ].compact_blank.join(" ")
   end
 
+  # The room's shared vocabulary: most common lexicon words per tasting
+  # section across a set of reviews (each review counts a word once, so one
+  # wordy taster can't dominate). => { "Nose" => ["peat", "iodine"], ... },
+  # sections with no lexicon hits omitted. Powers society verdict cards.
+  def self.common_descriptors(reviews, per_section: 4)
+    { "Nose" => :nose, "Palate" => :palate, "Finish" => :finish, "Body" => :body_notes }
+      .filter_map { |label, attr|
+        tally = reviews.flat_map { |r|
+          r.public_send(attr).to_s.downcase.scan(/[a-z]+/).uniq.select { |w| WORD_TO_FAMILY.key?(w) }
+        }.tally
+        [ label, tally.sort_by { |word, count| [ -count, word ] }.first(per_section).map(&:first) ] if tally.any?
+      }.to_h
+  end
+
   # => { "peat" => "smoky", "honey" => "sweet", ... } for words present.
   def descriptor_tags
     words = tasting_text.downcase.scan(/[a-z]+/)

@@ -14,6 +14,19 @@ class BottlesController < ApplicationController
                              .group_by { |r| r.event.society_id }
   end
 
+  # A society's verdict on one bottle: the aggregate up top, every
+  # individual tasting card below. Private societies 404 — same veil as
+  # everywhere else.
+  def verdict
+    @bottle = Bottle.find_by!(slug: params[:id])
+    @society = Society.public_societies.find(params[:society_id])
+    @verdict = @bottle.society_verdicts.find { |s| s.id == @society.id }
+    raise ActiveRecord::RecordNotFound unless @verdict
+    @reviews = @bottle.reviews.joins(:event).where(events: { society_id: @society.id })
+                      .includes(:user, event: [:society, :event_bottles])
+                      .order(created_at: :desc)
+  end
+
   def search
     bottles = Bottle.search(params[:q]).order(:name).limit(8)
     render json: bottles.map { |b|

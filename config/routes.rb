@@ -175,6 +175,9 @@ Rails.application.routes.draw do
     collection { get :search }
     resources :reviews, only: [:new, :create], module: :bottles
     resources :edits, only: [:new, :create], module: :bottles
+    # A society's verdict on this bottle: every individual card behind the
+    # aggregate. Public societies only (the action re-checks).
+    get "verdicts/:society_id", to: "bottles#verdict", as: :verdict, on: :member
   end
   # The review section: /reviews is the public library page (search +
   # latest tastings); individual bottles live at /bottles/:slug.
