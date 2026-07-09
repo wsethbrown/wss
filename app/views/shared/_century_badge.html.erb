@@ -5,7 +5,7 @@
 <% compact = local_assigns.fetch(:compact, false)
    tone = local_assigns.fetch(:tone, :light) %>
 <% if record.century? %>
-  <span class="inline-flex items-center gap-1 align-middle <%= compact ? '' : (tone == :dark ? 'rounded-full border border-whiskey-300/40 bg-whiskey-500/20 px-2 py-0.5' : 'rounded-full border border-whiskey-300 bg-whiskey-50 px-2 py-0.5') %>"
+  <span class="inline-flex items-center gap-1 <%= compact ? 'relative -top-[1px] align-baseline' : 'align-middle ' + (tone == :dark ? 'rounded-full border border-whiskey-300/40 bg-whiskey-500/20 px-2 py-0.5' : 'rounded-full border border-whiskey-300 bg-whiskey-50 px-2 py-0.5') %>"
         title="Century — followed by 100+ members">
     <svg class="h-3.5 w-3.5 <%= tone == :dark ? 'text-whiskey-300' : 'text-whiskey-600' %>" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
       <path fill-rule="evenodd" d="M10 2a1 1 0 01.894.553l2.062 4.177 4.61.67a1 1 0 01.554 1.706l-3.335 3.251.787 4.591a1 1 0 01-1.451 1.054L10 15.835l-4.121 2.167a1 1 0 01-1.451-1.054l.787-4.59L1.88 9.106a1 1 0 01.554-1.706l4.61-.67L9.106 2.553A1 1 0 0110 2z" clip-rule="evenodd"></path>
