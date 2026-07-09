@@ -20,7 +20,7 @@
         
         <!-- Profile Info -->
         <div class="flex-1">
-          <h1 class="text-3xl font-bold text-gray-900 mb-2"><%= @user.full_name %></h1>
+          <h1 class="text-3xl font-bold text-gray-900 mb-2"><%= @user.full_name %> <%= render "shared/century_badge", record: @user %></h1>
           <p class="text-gray-600 mb-4">Member since <%= @user.created_at.strftime('%B %Y') %></p>
           
           <!-- Social Stats -->

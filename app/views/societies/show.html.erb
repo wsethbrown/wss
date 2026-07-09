@@ -28,7 +28,7 @@
             <%= @society.private? ? 'Private society' : 'Public society' %><%= " · #{@society.location}" if @society.location.present? %>
           </p>
           <div class="rule-double mb-6 w-20 text-whiskey-300"></div>
-          <h1 class="font-display text-4xl font-semibold leading-tight text-cream md:text-5xl"><%= @society.name %></h1>
+          <h1 class="font-display text-4xl font-semibold leading-tight text-cream md:text-5xl"><%= @society.name %> <%= render "shared/century_badge", record: @society, tone: :dark %></h1>
           <% if @society.description.present? %>
             <p class="mt-4 text-lg leading-relaxed text-cream/70"><%= @society.description %></p>
           <% end %>

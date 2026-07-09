@@ -30,6 +30,9 @@ Rails.application.routes.draw do
   # Public membership page (plans + the start-your-own-club pitch)
   get "membership", to: "home#membership"
 
+  # Contact addresses (hello@ / support@ / partners@)
+  get "contact", to: "home#contact"
+
   # The signed-in landing page. /dashboard and /account render the same account
   # surface; /dashboard is the canonical post-authentication destination.
   get "dashboard", to: "account#index", as: :dashboard

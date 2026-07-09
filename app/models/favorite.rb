@@ -3,7 +3,9 @@
 # Society is gated by the same rule as viewing it (SocietyPolicy#show?).
 class Favorite < ApplicationRecord
   belongs_to :user
-  belongs_to :favoritable, polymorphic: true
+  # counter_cache keeps followers_count O(1) — review lists render many
+  # authors and each does a Century-badge check.
+  belongs_to :favoritable, polymorphic: true, counter_cache: true
 
   validates :favoritable_id, uniqueness: { scope: [:user_id, :favoritable_type] }
   validate :not_yourself

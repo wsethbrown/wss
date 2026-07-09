@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_08_135728) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_09_184859) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -262,6 +262,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_08_135728) do
     t.boolean "is_private"
     t.string "banner_position", default: "center center"
     t.string "invite_token"
+    t.integer "favorites_count", default: 0, null: false
     t.index ["creator_id"], name: "index_societies_on_creator_id"
     t.index ["invite_token"], name: "index_societies_on_invite_token", unique: true
     t.index ["location"], name: "index_societies_on_location"
@@ -489,6 +490,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_08_135728) do
     t.datetime "subscription_paused_at"
     t.string "magic_link_token"
     t.datetime "magic_link_sent_at"
+    t.integer "favorites_count", default: 0, null: false
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["is_admin"], name: "index_users_on_is_admin"
     t.index ["magic_link_token"], name: "index_users_on_magic_link_token", unique: true

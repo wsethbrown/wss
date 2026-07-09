@@ -11,6 +11,9 @@ class HomeController < ApplicationController
     @stripe_products = fetch_stripe_products
   end
 
+  def contact
+  end
+
   private
 
   def calculate_monthly_price(price, interval)

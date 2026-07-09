@@ -11,7 +11,7 @@
   <%= render "reviews/event_line", review: review %>
   <div class="mt-auto flex items-center justify-between pt-4">
     <span class="text-sm text-gray-400">
-      <% if review.respond_to?(:recent_votes_count) %>👍 <%= review.recent_votes_count %> this month · <% end %><%= review.user.first_name %> · <%= time_ago_in_words(review.created_at) %> ago
+      <% if review.respond_to?(:recent_votes_count) %>👍 <%= review.recent_votes_count %> this month · <% end %><%= review.user.first_name %> <%= render "shared/century_badge", record: review.user, compact: true %> · <%= time_ago_in_words(review.created_at) %> ago
     </span>
     <span class="text-sm font-semibold text-whiskey-700">Read the tasting →</span>
   </div>
