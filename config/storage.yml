@@ -6,6 +6,19 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
+# Cloudflare R2 (S3-compatible, zero egress fees). Uploads live here in
+# production so the server stays disposable. The checksum settings are
+# required — R2 doesn't implement the newer AWS checksum handshake.
+cloudflare_r2:
+  service: S3
+  endpoint: <%= ENV["R2_ENDPOINT"] %>
+  access_key_id: <%= ENV["R2_ACCESS_KEY_ID"] %>
+  secret_access_key: <%= ENV["R2_SECRET_ACCESS_KEY"] %>
+  region: auto
+  bucket: <%= ENV.fetch("R2_BUCKET", "wss-production") %>
+  request_checksum_calculation: when_required
+  response_checksum_validation: when_required
+
 # Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
 # amazon:
 #   service: S3

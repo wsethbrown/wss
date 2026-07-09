@@ -1,116 +1,105 @@
-# Name of your application. Used to uniquely configure containers.
+# Kamal production config. Deploys to the Hetzner CPX box; Postgres runs as a
+# Kamal accessory on the same host; Cloudflare fronts DNS/CDN (SSL mode: Full).
+# Secrets come from .kamal/secrets, which pulls from your shell env — see
+# docs/launch-checklist.md for the full first-deploy runbook.
 service: wss
+# registry.server (ghcr.io) is prepended automatically — don't repeat it here.
+image: wsethbrown/wss
 
-# Name of the container image.
-image: your-user/wss
-
-# Deploy to these servers.
 servers:
   web:
-    - 192.168.0.1
-  # job:
-  #   hosts:
-  #     - 192.168.0.1
-  #   cmd: bin/jobs
+    - 178.156.251.37
+  # LibreOffice deck-rendering is memory-heavy and must NEVER run inside the
+  # web container (it would stall page serving) — jobs get their own container.
+  job:
+    hosts:
+      - 178.156.251.37
+    cmd: bin/jobs
 
-# Enable SSL auto certification via Let's Encrypt and allow for multiple apps on a single web server.
-# Remove this section when using multiple web servers and ensure you terminate SSL at your load balancer.
-#
-# Note: If using Cloudflare, set encryption mode in SSL/TLS setting to "Full" to enable CF-to-app encryption.
 proxy:
   ssl: true
-  host: app.example.com
+  hosts:
+    - whiskeysharesociety.com
+    - www.whiskeysharesociety.com
 
-# Credentials for your image host.
 registry:
-  # Specify the registry server, if you're not using Docker Hub
-  # server: registry.digitalocean.com / ghcr.io / ...
-  username: your-user
-
-  # Always use an access token rather than real password when possible.
+  server: ghcr.io
+  username: wsethbrown
   password:
     - KAMAL_REGISTRY_PASSWORD
 
-# Inject ENV variables into containers (secrets come from .kamal/secrets).
 env:
   secret:
     - RAILS_MASTER_KEY
+    # Postgres (accessory below uses the same password via .kamal/secrets)
+    - WSS_DATABASE_PASSWORD
+    # Losing these = losing all 2FA data. Keep offline backups.
+    - AR_ENCRYPTION_PRIMARY_KEY
+    - AR_ENCRYPTION_DETERMINISTIC_KEY
+    - AR_ENCRYPTION_KEY_DERIVATION_SALT
+    # OAuth (production redirect URIs must be added in the Google console)
+    - GOOGLE_CLIENT_ID
+    - GOOGLE_CLIENT_SECRET
+    # Stripe LIVE mode
+    - STRIPE_SECRET_KEY
+    - STRIPE_PUBLISHABLE_KEY
+    - STRIPE_WEBHOOK_SECRET
+    - STRIPE_MONTHLY_PRICE_ID
+    - STRIPE_QUARTERLY_PRICE_ID
+    - STRIPE_YEARLY_PRICE_ID
+    # Error alerting (inert if blank)
+    - SENTRY_DSN
+    # Cloudflare R2: uploads (Active Storage) + nightly DB backups
+    - R2_ENDPOINT
+    - R2_ACCESS_KEY_ID
+    - R2_SECRET_ACCESS_KEY
+    - R2_BUCKET
+    # Transactional email (Devise resets/verifications); blank = mail disabled
+    - SMTP_ADDRESS
+    - SMTP_USERNAME
+    - SMTP_PASSWORD
   clear:
-    # Run the Solid Queue Supervisor inside the web server's Puma process to do jobs.
-    # When you start using multiple servers, you should split out job processing to a dedicated machine.
-    SOLID_QUEUE_IN_PUMA: true
+    # The Postgres accessory's name on Kamal's docker network.
+    DATABASE_HOST: wss-db
+    DATABASE_USERNAME: wss
+    WEB_CONCURRENCY: 2
+    JOB_CONCURRENCY: 1
+    RAILS_LOG_LEVEL: info
+    SMTP_PORT: 587
 
-    # Set number of processes dedicated to Solid Queue (default: 1)
-    # JOB_CONCURRENCY: 3
-
-    # Set number of cores available to the application on each server (default: 1).
-    # WEB_CONCURRENCY: 2
-
-    # Match this to any external database server to configure Active Record correctly
-    # Use wss-db for a db accessory server on same machine via local kamal docker network.
-    # DB_HOST: 192.168.0.2
-
-    # Log everything from Rails
-    # RAILS_LOG_LEVEL: debug
-
-# Aliases are triggered with "bin/kamal <alias>". You can overwrite arguments on invocation:
-# "bin/kamal logs -r job" will tail logs from the first server in the job section.
+# bin/kamal <alias>
 aliases:
   console: app exec --interactive --reuse "bin/rails console"
   shell: app exec --interactive --reuse "bash"
   logs: app logs -f
   dbc: app exec --interactive --reuse "bin/rails dbconsole"
+  backup: app exec --reuse "bin/rails runner DatabaseBackupJob.perform_now"
 
-
-# Use a persistent storage volume for sqlite database files and local Active Storage files.
-# Recommended to change this to a mounted volume path that is backed up off server.
+# Local Active Storage is only a scratch path in production (uploads live in
+# R2), but keep the volume so tmp/persisted files survive deploys.
 volumes:
   - "wss_storage:/rails/storage"
 
-
-# Bridge fingerprinted assets, like JS and CSS, between versions to avoid
-# hitting 404 on in-flight requests. Combines all files from new and old
-# version inside the asset_path.
+# Bridge fingerprinted assets between versions during rolling deploys.
 asset_path: /rails/public/assets
 
-# Configure the image builder.
 builder:
   arch: amd64
+  # Building amd64 images from an Apple Silicon Mac uses emulation (slow but
+  # fine). If deploys feel long, enable a remote builder on the server:
+  # remote: ssh://root@178.156.251.37
 
-  # # Build image via remote server (useful for faster amd64 builds on arm64 computers)
-  # remote: ssh://docker@docker-builder-server
-  #
-  # # Pass arguments and secrets to the Docker build process
-  # args:
-  #   RUBY_VERSION: ruby-3.4.3
-  # secrets:
-  #   - GITHUB_TOKEN
-  #   - RAILS_MASTER_KEY
-
-# Use a different ssh user than root
-# ssh:
-#   user: app
-
-# Use accessory services (secrets come from .kamal/secrets).
-# accessories:
-#   db:
-#     image: mysql:8.0
-#     host: 192.168.0.2
-#     # Change to 3306 to expose port to the world instead of just local network.
-#     port: "127.0.0.1:3306:3306"
-#     env:
-#       clear:
-#         MYSQL_ROOT_HOST: '%'
-#       secret:
-#         - MYSQL_ROOT_PASSWORD
-#     files:
-#       - config/mysql/production.cnf:/etc/mysql/my.cnf
-#       - db/production.sql:/docker-entrypoint-initdb.d/setup.sql
-#     directories:
-#       - data:/var/lib/mysql
-#   redis:
-#     image: redis:7.0
-#     host: 192.168.0.2
-#     port: 6379
-#     directories:
-#       - data:/data
+accessories:
+  db:
+    image: postgres:15
+    host: 178.156.251.37
+    # Bound to localhost only — reachable from containers, never the internet.
+    port: "127.0.0.1:5432:5432"
+    env:
+      clear:
+        POSTGRES_USER: wss
+        POSTGRES_DB: wss_production
+      secret:
+        - POSTGRES_PASSWORD
+    directories:
+      - data:/var/lib/postgresql/data

@@ -1,10 +1,7 @@
-# production:
-#   periodic_cleanup:
-#     class: CleanSoftDeletedRecordsJob
-#     queue: background
-#     args: [ 1000, { batch_size: 500 } ]
-#     schedule: every hour
-#   periodic_command:
-#     command: "SoftDeletedRecord.due.delete_all"
-#     priority: 2
-#     schedule: at 5am every day
+# Solid Queue recurring schedule (runs in the jobs container).
+production:
+  nightly_db_backup:
+    class: DatabaseBackupJob
+    queue: default
+    # 09:00 UTC = 4–5am US Eastern, the quietest hour for a US audience.
+    schedule: every day at 9am

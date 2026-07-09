@@ -106,3 +106,5 @@ gem "rubyzip", "~> 2.3", require: "zip"
 gem "lograge", "~> 0.15.0"
 gem "sentry-ruby", "~> 6.6"
 gem "sentry-rails", "~> 6.6"
+
+gem "aws-sdk-s3", "~> 1.226", require: false
