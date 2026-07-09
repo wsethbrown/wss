@@ -64,9 +64,8 @@ class WebhooksController < ApplicationController
     return unless user
 
     plan_name = extract_plan_name(subscription)
-    
-    # Access current_period_end correctly
-    period_end = subscription.try(:current_period_end) || subscription["current_period_end"]
+
+    period_end = subscription_period_end(subscription)
 
     user.update!(
       stripe_subscription_id: subscription.try(:id) || subscription["id"],
@@ -92,9 +91,8 @@ class WebhooksController < ApplicationController
     return unless user
 
     plan_name = extract_plan_name(subscription)
-    
-    # Access current_period_end correctly
-    period_end = subscription.try(:current_period_end) || subscription["current_period_end"]
+
+    period_end = subscription_period_end(subscription)
     cancel_at_period_end = subscription.try(:cancel_at_period_end) || subscription["cancel_at_period_end"]
 
     # Check for pause collection information
@@ -134,9 +132,8 @@ class WebhooksController < ApplicationController
     customer_id = subscription.try(:customer) || subscription["customer"]
     user = find_user_by_customer_id(customer_id)
     return unless user
-    
-    # Access current_period_end correctly
-    period_end = subscription.try(:current_period_end) || subscription["current_period_end"]
+
+    period_end = subscription_period_end(subscription)
 
     user.update!(
       stripe_subscription_id: nil,
@@ -161,11 +158,10 @@ class WebhooksController < ApplicationController
     return unless user
 
     # Update subscription end date based on successful payment
-    subscription_id = invoice.try(:subscription) || invoice["subscription"]
+    subscription_id = invoice_subscription_id(invoice)
     if subscription_id
       subscription = Stripe::Subscription.retrieve(subscription_id)
-      # Access current_period_end correctly
-      period_end = subscription.try(:current_period_end) || subscription["current_period_end"]
+      period_end = subscription_period_end(subscription)
       user.update!(
         subscription_ends_at: period_end ? Time.at(period_end) : nil
       )
@@ -182,12 +178,11 @@ class WebhooksController < ApplicationController
     elsif (invoice.try(:lines) || invoice["lines"])
       # Handle invoice lines that are subscription related
       lines_data = invoice.try(:lines).try(:data) || invoice.dig("lines", "data") || []
-      subscription_line = lines_data.find { |line| line.try(:subscription) || line["subscription"] }
+      subscription_line = lines_data.find { |line| line_subscription_id(line) }
       if subscription_line
-        subscription_id = subscription_line.try(:subscription) || subscription_line["subscription"]
+        subscription_id = line_subscription_id(subscription_line)
         subscription = Stripe::Subscription.retrieve(subscription_id)
-        # Access current_period_end correctly
-        period_end = subscription.try(:current_period_end) || subscription["current_period_end"]
+        period_end = subscription_period_end(subscription)
         user.update!(
           subscription_ends_at: period_end ? Time.at(period_end) : nil
         )
@@ -257,6 +252,43 @@ class WebhooksController < ApplicationController
       session_id = session.try(:id) || session["id"]
       Rails.logger.info "Subscription checkout completed: #{session_id}"
     end
+  end
+
+  # The webhook endpoint is pinned to API version 2025-05-28.basil while our
+  # direct API calls pin Stripe.api_version 2024-06-20, so objects arrive in
+  # BOTH shapes. Basil removed subscription.current_period_end (it now lives on
+  # each subscription item) — read whichever is present.
+  def subscription_period_end(subscription)
+    period_end = subscription.try(:current_period_end) || subscription["current_period_end"]
+    return period_end if period_end
+
+    items = subscription.try(:items) || subscription["items"]
+    items_data = items.try(:data) || (items && items["data"]) || []
+    items_data.filter_map { |item| item.try(:current_period_end) || item["current_period_end"] }.max
+  end
+
+  # Basil moved invoice.subscription to invoice.parent.subscription_details.subscription.
+  def invoice_subscription_id(invoice)
+    sub = invoice.try(:subscription) || invoice["subscription"]
+    return sub if sub
+
+    parent = invoice.try(:parent) || invoice["parent"]
+    return nil unless parent
+
+    details = parent.try(:subscription_details) || parent["subscription_details"]
+    details && (details.try(:subscription) || details["subscription"])
+  end
+
+  # Basil moved line.subscription to line.parent.subscription_item_details.subscription.
+  def line_subscription_id(line)
+    sub = line.try(:subscription) || line["subscription"]
+    return sub if sub
+
+    parent = line.try(:parent) || line["parent"]
+    return nil unless parent
+
+    details = parent.try(:subscription_item_details) || parent["subscription_item_details"]
+    details && (details.try(:subscription) || details["subscription"])
   end
 
   def find_user_by_customer_id(customer_id_obj)
