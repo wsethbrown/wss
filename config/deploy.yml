@@ -59,6 +59,10 @@ env:
     - SMTP_USERNAME
     - SMTP_PASSWORD
   clear:
+    # TEMPORARY pre-launch flag: lets the app boot before Stripe live keys
+    # exist (payments raise until then). DELETE this line the moment the
+    # live keys are in the secrets, then kamal deploy.
+    ALLOW_MISSING_STRIPE: "1"
     # The Postgres accessory's name on Kamal's docker network.
     DATABASE_HOST: wss-db
     DATABASE_USERNAME: wss
