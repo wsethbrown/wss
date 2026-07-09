@@ -90,7 +90,11 @@ production:
   primary: &primary_production
     <<: *default
     database: wss_production
-    username: wss
+    # TCP to the Kamal Postgres accessory — the default block has no host,
+    # and a host-less pg connection dials a local Unix socket that isn't there.
+    host: <%= ENV.fetch("DATABASE_HOST", "wss-db") %>
+    port: <%= ENV.fetch("DATABASE_PORT", 5432) %>
+    username: <%= ENV.fetch("DATABASE_USERNAME", "wss") %>
     password: <%= ENV["WSS_DATABASE_PASSWORD"] %>
   cache:
     <<: *primary_production
