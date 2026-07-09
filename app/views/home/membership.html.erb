@@ -1,0 +1,44 @@
+<%# Membership page. Char masthead (the pitch) over the shared pricing
+    section — same two-surface system as the homepage. %>
+
+<% content_for :title, "Membership" %>
+
+<!-- ===================================================== Masthead -->
+<section class="relative w-full overflow-hidden bg-char pt-16">
+  <div class="pointer-events-none absolute inset-0" aria-hidden="true"
+       style="background: radial-gradient(ellipse 70% 45% at 50% 105%, rgba(201, 136, 74, 0.28), transparent 70%);"></div>
+
+  <div class="relative z-10 mx-auto max-w-3xl px-6 py-20 text-center sm:py-24">
+    <p class="eyebrow mb-8 text-whiskey-300/90">Membership</p>
+
+    <h1 class="font-display text-4xl font-semibold leading-[1.1] text-cream sm:text-5xl lg:text-6xl">
+      Start your own<br>
+      <span class="relative inline-block whitespace-nowrap">
+        whiskey club.
+        <span class="thread absolute -bottom-2 left-0 right-0 sm:-bottom-3" aria-hidden="true"></span>
+      </span>
+    </h1>
+
+    <p class="mx-auto mt-8 max-w-xl text-lg leading-relaxed text-cream/70 sm:text-xl">
+      Membership lets you create a society — invite your friends, schedule
+      tasting nights, run the pours, and keep every bottle on the record.
+      Plus a deck credit every month.
+    </p>
+
+    <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
+      <%# data-turbo=false: let the browser handle the in-page anchor natively so
+          CSS scroll-behavior: smooth applies. Turbo's own anchor scroll overshoots. %>
+      <%= link_to 'See the plans', '#pricing',
+          data: { turbo: false },
+          class: 'inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char' %>
+      <%= link_to 'Browse societies', societies_path,
+          class: 'inline-flex items-center justify-center rounded-xl border border-cream/25 px-7 py-3.5 text-base font-semibold text-cream/90 transition hover:border-cream/50 hover:text-cream focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char' %>
+    </div>
+
+    <p class="mt-10 text-sm tracking-wide text-cream/50">
+      Joining a society is free &middot; Membership is for running one
+    </p>
+  </div>
+</section>
+
+<%= render "shared/membership_pricing" %>

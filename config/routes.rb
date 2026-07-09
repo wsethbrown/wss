@@ -27,6 +27,9 @@ Rails.application.routes.draw do
   # Single root for all users
   root to: 'home#index'
 
+  # Public membership page (plans + the start-your-own-club pitch)
+  get "membership", to: "home#membership"
+
   # The signed-in landing page. /dashboard and /account render the same account
   # surface; /dashboard is the canonical post-authentication destination.
   get "dashboard", to: "account#index", as: :dashboard

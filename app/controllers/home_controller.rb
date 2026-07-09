@@ -5,6 +5,12 @@ class HomeController < ApplicationController
     @featured_presentations = Presentation.published.recent.limit(3)
   end
 
+  # Standalone membership page: the "start your own whiskey club" pitch plus
+  # the same plan cards the homepage shows (shared partial).
+  def membership
+    @stripe_products = fetch_stripe_products
+  end
+
   private
 
   def calculate_monthly_price(price, interval)
