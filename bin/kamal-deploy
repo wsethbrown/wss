@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+set -e
+# Kamal without a local Ruby: runs the official Kamal image against this repo.
+# The host's ~/.ssh is mounted read-only (server auth) and Docker Desktop's
+# ssh-agent socket is forwarded as a fallback. Secrets flow from your shell
+# env (source ~/.wss-production.env first) via .kamal/secrets — nothing is
+# baked into the image or this script.
+#
+# Usage: source ~/.wss-production.env && bin/kamal-deploy setup|deploy|logs|...
+
+if ! docker info >/dev/null 2>&1; then
+  echo "Docker Desktop isn't running — start it first." >&2
+  exit 1
+fi
+
+ENV_ARGS=()
+for var in KAMAL_REGISTRY_PASSWORD WSS_DATABASE_PASSWORD \
+           AR_ENCRYPTION_PRIMARY_KEY AR_ENCRYPTION_DETERMINISTIC_KEY AR_ENCRYPTION_KEY_DERIVATION_SALT \
+           GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET \
+           STRIPE_SECRET_KEY STRIPE_PUBLISHABLE_KEY STRIPE_WEBHOOK_SECRET \
+           STRIPE_MONTHLY_PRICE_ID STRIPE_QUARTERLY_PRICE_ID STRIPE_YEARLY_PRICE_ID \
+           SENTRY_DSN R2_ENDPOINT R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_BUCKET \
+           SMTP_ADDRESS SMTP_USERNAME SMTP_PASSWORD; do
+  ENV_ARGS+=(-e "$var")
+done
+
+TTY_ARGS=(-i); [ -t 0 ] && TTY_ARGS=(-it)
+
+exec docker run "${TTY_ARGS[@]}" --rm \
+  -v "${PWD}:/workdir" \
+  -v "${HOME}/.ssh:/root/.ssh:ro" \
+  -v "/run/host-services/ssh-auth.sock:/ssh-agent" \
+  -e SSH_AUTH_SOCK=/ssh-agent \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  "${ENV_ARGS[@]}" \
+  ghcr.io/basecamp/kamal:latest "$@"
