@@ -115,13 +115,16 @@
       </div>
     <% end %>
 
-    <div class="mt-16">
+    <%# id + anchor on the tab links: switching feeds reloads the page, so
+        without the anchor the browser dumps you back at the top of the
+        bottle grid instead of the feed you just picked. %>
+    <div class="mt-16 scroll-mt-20" id="tastings">
       <div class="mb-4 flex items-center gap-2">
         <% { "Latest" => nil, "Circle" => "circle", "Hot" => "hot", "Tasting nights" => "nights" }.each do |label, key| %>
           <% next if key == "circle" && !user_signed_in? %>
           <%# Switching feeds drops the society filter — it only means something
               inside Tasting nights. %>
-          <%= link_to label, reviews_path(request.query_parameters.except("society").merge(feed: key).compact_blank),
+          <%= link_to label, reviews_path(request.query_parameters.except("society").merge(feed: key).compact_blank) + "#tastings",
               class: "rounded-full px-4 py-1.5 text-sm font-semibold transition #{@feed == key ? 'bg-whiskey-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
         <% end %>
       </div>
@@ -132,11 +135,11 @@
         <% if @night_societies.any? %>
           <div class="mb-6 flex flex-wrap items-center gap-2">
             <% if @night_society %>
-              <%= link_to "All societies", reviews_path(feed: "nights"), class: "rounded-full border border-gray-300 px-3 py-1 text-xs font-semibold text-gray-600 transition hover:bg-gray-100" %>
+              <%= link_to "All societies", reviews_path(feed: "nights", anchor: "tastings"), class: "rounded-full border border-gray-300 px-3 py-1 text-xs font-semibold text-gray-600 transition hover:bg-gray-100" %>
             <% end %>
             <% @night_societies.each do |society| %>
               <% next if society == @night_society %>
-              <%= link_to society.name, reviews_path(feed: "nights", society: society.id), class: "rounded-full border border-whiskey-200 bg-whiskey-50 px-3 py-1 text-xs font-semibold text-whiskey-700 transition hover:bg-whiskey-100" %>
+              <%= link_to society.name, reviews_path(feed: "nights", society: society.id, anchor: "tastings"), class: "rounded-full border border-whiskey-200 bg-whiskey-50 px-3 py-1 text-xs font-semibold text-whiskey-700 transition hover:bg-whiskey-100" %>
             <% end %>
           </div>
         <% end %>
