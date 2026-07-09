@@ -3,6 +3,6 @@
     <span class="truncate font-semibold text-gray-900"><%= review.bottle.display_name %></span>
     <%= render "bottles/rating", value: review.rating.to_f %>
   </div>
-  <p class="mt-1 text-sm text-gray-500"><%= review.user.first_name %> <%= render "shared/century_badge", record: review.user, compact: true %> · <%= time_ago_in_words(review.created_at) %> ago</p>
+  <p class="mt-1 text-sm text-gray-500"><%= review.user.first_name %> <%= render "shared/century_badge", record: review.user %> · <%= time_ago_in_words(review.created_at) %> ago</p>
   <%= render "reviews/event_line", review: review %>
 <% end %>
