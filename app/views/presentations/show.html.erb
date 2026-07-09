@@ -1,3 +1,9 @@
+<% content_for :title, "#{@presentation.title} - Whiskey Share Society" %>
+<% content_for :og_description, truncate(@presentation.description.to_s.squish, length: 200) if @presentation.description.present? %>
+<% if @presentation.featured_image.attached? %>
+  <% content_for :og_image, request.base_url + rails_blob_path(@presentation.featured_image) %>
+<% end %>
+
 <!-- Purchase Status Messages -->
 <% if params[:purchase] == 'success' %>
   <div class="max-w-2xl mx-auto pt-24 px-4">

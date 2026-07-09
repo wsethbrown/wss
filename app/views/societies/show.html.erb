@@ -1,4 +1,11 @@
 <% content_for :title, "#{@society.name} - Whiskey Share Society" %>
+<%# Private societies stay veiled everywhere, link previews included. %>
+<% if @society.public? %>
+  <% content_for :og_description, truncate(@society.description.to_s.squish, length: 200) if @society.description.present? %>
+  <% if @society.banner_image.attached? %>
+    <% content_for :og_image, request.base_url + rails_blob_path(@society.banner_image) %>
+  <% end %>
+<% end %>
 
 <div class="min-h-screen bg-whiskey-50">
   <%# Masthead — one header for every society. The banner image, when present,
