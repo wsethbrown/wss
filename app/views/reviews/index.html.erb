@@ -143,8 +143,14 @@
             <% end %>
           </div>
         <% end %>
-        <% if @night_reviews.any? %>
-          <div class="grid gap-4 sm:grid-cols-2"><%= render partial: "reviews/review_card", collection: @night_reviews, as: :review %></div>
+        <% if @nights.any? %>
+          <div class="grid gap-4 sm:grid-cols-2">
+            <% @nights.each do |event| %>
+              <% pours = @night_pours[event.id] || {} %>
+              <% next if pours.empty? %>
+              <%= render "reviews/night_card", event: event, pours: pours %>
+            <% end %>
+          </div>
         <% else %>
           <p class="text-gray-500">No tastings from society nights yet.</p>
         <% end %>

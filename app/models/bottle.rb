@@ -92,6 +92,28 @@ class Bottle < ApplicationRecord
     reviews.distinct.count(:user_id)
   end
 
+  # Each PUBLIC society's collective take on this bottle, from its event
+  # reviews — same latest-per-member math as the society board, so a
+  # re-taster refreshes their contribution instead of double-voting.
+  # Rows respond to #verdict_avg / #verdict_reviewers.
+  def society_verdicts
+    latest_per_member = <<~SQL
+      INNER JOIN (
+        SELECT DISTINCT ON (reviews.user_id, events.society_id) reviews.id
+        FROM reviews
+        INNER JOIN events ON events.id = reviews.event_id
+        WHERE reviews.bottle_id = #{id.to_i}
+        ORDER BY reviews.user_id, events.society_id, reviews.created_at DESC, reviews.id DESC
+      ) latest ON latest.id = reviews.id
+    SQL
+    Society.public_societies
+      .joins(events: :reviews).joins(latest_per_member)
+      .where(reviews: { bottle_id: id })
+      .select("societies.*, AVG(reviews.rating) AS verdict_avg, COUNT(DISTINCT reviews.user_id) AS verdict_reviewers")
+      .group("societies.id")
+      .order(Arel.sql("verdict_avg DESC, societies.name ASC"))
+  end
+
   # /bottles/<slug> image: pin > top-rated review hero (ties: votes, newest)
   # > creator's label_image > nil (view falls back to the SVG placeholder).
   def display_image

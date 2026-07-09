@@ -5,6 +5,13 @@ class BottlesController < ApplicationController
     @bottle = Bottle.find_by!(slug: params[:id])
     @reviews = @bottle.reviews.includes(:user, event: [:society, :event_bottles]).order(votes_count: :desc, created_at: :desc).page(params[:page]).per(10)
     @my_review = current_user && @bottle.reviews.find_by(user: current_user, event_id: nil)
+    # Society verdict cards lead the Tastings list. The expandable member
+    # rows show every event review (the aggregate itself dedups re-tastes).
+    @society_verdicts = @bottle.society_verdicts
+    @verdict_reviews = Review.joins(:event)
+                             .where(bottle_id: @bottle.id, events: { society_id: @society_verdicts.map(&:id) })
+                             .includes(:user, :event).recent_first
+                             .group_by { |r| r.event.society_id }
   end
 
   def search

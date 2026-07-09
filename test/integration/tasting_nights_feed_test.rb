@@ -1,15 +1,22 @@
 require "test_helper"
 
-# The "Tasting nights" feed: society event reviews, browsable by anyone —
-# public societies only, private nights stay veiled.
+# The "Tasting nights" feed: one card per society night, browsable by anyone.
+# Public societies only; private nights stay veiled.
 class TastingNightsFeedTest < ActionDispatch::IntegrationTest
-  test "nights feed shows public-society event reviews to signed-out visitors" do
+  test "nights feed shows one card per public-society night with room scores" do
     get reviews_path(feed: "nights")
     assert_response :success
 
-    # spring_blind belongs to single_malt (public) — its reviews appear.
-    assert_match reviews(:john_spring_ardbeg).bottle.name, response.body
-    assert_select "h2", text: "From society tasting nights"
+    event = events(:spring_blind)
+    assert_select "article" do
+      assert_select "a", text: event.society.name
+    end
+    assert_match event.title, response.body
+    # Ardbeg's night mean: john 4.5 + seth's spring review, averaged.
+    ardbeg_reviews = event.reviews.where(bottle: bottles(:ardbeg_10))
+    mean = (ardbeg_reviews.sum(:rating) / ardbeg_reviews.count).round(2)
+    assert_match ActionController::Base.helpers.number_with_precision(mean, precision: 2, strip_insignificant_zeros: true), response.body
+    assert_select "a", text: /See the night/
   end
 
   test "private-society nights never appear in the feed" do
@@ -19,6 +26,7 @@ class TastingNightsFeedTest < ActionDispatch::IntegrationTest
     get reviews_path(feed: "nights")
     assert_response :success
     assert_no_match private_review.event.society.name, response.body
+    assert_no_match private_review.event.title, response.body
   end
 
   test "society chip filters the feed to that society" do

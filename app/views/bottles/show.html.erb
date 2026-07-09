@@ -89,11 +89,15 @@
         <h2 class="mt-1 font-display text-2xl font-semibold text-gray-900">Tastings</h2>
       </div>
 
-      <% if @reviews.none? %>
+      <% if @reviews.none? && @society_verdicts.none? %>
         <p class="text-gray-600">No one has reviewed this bottle yet. Be the first pour.</p>
       <% end %>
 
       <div class="space-y-6">
+        <%# The rooms' verdicts lead; individual tastings follow. %>
+        <% @society_verdicts.each do |society| %>
+          <%= render "bottles/society_verdict_card", society: society, reviews: @verdict_reviews[society.id] || [] %>
+        <% end %>
         <% @reviews.each do |review| %>
           <article class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
             <div class="flex flex-wrap items-baseline justify-between gap-2">

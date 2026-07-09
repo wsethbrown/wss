@@ -39,9 +39,15 @@ class ReviewsController < ApplicationController
       # Filter chip: public societies only — a private society's id in the URL
       # silently falls back to the unfiltered feed (same veiling as the cards).
       @night_society = params[:society].present? ? Society.public_societies.find_by(id: params[:society]) : nil
-      @night_reviews = Review.from_tasting_nights(society: @night_society)
-                             .includes(:user, :bottle, event: [:society, :event_bottles])
-                             .recent_first.limit(50)
+      # One card per night: the events themselves, newest first, each with
+      # its per-bottle room scores (view aggregates from @night_pours).
+      nights = Event.joins(:society).where(societies: { is_private: false })
+      nights = nights.where(society_id: @night_society.id) if @night_society
+      @nights = nights.joins(:reviews).distinct.includes(:society)
+                      .order(start_time: :desc).limit(20)
+      @night_pours = Review.where(event_id: @nights.map(&:id)).includes(:user, :bottle)
+                           .group_by(&:event_id)
+                           .transform_values { |rs| rs.group_by(&:bottle) }
       @night_societies = Society.public_societies
                                 .joins(events: :reviews).distinct.order(:name).limit(12)
     end
