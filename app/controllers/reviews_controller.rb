@@ -32,9 +32,19 @@ class ReviewsController < ApplicationController
     # Distinguishes "nobody followed yet" from "followed, but no pours yet"
     # in the circle empty states. Managing follows lives on Account → Followed.
     @in_circle = current_user ? current_user.favorites.exists? : false
-    @feed = params[:feed] if %w[circle hot].include?(params[:feed])
+    @feed = params[:feed] if %w[circle hot nights].include?(params[:feed])
     @circle_feed_reviews = Review.for_circle(current_user, limit: 50) if @feed == "circle" && current_user
     @hot_reviews = Review.hot_ranked if @feed == "hot"
+    if @feed == "nights"
+      # Filter chip: public societies only — a private society's id in the URL
+      # silently falls back to the unfiltered feed (same veiling as the cards).
+      @night_society = params[:society].present? ? Society.public_societies.find_by(id: params[:society]) : nil
+      @night_reviews = Review.from_tasting_nights(society: @night_society)
+                             .includes(:user, :bottle, event: [:society, :event_bottles])
+                             .recent_first.limit(50)
+      @night_societies = Society.public_societies
+                                .joins(events: :reviews).distinct.order(:name).limit(12)
+    end
   end
 
   # Entity-grouped autocomplete for the section search: bottles and societies,

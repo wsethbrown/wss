@@ -117,14 +117,35 @@
 
     <div class="mt-16">
       <div class="mb-4 flex items-center gap-2">
-        <% { "Latest" => nil, "Circle" => "circle", "Hot" => "hot" }.each do |label, key| %>
+        <% { "Latest" => nil, "Circle" => "circle", "Hot" => "hot", "Tasting nights" => "nights" }.each do |label, key| %>
           <% next if key == "circle" && !user_signed_in? %>
-          <%= link_to label, reviews_path(request.query_parameters.merge(feed: key).compact_blank),
+          <%# Switching feeds drops the society filter — it only means something
+              inside Tasting nights. %>
+          <%= link_to label, reviews_path(request.query_parameters.except("society").merge(feed: key).compact_blank),
               class: "rounded-full px-4 py-1.5 text-sm font-semibold transition #{@feed == key ? 'bg-whiskey-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
         <% end %>
       </div>
 
-      <% if @feed == "hot" %>
+      <% if @feed == "nights" %>
+        <p class="eyebrow text-whiskey-600">Poured together</p>
+        <h2 class="mb-2 mt-1 font-display text-2xl font-semibold text-gray-900"><%= @night_society ? "Tasting nights · #{@night_society.name}" : "From society tasting nights" %></h2>
+        <% if @night_societies.any? %>
+          <div class="mb-6 flex flex-wrap items-center gap-2">
+            <% if @night_society %>
+              <%= link_to "All societies", reviews_path(feed: "nights"), class: "rounded-full border border-gray-300 px-3 py-1 text-xs font-semibold text-gray-600 transition hover:bg-gray-100" %>
+            <% end %>
+            <% @night_societies.each do |society| %>
+              <% next if society == @night_society %>
+              <%= link_to society.name, reviews_path(feed: "nights", society: society.id), class: "rounded-full border border-whiskey-200 bg-whiskey-50 px-3 py-1 text-xs font-semibold text-whiskey-700 transition hover:bg-whiskey-100" %>
+            <% end %>
+          </div>
+        <% end %>
+        <% if @night_reviews.any? %>
+          <div class="grid gap-4 sm:grid-cols-2"><%= render partial: "reviews/review_card", collection: @night_reviews, as: :review %></div>
+        <% else %>
+          <p class="text-gray-500">No tastings from society nights yet.</p>
+        <% end %>
+      <% elsif @feed == "hot" %>
         <p class="eyebrow text-whiskey-600">Getting thumbs</p>
         <h2 class="mb-6 mt-1 font-display text-2xl font-semibold text-gray-900">Hot tastings</h2>
         <div class="grid gap-4 sm:grid-cols-2"><%= render partial: "reviews/review_card", collection: @hot_reviews, as: :review %></div>

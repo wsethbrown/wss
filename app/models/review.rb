@@ -26,6 +26,15 @@ class Review < ApplicationRecord
 
   scope :recent_first, -> { order(created_at: :desc) }
 
+  # The "Tasting nights" feed: reviews poured at PUBLIC societies' events.
+  # Private societies stay veiled — their nights are never sourceable here,
+  # matching the provenance-card veiling rule.
+  scope :from_tasting_nights, ->(society: nil) {
+    scoped = joins(event: :society).where(societies: { is_private: false })
+    scoped = scoped.where(events: { society_id: society.id }) if society
+    scoped
+  }
+
   # Tastings ranked by thumbs-up received in the trailing window — a delta
   # ranking, distinct from the lifetime votes_count counter cache used on
   # bottle pages. LEFT JOIN keeps zero-vote reviews (sorted last); ties break
