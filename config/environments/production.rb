@@ -43,6 +43,18 @@ Rails.application.configure do
   # Prevent health checks from clogging up the logs.
   config.silence_healthcheck_path = "/up"
 
+  # One structured line per request (method, path, status, duration, db time,
+  # who) instead of Rails' multi-line chatter — greppable from `kamal app logs`
+  # and parseable by any log service we ship to later.
+  config.lograge.enabled = true
+  config.lograge.custom_payload do |controller|
+    {
+      request_id: controller.request.request_id,
+      user_id: controller.respond_to?(:current_user, true) ? controller.send(:current_user)&.id : nil,
+      ip: controller.request.remote_ip
+    }
+  end
+
   # Don't log any deprecations.
   config.active_support.report_deprecations = false
 
