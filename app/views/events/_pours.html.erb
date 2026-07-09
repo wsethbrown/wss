@@ -54,7 +54,7 @@
                   <% night_reviews.each do |review| %>
                     <div class="rounded-lg bg-whiskey-50 p-3">
                       <div class="flex flex-wrap items-baseline justify-between gap-2">
-                        <span class="text-sm font-semibold text-gray-900"><%= review.user.first_name %> <%= review.user.last_name %></span>
+                        <span class="text-sm font-semibold text-gray-900"><%= review.user.first_name %> <%= review.user.last_name %> <%= render "shared/century_badge", record: review.user, compact: true %></span>
                         <%= render "bottles/rating", value: review.rating.to_f %>
                       </div>
                       <% if review.notes.present? %><p class="mt-1 text-sm text-gray-600"><%= review.notes %></p><% end %>

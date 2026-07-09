@@ -47,6 +47,19 @@ class CenturyBadgeTest < ActionDispatch::IntegrationTest
     post "/users/sign_in", params: { user: { email: user.email, password: "password" } }
   end
 
+  test "bottle-page review cards show the compact badge for Century authors" do
+    bottle = bottles(:eagle_rare)
+    assert bottle.reviews.exists?(user: @user), "fixture assumption: john reviewed eagle rare"
+
+    get bottle_path(bottle)
+    assert_response :success
+    assert_select "[title*='Century']", count: 0
+
+    @user.update_column(:favorites_count, 150)
+    get bottle_path(bottle)
+    assert_select "[title*='Century']", minimum: 1
+  end
+
   test "society masthead shows the Century badge at 100+ followers" do
     @society.update!(is_private: false)
     @society.update_column(:favorites_count, 120)
