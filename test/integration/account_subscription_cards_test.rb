@@ -27,8 +27,12 @@ class AccountSubscriptionCardsTest < ActionDispatch::IntegrationTest
     get account_path
     assert_response :success
 
-    assert_select "h3", text: "Current Plan"
-    assert_select "h3", text: "Subscription Management"
+    assert_select "p", text: "Your membership"
+    assert_match "deck credit", response.body
+    assert_select "p", text: "Need a break?"
+    # No fabricated billing data — payment method and invoices live in the
+    # Stripe portal.
+    assert_no_match(/4242|Credit available:/, response.body)
     # The chooser is not shown to active subscribers.
     assert_select "h4", text: "Start your membership", count: 0
   end
