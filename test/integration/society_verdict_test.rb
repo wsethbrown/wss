@@ -75,6 +75,15 @@ class SocietyVerdictTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "blended_wheel averages member profiles and renormalizes" do
+    reviews = [ Review.new(nose: "peat smoke ash"), Review.new(nose: "honey and peat") ]
+    wheel = Review.blended_wheel(reviews)
+
+    assert_equal 1.0, wheel.values.max, "strongest family fills its spoke"
+    assert wheel["smoky"] > wheel["sweet"], "both mention smoky; only one sweet"
+    assert_empty Review.blended_wheel([ Review.new ])
+  end
+
   test "Bottle#society_verdicts uses latest-per-member math" do
     bottle = bottles(:ardbeg_10)
     verdicts = bottle.society_verdicts.to_a

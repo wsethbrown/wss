@@ -138,6 +138,20 @@ class Review < ApplicationRecord
     counts.transform_values { |n| (n / max).round(3) }
   end
 
+  # The room's shared palate: mean of each member's wheel profile per
+  # family, renormalized so the strongest family fills its spoke. Powers
+  # the wheel on society verdict cards.
+  def self.blended_wheel(reviews)
+    profiles = reviews.map(&:wheel_display_profile).reject(&:empty?)
+    return {} if profiles.empty?
+
+    sums = Hash.new(0.0)
+    profiles.each { |p| p.each { |family, v| sums[family] += v } }
+    means = sums.transform_values { |v| v / profiles.size }
+    max = means.values.max
+    means.transform_values { |v| (v / max).round(3) }
+  end
+
   # Reviews whose tasting text mentions EVERY given tag. A tag may be a
   # descriptor word ("peat") or a whole family ("smoky" = any of its words).
   scope :tagged, ->(tags) {

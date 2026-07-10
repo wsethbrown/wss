@@ -19,12 +19,20 @@
   </div>
 
   <% sections = Review.common_descriptors(reviews) %>
-  <% if sections.any? %>
-    <dl class="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 border-t border-gray-100 pt-4">
-      <% sections.each do |label, words| %>
-        <div><dt class="eyebrow text-whiskey-700"><%= label %></dt><dd class="mt-1 text-sm text-gray-600"><%= words.join(", ").capitalize %></dd></div>
+  <% wheel = Review.blended_wheel(reviews) %>
+  <% if sections.any? || wheel.any? %>
+    <div class="mt-4 grid items-start gap-6 border-t border-gray-100 pt-4 <%= 'sm:grid-cols-[1fr_11rem]' if sections.any? && wheel.any? %>">
+      <% if sections.any? %>
+        <dl class="grid grid-cols-2 gap-x-6 gap-y-3">
+          <% sections.each do |label, words| %>
+            <div><dt class="eyebrow text-whiskey-700"><%= label %></dt><dd class="mt-1 text-sm text-gray-600"><%= words.join(", ").capitalize %></dd></div>
+          <% end %>
+        </dl>
       <% end %>
-    </dl>
+      <% if wheel.any? %>
+        <%= render "reviews/palate_wheel", profile: wheel %>
+      <% end %>
+    </div>
   <% end %>
 
   <div class="mt-3 flex items-center justify-between">

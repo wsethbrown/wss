@@ -1,7 +1,9 @@
-<%# locals: review — the tasting's wheel, drawn with the SAME geometry the
-    input uses: spoke length = intensity. Lit segments click through to the
-    family's tag view. Renders nothing without descriptors or dial values. %>
-<% profile = review.wheel_display_profile %>
+<%# The palate wheel, drawn with the SAME geometry the input uses: spoke
+    length = intensity. Lit segments click through to the family's tag view.
+    Renders nothing without descriptors or dial values.
+    locals: review (one tasting) OR profile (a pre-blended family=>0..1
+    hash, e.g. Review.blended_wheel for a society verdict). %>
+<% profile = local_assigns[:profile] || review.wheel_display_profile %>
 <% if profile.any? %>
   <% families = Review::DESCRIPTOR_LEXICON.keys %>
   <% step = 360.0 / families.size %>
