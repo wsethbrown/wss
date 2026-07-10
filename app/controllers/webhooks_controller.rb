@@ -172,14 +172,16 @@ class WebhooksController < ApplicationController
         CreditTransaction.grant_monthly_credit(user, "Monthly subscription renewal")
         Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice_id}, credit added for renewal"
       when "subscription_create"
-        # The welcome credit. record! directly: our subscription_status row can
-        # still say "incomplete" at this instant (subscription.updated may not
-        # have processed yet), and a successful first payment IS the proof.
-        CreditTransaction.record!(user: user, amount: 1,
-          transaction_type: CreditTransaction::TRANSACTION_TYPES[:granted],
-          description: "Welcome credit - new subscription")
-        log_activity_for_user(user, :credits_added, nil, { amount: 1, reason: "new_subscription" })
-        Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice_id}, welcome credit added"
+        # The welcome credit's webhook path (fallback behind the synchronous
+        # grant on the checkout success redirect). No active-status guard:
+        # our subscription_status row can still say "incomplete" here, and a
+        # successful first payment IS the proof.
+        if CreditTransaction.grant_welcome_credit(user)
+          log_activity_for_user(user, :credits_added, nil, { amount: 1, reason: "new_subscription" })
+          Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice_id}, welcome credit added"
+        else
+          Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice_id}, welcome credit already granted"
+        end
       else
         Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice_id}"
       end

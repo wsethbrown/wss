@@ -45,6 +45,27 @@ class CreditTransaction < ApplicationRecord
     record!(user: user, amount: 1, transaction_type: TRANSACTION_TYPES[:granted], description: description)
   end
 
+  WELCOME_DESCRIPTION = "Welcome credit - new subscription".freeze
+
+  # The new-subscriber credit. Idempotent across its two triggers — the
+  # checkout success redirect (synchronous, so the credit is visible the
+  # moment they land back) and the invoice.payment_succeeded webhook
+  # (fallback for closed tabs) — which fire seconds apart. The 24-hour
+  # window blocks that double-grant while letting a genuine re-subscriber
+  # months later earn a fresh welcome. Returns true if granted.
+  def self.grant_welcome_credit(user)
+    granted = false
+    user.with_lock do
+      already = where(user: user, transaction_type: TRANSACTION_TYPES[:granted], description: WELCOME_DESCRIPTION)
+                  .where(created_at: 24.hours.ago..).exists?
+      unless already
+        create!(user: user, amount: 1, transaction_type: TRANSACTION_TYPES[:granted], description: WELCOME_DESCRIPTION)
+        granted = true
+      end
+    end
+    granted
+  end
+
   # Spends one credit to grant access to a presentation. Returns true/false.
   def self.use_credit(user, presentation)
     user.with_lock do

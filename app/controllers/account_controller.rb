@@ -7,6 +7,12 @@ class AccountController < ApplicationController
     # Clear any expired email change requests
     current_user.clear_expired_email_change
 
+    # Landing back from a successful checkout: grant the welcome credit NOW,
+    # synchronously, so it's on screen with the success message. The
+    # invoice.payment_succeeded webhook stays as the fallback (closed tabs),
+    # and grant_welcome_credit dedups the two.
+    ensure_welcome_credit_after_checkout if params[:subscription] == "success"
+
     @available_tags = Tag.order(:category, :name)
     @user_tags = current_user.tags.order(:category, :name)
 
@@ -290,6 +296,24 @@ class AccountController < ApplicationController
   end
 
   private
+
+  # Verifies with Stripe (the ?subscription=success param alone is
+  # forgeable) that a subscription was just created, then grants the
+  # welcome credit. Only subscriptions under an hour old count — anything
+  # older is not "just checked out" and belongs to the webhook path.
+  # Stripe hiccups here are fine: the webhook fallback still grants.
+  def ensure_welcome_credit_after_checkout
+    return if current_user.stripe_customer_id.blank?
+
+    subscription = Stripe::Subscription.list(customer: current_user.stripe_customer_id, status: "active", limit: 1).data.first
+    return unless subscription && Time.at(subscription.created) > 1.hour.ago
+
+    if CreditTransaction.grant_welcome_credit(current_user)
+      log_activity(:credits_added, current_user, { amount: 1, reason: "new_subscription" })
+    end
+  rescue Stripe::StripeError => e
+    Rails.logger.error "Welcome-credit sync check failed for user #{current_user.id}: #{e.message}"
+  end
 
   def profile_params
     params.require(:user).permit(:first_name, :last_name, :bio, :whiskey_shelf)
