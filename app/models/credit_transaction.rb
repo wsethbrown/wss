@@ -56,7 +56,12 @@ class CreditTransaction < ApplicationRecord
   def self.grant_welcome_credit(user)
     granted = false
     user.with_lock do
-      already = where(user: user, transaction_type: TRANSACTION_TYPES[:granted], description: WELCOME_DESCRIPTION)
+      # Prefix match, not equality: an admin-granted variant ("Welcome
+      # credit - new subscription (backfill)") must also count as already
+      # welcomed — exact matching once let a manual grant plus the
+      # automatic one stack to two credits.
+      already = where(user: user, transaction_type: TRANSACTION_TYPES[:granted])
+                  .where("description LIKE ?", "Welcome credit%")
                   .where(created_at: 24.hours.ago..).exists?
       unless already
         create!(user: user, amount: 1, transaction_type: TRANSACTION_TYPES[:granted], description: WELCOME_DESCRIPTION)

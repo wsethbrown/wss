@@ -67,6 +67,15 @@ class WelcomeCreditTest < ActionDispatch::IntegrationTest
     assert_equal 1, @user.reload.credits.to_i
   end
 
+  test "an admin-granted welcome variant blocks the automatic grant" do
+    CreditTransaction.record!(user: @user, amount: 1,
+      transaction_type: CreditTransaction::TRANSACTION_TYPES[:granted],
+      description: "Welcome credit - new subscription (backfill)")
+
+    assert_not CreditTransaction.grant_welcome_credit(@user)
+    assert_equal 1, @user.reload.credits.to_i
+  end
+
   private
 
   def stub_subscription_list(subscription, &block)
