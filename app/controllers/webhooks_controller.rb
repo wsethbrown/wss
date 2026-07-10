@@ -74,15 +74,14 @@ class WebhooksController < ApplicationController
       subscription_ends_at: period_end ? Time.at(period_end) : nil
     )
 
-    # Add initial credit for new subscription
-    CreditTransaction.grant_monthly_credit(user, "Welcome credit - new subscription")
-    
-    # Log activities
+    # NOTE: the welcome credit is granted on invoice.payment_succeeded
+    # (billing_reason subscription_create), not here — this event arrives
+    # with status "incomplete" during checkout, so an active-subscription
+    # guard would (and once did) silently swallow the credit.
     subscription_id = subscription.try(:id) || subscription["id"]
     log_activity_for_user(user, :subscription_created, nil, { plan: plan_name, stripe_id: subscription_id })
-    log_activity_for_user(user, :credits_added, nil, { amount: 1, reason: 'new_subscription' })
 
-    Rails.logger.info "Subscription created for user #{user.id}: #{subscription_id}, credit added"
+    Rails.logger.info "Subscription created for user #{user.id}: #{subscription_id}"
   end
 
   def handle_subscription_updated(subscription)
@@ -166,12 +165,21 @@ class WebhooksController < ApplicationController
         subscription_ends_at: period_end ? Time.at(period_end) : nil
       )
 
-      # Add credit for recurring subscription payments (not initial subscription creation)
       billing_reason = invoice.try(:billing_reason) || invoice["billing_reason"]
       invoice_id = invoice.try(:id) || invoice["id"]
-      if billing_reason == "subscription_cycle"
+      case billing_reason
+      when "subscription_cycle"
         CreditTransaction.grant_monthly_credit(user, "Monthly subscription renewal")
         Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice_id}, credit added for renewal"
+      when "subscription_create"
+        # The welcome credit. record! directly: our subscription_status row can
+        # still say "incomplete" at this instant (subscription.updated may not
+        # have processed yet), and a successful first payment IS the proof.
+        CreditTransaction.record!(user: user, amount: 1,
+          transaction_type: CreditTransaction::TRANSACTION_TYPES[:granted],
+          description: "Welcome credit - new subscription")
+        log_activity_for_user(user, :credits_added, nil, { amount: 1, reason: "new_subscription" })
+        Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice_id}, welcome credit added"
       else
         Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice_id}"
       end
