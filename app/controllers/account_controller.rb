@@ -7,11 +7,17 @@ class AccountController < ApplicationController
     # Clear any expired email change requests
     current_user.clear_expired_email_change
 
-    # Landing back from a successful checkout: grant the welcome credit NOW,
-    # synchronously, so it's on screen with the success message. The
-    # invoice.payment_succeeded webhook stays as the fallback (closed tabs),
-    # and grant_welcome_credit dedups the two.
-    ensure_welcome_credit_after_checkout if params[:subscription] == "success"
+    # Landing back from Stripe Checkout. On success, grant the welcome
+    # credit NOW, synchronously, so it's on screen with the banner (the
+    # invoice.payment_succeeded webhook stays as the closed-tab fallback;
+    # grant_welcome_credit dedups the two). Then redirect to strip the
+    # ?subscription param — flash makes the banner one-shot instead of
+    # immortal across refreshes.
+    if params[:subscription].present?
+      ensure_welcome_credit_after_checkout if params[:subscription] == "success"
+      flash[:checkout_result] = params[:subscription]
+      return redirect_to account_path(anchor: "subscription")
+    end
 
     @available_tags = Tag.order(:category, :name)
     @user_tags = current_user.tags.order(:category, :name)

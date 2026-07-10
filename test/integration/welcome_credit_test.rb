@@ -18,9 +18,16 @@ class WelcomeCreditTest < ActionDispatch::IntegrationTest
       get account_path(subscription: "success")
     end
 
-    assert_response :success
+    # Redirects to strip the param — the banner is flash-driven (one-shot),
+    # so a refresh can't resurrect it.
+    assert_redirected_to account_path(anchor: "subscription")
     assert_equal 1, @user.reload.credits.to_i
+
+    follow_redirect!
     assert_match "one deck credit added", response.body
+
+    get account_path
+    assert_no_match "one deck credit added", response.body, "banner must not survive a refresh"
   end
 
   test "the webhook arriving after the redirect does not double-grant" do
@@ -28,6 +35,7 @@ class WelcomeCreditTest < ActionDispatch::IntegrationTest
     stub_subscription_list(fresh_sub) do
       get account_path(subscription: "success")
     end
+    assert_redirected_to account_path(anchor: "subscription")
     assert_equal 1, @user.reload.credits.to_i
 
     # Webhook fallback fires seconds later — deduped.
@@ -42,7 +50,7 @@ class WelcomeCreditTest < ActionDispatch::IntegrationTest
       get account_path(subscription: "success")
     end
 
-    assert_response :success
+    assert_redirected_to account_path(anchor: "subscription")
     assert_equal 0, @user.reload.credits.to_i
   end
 
@@ -51,7 +59,7 @@ class WelcomeCreditTest < ActionDispatch::IntegrationTest
     Stripe::Subscription.stub(:list, raiser) do
       get account_path(subscription: "success")
     end
-    assert_response :success
+    assert_redirected_to account_path(anchor: "subscription")
     assert_equal 0, @user.reload.credits.to_i
 
     # Webhook path still grants.
