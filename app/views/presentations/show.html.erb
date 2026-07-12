@@ -343,6 +343,9 @@
           <div class="bg-white border border-whiskey-200 rounded-3xl shadow-xl p-8">
             <div class="text-center mb-6">
               <% owned_purchase = user_signed_in? ? current_user.user_presentations.find_by(presentation_id: @presentation.id) : nil %>
+              <%# A credit is the primary way to get a paid deck when the viewer is an
+                  active member holding at least one. Otherwise it's a cash purchase. %>
+              <% can_credit = user_signed_in? && !owned_purchase && current_user.subscription_active? && current_user.credits > 0 && !@presentation.free? %>
               <% if owned_purchase %>
                 <% if owned_purchase.purchase_type == 'credit' && !current_user.subscription_active? %>
                   <p class="eyebrow text-whiskey-600 mb-2">In your library</p>
@@ -353,14 +356,13 @@
                   <div class="font-display text-3xl font-semibold text-gray-900 mb-2"><%= owned_purchase.purchase_type == 'direct' ? 'Yours for good' : 'Unlocked' %></div>
                   <p class="text-gray-600"><%= owned_purchase.purchase_type == 'direct' ? 'Bought outright — lifetime access.' : 'Unlocked with a credit via your membership.' %></p>
                 <% end %>
+              <% elsif can_credit %>
+                <p class="eyebrow text-whiskey-600 mb-2">Included with membership</p>
+                <div class="font-display text-4xl font-semibold text-gray-900 mb-1">Use 1 credit</div>
+                <p class="text-gray-600">You have <%= current_user.credits %> credit<%= 's' unless current_user.credits == 1 %> — access lasts as long as your membership.</p>
               <% else %>
                 <div class="font-display text-4xl font-semibold text-gray-900 mb-1"><%= @presentation.formatted_price %></div>
-                <p class="text-gray-600"><%= @presentation.free? ? 'Free for everyone' : 'One-time purchase' %></p>
-                <% if user_signed_in? && current_user.subscription_active? && current_user.credits > 0 && !@presentation.free? %>
-                  <p class="mt-2 inline-flex items-center gap-1.5 rounded-full bg-whiskey-100 px-3 py-1 text-sm font-semibold text-whiskey-800">
-                    or 1 credit — you have <%= current_user.credits %>
-                  </p>
-                <% end %>
+                <p class="text-gray-600"><%= @presentation.free? ? 'Free for everyone' : 'One-time purchase — yours for good' %></p>
               <% end %>
             </div>
 
@@ -480,8 +482,20 @@
                 </div>
               <% end %>
               <% if user_signed_in? %>
-                <%= link_to new_presentation_purchase_path(@presentation), class: "block w-full bg-whiskey-600 text-white font-semibold py-4 px-6 rounded-2xl hover:bg-whiskey-700 transition mb-4 text-center" do %>
-                  <%= @presentation.free? ? 'Add to my library' : 'Get this deck' %>
+                <% if can_credit %>
+                  <%# Credit is primary; buying outright is the quieter alternative.
+                      Both route to the confirm page, which leads with the matching method. %>
+                  <%= link_to new_presentation_purchase_path(@presentation), class: "block w-full bg-whiskey-600 text-white font-semibold py-4 px-6 rounded-2xl hover:bg-whiskey-700 transition mb-3 text-center" do %>
+                    Use 1 credit
+                  <% end %>
+                  <%= link_to new_presentation_purchase_path(@presentation, method: 'direct'), class: "block w-full border border-whiskey-300 text-whiskey-800 font-semibold py-3.5 px-6 rounded-2xl hover:bg-whiskey-50 transition text-center" do %>
+                    Buy outright — <%= @presentation.formatted_price %>
+                  <% end %>
+                  <p class="mt-2 mb-4 text-center text-xs text-gray-500">Rather keep your credit? Buy it outright — yours for good, membership or not.</p>
+                <% else %>
+                  <%= link_to new_presentation_purchase_path(@presentation), class: "block w-full bg-whiskey-600 text-white font-semibold py-4 px-6 rounded-2xl hover:bg-whiskey-700 transition mb-4 text-center" do %>
+                    <%= @presentation.free? ? 'Add to my library' : 'Get this deck' %>
+                  <% end %>
                 <% end %>
               <% else %>
                 <%= link_to auth_path, class: "block w-full bg-whiskey-600 text-white font-semibold py-4 px-6 rounded-2xl hover:bg-whiskey-700 transition mb-4 text-center" do %>

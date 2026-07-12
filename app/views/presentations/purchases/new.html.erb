@@ -50,9 +50,10 @@
             <fieldset class="space-y-4">
               <legend class="sr-only">Purchase method</legend>
 
+              <% prefer_direct = params[:method] == 'direct' %>
               <% if @can_use_credit %>
                 <label class="block cursor-pointer">
-                  <input type="radio" name="purchase_method" value="credit" class="peer sr-only" checked>
+                  <input type="radio" name="purchase_method" value="credit" class="peer sr-only" <%= 'checked' unless prefer_direct %>>
                   <div class="rounded-xl border-2 border-whiskey-100 p-6 transition hover:border-whiskey-300 peer-checked:border-whiskey-600 peer-checked:bg-whiskey-50 peer-focus-visible:ring-2 peer-focus-visible:ring-whiskey-500 peer-focus-visible:ring-offset-2">
                     <div class="flex items-start justify-between gap-4">
                       <div>
@@ -69,7 +70,7 @@
               <% end %>
 
               <label class="block cursor-pointer">
-                <input type="radio" name="purchase_method" value="direct" class="peer sr-only" <%= 'checked' unless @can_use_credit %>>
+                <input type="radio" name="purchase_method" value="direct" class="peer sr-only" <%= 'checked' if !@can_use_credit || prefer_direct %>>
                 <div class="rounded-xl border-2 border-whiskey-100 p-6 transition hover:border-whiskey-300 peer-checked:border-whiskey-600 peer-checked:bg-whiskey-50 peer-focus-visible:ring-2 peer-focus-visible:ring-whiskey-500 peer-focus-visible:ring-offset-2">
                   <div class="flex items-start justify-between gap-4">
                     <div>
