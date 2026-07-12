@@ -60,9 +60,23 @@ protect it.
 ## Files
 pdf_file (buyer download; pptx/ppt/pdf allowed) · sneak_peek_file (public) ·
 speaker_notes/outline_file/recommendations_sheet (owner downloads) ·
+scorecard (owner download; optional custom tasting scorecard PDF) ·
 supplemental_materials (owner "Extras") · featured_image (cover) ·
 preview_images (≤3) · slide_images (rendered pages). Downloads box renders
 ONLY when files exist; otherwise an honest "being prepared" note.
+
+## Scorecards (owner-gated downloads, NOT generated)
+Each deck's owner downloads always include a **Blank scorecard** — one static
+PDF shipped at `app/assets/documents/wss_scorecard_blank.pdf`, identical for
+every deck, served via `send_file` behind `check_access`
+(`Presentations::DownloadsController#blank_scorecard`). If the author uploads a
+**Custom tasting scorecard** on the deck-edit form (`has_one_attached
+:scorecard`), it appears as an extra owner download; `#scorecard` falls back to
+the blank when none is attached. The old auto-generated HTML scorecard page
+(pour-list → print-to-PDF) and its `print` layout were RETIRED — don't
+reintroduce them. Regenerate the blank via `script/scorecard/` (offline tool,
+needs CrimsonText TTFs; not wired into the app). The PDF is excluded from the
+Tailwind scan (`@source not "../documents"`) so precompile doesn't crash.
 
 ## Slide rendering: fonts and the publish gate
 
