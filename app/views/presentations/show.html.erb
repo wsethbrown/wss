@@ -4,6 +4,12 @@
   <% content_for :og_image, request.base_url + rails_blob_path(@presentation.featured_image) %>
 <% end %>
 
+<%# A credit is the primary way to get a paid deck when the viewer is an active
+    member holding at least one and doesn't already own it. Used by every purchase
+    CTA on the page so they stay consistent. %>
+<% viewer_owns = user_signed_in? && @presentation.purchased_by?(current_user) %>
+<% viewer_can_credit = user_signed_in? && !viewer_owns && !@presentation.free? && current_user.subscription_active? && current_user.credits.to_i > 0 %>
+
 <!-- Purchase Status Messages -->
 <% if params[:purchase] == 'success' %>
   <div class="max-w-2xl mx-auto pt-24 px-4">
@@ -72,7 +78,13 @@
       <% else %>
         <%= link_to new_presentation_purchase_path(@presentation),
             class: "inline-flex items-center justify-center gap-2 rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char" do %>
-          <%= @presentation.free? ? 'Add to my library — free' : "Get this deck — #{@presentation.formatted_price}" %>
+          <%= if @presentation.free?
+                'Add to my library — free'
+              elsif viewer_can_credit
+                'Use 1 credit'
+              else
+                "Get this deck — #{@presentation.formatted_price}"
+              end %>
         <% end %>
       <% end %>
       <% if @presentation.sneak_peek_file.attached? %>
@@ -160,6 +172,8 @@
                             'Sign in to get this deck'
                           elsif @presentation.free?
                             'Add to my library — free'
+                          elsif viewer_can_credit
+                            'Use 1 credit'
                           else
                             "Get this deck — #{@presentation.formatted_price}"
                           end %>
@@ -252,7 +266,13 @@
                         <p class="font-display text-xl font-semibold text-gray-900"><%= slides.size - count %> more slides in the full deck.</p>
                         <%= link_to user_signed_in? ? new_presentation_purchase_path(@presentation) : auth_path,
                             class: 'mt-4 inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-6 py-3 font-semibold text-white shadow-lg shadow-whiskey-950/20 transition hover:bg-whiskey-700' do %>
-                          <%= user_signed_in? ? 'Get this deck' : 'Sign in to get this deck' %>
+                          <%= if !user_signed_in?
+                                'Sign in to get this deck'
+                              elsif viewer_can_credit
+                                'Use 1 credit'
+                              else
+                                'Get this deck'
+                              end %>
                         <% end %>
                       </div>
                     </div>
@@ -343,9 +363,7 @@
           <div class="bg-white border border-whiskey-200 rounded-3xl shadow-xl p-8">
             <div class="text-center mb-6">
               <% owned_purchase = user_signed_in? ? current_user.user_presentations.find_by(presentation_id: @presentation.id) : nil %>
-              <%# A credit is the primary way to get a paid deck when the viewer is an
-                  active member holding at least one. Otherwise it's a cash purchase. %>
-              <% can_credit = user_signed_in? && !owned_purchase && current_user.subscription_active? && current_user.credits > 0 && !@presentation.free? %>
+              <% can_credit = viewer_can_credit %>
               <% if owned_purchase %>
                 <% if owned_purchase.purchase_type == 'credit' && !current_user.subscription_active? %>
                   <p class="eyebrow text-whiskey-600 mb-2">In your library</p>

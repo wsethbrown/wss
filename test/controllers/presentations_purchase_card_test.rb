@@ -28,6 +28,9 @@ class PresentationsPurchaseCardTest < ActionDispatch::IntegrationTest
     # Buying outright is still offered, as the secondary option, at the cash price.
     assert_select "a[href=?]", new_presentation_purchase_path(deck, method: "direct"), text: /Buy outright/
     assert_match(/\$17\.99/, @response.body)
+    # No CTA on the page shouts the cash price when the viewer holds a credit —
+    # the hero and story-gate CTAs became credit-first too.
+    assert_no_match(/Get this deck — \$/, @response.body)
   end
 
   test "member with no credits sees only the cash option" do
