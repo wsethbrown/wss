@@ -1,9 +1,21 @@
 ---
 name: wss-societies
-description: WSS societies — the privacy model, invite links, member management, events/RSVPs, and profile visibility rules. Use for any society, event, or membership change.
+description: WSS societies — the privacy model, invite links, member management, events/RSVPs, and profile visibility rules. Use for any society, event, or member/role change (the SocietyMembership join table). NOT for paid membership — see wss-membership-model.
 ---
 
 # WSS Societies
+
+## Naming collision — read first
+`SocietyMembership` (this skill's join table: roles `member|officer|admin`,
+status active/etc.) is UNRELATED to paid **membership** / Stripe subscription.
+"Member of a society" ≠ "paying member." For the paid model see
+wss-membership-model.
+
+## The creation paywall (SocietyPolicy#create?)
+Creating/running a society is a PAID benefit — `create?` (society_policy.rb:39)
+returns true only for `user.admin? || user.has_active_subscription?`. `new?`
+aliases `create?`. JOINING a public society stays FREE (see join? below). See
+wss-membership-model for the free-vs-paid split.
 
 ## The privacy model (every layer enforces it — keep it that way)
 - **Scope** (SocietyPolicy::Scope): anonymous → public only; signed-in →
