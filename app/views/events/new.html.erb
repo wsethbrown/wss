@@ -1,50 +1,30 @@
 <% content_for :title, "Create New Event - Whiskey Share Society" %>
 
-<div class="min-h-screen bg-whiskey-50 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
-  <!-- Background Effects -->
-  <div class="absolute inset-0 pointer-events-none">
-    <div class="absolute top-1/4 left-1/6 w-40 h-40 bg-blue-200/20 rounded-full blur-3xl animate-pulse"></div>
-    <div class="absolute bottom-1/4 right-1/6 w-32 h-32 bg-whiskey-200/25 rounded-full blur-2xl animate-pulse delay-1000"></div>
-  </div>
-
-  <div class="max-w-4xl mx-auto relative z-10">
+<div class="min-h-screen bg-whiskey-50 px-4 pt-28 pb-16 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-3xl">
     <!-- Header -->
-    <div class="text-center mb-12">
-      <div class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-whiskey-100/80 backdrop-blur-sm border border-whiskey-200/50 text-whiskey-800 font-bold text-sm mb-8 shadow-lg">
-        <span class="w-2 h-2 bg-whiskey-500 rounded-full animate-pulse"></span>
-        <span>Create Event</span>
-      </div>
-
-      <h1 class="text-5xl md:text-6xl font-display font-semibold tracking-tight mb-6 leading-tight">
-        <span class="block text-gray-900">Create New</span>
-        <span class="block bg-gradient-to-r from-whiskey-600 via-whiskey-600 to-blue-600 bg-clip-text text-transparent">Event</span>
-      </h1>
-
+    <div class="mb-10 text-center">
+      <p class="eyebrow mb-3 text-whiskey-600">Create an event</p>
+      <h1 class="font-display text-4xl font-semibold leading-tight text-gray-900 md:text-5xl">Create New Event</h1>
+      <div class="rule-double mx-auto mt-6 w-20 text-whiskey-800"></div>
       <% if @event.society %>
-        <p class="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed font-medium">
-          Planning an event for <strong class="text-gray-900"><%= @event.society.name %></strong>? Let's get the details sorted.
+        <p class="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-gray-600">
+          Planning an event for <strong class="font-semibold text-gray-900"><%= @event.society.name %></strong>? Let's get the details sorted.
         </p>
       <% else %>
-        <p class="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed font-medium">
-          Create an engaging <strong class="text-gray-900">whiskey event</strong> for your community.
+        <p class="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-gray-600">
+          Create an engaging <strong class="font-semibold text-gray-900">whiskey event</strong> for your community.
         </p>
       <% end %>
     </div>
 
     <!-- Form Card -->
-    <div class="bg-white/90 backdrop-blur-xl border border-white/50 rounded-3xl shadow-2xl p-8 md:p-12">
+    <div class="rounded-2xl border border-whiskey-200 bg-white p-6 shadow-sm sm:p-10">
       <%= form_with(model: [@society, @event].compact, local: true, html: { class: "space-y-8" }) do |form| %>
         <% if @event.errors.any? %>
-          <div class="rounded-2xl bg-red-50 border border-red-200 p-6">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <h3 class="text-lg font-semibold text-red-800">Please fix the following errors:</h3>
-            </div>
-            <ul class="list-disc list-inside text-red-700 space-y-1">
+          <div class="rounded-xl border border-red-200 bg-red-50 p-5">
+            <h3 class="mb-2 text-sm font-semibold text-red-800">Please fix the following:</h3>
+            <ul class="list-inside list-disc space-y-1 text-sm text-red-700">
               <% @event.errors.full_messages.each do |message| %>
                 <li><%= message %></li>
               <% end %>
@@ -54,119 +34,84 @@
 
         <!-- Society Selection (if not pre-selected) -->
         <% unless @event.society_id %>
-          <div class="space-y-3">
-            <%= form.label :society_id, class: "block text-lg font-semibold text-gray-900" do %>
-              <span class="flex items-center gap-2">
-                Society
-                <span class="text-red-500">*</span>
-              </span>
+          <div>
+            <%= form.label :society_id, class: "block text-sm font-medium text-gray-700 mb-2" do %>
+              Society <span class="text-whiskey-600">*</span>
             <% end %>
-            <%= form.collection_select :society_id, 
-                current_user.administered_societies, 
-                :id, :name, 
+            <%= form.collection_select :society_id,
+                current_user.administered_societies,
+                :id, :name,
                 { prompt: "Select a society..." },
-                { class: "w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-whiskey-500 focus:border-whiskey-500 transition-colors bg-white/80" } %>
-            <p class="text-sm text-gray-600">Choose which society this event belongs to.</p>
+                { class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500" } %>
+            <p class="mt-1 text-sm text-gray-500">Choose which society this event belongs to.</p>
           </div>
         <% else %>
           <%= form.hidden_field :society_id %>
         <% end %>
 
         <!-- Event Title -->
-        <div class="space-y-3">
-          <%= form.label :title, class: "block text-lg font-semibold text-gray-900" do %>
-            <span class="flex items-center gap-2">
-              🎯 Event Title
-              <span class="text-red-500">*</span>
-            </span>
+        <div>
+          <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-2" do %>
+            Event title <span class="text-whiskey-600">*</span>
           <% end %>
-          <%= form.text_field :title, 
-              class: "w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-whiskey-500 focus:border-whiskey-500 transition-colors placeholder-gray-400 bg-white/80",
+          <%= form.text_field :title,
+              class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
               placeholder: "e.g., Highland Scotch Tasting, Bourbon & BBQ Night" %>
-          <p class="text-sm text-gray-600">Give your event a compelling title that captures what makes it special.</p>
+          <p class="mt-1 text-sm text-gray-500">Give your event a compelling title that captures what makes it special.</p>
         </div>
 
         <!-- Event Description -->
-        <div class="space-y-3">
-          <%= form.label :description, class: "block text-lg font-semibold text-gray-900" do %>
-            <span class="flex items-center gap-2">
-              📝 Description
-            </span>
-          <% end %>
-          <%= form.text_area :description, 
-              rows: 5,
-              class: "w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-whiskey-500 focus:border-whiskey-500 transition-colors placeholder-gray-400 bg-white/80 resize-none",
+        <div>
+          <%= form.label :description, class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_area :description, rows: 5,
+              class: "w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
               placeholder: "Describe what attendees can expect, what whiskies will be featured, any special guests, food pairings, etc..." %>
-          <p class="text-sm text-gray-600">Help members understand what makes this event worth attending.</p>
+          <p class="mt-1 text-sm text-gray-500">Help members understand what makes this event worth attending.</p>
         </div>
 
         <!-- Location -->
-        <div class="space-y-3">
-          <%= form.label :location, class: "block text-lg font-semibold text-gray-900" do %>
-            <span class="flex items-center gap-2">
-              Location
-            </span>
-          <% end %>
-          <%= form.text_field :location, 
-              class: "w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-whiskey-500 focus:border-whiskey-500 transition-colors placeholder-gray-400 bg-white/80",
+        <div>
+          <%= form.label :location, class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_field :location,
+              class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
               placeholder: "e.g., The Whiskey Bar, 123 Main St, or Virtual (Zoom)" %>
-          <p class="text-sm text-gray-600">Where will your event take place? Include address or virtual meeting details.</p>
+          <p class="mt-1 text-sm text-gray-500">Where will your event take place? Include address or virtual meeting details.</p>
         </div>
 
         <!-- Date and Time -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <!-- Start Time -->
-          <div class="space-y-3">
-            <%= form.label :start_time, class: "block text-lg font-semibold text-gray-900" do %>
-              <span class="flex items-center gap-2">
-                🕐 Start Date & Time
-                <span class="text-red-500">*</span>
-              </span>
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+          <div>
+            <%= form.label :start_time, class: "block text-sm font-medium text-gray-700 mb-2" do %>
+              Start date &amp; time <span class="text-whiskey-600">*</span>
             <% end %>
-            <%= form.datetime_local_field :start_time, 
-                class: "w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-whiskey-500 focus:border-whiskey-500 transition-colors bg-white/80" %>
-            <p class="text-sm text-gray-600">When does the event begin?</p>
+            <%= form.datetime_local_field :start_time,
+                class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+            <p class="mt-1 text-sm text-gray-500">When does the event begin?</p>
           </div>
 
-          <!-- End Time -->
-          <div class="space-y-3">
-            <%= form.label :end_time, class: "block text-lg font-semibold text-gray-900" do %>
-              <span class="flex items-center gap-2">
-                🕕 End Date & Time
-                <span class="text-red-500">*</span>
-              </span>
+          <div>
+            <%= form.label :end_time, class: "block text-sm font-medium text-gray-700 mb-2" do %>
+              End date &amp; time <span class="text-whiskey-600">*</span>
             <% end %>
-            <%= form.datetime_local_field :end_time, 
-                class: "w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-whiskey-500 focus:border-whiskey-500 transition-colors bg-white/80" %>
-            <p class="text-sm text-gray-600">When does the event end?</p>
+            <%= form.datetime_local_field :end_time,
+                class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+            <p class="mt-1 text-sm text-gray-500">When does the event end?</p>
           </div>
         </div>
 
         <!-- Action Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 pt-8">
-          <%= form.submit "Create Event",
-              class: "flex-1 py-4 px-8 bg-whiskey-600 text-white text-lg font-semibold rounded-xl hover:bg-whiskey-700 transition-colors duration-200 shadow-md cursor-pointer" %>
-
-          <% if @event.society %>
-            <%= link_to "Cancel", society_path(@event.society),
-                class: "flex-1 py-4 px-8 bg-white text-gray-700 text-lg font-semibold rounded-xl hover:bg-gray-50 transition-colors duration-200 text-center border-2 border-gray-300 hover:border-gray-400" %>
-          <% else %>
-            <%= link_to "Cancel", societies_path,
-                class: "flex-1 py-4 px-8 bg-white text-gray-700 text-lg font-semibold rounded-xl hover:bg-gray-50 transition-colors duration-200 text-center border-2 border-gray-300 hover:border-gray-400" %>
-          <% end %>
+        <div class="flex flex-col gap-4 pt-2 sm:flex-row">
+          <%= form.submit "Create event",
+              class: "flex-1 cursor-pointer rounded-xl bg-whiskey-600 px-8 py-4 text-lg font-semibold text-white transition hover:bg-whiskey-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2" %>
+          <%= link_to "Cancel", (@event.society ? society_path(@event.society) : societies_path),
+              class: "flex-1 rounded-xl border border-gray-200 bg-gray-100 px-8 py-4 text-center text-lg font-semibold text-gray-700 transition hover:bg-gray-200" %>
         </div>
 
         <!-- Organizer Note -->
-        <div class="bg-gradient-to-r from-whiskey-50 to-whiskey-50 rounded-2xl p-6 border border-whiskey-100">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-8 h-8 bg-whiskey-500 rounded-full flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-            </svg>
-          </div>
-          <h3 class="text-lg font-semibold text-whiskey-900">Event Organizer</h3>
+        <div class="rounded-xl border border-whiskey-100 bg-whiskey-50 p-5">
+          <h3 class="mb-1 text-sm font-semibold text-whiskey-900">Event Organizer</h3>
+          <p class="text-sm text-whiskey-800">You'll be set as the organizer of this event and can manage RSVPs and edit details.</p>
         </div>
-        <p class="text-whiskey-800">You'll be set as the organizer of this event and can manage RSVPs and edit details.</p>
       <% end %>
     </div>
   </div>
