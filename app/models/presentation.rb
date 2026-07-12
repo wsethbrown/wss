@@ -21,6 +21,7 @@ class Presentation < ApplicationRecord
   has_one_attached :speaker_notes     # Speaker notes document
   has_one_attached :outline_file      # Presentation outline
   has_one_attached :recommendations_sheet  # Whiskey recommendations PDF
+  has_one_attached :scorecard          # Custom tasting scorecard (optional; buyers always get the blank one too)
 
   # Validations
   validates :title, presence: true, length: { minimum: 2, maximum: 200 }

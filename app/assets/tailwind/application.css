@@ -3,6 +3,8 @@
 /* Tailwind v4 scans project files for class names; binary fonts in
    docker/fonts crash the scanner (RangeError: out of range code points). */
 @source not "../../../docker";
+/* Same reason: shipped PDF assets (e.g. the blank scorecard) are binary. */
+@source not "../documents";
 
 /*
   Whiskey Share Society design system.

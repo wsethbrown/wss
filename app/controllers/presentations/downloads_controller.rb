@@ -52,14 +52,39 @@ class Presentations::DownloadsController < ApplicationController
   def recommendations
     if @presentation.recommendations_sheet.attached?
       track_download('recommendations')
-      
+
       redirect_to rails_blob_url(@presentation.recommendations_sheet)
     else
       redirect_to @presentation, alert: 'Recommendations sheet not available'
     end
   end
-  
+
+  # The deck's custom tasting scorecard, if the author uploaded one. When they
+  # haven't, fall back to the standard blank card so the link is always safe.
+  def scorecard
+    if @presentation.scorecard.attached?
+      track_download('scorecard')
+
+      redirect_to rails_blob_url(@presentation.scorecard)
+    else
+      redirect_to blank_scorecard_presentation_downloads_path(@presentation)
+    end
+  end
+
+  # The standard blank WSS scorecard — one static asset, identical for every
+  # deck, always available to owners as a fallback for pouring their own bottles.
+  def blank_scorecard
+    track_download('blank_scorecard')
+
+    send_file BLANK_SCORECARD_PATH,
+              filename: "wss-tasting-scorecard.pdf",
+              type: "application/pdf",
+              disposition: "attachment"
+  end
+
   private
+
+  BLANK_SCORECARD_PATH = Rails.root.join("app/assets/documents/wss_scorecard_blank.pdf").freeze
   
   def set_presentation
     @presentation = Presentation.find(params[:presentation_id])

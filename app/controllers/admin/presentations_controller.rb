@@ -199,6 +199,7 @@ class Admin::PresentationsController < Admin::BaseController
       :speaker_notes,
       :outline_file,
       :recommendations_sheet,
+      :scorecard,
       supplemental_materials: []
     )
   end

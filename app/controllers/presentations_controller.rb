@@ -2,7 +2,7 @@ class PresentationsController < ApplicationController
   include ActivityLogger
   include DesignPreview
   
-  before_action :set_presentation, only: [:show, :present, :scorecard, :edit, :update, :destroy]
+  before_action :set_presentation, only: [:show, :present, :edit, :update, :destroy]
 
   def index
     # The library is fully empty only when there are no published decks at all —
@@ -47,14 +47,6 @@ class PresentationsController < ApplicationController
     @more_decks = Presentation.published.where.not(id: @presentation.id).recent.limit(3)
 
     maybe_render_next
-  end
-
-  # A printable tasting scorecard built from the deck's pour list: a filled
-  # card (the deck's own pours) plus a blank one for a group pouring their own.
-  # Rendered in a minimal, printer-friendly layout — you print it to PDF.
-  def scorecard
-    @pours = @presentation.parsed_whiskey_recommendations
-    render layout: "print"
   end
 
   # Full-screen in-browser slide player — the tasting venue. Owners/admins only.
