@@ -1,203 +1,147 @@
 ---
 name: wss-reviews
-description: The review system — bottle catalog, solo + event reviews, event pours with the secret toggle, provenance veiling, society review boards, and the Phase 3 roadmap (deck ties)
+description: The review system — bottle catalog, solo + event reviews, event pours with the secret toggle, provenance veiling, society review boards, society verdict cards, and the flavor lexicon/palate wheel. Use for anything touching bottles, reviews, tastings, or verdicts. Social layer (favorites/votes/feeds/Century) lives in wss-community.
 ---
 
 # WSS Reviews
 
 Spec: `docs/superpowers/specs/2026-07-06-review-system-design.md` (owner-approved;
-read it before extending anything here). Plans:
-`docs/superpowers/plans/2026-07-06-review-system-phase-1.md`,
-`docs/superpowers/plans/2026-07-07-review-system-phase-2.md`.
+read before extending). Plans in `docs/superpowers/plans/2026-07-06-*` and `-07-*`.
 
-## What exists (Phase 1 — the public bottle database)
+## Phase 1 — the public bottle database
 
 - **Public section is `/reviews`** (`ReviewsController#index`) — the bottle
-  library: search bar + result rows (name, style/region, distillery, average
-  rating, reviewer count) plus a "Latest tastings" feed of recent reviews.
-  A sort control sits beside the search box (`Bottle::SORTS`: top rated,
-  most reviewed, A–Z, recently added; `Bottle.with_score` backs it, default
-  `"top"`).
-- **Bottle detail/new/create stay under `/bottles`**: `bottle_path`
-  (`/bottles/<slug>`), slug URLs via `to_param`. No hard uniqueness; creation
-  shows a near-match warning (`confirmed_duplicate=1` bypasses).
-- **Autocomplete**: `GET /bottles/search?q=` returns JSON
-  `[{ id, name, display_name, url, review_url }]`, consumed by
-  `bottle_search_controller.js`.
-- **Every review has its own public page** (`review_path`,
-  `ReviewsController#show`) — the drill-down target from bottle pages, the
-  /reviews feed, and profile tastings. Feed cards on /reviews are whole-card
-  `<a>` links to the review page, equal-height and line-clamped so ragged
-  note lengths don't break the grid.
-- `Review` — user + bottle + **nullable event_id** + rating (decimal 2,1;
-  half-steps 0.5–5.0, `Review::VALID_RATINGS`) + `notes` (free text — NOT
-  `body`) + nose/palate/finish/body_notes. Two unique indexes:
-  `(user_id, bottle_id, event_id)` and a partial `(user_id, bottle_id) WHERE
-  event_id IS NULL` — one review per tasting context, one solo per bottle.
-- Aggregation: `Bottle#average_rating` = mean of each user's LATEST review
-  across contexts. `Bottle.with_score` computes the same thing in SQL for
-  whole pages (`avg_rating`/`reviewers` columns; feeds `Bottle::SORTS`).
-- `bottles/_rating` partial: displayed stars snap to the nearest 0.5, but the
-  `aria-label` carries the true value; numerals render via
-  `number_with_precision(precision: 2, strip_insignificant_zeros: true)`.
-- Solo review CRUD: create nested under bottle (`Bottles::ReviewsController`),
-  edit/delete top-level (`ReviewsController`, scoped `current_user.reviews` →
-  404 for non-authors).
+  library: search + result rows (name, style/region, distillery, avg rating,
+  reviewer count) plus a "Latest tastings" feed. Sort control uses `Bottle::SORTS`
+  (top rated, most reviewed, A–Z, recently added; `Bottle.with_score`, default `top`).
+- **Bottle detail/new/create under `/bottles`**: `bottle_path` (`/bottles/<slug>`,
+  slug via `to_param`). No hard uniqueness; creation shows a near-match warning
+  (`confirmed_duplicate=1` bypasses).
+- **Autocomplete**: `GET /bottles/search?q=` → JSON `[{id,name,display_name,url,review_url}]`,
+  consumed by `bottle_search_controller.js`.
+- **Every review has a public page** (`review_path`, `ReviewsController#show`) — the
+  drill-down from bottle pages, the feed, and profile tastings. Feed cards are
+  whole-card `<a>` links, equal-height and line-clamped.
+- `Review` — user + bottle + **nullable event_id** + rating (decimal 2,1; half-steps
+  0.5–5.0, `Review::VALID_RATINGS`) + `notes` (free text, NOT `body`) +
+  nose/palate/finish/body_notes. Two unique indexes: `(user_id, bottle_id, event_id)`
+  and partial `(user_id, bottle_id) WHERE event_id IS NULL` — one per tasting context,
+  one solo per bottle.
+- Aggregation: `Bottle#average_rating` = mean of each user's LATEST review across
+  contexts. `Bottle.with_score` computes the same in SQL (`avg_rating`/`reviewers`).
+- `bottles/_rating`: stars snap to nearest 0.5; `aria-label` carries the true value.
+- Solo CRUD: create nested under bottle (`Bottles::ReviewsController`); edit/delete
+  top-level (`ReviewsController`, scoped `current_user.reviews` → 404 for non-authors).
 
-## What exists (Phase 2 — events and societies)
+## Phase 2 — events and societies
 
-- `event_bottles` (`event`, `bottle`, `position`, `label`; unique per
-  event+bottle; `EventBottle.ordered`). Managed on the EVENT PAGE by
-  `policy(event).update?` holders (`app/views/events/_pours.html.erb`) —
-  the events/edit view is an unstyled stub, so management lives on show.
-- **Secret toggle**: `events.pours_hidden_until_complete`.
-  `Event#pours_revealed?` (off-toggle OR past end_time),
-  `Event#pours_visible_to?(user)` (revealed OR `Event#managed_by?` —
-  organizer / society admin / global admin). Review buttons AND the review
-  gate use `pours_revealed?` — even the organizer can't review early
-  (`EventReviewTest#"organizer cannot review a secret pour before reveal"`
-  pins this; organizers get NO early-review bypass).
-- **Event reviews**: created only via
-  `POST /events/:event_id/reviews?bottle_id=<slug>`
-  (`Events::ReviewsController`). Create-time model gates, enforced in
-  `Review#event_review_gates` (`on: :create`): bottle on the pour list,
-  pours revealed, reviewer has a `status: "yes"` RSVP. Gates run once, at
-  creation — edits (shared `ReviewsController`) never re-check and can never
-  move a review between events (strong params omit event_id).
-- **Event page "The pours"**: ordered rows, per-pour group mean (event-tagged
-  reviews ONLY — computed in-view from `@pour_reviews`), expandable
-  individual reviews, Review-this-pour / Edit-your-review buttons.
-- **Provenance veiling** (`app/views/reviews/_event_card.html.erb`, rendered
-  on bottle pages, profile tastings, and the review's own page): public
-  society → clickable event card (title, date, society name, pour count →
-  `society_event_path`). **Private society → the event title and date show,
-  UNLINKED — no society name, no link, and no pour count. The line reads
-  "A private society."** The rule is `society.public?`, NOT per-viewer:
-  members and the review's own author see the veil too. A second partial,
-  `reviews/_event_line`, exists ONLY because /reviews feed cards are
-  themselves `<a>`-wrapped (whole-card links to the review page) — a nested
-  `<a>` to the event would be invalid HTML, so `_event_line` renders the
-  same veiled information as plain text with a calendar glyph instead of a
-  link. Both partials share the exact veiling rule; don't let them drift.
-- **Society review board** (`SocietiesController#show` → `@review_board`):
-  bottles ranked by plain AVG of reviews joined through the society's
-  events, with `COUNT(DISTINCT user_id)` reviewer counts and a member-review
-  drill-down. This is an unweighted average over event reviews — a bottle
-  re-tasted across two events counts each event's reviews equally, so a
-  two-event re-taster's opinion is double-weighted relative to a one-event
-  taster's. **Open question (owner decision pending): should the board
-  weight by event, or by reviewer, instead of by raw review row?** Until
-  decided, leave the plain AVG as-is. Inherits the society page's Pundit
-  gate; no separate policy.
-- Events/pours with reviews refuse destroy (`dependent: :restrict_with_error`
-  on `Event#reviews`; `before_destroy` guard on `EventBottle`) — the night is
-  on the record.
+- `event_bottles` (`event`, `bottle`, `position`, `label`; unique per event+bottle;
+  `EventBottle.ordered`). Managed on the EVENT SHOW page by `policy(event).update?`
+  holders (`events/_pours.html.erb`) — events/edit is an unstyled stub.
+- **Secret toggle**: `events.pours_hidden_until_complete`. `Event#pours_revealed?`
+  (off-toggle OR past end_time); `Event#pours_visible_to?(user)` (revealed OR
+  `managed_by?` — organizer/society admin/global admin). Review buttons AND the gate
+  use `pours_revealed?` — even the organizer can't review a secret pour early
+  (pinned by `EventReviewTest`; NO organizer bypass).
+- **Event reviews**: created only via `POST /events/:event_id/reviews?bottle_id=<slug>`
+  (`Events::ReviewsController`). `Review#event_review_gates` (`on: :create`): bottle on
+  the pour list, pours revealed, reviewer has a `status:"yes"` RSVP. Gates run once at
+  creation — edits never re-check and can't move a review between events (strong params
+  omit event_id).
+- **Event page "The pours"**: ordered rows, per-pour group mean (event-tagged reviews
+  ONLY, from `@pour_reviews`), expandable reviews, Review/Edit buttons.
+- **Provenance veiling** (`reviews/_event_card.html.erb`, on bottle pages, profile
+  tastings, review show): public society → clickable event card (title, date, society
+  name, pour count → `society_event_path`). **Private society → title + date show,
+  UNLINKED, no society name/link/pour count, line reads "A private society."** Rule is
+  `society.public?`, NOT per-viewer — members and the author see the veil too. Second
+  partial `reviews/_event_line` exists ONLY because feed cards are already `<a>`-wrapped
+  (nested `<a>` is invalid HTML): same veiled info as plain text with a calendar glyph.
+  Both partials share the exact rule; don't let them drift.
+- **Society review board** (`SocietiesController#show` → `@review_board`,
+  societies_controller.rb:57): bottles ranked by AVG of THIS society's event reviews,
+  latest-per-member (`DISTINCT ON (user_id, bottle_id)` newest-first) so a re-taster
+  refreshes rather than double-votes; `COUNT(DISTINCT user_id)` reviewers. Inherits the
+  page's Pundit gate. **Open question (owner pending): weight by event or reviewer
+  instead of raw row? Leave plain latest-per-member AVG until decided.**
+- Events/pours with reviews refuse destroy (`dependent: :restrict_with_error` on
+  `Event#reviews`; `before_destroy` guard on `EventBottle`) — the night is on the record.
+
+## Society verdicts (bottle pages)
+
+- `Bottle#society_verdicts` (bottle.rb:99): each PUBLIC society's collective take on the
+  bottle from its event reviews — same latest-per-member math (`DISTINCT ON (user_id,
+  society_id)`) as the board. Rows expose `verdict_avg` / `verdict_reviewers`. These
+  cards LEAD the Tastings list on `bottles#show` (`_society_verdict_card.html.erb`).
+- Card body: aggregate stars + `Review.common_descriptors(reviews)` (review.rb:95 — most
+  common lexicon words per tasting section, each review counts a word once so one wordy
+  taster can't dominate) and `Review.blended_wheel(reviews)` (review.rb:144 — mean of
+  each member's wheel profile per family, renormalized).
+- **Drill-in**: `GET /bottles/:id/verdicts/:society_id` (`bottles#verdict`, route
+  `verdict`, `bottles/verdict.html.erb`) — aggregate up top, every individual tasting
+  card below. **Private societies 404 there** (`Society.public_societies.find` +
+  `find { }` guard raises `RecordNotFound`) — same veil as everywhere.
+- **Tasting-nights feed** (`/reviews?feed=nights`, reviews_controller.rb:38): one card
+  per NIGHT (the events, newest first, per-bottle room scores from `@night_pours`), built
+  from `Event.joins(:society).where(societies: { is_private: false })`. A private society id in
+  `?society=` silently falls back to unfiltered (same veil). NOTE: the
+  `Review.from_tasting_nights` scope (review.rb:32) is defined but the controller does NOT
+  call it — it queries Events directly; the scope is currently used only in tests.
 
 ## What's next (do NOT improvise — the spec decides)
 
-- Phase 3: `events.presentation_id`, deck pour-list ↔ bottle links, deck
+- Phase 3 (deck ties): `events.presentation_id`, deck pour-list ↔ bottle links, deck
   names on provenance cards, "search by chapter," review badges on deck pages.
 
-## Traps
+## Section search + three search modes
 
-- The event review, not the user's solo review, feeds event/society
-  aggregates — regardless of creation date (owner decision, in the spec).
-- Bottle public score uses latest-per-user ACROSS contexts.
-- Never store society/deck on a review; always derive through the event.
-- `BottlesController#create` skips the near-match check for blank names so
-  validation renders (see `@bottle.name.blank?` short-circuit) — don't
-  "fix" this into always running the search.
-- Adding a migration requires committing the regenerated `db/schema.rb` —
-  parallel test workers build their databases from the schema dump, not by
-  replaying migrations. A missing/stale dump makes every parallel test
-  worker error out while a single-file run still passes (false green).
-- Fixture landmines: eagle_rare must keep exactly one review (john, 4.0),
-  lagavulin zero; whiskey_lovers must gain no membership fixtures
-  (society_test pins its counts). The Phase-2 demo chain therefore lives on
-  `societies(:single_malt)` with three dedicated bottles.
-- `event_rsvps` fixtures must QUOTE `status: "yes"` — bare `yes` is YAML
-  boolean true.
-- `EventRsvp` validates "no RSVP after the event" — seeds for completed
-  demo events bypass it with `save!(validate: false)` (documented dev
-  shortcut, same spirit as the presentation publish bypass). The dev-only
-  demo chain in `db/seeds.rb` (search "Review demo chain") builds on
-  `societies[0]` (Athens Whiskey Society) with `find_or_create_by!`
-  throughout — safe to re-run; verified idempotent by running
-  `bin/rails db:seed` twice.
-- The canonical event URL is `society_event_path(event.society, event)`;
-  bare `event_path` is a legacy alias.
-- Don't confuse the two veiling partials: `_event_card` is a standalone link
-  (bottle pages, profile tastings, the review show page); `_event_line` is
-  plain text for contexts where the enclosing element is already an `<a>`
-  (the /reviews feed cards). Both veil private societies identically.
+/reviews search covers bottles AND societies: `policy_scope(Society).search(q)` renders a
+"Societies" group (private societies invisible to non-members — the policy scope, not the
+view, enforces it; same scope backs `GET /reviews/search`).
 
-## Section search scope
-
-/reviews search covers bottles AND societies: `policy_scope(Society).search(q)`
-renders a "Societies" result group (private societies stay invisible to
-non-members — the policy scope, not the view, enforces it; same scope backs
-the grouped JSON at GET /reviews/search).
-
-Three dropdown modes in bottle_search_controller.js:
-- grouped (the /reviews page): entity-grouped Bottles/Societies results, NO
-  add-a-bottle row — a society name or typo must never become a catalog entry.
-- picker (GET /reviews/start, authed "Add a review" flow): bottle rows link
-  straight to that bottle's review form (review_url in /bottles/search JSON);
-  the "+ Add … as a new bottle" escape lives HERE, where intent is explicit.
-- fill (the event pour form — a hidden `bottleId` target is present): rows
-  fill the hidden bottle_id instead of navigating; the add-new escape carries
-  `return_to` (internal paths only) so organizers land back on the event.
+Three dropdown modes in `bottle_search_controller.js`:
+- **grouped** (/reviews): entity-grouped Bottles/Societies, NO add-a-bottle row — a name
+  or typo must never become a catalog entry.
+- **picker** (`GET /reviews/start`, authed "Add a review"): bottle rows link to that
+  bottle's review form; the "+ Add … as a new bottle" escape lives HERE (explicit intent).
+- **fill** (event pour form — hidden `bottleId` target present): rows fill the hidden
+  bottle_id instead of navigating; add-new escape carries `return_to` (internal paths only).
 
 ## Flavor descriptors, tags, and the palate wheel
 
-`Review::DESCRIPTOR_LEXICON` (9 families × curated words) lifts descriptors
-from the FOUR TASTING FIELDS ONLY (never notes): `descriptor_tags` (word →
-family), `flavor_profile` (family → strength), `Review.tagged(tags)` (AND
-semantics; a family name matches any of its words; Postgres `~*` with `\m`
-word boundary). /reviews?tags=a,b filters bottles+feed with removable chips.
-Review pages render clickable tag chips (multi-select via
-tag_picker_controller → one combined tags URL) and the palate wheel
-(reviews/_palate_wheel — server-side SVG, segments = families, opacity =
-strength, lit segments link to the family's tag view). Tags are computed
-from text, never stored — edit the lexicon freely.
+`Review::DESCRIPTOR_LEXICON` (9 families × curated words) lifts descriptors from the FOUR
+TASTING FIELDS ONLY (never notes): `descriptor_tags` (word→family), `flavor_profile`
+(family→strength), `Review.tagged(tags)` (AND semantics; family name matches any word;
+Postgres `~*` with `\m` boundary). /reviews?tags=a,b filters bottles+feed with removable
+chips. Review pages render clickable chips (tag_picker_controller → one combined tags URL)
+and the palate wheel (`reviews/_palate_wheel` — server SVG, segments = families, opacity =
+strength). Hand-set `flavor_wheel` values win over word counts. Tags are computed from
+text, never stored — edit the lexicon freely.
 
-## What exists (Phase 3 — the social layer)
+## Social layer
 
-- **Favorites** (`Favorite`): A user's private bookmark on a `Society` or
-  `User` (polymorphic `favoritable`). Visible only to the owner
-  (ProfilesController loads `@favorites` on your own profile only).
-  Uniqueness validated on `(user_id, favoritable_type, favoritable_id)`.
-  Self-favoriting blocked by validation (`favoritable.id != user.id`).
-  Favoriting a `Society` is gated by `SocietyPolicy#show?` at creation time.
-  Controller is idempotent: `create` uses `find_or_create_by` and surfaces
-  alerts (already favorited, access denied); `destroy` is explicit.
-- **Review votes** (`ReviewVote`): Thumbs-up only, no downvotes. One per user
-  per review; no self-votes (validated in the model). Maintains
-  `reviews.votes_count` via counter_cache for bottle-page ordering. Controller
-  is Turbo-framed (inline button swaps in place, never navigates);
-  idempotent (create: find_or_create_by; destroy: none-safe). The hot feed
-  (see below) needs a real join for 30-day windows, not the counter cache.
-- **Bottle page tastings order**: `Bottle#tasting_reviews` ordered by
-  `votes_count DESC, created_at DESC`. Vote count surfaces on review cards.
-- **/reviews feed enhancements**:
-  - Three pill controls: **Latest** (default, all reviews sorted by created_at
-    DESC), **Circle** (only reviews from favorited users + events from
-    favorited societies, via `current_user.circle_reviews`; inner join of
-    users.id IN (favorites.favoritable_id WHERE type=User) OR events from
-    societies in (favorites.favoritable_id WHERE type=Society)), **Hot**
-    (trailing-30-day vote count via a condition IN THE JOIN on
-    ReviewVote.created_at — zero-vote reviews included).
-  - CAUTION: search/tags/distillery filters apply ONLY to the Latest feed.
-    Circle and Hot ignore them (`hot_ranked` / `for_circle` take no filter
-    args), even though the pill links preserve query params in URLs — so
-    `/reviews?tags=smoky&feed=hot` silently ignores the tag. Filter
-    composition across feeds is unimplemented, not broken; implement in
-    the controller if ever needed.
-  - Veiled partials (reviews/_event_card, reviews/_event_line) are unchanged
-    and reused across all three feeds.
-- **Demo seeds**: `db/seeds.rb` includes a social-layer block (development
-  only) seeding favorites (jane→john, jane→single_malt, seth→whiskey_lovers)
-  and review votes (jane & seth vote on john's ardbeg & eagle_rare reviews,
-  skipping self-votes). Idempotent via find_or_create_by; verified by running
-  db:seed twice with no duplicates or errors.
-- **Implemented 2026-07-07**. See `docs/superpowers/plans/2026-07-07-review-system-social.md`.
+Favorites (follows), review votes, Latest/Circle/Hot feeds, and the Century badge live in
+**wss-community**. The veiled partials above are reused across all three feeds unchanged.
+
+## Traps
+
+- The event review, not the solo review, feeds event/society aggregates — regardless of
+  creation date (owner decision, in the spec).
+- Bottle public score uses latest-per-user ACROSS contexts.
+- Never store society/deck on a review; always derive through the event.
+- `BottlesController#create` skips the near-match check for blank names so validation
+  renders (`@bottle.name.blank?` short-circuit) — don't "fix" it to always search.
+- Adding a migration (review tables first hit this) requires committing the regenerated
+  `db/schema.rb` or parallel workers error while single-file runs pass — full trap in wss-testing.
+- Fixture landmines: `eagle_rare` must keep exactly one review (john, 4.0), `lagavulin`
+  zero; `whiskey_lovers` must gain no membership fixtures (society_test pins counts). The
+  Phase-2 demo chain lives on `societies(:single_malt)` with three dedicated bottles.
+- `event_rsvps` fixtures must QUOTE `status: "yes"` — bare `yes` is YAML boolean true.
+- `EventRsvp` validates "no RSVP after the event" — seeds for completed demo events bypass
+  it with `save!(validate: false)`. The dev-only demo chain in `db/seeds.rb` (search
+  "Review demo chain") builds on `societies[0]` (Athens Whiskey Society) with
+  `find_or_create_by!` — idempotent, safe to re-run.
+- Canonical event URL is `society_event_path(event.society, event)`; bare `event_path` is
+  a legacy alias.
+- Don't confuse the two veiling partials: `_event_card` is a standalone link; `_event_line`
+  is plain text for `<a>`-wrapped feed cards. Both veil private societies identically.
