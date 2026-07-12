@@ -1,6 +1,6 @@
 # Renders a deck's uploaded file to per-slide PNGs off the request cycle.
 # LibreOffice is heavy (a full office suite spins up), so this must never run
-# inside a web worker — it belongs in the jobs process.
+# inside a web worker, it belongs in the jobs process.
 class DeckSlideRenderJob < ApplicationJob
   queue_as :default
 

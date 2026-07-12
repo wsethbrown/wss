@@ -2,8 +2,8 @@ require "zip"
 require "tmpdir"
 
 # Parses an uploaded deck file (.pptx, .ppt, or .pdf) into draft deck fields.
-# The goal is a good DRAFT — title, story skeleton, slide-preview rows,
-# images — for a human to polish in the edit form, never an auto-published deck.
+# The goal is a good DRAFT, title, story skeleton, slide-preview rows,
+# images, for a human to polish in the edit form, never an auto-published deck.
 #
 # Callers pass raw BYTES (read the upload once); every consumer here works on
 # its own copy, so no shared io pointers or tempfile lifecycles are involved.
@@ -27,7 +27,7 @@ class DeckImport
     ext == ".pptx" ? parse_pptx(data) : parse_via_text(data, ext, filename)
   end
 
-  # .pptx is zipped XML — full structure: per-slide paragraphs and embedded images.
+  # .pptx is zipped XML, full structure: per-slide paragraphs and embedded images.
   def self.parse_pptx(data)
     slides = []
     images = []
@@ -50,7 +50,7 @@ class DeckImport
     build_result(slides, images.sort_by { |i| -i[:data].bytesize })
   end
 
-  # .ppt / .pdf: no clean XML to walk — extract text per page via LibreOffice/
+  # .ppt / .pdf: no clean XML to walk, extract text per page via LibreOffice/
   # poppler and draft from that. Rendering (render_slides) supplies the visuals.
   def self.parse_via_text(data, ext, filename)
     pages = Dir.mktmpdir do |dir|

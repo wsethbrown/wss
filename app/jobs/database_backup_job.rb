@@ -8,7 +8,7 @@ require "aws-sdk-s3" # gem is require:false; the job loads it on demand
 #
 # This exists because the server is a single box: Hetzner's snapshot backups
 # protect against disk loss, but an off-box logical dump protects against the
-# scarier failures — a bad migration, a fat-fingered console session, or the
+# scarier failures, a bad migration, a fat-fingered console session, or the
 # provider account itself.
 class DatabaseBackupJob < ApplicationJob
   queue_as :default
@@ -18,7 +18,7 @@ class DatabaseBackupJob < ApplicationJob
 
   def perform
     if ENV["R2_BUCKET"].blank?
-      Rails.logger.warn("[db-backup] R2 not configured — skipping")
+      Rails.logger.warn("[db-backup] R2 not configured, skipping")
       return
     end
 
@@ -45,7 +45,7 @@ class DatabaseBackupJob < ApplicationJob
       "| gzip >", path.shellescape
     ].join(" ")
 
-    # bash, not sh: Debian's sh is dash, which lacks pipefail — and without
+    # bash, not sh: Debian's sh is dash, which lacks pipefail, and without
     # pipefail a failed pg_dump piped into gzip would "succeed" with an empty
     # file (the exact silent-backup failure this job exists to prevent).
     ok = system({ "PGPASSWORD" => db[:password].to_s }, "bash", "-c", "set -o pipefail; #{command}")

@@ -34,7 +34,7 @@ class SocietyPolicy < ApplicationPolicy
     create?
   end
 
-  # Starting a society is a paid membership benefit — free accounts can JOIN
+  # Starting a society is a paid membership benefit, free accounts can JOIN
   # societies but not create one. Global admins are exempt (superuser).
   def create?
     return false unless user
@@ -48,7 +48,7 @@ class SocietyPolicy < ApplicationPolicy
   alias_method :update?, :edit?
 
   # Destroying a society is reserved for its creator (and global admins as a
-  # superuser escape hatch) — not delegated society admins.
+  # superuser escape hatch), not delegated society admins.
   def destroy?
     return false unless user
     record.creator_id == user.id || user.admin?

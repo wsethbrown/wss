@@ -10,20 +10,20 @@
   Whiskey Share Society design system.
 
   Identity: a two-surface world drawn from the product itself.
-    — "char"  : the tasting room. Dark barrel-char brown for narrative surfaces
+, "char"  : the tasting room. Dark barrel-char brown for narrative surfaces
                 (nav, hero, deck reader chrome, footer). Amber is the pour.
-    — "paper" : the label. Warm cream/white for utility surfaces (catalog,
+, "paper" : the label. Warm cream/white for utility surfaces (catalog,
                 forms, account, admin) with whiskey-label details: small-caps
                 eyebrows, thin double rules, stamp badges.
 
-  Signature motif: the THREAD — a thin amber line that connects a pour to its
+  Signature motif: the THREAD, a thin amber line that connects a pour to its
   story (the founding ritual). It underlines the hero headline, connects the
   how-it-works steps, and tracks reading progress in the deck reader.
 
   Type:
-    — Display : Fraunces (engraved whiskey-label soul), headings only.
-    — UI/body : Instrument Sans.
-    — Reading : Source Serif 4, deck content only (.prose-deck).
+, Display : Fraunces (engraved whiskey-label soul), headings only.
+, UI/body : Instrument Sans.
+, Reading : Source Serif 4, deck content only (.prose-deck).
 
   Tailwind v4 exposes @theme tokens as utilities automatically, e.g.
   bg-whiskey-600, bg-char, font-display.
@@ -42,7 +42,7 @@
   --color-whiskey-950: #32180e;
 
   /* Dark narrative surfaces */
-  --color-char: #191009;      /* barrel char — page-level dark */
+  --color-char: #191009;      /* barrel char, page-level dark */
   --color-oak: #261a10;       /* elevated dark surface */
   --color-oak-edge: #3d2c1c;  /* hairline borders on dark */
 
@@ -105,7 +105,7 @@
     border-top: 1px solid currentColor;
   }
 
-  /* The thread — the signature amber line. Draws in on load where used. */
+  /* The thread, the signature amber line. Draws in on load where used. */
   .thread {
     display: block;
     height: 2px;

@@ -1,7 +1,7 @@
 # Shared value normalization for ghost-edit proposals: what gets STORED as
 # proposed_value (so identical submissions group together for auto-apply)
 # and what gets WRITTEN onto the bottle column when a proposal is applied.
-# abv is the only field needing numeric normalization — the other four
+# abv is the only field needing numeric normalization, the other four
 # whitelisted fields are strings compared as-is (no case-folding: "Buffalo
 # Trace" and "buffalo trace" are different proposals, matching how the
 # model layer treats them as different values).
