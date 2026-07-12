@@ -7,7 +7,7 @@
     <p class="eyebrow mb-4 text-whiskey-300/90">The library</p>
     <h1 class="font-display text-4xl font-semibold text-cream md:text-5xl">Whiskey Presentations</h1>
     <p class="mx-auto mt-4 max-w-2xl text-lg text-cream/70">
-      Narrative tasting decks — slides, script, and a bottle list for every budget.
+      Narrative tasting decks, slides, script, and a bottle list for every budget.
       Pick the story you want to tell.
     </p>
     <% if current_user&.admin? %>
@@ -115,7 +115,7 @@
     <% elsif @library_empty %>
       <div class="mx-auto max-w-md py-16 text-center">
         <p class="font-display text-2xl font-semibold text-gray-900">The library is being stocked.</p>
-        <p class="mt-3 text-gray-600">The first decks are on their way — check back soon, or join a society in the meantime.</p>
+        <p class="mt-3 text-gray-600">The first decks are on their way, check back soon, or join a society in the meantime.</p>
         <%= link_to 'Browse societies', societies_path,
             class: 'mt-8 inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-6 py-3 font-semibold text-white transition hover:bg-whiskey-700' %>
       </div>

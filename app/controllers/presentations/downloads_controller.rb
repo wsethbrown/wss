@@ -71,7 +71,7 @@ class Presentations::DownloadsController < ApplicationController
     end
   end
 
-  # The standard blank WSS scorecard — one static asset, identical for every
+  # The standard blank WSS scorecard, one static asset, identical for every
   # deck, always available to owners as a fallback for pouring their own bottles.
   def blank_scorecard
     track_download('blank_scorecard')
@@ -98,10 +98,10 @@ class Presentations::DownloadsController < ApplicationController
     if !user_signed_in?
       redirect_to auth_path, alert: 'Sign in to download this file'
     elsif @presentation.purchased_by?(current_user)
-      # Owns the deck via a credit but the membership has lapsed — downloads
+      # Owns the deck via a credit but the membership has lapsed, downloads
       # come back when the membership does.
       redirect_to root_path(anchor: 'pricing'),
-                  alert: 'This deck was unlocked with a credit — reactivate your membership to download it'
+                  alert: 'This deck was unlocked with a credit. Reactivate your membership to download it'
     else
       redirect_to new_presentation_purchase_path(@presentation),
                   alert: 'Get this deck to download its files'

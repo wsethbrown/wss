@@ -86,7 +86,7 @@ class Presentation < ApplicationRecord
   end
 
   # Duration as buyers should read it: a bare number means minutes.
-  # (Admins type "20" as often as "45 min" — don't render naked digits.)
+  # (Admins type "20" as often as "45 min", don't render naked digits.)
   def duration_label
     return if duration.blank?
     duration.match?(/\A\s*\d+\s*\z/) ? "#{duration.strip} min" : duration
@@ -291,9 +291,9 @@ class Presentation < ApplicationRecord
     return if slides_rendered?
 
     if slide_render_pending?
-      errors.add(:base, "Slide previews are still rendering — publish once they finish (usually under a minute)")
+      errors.add(:base, "Slide previews are still rendering, publish once they finish (usually under a minute)")
     else
-      errors.add(:base, "No slide previews have been rendered for this deck — re-render them, then publish")
+      errors.add(:base, "No slide previews have been rendered for this deck, re-render them, then publish")
     end
   end
 

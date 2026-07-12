@@ -21,7 +21,7 @@
   <% slides.each_with_index do |slide, i| %>
     <div class="slide <%= 'active' if i.zero? %>"><%= image_tag slide, alt: "Slide #{i + 1}", loading: i < 3 ? 'eager' : 'lazy' %></div>
   <% end %>
-  <a class="exit" href="<%= presentation_path(@presentation) %>">esc — exit</a>
+  <a class="exit" href="<%= presentation_path(@presentation) %>">esc, exit</a>
   <div class="hud"><span id="n">1</span> / <%= slides.size %></div>
   <script>
     const slides = document.querySelectorAll('.slide'), n = document.getElementById('n');

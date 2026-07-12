@@ -4,7 +4,7 @@ class CreditTransaction < ApplicationRecord
 
   # The credit_transactions table is the LEDGER and the single source of truth for a
   # user's credit balance. users.credits is a cached total that is recomputed from the
-  # ledger (sum of amounts) after every transaction — nothing else may write it.
+  # ledger (sum of amounts) after every transaction, nothing else may write it.
   TRANSACTION_TYPES = {
     granted: "granted",                    # subscription activation, monthly refresh
     used: "used",                          # spent on a presentation
@@ -47,10 +47,10 @@ class CreditTransaction < ApplicationRecord
 
   WELCOME_DESCRIPTION = "Welcome credit - new subscription".freeze
 
-  # The new-subscriber credit. Idempotent across its two triggers — the
+  # The new-subscriber credit. Idempotent across its two triggers, the
   # checkout success redirect (synchronous, so the credit is visible the
   # moment they land back) and the invoice.payment_succeeded webhook
-  # (fallback for closed tabs) — which fire seconds apart. The 24-hour
+  # (fallback for closed tabs), which fire seconds apart. The 24-hour
   # window blocks that double-grant while letting a genuine re-subscriber
   # months later earn a fresh welcome. Returns true if granted.
   def self.grant_welcome_credit(user)
@@ -58,7 +58,7 @@ class CreditTransaction < ApplicationRecord
     user.with_lock do
       # Prefix match, not equality: an admin-granted variant ("Welcome
       # credit - new subscription (backfill)") must also count as already
-      # welcomed — exact matching once let a manual grant plus the
+      # welcomed, exact matching once let a manual grant plus the
       # automatic one stack to two credits.
       already = where(user: user, transaction_type: TRANSACTION_TYPES[:granted])
                   .where("description LIKE ?", "Welcome credit%")

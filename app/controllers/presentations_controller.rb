@@ -5,7 +5,7 @@ class PresentationsController < ApplicationController
   before_action :set_presentation, only: [:show, :present, :edit, :update, :destroy]
 
   def index
-    # The library is fully empty only when there are no published decks at all —
+    # The library is fully empty only when there are no published decks at all,
     # distinct from "your filters matched nothing".
     @library_empty = Presentation.published.none?
 
@@ -49,7 +49,7 @@ class PresentationsController < ApplicationController
     maybe_render_next
   end
 
-  # Full-screen in-browser slide player — the tasting venue. Owners/admins only.
+  # Full-screen in-browser slide player, the tasting venue. Owners/admins only.
   def present
     unless user_signed_in? && @presentation.can_download_full_presentation?(current_user) &&
            @presentation.slide_images.attached?

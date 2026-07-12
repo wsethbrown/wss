@@ -1,4 +1,4 @@
-<%# The authoring flow mirrors the buyer page top to bottom — same sections,
+<%# The authoring flow mirrors the buyer page top to bottom, same sections,
     same order, same numbering. The right rail is the map: it shows what the
     buyer page will actually render given what's filled in, and is the fastest
     honest answer to "is this deck ready to sell?" %>
@@ -46,8 +46,8 @@
           </div>
 
           <div class="md:col-span-2">
-            <%= form.label :description, "Description — the one-line pitch", class: "block text-sm font-medium text-gray-700 mb-2" %>
-            <%= form.text_area :description, rows: 2, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "One or two sentences under the title — why THIS deck, in the buyer's language." %>
+            <%= form.label :description, "Description, the one-line pitch", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.text_area :description, rows: 2, class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500", placeholder: "One or two sentences under the title, why THIS deck, in the buyer's language." %>
             <p class="mt-1 text-xs text-gray-500">Shows under the title on the hero and on every library card. This line does the most selling per word on the site.</p>
           </div>
 
@@ -119,7 +119,7 @@
 
       <!-- ═══ 2 · THE TAKEAWAYS ═══ -->
       <section id="f-pitch" class="scroll-mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm" data-controller="what-youll-learn">
-        <h3 class="font-display text-xl font-semibold text-gray-900">2 · The takeaways — what you'll learn</h3>
+        <h3 class="font-display text-xl font-semibold text-gray-900">2 · The takeaways, what you'll learn</h3>
         <p class="mb-5 mt-1 text-sm text-gray-500">Appears on: the "What you'll learn" grid, right under the hero. Three or four concrete points sell better than six vague ones. Empty = the section is hidden.</p>
 
         <%= form.hidden_field :what_youll_learn, id: 'what_youll_learn_hidden' %>
@@ -157,7 +157,7 @@
                 <textarea
                        class="learning-description w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
                        rows="2"
-                       placeholder="e.g., What sets rye apart — mash bills, legal definitions, and signature character."
+                       placeholder="e.g., What sets rye apart, mash bills, legal definitions, and signature character."
                        data-action="input->what-youll-learn#fieldChanged"></textarea>
               </div>
             </div>
@@ -170,7 +170,7 @@
         <h3 class="font-display text-xl font-semibold text-gray-900">3 · The story</h3>
         <p class="mb-5 mt-1 text-sm text-gray-500">
           Appears on: the "A taste of the writing" section of the deck page, one chapter at a time.
-          Buyers read it all; <span class="font-semibold">non-buyers only get the free teaser</span> —
+          Buyers read it all; <span class="font-semibold">non-buyers only get the free teaser</span>,
           the marker below shows exactly where it fades into the purchase prompt.
           Imported decks land here as one rough block per slide: rewrite each chapter as prose, cut the fragments.
         </p>
@@ -222,7 +222,7 @@
             <div class="space-y-3">
               <input type="text"
                      class="chapter-title w-full px-3 py-2 border border-gray-300 rounded-lg font-display text-base font-semibold focus:outline-none focus:ring-2 focus:ring-whiskey-500"
-                     placeholder="Chapter heading — leave empty for the opening"
+                     placeholder="Chapter heading, leave empty for the opening"
                      data-action="input->story-chapters#fieldChanged">
               <textarea class="chapter-body w-full px-3 py-2 border border-gray-300 rounded-lg text-sm leading-relaxed focus:outline-none focus:ring-2 focus:ring-whiskey-500"
                         rows="4"
@@ -237,14 +237,14 @@
       <section id="f-tasting" class="scroll-mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <h3 class="font-display text-xl font-semibold text-gray-900">4 · What you'll taste <span class="ml-1 align-middle text-xs font-sans font-medium uppercase tracking-wide text-gray-400">optional</span></h3>
         <p class="mb-5 mt-1 text-sm text-gray-500">
-          Appears on: the tasting section, set like a back label. One profile for the whole flight —
+          Appears on: the tasting section, set like a back label. One profile for the whole flight,
           works the same for whiskey, cocktails, or wine. Leave all four empty to hide the section.
         </p>
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
           <% {
             nose_notes:   ["Nose",   "e.g., Vanilla, honey, light oak, subtle fruit", "Aromas, before the first sip"],
-            palate_notes: ["Palate", "e.g., Smooth and balanced — caramel, then spice", "Flavors on the tongue"],
+            palate_notes: ["Palate", "e.g., Smooth and balanced, caramel, then spice", "Flavors on the tongue"],
             finish_notes: ["Finish", "e.g., Medium length, warming oak, gentle smoke", "The aftertaste, and how long it lasts"],
             body_notes:   ["Body",   "e.g., Medium-bodied, smooth, approachable", "Mouthfeel and texture"]
           }.each do |field, (label, placeholder, hint)| %>
@@ -262,12 +262,12 @@
         <h3 class="font-display text-xl font-semibold text-gray-900">5 · The slides &amp; the deck file</h3>
         <p class="mb-5 mt-1 text-sm text-gray-500">
           Appears on: the full-slide preview strip and the slide count in the hero.
-          <span class="font-semibold">Nothing to write here</span> — slides render automatically
+          <span class="font-semibold">Nothing to write here</span>, slides render automatically
           from the deck file, and re-render whenever you replace it.
         </p>
 
         <div class="mb-6">
-          <%= form.label :pdf_file, "The deck file — required to publish", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.label :pdf_file, "The deck file, required to publish", class: "block text-sm font-medium text-gray-700 mb-2" %>
           <% if presentation.pdf_file.attached? %>
             <p class="mb-2 text-sm text-gray-600">Current file: <span class="font-medium"><%= presentation.pdf_file.filename %></span></p>
           <% end %>
@@ -286,7 +286,7 @@
             <% end %>
           </div>
           <% if slides.size > 8 %>
-            <p class="mt-2 text-xs text-gray-500">+ <%= slides.size - 8 %> more — buyers see all <%= slides.size %> full-size.</p>
+            <p class="mt-2 text-xs text-gray-500">+ <%= slides.size - 8 %> more, buyers see all <%= slides.size %> full-size.</p>
           <% end %>
         <% elsif presentation.slide_render_pending? %>
           <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
@@ -300,10 +300,10 @@
         <% end %>
 
         <div class="mt-6 border-t border-gray-100 pt-5">
-          <%= form.label :preview_slide_count, "Free preview — slides shown before the buy prompt", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.label :preview_slide_count, "Free preview, slides shown before the buy prompt", class: "block text-sm font-medium text-gray-700 mb-2" %>
           <div class="flex items-center gap-3">
             <%= form.number_field :preview_slide_count, min: 1, value: presentation.preview_slide_count || 3, class: "w-24 px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
-            <span class="text-sm text-gray-500">of <%= presentation.slide_images.attached? ? presentation.slide_images.count : "&mdash;".html_safe %> rendered slides</span>
+            <span class="text-sm text-gray-500">of <%= presentation.slide_images.attached? ? presentation.slide_images.count : ", ".html_safe %> rendered slides</span>
           </div>
           <p class="mt-1 text-xs text-gray-500">Non-buyers see the first N slides on the deck page; the last one fades into a &ldquo;get this deck&rdquo; prompt. Slide 1 is usually your title, so this replaces the old free-sample upload.</p>
         </div>
@@ -314,7 +314,7 @@
         <h3 class="font-display text-xl font-semibold text-gray-900">6 · The pour list <span class="ml-1 align-middle text-xs font-sans font-medium uppercase tracking-wide text-gray-400">optional</span></h3>
         <p class="mb-5 mt-1 text-sm text-gray-500">
           Appears on: the "What to pour" cards, and in the buyer's "what you get" manifest with a count.
-          Bottles, cocktails, or anything else the night pours — one card each, with where to find it
+          Bottles, cocktails, or anything else the night pours, one card each, with where to find it
           and what it costs. Empty = the section is hidden.
         </p>
 
@@ -345,14 +345,14 @@
                 <label class="block text-xs font-medium text-gray-600 mb-1">Name</label>
                 <input type="text"
                        class="whiskey-name w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
-                       placeholder="e.g., Glenfiddich 12 — or Mint Julep"
+                       placeholder="e.g., Glenfiddich 12, or Mint Julep"
                        data-action="input->whiskey-recommendations#fieldChanged">
               </div>
               <div>
                 <label class="block text-xs font-medium text-gray-600 mb-1">Origin</label>
                 <input type="text"
                        class="whiskey-region w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
-                       placeholder="e.g., Speyside — or Kentucky, 1803"
+                       placeholder="e.g., Speyside, or Kentucky, 1803"
                        data-action="input->whiskey-recommendations#fieldChanged">
               </div>
               <div>
@@ -373,7 +373,7 @@
                 <label class="block text-xs font-medium text-gray-600 mb-1">Notes</label>
                 <input type="text"
                        class="whiskey-notes w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
-                       placeholder="e.g., Pear, oak, subtle spice — pour it for the 1820s chapter"
+                       placeholder="e.g., Pear, oak, subtle spice, pour it for the 1820s chapter"
                        data-action="input->whiskey-recommendations#fieldChanged">
               </div>
             </div>
@@ -414,7 +414,7 @@
               </ul>
             <% end %>
             <%= form.file_field :supplemental_materials, multiple: true, accept: "application/pdf,image/jpeg,image/jpg,image/png,application/vnd.ms-powerpoint,application/vnd.openxmlformats-officedocument.presentationml.presentation", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
-            <p class="mt-1 text-xs text-gray-500">Tasting mats, score sheets, blind-tasting wraps — each shows up by name in the buyer's downloads (max 25MB each).</p>
+            <p class="mt-1 text-xs text-gray-500">Tasting mats, score sheets, blind-tasting wraps, each shows up by name in the buyer's downloads (max 25MB each).</p>
           </div>
 
           <div class="md:col-span-2">
@@ -424,7 +424,7 @@
                 &middot; <%= link_to "download", scorecard_presentation_downloads_path(presentation), target: "_blank", rel: "noopener", class: "text-whiskey-700 underline" %></p>
             <% end %>
             <%= form.file_field :scorecard, accept: "application/pdf", class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
-            <p class="mt-1 text-xs text-gray-500">Upload a scorecard tailored to this deck&rsquo;s pours. Optional &mdash; buyers always get the standard blank WSS scorecard to fill in either way.</p>
+            <p class="mt-1 text-xs text-gray-500">Upload a scorecard tailored to this deck&rsquo;s pours. Optional, buyers always get the standard blank WSS scorecard to fill in either way.</p>
           </div>
         </div>
       </section>
@@ -451,17 +451,17 @@
           <li class="flex gap-2.5">
             <%= dot.call(takeaways_count.positive? ? :on : :off) %>
             <span><a href="#f-pitch" data-turbo="false" class="font-medium text-gray-900 hover:text-whiskey-700">The takeaways</a><br>
-              <span class="text-gray-500"><%= takeaways_count.positive? ? pluralize(takeaways_count, "point") : "hidden — none yet" %></span></span>
+              <span class="text-gray-500"><%= takeaways_count.positive? ? pluralize(takeaways_count, "point") : "hidden, none yet" %></span></span>
           </li>
           <li class="flex gap-2.5">
             <%= dot.call(story_words > 40 ? :on : :need) %>
             <span><a href="#f-story" data-turbo="false" class="font-medium text-gray-900 hover:text-whiskey-700">The story</a><br>
-              <span class="text-gray-500"><%= story_words > 40 ? "#{number_with_delimiter(story_words)} words · ~#{presentation.reading_time} min read" : "too short — the teaser is the pitch" %></span></span>
+              <span class="text-gray-500"><%= story_words > 40 ? "#{number_with_delimiter(story_words)} words · ~#{presentation.reading_time} min read" : "too short, the teaser is the pitch" %></span></span>
           </li>
           <li class="flex gap-2.5">
             <%= dot.call(tasting_notes_n.positive? ? :on : :off) %>
             <span><a href="#f-tasting" data-turbo="false" class="font-medium text-gray-900 hover:text-whiskey-700">What you'll taste</a><br>
-              <span class="text-gray-500"><%= tasting_notes_n.positive? ? "#{tasting_notes_n} of 4 notes" : "hidden — empty" %></span></span>
+              <span class="text-gray-500"><%= tasting_notes_n.positive? ? "#{tasting_notes_n} of 4 notes" : "hidden, empty" %></span></span>
           </li>
           <li class="flex gap-2.5">
             <%= dot.call(slides_count.positive? ? :auto : :need) %>
@@ -476,14 +476,14 @@
           <li class="flex gap-2.5">
             <%= dot.call(pours_count.positive? ? :on : :off) %>
             <span><a href="#f-pours" data-turbo="false" class="font-medium text-gray-900 hover:text-whiskey-700">The pour list</a><br>
-              <span class="text-gray-500"><%= pours_count.positive? ? pluralize(pours_count, "pour") : "hidden — empty" %></span></span>
+              <span class="text-gray-500"><%= pours_count.positive? ? pluralize(pours_count, "pour") : "hidden, empty" %></span></span>
           </li>
           <li class="flex gap-2.5">
             <%= dot.call(presentation.pdf_file.attached? ? :on : :need) %>
             <span><a href="#f-files" data-turbo="false" class="font-medium text-gray-900 hover:text-whiskey-700">What you get</a><br>
               <span class="text-gray-500">
                 <% if presentation.pdf_file.attached? %>the deck<%= extras_count.positive? ? " + #{pluralize(extras_count, 'extra')}" : "" %>
-                <% else %>no deck file — required to publish<% end %>
+                <% else %>no deck file, required to publish<% end %>
               </span></span>
           </li>
         </ol>
@@ -494,7 +494,7 @@
             <%= link_to "Preview as buyer ↗", presentation_path(presentation), target: "_blank",
                 class: "block w-full rounded-xl bg-gray-100 px-4 py-2.5 text-center font-medium text-gray-700 transition hover:bg-gray-200" %>
             <p class="text-center text-xs text-gray-400">
-              <%= presentation.published? ? "Live in the library" : "Draft — publish from the deck's admin page" %>
+              <%= presentation.published? ? "Live in the library" : "Draft, publish from the deck's admin page" %>
             </p>
           <% end %>
         </div>

@@ -1,7 +1,7 @@
 # A community-proposed correction to one field on a bottle. Lives as
 # "pending" until enough distinct users agree on the identical value
 # (BottleEdits::AutoApply, Task 3) or an admin applies/rejects it by hand
-# (Admin::BottleEditsController, Task 4). Applied/rejected rows are kept —
+# (Admin::BottleEditsController, Task 4). Applied/rejected rows are kept,
 # they're the "who proposed, when applied" audit trail, not scratch data.
 class BottleEdit < ApplicationRecord
   FIELDS = %w[name distillery region style abv].freeze
@@ -13,8 +13,8 @@ class BottleEdit < ApplicationRecord
 
   # Normalization IS the grouping contract: identical proposals must store
   # byte-identical proposed_value ("45"/"45.0"/"45.00" are ONE abv proposal).
-  # Controllers normalize too, but enforcing it here means no write path —
-  # console, import, future feature — can silently split a vote group.
+  # Controllers normalize too, but enforcing it here means no write path,
+  # console, import, future feature, can silently split a vote group.
   before_validation :normalize_proposed_value
 
   validates :field, inclusion: { in: FIELDS }

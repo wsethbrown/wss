@@ -35,7 +35,7 @@ class Admin::BottlesController < Admin::BaseController
 
   def unpin_image
     @bottle.pinned_label_image.purge_later
-    redirect_to admin_bottle_path(@bottle), notice: "Pin removed — the derived image (or placeholder) shows again."
+    redirect_to admin_bottle_path(@bottle), notice: "Pin removed. The derived image (or placeholder) shows again."
   end
 
   private
@@ -48,7 +48,7 @@ class Admin::BottlesController < Admin::BaseController
     params.require(:bottle).permit(:pinned_label_image)
   end
 
-  # Same five fields the ghost-edit whitelist uses (Task 2) — slug and
+  # Same five fields the ghost-edit whitelist uses (Task 2), slug and
   # created_by_id are deliberately never permitted here.
   def bottle_edit_params
     params.require(:bottle).permit(:name, :distillery, :region, :style, :abv)

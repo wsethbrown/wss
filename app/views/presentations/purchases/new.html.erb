@@ -37,11 +37,11 @@
         <% if @presentation.free? %>
           <%# ------------------------------------------------ Free deck %>
           <p class="text-gray-700">
-            This deck is free for everyone. Add it to your library and it's yours for good —
+            This deck is free for everyone. Add it to your library and it's yours for good,
             slides, script, and downloads included.
           </p>
           <%= form_with url: presentation_purchases_path(@presentation), local: true, data: { turbo: false } do |f| %>
-            <%= f.submit "Add to my library — free",
+            <%= f.submit "Add to my library, free",
                 class: "mt-8 w-full cursor-pointer rounded-xl bg-whiskey-600 px-6 py-4 text-lg font-semibold text-white transition hover:bg-whiskey-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2" %>
           <% end %>
         <% else %>
@@ -89,7 +89,7 @@
             <% unless current_user.subscription_active? %>
               <div class="mt-6 rounded-xl border border-whiskey-200 bg-whiskey-50 p-5">
                 <p class="text-sm text-whiskey-900">
-                  <strong>Members get a deck credit every month</strong> — most months, that
+                  <strong>Members get a deck credit every month</strong>, most months, that
                   makes the membership cheaper than one deck.
                   <%= link_to "See membership plans", root_path(anchor: "pricing"), class: "font-semibold underline underline-offset-2 hover:text-whiskey-700" %>
                 </p>

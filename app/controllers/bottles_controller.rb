@@ -15,7 +15,7 @@ class BottlesController < ApplicationController
   end
 
   # A society's verdict on one bottle: the aggregate up top, every
-  # individual tasting card below. Private societies 404 — same veil as
+  # individual tasting card below. Private societies 404, same veil as
   # everywhere else.
   def verdict
     @bottle = Bottle.find_by!(slug: params[:id])
@@ -63,7 +63,7 @@ class BottlesController < ApplicationController
       if @return_to
         redirect_to @return_to, notice: "#{@bottle.name} is on the shelf."
       else
-        redirect_to bottle_path(@bottle), notice: "#{@bottle.name} is on the shelf — add your tasting."
+        redirect_to bottle_path(@bottle), notice: "#{@bottle.name} is on the shelf. Add your tasting."
       end
     else
       render :new, status: :unprocessable_entity

@@ -2,7 +2,7 @@ class ActivityLog < ApplicationRecord
   belongs_to :user
   belongs_to :trackable, polymorphic: true, optional: true
 
-  # Activity types. Keep this list in lockstep with what controllers emit —
+  # Activity types. Keep this list in lockstep with what controllers emit,
   # the inclusion validation below SILENTLY discards unknown types (the logger
   # swallows the error), which is how paused/resumed events went unrecorded
   # for months. presentation_viewed was retired (per-view rows, unused);

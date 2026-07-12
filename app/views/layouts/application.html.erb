@@ -17,7 +17,7 @@
         content_for :title / :og_description / :og_image. %>
     <% og_title = content_for(:title) || "Whiskey Share Society" %>
     <% og_description = content_for(:og_description).presence ||
-         "Narrative tasting decks for whiskey nights that hold together — the research done, the script written, the bottles picked." %>
+         "Narrative tasting decks for whiskey nights that hold together, the research done, the script written, the bottles picked." %>
     <% og_image = content_for(:og_image).presence || "#{request.base_url}/og-image.png" %>
     <meta name="description" content="<%= og_description %>">
     <meta property="og:site_name" content="Whiskey Share Society">

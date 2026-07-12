@@ -8,7 +8,7 @@
 <% end %>
 
 <div class="min-h-screen bg-whiskey-50">
-  <%# Masthead — one header for every society. The banner image, when present,
+  <%# Masthead, one header for every society. The banner image, when present,
       sits behind a char gradient; without one, the char label stands alone. %>
   <div class="relative w-full overflow-hidden bg-char pt-16">
     <% if @society.banner_image.attached? %>
@@ -301,14 +301,14 @@
           </div>
         </div>
 
-        <%# Invite link — managers share it; works for private societies too. %>
+        <%# Invite link, managers share it; works for private societies too. %>
         <% if user_signed_in? && policy(@society).manage_members? %>
           <div class="overflow-hidden rounded-lg bg-white shadow-sm">
             <div class="border-b border-gray-200 px-6 py-4">
               <h2 class="text-lg font-semibold text-gray-900">Invite link</h2>
             </div>
             <div class="p-6">
-              <p class="text-sm text-gray-600">Anyone with this link can join<%= ' — it is the invite for this private society' if @society.private? %>.</p>
+              <p class="text-sm text-gray-600">Anyone with this link can join<%= ', it is the invite for this private society' if @society.private? %>.</p>
               <input type="text" readonly value="<%= society_invite_url(@society.invite_token!) %>"
                      onclick="this.select()"
                      class="mt-3 w-full rounded-lg border border-whiskey-200 bg-whiskey-50 px-3 py-2 text-xs text-gray-700" />
@@ -318,7 +318,7 @@
           </div>
         <% end %>
 
-        <%# Next tasting — the one thing a member actually needs from the sidebar.
+        <%# Next tasting, the one thing a member actually needs from the sidebar.
             (Replaced the old "Society Stats" card: member/event counts already
             live in the masthead, role counts are visible in the member list.) %>
         <% next_event = @society.upcoming_events.first %>

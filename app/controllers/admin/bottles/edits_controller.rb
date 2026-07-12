@@ -1,6 +1,6 @@
 # app/controllers/admin/bottles/edits_controller.rb
 # Manual apply/reject for a single ghost-edit proposal. Distinct from
-# BottleEdits::AutoApply (Task 3) but shares its "clear the field" step —
+# BottleEdits::AutoApply (Task 3) but shares its "clear the field" step,
 # applying manually still resolves every pending proposal on the field.
 class Admin::Bottles::EditsController < Admin::BaseController
   before_action :set_bottle
@@ -43,7 +43,7 @@ class Admin::Bottles::EditsController < Admin::BaseController
 
   # Scoped to pending: acting on an already-resolved proposal from a stale
   # admin page must 404, not flip an applied row to rejected (which would
-  # leave applied_at set on a "rejected" row — audit trail mangled).
+  # leave applied_at set on a "rejected" row, audit trail mangled).
   def set_edit
     @edit = @bottle.bottle_edits.pending.find(params[:id])
   end

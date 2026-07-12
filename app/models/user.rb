@@ -119,7 +119,7 @@ class User < ApplicationRecord
 
   # Site-wide admin. Single source of truth is the is_admin boolean column.
   # (Previously this checked the email domain, which disagreed with is_admin? and
-  # was used to gate presentation downloads — a real authorization inconsistency.)
+  # was used to gate presentation downloads, a real authorization inconsistency.)
   def admin?
     is_admin?
   end
@@ -155,7 +155,7 @@ class User < ApplicationRecord
   def favorite?(record) = favorites.exists?(favoritable: record)
 
   # How many members follow (favorite) this user. The count is public; who
-  # follows whom stays private — favorites are only ever listed to their owner.
+  # follows whom stays private, favorites are only ever listed to their owner.
   # Reads the counter-cache column so per-row checks (review lists) stay O(1).
   def followers_count = favorites_count
 
@@ -250,7 +250,7 @@ class User < ApplicationRecord
   end
 
   # TOTP secret and backup codes are encrypted at rest (ActiveRecord encryption;
-  # keys in env — see config/initializers/active_record_encryption.rb).
+  # keys in env, see config/initializers/active_record_encryption.rb).
   encrypts :otp_secret_key
   encrypts :backup_codes
 

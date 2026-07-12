@@ -131,7 +131,7 @@ function initializeAccountPage() {
       const targetTab = tabElement.getAttribute('data-tab');
       activateTab(targetTab);
       // The click handler suppresses native anchor navigation, so mirror the
-      // tab into the hash by hand — keeps deep links and back/forward sane.
+      // tab into the hash by hand, keeps deep links and back/forward sane.
       history.replaceState(null, '', '#' + targetTab);
     }
   });

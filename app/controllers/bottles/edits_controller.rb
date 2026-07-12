@@ -1,5 +1,5 @@
 # app/controllers/bottles/edits_controller.rb
-# "Suggest a correction" — any signed-in user proposes new values for the
+# "Suggest a correction", any signed-in user proposes new values for the
 # five whitelisted bottle fields. Only fields that actually changed become
 # BottleEdit rows; each triggers an auto-apply check immediately after
 # creation (BottleEdits::AutoApply, Task 3).
@@ -18,7 +18,7 @@ class Bottles::EditsController < ApplicationController
       next if submitted.nil?
 
       normalized = BottleEdits::Normalize.for_storage(field, submitted)
-      # Clearing a field isn't a proposable correction — a blank value would
+      # Clearing a field isn't a proposable correction, a blank value would
       # fail the row's presence validation and dead-end the whole submit.
       next if normalized.blank?
 
@@ -28,7 +28,7 @@ class Bottles::EditsController < ApplicationController
       edit = @bottle.bottle_edits.pending.for_field(field).find_by(user: current_user)
       if edit
         # Same value again: no-op. A DIFFERENT value replaces their earlier
-        # suggestion — silently dropping it while saying "no changes" lies
+        # suggestion, silently dropping it while saying "no changes" lies
         # to the user about what got recorded.
         next if edit.proposed_value == normalized
 
@@ -42,7 +42,7 @@ class Bottles::EditsController < ApplicationController
     changed_fields.each { |field| BottleEdits::AutoApply.call(bottle: @bottle, field: field) }
 
     redirect_to bottle_path(@bottle), notice:
-      changed_fields.any? ? "Thanks — your correction is on the record." : "No changes to suggest."
+      changed_fields.any? ? "Thanks, your correction is on the record." : "No changes to suggest."
   end
 
   private

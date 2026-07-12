@@ -113,7 +113,7 @@ class BottlesTest < ActionDispatch::IntegrationTest
 
     get search_reviews_path(q: "buffalo", format: :json)
     labels = response.parsed_body["distilleries"].map { |d| d["label"] }
-    assert_includes labels, "Buffalo Trace — Distillery"
+    assert_includes labels, "Buffalo Trace · Distillery"
 
     get bottle_path(bottles(:eagle_rare))
     assert_select "a[href=?]", reviews_path(distillery: "Buffalo Trace"), text: "Buffalo Trace"

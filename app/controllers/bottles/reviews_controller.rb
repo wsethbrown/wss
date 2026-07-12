@@ -1,4 +1,4 @@
-# Creating a review in the context of a bottle (solo tastings — Phase 1).
+# Creating a review in the context of a bottle (solo tastings, Phase 1).
 # Event-tagged creation arrives in Phase 2 via the event page.
 class Bottles::ReviewsController < ApplicationController
   before_action :authenticate_user!

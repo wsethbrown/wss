@@ -100,7 +100,7 @@ class EventsController < ApplicationController
 
   def event_params
     # society_id is permitted only on create (the nested form); update must not
-    # re-home an event — that would re-attribute its reviews/board rows and
+    # re-home an event, that would re-attribute its reviews/board rows and
     # switch their veiling.
     permitted = [:title, :description, :location, :start_time, :end_time, :pours_hidden_until_complete]
     permitted << :society_id if action_name == "create" || action_name == "new"

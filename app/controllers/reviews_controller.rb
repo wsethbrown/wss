@@ -18,7 +18,7 @@ class ReviewsController < ApplicationController
                         .page(params[:bottle_page]).per(24)
     Bottle.preload_display_images(@bottles)
     # The record covers the people as well as the pours: a search also turns
-    # up societies (policy-scoped — private ones stay invisible to outsiders).
+    # up societies (policy-scoped, private ones stay invisible to outsiders).
     @societies = params[:q].present? ? policy_scope(Society).search(params[:q]).order(:name).limit(6) : Society.none
     @recent_reviews =
       if @tags.any? || @distillery
@@ -36,7 +36,7 @@ class ReviewsController < ApplicationController
     @circle_feed_reviews = Review.for_circle(current_user, limit: 50) if @feed == "circle" && current_user
     @hot_reviews = Review.hot_ranked if @feed == "hot"
     if @feed == "nights"
-      # Filter chip: public societies only — a private society's id in the URL
+      # Filter chip: public societies only, a private society's id in the URL
       # silently falls back to the unfiltered feed (same veiling as the cards).
       @night_society = params[:society].present? ? Society.public_societies.find_by(id: params[:society]) : nil
       # One card per night: the events themselves, newest first, each with
@@ -54,7 +54,7 @@ class ReviewsController < ApplicationController
   end
 
   # Entity-grouped autocomplete for the section search: bottles and societies,
-  # same privacy scope as the page results. Deliberately NO add-a-bottle row —
+  # same privacy scope as the page results. Deliberately NO add-a-bottle row,
   # cataloging happens in the start-a-review flow, where intent is explicit.
   def search
     q = params[:q].to_s.strip
@@ -62,7 +62,7 @@ class ReviewsController < ApplicationController
     societies = q.length >= 2 ? policy_scope(Society).search(q).order(:name).limit(4) : Society.none
     distilleries = q.length >= 2 ? Bottle.where("distillery ILIKE ?", "%#{Bottle.sanitize_sql_like(q)}%").distinct.order(:distillery).limit(4).pluck(:distillery) : []
     render json: {
-      distilleries: distilleries.map { |d| { label: "#{d} — Distillery", url: reviews_path(distillery: d) } },
+      distilleries: distilleries.map { |d| { label: "#{d} · Distillery", url: reviews_path(distillery: d) } },
       bottles:   bottles.map { |b| { label: b.display_name, url: bottle_path(b) } },
       societies: societies.map { |s| { label: s.name, url: society_path(s) } }
     }
@@ -72,7 +72,7 @@ class ReviewsController < ApplicationController
   # autocomplete links straight into each bottle's review form.
   def start; end
 
-  # A review's own page — the drill-down target for every clamped card.
+  # A review's own page, the drill-down target for every clamped card.
   def show
     @review = Review.includes(:user, :bottle, event: [:society, :event_bottles], images_attachments: :blob).find(params[:id])
   end

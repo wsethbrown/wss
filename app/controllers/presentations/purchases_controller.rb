@@ -58,7 +58,7 @@ class Presentations::PurchasesController < ApplicationController
       purchased_at: Time.current
     )
     log_activity(:presentation_purchased, @presentation, { purchase_type: 'free', price: 0 })
-    redirect_to @presentation, notice: 'Added to your library — this deck is free.'
+    redirect_to @presentation, notice: 'Added to your library. This deck is free.'
   end
 
   def handle_credit_purchase

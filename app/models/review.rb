@@ -19,7 +19,7 @@ class Review < ApplicationRecord
   validates :nose, :palate, :finish, :body_notes, length: { maximum: 500 }
   validates :bottle_id, uniqueness: {
     scope: [ :user_id, :event_id ],
-    message: "already has your review — edit it instead"
+    message: "already has your review, edit it instead"
   }
   validate :event_review_gates, on: :create, if: -> { event.present? }
   validate :images_are_valid
@@ -27,7 +27,7 @@ class Review < ApplicationRecord
   scope :recent_first, -> { order(created_at: :desc) }
 
   # The "Tasting nights" feed: reviews poured at PUBLIC societies' events.
-  # Private societies stay veiled — their nights are never sourceable here,
+  # Private societies stay veiled, their nights are never sourceable here,
   # matching the provenance-card veiling rule.
   scope :from_tasting_nights, ->(society: nil) {
     scoped = joins(event: :society).where(societies: { is_private: false })
@@ -35,7 +35,7 @@ class Review < ApplicationRecord
     scoped
   }
 
-  # Tastings ranked by thumbs-up received in the trailing window — a delta
+  # Tastings ranked by thumbs-up received in the trailing window, a delta
   # ranking, distinct from the lifetime votes_count counter cache used on
   # bottle pages. LEFT JOIN keeps zero-vote reviews (sorted last); ties break
   # newest-first per the addendum.
@@ -69,7 +69,7 @@ class Review < ApplicationRecord
   # ── Flavor descriptors ──────────────────────────────────────────────────
   # The tasting fields are free text; this curated lexicon lifts known
   # descriptor words out of them, each belonging to a flavor family. Tags are
-  # computed, never stored — the text stays the source of truth.
+  # computed, never stored, the text stays the source of truth.
   DESCRIPTOR_LEXICON = {
     "smoky"   => %w[peat peaty smoke smoky campfire ash char tar iodine bonfire],
     "sweet"   => %w[honey caramel toffee vanilla chocolate butterscotch molasses sweet sugar maple],
@@ -115,7 +115,7 @@ class Review < ApplicationRecord
     }.to_h
   end
 
-  # => { "smoky" => 3, "sweet" => 1 } — strength per family, for the wheel.
+  # => { "smoky" => 3, "sweet" => 1 }, strength per family, for the wheel.
   def flavor_profile
     wheel = wheel_values
     # Scale 0..1 dial values into pseudo-counts so wheels and waves mix
@@ -163,7 +163,7 @@ class Review < ApplicationRecord
     end
   }
 
-  # First upload wins — shown on the review page and feeds Bottle#display_image.
+  # First upload wins, shown on the review page and feeds Bottle#display_image.
   def hero_image
     images.attached? ? images.first : nil
   end
@@ -180,7 +180,7 @@ class Review < ApplicationRecord
     end
   end
 
-  # Event reviews are the society's record of the night — they only exist for
+  # Event reviews are the society's record of the night, they only exist for
   # bottles that were actually poured, written by people who actually said
   # they were going, once the pour list is public knowledge. Create-only:
   # edits never re-check (a deleted RSVP must not brick an existing review),

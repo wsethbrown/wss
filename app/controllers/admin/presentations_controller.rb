@@ -47,7 +47,7 @@ class Admin::PresentationsController < Admin::BaseController
     deck.pdf_file.attach(io: StringIO.new(data), filename: file.original_filename,
                          content_type: content_type)
 
-    # Model validations cap images at Presentation::MAX_IMAGE_SIZE — oversized embeds
+    # Model validations cap images at Presentation::MAX_IMAGE_SIZE, oversized embeds
     # are common in decks) must not sink the import. Use the largest that fits;
     # no cover just means the typographic char cover.
     usable_images = parsed.images.select { |i| i[:data].bytesize <= Presentation::MAX_IMAGE_SIZE }
@@ -56,10 +56,10 @@ class Admin::PresentationsController < Admin::BaseController
     end
 
     if deck.save
-      # Slide rendering (LibreOffice) is slow and heavy — do it off the request.
+      # Slide rendering (LibreOffice) is slow and heavy, do it off the request.
       DeckSlideRenderJob.perform_later(deck.id)
       redirect_to edit_admin_presentation_path(deck),
-                  notice: 'Draft imported — the slide previews are rendering and will appear shortly. Review each section, set a price, then publish.'
+                  notice: 'Draft imported. The slide previews are rendering and will appear shortly. Review each section, set a price, then publish.'
     else
       redirect_to new_admin_presentation_path,
                   alert: "Import failed: #{deck.errors.full_messages.to_sentence}"
@@ -68,7 +68,7 @@ class Admin::PresentationsController < Admin::BaseController
     redirect_to new_admin_presentation_path, alert: "Couldn't read that file as a deck: #{e.message}"
   end
 
-  # Server-side Markdown preview for the story editor — same pipeline the
+  # Server-side Markdown preview for the story editor, same pipeline the
   # public reader uses, so the preview is exact.
   def create
     @presentation = Presentation.new(presentation_params)
@@ -99,7 +99,7 @@ class Admin::PresentationsController < Admin::BaseController
     process_whiskey_recommendations(@presentation)
     
     if @presentation.update(presentation_params)
-      # A new deck file makes the old slide previews stale — re-render.
+      # A new deck file makes the old slide previews stale, re-render.
       DeckSlideRenderJob.perform_later(@presentation.id) if presentation_params[:pdf_file].present?
       redirect_to admin_presentation_path(@presentation), notice: 'Presentation updated successfully.'
     else
@@ -111,7 +111,7 @@ class Admin::PresentationsController < Admin::BaseController
   # blocks publishing without the buyer-download deck file.
   def publish
     if @presentation.update(published: true)
-      redirect_to admin_presentation_path(@presentation), notice: 'Published — the deck is live in the library.'
+      redirect_to admin_presentation_path(@presentation), notice: 'Published. The deck is live in the library.'
     else
       redirect_to admin_presentation_path(@presentation), alert: @presentation.errors.full_messages.to_sentence
     end
@@ -119,7 +119,7 @@ class Admin::PresentationsController < Admin::BaseController
 
   def unpublish
     @presentation.update_columns(published: false)
-    redirect_to admin_presentation_path(@presentation), notice: 'Unpublished — the deck is back to draft.'
+    redirect_to admin_presentation_path(@presentation), notice: 'Unpublished. The deck is back to draft.'
   end
 
   # Slide previews normally render automatically on import/upload; this is
@@ -127,7 +127,7 @@ class Admin::PresentationsController < Admin::BaseController
   def render_slides
     DeckSlideRenderJob.perform_later(@presentation.id)
     redirect_to admin_presentation_path(@presentation),
-                notice: 'Slide render queued — previews refresh in about a minute.'
+                notice: 'Slide render queued. Previews refresh in about a minute.'
   end
 
   def destroy

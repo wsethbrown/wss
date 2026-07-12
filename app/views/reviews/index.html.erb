@@ -4,7 +4,7 @@
   <p class="eyebrow mb-4 text-whiskey-300/90">The pours, on the record</p>
   <h1 class="font-display text-4xl font-semibold text-cream sm:text-5xl">The tasting record</h1>
   <p class="mx-auto mt-4 max-w-2xl text-cream/80">
-    Every bottle we've tasted and rated, and the societies doing the tasting —
+    Every bottle we've tasted and rated, and the societies doing the tasting,
     search either, and say what you found in the glass.
   </p>
 </section>
@@ -122,7 +122,7 @@
       <div class="mb-4 flex items-center gap-2">
         <% { "Latest" => nil, "Circle" => "circle", "Hot" => "hot", "Tasting nights" => "nights" }.each do |label, key| %>
           <% next if key == "circle" && !user_signed_in? %>
-          <%# Switching feeds drops the society filter — it only means something
+          <%# Switching feeds drops the society filter, it only means something
               inside Tasting nights. %>
           <%= link_to label, reviews_path(request.query_parameters.except("society").merge(feed: key).compact_blank) + "#tastings",
               class: "rounded-full px-4 py-1.5 text-sm font-semibold transition #{@feed == key ? 'bg-whiskey-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
@@ -174,7 +174,7 @@
             <% if @circle_feed_reviews.any? %>
               <div class="space-y-4"><%= render partial: "reviews/circle_row", collection: @circle_feed_reviews, as: :review %></div>
             <% elsif @in_circle %>
-              <p class="text-sm text-gray-500">No pours from your circle yet — their next tastings will land here.</p>
+              <p class="text-sm text-gray-500">No pours from your circle yet, their next tastings will land here.</p>
             <% else %>
               <p class="text-sm text-gray-500">Favorite a society or a fellow taster to see their pours here.</p>
             <% end %>

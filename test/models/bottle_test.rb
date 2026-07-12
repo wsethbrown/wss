@@ -34,7 +34,7 @@ class BottleTest < ActiveSupport::TestCase
   end
 
   test "display_name combines name and distillery" do
-    assert_equal "Eagle Rare 10 — Buffalo Trace", bottles(:eagle_rare).display_name
+    assert_equal "Eagle Rare 10 · Buffalo Trace", bottles(:eagle_rare).display_name
     assert_equal "Housemade Amaro", Bottle.new(name: "Housemade Amaro").display_name
   end
 end

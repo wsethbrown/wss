@@ -64,7 +64,7 @@
   </div>
 
   <div>
-    <p class="mb-2 block text-sm font-medium text-gray-700">Photos <span class="font-normal text-gray-400">(optional, up to 3 — the first becomes this tasting's cover photo)</span></p>
+    <p class="mb-2 block text-sm font-medium text-gray-700">Photos <span class="font-normal text-gray-400">(optional, up to 3, the first becomes this tasting's cover photo)</span></p>
     <% if review.persisted? && review.images.attached? %>
       <div class="mb-4 flex flex-wrap gap-3">
         <% review.images.each do |image| %>

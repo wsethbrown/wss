@@ -1,4 +1,4 @@
-# create/destroy only — favorites render inline on the favoritable's page and
+# create/destroy only, favorites render inline on the favoritable's page and
 # in full on the owner's own profile (ProfilesController).
 class FavoritesController < ApplicationController
   before_action :authenticate_user!
@@ -22,7 +22,7 @@ class FavoritesController < ApplicationController
 
   private
 
-  # The button flips in place (star fills/empties) — that IS the feedback,
+  # The button flips in place (star fills/empties), that IS the feedback,
   # so success carries no flash. Failures still redirect with an alert.
   # On unfollow, a remove stream also clears the row on Account → Followed;
   # each stream no-ops on pages where its target frame isn't present.

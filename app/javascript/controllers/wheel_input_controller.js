@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
 // The tasting wheel as an input: press anywhere in a segment and drag
-// outward — further from the hub means stronger. Drag back into the hub to
+// outward, further from the hub means stronger. Drag back into the hub to
 // clear a family. No modes, no instructions; the gesture is the meaning.
 const R = 96
 const HUB = 22

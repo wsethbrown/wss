@@ -108,10 +108,10 @@
               <% user_rsvp = @event.event_rsvps.find_by(user: current_user) %>
               <% if user_rsvp %>
                 <span class="text-sm text-gray-500">
-                  Your RSVP: <span class="font-medium text-gray-700"><%= user_rsvp.status.capitalize %></span> — RSVPs closed
+                  Your RSVP: <span class="font-medium text-gray-700"><%= user_rsvp.status.capitalize %></span>, RSVPs closed
                 </span>
               <% else %>
-                <span class="text-sm text-gray-500">RSVPs closed — they close 24 hours before the event</span>
+                <span class="text-sm text-gray-500">RSVPs closed, they close 24 hours before the event</span>
               <% end %>
             <% else %>
               <span class="text-sm text-gray-500">Event has ended</span>

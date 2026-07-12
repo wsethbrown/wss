@@ -1,6 +1,6 @@
 <%# The night's lineup. Visibility: Event#pours_visible_to? decides;
     management: EventPolicy#update? (organizer / society admins).
-    Group means use ONLY event-tagged reviews (@pour_reviews) — a solo
+    Group means use ONLY event-tagged reviews (@pour_reviews), a solo
     review of the same bottle never counts toward the night. %>
 <div class="bg-white shadow-sm rounded-lg overflow-hidden mt-8">
   <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
@@ -74,7 +74,7 @@
           <div class="relative" data-controller="bottle-search"
                data-bottle-search-url-value="<%= search_bottles_path %>"
                data-bottle-search-return-to-value="<%= society_event_path(@event.society, @event) %>">
-            <input type="search" placeholder="Add a pour — search bottles or distilleries…" autocomplete="off"
+            <input type="search" placeholder="Add a pour, search bottles or distilleries…" autocomplete="off"
                    data-bottle-search-target="input" data-action="input->bottle-search#query"
                    class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-whiskey-500">
             <input type="hidden" name="event_bottle[bottle_id]" data-bottle-search-target="bottleId">
@@ -82,7 +82,7 @@
                  class="absolute inset-x-0 top-full z-20 mt-1 hidden overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"></div>
           </div>
           <div class="flex items-center gap-3">
-            <input type="text" name="event_bottle[label]" placeholder="Label (optional — "the blind", "pour #3")"
+            <input type="text" name="event_bottle[label]" placeholder="Label (optional, "the blind", "pour #3")"
                    class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500">
             <%= submit_tag "Add pour", class: "cursor-pointer shrink-0 rounded-xl bg-whiskey-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-whiskey-700" %>
           </div>

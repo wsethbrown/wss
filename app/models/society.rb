@@ -95,7 +95,7 @@ class Society < ApplicationRecord
     is_private
   end
 
-  # How many members follow (favorite) this society — counter-cache column.
+  # How many members follow (favorite) this society, counter-cache column.
   def followers_count = favorites_count
 
   # Century badge: 100+ followers, same threshold as tasters.

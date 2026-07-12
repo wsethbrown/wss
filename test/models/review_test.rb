@@ -22,7 +22,7 @@ class ReviewTest < ActiveSupport::TestCase
   test "one solo review per user per bottle" do
     dup = Review.new(user: users(:john), bottle: bottles(:eagle_rare), rating: 3.0)
     assert_not dup.valid?
-    assert_includes dup.errors[:bottle_id], "already has your review — edit it instead"
+    assert_includes dup.errors[:bottle_id], "already has your review, edit it instead"
   end
 
   test "solo? distinguishes event-tagged reviews" do

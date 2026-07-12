@@ -3,7 +3,7 @@
 <div class="mb-8 flex items-center justify-between">
   <div>
     <h1 class="font-display text-3xl font-semibold text-gray-900">Credit ledger</h1>
-    <p class="mt-1 text-gray-600">Every grant, spend, expiry, and refund — the source of truth for balances.</p>
+    <p class="mt-1 text-gray-600">Every grant, spend, expiry, and refund, the source of truth for balances.</p>
   </div>
   <%= link_to 'Back to credits', admin_credits_path, class: 'rounded-xl border border-whiskey-300 bg-white px-4 py-2.5 text-sm font-semibold text-whiskey-800 transition hover:bg-whiskey-50' %>
 </div>
@@ -45,7 +45,7 @@
               <td class="px-6 py-4 text-sm text-gray-600">
                 <%= txn.description %>
                 <% if txn.presentation %>
-                  — <%= link_to txn.presentation.title, admin_presentation_path(txn.presentation), class: 'text-whiskey-700 hover:text-whiskey-600' %>
+, <%= link_to txn.presentation.title, admin_presentation_path(txn.presentation), class: 'text-whiskey-700 hover:text-whiskey-600' %>
                 <% end %>
               </td>
             </tr>

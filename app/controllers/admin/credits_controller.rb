@@ -97,7 +97,7 @@ class Admin::CreditsController < Admin::BaseController
 
       if adjustment != 0
         # Single ledger entry; the ledger recomputes the cached balance. (Previously
-        # this both increment!'d and created a transaction — a double count — using an
+        # this both increment!'d and created a transaction, a double count, using an
         # invalid transaction_type that failed validation after the increment.)
         CreditTransaction.record!(
           user: @user,

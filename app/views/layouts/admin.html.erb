@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>WSS Admin<%= " — #{content_for(:title)}" if content_for?(:title) %></title>
+    <title>WSS Admin<%= ", #{content_for(:title)}" if content_for?(:title) %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
@@ -10,7 +10,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900&family=Instrument+Sans:ital,wght@0,400..700&display=swap" rel="stylesheet">
 
-    <%# The old layout linked `:app`, which doesn't exist — admin rendered unstyled. %>
+    <%# The old layout linked `:app`, which doesn't exist, admin rendered unstyled. %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
     <%= javascript_importmap_tags %>
@@ -18,7 +18,7 @@
 
   <body class="bg-whiskey-50 font-sans">
     <div class="min-h-screen">
-      <!-- Sidebar (fixed, out of flow — main clears it with ml-60 only; a flex-1
+      <!-- Sidebar (fixed, out of flow, main clears it with ml-60 only; a flex-1
            sibling would take full viewport width and overflow right by 240px) -->
       <aside class="fixed inset-y-0 left-0 z-40 flex w-60 flex-col bg-char">
         <%= link_to admin_root_path, class: "flex items-center gap-3 border-b border-oak-edge px-5 py-4" do %>

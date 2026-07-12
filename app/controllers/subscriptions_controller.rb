@@ -215,7 +215,7 @@ class SubscriptionsController < ApplicationController
     end
   end
 
-  # NOTE: pause/resume must live above `private` — they are routed actions
+  # NOTE: pause/resume must live above `private`, they are routed actions
   # (POST /subscriptions/pause|resume). They were previously defined below the
   # `private` keyword, which made them non-public and 404'd the live feature.
   def pause

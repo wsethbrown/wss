@@ -30,7 +30,7 @@ class Bottle < ApplicationRecord
   end
 
   # Aggregate columns (avg_rating, reviewers) computed in SQL with the SAME
-  # latest-per-user semantics as #average_rating — one query for a whole page
+  # latest-per-user semantics as #average_rating, one query for a whole page
   # of rows, and sortable. Rows respond to #avg_rating / #reviewers.
   scope :with_score, -> {
     select("bottles.*, agg.avg_rating, agg.reviewers").joins(<<~SQL)
@@ -52,7 +52,7 @@ class Bottle < ApplicationRecord
     "newest"   => "bottles.created_at DESC"
   }.freeze
 
-  # Aggregated flavor families across every tasting of this bottle —
+  # Aggregated flavor families across every tasting of this bottle,
   # the community's palate, summed from Review#flavor_profile.
   def flavor_profile
     reviews.map(&:flavor_profile).each_with_object(Hash.new(0)) do |profile, sum|
@@ -72,14 +72,14 @@ class Bottle < ApplicationRecord
   end
 
   # The community's most-used descriptor words across this bottle's
-  # tastings — the left rail's tag cloud.
+  # tastings, the left rail's tag cloud.
   def top_descriptors(limit = 5)
     reviews.flat_map { |r| r.descriptor_tags.keys }.tally
            .sort_by { |word, n| [ -n, word ] }.first(limit).map(&:first)
   end
 
   def display_name
-    [ name, distillery ].compact_blank.join(" — ")
+    [ name, distillery ].compact_blank.join(" · ")
   end
 
   # The public score: each reviewer counts once, via their latest tasting
@@ -93,7 +93,7 @@ class Bottle < ApplicationRecord
   end
 
   # Each PUBLIC society's collective take on this bottle, from its event
-  # reviews — same latest-per-member math as the society board, so a
+  # reviews, same latest-per-member math as the society board, so a
   # re-taster refreshes their contribution instead of double-voting.
   # Rows respond to #verdict_avg / #verdict_reviewers.
   def society_verdicts
@@ -117,7 +117,7 @@ class Bottle < ApplicationRecord
   # /bottles/<slug> image: pin > top-rated review hero (ties: votes, newest)
   # > creator's label_image > nil (view falls back to the SVG placeholder).
   def display_image
-    # Memoized — every call site checks presence then renders, and the lookup
+    # Memoized, every call site checks presence then renders, and the lookup
     # costs two queries. defined? because nil (imageless bottle) is a valid
     # cached answer.
     return @display_image if defined?(@display_image)
@@ -134,7 +134,7 @@ class Bottle < ApplicationRecord
       end
   end
 
-  # Sets the same memo #display_image reads — lets batch preloading (see
+  # Sets the same memo #display_image reads, lets batch preloading (see
   # .preload_display_images) hand a bottle its precomputed answer so the
   # reader never falls through to the per-bottle query path. nil is a valid
   # assigned value (imageless bottle), same as the lazy path.
@@ -144,7 +144,7 @@ class Bottle < ApplicationRecord
 
   # Batch version of #display_image for list pages: one query to find each
   # bottle's top review-with-images (same DISTINCT ON tie-break order as the
-  # instance method — rating desc, votes_count desc, created_at desc), one
+  # instance method, rating desc, votes_count desc, created_at desc), one
   # query to preload those candidate reviews' image attachments, then an
   # in-memory walk assigning each bottle's memoized #display_image.
   #

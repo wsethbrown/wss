@@ -70,14 +70,14 @@
           </div>
         </div>
       <% else %>
-        <!-- Empty State for My Societies — compact so Discover stays near the top -->
+        <!-- Empty State for My Societies, compact so Discover stays near the top -->
         <div class="mb-10 flex flex-col items-center gap-4 rounded-2xl border border-whiskey-100 bg-white px-6 py-6 text-center sm:flex-row sm:justify-between sm:text-left">
           <div>
             <h2 class="text-xl font-bold text-gray-900">Start your whiskey journey</h2>
             <% if can_create_society %>
-              <p class="mt-1 text-gray-600">You haven't joined any societies yet — discover one below, or start your own.</p>
+              <p class="mt-1 text-gray-600">You haven't joined any societies yet, discover one below, or start your own.</p>
             <% else %>
-              <p class="mt-1 text-gray-600">You haven't joined any societies yet — discover one below. Starting your own society is a membership benefit.</p>
+              <p class="mt-1 text-gray-600">You haven't joined any societies yet, discover one below. Starting your own society is a membership benefit.</p>
             <% end %>
           </div>
           <% if can_create_society %>
@@ -99,7 +99,7 @@
       <div>
         <h2 class="text-3xl font-bold text-gray-900 mb-8">Discover Societies</h2>
 
-        <%# Search: name + location text. The old ZIP-radius search was decorative —
+        <%# Search: name + location text. The old ZIP-radius search was decorative,
             no coordinates or geocoding existed; it even requested browser
             geolocation to feed a plain ILIKE that matched nothing. %>
         <div class="mb-8">

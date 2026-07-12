@@ -111,7 +111,7 @@ export default class extends Controller {
           span.className = "h-px flex-1 bg-whiskey-300"
           return span
         }
-        marker.append(rule(), "The free teaser fades out here — everything below is buyers-only", rule())
+        marker.append(rule(), "The free teaser fades out here, everything below is buyers-only", rule())
         nonEmpty[i]?.after(marker)
         return
       }
@@ -134,7 +134,7 @@ export default class extends Controller {
     this.refresh()
   }
 
-  // Siblings may include the teaser marker — skip anything that isn't a card.
+  // Siblings may include the teaser marker, skip anything that isn't a card.
   moveUp(event) {
     const item = event.target.closest(".chapter-item")
     let prev = item.previousElementSibling

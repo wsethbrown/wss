@@ -36,7 +36,7 @@ class EventReviewTest < ActiveSupport::TestCase
     dup = Review.new(user: users(:john), bottle: bottles(:ardbeg_10),
                      event: events(:spring_blind), rating: 4.0)
     assert_not dup.valid?
-    assert_includes dup.errors[:bottle_id], "already has your review — edit it instead"
+    assert_includes dup.errors[:bottle_id], "already has your review, edit it instead"
   end
 
   test "organizer cannot review a secret pour before reveal" do

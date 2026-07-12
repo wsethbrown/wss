@@ -27,7 +27,7 @@
 
 <% unless @presentation.published? %>
   <div class="fixed inset-x-0 top-16 z-40 bg-whiskey-600 px-4 py-2 text-center text-sm font-semibold text-white">
-    Draft — visible to admins only. Customers get a 404 until this deck is published.
+    Draft, visible to admins only. Customers get a 404 until this deck is published.
   </div>
 <% end %>
 
@@ -79,11 +79,11 @@
         <%= link_to new_presentation_purchase_path(@presentation),
             class: "inline-flex items-center justify-center gap-2 rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char" do %>
           <%= if @presentation.free?
-                'Add to my library — free'
+                'Add to my library, free'
               elsif viewer_can_credit
                 'Use 1 credit'
               else
-                "Get this deck — #{@presentation.formatted_price}"
+                "Get this deck, #{@presentation.formatted_price}"
               end %>
         <% end %>
       <% end %>
@@ -133,14 +133,14 @@
           </section>
         <% end %>
 
-        <!-- The Story — narrative deck content, rendered from Markdown -->
+        <!-- The Story, narrative deck content, rendered from Markdown -->
         <section class="mb-16 scroll-mt-24" id="deck-story">
           <p class="eyebrow text-whiskey-600 mb-2">The story</p>
           <h2 class="font-display text-3xl font-semibold text-gray-900 mb-3">A taste of the writing</h2>
           <div class="rule-double text-whiskey-800 mb-10"></div>
 
           <div class="relative pl-6 md:pl-10">
-            <%# The thread: a thin amber line that fills as you read — the narrative
+            <%# The thread: a thin amber line that fills as you read, the narrative
                 spine connecting the pour to its story. %>
             <div class="absolute left-0 top-1 bottom-1 w-[2px] rounded bg-whiskey-100" aria-hidden="true">
               <div id="deck-thread" class="w-full rounded bg-gradient-to-b from-whiskey-300 to-whiskey-600 transition-[height] duration-150 ease-out" style="height: 0%"></div>
@@ -165,17 +165,17 @@
                 <% if story_truncated?(@presentation.content) %>
                   <div class="mt-2 rounded-2xl border border-whiskey-200 bg-whiskey-50 p-8 text-center">
                     <p class="font-display text-xl font-semibold text-gray-900">The story keeps going.</p>
-                    <p class="mt-2 text-gray-600">Get the deck to read the rest — slides, script, and downloads included.</p>
+                    <p class="mt-2 text-gray-600">Get the deck to read the rest, slides, script, and downloads included.</p>
                     <%= link_to user_signed_in? ? new_presentation_purchase_path(@presentation) : auth_path,
                         class: 'mt-6 inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-7 py-3 font-semibold text-white transition hover:bg-whiskey-700' do %>
                       <%= if !user_signed_in?
                             'Sign in to get this deck'
                           elsif @presentation.free?
-                            'Add to my library — free'
+                            'Add to my library, free'
                           elsif viewer_can_credit
                             'Use 1 credit'
                           else
-                            "Get this deck — #{@presentation.formatted_price}"
+                            "Get this deck, #{@presentation.formatted_price}"
                           end %>
                     <% end %>
                   </div>
@@ -212,7 +212,7 @@
           })();
         </script>
 
-        <!-- Tasting Notes (if present) — set like the back of a label -->
+        <!-- Tasting Notes (if present), set like the back of a label -->
         <% if @presentation.nose_notes.present? || @presentation.palate_notes.present? || @presentation.finish_notes.present? || @presentation.body_notes.present? %>
           <section class="mb-16">
             <p class="eyebrow text-whiskey-600 mb-2">Tasting notes</p>
@@ -237,9 +237,9 @@
           </section>
         <% end %>
 
-        <!-- The Slides — a teaser for non-owners ONLY. We never show the whole
+        <!-- The Slides, a teaser for non-owners ONLY. We never show the whole
              deck here: the preview caps below the slide count and the last one
-             fades into the buy prompt. Owners skip this section entirely — they
+             fades into the buy prompt. Owners skip this section entirely, they
              open the deck itself. Falls back to the text outline when no
              renders exist. -->
         <% unless @full_story %>
@@ -260,7 +260,7 @@
                       class: 'w-full rounded-2xl border border-whiskey-200 shadow-sm' %>
                   <% if fade %>
                     <%# The last free slide dissolves from about halfway down into
-                        the purchase prompt — the paywall, made of the deck itself. %>
+                        the purchase prompt, the paywall, made of the deck itself. %>
                     <div class="absolute inset-x-0 bottom-0 top-1/2 flex items-end justify-center rounded-b-2xl bg-gradient-to-b from-transparent via-white via-30% to-white">
                       <div class="mb-8 px-6 text-center">
                         <p class="font-display text-xl font-semibold text-gray-900"><%= slides.size - count %> more slides in the full deck.</p>
@@ -377,19 +377,19 @@
                 <% if owned_purchase.purchase_type == 'credit' && !current_user.subscription_active? %>
                   <p class="eyebrow text-whiskey-600 mb-2">In your library</p>
                   <div class="font-display text-3xl font-semibold text-gray-900 mb-2">Membership paused</div>
-                  <p class="text-gray-600">You unlocked this deck with a credit — reactivate to read it again.</p>
+                  <p class="text-gray-600">You unlocked this deck with a credit, reactivate to read it again.</p>
                 <% else %>
                   <p class="eyebrow text-whiskey-600 mb-2">In your library</p>
                   <div class="font-display text-3xl font-semibold text-gray-900 mb-2"><%= owned_purchase.purchase_type == 'direct' ? 'Yours for good' : 'Unlocked' %></div>
-                  <p class="text-gray-600"><%= owned_purchase.purchase_type == 'direct' ? 'Bought outright — lifetime access.' : 'Unlocked with a credit via your membership.' %></p>
+                  <p class="text-gray-600"><%= owned_purchase.purchase_type == 'direct' ? 'Bought outright, lifetime access.' : 'Unlocked with a credit via your membership.' %></p>
                 <% end %>
               <% elsif can_credit %>
                 <p class="eyebrow text-whiskey-600 mb-2">Included with membership</p>
                 <div class="font-display text-4xl font-semibold text-gray-900 mb-1">Use 1 credit</div>
-                <p class="text-gray-600">You have <%= current_user.credits %> credit<%= 's' unless current_user.credits == 1 %> — access lasts as long as your membership.</p>
+                <p class="text-gray-600">You have <%= current_user.credits %> credit<%= 's' unless current_user.credits == 1 %>, access lasts as long as your membership.</p>
               <% else %>
                 <div class="font-display text-4xl font-semibold text-gray-900 mb-1"><%= @presentation.formatted_price %></div>
-                <p class="text-gray-600"><%= @presentation.free? ? 'Free for everyone' : 'One-time purchase — yours for good' %></p>
+                <p class="text-gray-600"><%= @presentation.free? ? 'Free for everyone' : 'One-time purchase, yours for good' %></p>
               <% end %>
             </div>
 
@@ -436,7 +436,7 @@
                 <% end %>
               <% else %>
                 <%# Downloads: one list built from whatever files exist. The box only
-                    renders when there is something to download — an empty labeled box
+                    renders when there is something to download, an empty labeled box
                     reads as broken. %>
                 <% downloads = [
                   ['Full presentation', (full_presentation_presentation_downloads_path(@presentation) if @presentation.pdf_file.attached?)],
@@ -444,7 +444,7 @@
                   ['Outline',           (outline_presentation_downloads_path(@presentation) if @presentation.outline_file.attached?)],
                   ['Whiskey list',      (recommendations_presentation_downloads_path(@presentation) if @presentation.recommendations_sheet.attached?)],
                   ['Tasting scorecard', (scorecard_presentation_downloads_path(@presentation) if @presentation.scorecard.attached?)],
-                  # The blank card is always included — the fallback for pouring your own bottles.
+                  # The blank card is always included, the fallback for pouring your own bottles.
                   ['Blank scorecard',   blank_scorecard_presentation_downloads_path(@presentation)]
                 ].select { |_, path| path } %>
 
@@ -484,14 +484,14 @@
             <% end %>
 
             <% unless owned_purchase %>
-              <%# What you get — an honest manifest built ONLY from what exists. %>
+              <%# What you get, an honest manifest built ONLY from what exists. %>
               <% manifest = [
-                (@presentation.slide_images.attached? ? "The full deck — #{@presentation.slide_images.count} slides" : (@presentation.pdf_file.attached? ? "The full presentation file" : nil)),
-                ("The story — #{@presentation.reading_time} min read" if @presentation.content.present?),
+                (@presentation.slide_images.attached? ? "The full deck, #{@presentation.slide_images.count} slides" : (@presentation.pdf_file.attached? ? "The full presentation file" : nil)),
+                ("The story, #{@presentation.reading_time} min read" if @presentation.content.present?),
                 ("Speaker script" if @presentation.speaker_notes.attached?),
                 ("Presentation outline" if @presentation.outline_file.attached?),
                 ("Printable whiskey list" if @presentation.recommendations_sheet.attached?),
-                ("Bottle list — #{@presentation.parsed_whiskey_recommendations.size} pours with tasting notes" if @presentation.parsed_whiskey_recommendations.any?)
+                ("Bottle list, #{@presentation.parsed_whiskey_recommendations.size} pours with tasting notes" if @presentation.parsed_whiskey_recommendations.any?)
               ].compact %>
               <% if manifest.any? %>
                 <div class="mb-6 rounded-2xl bg-whiskey-50 p-4">
@@ -516,9 +516,9 @@
                     Use 1 credit
                   <% end %>
                   <%= link_to new_presentation_purchase_path(@presentation, method: 'direct'), class: "block w-full border border-whiskey-300 text-whiskey-800 font-semibold py-3.5 px-6 rounded-2xl hover:bg-whiskey-50 transition text-center" do %>
-                    Buy outright — <%= @presentation.formatted_price %>
+                    Buy outright, <%= @presentation.formatted_price %>
                   <% end %>
-                  <p class="mt-2 mb-4 text-center text-xs text-gray-500">Rather keep your credit? Buy it outright — yours for good, membership or not.</p>
+                  <p class="mt-2 mb-4 text-center text-xs text-gray-500">Rather keep your credit? Buy it outright, yours for good, membership or not.</p>
                 <% else %>
                   <%= link_to new_presentation_purchase_path(@presentation), class: "block w-full bg-whiskey-600 text-white font-semibold py-4 px-6 rounded-2xl hover:bg-whiskey-700 transition mb-4 text-center" do %>
                     <%= @presentation.free? ? 'Add to my library' : 'Get this deck' %>
@@ -572,7 +572,7 @@
   </div>
 </div>
 
-<!-- More from the library — never dead-end a reader -->
+<!-- More from the library, never dead-end a reader -->
 <% if @more_decks&.any? %>
   <section class="w-full bg-whiskey-50 px-4 py-16">
     <div class="mx-auto max-w-6xl">

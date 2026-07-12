@@ -1,4 +1,4 @@
-<%# Account tab panel: subscription. Everything shown here is REAL —
+<%# Account tab panel: subscription. Everything shown here is REAL,
     payment method and invoices live in the Stripe Customer Portal (one
     button), never mocked up here. Checkout banners are flash-driven
     (one-shot), set by AccountController#index's redirect. %>
@@ -16,7 +16,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
           <p class="text-sm font-medium text-green-800">
-            You're in — one deck credit added. <%= link_to "Browse the decks", presentations_path, class: "underline hover:text-green-900" %> and spend it well.
+            You're in, one deck credit added. <%= link_to "Browse the decks", presentations_path, class: "underline hover:text-green-900" %> and spend it well.
           </p>
         </div>
       </div>
@@ -40,13 +40,13 @@
       <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <% if current_user.subscription_paused? %>
           <div class="mb-5 rounded-xl border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
-            <span class="font-semibold">Paused</span> since <%= current_user.subscription_paused_at.strftime('%B %-d, %Y') %> —
+            <span class="font-semibold">Paused</span> since <%= current_user.subscription_paused_at.strftime('%B %-d, %Y') %>,
             billing resumes automatically on <%= (current_user.subscription_paused_at + 1.month).strftime('%B %-d, %Y') %>.
             You keep access to everything you've unlocked.
           </div>
         <% elsif current_user.cancel_at_period_end? && renewal&.future? %>
           <div class="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-            <span class="font-semibold">Ending</span> — your membership runs until <%= renewal.strftime('%B %-d, %Y') %>.
+            <span class="font-semibold">Ending</span>, your membership runs until <%= renewal.strftime('%B %-d, %Y') %>.
             You keep full access until then.
           </div>
         <% end %>
@@ -81,7 +81,7 @@
         </div>
 
         <p class="mt-4 text-sm text-gray-500">
-          Credits unlock any deck while your membership is active — you receive one with each renewal.
+          Credits unlock any deck while your membership is active, you receive one with each renewal.
         </p>
 
         <div class="mt-5 flex flex-wrap items-center gap-3 border-t border-gray-100 pt-5">
@@ -113,12 +113,12 @@
         </div>
       </div>
     <% else %>
-      <%# Non-subscriber chooser — matches the homepage pricing design:
+      <%# Non-subscriber chooser, matches the homepage pricing design:
           honest copy, slim price-only cards, one shared benefits list. %>
       <div class="mb-8">
         <div class="text-center mb-8">
           <h4 class="font-display text-2xl font-semibold text-gray-900">Start your membership</h4>
-          <p class="mt-2 text-gray-600">Every plan unlocks the same thing — pick the commitment that suits you.</p>
+          <p class="mt-2 text-gray-600">Every plan unlocks the same thing, pick the commitment that suits you.</p>
         </div>
 
         <div id="plan-cards" class="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -182,7 +182,7 @@
       </div>
     <% end %>
 
-    <!-- Credits history — real transactions only -->
+    <!-- Credits history, real transactions only -->
     <% if current_user.credit_transactions.exists? %>
       <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
         <div class="flex items-center justify-between">

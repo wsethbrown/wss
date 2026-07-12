@@ -1,9 +1,9 @@
-# A user's private bookmark on a Society or User — visible only to the owner
+# A user's private bookmark on a Society or User, visible only to the owner
 # (ProfilesController only sets @favorites on your own profile). Favoriting a
 # Society is gated by the same rule as viewing it (SocietyPolicy#show?).
 class Favorite < ApplicationRecord
   belongs_to :user
-  # counter_cache keeps followers_count O(1) — review lists render many
+  # counter_cache keeps followers_count O(1), review lists render many
   # authors and each does a Century-badge check.
   belongs_to :favoritable, polymorphic: true, counter_cache: true
 

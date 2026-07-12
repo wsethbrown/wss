@@ -11,7 +11,7 @@ class AccountController < ApplicationController
     # credit NOW, synchronously, so it's on screen with the banner (the
     # invoice.payment_succeeded webhook stays as the closed-tab fallback;
     # grant_welcome_credit dedups the two). Then redirect to strip the
-    # ?subscription param — flash makes the banner one-shot instead of
+    # ?subscription param, flash makes the banner one-shot instead of
     # immortal across refreshes.
     if params[:subscription].present?
       ensure_welcome_credit_after_checkout if params[:subscription] == "success"
@@ -305,7 +305,7 @@ class AccountController < ApplicationController
 
   # Verifies with Stripe (the ?subscription=success param alone is
   # forgeable) that a subscription was just created, then grants the
-  # welcome credit. Only subscriptions under an hour old count — anything
+  # welcome credit. Only subscriptions under an hour old count, anything
   # older is not "just checked out" and belongs to the webhook path.
   # Stripe hiccups here are fine: the webhook fallback still grants.
   def ensure_welcome_credit_after_checkout

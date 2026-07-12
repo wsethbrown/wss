@@ -48,7 +48,7 @@
       <p class="text-gray-700"><%= @presentation.description.presence || "No description provided." %></p>
     </div>
 
-    <!-- The Story — rendered exactly as buyers read it -->
+    <!-- The Story, rendered exactly as buyers read it -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
       <div class="mb-4 flex items-baseline justify-between">
         <h2 class="text-lg font-semibold text-gray-900">The story</h2>
@@ -59,7 +59,7 @@
           <%= render_markdown(@presentation.content) %>
         </div>
       <% else %>
-        <p class="text-sm text-gray-500">No story yet — add it in the editor.</p>
+        <p class="text-sm text-gray-500">No story yet, add it in the editor.</p>
       <% end %>
     </div>
 
@@ -78,7 +78,7 @@
       </div>
     <% elsif @presentation.pdf_file.attached? %>
       <div class="rounded-2xl border border-whiskey-200 bg-whiskey-50 p-6 text-sm text-whiskey-900">
-        Slide previews are rendering in the background — refresh in a moment.
+        Slide previews are rendering in the background, refresh in a moment.
       </div>
     <% end %>
 
@@ -245,7 +245,7 @@
         <% elsif @presentation.slide_render_pending? %>
           <div class="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900">
             <span class="font-semibold">Rendering slide previews&hellip;</span>
-            Usually under a minute. Publishing unlocks when they're ready — refresh to check.
+            Usually under a minute. Publishing unlocks when they're ready, refresh to check.
           </div>
         <% else %>
           <div class="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-900">

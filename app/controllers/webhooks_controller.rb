@@ -75,7 +75,7 @@ class WebhooksController < ApplicationController
     )
 
     # NOTE: the welcome credit is granted on invoice.payment_succeeded
-    # (billing_reason subscription_create), not here — this event arrives
+    # (billing_reason subscription_create), not here, this event arrives
     # with status "incomplete" during checkout, so an active-subscription
     # guard would (and once did) silently swallow the credit.
     subscription_id = subscription.try(:id) || subscription["id"]
@@ -267,7 +267,7 @@ class WebhooksController < ApplicationController
   # The webhook endpoint is pinned to API version 2025-05-28.basil while our
   # direct API calls pin Stripe.api_version 2024-06-20, so objects arrive in
   # BOTH shapes. Basil removed subscription.current_period_end (it now lives on
-  # each subscription item) — read whichever is present.
+  # each subscription item), read whichever is present.
   def subscription_period_end(subscription)
     period_end = subscription.try(:current_period_end) || subscription["current_period_end"]
     return period_end if period_end

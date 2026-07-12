@@ -1,5 +1,5 @@
 <%# Locals: favoritable; optional tone (:light default, :dark for dark heroes).
-    Toggles in place inside its turbo frame — no redirect, no flash toast. %>
+    Toggles in place inside its turbo frame, no redirect, no flash toast. %>
 <% if user_signed_in? && favoritable != current_user %>
   <% tone = local_assigns.fetch(:tone, :light).to_sym %>
   <%= turbo_frame_tag dom_id(favoritable, :favorite) do %>

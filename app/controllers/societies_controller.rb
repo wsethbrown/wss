@@ -48,10 +48,10 @@ class SocietiesController < ApplicationController
     @recent_members = @society.members.limit(10)
 
     # The review board: bottles ranked by THIS society's event reviews only
-    # (spec's aggregation table — solo reviews never count here). Inherits
+    # (spec's aggregation table, solo reviews never count here). Inherits
     # the page's visibility from `authorize @society` above; no new gate.
     # Board math (owner decision 2026-07-07): each member counts once per
-    # bottle — their LATEST review at this society's events. A re-taster's
+    # bottle, their LATEST review at this society's events. A re-taster's
     # newer score replaces their older one instead of double-weighting them,
     # and "N reviewers" is exactly the mean's denominator.
     latest_per_member = <<~SQL
@@ -137,7 +137,7 @@ class SocietiesController < ApplicationController
     end
   end
 
-  # Join via invite link — valid for private societies (the link IS the invite).
+  # Join via invite link, valid for private societies (the link IS the invite).
   def join_by_invite
     unless user_signed_in?
       redirect_to auth_path, alert: "Sign in to accept this invite" and return
@@ -161,7 +161,7 @@ class SocietiesController < ApplicationController
     society = Society.find(params[:id])
     authorize society, :manage_members?
     society.regenerate_invite_token!
-    redirect_to society, notice: "New invite link generated — old links no longer work."
+    redirect_to society, notice: "New invite link generated. Old links no longer work."
   end
 
   private
@@ -200,7 +200,7 @@ class SocietiesController < ApplicationController
     end
 
     # Location text search (city/state). The previous ZIP-radius search was
-    # decorative — no coordinates or geocoding existed. If radius search is
+    # decorative, no coordinates or geocoding existed. If radius search is
     # ever wanted for real, add lat/lng columns + the geocoder gem.
     scope = scope.by_location(params[:location]) if params[:location].present?
 

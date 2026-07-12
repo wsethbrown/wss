@@ -2,20 +2,20 @@ import { Controller } from "@hotwired/stimulus"
 
 // Live search dropdown, three shapes:
 //
-// - Section mode (grouped: true) — the /reviews page. Fetches the section
+// - Section mode (grouped: true), the /reviews page. Fetches the section
 //   endpoint, which returns { bottles: [...], societies: [...] }; renders
 //   grouped results. Deliberately NO "add a new bottle" row: a society name
 //   or a typo must never become a junk catalog entry from here.
-// - Picker mode (grouped: false, no bottleId target) — the start-a-review
+// - Picker mode (grouped: false, no bottleId target), the start-a-review
 //   page. Fetches the bottle endpoint (a flat array); rows link to each
 //   bottle's REVIEW form (review_url) and an explicit "+ Add …" escape
 //   hatch is appended, because the intent to catalog is unambiguous there.
-// - Fill mode (grouped: false, WITH a bottleId hidden-input target) — the
+// - Fill mode (grouped: false, WITH a bottleId hidden-input target), the
 //   event pour form. Clicking a row fills the hidden bottle_id instead of
 //   navigating; the "+ Add …" escape carries return-to so the organizer
 //   lands back on the event after cataloging.
 //
-// All rendering is textContent/createElement — user input never becomes HTML.
+// All rendering is textContent/createElement, user input never becomes HTML.
 export default class extends Controller {
   static targets = ["input", "results", "bottleId"]
   static values = {
