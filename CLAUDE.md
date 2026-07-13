@@ -10,7 +10,9 @@ source of truth for what's done and what's next. Key invariants established ther
 - **Auth:** Only three paths — Devise password, magic link (`Auth::MagicLinkService`), and OmniAuth
   (Google always; Apple only when `APPLE_*` env vars are set). There are NO hand-rolled OAuth
   callbacks; never add one, and never disable OAuth/JWT signature verification.
-- **Admin:** A user is an admin iff the `is_admin` boolean column is true (`User#admin?` returns it).
+- **Admin:** Roles are the `users.admin_role` enum (none/limited/full). `User#admin?` is true for any
+  admin tier; `User#can_delete?` is true only for full (limited admins keep every admin power except
+  hard-deleting records). `admin_role` is the source of truth; the old `is_admin` boolean is vestigial.
   Do not reintroduce email-domain admin checks.
 - **Credits:** `credit_transactions` is the ledger and single source of truth. `users.credits` is a
   cache recomputed from the ledger; NEVER write it directly. All changes go through

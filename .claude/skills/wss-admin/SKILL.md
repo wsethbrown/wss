@@ -8,8 +8,16 @@ description: WSS admin panel — structure, layout traps, credit-adjustment rule
 ## Structure
 Char sidebar shell (layouts/admin.html.erb): Dashboard · Decks · Users ·
 Subscriptions · Credits (+ /transactions ledger view) · Activity · Analytics.
-Admin = users.is_admin (User#admin?). No UI exists to grant/revoke admin —
-console only (deliberate until roles are designed).
+
+**Admin roles = `users.admin_role` enum (none/limited/full).** `User#admin?` is
+true for either admin tier (limited OR full); `User#can_delete?` is true only for
+full. admin_role is the single source of truth; the old `is_admin` boolean is
+vestigial (backfilled once, no longer read by `admin?`). No UI to grant roles —
+console only: `user.update!(admin_role: "limited")`. A **limited** admin is a full
+admin minus HARD-DELETE rights: the deck + review admin destroy actions call
+`require_delete_rights!` (Admin::BaseController), and the society/presentation/event
+`destroy?` policies gate the admin-override delete on `can_delete?` (owners and
+organizers keep deleting their OWN records). Delete buttons hide for limited admins.
 
 ## Layout traps
 - Fixed sidebar + `main.ml-60.min-w-0`. NEVER flex-1 on main (overflows the
