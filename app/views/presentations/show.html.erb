@@ -78,13 +78,7 @@
       <% else %>
         <%= link_to new_presentation_purchase_path(@presentation),
             class: "inline-flex items-center justify-center gap-2 rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char" do %>
-          <%= if @presentation.free?
-                'Add to my library, free'
-              elsif viewer_can_credit
-                'Use 1 credit'
-              else
-                "Get this deck, #{@presentation.formatted_price}"
-              end %>
+          <%= @presentation.free? ? 'Add to my library' : 'Purchase' %>
         <% end %>
       <% end %>
       <% if @presentation.sneak_peek_file.attached? %>
@@ -171,11 +165,9 @@
                       <%= if !user_signed_in?
                             'Sign in to get this deck'
                           elsif @presentation.free?
-                            'Add to my library, free'
-                          elsif viewer_can_credit
-                            'Use 1 credit'
+                            'Add to my library'
                           else
-                            "Get this deck, #{@presentation.formatted_price}"
+                            'Purchase'
                           end %>
                     <% end %>
                   </div>
@@ -268,10 +260,10 @@
                             class: 'mt-4 inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-6 py-3 font-semibold text-white shadow-lg shadow-whiskey-950/20 transition hover:bg-whiskey-700' do %>
                           <%= if !user_signed_in?
                                 'Sign in to get this deck'
-                              elsif viewer_can_credit
-                                'Use 1 credit'
+                              elsif @presentation.free?
+                                'Add to my library'
                               else
-                                'Get this deck'
+                                'Purchase'
                               end %>
                         <% end %>
                       </div>
@@ -372,7 +364,6 @@
           <div class="bg-white border border-whiskey-200 rounded-3xl shadow-xl p-8">
             <div class="text-center mb-6">
               <% owned_purchase = user_signed_in? ? current_user.user_presentations.find_by(presentation_id: @presentation.id) : nil %>
-              <% can_credit = viewer_can_credit %>
               <% if owned_purchase %>
                 <% if owned_purchase.purchase_type == 'credit' && !current_user.subscription_active? %>
                   <p class="eyebrow text-whiskey-600 mb-2">In your library</p>
@@ -383,13 +374,12 @@
                   <div class="font-display text-3xl font-semibold text-gray-900 mb-2"><%= owned_purchase.purchase_type == 'direct' ? 'Yours for good' : 'Unlocked' %></div>
                   <p class="text-gray-600"><%= owned_purchase.purchase_type == 'direct' ? 'Bought outright, lifetime access.' : 'Unlocked with a credit via your membership.' %></p>
                 <% end %>
-              <% elsif can_credit %>
-                <p class="eyebrow text-whiskey-600 mb-2">Included with membership</p>
-                <div class="font-display text-4xl font-semibold text-gray-900 mb-1">Use 1 credit</div>
-                <p class="text-gray-600">You have <%= current_user.credits %> credit<%= 's' unless current_user.credits == 1 %>, access lasts as long as your membership.</p>
               <% else %>
                 <div class="font-display text-4xl font-semibold text-gray-900 mb-1"><%= @presentation.formatted_price %></div>
                 <p class="text-gray-600"><%= @presentation.free? ? 'Free for everyone' : 'One-time purchase, yours for good' %></p>
+                <% if viewer_can_credit %>
+                  <p class="mt-2 text-sm font-medium text-whiskey-700">Members can use a credit at checkout.</p>
+                <% end %>
               <% end %>
             </div>
 
@@ -509,20 +499,9 @@
                 </div>
               <% end %>
               <% if user_signed_in? %>
-                <% if can_credit %>
-                  <%# Credit is primary; buying outright is the quieter alternative.
-                      Both route to the confirm page, which leads with the matching method. %>
-                  <%= link_to new_presentation_purchase_path(@presentation), class: "block w-full bg-whiskey-600 text-white font-semibold py-4 px-6 rounded-2xl hover:bg-whiskey-700 transition mb-3 text-center" do %>
-                    Use 1 credit
-                  <% end %>
-                  <%= link_to new_presentation_purchase_path(@presentation, method: 'direct'), class: "block w-full border border-whiskey-300 text-whiskey-800 font-semibold py-3.5 px-6 rounded-2xl hover:bg-whiskey-50 transition text-center" do %>
-                    Buy outright, <%= @presentation.formatted_price %>
-                  <% end %>
-                  <p class="mt-2 mb-4 text-center text-xs text-gray-500">Rather keep your credit? Buy it outright, yours for good, membership or not.</p>
-                <% else %>
-                  <%= link_to new_presentation_purchase_path(@presentation), class: "block w-full bg-whiskey-600 text-white font-semibold py-4 px-6 rounded-2xl hover:bg-whiskey-700 transition mb-4 text-center" do %>
-                    <%= @presentation.free? ? 'Add to my library' : 'Get this deck' %>
-                  <% end %>
+                <%# One button. The credit-vs-card choice happens on the checkout screen. %>
+                <%= link_to new_presentation_purchase_path(@presentation), class: "block w-full bg-whiskey-600 text-white font-semibold py-4 px-6 rounded-2xl hover:bg-whiskey-700 transition mb-4 text-center" do %>
+                  <%= @presentation.free? ? 'Add to my library' : 'Purchase' %>
                 <% end %>
               <% else %>
                 <%= link_to auth_path, class: "block w-full bg-whiskey-600 text-white font-semibold py-4 px-6 rounded-2xl hover:bg-whiskey-700 transition mb-4 text-center" do %>

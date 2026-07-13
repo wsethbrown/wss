@@ -41,7 +41,7 @@
             slides, script, and downloads included.
           </p>
           <%= form_with url: presentation_purchases_path(@presentation), local: true, data: { turbo: false } do |f| %>
-            <%= f.submit "Add to my library, free",
+            <%= f.submit "Add to my library",
                 class: "mt-8 w-full cursor-pointer rounded-xl bg-whiskey-600 px-6 py-4 text-lg font-semibold text-white transition hover:bg-whiskey-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2" %>
           <% end %>
         <% else %>
