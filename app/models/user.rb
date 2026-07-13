@@ -117,11 +117,20 @@ class User < ApplicationRecord
   scope :active, -> { where.not(encrypted_password: [ nil, "" ]) }
 
 
-  # Site-wide admin. Single source of truth is the is_admin boolean column.
-  # (Previously this checked the email domain, which disagreed with is_admin? and
-  # was used to gate presentation downloads, a real authorization inconsistency.)
+  # Admin role tiers, assigned via console. `full` can do everything including
+  # hard-deleting records; `limited` is a full admin minus delete rights; `none`
+  # is a normal user. admin_role is the single source of truth for admin access.
+  enum :admin_role, { none: "none", limited: "limited", full: "full" }, prefix: :admin_role
+
+  # Site-wide admin gate: any admin tier (limited or full).
   def admin?
-    is_admin?
+    !admin_role_none?
+  end
+
+  # Only full admins may hard-delete records (decks, bottles, reviews, events,
+  # users). Limited admins retain every other admin power.
+  def can_delete?
+    admin_role_full?
   end
 
   def member_of?(society)

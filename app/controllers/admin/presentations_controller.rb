@@ -1,4 +1,5 @@
 class Admin::PresentationsController < Admin::BaseController
+  before_action :require_delete_rights!, only: :destroy
   before_action :set_presentation, only: [:show, :edit, :update, :destroy, :publish, :unpublish]
   
   # Temporary fix for schema caching issue

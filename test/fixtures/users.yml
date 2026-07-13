@@ -16,6 +16,15 @@ admin:
   first_name: Admin
   last_name: User
   is_admin: true
+  admin_role: full
+
+# A limited admin: full admin powers except hard-deleting records.
+limited_admin:
+  email: limited-admin@whiskeysharesociety.com
+  encrypted_password: <%= Devise::Encryptor.digest(User, 'password') %>
+  first_name: Limited
+  last_name: Admin
+  admin_role: limited
 
 seth:
   email: seth@example.com

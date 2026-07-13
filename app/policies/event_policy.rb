@@ -34,7 +34,9 @@ class EventPolicy < ApplicationPolicy
 
   def destroy?
     return false unless user.present?
-    user.admin? || record.organizer == user || record.society.has_admin?(user)
+    # Organizers and society admins delete their own events; site admin-override
+    # delete needs full rights.
+    user.can_delete? || record.organizer == user || record.society.has_admin?(user)
   end
 
   def rsvp?

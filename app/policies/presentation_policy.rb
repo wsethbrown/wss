@@ -31,7 +31,8 @@ class PresentationPolicy < ApplicationPolicy
 
   def destroy?
     return false unless user.present?
-    user.admin? || record.author == user
+    # Authors delete their own decks; admin-override delete needs full rights.
+    user.can_delete? || record.author == user
   end
 
   def purchase?

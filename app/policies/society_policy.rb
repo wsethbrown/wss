@@ -51,7 +51,9 @@ class SocietyPolicy < ApplicationPolicy
   # superuser escape hatch), not delegated society admins.
   def destroy?
     return false unless user
-    record.creator_id == user.id || user.admin?
+    # Owners can always delete their own society; admin-override delete needs
+    # full delete rights (a limited admin cannot delete records).
+    record.creator_id == user.id || user.can_delete?
   end
 
   def join?

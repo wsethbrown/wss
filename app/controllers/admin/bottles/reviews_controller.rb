@@ -1,6 +1,7 @@
 # app/controllers/admin/bottles/reviews_controller.rb
 # Admin-only moderation, no ownership check (distinct from ReviewsController).
 class Admin::Bottles::ReviewsController < Admin::BaseController
+  before_action :require_delete_rights!, only: :destroy
   before_action :set_review
 
   def destroy

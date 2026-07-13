@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_09_184859) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_13_010844) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -491,6 +491,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_09_184859) do
     t.string "magic_link_token"
     t.datetime "magic_link_sent_at"
     t.integer "favorites_count", default: 0, null: false
+    t.string "admin_role", default: "none", null: false
+    t.index ["admin_role"], name: "index_users_on_admin_role"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["is_admin"], name: "index_users_on_is_admin"
     t.index ["magic_link_token"], name: "index_users_on_magic_link_token", unique: true
