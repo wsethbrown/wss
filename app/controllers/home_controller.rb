@@ -3,6 +3,8 @@ class HomeController < ApplicationController
     # Fetch Stripe products for pricing display
     @stripe_products = fetch_stripe_products
     @featured_presentations = Presentation.published.recent.limit(3)
+    # The one deck to spotlight right now: the most recently featured published deck.
+    @spotlight_deck = Presentation.published.featured.recent.first
   end
 
   # Standalone membership page: the "start your own whiskey club" pitch plus

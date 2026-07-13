@@ -48,6 +48,7 @@ class Presentation < ApplicationRecord
   scope :paid, -> { where('price > 0') }
   scope :published, -> { where(published: true) }
   scope :unpublished, -> { where(published: false) }
+  scope :featured, -> { where(featured: true) }
   scope :by_category, ->(category) { where(category: category) if category.present? }
   scope :by_difficulty, ->(difficulty) { where(difficulty: difficulty) if difficulty.present? }
   scope :search, ->(query) { where('title ILIKE ? OR description ILIKE ?', "%#{query}%", "%#{query}%") if query.present? }

@@ -201,6 +201,7 @@ class Admin::PresentationsController < Admin::BaseController
       :outline_file,
       :recommendations_sheet,
       :scorecard,
+      :featured,
       supplemental_materials: []
     )
   end

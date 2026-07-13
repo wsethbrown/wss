@@ -28,7 +28,8 @@ class PresentationsController < ApplicationController
                      when 'newest'     then @presentations.recent
                      when 'price_low'  then @presentations.order(:price)
                      when 'price_high' then @presentations.order(price: :desc)
-                     else                   @presentations.popular
+                     # Default view pins featured decks to the top, then popularity.
+                     else                   @presentations.order(featured: :desc).popular
                      end
 
     @presentations = @presentations.page(params[:page]).per(12)

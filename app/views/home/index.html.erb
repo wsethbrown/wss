@@ -39,6 +39,40 @@
   </div>
 </section>
 
+<!-- ===================================================== Spotlight deck -->
+<% if @spotlight_deck %>
+  <section class="w-full bg-char px-6 py-16 sm:py-20">
+    <div class="mx-auto grid max-w-6xl items-center gap-10 lg:grid-cols-2">
+      <div class="order-last lg:order-first">
+        <% if @spotlight_deck.featured_image.attached? %>
+          <%= image_tag @spotlight_deck.featured_image, alt: @spotlight_deck.title, loading: 'lazy',
+              class: "aspect-[16/10] w-full rounded-2xl border border-oak-edge object-cover shadow-2xl shadow-whiskey-950/50" %>
+        <% else %>
+          <div class="flex aspect-[16/10] w-full items-center justify-center rounded-2xl border border-oak-edge bg-oak">
+            <span class="font-display text-2xl text-whiskey-300/60"><%= @spotlight_deck.category.presence || 'Whiskey Share Society' %></span>
+          </div>
+        <% end %>
+      </div>
+
+      <div>
+        <p class="eyebrow mb-3 text-whiskey-300/90">In the spotlight</p>
+        <span class="thread mb-6 block w-16" aria-hidden="true"></span>
+        <h2 class="font-display text-4xl font-semibold leading-tight text-cream lg:text-5xl">
+          <%= @spotlight_deck.title %>
+        </h2>
+        <p class="mt-5 max-w-xl text-lg leading-relaxed text-cream/70"><%= @spotlight_deck.excerpt(170) %></p>
+        <div class="mt-8 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <%= link_to 'See the deck', presentation_path(@spotlight_deck),
+              class: 'inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char' %>
+          <span class="text-sm text-cream/60">
+            <%= @spotlight_deck.free? ? 'Free for everyone' : "#{@spotlight_deck.formatted_price}, or one credit with membership" %>
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+<% end %>
+
 <!-- ============================================== How it works (pinned) -->
 <section id="how-it-works" class="w-full bg-char md:grid md:grid-cols-2">
   <%# Left panel pins while the steps scroll. Grid + self-start is the reliable
