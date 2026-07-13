@@ -25,7 +25,7 @@
             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Price</th>
             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Purchases</th>
             <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            <th class="sticky right-0 z-10 border-l border-gray-200 bg-gray-50 px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
@@ -56,7 +56,7 @@
                   <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">Draft</span>
                 <% end %>
               </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
+              <td class="sticky right-0 border-l border-gray-200 bg-white px-4 py-4 whitespace-nowrap text-sm font-medium">
                 <div class="flex items-center gap-2">
                   <%= link_to "View", admin_presentation_path(presentation), class: "text-whiskey-600 hover:text-whiskey-900" %>
                   <%= link_to "Edit", edit_admin_presentation_path(presentation), class: "text-whiskey-600 hover:text-whiskey-900" %>
