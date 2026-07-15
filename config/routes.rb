@@ -139,6 +139,7 @@ Rails.application.routes.draw do
     # Analytics routes
     get 'analytics/downloads', to: 'analytics#downloads', as: 'downloads_analytics'
     get 'analytics/presentations/:id/downloads', to: 'analytics#presentation_downloads', as: 'presentation_downloads_analytics'
+    get 'analytics/reviews', to: 'analytics#reviews', as: 'reviews_analytics'
 
     root to: 'dashboard#index'
   end

@@ -1,4 +1,33 @@
 class Admin::AnalyticsController < Admin::BaseController
+  # Reviews analytics: the health of the tasting-record layer at a glance.
+  def reviews
+    @total_reviews    = Review.count
+    @total_reviewers  = Review.distinct.count(:user_id)
+    @bottles_reviewed = Review.distinct.count(:bottle_id)
+    @avg_rating       = Review.average(:rating)&.round(1)
+    @reviews_this_week = Review.where("reviews.created_at >= ?", 1.week.ago).count
+
+    @most_reviewed = Bottle.joins(:reviews)
+                           .select("bottles.*, COUNT(reviews.id) AS reviews_count")
+                           .group("bottles.id")
+                           .order(Arel.sql("COUNT(reviews.id) DESC"))
+                           .limit(10)
+
+    # Top rated with at least 2 reviewers so a lone 5.0 doesn't top the list.
+    @top_rated = Bottle.with_score
+                       .where("agg.reviewers >= 2")
+                       .order(Arel.sql("agg.avg_rating DESC NULLS LAST"))
+                       .limit(10)
+
+    @active_reviewers = User.joins(:reviews)
+                            .select("users.*, COUNT(reviews.id) AS reviews_count")
+                            .group("users.id")
+                            .order(Arel.sql("COUNT(reviews.id) DESC"))
+                            .limit(10)
+
+    @recent_reviews = Review.includes(:user, :bottle).order(created_at: :desc).limit(15)
+  end
+
   def downloads
     @date_range = params[:date_range] || "week"
 
