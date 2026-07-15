@@ -48,7 +48,7 @@ class Admin::SubscriptionsController < Admin::BaseController
     @total_active = User.where(subscription_status: 'active').where(subscription_paused_at: nil).count
     @total_paused = User.where.not(subscription_paused_at: nil).count
     @total_canceled = User.where(subscription_status: 'canceled').count
-    @total_revenue = calculate_monthly_revenue
+    @total_revenue = SubscriptionRevenue.monthly_recurring
   end
 
   def edit
@@ -330,12 +330,4 @@ class Admin::SubscriptionsController < Admin::BaseController
     )
   end
 
-  def calculate_monthly_revenue
-    # TODO: Calculate based on actual Stripe data
-    active_users = User.where(subscription_status: 'active')
-    monthly_users = active_users.where(subscription_plan: 'monthly').count
-    annual_users = active_users.where(subscription_plan: 'annual').count
-    
-    (monthly_users * 9.99) + (annual_users * 99.99 / 12)
-  end
 end

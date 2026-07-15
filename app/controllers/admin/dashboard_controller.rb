@@ -15,9 +15,11 @@ class Admin::DashboardController < Admin::BaseController
     @total_downloads_today = DownloadLog.today.count
     @total_downloads_week = DownloadLog.this_week.count
     
-    # Revenue metrics (approximate - would need Stripe integration for accurate data)
-    @total_revenue = calculate_total_revenue
-    @revenue_this_month = calculate_monthly_revenue
+    # Revenue metrics. Deck sales are exact (from the purchase ledger); the
+    # subscription figure is estimated MRR (active subscribers x live plan price).
+    @deck_sales_total = calculate_total_revenue
+    @deck_sales_this_month = calculate_monthly_revenue
+    @subscription_mrr = SubscriptionRevenue.monthly_recurring
     
     # Recent activity
     @recent_users = User.order(created_at: :desc).limit(5)

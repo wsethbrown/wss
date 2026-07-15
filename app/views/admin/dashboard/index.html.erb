@@ -47,10 +47,10 @@
   <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
     <div class="flex items-center justify-between">
       <div>
-        <p class="text-sm font-medium text-gray-600">Total Revenue</p>
-        <p class="text-3xl font-bold text-gray-900 mt-2">$<%= number_with_precision(@total_revenue, precision: 2) %></p>
+        <p class="text-sm font-medium text-gray-600">Monthly recurring revenue</p>
+        <p class="text-3xl font-bold text-gray-900 mt-2">$<%= number_with_precision(@subscription_mrr, precision: 2) %></p>
         <p class="text-xs text-gray-500 mt-1">
-          $<%= number_with_precision(@revenue_this_month, precision: 2) %> this month
+          $<%= number_with_precision(@deck_sales_this_month, precision: 2) %> in deck sales this month
         </p>
       </div>
       <div class="p-3 bg-yellow-50 rounded-xl">
@@ -287,11 +287,11 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
           <div>
-            <p class="text-sm font-medium text-gray-700">Direct Purchases</p>
-            <p class="text-xs text-gray-500">One-time sales</p>
+            <p class="text-sm font-medium text-gray-700">Deck sales</p>
+            <p class="text-xs text-gray-500">One-time purchases, all time</p>
           </div>
         </div>
-        <p class="text-lg font-bold text-gray-900">$<%= @total_revenue.to_i %></p>
+        <p class="text-lg font-bold text-gray-900">$<%= number_with_precision(@deck_sales_total, precision: 2) %></p>
       </div>
       
       <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
@@ -301,16 +301,16 @@
           </svg>
           <div>
             <p class="text-sm font-medium text-gray-700">Subscriptions</p>
-            <p class="text-xs text-gray-500">Monthly recurring</p>
+            <p class="text-xs text-gray-500">Estimated monthly recurring</p>
           </div>
         </div>
-        <p class="text-lg font-bold text-gray-900">$<%= (@active_subscriptions * 9.99).to_i %></p>
+        <p class="text-lg font-bold text-gray-900">$<%= number_with_precision(@subscription_mrr, precision: 2) %></p>
       </div>
-      
+
       <div class="pt-3 border-t border-gray-200">
         <div class="flex items-center justify-between">
-          <p class="text-sm font-medium text-gray-600">This Month</p>
-          <p class="text-xl font-bold text-whiskey-600">$<%= @revenue_this_month.to_i %></p>
+          <p class="text-sm font-medium text-gray-600">Deck sales this month</p>
+          <p class="text-xl font-bold text-whiskey-600">$<%= number_with_precision(@deck_sales_this_month, precision: 2) %></p>
         </div>
       </div>
     </div>

@@ -52,8 +52,8 @@
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <div class="flex items-center justify-between">
         <div>
-          <p class="text-sm font-medium text-gray-600">Monthly Revenue</p>
-          <p class="text-3xl font-bold text-purple-600 mt-2">$<%= number_with_precision(@total_revenue, precision: 0) %></p>
+          <p class="text-sm font-medium text-gray-600">Monthly recurring revenue</p>
+          <p class="text-3xl font-bold text-purple-600 mt-2">$<%= number_with_precision(@total_revenue, precision: 2) %></p>
         </div>
         <div class="p-3 bg-purple-100 rounded-lg">
           <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
