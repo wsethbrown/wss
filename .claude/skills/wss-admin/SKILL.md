@@ -6,8 +6,22 @@ description: WSS admin panel — structure, layout traps, credit-adjustment rule
 # WSS Admin
 
 ## Structure
-Char sidebar shell (layouts/admin.html.erb): Dashboard · Decks · Users ·
-Subscriptions · Credits (+ /transactions ledger view) · Activity · Analytics.
+Char sidebar shell (layouts/admin.html.erb): Dashboard · Decks · Bottles ·
+Reviews (analytics) · Moderation · Users · Subscriptions · Credits
+(+ /transactions ledger view) · Activity · Analytics.
+
+**Moderation is POST-moderation by owner decision (July 2026):** review content
+(text + photos) publishes instantly; members flag via the Report button on
+review pages (ReviewReport, one per user per review, not your own). The admin
+Moderation page queues open reports (dismiss closes ALL of a review's reports;
+delete reuses the gated hard-delete so limited admins see no delete button) plus
+pending BottleEdit proposals. If pre-moderation is ever wanted, the agreed rule
+is auto-trust after ~3 approved photos; do not build it until asked.
+
+**Revenue on the dashboard/subscriptions pages is estimated MRR** (active
+subscribers per plan x live monthly-equivalent price via SubscriptionProducts,
+the single pricing source shared with the homepage). Deck sales are exact from
+UserPresentation. Never hardcode plan prices.
 
 **Admin roles = `users.admin_role` enum (none/limited/full).** `User#admin?` is
 true for either admin tier (limited OR full); `User#can_delete?` is true only for
