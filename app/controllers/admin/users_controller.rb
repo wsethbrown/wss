@@ -1,5 +1,5 @@
 class Admin::UsersController < Admin::BaseController
-  before_action :set_user, only: [:show, :edit, :update]
+  before_action :set_user, only: [:show, :edit, :update, :update_role]
 
   def index
     @users = User.all
@@ -71,7 +71,32 @@ class Admin::UsersController < Admin::BaseController
     end
   end
 
+  # Grant or revoke admin tiers. Guards: only FULL admins may change roles (a
+  # limited admin must not be able to escalate anyone, least of all themselves),
+  # and nobody may change their own role (no self-promotion, no locking
+  # yourself out). The role value is whitelisted against the enum.
+  def update_role
+    unless current_user.admin_role_full?
+      redirect_to admin_user_path(@user), alert: 'Only full administrators can change roles.' and return
+    end
+    if @user == current_user
+      redirect_to admin_user_path(@user), alert: "You can't change your own role." and return
+    end
+
+    role = params[:admin_role].to_s
+    unless User.admin_roles.key?(role)
+      redirect_to admin_user_path(@user), alert: 'Unknown role.' and return
+    end
+
+    @user.update!(admin_role: role)
+    redirect_to admin_user_path(@user), notice: "Role updated: #{@user.email} is now #{role_label(role)}."
+  end
+
   private
+
+  def role_label(role)
+    { 'none' => 'a regular user', 'limited' => 'an administrator (no delete)', 'full' => 'a full administrator' }.fetch(role)
+  end
 
   def set_user
     @user = User.find(params[:id])

@@ -100,7 +100,11 @@ Rails.application.routes.draw do
       collection { post :import }
       member { post :publish; post :unpublish; post :render_slides }
     end
-    resources :users, only: [:index, :show, :edit, :update]
+    resources :users, only: [:index, :show, :edit, :update] do
+      # Admin-role changes are a dedicated, guarded action, never part of the
+      # general user update (same rule as credits: no mass-assignment path).
+      member { patch :update_role }
+    end
     resources :subscriptions, only: [:index, :edit, :update] do
       member do
         post :cancel
