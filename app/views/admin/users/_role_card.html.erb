@@ -22,13 +22,16 @@
     <% if user == current_user %>
       <p class="mt-4 text-xs text-gray-400">You can't change your own role.</p>
     <% else %>
-      <%= form_with url: update_role_admin_user_path(user), method: :patch, local: true, class: "mt-4 flex items-center gap-2" do %>
+      <%# Stacked, full-width controls: the sidebar card is too narrow for a
+          select + button row (the long role labels pushed the button out of
+          the card). %>
+      <%= form_with url: update_role_admin_user_path(user), method: :patch, local: true, class: "mt-4 space-y-2" do %>
         <%= select_tag :admin_role,
             options_for_select([["Regular user", "none"], ["Administrator (no delete)", "limited"], ["Administrator (full)", "full"]], user.admin_role),
-            class: "rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+            class: "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
         <%= submit_tag "Update role",
             data: { turbo_confirm: "Change this user's admin role?" },
-            class: "cursor-pointer rounded-lg bg-whiskey-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-whiskey-700" %>
+            class: "w-full cursor-pointer rounded-lg bg-whiskey-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-whiskey-700" %>
       <% end %>
       <p class="mt-2 text-xs text-gray-400">No-delete admins have every admin power except permanently deleting records.</p>
     <% end %>
