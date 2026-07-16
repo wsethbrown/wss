@@ -107,6 +107,15 @@
       <%= link_to "All tastings of #{@review.bottle.name} →", bottle_path(@review.bottle), class: "font-semibold text-whiskey-700 hover:text-whiskey-600" %>
       <% if @review.user == current_user %>
         <%= link_to "Edit your review", edit_review_path(@review), class: "ml-auto rounded-xl bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-200" %>
+      <% elsif user_signed_in? %>
+        <%# Post-moderation: flagging sends the review to the admin queue; it stays public until an admin acts. %>
+        <% if current_user.review_reports.exists?(review: @review) %>
+          <span class="ml-auto text-sm text-gray-400">Flagged for review</span>
+        <% else %>
+          <%= button_to "Report", review_report_path(@review), method: :post,
+              data: { turbo_confirm: "Flag this review for the admins?" },
+              class: "ml-auto text-sm font-medium text-gray-400 transition hover:text-red-600 cursor-pointer" %>
+        <% end %>
       <% end %>
     </div>
   </div>

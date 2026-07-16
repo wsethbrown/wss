@@ -8,6 +8,7 @@ class Review < ApplicationRecord
   belongs_to :bottle
   belongs_to :event, optional: true
   has_many :review_votes, dependent: :destroy
+  has_many :review_reports, dependent: :destroy
 
   has_many_attached :images do |attachable|
     attachable.variant :thumb, resize_to_fill: [ 400, 400 ], saver: { quality: 80 }

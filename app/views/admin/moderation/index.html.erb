@@ -1,0 +1,76 @@
+<% content_for :title, "Moderation" %>
+
+<div class="mb-8">
+  <h1 class="font-display text-3xl font-semibold text-gray-900">Moderation</h1>
+  <p class="mt-1 text-gray-500">Flagged reviews and proposed bottle corrections, in one queue.</p>
+</div>
+
+<!-- Flagged reviews -->
+<div class="mb-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+  <h2 class="mb-1 font-semibold text-gray-900">Flagged reviews</h2>
+  <p class="mb-4 text-xs text-gray-400">Reported content stays public until you act. Dismiss keeps the review and closes its reports.</p>
+
+  <% if @open_reports.any? %>
+    <ul class="divide-y divide-gray-100">
+      <% @open_reports.each do |review, reports| %>
+        <li class="flex flex-wrap items-start justify-between gap-4 py-4">
+          <div class="min-w-0">
+            <p class="text-sm">
+              <%= link_to review.bottle.display_name, review_path(review), class: "font-medium text-whiskey-700 hover:text-whiskey-900" %>
+              <span class="text-gray-500">by <%= review.user.full_name.presence || review.user.email %> &middot; rated <%= review.rating %></span>
+            </p>
+            <% if review.notes.present? %>
+              <p class="mt-1 line-clamp-2 max-w-xl text-sm text-gray-600"><%= review.notes %></p>
+            <% end %>
+            <p class="mt-1 text-xs text-gray-400">
+              <%= pluralize(reports.size, "report") %> &middot; latest <%= time_ago_in_words(reports.map(&:created_at).max) %> ago
+              <%= " · #{pluralize(review.images.size, 'photo')}" if review.images.attached? %>
+            </p>
+          </div>
+          <div class="flex shrink-0 items-center gap-2">
+            <%= button_to "Dismiss", dismiss_admin_review_report_path(reports.first), method: :post,
+                class: "rounded-lg border border-gray-300 px-3 py-1.5 text-sm font-medium text-gray-700 hover:bg-gray-50 cursor-pointer" %>
+            <% if review.images.attached? %>
+              <%= button_to "Remove photos", destroy_image_admin_bottle_review_path(review.bottle, review), method: :delete,
+                  data: { turbo_confirm: "Remove every photo on this review? The text stays." },
+                  class: "rounded-lg border border-whiskey-300 px-3 py-1.5 text-sm font-medium text-whiskey-800 hover:bg-whiskey-50 cursor-pointer" %>
+            <% end %>
+            <% if current_user.can_delete? %>
+              <%= button_to "Delete review", admin_bottle_review_path(review.bottle, review), method: :delete,
+                  data: { turbo_confirm: "Permanently delete this review and its photos?" },
+                  class: "rounded-lg bg-red-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-red-700 cursor-pointer" %>
+            <% end %>
+          </div>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="text-sm text-gray-500">Nothing flagged. All quiet.</p>
+  <% end %>
+</div>
+
+<!-- Pending bottle corrections -->
+<div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+  <h2 class="mb-1 font-semibold text-gray-900">Proposed bottle corrections</h2>
+  <p class="mb-4 text-xs text-gray-400">Member-suggested stat fixes. Apply or reject them on each bottle's admin page.</p>
+
+  <% if @pending_edits.any? %>
+    <ul class="divide-y divide-gray-100">
+      <% @pending_edits.each do |edit| %>
+        <li class="flex flex-wrap items-center justify-between gap-4 py-3">
+          <div class="min-w-0 text-sm">
+            <%= link_to edit.bottle.display_name, admin_bottle_path(edit.bottle), class: "font-medium text-whiskey-700 hover:text-whiskey-900" %>
+            <span class="text-gray-600"><%= edit.field %> &rarr; <span class="font-medium text-gray-900"><%= edit.proposed_value %></span></span>
+            <p class="mt-0.5 text-xs text-gray-400">
+              proposed by <%= edit.user&.full_name.presence || edit.user&.email || "unknown" %> &middot; <%= time_ago_in_words(edit.created_at) %> ago
+            </p>
+          </div>
+          <%= link_to "Review on bottle page", admin_bottle_path(edit.bottle),
+              class: "shrink-0 rounded-lg border border-whiskey-300 px-3 py-1.5 text-sm font-medium text-whiskey-800 hover:bg-whiskey-50" %>
+        </li>
+      <% end %>
+    </ul>
+  <% else %>
+    <p class="text-sm text-gray-500">No pending corrections.</p>
+  <% end %>
+</div>

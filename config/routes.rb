@@ -136,6 +136,12 @@ Rails.application.routes.draw do
       end
     end
 
+    # Moderation queue: open review reports + pending bottle-edit proposals.
+    get 'moderation', to: 'moderation#index'
+    resources :review_reports, only: [] do
+      member { post :dismiss }
+    end
+
     # Analytics routes
     get 'analytics/downloads', to: 'analytics#downloads', as: 'downloads_analytics'
     get 'analytics/presentations/:id/downloads', to: 'analytics#presentation_downloads', as: 'presentation_downloads_analytics'
@@ -186,6 +192,9 @@ Rails.application.routes.draw do
   # latest tastings); individual bottles live at /bottles/:slug.
   resources :reviews, only: [:index, :show, :edit, :update, :destroy] do
     collection { get :search; get :start }
+    # Flag a review (text or photos) for admin attention. Post-moderation:
+    # content stays public until an admin acts on the report.
+    resource :report, only: [:create], module: :reviews
   end
 
   # Health check

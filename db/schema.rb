@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_13_012154) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_16_005312) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -220,6 +220,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_13_012154) do
     t.index ["price"], name: "index_presentations_on_price"
     t.index ["title"], name: "index_presentations_on_title"
     t.index ["whiskey_recommendations_json"], name: "index_presentations_on_whiskey_recommendations_json", using: :gin
+  end
+
+  create_table "review_reports", force: :cascade do |t|
+    t.bigint "review_id", null: false
+    t.bigint "user_id", null: false
+    t.string "status", default: "open", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["review_id"], name: "index_review_reports_on_review_id"
+    t.index ["status"], name: "index_review_reports_on_status"
+    t.index ["user_id", "review_id"], name: "index_review_reports_on_user_id_and_review_id", unique: true
+    t.index ["user_id"], name: "index_review_reports_on_user_id"
   end
 
   create_table "review_votes", force: :cascade do |t|
@@ -522,6 +534,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_13_012154) do
   add_foreign_key "presentation_tags", "presentations"
   add_foreign_key "presentation_tags", "tags"
   add_foreign_key "presentations", "users", column: "author_id"
+  add_foreign_key "review_reports", "reviews"
+  add_foreign_key "review_reports", "users"
   add_foreign_key "review_votes", "reviews"
   add_foreign_key "review_votes", "users"
   add_foreign_key "reviews", "bottles"
