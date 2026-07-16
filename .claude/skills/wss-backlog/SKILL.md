@@ -35,6 +35,23 @@ Legend: **[code]** = engineering work · **[owner]** = only the owner can do it 
 - **Google Search Console. [owner]** After the three above ship: verify the domain and submit the
   sitemap. Blocked on the sitemap existing first.
 
+## Founding Member tier (owner idea July 2026, blocked on owner decisions)
+
+- **[code + owner] Sketch:** a "Founding Member" status kept only while the subscription never
+  pauses/cancels. Two shapes discussed: (a) a $5/mo society-only plan (create/run societies, NO
+  monthly deck credit), and/or (b) a founding rate on the full monthly plan ($5 off, e.g. $10.99
+  vs $15.99, which matches the yearly plan's effective monthly rate, a coherent story). Losing
+  status is permanent; regular price on return.
+- **Open owner decisions before building:** Is founding a limited-time window (first N members or
+  a date)? Does the $5 tier exist AND the founding rate, or just one? Does a PAUSE lose status or
+  only cancel? (Recommend: voluntary cancel only; involuntary payment failure should not strip
+  status.) Naming/copy.
+- **Engineering notes when approved:** new Stripe Price(s) [owner creates in dashboard];
+  `grant_monthly_credit` must become plan-aware (society-only plan gets NO credit);
+  society-creation gate already keys on active subscription so the $5 plan passes it; webhook
+  handling flags founding status on pause/cancel events. See wss-membership-model +
+  wss-payments-credits before touching any of this.
+
 ## Society review board
 
 - **Placement + weighting question. [code, blocked on owner decision]**
