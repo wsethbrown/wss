@@ -46,7 +46,9 @@
             </div>
           </div>
 
-          <div class="mt-8">
+          <%# mt-auto pins every card's CTA to the same baseline; the cards are
+              different heights (only some have a billed-line and savings chip). %>
+          <div class="mt-auto pt-8">
             <% if user_signed_in? && current_user.subscription_active? %>
               <%# Members don't need three checkout buttons. Mark their plan;
                   changes happen from the account page. %>
