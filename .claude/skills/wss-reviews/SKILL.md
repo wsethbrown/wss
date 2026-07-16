@@ -43,11 +43,17 @@ read before extending). Plans in `docs/superpowers/plans/2026-07-06-*` and `-07-
   `managed_by?` — organizer/society admin/global admin). Review buttons AND the gate
   use `pours_revealed?` — even the organizer can't review a secret pour early
   (pinned by `EventReviewTest`; NO organizer bypass).
-- **Event reviews**: created only via `POST /events/:event_id/reviews?bottle_id=<slug>`
+- **Event reviews**: created via `POST /events/:event_id/reviews?bottle_id=<slug>`
   (`Events::ReviewsController`). `Review#event_review_gates` (`on: :create`): bottle on
   the pour list, pours revealed, reviewer has a `status:"yes"` RSVP. Gates run once at
   creation — edits never re-check and can't move a review between events (strong params
   omit event_id).
+- **Event adoption (owner rule, July 2026)**: a SOLO review created within 7 days of an
+  attended event (RSVP yes) that poured that bottle is auto-linked to that event
+  (`Bottles::ReviewsController#recent_attended_event_for`; most recent qualifying night
+  wins; skips events whose (user,bottle) slot is already reviewed; past events are always
+  revealed, so the gates hold by construction). The flash tells the reviewer it linked.
+  Event provenance now has TWO entry points; don't "fix" the solo path back to solo-only.
 - **Event page "The pours"**: ordered rows, per-pour group mean (event-tagged reviews
   ONLY, from `@pour_reviews`), expandable reviews, Review/Edit buttons.
 - **Provenance veiling** (`reviews/_event_card.html.erb`, on bottle pages, profile

@@ -16,7 +16,7 @@ WORKDIR /rails
 
 # Install base packages
 RUN apt-get update -qq && \
-    apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client libreoffice-impress poppler-utils fonts-liberation fonts-crosextra-carlito fonts-crosextra-caladea fonts-dejavu-core fonts-noto-core fonts-adf-gillius && \
+    apt-get install --no-install-recommends -y curl libjemalloc2 libvips postgresql-client libreoffice-impress poppler-utils fonts-liberation fonts-crosextra-carlito fonts-crosextra-caladea fonts-dejavu-core fonts-noto-core fonts-noto-cjk fonts-adf-gillius && \
     rm -rf /var/lib/apt/lists /var/cache/apt/archives
 
 # Deck fonts: Gelasio (metric-compatible Georgia, OFL) plus substitution

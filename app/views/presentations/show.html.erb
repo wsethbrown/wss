@@ -528,22 +528,27 @@
           <!-- Author Info -->
           <div class="bg-gray-50 rounded-2xl p-6 mt-6">
             <h3 class="font-bold text-gray-900 mb-4">About the Author</h3>
+            <% author = @presentation.author %>
             <div class="flex items-center gap-4">
-              <% if @presentation.author.profile_image.attached? %>
-                <%= image_tag @presentation.author.profile_image, class: "w-12 h-12 rounded-full object-cover" %>
+              <% if author.profile_image.attached? %>
+                <%= image_tag author.profile_image, class: "h-14 w-14 rounded-full object-cover" %>
               <% else %>
-                <div class="w-12 h-12 bg-whiskey-600 rounded-full flex items-center justify-center">
-                  <span class="text-white font-bold"><%= @presentation.author.first_name.first %><%= @presentation.author.last_name.first if @presentation.author.last_name.present? %></span>
+                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-whiskey-600">
+                  <span class="font-bold text-white"><%= author.first_name.first %><%= author.last_name.first if author.last_name.present? %></span>
                 </div>
               <% end %>
-              <div>
-                <h4 class="font-semibold text-gray-900"><%= @presentation.author.full_name %></h4>
-                <p class="text-sm text-gray-600">Presentation Author</p>
-                <% if @presentation.author.bio.present? %>
-                  <p class="text-xs text-gray-500"><%= @presentation.author.bio.truncate(50) %></p>
-                <% end %>
+              <div class="min-w-0">
+                <h4 class="font-semibold text-gray-900"><%= author.full_name %></h4>
+                <% deck_count = Presentation.published.where(author: author).count %>
+                <p class="text-sm text-gray-600"><%= pluralize(deck_count, 'deck') %> in the library</p>
               </div>
             </div>
+            <%# The author's own blurb, from their profile (account settings / admin). %>
+            <% if author.bio.present? %>
+              <p class="mt-4 text-sm leading-relaxed text-gray-600"><%= author.bio %></p>
+            <% end %>
+            <%= link_to "View profile →", profile_path(author),
+                class: "mt-4 inline-block text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>
           </div>
         </div>
       </div>
