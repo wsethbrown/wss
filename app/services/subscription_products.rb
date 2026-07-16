@@ -109,8 +109,56 @@ module SubscriptionProducts
   end
 
   # plan id ("monthly"/"quarterly"/"yearly") => monthly-equivalent price in cents.
+  # Founding plans are included so admin MRR counts them at their real rates.
   def monthly_cents_by_plan
-    all.each_with_object({}) { |p, h| h[p[:id].to_s] = p[:price].to_i }
+    prices = all.each_with_object({}) { |p, h| h[p[:id].to_s] = p[:price].to_i }
+    founding.each { |p| prices[p[:id].to_s] = p[:price].to_i }
+    prices
+  end
+
+  # The two Founding Member offers (first 50, kept while never cancelling):
+  # the $5/mo society-only plan and the $5-off full monthly. Live amounts from
+  # Stripe when the env price ids exist; fallback display values otherwise.
+  def founding
+    return founding_fallback if Rails.env.test?
+    return founding_fallback unless Stripe.api_key.present?
+
+    Rails.cache.fetch("stripe_founding_products", expires_in: 1.hour) do
+      founding_fallback.map do |offer|
+        env_id = offer[:id] == "founding_society" ? "STRIPE_FOUNDING_SOCIETY_PRICE_ID" : "STRIPE_FOUNDING_MONTHLY_PRICE_ID"
+        next offer if ENV[env_id].blank?
+
+        begin
+          price = Stripe::Price.retrieve({ id: ENV[env_id] })
+          offer.merge(price: price.unit_amount, price_id: price.id)
+        rescue => e
+          Rails.logger.error "Error fetching founding price #{env_id}: #{e.message}"
+          offer
+        end
+      end
+    end
+  rescue => e
+    Rails.logger.error "Error fetching founding products: #{e.message}"
+    founding_fallback
+  end
+
+  def founding_fallback
+    [
+      {
+        id: "founding_society",
+        name: "Founding Society",
+        price: 500,
+        interval: "month",
+        price_id: ENV.fetch("STRIPE_FOUNDING_SOCIETY_PRICE_ID", "price_founding_society")
+      },
+      {
+        id: "founding_monthly",
+        name: "Founding Monthly",
+        price: 1099,
+        interval: "month",
+        price_id: ENV.fetch("STRIPE_FOUNDING_MONTHLY_PRICE_ID", "price_founding_monthly")
+      }
+    ]
   end
 
   def fallback

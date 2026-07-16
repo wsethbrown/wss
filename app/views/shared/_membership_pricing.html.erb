@@ -72,6 +72,49 @@
       <% end %>
     </div>
 
+    <%# Founding Members: shown only while slots remain, and only to accounts
+        that can still take the offer. Separate from #plan-cards on purpose;
+        that DOM contract is pinned by tests. %>
+    <% founding_slots = User.founding_slots_remaining %>
+    <% if founding_slots.positive? && (!user_signed_in? || current_user.founding_eligible?) %>
+      <% founding = SubscriptionProducts.founding %>
+      <div class="mx-auto mt-14 max-w-4xl rounded-3xl border border-whiskey-300 bg-char p-8 sm:p-10">
+        <p class="eyebrow text-whiskey-300/90">Founding members</p>
+        <h3 class="mt-2 font-display text-3xl font-semibold text-cream">The first fifty</h3>
+        <p class="mt-3 max-w-2xl text-cream/70">
+          Fifty founding spots, then these offers are gone. Keep your founding rate for as long as
+          your membership stays active. Pause anytime; cancel and it's gone for good.
+        </p>
+        <div class="mt-8 grid gap-6 md:grid-cols-2">
+          <% founding.each do |offer| %>
+            <div class="rounded-2xl border border-oak-edge bg-oak p-6">
+              <h4 class="font-display text-xl font-semibold text-cream"><%= offer[:name] %></h4>
+              <p class="mt-1 font-display text-3xl font-semibold text-whiskey-300">
+                $<%= number_with_precision(offer[:price] / 100.0, precision: 2) %><span class="text-base text-cream/50">/mo</span>
+              </p>
+              <p class="mt-3 text-sm leading-relaxed text-cream/70">
+                <% if offer[:id] == "founding_society" %>
+                  Create and run your own society: events, RSVPs, invites, members. No monthly deck credit; buy any deck outright whenever you like.
+                <% else %>
+                  The full membership at $5 off, the same rate as the yearly plan, billed monthly. One deck credit every month.
+                <% end %>
+              </p>
+              <% if user_signed_in? %>
+                <%= form_with url: subscriptions_checkout_path, method: :post, local: true, data: { turbo: false } do |f| %>
+                  <%= f.hidden_field :price_id, value: offer[:id] %>
+                  <%= f.submit "Claim a founding spot", class: "mt-5 w-full cursor-pointer rounded-xl bg-whiskey-500 px-6 py-3 text-base font-semibold text-white transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char" %>
+                <% end %>
+              <% else %>
+                <%= link_to "Sign in to claim a spot", auth_path,
+                    class: "mt-5 block w-full rounded-xl bg-whiskey-500 px-6 py-3 text-center text-base font-semibold text-white transition hover:bg-whiskey-400" %>
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+        <p class="mt-6 text-center text-sm text-whiskey-300/80"><%= founding_slots %> of <%= User::FOUNDING_MEMBER_CAP %> founding spots left</p>
+      </div>
+    <% end %>
+
     <%# Free vs paid, side by side: the review section and joining societies
         are free (that's the everyday reason to have an account); membership
         adds deck credits and the ability to run your own society. %>

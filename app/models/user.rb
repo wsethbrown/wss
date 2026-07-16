@@ -118,6 +118,28 @@ class User < ApplicationRecord
   scope :active, -> { where.not(encrypted_password: [ nil, "" ]) }
 
 
+  # ---- Founding Members (first 50, owner-approved July 2026) ----------------
+  # Two founding shapes, both consuming one of the 50 slots: the $5/mo
+  # society-only plan (founding_society, NO deck credits) and the $5-off full
+  # monthly plan (founding_monthly). Status is kept while the subscription
+  # never CANCELS; pausing is fine. Revocation is permanent.
+  FOUNDING_MEMBER_CAP = 50
+  FOUNDING_PLANS = %w[founding_society founding_monthly].freeze
+
+  def self.founding_slots_remaining
+    [FOUNDING_MEMBER_CAP - where(founding_member: true).count, 0].max
+  end
+
+  # Eligible to TAKE a founding offer: never revoked, not already founding.
+  def founding_eligible?
+    !founding_member? && founding_revoked_at.nil?
+  end
+
+  # The $5 society-only plan runs societies but earns NO deck credits.
+  def society_only_plan?
+    subscription_plan == "founding_society"
+  end
+
   # Admin role tiers, assigned via console. `full` can do everything including
   # hard-deleting records; `limited` is a full admin minus delete rights; `none`
   # is a normal user. admin_role is the single source of truth for admin access.

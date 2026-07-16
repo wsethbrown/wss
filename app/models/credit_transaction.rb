@@ -41,6 +41,8 @@ class CreditTransaction < ApplicationRecord
 
   def self.grant_monthly_credit(user, description = "Monthly subscription credit")
     return unless user.subscription_active?
+    # The $5 founding society-only plan runs societies; it earns NO deck credits.
+    return if user.society_only_plan?
 
     record!(user: user, amount: 1, transaction_type: TRANSACTION_TYPES[:granted], description: description)
   end
@@ -54,6 +56,10 @@ class CreditTransaction < ApplicationRecord
   # window blocks that double-grant while letting a genuine re-subscriber
   # months later earn a fresh welcome. Returns true if granted.
   def self.grant_welcome_credit(user)
+    # Society-only founding members get no deck credits, welcome included.
+    # Guarded here so BOTH triggers (sync redirect + webhook) are covered.
+    return false if user.society_only_plan?
+
     granted = false
     user.with_lock do
       # Prefix match, not equality: an admin-granted variant ("Welcome

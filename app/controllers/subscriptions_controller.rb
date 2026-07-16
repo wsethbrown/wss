@@ -11,12 +11,27 @@ class SubscriptionsController < ApplicationController
     price_ids = {
       "monthly" => ENV.fetch("STRIPE_MONTHLY_PRICE_ID", "price_monthly"),
       "quarterly" => ENV.fetch("STRIPE_QUARTERLY_PRICE_ID", "price_quarterly"),
-      "yearly" => ENV.fetch("STRIPE_YEARLY_PRICE_ID", "price_yearly")
+      "yearly" => ENV.fetch("STRIPE_YEARLY_PRICE_ID", "price_yearly"),
+      "founding_society" => ENV.fetch("STRIPE_FOUNDING_SOCIETY_PRICE_ID", "price_founding_society"),
+      "founding_monthly" => ENV.fetch("STRIPE_FOUNDING_MONTHLY_PRICE_ID", "price_founding_monthly")
     }
 
     unless price_ids.key?(price_id)
       redirect_to account_path(anchor: "subscription"), alert: "Invalid subscription plan"
       return
+    end
+
+    # Founding offers: first 50 members only, and never for anyone whose
+    # founding status was revoked (revocation is permanent, owner rule).
+    if User::FOUNDING_PLANS.include?(price_id)
+      unless User.founding_slots_remaining.positive?
+        redirect_to account_path(anchor: "subscription"), alert: "All 50 founding memberships are taken."
+        return
+      end
+      unless current_user.founding_eligible?
+        redirect_to account_path(anchor: "subscription"), alert: "Founding membership isn't available on this account."
+        return
+      end
     end
 
     begin

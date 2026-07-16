@@ -74,6 +74,8 @@ class WebhooksController < ApplicationController
       subscription_ends_at: period_end ? Time.at(period_end) : nil
     )
 
+    grant_founding_status(user, plan_name)
+
     # NOTE: the welcome credit is granted on invoice.payment_succeeded
     # (billing_reason subscription_create), not here, this event arrives
     # with status "incomplete" during checkout, so an active-subscription
@@ -109,6 +111,9 @@ class WebhooksController < ApplicationController
       cancel_at_period_end: cancel_at_period_end,
       subscription_paused_at: paused_at
     )
+
+    # Pausing does NOT touch founding status (owner rule); only deletion does.
+    grant_founding_status(user, plan_name)
     
     # Log activity if subscription was canceled
     if cancel_at_period_end
@@ -140,6 +145,13 @@ class WebhooksController < ApplicationController
       subscription_ends_at: period_end ? Time.at(period_end) : Time.current,
       cancel_at_period_end: false
     )
+
+    # Founding status dies with a cancel, permanently (owner rule: cancel only;
+    # pausing never lands here). founding_revoked_at bars ever re-earning it.
+    if user.founding_member?
+      user.update!(founding_member: false, founding_revoked_at: Time.current)
+      Rails.logger.info "Founding member status revoked for user #{user.id} (subscription cancelled)"
+    end
     
     # If subscription is ending immediately (not at period end), expire credits
     cancel_at = subscription.try(:cancel_at) || subscription["cancel_at"]
@@ -328,9 +340,24 @@ class WebhooksController < ApplicationController
       "quarterly"
     when ENV["STRIPE_YEARLY_PRICE_ID"]
       "yearly"
+    when ENV["STRIPE_FOUNDING_SOCIETY_PRICE_ID"]
+      "founding_society"
+    when ENV["STRIPE_FOUNDING_MONTHLY_PRICE_ID"]
+      "founding_monthly"
     else
       Rails.logger.warn "Unknown price ID: #{price_id}"
       "unknown"
     end
+  end
+
+  # Taking a founding plan grants founding status, unless it was ever revoked
+  # (revocation is permanent). Idempotent; checkout enforces the 50-slot cap,
+  # this just records the status the paid plan implies.
+  def grant_founding_status(user, plan_name)
+    return unless User::FOUNDING_PLANS.include?(plan_name)
+    return if user.founding_member? || user.founding_revoked_at.present?
+
+    user.update!(founding_member: true)
+    Rails.logger.info "Founding member status granted to user #{user.id} (#{plan_name})"
   end
 end
