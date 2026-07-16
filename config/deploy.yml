@@ -47,6 +47,8 @@ env:
     - STRIPE_MONTHLY_PRICE_ID
     - STRIPE_QUARTERLY_PRICE_ID
     - STRIPE_YEARLY_PRICE_ID
+    - STRIPE_FOUNDING_SOCIETY_PRICE_ID
+    - STRIPE_FOUNDING_MONTHLY_PRICE_ID
     # Error alerting (inert if blank)
     - SENTRY_DSN
     # Cloudflare R2: uploads (Active Storage) + nightly DB backups
