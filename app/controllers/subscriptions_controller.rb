@@ -337,38 +337,11 @@ class SubscriptionsController < ApplicationController
     end
   end
 
+  # Membership products/prices live in SubscriptionProducts (shared with the
+  # homepage, account page, and admin revenue) so pricing is never hardcoded
+  # in two places.
   def fetch_stripe_products
-    [
-      {
-        id: 'monthly',
-        name: 'Monthly Membership',
-        price: 1599,
-        interval: 'month',
-        features: Membership::BENEFITS,
-        popular: false,
-        price_id: ENV.fetch('STRIPE_MONTHLY_PRICE_ID', 'price_monthly')
-      },
-      {
-        id: 'quarterly',
-        name: 'Quarterly Membership',
-        price: 1299,
-        interval: 'month',
-        features: Membership::BENEFITS,
-        popular: false,
-        price_id: ENV.fetch('STRIPE_QUARTERLY_PRICE_ID', 'price_quarterly'),
-        savings: '19%'
-      },
-      {
-        id: 'yearly',
-        name: 'Yearly Membership',
-        price: 1099,
-        interval: 'month',
-        features: Membership::BENEFITS,
-        popular: true,
-        price_id: ENV.fetch('STRIPE_YEARLY_PRICE_ID', 'price_yearly'),
-        savings: '31%'
-      }
-    ]
+    SubscriptionProducts.all
   end
 
 end
