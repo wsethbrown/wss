@@ -46,6 +46,12 @@ class Admin::UserRolesTest < ActionDispatch::IntegrationTest
     assert_select "form[action=?]", update_role_admin_user_path(users(:john))
   end
 
+  test "the role form also shows on the edit-user page" do
+    sign_in users(:admin)
+    get edit_admin_user_path(users(:john))
+    assert_select "form[action=?]", update_role_admin_user_path(users(:john))
+  end
+
   test "the role form is hidden from limited admins and on your own page" do
     sign_in users(:limited_admin)
     get admin_user_path(users(:john))

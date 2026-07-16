@@ -1,0 +1,36 @@
+<%# The user's admin tier + the promote/demote control. Rendered on both the
+    user view and edit pages (outside the main form; nested forms are invalid).
+    Server-side guards mirror the UI: full admins only, never your own role. %>
+<div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
+  <h2 class="text-lg font-semibold text-gray-900 mb-4">Role</h2>
+  <% case user.admin_role %>
+  <% when "full" %>
+    <span class="px-3 py-2 text-sm font-semibold rounded-full bg-whiskey-100 text-whiskey-800">
+      Administrator (full)
+    </span>
+  <% when "limited" %>
+    <span class="px-3 py-2 text-sm font-semibold rounded-full bg-whiskey-100 text-whiskey-800">
+      Administrator (no delete)
+    </span>
+  <% else %>
+    <span class="px-3 py-2 text-sm font-semibold rounded-full bg-gray-100 text-gray-700">
+      Regular User
+    </span>
+  <% end %>
+
+  <% if current_user.admin_role_full? %>
+    <% if user == current_user %>
+      <p class="mt-4 text-xs text-gray-400">You can't change your own role.</p>
+    <% else %>
+      <%= form_with url: update_role_admin_user_path(user), method: :patch, local: true, class: "mt-4 flex items-center gap-2" do %>
+        <%= select_tag :admin_role,
+            options_for_select([["Regular user", "none"], ["Administrator (no delete)", "limited"], ["Administrator (full)", "full"]], user.admin_role),
+            class: "rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+        <%= submit_tag "Update role",
+            data: { turbo_confirm: "Change this user's admin role?" },
+            class: "cursor-pointer rounded-lg bg-whiskey-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-whiskey-700" %>
+      <% end %>
+      <p class="mt-2 text-xs text-gray-400">No-delete admins have every admin power except permanently deleting records.</p>
+    <% end %>
+  <% end %>
+</div>

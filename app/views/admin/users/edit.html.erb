@@ -91,8 +91,9 @@
     </div>
   <% end %>
 
-  <!-- Subscription Management (Outside Form) -->
+  <!-- Role + Subscription Management (Outside Form: these post to their own endpoints) -->
   <div class="mt-8 space-y-6">
+    <%= render "role_card", user: @user %>
     <!-- Current Subscription Status -->
     <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
       <h2 class="text-xl font-semibold text-gray-900 mb-4">Subscription Management</h2>
