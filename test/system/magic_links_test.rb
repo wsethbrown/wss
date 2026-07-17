@@ -26,11 +26,9 @@ class MagicLinksTest < ApplicationSystemTestCase
     
     # Verify the initial state
     assert_text "Join the Society"
-    
-    # Click the magic link button
-    click_button "Sign in with magic link"
-    
-    # Verify the form appears
+
+    # The email form is visible immediately (no toggle since the horizontal
+    # auth layout, July 2026, the whole point is zero clicks to type an email)
     assert_selector "#magic-link-form", visible: true
     assert_field "Email address"
     
@@ -63,11 +61,8 @@ class MagicLinksTest < ApplicationSystemTestCase
     new_email = 'newuser@example.com'
     
     visit auth_path
-    
-    # Click the magic link button
-    click_button "Sign in with magic link"
-    
-    # Fill and submit the form
+
+    # Fill and submit the always-visible form
     fill_in "Email address", with: new_email
     
     # Check email count before submission
@@ -84,30 +79,16 @@ class MagicLinksTest < ApplicationSystemTestCase
     assert_equal initial_count + 1, final_count, "Email should have been generated"
   end
 
-  test "magic link form shows and hides correctly" do
+  test "magic link form is visible without any toggling" do
     visit auth_path
-    
-    # Initially the form should be hidden
-    assert_selector "#magic-link-form", visible: false
-    
-    # Click the magic link button
-    click_button "Sign in with magic link"
-    
-    # Form should now be visible
+
     assert_selector "#magic-link-form", visible: true
     assert_field "Email address"
-    
-    # Click back button
-    click_button "Back to other options"
-    
-    # Form should be hidden again
-    assert_selector "#magic-link-form", visible: false
   end
 
   test "magic link actually works for signing in" do
     # First, create a magic link
     visit auth_path
-    click_button "Sign in with magic link"
     fill_in "Email address", with: @user.email
     click_button "Send magic link"
     
