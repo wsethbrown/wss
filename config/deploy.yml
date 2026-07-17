@@ -40,6 +40,10 @@ env:
     # OAuth (production redirect URIs must be added in the Google console)
     - GOOGLE_CLIENT_ID
     - GOOGLE_CLIENT_SECRET
+    - APPLE_CLIENT_ID
+    - APPLE_TEAM_ID
+    - APPLE_KEY_ID
+    - APPLE_PRIVATE_KEY
     # Stripe LIVE mode
     - STRIPE_SECRET_KEY
     - STRIPE_PUBLISHABLE_KEY
