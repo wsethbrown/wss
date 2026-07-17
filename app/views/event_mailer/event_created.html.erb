@@ -1,14 +1,18 @@
 <%= render "mailers/layout_open" %>
-      <h2 style="margin-top:0;"><%= @society.name %> has a new tasting night</h2>
-      <p><strong><%= @event.title %></strong></p>
-      <p class="meta"><%= @event.start_time.strftime("%A, %B %-d at %-l:%M %p") %></p>
-      <% if @event.location.present? %><p class="meta"><%= @event.location %></p><% end %>
+      <p class="eyebrow">New tasting night</p>
+      <h2 class="title" style="margin-top:0;"><%= @event.title %></h2>
+      <div class="details">
+        <p><strong><%= @society.name %></strong></p>
+        <p><%= @event.start_time.strftime("%A, %B %-d at %-l:%M %p") %></p>
+        <% if @event.location.present? %><p><%= @event.location %></p><% end %>
+      </div>
       <% if @event.description.present? %><p><%= truncate(@event.description, length: 200) %></p><% end %>
-      <a class="btn" href="<%= society_event_url(@society, @event) %>">See the event</a>
+      <p style="margin: 20px 0 0; font-weight: 600;">Will you be there?</p>
       <div class="rsvp">
         <a class="btn" style="background:#047857;" href="<%= @rsvp_urls["yes"] %>">RSVP yes</a>
         <a class="btn" style="background:#b45309;" href="<%= @rsvp_urls["maybe"] %>">Maybe</a>
         <a class="btn" style="background:#6a5a48;" href="<%= @rsvp_urls["no"] %>">Can't make it</a>
       </div>
-      <p class="meta" style="margin-top: 10px;">One click records your answer. You can change it any time on the event page.</p>
+      <p class="hint">You can change your answer at any time on the event page.</p>
+      <p class="see"><a href="<%= society_event_url(@society, @event) %>">See the full event page</a></p>
 <%= render "mailers/layout_close", footer_note: "You can turn off event emails any time in your account settings at whiskeysharesociety.com." %>

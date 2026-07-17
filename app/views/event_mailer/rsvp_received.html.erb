@@ -1,6 +1,10 @@
 <%= render "mailers/layout_open" %>
-      <h2 style="margin-top:0;"><%= @guest.full_name %> RSVP'd <%= @rsvp.status %></h2>
-      <p class="meta">For <strong><%= @event.title %></strong>, <%= @event.start_time.strftime("%A, %B %-d") %></p>
+      <p class="eyebrow">New RSVP</p>
+      <h2 class="title" style="margin-top:0;"><%= @guest.full_name %> RSVP'd <%= @rsvp.status %></h2>
+      <div class="details">
+        <p><strong><%= @event.title %></strong></p>
+        <p><%= @event.start_time.strftime("%A, %B %-d") %></p>
+      </div>
       <% if @rsvp.note.present? %>
         <div class="note">&ldquo;<%= @rsvp.note %>&rdquo;</div>
       <% end %>

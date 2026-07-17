@@ -1,7 +1,11 @@
 <%= render "mailers/layout_open" %>
-      <h2 style="margin-top:0;"><%= @event.title %> has changed</h2>
+      <p class="eyebrow">Event update</p>
+      <h2 class="title" style="margin-top:0;"><%= @event.title %></h2>
       <p class="meta">Updated: <%= @changed_fields.join(" and ") %></p>
-      <p class="meta"><strong>When:</strong> <%= @event.start_time.strftime("%A, %B %-d at %-l:%M %p") %></p>
-      <% if @event.location.present? %><p class="meta"><strong>Where:</strong> <%= @event.location %></p><% end %>
-      <a class="btn" href="<%= society_event_url(@event.society, @event) %>">See the event</a>
+      <div class="details">
+        <p><strong><%= @event.society.name %></strong></p>
+        <p><%= @event.start_time.strftime("%A, %B %-d at %-l:%M %p") %></p>
+        <% if @event.location.present? %><p><%= @event.location %></p><% end %>
+      </div>
+      <p class="see"><a href="<%= society_event_url(@event.society, @event) %>">See the full event page</a></p>
 <%= render "mailers/layout_close", footer_note: "You can turn off event emails any time in your account settings at whiskeysharesociety.com." %>
