@@ -6,10 +6,10 @@
         <p class="meta"><%= pluralize(@event.event_bottles.count, "pour") %> on the list.</p>
       <% end %>
       <a class="btn" href="<%= society_event_url(@event.society, @event) %>">See the event</a>
-      <table role="presentation" style="margin-top: 16px;"><tr>
-        <td><a class="btn" style="background:#047857;" href="<%= @rsvp_urls["yes"] %>">RSVP yes</a></td>
-        <td style="padding-left:8px;"><a class="btn" style="background:#b45309;" href="<%= @rsvp_urls["maybe"] %>">Maybe</a></td>
-        <td style="padding-left:8px;"><a class="btn" style="background:#6a5a48;" href="<%= @rsvp_urls["no"] %>">Can't make it</a></td>
-      </tr></table>
+      <div class="rsvp">
+        <a class="btn" style="background:#047857;" href="<%= @rsvp_urls["yes"] %>">RSVP yes</a>
+        <a class="btn" style="background:#b45309;" href="<%= @rsvp_urls["maybe"] %>">Maybe</a>
+        <a class="btn" style="background:#6a5a48;" href="<%= @rsvp_urls["no"] %>">Can't make it</a>
+      </div>
       <p class="meta" style="margin-top: 10px;">One click records your answer. You can change it any time on the event page.</p>
 <%= render "mailers/layout_close", footer_note: "You can turn off event emails any time in your account settings at whiskeysharesociety.com." %>

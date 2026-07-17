@@ -11,8 +11,16 @@
     .body { padding: 24px; }
     .meta { color: #6a5a48; font-size: 14px; margin: 4px 0; }
     .note { background: #fbf6ef; border-left: 3px solid #c9884a; padding: 10px 14px; margin: 16px 0; color: #33271c; }
-    .btn { display: inline-block; background: #a15825; color: #ffffff !important; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; margin-top: 16px; }
+    .btn { display: inline-block; background: #a15825; color: #ffffff !important; text-decoration: none; padding: 12px 24px; border-radius: 10px; font-weight: 600; margin-top: 16px; white-space: nowrap; }
+    .rsvp { margin-top: 8px; }
+    .rsvp a { padding: 11px 18px; margin: 8px 8px 0 0; }
     .footer { text-align: center; color: #b4a58e; font-size: 12px; padding: 16px; }
+    @media only screen and (max-width: 480px) {
+      body { padding: 10px !important; }
+      .body { padding: 20px 16px !important; }
+      .btn { display: block !important; margin: 12px 0 0 0 !important; text-align: center !important; }
+      .rsvp a { margin: 10px 0 0 0 !important; }
+    }
   </style>
 </head>
 <body>
