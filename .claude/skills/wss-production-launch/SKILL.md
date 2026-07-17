@@ -112,10 +112,10 @@ wss-payments-credits for webhook shapes, the welcome-credit design, and the
 Aug 9 first-renewal watch.
 
 ## Remaining owner launch items (not code)
-- **SMTP provider — UNDECIDED, BLOCKING.** `SMTP_*` secrets are blank; with
-  `SMTP_ADDRESS` unset the mailer uses the `:test` adapter and **silently
-  drops mail** (production.rb:80-92). Magic links are the PRIMARY sign-in, so
-  they fail in prod until a provider (Resend/Postmark) lands. Highest priority.
+- **SMTP — DONE (Resend, 2026-07-17).** smtp.resend.com creds in
+  `~/.wss-production.env`; verified sending domain send.whiskeysharesociety.com;
+  first prod magic link verified delivered. Free tier 3k/month — see the
+  wss-backlog cost-tracking watch item.
 - **Google OAuth** — production redirect URI
   `https://whiskeysharesociety.com/users/auth/google_oauth2/callback` must be
   added in the Google console (button gates on real creds). See wss-auth.

@@ -15,9 +15,12 @@ new_user_session_path / user_session_path still resolve (aliased in routes).
 ## Magic links (primary auth)
 Auth::MagicLinkService — single-use, HMAC-digested tokens on dedicated
 columns, 15-min expiry, deliver_later. Consuming signs in + logs :login
-(method: magic_link). PRODUCTION DEPENDS ON EMAIL DELIVERY — no SMTP
-configured yet (see wss-production-launch); magic links silently break in
-prod until that's done.
+(method: magic_link). PRODUCTION EMAIL IS LIVE (2026-07-17): Resend SMTP
+(smtp.resend.com, sending-scoped key in the prod env file), verified domain
+send.whiskeysharesociety.com, every sender is
+'Whiskey Share Society <noreply@send.whiskeysharesociety.com>' (senders MUST
+stay on the verified subdomain or Resend rejects). First prod magic link
+verified delivered end-to-end.
 
 ## Google OAuth
 - Strategy registers with real env creds in production; with DUMMY fallbacks
