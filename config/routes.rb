@@ -15,6 +15,10 @@ Rails.application.routes.draw do
     # Custom password sign-in (adds 2FA + remember-me handling on top of Devise)
     post   '/users/sign_in', to: 'auth#sign_in', as: 'user_session'
     delete '/users/sign_out', to: 'auth#logout', as: 'destroy_user_session'
+    # OmniAuth redirects here when a provider errors (declined consent, bad
+    # credentials). Without this route the person lands on a bare 404 instead
+    # of the sign-in page with an explanation (Apple hit exactly that).
+    get    '/users/auth/failure', to: 'users/omniauth_callbacks#failure'
   end
 
   # Unified authentication page

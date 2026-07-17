@@ -302,10 +302,15 @@ Devise.setup do |config|
   # Apple ID token signature for us. Registered only when all required credentials are
   # present, so a missing/rotated key never breaks boot — the Apple button simply hides.
   #
-  # Provide the signing key via the APPLE_PRIVATE_KEY env var (the full PEM contents),
-  # NOT a file in the repo. Set APPLE_CLIENT_ID, APPLE_TEAM_ID, and APPLE_KEY_ID too.
+  # Provide the signing key via the APPLE_PRIVATE_KEY env var, NOT a file in the
+  # repo. Kamal ships env vars in docker env-file format, which CANNOT carry
+  # multiline values — so the PEM is stored single-line with literal \n escapes
+  # and normalized here (a mangled multiline key once reached production as its
+  # first line only, and OmniAuth failed with OpenSSL "invalid curve name").
+  # Real newlines also pass through unchanged for local use.
   if ENV['APPLE_CLIENT_ID'].present? && ENV['APPLE_TEAM_ID'].present? &&
      ENV['APPLE_KEY_ID'].present? && ENV['APPLE_PRIVATE_KEY'].present?
+    apple_pem = ENV['APPLE_PRIVATE_KEY'].strip.gsub('\n', "\n")
     config.omniauth :apple,
       ENV['APPLE_CLIENT_ID'],
       '',
@@ -313,7 +318,7 @@ Devise.setup do |config|
         scope: 'email name',
         team_id: ENV['APPLE_TEAM_ID'],
         key_id: ENV['APPLE_KEY_ID'],
-        pem: ENV['APPLE_PRIVATE_KEY'],
+        pem: apple_pem,
         name: 'apple'
       }
   end
