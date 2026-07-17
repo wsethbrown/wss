@@ -1,6 +1,6 @@
 class Event < ApplicationRecord
   belongs_to :society
-  belongs_to :organizer, class_name: 'User'
+  belongs_to :organizer, class_name: "User"
 
   # Associations
   has_many :event_rsvps, dependent: :destroy
@@ -9,6 +9,7 @@ class Event < ApplicationRecord
   has_many :reviews, dependent: :restrict_with_error
   has_many :event_bottles, dependent: :destroy
   has_many :pour_bottles, through: :event_bottles, source: :bottle
+  has_many :event_comments, dependent: :destroy
 
   # Validations
   validates :title, presence: true, length: { minimum: 2, maximum: 200 }
@@ -19,36 +20,36 @@ class Event < ApplicationRecord
   validate :end_time_after_start_time
 
   # Scopes
-  scope :upcoming, -> { where('start_time > ?', Time.current).order(:start_time) }
-  scope :past, -> { where('start_time < ?', Time.current).order(start_time: :desc) }
+  scope :upcoming, -> { where("start_time > ?", Time.current).order(:start_time) }
+  scope :past, -> { where("start_time < ?", Time.current).order(start_time: :desc) }
   scope :today, -> { where(start_time: Time.current.beginning_of_day..Time.current.end_of_day) }
   scope :this_week, -> { where(start_time: Time.current.beginning_of_week..Time.current.end_of_week) }
   scope :by_society, ->(society_id) { where(society_id: society_id) if society_id.present? }
-  scope :search, ->(query) { where('title ILIKE ? OR description ILIKE ?', "%#{query}%", "%#{query}%") if query.present? }
+  scope :search, ->(query) { where("title ILIKE ? OR description ILIKE ?", "%#{query}%", "%#{query}%") if query.present? }
 
   # Instance methods
   def yes_attendees
-    User.joins(:event_rsvps).where(event_rsvps: { event_id: id, status: 'yes' })
+    User.joins(:event_rsvps).where(event_rsvps: { event_id: id, status: "yes" })
   end
 
   def maybe_attendees
-    User.joins(:event_rsvps).where(event_rsvps: { event_id: id, status: 'maybe' })
+    User.joins(:event_rsvps).where(event_rsvps: { event_id: id, status: "maybe" })
   end
 
   def no_attendees
-    User.joins(:event_rsvps).where(event_rsvps: { event_id: id, status: 'no' })
+    User.joins(:event_rsvps).where(event_rsvps: { event_id: id, status: "no" })
   end
 
   def yes_count
-    event_rsvps.where(status: 'yes').count
+    event_rsvps.where(status: "yes").count
   end
 
   def maybe_count
-    event_rsvps.where(status: 'maybe').count
+    event_rsvps.where(status: "maybe").count
   end
 
   def no_count
-    event_rsvps.where(status: 'no').count
+    event_rsvps.where(status: "no").count
   end
 
   # Legacy method for compatibility - returns "Yes" attendees
@@ -122,6 +123,11 @@ class Event < ApplicationRecord
     pours_revealed? || managed_by?(user)
   end
 
+  # Table talk stays open until a week after the night ends.
+  def comments_open?
+    Time.current <= end_time + 7.days
+  end
+
   # Mirrors EventPolicy#update?, the people who run the night.
   def managed_by?(user)
     return false unless user
@@ -134,7 +140,7 @@ class Event < ApplicationRecord
   def end_time_after_start_time
     return unless start_time && end_time
     if end_time <= start_time
-      errors.add(:end_time, 'must be after start time')
+      errors.add(:end_time, "must be after start time")
     end
   end
 end

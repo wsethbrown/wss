@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_17_193906) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_17_200652) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -132,6 +132,17 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_17_193906) do
     t.index ["event_id", "bottle_id"], name: "index_event_bottles_on_event_id_and_bottle_id", unique: true
     t.index ["event_id", "position"], name: "index_event_bottles_on_event_id_and_position"
     t.index ["event_id"], name: "index_event_bottles_on_event_id"
+  end
+
+  create_table "event_comments", force: :cascade do |t|
+    t.bigint "event_id", null: false
+    t.bigint "user_id", null: false
+    t.text "body", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["event_id", "created_at"], name: "index_event_comments_on_event_id_and_created_at"
+    t.index ["event_id"], name: "index_event_comments_on_event_id"
+    t.index ["user_id"], name: "index_event_comments_on_user_id"
   end
 
   create_table "event_rsvps", force: :cascade do |t|
@@ -511,7 +522,6 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_17_193906) do
     t.string "subscription_status"
     t.string "subscription_plan"
     t.datetime "subscription_ends_at"
-    t.text "whiskey_shelf"
     t.integer "credits", default: 0, null: false
     t.boolean "cancel_at_period_end", default: false
     t.boolean "is_admin", default: false, null: false
@@ -544,6 +554,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_17_193906) do
   add_foreign_key "download_logs", "users"
   add_foreign_key "event_bottles", "bottles"
   add_foreign_key "event_bottles", "events"
+  add_foreign_key "event_comments", "events"
+  add_foreign_key "event_comments", "users"
   add_foreign_key "event_rsvps", "events"
   add_foreign_key "event_rsvps", "users"
   add_foreign_key "events", "societies"

@@ -131,7 +131,12 @@ hides private societies from non-members; show? gates too.
 
 **State:** Nested under societies. Create/edit forms work; RSVP Yes/Maybe/No
 with turbo_stream updates; event show has date/location/RSVP panels;
-emoji stripped, display type on titles.
+emoji stripped, display type on titles. "Table talk" comments on the event
+page (`events/_comments`, `Events::CommentsController`, owner-approved July
+2026): society members/organizer post until a week after `end_time`
+(`Event#comments_open?`, window enforced in the EventComment model); authors
+and event managers delete. Flat and event-scoped by design — NOT the
+rejected forum.
 
 **Gaps:**
 - events#index IS routed (nested: /societies/:id/events) — earlier draft of

@@ -44,6 +44,13 @@ class EventPolicy < ApplicationPolicy
     record.can_rsvp?(user)
   end
 
+  # Table talk: society members, the organizer, and global admins. The
+  # week-after-the-night window is enforced by EventComment, not here.
+  def comment?
+    return false unless user.present?
+    user.admin? || record.organizer == user || record.society.has_member?(user)
+  end
+
   def manage_rsvps?
     return false unless user.present?
     user.admin? || record.organizer == user || record.society.has_admin?(user)

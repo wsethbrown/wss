@@ -47,6 +47,11 @@ wss-membership-model for the free-vs-paid split.
 ## Events
 - Nested under societies; creating from a society page pre-pins society_id.
 - RSVP yes/maybe/no with turbo_stream updates; logs :event_rsvp activity.
+- "Table talk" comments (EventComment, owner-approved July 2026): society
+  members/organizer/global admin may post (EventPolicy#comment?); window is
+  event creation → end_time + 7 days, enforced in the MODEL so it can't be
+  bypassed; authors + Event#managed_by? delete. Flat, event-scoped chatter —
+  deliberately NOT the rejected forum; don't generalize it into one.
 - Society page sidebar = "Next tasting" card (next event + RSVP link, or a
   schedule prompt for managers). A redundant "Society Stats" card was removed
   deliberately — counts live in the masthead; don't bring it back.

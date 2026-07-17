@@ -30,8 +30,7 @@ class ProfileShelfTest < ActionDispatch::IntegrationTest
     assert_select "#whiskey-shelf a", count: 0
   end
 
-  test "no shelf section without shelf items, even with legacy text" do
-    @john.update_column(:whiskey_shelf, "Macallan 18\nSomething else")
+  test "no shelf section without shelf items" do
     get profile_path(@john)
     assert_select "#whiskey-shelf", count: 0
   end

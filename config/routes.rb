@@ -97,6 +97,8 @@ Rails.application.routes.draw do
     resources :event_bottles, only: [:create, :destroy], module: :events
     # Event-tagged reviews; the bottle rides along as ?bottle_id=<slug>.
     resources :reviews, only: [:new, :create], module: :events
+    # Table talk: society members' comments, open until a week after the night.
+    resources :comments, only: [:create, :destroy], module: :events
   end
 
   # Admin panel
