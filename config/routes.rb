@@ -54,6 +54,8 @@ Rails.application.routes.draw do
   post "account/enable_2fa", to: "account#enable_2fa"
   post "account/disable_2fa", to: "account#disable_2fa"
   post "account/regenerate_backup_codes", to: "account#regenerate_backup_codes"
+  post "account/shelf_items", to: "account/shelf_items#create", as: :account_shelf_items
+  delete "account/shelf_items/:id", to: "account/shelf_items#destroy", as: :account_shelf_item
 
   # Subscriptions
   post "subscriptions/checkout", to: "subscriptions#create_checkout_session"

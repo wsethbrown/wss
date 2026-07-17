@@ -1,0 +1,49 @@
+<%# locals: alert (String, optional) — inline error from a failed add. %>
+<div id="shelf-editor" class="bg-white rounded-lg border border-gray-200 p-6">
+  <h3 class="text-lg font-medium text-gray-900 mb-1">My whiskey shelf</h3>
+  <p class="text-sm text-gray-500 mb-4">Search the bottle library, or add anything you keep on hand.</p>
+
+  <% items = current_user.shelf_items.includes(:bottle).ordered %>
+  <% if items.any? %>
+    <div class="flex flex-wrap gap-2 mb-4">
+      <% items.each do |item| %>
+        <div class="inline-flex items-center gap-1.5 rounded-full py-1 pl-3 pr-1.5 text-sm
+                    <%= item.bottle ? "bg-whiskey-50 text-whiskey-900 border border-whiskey-300" : "bg-gray-50 text-gray-700 border border-gray-300" %>">
+          <% if item.bottle %>
+            <svg class="w-3.5 h-3.5 text-whiskey-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.35-.622l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244"></path>
+            </svg>
+          <% end %>
+          <%= item.display_name %>
+          <%= button_to account_shelf_item_path(item), method: :delete,
+              class: "cursor-pointer rounded-full p-0.5 hover:bg-whiskey-100 text-gray-400 hover:text-gray-600",
+              aria: { label: "Remove #{item.display_name} from your shelf" } do %>
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+            </svg>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <% if local_assigns[:alert].present? %>
+    <p class="mb-3 text-sm text-red-600"><%= alert %></p>
+  <% end %>
+
+  <div class="relative" data-controller="bottle-search"
+       data-bottle-search-url-value="<%= search_bottles_path %>"
+       data-bottle-search-submit-on-select-value="true"
+       data-bottle-search-add-label-value='+ Add "%s" to my shelf as written'>
+    <%= form_with url: account_shelf_items_path, method: :post,
+        data: { action: "submit->bottle-search#fillFreeTextBeforeSubmit" } do %>
+      <input type="search" placeholder="Add a bottle…" autocomplete="off"
+             data-bottle-search-target="input" data-action="input->bottle-search#query"
+             class="w-full rounded-md border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-whiskey-500 sm:text-sm">
+      <input type="hidden" name="shelf_item[bottle_id]" data-bottle-search-target="bottleId">
+      <input type="hidden" name="shelf_item[custom_name]" data-bottle-search-target="customName">
+      <div data-bottle-search-target="results"
+           class="absolute inset-x-0 top-full z-20 mt-1 hidden overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"></div>
+    <% end %>
+  </div>
+</div>

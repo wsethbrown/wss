@@ -149,6 +149,11 @@ My Societies, Subscription, Billing). Tab switcher now scrolls to the shown
 panel, syncs the URL hash, and restores any tab from the hash on load.
 Subscription tab: plan cards + pause/resume/cancel via SubscriptionsController
 (Stripe-backed, tested). 2FA (TOTP + backup codes) in Account Details.
+Profile tab: the whiskey shelf is a chip editor (`account/_shelf_editor`,
+`Account::ShelfItemsController`, Turbo Stream refresh) over structured
+`shelf_items` (bottle-linked or free-text; owner-approved July 2026). The
+legacy `users.whiskey_shelf` text column is backfilled + retained but no
+longer written or rendered — drop it once prod backfill is verified.
 
 **Gaps:**
 - The page is a 1000-line monolith with six panels inline. Split into

@@ -1,6 +1,6 @@
 class ProfilesController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_user, only: [:show]
+  before_action :set_user, only: [ :show ]
 
   def show
     # Membership in a PRIVATE society is not public record. Profiles show:
@@ -16,7 +16,13 @@ class ProfilesController < ApplicationController
              .distinct.includes(:creator)
       end
 
-    @tastings = @user.reviews.includes(:bottle, event: [:society, :event_bottles]).recent_first.limit(20)
+    @tastings = @user.reviews.includes(:bottle, event: [ :society, :event_bottles ]).recent_first.limit(20)
+
+    # The shelf: one with_score query covers every linked bottle's community
+    # rating; free-text entries have no bottle and no score.
+    @shelf_items = @user.shelf_items.includes(:bottle).ordered.to_a
+    shelf_bottle_ids = @shelf_items.filter_map(&:bottle_id)
+    @shelf_scores = shelf_bottle_ids.any? ? Bottle.with_score.where(id: shelf_bottle_ids).index_by(&:id) : {}
 
     @favorites = @user == current_user ? current_user.favorites.includes(:favoritable).order(created_at: :desc).select { |f| f.favoritable.is_a?(User) || Pundit.policy(current_user, f.favoritable).show? } : []
   end
