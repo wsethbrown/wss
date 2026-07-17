@@ -77,10 +77,6 @@ Legend: **[code]** = engineering work · **[owner]** = only the owner can do it 
 
 - **Real deck uploads. [owner]** The catalog still holds demo/dev decks. Owner must import real
   decks via the admin import flow (see wss-deck-pipeline) before any marketing push.
-- **Google OAuth prod redirect URI. [owner — verify done]** The Google console needs
-  `https://whiskeysharesociety.com/users/auth/google_oauth2/callback` added as an authorized redirect
-  URI. Unconfirmed whether it's been added. The sign-in button gates on real creds being present
-  (see wss-auth) — a missing URI = OAuth fails in prod. Verify in the Google Cloud console.
 
 ## Owner / legal (blocks nothing technical)
 
