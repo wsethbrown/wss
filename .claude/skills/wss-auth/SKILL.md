@@ -40,6 +40,16 @@ Apple forbids localhost return URLs, verify on prod). Portal facts: Team ID
 domain whiskeysharesociety.com + return URL /users/auth/apple/callback; key
 "WSS Sign in with Apple 2026" id WYKKT43BGN. The ORIGINAL leaked key
 (364BWT474N, once committed to the repo) was REVOKED 2026-07-17.
+Verified working end-to-end 2026-07-17. THREE production bugs, don't regress:
+(1) APPLE_PRIVATE_KEY is stored SINGLE-LINE with \n escapes (kamal's docker
+env-file transport cannot carry multiline values AND doubles backslashes);
+the devise.rb initializer normalizes with gsub(/\\+n/, newline) — any escape
+depth. (2) /users/auth/failure must stay routed (params-based #failure action)
+or provider errors render a bare 404. (3) Apple's callback is a CROSS-SITE
+form POST: the OmniAuth setup hook sets the session cookie SameSite=None for
+the apple phases only, else the state check fails csrf_detected. Hide My Email
+creates @privaterelay.appleid.com users (expected; matching real email links
+to the existing account instead).
 
 ## 2FA (TOTP + backup codes)
 - Columns otp_secret_key + backup_codes are ENCRYPTED at rest (ActiveRecord
