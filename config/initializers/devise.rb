@@ -310,7 +310,10 @@ Devise.setup do |config|
   # Real newlines also pass through unchanged for local use.
   if ENV['APPLE_CLIENT_ID'].present? && ENV['APPLE_TEAM_ID'].present? &&
      ENV['APPLE_KEY_ID'].present? && ENV['APPLE_PRIVATE_KEY'].present?
-    apple_pem = ENV['APPLE_PRIVATE_KEY'].strip.gsub('\n', "\n")
+    # \\+n, not \n: kamal's env transport doubled the backslashes en route to
+    # the container, so collapse ANY escape depth. Backslashes never appear in
+    # a legitimate PEM, so this cannot corrupt a correctly-delivered key.
+    apple_pem = ENV['APPLE_PRIVATE_KEY'].strip.gsub(/\\+n/, "\n")
     config.omniauth :apple,
       ENV['APPLE_CLIENT_ID'],
       '',
