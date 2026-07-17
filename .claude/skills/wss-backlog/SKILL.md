@@ -14,12 +14,12 @@ Legend: **[code]** = engineering work · **[owner]** = only the owner can do it 
 
 ## Highest priority
 
-- **SMTP provider undecided — magic links break in prod until fixed. [code + owner]**
-  Magic links are the PRIMARY sign-in path (see wss-auth). `SMTP_*` secrets are blank, no outbound
-  SMTP configured — so magic-link email never sends in production. Provider not yet chosen
-  (Resend vs Postmark). Owner picks provider + creates account; then wire `SMTP_*` into
-  `~/.wss-production.env` / `.kamal/secrets` and Action Mailer prod config. This is the top blocker
-  for a real launch — nobody can sign in by magic link without it.
+- **Email cost tracking as volume grows. [owner watch + code later]** Resend went live 2026-07-17
+  (verified sending domain send.whiskeysharesociety.com, sending-scoped API key in the prod env
+  file + encrypted backup). FREE TIER = 3,000 emails/month, 100/day. Owner directive: once volume
+  approaches the free tier, analyze sending costs (Resend paid starts ~$20/mo for 50k) and track
+  the line item in the business budget. Watch volume in the Resend dashboard; event notifications
+  (launched July 2026) multiply sends per event, so member growth is the driver.
 
 ## SEO (all three absent today — verified)
 
