@@ -31,11 +31,15 @@ prod until that's done.
 - Users::OmniauthCallbacksController#handle_auth → User.from_omniauth
   (links by provider/uid, then by email if no provider set).
 
-## Apple
-Fully gated: strategy registers ONLY when all four APPLE_* env vars exist;
-tests for it skip (the 9 expected skips). History: the original Apple key was
-COMMITTED to the repo and must be treated as leaked — when the owner renews
-Apple membership, mint a new key and revoke the old.
+## Apple (LIVE in production since July 2026)
+Strategy registers ONLY when all four APPLE_* env vars exist; they are set in
+~/.wss-production.env (and the encrypted secrets backup), so prod renders the
+Apple button; dev/test stay unconfigured (the 9 Apple tests keep skipping,
+Apple forbids localhost return URLs, verify on prod). Portal facts: Team ID
+2WUB78295H; Services ID com.whiskeysharesociety.web (= APPLE_CLIENT_ID) with
+domain whiskeysharesociety.com + return URL /users/auth/apple/callback; key
+"WSS Sign in with Apple 2026" id WYKKT43BGN. The ORIGINAL leaked key
+(364BWT474N, once committed to the repo) was REVOKED 2026-07-17.
 
 ## 2FA (TOTP + backup codes)
 - Columns otp_secret_key + backup_codes are ENCRYPTED at rest (ActiveRecord

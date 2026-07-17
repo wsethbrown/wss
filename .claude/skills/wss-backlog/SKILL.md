@@ -86,9 +86,6 @@ Legend: **[code]** = engineering work · **[owner]** = only the owner can do it 
 
 - **Georgia LLC registration. [owner/legal]** Register the business with the GA Secretary of State.
   Pure legal action — blocks no code, but matters before taking real revenue.
-- **Apple sign-in key. [owner]** The previously committed Apple signing key is compromised; renew/
-  revoke it in the Apple Developer console before enabling Apple OAuth. Apple login stays gated off
-  until real `APPLE_*` creds land (see wss-auth, wss-production-launch).
 
 ## Gotchas / Traps
 
