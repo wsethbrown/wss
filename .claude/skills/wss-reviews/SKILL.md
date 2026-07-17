@@ -105,13 +105,18 @@ read before extending). Plans in `docs/superpowers/plans/2026-07-06-*` and `-07-
 "Societies" group (private societies invisible to non-members — the policy scope, not the
 view, enforces it; same scope backs `GET /reviews/search`).
 
-Three dropdown modes in `bottle_search_controller.js`:
+Four dropdown modes in `bottle_search_controller.js`:
 - **grouped** (/reviews): entity-grouped Bottles/Societies, NO add-a-bottle row — a name
   or typo must never become a catalog entry.
 - **picker** (`GET /reviews/start`, authed "Add a review"): bottle rows link to that
   bottle's review form; the "+ Add … as a new bottle" escape lives HERE (explicit intent).
 - **fill** (event pour form — hidden `bottleId` target present): rows fill the hidden
   bottle_id instead of navigating; add-new escape carries `return_to` (internal paths only).
+- **chip** (account shelf editor — fill + `submitOnSelect` + `customName` target): picking
+  a row submits the form immediately; the add-row fills `custom_name` (label via
+  `addLabel`, `%s` = query) and submits WITHOUT creating a Bottle — the shelf must never
+  become a side door into the catalog (shelf entries live in `shelf_items`, see
+  wss-societies/profile notes and SECTION_NOTES §8).
 
 ## Flavor descriptors, tags, and the palate wheel
 

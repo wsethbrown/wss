@@ -14,14 +14,21 @@ import { Controller } from "@hotwired/stimulus"
 //   event pour form. Clicking a row fills the hidden bottle_id instead of
 //   navigating; the "+ Add …" escape carries return-to so the organizer
 //   lands back on the event after cataloging.
+// - Chip mode (fill mode + submitOnSelect + a customName target), the
+//   account shelf editor. Picking a row submits the form immediately; the
+//   add-row (label from addLabel, %s = the query) fills custom_name and
+//   submits instead of navigating to /bottles/new — the shelf must never
+//   become a side door into the catalog.
 //
 // All rendering is textContent/createElement, user input never becomes HTML.
 export default class extends Controller {
-  static targets = ["input", "results", "bottleId"]
+  static targets = ["input", "results", "bottleId", "customName"]
   static values = {
     url: String,
     grouped: { type: Boolean, default: false },
-    returnTo: { type: String, default: "" }
+    returnTo: { type: String, default: "" },
+    submitOnSelect: { type: Boolean, default: false },
+    addLabel: { type: String, default: "" }
   }
 
   query() {
@@ -63,13 +70,32 @@ export default class extends Controller {
         this.resultsTarget.appendChild(this.link(match.display_name, match.review_url || match.url))
       }
     }
-    let addHref = `/bottles/new?name=${encodeURIComponent(q)}`
-    if (this.returnToValue) addHref += `&return_to=${encodeURIComponent(this.returnToValue)}`
-    const add = this.link(`+ Add "${q}" as a new bottle`, addHref)
+    const add = this.hasCustomNameTarget ? this.customNameRow(q) : this.catalogRow(q)
     add.classList.add("border-t", "border-gray-100", "font-medium", "text-whiskey-700")
     add.classList.remove("text-gray-800")
     this.resultsTarget.appendChild(add)
     this.resultsTarget.classList.remove("hidden")
+  }
+
+  catalogRow(q) {
+    let addHref = `/bottles/new?name=${encodeURIComponent(q)}`
+    if (this.returnToValue) addHref += `&return_to=${encodeURIComponent(this.returnToValue)}`
+    return this.link(`+ Add "${q}" as a new bottle`, addHref)
+  }
+
+  customNameRow(q) {
+    const label = (this.addLabelValue || `+ Add "%s"`).replace("%s", q)
+    const el = document.createElement("button")
+    el.type = "button"
+    el.textContent = label
+    el.className = "block w-full text-left px-4 py-2.5 text-gray-800 hover:bg-whiskey-50"
+    el.addEventListener("click", () => {
+      this.bottleIdTarget.value = ""
+      this.customNameTarget.value = q
+      this.resultsTarget.classList.add("hidden")
+      this.submitForm()
+    })
+    return el
   }
 
   fillRow(match) {
@@ -79,10 +105,25 @@ export default class extends Controller {
     el.className = "block w-full text-left px-4 py-2.5 text-gray-800 hover:bg-whiskey-50"
     el.addEventListener("click", () => {
       this.bottleIdTarget.value = match.id
+      if (this.hasCustomNameTarget) this.customNameTarget.value = ""
       this.inputTarget.value = match.display_name
       this.resultsTarget.classList.add("hidden")
+      if (this.submitOnSelectValue) this.submitForm()
     })
     return el
+  }
+
+  // Pressing Enter in the search box (instead of picking a row) adds the
+  // typed text as a free-text entry.
+  fillFreeTextBeforeSubmit() {
+    if (!this.hasCustomNameTarget) return
+    if (this.bottleIdTarget.value === "") {
+      this.customNameTarget.value = this.inputTarget.value.trim()
+    }
+  }
+
+  submitForm() {
+    this.inputTarget.form?.requestSubmit()
   }
 
   heading(text) {

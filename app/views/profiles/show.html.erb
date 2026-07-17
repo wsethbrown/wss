@@ -151,21 +151,25 @@
       <!-- Sidebar -->
       <div class="space-y-6">
         <!-- Whiskey Shelf -->
-        <% if @user.whiskey_shelf.present? %>
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4 flex items-center">
-              <svg class="w-5 h-5 mr-2 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
-              </svg>
-              Whiskey Shelf
-            </h2>
-            <div class="space-y-2">
-              <% @user.whiskey_shelf.split("\n").reject(&:blank?).each do |whiskey| %>
-                <div class="flex items-center p-2 bg-amber-50 rounded-lg">
-                  <svg class="w-4 h-4 text-amber-600 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m11-9h-4V3h4v4zM9 21V9a2 2 0 012-2h2a2 2 0 012 2v12"></path>
-                  </svg>
-                  <span class="text-sm text-gray-700"><%= whiskey.strip %></span>
+        <% if @shelf_items.any? %>
+          <div id="whiskey-shelf" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+            <h2 class="text-xl font-semibold text-gray-900 mb-2">Whiskey shelf</h2>
+            <div class="divide-y divide-gray-100">
+              <% @shelf_items.each do |item| %>
+                <div class="flex items-baseline justify-between gap-3 py-2.5">
+                  <% if item.bottle %>
+                    <%= link_to item.bottle.name, bottle_path(item.bottle),
+                        class: "text-sm font-medium text-gray-900 underline decoration-whiskey-400 underline-offset-4 hover:text-whiskey-700" %>
+                    <% score = @shelf_scores[item.bottle_id] %>
+                    <% if score&.avg_rating %>
+                      <span class="shrink-0 whitespace-nowrap text-xs text-gray-400">
+                        <%= score.avg_rating.to_f.round(1) %> <span class="text-whiskey-600">&#9733;</span>
+                        &middot; <%= pluralize(score.reviewers, "tasting") %>
+                      </span>
+                    <% end %>
+                  <% else %>
+                    <span class="text-sm text-gray-600"><%= item.custom_name %></span>
+                  <% end %>
                 </div>
               <% end %>
             </div>

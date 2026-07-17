@@ -60,18 +60,14 @@
                   <%= f.label :event_emails, "Email me about society events (new events, changes, reminders)", class: "text-sm text-gray-700" %>
                 </div>
 
-                <div>
-                  <%= f.label :whiskey_shelf, "My Whiskey Shelf", class: "block text-sm font-medium text-gray-700 mb-1" %>
-                  <p class="text-sm text-gray-500 mb-2">List the whiskeys you own or love (one per line)</p>
-                  <%= f.text_area :whiskey_shelf, rows: 6, class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-whiskey-500 focus:border-whiskey-500 sm:text-sm font-mono", placeholder: "Macallan 18\nGlenfiddich 21\nBlantons Single Barrel\nRedbreast 12" %>
-                </div>
-                
                 <div class="pt-4 flex gap-3">
                   <%= f.submit "Save Profile", class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-whiskey-600 hover:bg-whiskey-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-whiskey-500" %>
                   <%= link_to "See my Profile", profile_path(current_user), class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-whiskey-500", target: "_blank" %>
                 </div>
               <% end %>
             </div>
+
+            <%= render "account/shelf_editor" %>
           </div>
         </div>
 
