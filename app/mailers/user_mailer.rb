@@ -1,5 +1,5 @@
 class UserMailer < ApplicationMailer
-  default from: 'noreply@whiskeysharesociety.com'
+  default from: 'Whiskey Share Society <noreply@send.whiskeysharesociety.com>'
 
   def magic_link_email(user, token)
     @user = user
