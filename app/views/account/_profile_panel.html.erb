@@ -55,6 +55,11 @@
                   <%= f.text_area :bio, rows: 4, class: "block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-whiskey-500 focus:border-whiskey-500 sm:text-sm", placeholder: "Tell others about your whiskey journey..." %>
                 </div>
                 
+                <div class="flex items-center gap-3">
+                  <%= f.check_box :event_emails, class: "h-4 w-4 rounded border-gray-300 text-whiskey-600 focus:ring-whiskey-500" %>
+                  <%= f.label :event_emails, "Email me about society events (new events, changes, reminders)", class: "text-sm text-gray-700" %>
+                </div>
+
                 <div>
                   <%= f.label :whiskey_shelf, "My Whiskey Shelf", class: "block text-sm font-medium text-gray-700 mb-1" %>
                   <p class="text-sm text-gray-500 mb-2">List the whiskeys you own or love (one per line)</p>

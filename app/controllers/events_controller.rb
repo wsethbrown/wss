@@ -49,6 +49,9 @@ class EventsController < ApplicationController
     authorize @event
 
     if @event.save
+      # Announce to active members and schedule the 24h reminder.
+      EventNotificationJob.perform_later(@event.id, "created")
+      EventReminderJob.schedule(@event)
       redirect_to @event, notice: 'Event was successfully created.'
     else
       render :new, status: :unprocessable_entity
@@ -76,6 +79,15 @@ class EventsController < ApplicationController
     end
 
     if @event.update(updated_params)
+      # Time or location changes notify yes-RSVPs; a time change also
+      # re-schedules the 24h reminder (the old job no-ops on its stale stamp).
+      changed = []
+      changed << "time" if @event.saved_change_to_start_time? || @event.saved_change_to_end_time?
+      changed << "location" if @event.saved_change_to_location?
+      if changed.any?
+        EventNotificationJob.perform_later(@event.id, "updated", changed)
+        EventReminderJob.schedule(@event) if changed.include?("time")
+      end
       redirect_to @event, notice: 'Event was successfully updated.'
     else
       render :edit, status: :unprocessable_entity

@@ -1,0 +1,7 @@
+<%= render "layout_open" %>
+      <h2 style="margin-top:0;"><%= @event.title %> has changed</h2>
+      <p class="meta">Updated: <%= @changed_fields.join(" and ") %></p>
+      <p class="meta"><strong>When:</strong> <%= @event.start_time.strftime("%A, %B %-d at %-l:%M %p") %></p>
+      <% if @event.location.present? %><p class="meta"><strong>Where:</strong> <%= @event.location %></p><% end %>
+      <a class="btn" href="<%= society_event_url(@event.society, @event) %>">See the event</a>
+<%= render "layout_close" %>

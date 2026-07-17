@@ -1,0 +1,5 @@
+<%= @guest.full_name %> RSVP'd <%= @rsvp.status %> to <%= @event.title %> (<%= @event.start_time.strftime("%A, %B %-d") %>).
+<% if @rsvp.note.present? %>
+Their note: "<%= @rsvp.note %>"
+<% end %>
+See all RSVPs: <%= society_event_url(@event.society, @event) %>

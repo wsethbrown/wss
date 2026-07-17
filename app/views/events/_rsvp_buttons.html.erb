@@ -46,3 +46,15 @@
         class: "inline-flex items-center px-4 py-2 border-2 border-red-500 rounded-full shadow-sm text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 hover:border-red-600 transition-all" %>
   <% end %>
 </div>
+<%# A short optional note to the host, sent with the RSVP notification. Only
+    shown once the person has responded. %>
+<% if user_rsvp %>
+  <%= form_with url: event_event_rsvp_path(event, user_rsvp), method: :patch, local: true, class: "mt-3 flex items-center gap-2" do |f| %>
+    <label for="rsvp-note" class="sr-only">Note for the host</label>
+    <input type="text" name="event_rsvp[note]" id="rsvp-note" maxlength="300"
+           value="<%= user_rsvp.note %>" placeholder="Add a note for the host"
+           class="w-64 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500">
+    <%= f.submit user_rsvp.note.present? ? "Update note" : "Send note",
+        class: "cursor-pointer rounded-lg border border-whiskey-300 px-3 py-2 text-sm font-medium text-whiskey-800 hover:bg-whiskey-50" %>
+  <% end %>
+<% end %>

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_16_021159) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_17_193906) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -140,6 +140,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_16_021159) do
     t.string "status", default: "pending", null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "note"
     t.index ["event_id"], name: "index_event_rsvps_on_event_id"
     t.index ["status"], name: "index_event_rsvps_on_status"
     t.index ["user_id", "event_id"], name: "index_event_rsvps_on_user_id_and_event_id", unique: true
@@ -264,6 +265,19 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_16_021159) do
     t.index ["user_id", "bottle_id", "event_id"], name: "index_reviews_on_user_id_and_bottle_id_and_event_id", unique: true
     t.index ["user_id", "bottle_id"], name: "index_reviews_solo_uniqueness", unique: true, where: "(event_id IS NULL)"
     t.index ["user_id"], name: "index_reviews_on_user_id"
+  end
+
+  create_table "shelf_items", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "bottle_id"
+    t.string "custom_name"
+    t.integer "position", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index "user_id, lower((custom_name)::text)", name: "index_shelf_items_on_user_and_lower_custom_name", unique: true, where: "(custom_name IS NOT NULL)"
+    t.index ["bottle_id"], name: "index_shelf_items_on_bottle_id"
+    t.index ["user_id", "bottle_id"], name: "index_shelf_items_on_user_id_and_bottle_id", unique: true, where: "(bottle_id IS NOT NULL)"
+    t.index ["user_id"], name: "index_shelf_items_on_user_id"
   end
 
   create_table "societies", force: :cascade do |t|
@@ -508,6 +522,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_16_021159) do
     t.string "admin_role", default: "none", null: false
     t.boolean "founding_member", default: false, null: false
     t.datetime "founding_revoked_at"
+    t.boolean "event_emails", default: true, null: false
     t.index ["admin_role"], name: "index_users_on_admin_role"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["founding_member"], name: "index_users_on_founding_member"
@@ -544,6 +559,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_16_021159) do
   add_foreign_key "reviews", "bottles"
   add_foreign_key "reviews", "events"
   add_foreign_key "reviews", "users"
+  add_foreign_key "shelf_items", "bottles"
+  add_foreign_key "shelf_items", "users"
   add_foreign_key "societies", "users", column: "creator_id"
   add_foreign_key "society_applications", "societies"
   add_foreign_key "society_applications", "users"

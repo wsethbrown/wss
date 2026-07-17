@@ -8,11 +8,12 @@ class EventRsvpsController < ApplicationController
     # Get the status from params, default to 'yes' if not provided
     status = params[:status] || 'yes'
     
-    @rsvp = @event.event_rsvps.build(user: current_user, status: status)
+    @rsvp = @event.event_rsvps.build(user: current_user, status: status, note: params[:note].presence)
     authorize @rsvp, :create?
 
     if @rsvp.save
       log_activity(:event_rsvp, @event, { status: status })
+      notify_organizer
       @success_message = rsvp_success_message(status)
       @event.reload # Reload to get fresh RSVP data
       respond_to do |format|
@@ -31,6 +32,7 @@ class EventRsvpsController < ApplicationController
     authorize @rsvp
 
     if @rsvp.update(rsvp_params)
+      notify_organizer if @rsvp.saved_change_to_status? || @rsvp.saved_change_to_note?
       @success_message = rsvp_success_message(@rsvp.status)
       @event.reload # Reload to get fresh RSVP data
       respond_to do |format|
@@ -63,7 +65,17 @@ class EventRsvpsController < ApplicationController
   end
 
   def rsvp_params
-    params.require(:event_rsvp).permit(:status)
+    params.require(:event_rsvp).permit(:status, :note)
+  end
+
+  # The host hears about every response (with the guest's note) unless they
+  # responded to their own event or muted event emails.
+  def notify_organizer
+    organizer = @event.organizer
+    return if organizer.nil? || organizer.id == current_user.id
+    return unless organizer.event_emails?
+
+    EventMailer.rsvp_received(organizer, @rsvp).deliver_later
   end
 
   def rsvp_success_message(status)

@@ -1,0 +1,8 @@
+<%= render "layout_open" %>
+      <h2 style="margin-top:0;"><%= @society.name %> has a new tasting night</h2>
+      <p><strong><%= @event.title %></strong></p>
+      <p class="meta"><%= @event.start_time.strftime("%A, %B %-d at %-l:%M %p") %></p>
+      <% if @event.location.present? %><p class="meta"><%= @event.location %></p><% end %>
+      <% if @event.description.present? %><p><%= truncate(@event.description, length: 200) %></p><% end %>
+      <a class="btn" href="<%= society_event_url(@society, @event) %>">See the event and RSVP</a>
+<%= render "layout_close" %>

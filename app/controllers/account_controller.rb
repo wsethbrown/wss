@@ -322,7 +322,7 @@ class AccountController < ApplicationController
   end
 
   def profile_params
-    params.require(:user).permit(:first_name, :last_name, :bio, :whiskey_shelf)
+    params.require(:user).permit(:first_name, :last_name, :bio, :whiskey_shelf, :event_emails)
   end
 
   # Membership products/prices live in SubscriptionProducts (shared with the

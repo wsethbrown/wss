@@ -1,0 +1,6 @@
+<%= @event.title %> has changed (updated: <%= @changed_fields.join(" and ") %>).
+
+When: <%= @event.start_time.strftime("%A, %B %-d at %-l:%M %p") %>
+<% if @event.location.present? %>Where: <%= @event.location %>
+<% end %>
+See the event: <%= society_event_url(@event.society, @event) %>

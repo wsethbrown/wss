@@ -1,0 +1,8 @@
+<%= render "layout_open" %>
+      <h2 style="margin-top:0;"><%= @guest.full_name %> RSVP'd <%= @rsvp.status %></h2>
+      <p class="meta">For <strong><%= @event.title %></strong>, <%= @event.start_time.strftime("%A, %B %-d") %></p>
+      <% if @rsvp.note.present? %>
+        <div class="note">&ldquo;<%= @rsvp.note %>&rdquo;</div>
+      <% end %>
+      <a class="btn" href="<%= society_event_url(@event.society, @event) %>">See all RSVPs</a>
+<%= render "layout_close" %>
