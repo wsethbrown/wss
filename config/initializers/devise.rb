@@ -322,7 +322,16 @@ Devise.setup do |config|
         team_id: ENV['APPLE_TEAM_ID'],
         key_id: ENV['APPLE_KEY_ID'],
         pem: apple_pem,
-        name: 'apple'
+        name: 'apple',
+        # Apple returns its callback as a CROSS-SITE form POST. The app's
+        # default SameSite=Lax session cookie is withheld on cross-site POSTs,
+        # so the callback arrived sessionless and OmniAuth's state check failed
+        # (csrf_detected). Mark the session cookie SameSite=None (Secure) for
+        # the Apple request+callback phases only; every other response keeps
+        # the Lax default. State checking itself stays ON.
+        setup: lambda { |env|
+          env['rack.session.options'][:same_site] = :none if env['rack.session.options']
+        }
       }
   end
     
