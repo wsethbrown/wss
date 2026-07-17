@@ -1,20 +1,8 @@
-Whiskey Share Society - Verify Your Email Change
+Confirm your new email
 
-Hello <%= @user.first_name %>,
-
-We received a request to change your email address from <%= @user.email %> to <%= @new_email %>.
-
-To complete this change, please click the verification link below:
-
+You asked to change your Whiskey Share Society email to <%= @new_email %>.
+Confirm it here:
 <%= @verification_url %>
 
-IMPORTANT:
-- This link will expire in 24 hours
-- If you didn't request this change, please ignore this email
-- After verification, you'll need to sign in with your new email address
-
-If you have any questions, please contact our support team.
-
-© 2025 Whiskey Share Society. All rights reserved.
-
-This email was sent to <%= @user.email %> because a request was made to change your email address.
+If you didn't request this change, ignore this email and your address stays
+as it is.

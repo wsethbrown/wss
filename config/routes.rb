@@ -205,6 +205,9 @@ Rails.application.routes.draw do
     resource :report, only: [:create], module: :reviews
   end
 
+  # One-click RSVP from event emails (signed token carries user + event).
+  get "email_rsvps/:status", to: "email_rsvps#create", as: :email_rsvp
+
   # Health check
   get "health" => "application#health"
   get "up" => "rails/health#show", as: :rails_health_check

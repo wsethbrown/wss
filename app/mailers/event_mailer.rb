@@ -12,6 +12,7 @@ class EventMailer < ApplicationMailer
     @user = user
     @event = event
     @society = event.society
+    @rsvp_urls = rsvp_urls(user, event)
     mail(to: user.email, subject: "New tasting night: #{event.title} at #{@society.name}")
   end
 
@@ -33,6 +34,15 @@ class EventMailer < ApplicationMailer
   def event_reminder(user, event)
     @user = user
     @event = event
+    @rsvp_urls = rsvp_urls(user, event)
     mail(to: user.email, subject: "Tomorrow: #{event.title}")
+  end
+
+  private
+
+  # One-click RSVP links, tokened per recipient (see EmailRsvpsController).
+  def rsvp_urls(user, event)
+    token = EmailRsvpsController.token_for(user, event)
+    %w[yes maybe no].index_with { |s| email_rsvp_url(status: s, token: token) }
   end
 end

@@ -4,6 +4,11 @@
 <%= @event.start_time.strftime("%A, %B %-d at %-l:%M %p") %>
 <% if @event.location.present? %><%= @event.location %>
 <% end %>
-See the event and RSVP: <%= society_event_url(@society, @event) %>
+See the event: <%= society_event_url(@society, @event) %>
+
+RSVP with one click:
+  Yes:   <%= @rsvp_urls["yes"] %>
+  Maybe: <%= @rsvp_urls["maybe"] %>
+  No:    <%= @rsvp_urls["no"] %>
 
 You can turn off event emails any time in your account settings.

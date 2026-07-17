@@ -4,3 +4,8 @@ When: <%= @event.start_time.strftime("%A, %B %-d at %-l:%M %p") %>
 <% if @event.location.present? %>Where: <%= @event.location %>
 <% end %>
 See the event: <%= society_event_url(@event.society, @event) %>
+
+Change your RSVP with one click:
+  Yes:   <%= @rsvp_urls["yes"] %>
+  Maybe: <%= @rsvp_urls["maybe"] %>
+  No:    <%= @rsvp_urls["no"] %>

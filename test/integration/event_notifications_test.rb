@@ -144,3 +144,52 @@ class EventNotificationsTest < ActionDispatch::IntegrationTest
     end
   end
 end
+
+# One-click RSVP from emails: the signed token is the authorization.
+class EmailRsvpTest < ActionDispatch::IntegrationTest
+  def setup
+    @organizer = users(:john)
+    @member = users(:jane)
+    @society = Society.create!(name: "Token Club", description: "x", creator: @organizer, is_private: false)
+    SocietyMembership.create!(user: @member, society: @society, role: "member", status: "active")
+    st = 3.days.from_now
+    @event = Event.create!(society: @society, organizer: @organizer, title: "Token Night",
+                           description: "x", location: "den", start_time: st, end_time: st + 2.hours)
+  end
+
+  test "a valid token records the RSVP and notifies the host, no sign-in needed" do
+    token = EmailRsvpsController.token_for(@member, @event)
+    assert_enqueued_emails 1 do
+      get email_rsvp_path(status: "yes", token: token)
+    end
+    assert_redirected_to society_event_path(@society, @event)
+    assert_equal "yes", @event.event_rsvps.find_by(user: @member).status
+  end
+
+  test "clicking a second link updates the same RSVP" do
+    token = EmailRsvpsController.token_for(@member, @event)
+    get email_rsvp_path(status: "yes", token: token)
+    get email_rsvp_path(status: "no", token: token)
+    assert_equal "no", @event.event_rsvps.find_by(user: @member).status
+    assert_equal 1, @event.event_rsvps.where(user: @member).count
+  end
+
+  test "a tampered token is rejected safely" do
+    get email_rsvp_path(status: "yes", token: "garbage--forged")
+    assert_redirected_to root_path
+    assert_equal 0, @event.event_rsvps.count
+  end
+
+  test "an unknown status is rejected" do
+    token = EmailRsvpsController.token_for(@member, @event)
+    get email_rsvp_path(status: "yes", token: token) # valid first
+    get "/email_rsvps/definitely?token=#{token}"
+    assert_equal "yes", @event.event_rsvps.find_by(user: @member).status
+  end
+
+  test "the event emails carry tokened rsvp links" do
+    mail = EventMailer.event_created(@member, @event)
+    assert_match "/email_rsvps/yes?", mail.body.encoded
+    assert_match "/email_rsvps/no?", mail.body.encoded
+  end
+end

@@ -1,8 +1,8 @@
-<%= render "layout_open" %>
+<%= render "mailers/layout_open" %>
       <h2 style="margin-top:0;"><%= @guest.full_name %> RSVP'd <%= @rsvp.status %></h2>
       <p class="meta">For <strong><%= @event.title %></strong>, <%= @event.start_time.strftime("%A, %B %-d") %></p>
       <% if @rsvp.note.present? %>
         <div class="note">&ldquo;<%= @rsvp.note %>&rdquo;</div>
       <% end %>
       <a class="btn" href="<%= society_event_url(@event.society, @event) %>">See all RSVPs</a>
-<%= render "layout_close" %>
+<%= render "mailers/layout_close", footer_note: "You can turn off event emails any time in your account settings at whiskeysharesociety.com." %>
