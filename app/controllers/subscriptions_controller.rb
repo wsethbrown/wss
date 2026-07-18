@@ -94,6 +94,10 @@ class SubscriptionsController < ApplicationController
           quantity: 1
         } ],
         mode: "subscription",
+        # Membership coupons (owner-approved): codes are created and managed
+        # in the Stripe dashboard (Products -> Coupons -> promotion codes);
+        # this exposes the "Add promotion code" field at checkout.
+        allow_promotion_codes: true,
         success_url: account_url + "?subscription=success#subscription",
         cancel_url: account_url + "?subscription=cancelled#subscription",
         metadata: {

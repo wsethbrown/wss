@@ -3,6 +3,17 @@
 <% if @presentation.featured_image.attached? %>
   <% content_for :og_image, request.base_url + rails_blob_path(@presentation.featured_image) %>
 <% end %>
+<%# SEO: Product structured data for the deck (rides the layout's jsonld slot). %>
+<% content_for :jsonld do %>
+  <script type="application/ld+json">
+    <%= raw({ "@context" => "https://schema.org", "@type" => "Product",
+              name: @presentation.title,
+              description: @presentation.description.to_s.squish.truncate(300),
+              url: "https://whiskeysharesociety.com#{presentation_path(@presentation)}",
+              offers: { "@type" => "Offer", price: format("%.2f", @presentation.price),
+                        priceCurrency: "USD", availability: "https://schema.org/InStock" } }.to_json) %>
+  </script>
+<% end %>
 
 <%# A credit is the primary way to get a paid deck when the viewer is an active
     member holding at least one and doesn't already own it. Used by every purchase

@@ -1,1 +1,10 @@
 # See https://www.robotstxt.org/robotstxt.html for documentation on how to use the robots.txt file
+User-agent: *
+Disallow: /admin/
+Disallow: /account
+Disallow: /notifications
+Disallow: /magic_links/
+Disallow: /invitations/
+Disallow: /email_rsvps/
+
+Sitemap: https://whiskeysharesociety.com/sitemap.xml

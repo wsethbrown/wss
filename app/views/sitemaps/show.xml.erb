@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <% @static_paths.each do |path| %>
+  <url><loc><%= @host %><%= path %></loc></url>
+  <% end %>
+  <% @societies.each do |society| %>
+  <url><loc><%= @host %><%= society_path(society) %></loc><lastmod><%= society.updated_at.iso8601 %></lastmod></url>
+  <% end %>
+  <% @presentations.each do |presentation| %>
+  <url><loc><%= @host %><%= presentation_path(presentation) %></loc><lastmod><%= presentation.updated_at.iso8601 %></lastmod></url>
+  <% end %>
+  <% @bottles.each do |bottle| %>
+  <url><loc><%= @host %><%= bottle_path(bottle) %></loc><lastmod><%= bottle.updated_at.iso8601 %></lastmod></url>
+  <% end %>
+  <% @reviews.each do |review| %>
+  <url><loc><%= @host %><%= review_path(review) %></loc><lastmod><%= review.updated_at.iso8601 %></lastmod></url>
+  <% end %>
+</urlset>

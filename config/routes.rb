@@ -231,6 +231,9 @@ Rails.application.routes.draw do
   # One-click RSVP from event emails (signed token carries user + event).
   get "email_rsvps/:status", to: "email_rsvps#create", as: :email_rsvp
 
+  # SEO: the sitemap (public pages only; the veil rules hold).
+  get "sitemap.xml", to: "sitemaps#show", format: :xml
+
   # Health check
   get "health" => "application#health"
   get "up" => "rails/health#show", as: :rails_health_check

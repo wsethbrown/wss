@@ -30,36 +30,23 @@ Legend: **[code]** = engineering work · **[owner]** = only the owner can do it 
   the line item in the business budget. Watch volume in the Resend dashboard; event notifications
   (launched July 2026) multiply sends per event, so member growth is the driver.
 
-## SEO (all three absent today — verified)
+## SEO
 
-- **Sitemap.xml. [code]** No sitemap route or generator exists (`grep -rin sitemap config/ app/`
-  returns nothing). Build dynamic `/sitemap.xml`. Absolute URLs need the prod host
-  `whiskeysharesociety.com` (there is no base_url constant — see wss-community). `public/robots.txt`
-  is the stock empty Rails file today; add a `Sitemap:` line to it when the sitemap ships.
-- **Canonical tags. [code]** None in `app/views/layouts/application.html.erb` (no `canonical`).
-  Add `<link rel="canonical">` (per-page overridable, mirroring the existing `og_*` helper pattern
-  in the layout).
-- **JSON-LD structured data. [code]** No `application/ld+json` anywhere. Add structured data
-  (Organization / Product for decks).
-- **Google Search Console. [owner]** After the three above ship: verify the domain and submit the
-  sitemap. Blocked on the sitemap existing first.
+- **Google Search Console. [owner]** The sitemap (/sitemap.xml, linked from robots.txt), canonical
+  tags, and JSON-LD (Organization + deck Product) shipped July 2026. Remaining owner step: verify
+  the domain in Search Console and submit https://whiskeysharesociety.com/sitemap.xml.
 
-## Founding Member tier (owner idea July 2026, blocked on owner decisions)
+## Deck reviews (owner-approved design, awaiting the owner's go)
 
-- **[code + owner] Sketch:** a "Founding Member" status kept only while the subscription never
-  pauses/cancels. Two shapes discussed: (a) a $5/mo society-only plan (create/run societies, NO
-  monthly deck credit), and/or (b) a founding rate on the full monthly plan ($5 off, e.g. $10.99
-  vs $15.99, which matches the yearly plan's effective monthly rate, a coherent story). Losing
-  status is permanent; regular price on return.
-- **Open owner decisions before building:** Is founding a limited-time window (first N members or
-  a date)? Does the $5 tier exist AND the founding rate, or just one? Does a PAUSE lose status or
-  only cancel? (Recommend: voluntary cancel only; involuntary payment failure should not strip
-  status.) Naming/copy.
-- **Engineering notes when approved:** new Stripe Price(s) [owner creates in dashboard];
-  `grant_monthly_credit` must become plan-aware (society-only plan gets NO credit);
-  society-creation gate already keys on active subscription so the $5 plan passes it; webhook
-  handling flags founding status on pause/cancel events. See wss-membership-model +
-  wss-payments-credits before touching any of this.
+- **[code] Part A — events carry their deck + host.** Event creation gets a deck select (decks
+  owned by the society owner OR the event host) and the host field ON THE FORM: member
+  autocomplete with profile link, free-text `host_name` fallback for guest presenters. The member
+  half already shipped (`events.host_id`, see wss-societies) — EXTEND it, don't parallel-build.
+- **[code] Part B — PresentationReview.** Star rating (half-steps) + short text on deck pages.
+  Eligibility (owner rule): reviewer purchased the deck OR attended an event that ran it
+  (RSVP yes). This ties societies to the marketplace.
+- Related: wss-reviews "Phase 3" ties (deck names on provenance cards, review badges on deck
+  pages, search by chapter).
 
 ## Society review board
 
@@ -86,11 +73,6 @@ Legend: **[code]** = engineering work · **[owner]** = only the owner can do it 
 
 - **Real deck uploads. [owner]** The catalog still holds demo/dev decks. Owner must import real
   decks via the admin import flow (see wss-deck-pipeline) before any marketing push.
-
-## Owner / legal (blocks nothing technical)
-
-- **Georgia LLC registration. [owner/legal]** Register the business with the GA Secretary of State.
-  Pure legal action — blocks no code, but matters before taking real revenue.
 
 ## Gotchas / Traps
 

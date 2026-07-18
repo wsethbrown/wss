@@ -28,6 +28,18 @@
     <meta property="og:url" content="<%= request.original_url %>">
     <meta name="twitter:card" content="summary_large_image">
 
+    <%# SEO: canonical always points at the prod host, path only (no query
+        strings); pages override with content_for :canonical. %>
+    <link rel="canonical" href="<%= content_for(:canonical).presence || "https://whiskeysharesociety.com#{request.path}" %>">
+    <%# JSON-LD: Organization on every page; pages add their own (e.g. the
+        deck Product schema) via content_for :jsonld. %>
+    <script type="application/ld+json">
+      <%= raw({ "@context" => "https://schema.org", "@type" => "Organization",
+                name: "Whiskey Share Society", url: "https://whiskeysharesociety.com",
+                logo: "https://whiskeysharesociety.com/icon.png" }.to_json) %>
+    </script>
+    <%= content_for(:jsonld) %>
+
     <link rel="icon" href="/icon.png" type="image/png">
     <link rel="icon" href="/icon.svg" type="image/svg+xml">
     <link rel="apple-touch-icon" href="/icon.png">
