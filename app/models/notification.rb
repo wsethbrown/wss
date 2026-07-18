@@ -27,7 +27,7 @@ class Notification < ApplicationRecord
       create!(attrs)
     end
   rescue ActiveRecord::RecordInvalid, ActiveRecord::RecordNotUnique => e
-    Rails.logger.error "Notification skipped (#{action}): #{e.message}"
+    Rails.logger.error "Notification skipped (#{action}) for user #{user.id}, actor #{actor&.id}, #{notifiable ? "#{notifiable.class.name}##{notifiable.id}" : 'no notifiable'}: #{e.message}"
     nil
   end
 

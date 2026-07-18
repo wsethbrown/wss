@@ -15,6 +15,7 @@ class FavoritesController < ApplicationController
       end
       swap_button_or_redirect favoritable
     else
+      Rails.logger.warn "Favorite of #{favoritable.class.name}##{favoritable.id} by user #{current_user.id} failed to save: #{favorite.errors.full_messages.to_sentence}"
       redirect_back_or_to favoritable, alert: favorite.errors.full_messages.to_sentence
     end
   end

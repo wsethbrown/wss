@@ -12,15 +12,18 @@ class SocietyInvitationsController < ApplicationController
     email = params[:email].to_s.strip.downcase
     invitee = User.find_by(email: email)
     if invitee.nil?
+      Rails.logger.info "Society #{society.id} invitation by user #{current_user.id}: no account for the entered email"
       return redirect_to society, alert: "No account uses #{email}. Share the society's invite link instead; it works for anyone."
     end
 
     invitation = SocietyInvitation.new(society: society, user: invitee, invited_by: current_user)
     if invitation.save
+      Rails.logger.info "Society invitation #{invitation.id} created: user #{invitee.id} invited to society #{society.id} by user #{current_user.id}"
       Notification.notify!(user: invitee, actor: current_user, notifiable: invitation, action: "society_invite")
       SocietyMailer.invitation(invitation).deliver_later
       redirect_to society, notice: "Invitation sent to #{invitee.full_name}."
     else
+      Rails.logger.info "Society #{society.id} invitation of user #{invitee.id} refused: #{invitation.errors.full_messages.to_sentence}"
       redirect_to society, alert: invitation.errors.full_messages.to_sentence
     end
   end

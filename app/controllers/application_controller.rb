@@ -30,17 +30,22 @@ class ApplicationController < ActionController::Base
 
     token = session.delete(:pending_invite_token)
     society = Society.find_by(invite_token: token)
-    return unless society
+    unless society
+      # Token was regenerated or the society is gone; the invite dies here.
+      Rails.logger.warn "Pending invite for user #{current_user.id} dropped: no society matches the stored token"
+      return
+    end
 
     if society.has_member?(current_user)
       return
     end
 
     society.society_memberships.create!(user: current_user, role: :member, status: :active)
+    Rails.logger.info "Pending invite consumed: user #{current_user.id} joined society #{society.id} via invite link"
     log_activity(:society_joined, society)
     redirect_to society_path(society), notice: "Welcome to #{society.name}!"
   rescue ActiveRecord::RecordInvalid => e
-    Rails.logger.error "Pending invite failed: #{e.message}"
+    Rails.logger.error "Pending invite failed for user #{current_user.id}, society #{society&.id}: #{e.message}"
   end
 
   def set_timezone

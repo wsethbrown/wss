@@ -10,36 +10,48 @@ class EventNotificationJob < ApplicationJob
 
   def perform(event_id, kind, changed_fields = [])
     event = Event.find_by(id: event_id)
-    return unless event
+    unless event
+      Rails.logger.info "EventNotificationJob: event #{event_id} no longer exists; skipping"
+      return
+    end
 
     case kind.to_s
     when "created"
       members = event.society.society_memberships.where(status: "active").includes(:user).map(&:user)
       # In-app notifications go to every member; the event_emails mute only
       # silences EMAIL, the bell still rings.
+      belled = 0
       members.uniq.each do |user|
         next if user.id == event.organizer_id
 
-        Notification.notify!(user: user, actor: event.organizer, notifiable: event, action: "event_created")
+        belled += 1 if Notification.notify!(user: user, actor: event.organizer, notifiable: event, action: "event_created")
       end
-      recipients(members, event) do |user|
+      emailed = recipients(members, event) do |user|
         EventMailer.event_created(user, event).deliver_later
       end
+      Rails.logger.info "EventNotificationJob: event #{event.id} created: notified #{belled} members in-app, emailed #{emailed} (rest muted)"
     when "updated"
-      recipients(event.event_rsvps.where(status: "yes").includes(:user).map(&:user), event) do |user|
+      yes_users = event.event_rsvps.where(status: "yes").includes(:user).map(&:user)
+      emailed = recipients(yes_users, event) do |user|
         EventMailer.event_updated(user, event, changed_fields).deliver_later
       end
+      Rails.logger.info "EventNotificationJob: event #{event.id} updated (#{changed_fields.join(', ')}): emailed #{emailed} of #{yes_users.uniq.size} yes-RSVPs"
     end
   end
 
   private
 
+  # Yields each eligible recipient; returns how many were yielded so the
+  # caller can log the fan-out.
   def recipients(users, event)
+    count = 0
     users.uniq.each do |user|
       next if user.id == event.organizer_id
       next unless user.event_emails?
 
+      count += 1
       yield user
     end
+    count
   end
 end

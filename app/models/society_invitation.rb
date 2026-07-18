@@ -28,12 +28,14 @@ class SocietyInvitation < ApplicationRecord
       membership.status = "active"
       membership.save!
     end
+    Rails.logger.info "Society invitation #{id} accepted: user #{user_id} is now an active member of society #{society_id}"
     Notification.notify!(user: invited_by, actor: user, notifiable: self, action: "invite_accepted")
     SocietyMailer.invitation_response(self).deliver_later
   end
 
   def decline!
     update!(status: "declined", responded_at: Time.current)
+    Rails.logger.info "Society invitation #{id} declined by user #{user_id} (society #{society_id})"
     Notification.notify!(user: invited_by, actor: user, notifiable: self, action: "invite_declined")
     SocietyMailer.invitation_response(self).deliver_later
   end

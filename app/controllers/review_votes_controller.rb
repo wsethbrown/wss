@@ -5,7 +5,10 @@ class ReviewVotesController < ApplicationController
     review = Review.find(params[:review_id])
     vote = current_user.review_votes.find_or_initialize_by(review: review)
     fresh_vote = !vote.persisted?
-    vote.persisted? || vote.save
+    unless vote.persisted? || vote.save
+      # The button re-renders unchanged on failure; this line is the only trace.
+      Rails.logger.warn "Review vote by user #{current_user.id} on review #{review.id} failed to save: #{vote.errors.full_messages.to_sentence}"
+    end
     if fresh_vote && vote.persisted?
       Notification.notify!(user: review.user, actor: current_user, notifiable: review, action: "review_vote")
     end
