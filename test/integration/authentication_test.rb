@@ -104,7 +104,9 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h2", "Join the Society"
-    assert_select "button", "Sign Up"
+    # The password path hides behind one toggle; the old Sign In / Sign Up
+    # tabs are gone (email-first branching, owner-requested July 2026).
+    assert_select "button", "Use a password instead"
     # OAuth controls are POST forms (CSRF-protected), not links. Apple only
     # renders when configured, so it is asserted in its own dedicated test.
     assert_select "form[action*='/users/auth/google_oauth2'] button", /Continue with Google/

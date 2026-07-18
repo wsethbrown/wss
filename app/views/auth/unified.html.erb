@@ -72,7 +72,9 @@
         <% end %>
       </div>
 
-      <!-- Password path, hidden until asked for -->
+      <!-- Password path, hidden until asked for. It reuses the email typed
+           above: one lookup decides whether to ask for a password (existing
+           account) or a name + password (new account). No second email box. -->
       <div class="text-center">
         <button type="button" id="password-toggle" onclick="togglePasswordForms()"
                 class="text-sm text-gray-500 hover:text-whiskey-700 underline underline-offset-2 cursor-pointer">
@@ -80,32 +82,18 @@
         </button>
       </div>
 
-      <div id="password-forms" class="hidden space-y-6">
-        <!-- Mode Toggle -->
-        <div class="relative flex bg-gray-100 rounded-xl p-1 overflow-hidden">
-          <div class="absolute top-1 bottom-1 w-1/2 bg-whiskey-600 rounded-lg shadow-sm transition-transform duration-300 ease-in-out" style="transform: translateX(100%);" id="slider"></div>
-          <button type="button" class="relative z-10 flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-colors duration-300" style="color: #374151;" id="signin-tab">
-            Sign In
-          </button>
-          <button type="button" class="relative z-10 flex-1 py-2 px-4 text-sm font-medium rounded-lg transition-colors duration-300" style="color: white;" id="signup-tab">
-            Sign Up
-          </button>
-        </div>
+      <div id="password-forms" class="hidden space-y-5">
+        <p id="password-context" class="text-center text-sm text-gray-500"></p>
 
-        <!-- Sign In Form -->
-        <div id="signin-form" class="hidden transform transition-all duration-500 ease-in-out opacity-0 translate-x-4">
+        <!-- Existing account: just the password -->
+        <div id="password-signin" class="hidden">
           <%= form_for(User.new, as: :user, url: user_session_path,
               html: { class: "space-y-5" }) do |f| %>
+            <%= f.hidden_field :email, id: "signin-email" %>
             <div>
-              <%= f.label :email, class: "block text-sm font-medium text-gray-700 mb-2" %>
-              <%= f.email_field :email, autocomplete: "email",
-                  class: "appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-whiskey-500 focus:border-whiskey-500 sm:text-sm",
-                  placeholder: "Enter your email" %>
-            </div>
-            <div>
-              <%= f.label :password, class: "block text-sm font-medium text-gray-700 mb-2" %>
-              <%= f.password_field :password, autocomplete: "current-password",
-                  class: "appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-whiskey-500 focus:border-whiskey-500 sm:text-sm",
+              <%= f.label :password, class: "sr-only" %>
+              <%= f.password_field :password, autocomplete: "current-password", id: "signin-password",
+                  class: "appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 text-center rounded-xl focus:outline-none focus:ring-2 focus:ring-whiskey-500 focus:border-whiskey-500 sm:text-sm",
                   placeholder: "Enter your password" %>
             </div>
             <div class="flex items-center justify-between">
@@ -123,10 +111,11 @@
           <% end %>
         </div>
 
-        <!-- Sign Up Form -->
-        <div id="signup-form" class="transform transition-all duration-500 ease-in-out opacity-100 translate-x-0">
+        <!-- New account: name + password -->
+        <div id="password-signup" class="hidden">
           <%= form_for(User.new, as: :user, url: user_registration_path,
               html: { class: "space-y-5" }) do |f| %>
+            <%= f.hidden_field :email, id: "signup-email" %>
             <div class="grid grid-cols-2 gap-3">
               <div>
                 <%= f.label :first_name, class: "block text-sm font-medium text-gray-700 mb-2" %>
@@ -140,12 +129,6 @@
                     class: "appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-whiskey-500 focus:border-whiskey-500 sm:text-sm",
                     placeholder: "Last name" %>
               </div>
-            </div>
-            <div>
-              <%= f.label :email, class: "block text-sm font-medium text-gray-700 mb-2" %>
-              <%= f.email_field :email, autocomplete: "email",
-                  class: "appearance-none relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-xl focus:outline-none focus:ring-2 focus:ring-whiskey-500 focus:border-whiskey-500 sm:text-sm",
-                  placeholder: "Enter your email" %>
             </div>
             <div>
               <%= f.label :password, class: "block text-sm font-medium text-gray-700 mb-2" %>
@@ -178,79 +161,83 @@
 </div>
 
 <script>
-function togglePasswordForms() {
+// The password path branches on one email lookup: existing account shows a
+// password box, unknown email shows the name + password signup. The email
+// comes from the magic-link field above; it is never asked for twice.
+async function togglePasswordForms() {
   const forms = document.getElementById('password-forms');
   const toggle = document.getElementById('password-toggle');
-  if (!forms) return;
-  const showing = !forms.classList.contains('hidden');
-  forms.classList.toggle('hidden');
-  if (toggle) toggle.textContent = showing ? 'Use a password instead' : 'Hide password sign-in';
+  const emailInput = document.getElementById('magic-link-email');
+  if (!forms || !emailInput) return;
+
+  if (!forms.classList.contains('hidden')) {
+    forms.classList.add('hidden');
+    if (toggle) toggle.textContent = 'Use a password instead';
+    return;
+  }
+
+  const email = emailInput.value.trim();
+  if (!email || !emailInput.checkValidity()) {
+    emailInput.focus();
+    if (emailInput.reportValidity) emailInput.reportValidity();
+    return;
+  }
+
+  await revealPasswordForm(email);
+  if (toggle) toggle.textContent = 'Hide password sign-in';
 }
 
-function initializeAuthTabs() {
-  const signupTab = document.getElementById('signup-tab');
-  const signinTab = document.getElementById('signin-tab');
-  const signupForm = document.getElementById('signup-form');
-  const signinForm = document.getElementById('signin-form');
-  const slider = document.getElementById('slider');
-
-  if (!signupTab || !signinTab || !signupForm || !signinForm || !slider) {
-    return; // Elements not found, exit
+async function revealPasswordForm(email) {
+  const forms = document.getElementById('password-forms');
+  const context = document.getElementById('password-context');
+  const signin = document.getElementById('password-signin');
+  const signup = document.getElementById('password-signup');
+  let exists = false;
+  try {
+    const response = await fetch('/auth/email_check', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-Token': document.querySelector('meta[name="csrf-token"]')?.content || ''
+      },
+      body: JSON.stringify({ email: email })
+    });
+    exists = (await response.json()).exists;
+  } catch (e) {
+    if (context) context.textContent = 'Something went wrong checking that email. Try the magic link instead.';
+    forms.classList.remove('hidden');
+    signin.classList.add('hidden');
+    signup.classList.add('hidden');
+    return;
   }
 
-  function showSignup() {
-    slider.style.transform = 'translateX(100%)';
-    signupTab.style.color = 'white';
-    signinTab.style.color = '#374151';
-    animateFormTransition('signup');
+  document.getElementById('signin-email').value = email;
+  document.getElementById('signup-email').value = email;
+  if (context) {
+    context.textContent = exists ? ('Signing in as ' + email) : ('Creating an account for ' + email);
   }
-
-  function showSignin() {
-    slider.style.transform = 'translateX(0%)';
-    signinTab.style.color = 'white';
-    signupTab.style.color = '#374151';
-    animateFormTransition('signin');
-  }
-
-  function animateFormTransition(targetForm) {
-    if (targetForm === 'signin') {
-      signupForm.classList.add('opacity-0', 'translate-x-4');
-      signupForm.classList.remove('opacity-100', 'translate-x-0');
-      setTimeout(() => {
-        signupForm.classList.add('hidden');
-        signinForm.classList.remove('hidden');
-        requestAnimationFrame(() => {
-          signinForm.classList.remove('opacity-0', 'translate-x-4');
-          signinForm.classList.add('opacity-100', 'translate-x-0');
-        });
-      }, 250);
-    } else {
-      signinForm.classList.add('opacity-0', 'translate-x-4');
-      signinForm.classList.remove('opacity-100', 'translate-x-0');
-      setTimeout(() => {
-        signinForm.classList.add('hidden');
-        signupForm.classList.remove('hidden');
-        requestAnimationFrame(() => {
-          signupForm.classList.remove('opacity-0', 'translate-x-4');
-          signupForm.classList.add('opacity-100', 'translate-x-0');
-        });
-      }, 250);
-    }
-  }
-
-  signupTab.removeEventListener('click', showSignup);
-  signinTab.removeEventListener('click', showSignin);
-  signupTab.addEventListener('click', showSignup);
-  signinTab.addEventListener('click', showSignin);
-
-  // Initialize to signup by default
-  showSignup();
+  signin.classList.toggle('hidden', !exists);
+  signup.classList.toggle('hidden', exists);
+  forms.classList.remove('hidden');
+  const focusTarget = exists
+    ? document.getElementById('signin-password')
+    : signup.querySelector('input[name="user[first_name]"]');
+  if (focusTarget) focusTarget.focus();
 }
 
-// Initialize on DOM ready
-document.addEventListener('DOMContentLoaded', initializeAuthTabs);
-
-// Initialize on Turbo visits (for navigation)
-document.addEventListener('turbo:visit', initializeAuthTabs);
-document.addEventListener('turbo:render', initializeAuthTabs);
+// Editing the email while the password panel is open re-runs the branch.
+document.addEventListener('DOMContentLoaded', function () {
+  const emailInput = document.getElementById('magic-link-email');
+  if (!emailInput) return;
+  let debounce;
+  emailInput.addEventListener('input', function () {
+    const forms = document.getElementById('password-forms');
+    if (!forms || forms.classList.contains('hidden')) return;
+    clearTimeout(debounce);
+    debounce = setTimeout(function () {
+      const email = emailInput.value.trim();
+      if (email && emailInput.checkValidity()) revealPasswordForm(email);
+    }, 400);
+  });
+});
 </script>

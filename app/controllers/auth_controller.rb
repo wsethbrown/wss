@@ -5,6 +5,17 @@ class AuthController < ApplicationController
     redirect_to root_path if user_signed_in?
   end
 
+  # The password path asks for the email first (it reuses the magic-link
+  # field), then branches: existing account -> password box, new account ->
+  # name + password. This endpoint answers "does this email have an account?"
+  # for that branch. Membership disclosure is accepted for this product; the
+  # magic-link flow is the primary path either way.
+  def email_check
+    email = params[:email].to_s.strip.downcase
+    exists = email.match?(URI::MailTo::EMAIL_REGEXP) && User.exists?(email: email)
+    render json: { exists: exists }
+  end
+
   def sign_in
     user = User.find_by(email: params[:user][:email])
     

@@ -23,6 +23,7 @@ Rails.application.routes.draw do
 
   # Unified authentication page
   get "auth", to: "auth#unified"
+  post "auth/email_check", to: "auth#email_check"
   
   # Magic Links
   post "magic_links", to: "magic_links#create"
