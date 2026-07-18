@@ -72,19 +72,19 @@
         <!-- Location -->
         <div>
           <%= form.label :location, class: "block text-sm font-medium text-gray-700 mb-2" %>
-          <%= form.text_field :location,
+          <%= form.text_field :location, data: { controller: "location-autocomplete" },
               class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
               placeholder: "e.g., The Whiskey Bar, 123 Main St, or Virtual (Zoom)" %>
           <p class="mt-1 text-sm text-gray-500">Where will your event take place? Include address or virtual meeting details.</p>
         </div>
 
-        <!-- Date and Time -->
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+        <!-- Date and Time (flatpickr; end auto-fills to start + 3 hours) -->
+        <div class="grid grid-cols-1 gap-6 md:grid-cols-2" data-controller="event-times">
           <div>
             <%= form.label :start_time, class: "block text-sm font-medium text-gray-700 mb-2" do %>
               Start date &amp; time <span class="text-whiskey-600">*</span>
             <% end %>
-            <%= form.datetime_local_field :start_time,
+            <%= form.datetime_local_field :start_time, data: { event_times_target: "start" },
                 class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
             <p class="mt-1 text-sm text-gray-500">When does the event begin?</p>
           </div>
@@ -93,9 +93,9 @@
             <%= form.label :end_time, class: "block text-sm font-medium text-gray-700 mb-2" do %>
               End date &amp; time <span class="text-whiskey-600">*</span>
             <% end %>
-            <%= form.datetime_local_field :end_time,
+            <%= form.datetime_local_field :end_time, data: { event_times_target: "end" },
                 class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
-            <p class="mt-1 text-sm text-gray-500">When does the event end?</p>
+            <p class="mt-1 text-sm text-gray-500">Fills in three hours after the start; adjust if the night runs long.</p>
           </div>
         </div>
 

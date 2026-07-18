@@ -43,9 +43,20 @@ class ApplicationController < ActionController::Base
     society.society_memberships.create!(user: current_user, role: :member, status: :active)
     Rails.logger.info "Pending invite consumed: user #{current_user.id} joined society #{society.id} via invite link"
     log_activity(:society_joined, society)
+    notify_society_admins_of_join(society, current_user)
     redirect_to society_path(society), notice: "Welcome to #{society.name}!"
   rescue ActiveRecord::RecordInvalid => e
     Rails.logger.error "Pending invite failed for user #{current_user.id}, society #{society&.id}: #{e.message}"
+  end
+
+  # Invite-link joins ring the admins' bells (owner rule: routine public
+  # join/leave churn stays OFF the bell; it lands on the society Activity
+  # page instead).
+  def notify_society_admins_of_join(society, joiner)
+    admins = [society.creator] + society.society_memberships.where(role: "admin", status: "active").includes(:user).map(&:user)
+    admins.uniq.each do |admin|
+      Notification.notify!(user: admin, actor: joiner, notifiable: society, action: "member_joined")
+    end
   end
 
   def set_timezone

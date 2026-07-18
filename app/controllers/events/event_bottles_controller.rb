@@ -5,7 +5,7 @@ class Events::EventBottlesController < ApplicationController
   before_action :set_event
 
   def create
-    authorize @event, :update?
+    authorize @event, :manage_pours?
     bottle = Bottle.find_by(id: params.dig(:event_bottle, :bottle_id))
     if bottle.nil?
       redirect_to event_page, alert: "Pick a bottle from the search results first."
@@ -26,7 +26,7 @@ class Events::EventBottlesController < ApplicationController
   end
 
   def destroy
-    authorize @event, :update?
+    authorize @event, :manage_pours?
     pour = @event.event_bottles.find(params[:id])
 
     if pour.destroy

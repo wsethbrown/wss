@@ -64,6 +64,10 @@
               <span class="eyebrow rounded-full border border-whiskey-500/40 bg-whiskey-500/10 px-4 py-2 text-whiskey-200">
                 <%= membership.admin? ? 'Society admin' : (membership.officer? ? 'Officer' : 'Member') %>
               </span>
+              <% if policy(@society).manage_members? %>
+                <%= link_to "Activity", activity_society_path(@society),
+                    class: "inline-flex items-center rounded-xl border border-cream/25 px-5 py-2.5 text-sm font-semibold text-cream/90 transition hover:border-cream/50 hover:text-cream" %>
+              <% end %>
               <% if policy(@society).edit? %>
                 <%= link_to "Edit society", edit_society_path(@society),
                     class: "inline-flex items-center rounded-xl border border-cream/25 px-5 py-2.5 text-sm font-semibold text-cream/90 transition hover:border-cream/50 hover:text-cream" %>

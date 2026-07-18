@@ -1,0 +1,15 @@
+<%# Toast cards; the layout's fixed container positions them (overlay, no
+    layout shift). Auto-dismiss + manual close via flash_controller. %>
+<% { notice: notice, alert: alert }.each do |kind, message| %>
+  <% next if message.blank? %>
+  <div class="<%= kind == :notice ? "flash-notice border-green-200 bg-green-50 text-green-800" : "flash-alert border-red-200 bg-red-50 text-red-800" %> toast-in pointer-events-auto flex w-full max-w-md items-start gap-3 rounded-xl border px-4 py-3 shadow-lg"
+       data-controller="flash" role="status">
+    <p class="flex-1 text-sm font-medium"><%= message %></p>
+    <button type="button" data-action="flash#dismiss" aria-label="Dismiss"
+            class="-mr-1 cursor-pointer rounded p-0.5 opacity-50 transition hover:opacity-100">
+      <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path>
+      </svg>
+    </button>
+  </div>
+<% end %>

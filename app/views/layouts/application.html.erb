@@ -40,6 +40,16 @@
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
     <%= stylesheet_link_tag "application", "data-turbo-track": "reload" %>
+    <%# Vendored locally (with the whiskey theme appended); no CDN. %>
+    <%= stylesheet_link_tag "flatpickr", "data-turbo-track": "reload" %>
+    <%# Places autocomplete on location fields; the key is referrer-restricted
+        to this site, which is what makes a browser key safe to embed.
+        Kill switch (owner rule: off at the $10 budget alert): set
+        MAPS_AUTOCOMPLETE=off in the prod env and deploy; every location
+        field degrades to a plain text input. %>
+    <% if ENV["GOOGLE_MAPS_API_KEY"].present? && ENV["MAPS_AUTOCOMPLETE"] != "off" %>
+      <meta name="google-maps-key" content="<%= ENV["GOOGLE_MAPS_API_KEY"] %>">
+    <% end %>
     <%= javascript_importmap_tags %>
 
     <!-- Detect and store user's timezone -->
@@ -164,21 +174,14 @@
       </div>
     </nav>
 
-    <!-- Flash Messages -->
-    <% if notice || alert %>
-      <div class="max-w-2xl mx-auto pt-20 px-4">
-        <% if notice %>
-          <div class="flash-notice mb-4 rounded-lg bg-green-50 border border-green-200 text-green-800 px-4 py-3 text-center shadow">
-            <%= notice %>
-          </div>
-        <% end %>
-        <% if alert %>
-          <div class="flash-alert mb-4 rounded-lg bg-red-50 border border-red-200 text-red-800 px-4 py-3 text-center shadow">
-            <%= alert %>
-          </div>
-        <% end %>
+    <!-- Flash toasts: a fixed overlay under the nav; never pushes content.
+         #flash-messages is the turbo_stream.update target (never replace,
+         that would delete the target for the next stream). -->
+    <div class="pointer-events-none fixed inset-x-0 top-20 z-[70] flex flex-col items-center px-4">
+      <div id="flash-messages" class="flex w-full flex-col items-center gap-2">
+        <%= render "shared/flash_messages" %>
       </div>
-    <% end %>
+    </div>
 
     <!-- Main Content. Pages that open with a full-bleed char masthead manage
          their own width and top padding; everything else gets the standard
@@ -197,7 +200,7 @@
         <%= yield %>
       </main>
     <% else %>
-      <main class="max-w-6xl mx-auto px-4 min-h-[80vh] <%= 'pt-20' unless notice || alert %>">
+      <main class="max-w-6xl mx-auto px-4 min-h-[80vh] pt-20">
         <%= yield %>
       </main>
     <% end %>

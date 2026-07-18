@@ -118,6 +118,7 @@ class SocietiesController < ApplicationController
 
     if membership&.destroy
       log_activity(:society_left, @society)
+      SocietyActivity.record!(society: @society, user: current_user, action: "left")
       redirect_to societies_path, notice: 'Successfully left the society.'
     else
       redirect_to @society, alert: 'Unable to leave the society.'
@@ -152,7 +153,16 @@ class SocietiesController < ApplicationController
     society.society_memberships.create!(user: current_user, role: :member, status: :active)
     Rails.logger.info "Invite link join: user #{current_user.id} joined society #{society.id}"
     log_activity(:society_joined, society)
+    notify_society_admins_of_join(society, current_user)
     redirect_to society, notice: "Welcome to #{society.name}!"
+  end
+
+  # Managers' member ledger: joins, leaves, removals, role changes, invites.
+  def activity
+    society = Society.find(params[:id])
+    authorize society, :manage_members?
+    @society = society
+    @activities = society.society_activities.recent.includes(:user, :actor).limit(200)
   end
 
   def regenerate_invite

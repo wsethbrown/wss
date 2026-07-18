@@ -8,6 +8,8 @@ class Society < ApplicationRecord
   # Associations
   has_many :society_memberships, dependent: :destroy
   has_many :society_invitations, dependent: :destroy
+  has_many :society_activities, dependent: :destroy
+  has_many :society_activities, dependent: :destroy
 
   # The review board relation: bottles ranked by THIS society's event reviews,
   # latest-per-member (owner-pinned math, see wss-reviews). Shared by the

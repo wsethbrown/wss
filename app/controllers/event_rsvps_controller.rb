@@ -23,7 +23,7 @@ class EventRsvpsController < ApplicationController
     else
       respond_to do |format|
         format.html { redirect_to @event, alert: 'Unable to RSVP to the event.' }
-        format.turbo_stream { render turbo_stream: turbo_stream.replace("flash-messages", partial: "shared/flash_messages") }
+        format.turbo_stream { render turbo_stream: turbo_stream.update("flash-messages", partial: "shared/flash_messages") }
       end
     end
   end
@@ -42,7 +42,7 @@ class EventRsvpsController < ApplicationController
     else
       respond_to do |format|
         format.html { redirect_to @event, alert: 'Unable to update RSVP.' }
-        format.turbo_stream { render turbo_stream: turbo_stream.replace("flash-messages", partial: "shared/flash_messages") }
+        format.turbo_stream { render turbo_stream: turbo_stream.update("flash-messages", partial: "shared/flash_messages") }
       end
     end
   end

@@ -82,6 +82,8 @@ Rails.application.routes.draw do
       post :join
       post :regenerate_invite
       delete :leave
+      # The managers-only member ledger (joins/leaves/roles/invites).
+      get :activity
     end
     
     # Events are now nested under societies

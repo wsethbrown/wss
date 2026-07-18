@@ -13,6 +13,8 @@ class SocietyMembershipsController < ApplicationController
     end
 
     @membership.update!(role: new_role)
+    SocietyActivity.record!(society: @membership.society, user: @membership.user, actor: current_user,
+                            action: "role_changed", detail: "now #{new_role == 'officer' ? 'an officer' : 'a member'}")
     redirect_to @membership.society, notice: "#{@membership.user.full_name} is now #{new_role == 'officer' ? 'an officer' : 'a member'}."
   end
 
@@ -24,6 +26,7 @@ class SocietyMembershipsController < ApplicationController
     end
 
     @membership.destroy
+    SocietyActivity.record!(society: @membership.society, user: @membership.user, actor: current_user, action: "removed")
     redirect_to @membership.society, notice: "#{@membership.user.full_name} was removed from the society."
   end
 

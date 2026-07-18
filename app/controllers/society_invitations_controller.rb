@@ -20,6 +20,7 @@ class SocietyInvitationsController < ApplicationController
     if invitation.save
       Rails.logger.info "Society invitation #{invitation.id} created: user #{invitee.id} invited to society #{society.id} by user #{current_user.id}"
       Notification.notify!(user: invitee, actor: current_user, notifiable: invitation, action: "society_invite")
+      SocietyActivity.record!(society: society, user: invitee, actor: current_user, action: "invite_sent")
       SocietyMailer.invitation(invitation).deliver_later
       redirect_to society, notice: "Invitation sent to #{invitee.full_name}."
     else

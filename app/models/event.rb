@@ -123,8 +123,10 @@ class Event < ApplicationRecord
     !pours_hidden_until_complete? || (end_time.present? && end_time <= Time.current)
   end
 
+  # The host sees hidden pours too: they set the list, so the secret toggle
+  # cannot blind them (review gating still keys on pours_revealed? alone).
   def pours_visible_to?(user)
-    pours_revealed? || managed_by?(user)
+    pours_revealed? || managed_by?(user) || (user && host_id == user.id)
   end
 
   # Table talk stays open until a week after the night ends.

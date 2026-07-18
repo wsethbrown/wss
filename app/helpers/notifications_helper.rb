@@ -22,6 +22,9 @@ module NotificationsHelper
     when "invite_declined"
       return unless actor && target
       "#{actor} declined your invitation to #{target.society.name}"
+    when "member_joined"
+      return unless actor && target
+      "#{actor} joined #{target.name} from an invite link"
     end
   end
 
@@ -36,6 +39,8 @@ module NotificationsHelper
       society_event_path(target.society, target) if target
     when "invite_accepted", "invite_declined"
       society_path(target.society) if target
+    when "member_joined"
+      society_path(target) if target
     end
   end
 end

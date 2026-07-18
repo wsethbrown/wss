@@ -1,0 +1,54 @@
+<% content_for :title, "Activity - #{@society.name} - Whiskey Share Society" %>
+<%# The managers-only member ledger: every join, leave, removal, role change,
+    and invitation event, quiet and chronological. Bell notifications only
+    ring for invitation flows and invite-link joins; the churn lives here. %>
+<div class="mx-auto max-w-2xl px-4 pt-8 pb-16">
+  <div class="mb-8 text-center">
+    <p class="eyebrow mb-3 text-whiskey-600">Member activity</p>
+    <h1 class="font-display text-4xl font-semibold leading-tight text-gray-900"><%= @society.name %></h1>
+    <div class="rule-double mx-auto mt-6 w-20 text-whiskey-800"></div>
+    <p class="mx-auto mt-6 max-w-xl text-gray-600">Joins, departures, role changes, and invitations. Only society managers see this page.</p>
+  </div>
+
+  <% if @activities.empty? %>
+    <p class="text-center text-gray-500">Nothing yet. Member comings and goings will appear here.</p>
+  <% else %>
+    <div class="divide-y divide-whiskey-100 rounded-2xl border border-whiskey-200 bg-white shadow-sm">
+      <% @activities.each do |activity| %>
+        <div class="flex items-start gap-3 p-4">
+          <%
+            dot = {
+              "joined" => "bg-green-500", "invite_accepted" => "bg-green-500",
+              "left" => "bg-gray-400", "removed" => "bg-red-500",
+              "invite_declined" => "bg-red-400",
+              "role_changed" => "bg-whiskey-500", "invite_sent" => "bg-whiskey-400"
+            }[activity.action] || "bg-gray-300"
+          %>
+          <span class="mt-1.5 h-2.5 w-2.5 shrink-0 rounded-full <%= dot %>"></span>
+          <div class="min-w-0 flex-1">
+            <p class="text-sm text-gray-900">
+              <%= link_to activity.user.full_name, profile_path(activity.user), class: "font-medium hover:text-whiskey-700" %>
+              <%
+                line = case activity.action
+                       when "joined"          then "joined the society"
+                       when "left"            then "left the society"
+                       when "removed"         then "was removed"
+                       when "role_changed"    then activity.detail || "changed role"
+                       when "invite_sent"     then "was invited"
+                       when "invite_accepted" then "accepted an invitation"
+                       when "invite_declined" then "declined an invitation"
+                       end
+              %>
+              <%= line %><%= " by #{activity.actor.full_name}" if activity.actor && %w[removed invite_sent].include?(activity.action) %>
+            </p>
+            <p class="mt-0.5 text-xs text-gray-500"><%= activity.created_at.strftime("%B %-d, %Y at %-l:%M %p") %></p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+  <% end %>
+
+  <div class="mt-8 text-center">
+    <%= link_to "Back to #{@society.name}", society_path(@society), class: "text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>
+  </div>
+</div>

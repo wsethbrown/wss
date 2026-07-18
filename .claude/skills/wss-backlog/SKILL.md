@@ -14,6 +14,15 @@ Legend: **[code]** = engineering work · **[owner]** = only the owner can do it 
 
 ## Highest priority
 
+- **Google Maps cost watch (owner rule, July 2026). [watch + one-flag response]**
+  Places autocomplete (location fields) runs on the "WSS Location Autocomplete"
+  key in the Whiskey Share Society GCloud project (billing account "My Maps
+  Billing Account"). Budgets: "$5 Monthly Budget Alert" (early warning) and
+  "$10 Maps kill-switch (turn off autocomplete)" (alerts at $5/$9/$10 to
+  billing-admin email). **When the $10 alert fires: set MAPS_AUTOCOMPLETE: "off"
+  in config/deploy.yml env.clear and deploy** — every location field degrades
+  to a plain text input by design. Don't delete the key; the flag is the switch.
+
 - **Email cost tracking as volume grows. [owner watch + code later]** Resend went live 2026-07-17
   (verified sending domain send.whiskeysharesociety.com, sending-scoped API key in the prod env
   file + encrypted backup). FREE TIER = 3,000 emails/month, 100/day. Owner directive: once volume

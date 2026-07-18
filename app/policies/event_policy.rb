@@ -61,4 +61,11 @@ class EventPolicy < ApplicationPolicy
     return false unless user.present?
     record.host_id == user.id || manage_rsvps?
   end
+
+  # The pour list: managers plus the event's host (they run the night).
+  # Host pour rights do NOT extend to editing the event itself.
+  def manage_pours?
+    return false unless user.present?
+    record.host_id == user.id || update?
+  end
 end

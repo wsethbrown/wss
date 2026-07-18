@@ -114,6 +114,8 @@ class User < ApplicationRecord
   # Society email invitations (received / sent).
   has_many :society_invitations, dependent: :destroy
   has_many :sent_society_invitations, class_name: "SocietyInvitation", foreign_key: :invited_by_id, dependent: :destroy
+  has_many :society_activities, dependent: :destroy
+  has_many :authored_society_activities, class_name: "SocietyActivity", foreign_key: :actor_id, dependent: :destroy
   has_many :review_votes, dependent: :destroy
   has_many :review_reports, dependent: :destroy
   has_many :favorites, dependent: :destroy

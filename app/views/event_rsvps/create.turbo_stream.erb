@@ -10,6 +10,6 @@
   <%= render partial: "events/stats", locals: { event: @event } %>
 <% end %>
 
-<%= turbo_stream.replace "flash-messages" do %>
+<%= turbo_stream.update "flash-messages" do %>
   <!-- Clear any existing flash messages -->
 <% end %>

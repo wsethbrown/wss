@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_18_211932) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_18_223427) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -327,6 +327,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_211932) do
     t.index ["name"], name: "index_societies_on_name"
   end
 
+  create_table "society_activities", force: :cascade do |t|
+    t.bigint "society_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "actor_id"
+    t.string "action", null: false
+    t.string "detail"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_society_activities_on_actor_id"
+    t.index ["society_id", "created_at"], name: "index_society_activities_on_society_id_and_created_at"
+    t.index ["society_id"], name: "index_society_activities_on_society_id"
+    t.index ["user_id"], name: "index_society_activities_on_user_id"
+  end
+
   create_table "society_applications", force: :cascade do |t|
     t.bigint "user_id", null: false
     t.bigint "society_id", null: false
@@ -616,6 +630,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_211932) do
   add_foreign_key "shelf_items", "bottles"
   add_foreign_key "shelf_items", "users"
   add_foreign_key "societies", "users", column: "creator_id"
+  add_foreign_key "society_activities", "societies"
+  add_foreign_key "society_activities", "users"
+  add_foreign_key "society_activities", "users", column: "actor_id"
   add_foreign_key "society_applications", "societies"
   add_foreign_key "society_applications", "users"
   add_foreign_key "society_invitations", "societies"
