@@ -23,6 +23,7 @@ class AuthController < ApplicationController
       if user.otp_required_for_login?
         # Store user_id in session for 2FA verification
         session[:user_id_for_2fa] = user.id
+        Rails.logger.info "Password sign-in for user #{user.id}: 2FA verification required"
         redirect_to auth_path, alert: '2FA verification required'
       else
         warden.set_user(user, scope: :user)
@@ -31,6 +32,8 @@ class AuthController < ApplicationController
         redirect_to dashboard_path, notice: 'Signed in successfully'
       end
     else
+      # Security guideline: authentication failures are logged for monitoring.
+      Rails.logger.warn "Failed password sign-in attempt for #{params.dig(:user, :email)}"
       # Re-render the auth page with a 422 so Turbo swaps in the error state
       # instead of following a redirect (which loses the entered email).
       flash.now[:alert] = 'Invalid Email or password'

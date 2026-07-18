@@ -36,8 +36,10 @@ module Auth
         invitation_sent_at: Time.current
       )
       UserMailer.invitation_email(user, raw).deliver_later
+      Rails.logger.info "Invitation created for #{normalized} (user #{user.id}) by admin #{invited_by&.email}"
       Result.new(success: true, message: "Invitation sent to #{normalized}.", user: user, raw_token: raw)
     rescue ActiveRecord::RecordInvalid => e
+      Rails.logger.error "Invitation create failed for #{normalized}: #{e.record.errors.full_messages.to_sentence}"
       Result.new(success: false, message: e.record.errors.full_messages.to_sentence)
     end
 
@@ -50,6 +52,7 @@ module Auth
       raw = SecureRandom.urlsafe_base64(32)
       user.update!(invitation_token_digest: MagicLinkService.digest(raw), invitation_sent_at: Time.current)
       UserMailer.invitation_email(user, raw).deliver_later
+      Rails.logger.info "Invitation re-sent to #{user.email} (user #{user.id})"
       Result.new(success: true, message: "Invitation re-sent to #{user.email}.", user: user, raw_token: raw)
     end
 
@@ -58,9 +61,17 @@ module Auth
       return nil if raw_token.blank?
 
       user = User.find_by(invitation_token_digest: MagicLinkService.digest(raw_token))
-      return nil unless user&.invitation_sent_at && user.invitation_sent_at > EXPIRY.ago
+      unless user
+        Rails.logger.warn "Invitation consume failed: no account matches the presented token (already used or invalid)"
+        return nil
+      end
+      unless user.invitation_sent_at && user.invitation_sent_at > EXPIRY.ago
+        Rails.logger.warn "Invitation consume failed for #{user.email} (user #{user.id}): token expired (sent #{user.invitation_sent_at})"
+        return nil
+      end
 
       user.update!(invitation_token_digest: nil, invitation_accepted_at: Time.current)
+      Rails.logger.info "Invitation accepted by #{user.email} (user #{user.id})"
       user
     end
   end

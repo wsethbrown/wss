@@ -50,6 +50,7 @@ class EventsController < ApplicationController
 
     if @event.save
       # Announce to active members and schedule the 24h reminder.
+      Rails.logger.info "Event #{@event.id} created in society #{@event.society_id} by user #{current_user.id}; member notifications enqueued"
       EventNotificationJob.perform_later(@event.id, "created")
       EventReminderJob.schedule(@event)
       redirect_to @event, notice: 'Event was successfully created.'
@@ -85,6 +86,7 @@ class EventsController < ApplicationController
       changed << "time" if @event.saved_change_to_start_time? || @event.saved_change_to_end_time?
       changed << "location" if @event.saved_change_to_location?
       if changed.any?
+        Rails.logger.info "Event #{@event.id} updated (#{changed.join(', ')}) by user #{current_user.id}; notifying yes-RSVPs"
         EventNotificationJob.perform_later(@event.id, "updated", changed)
         EventReminderJob.schedule(@event) if changed.include?("time")
       end
@@ -102,13 +104,16 @@ class EventsController < ApplicationController
 
     if params[:host_id].blank?
       @event.update!(host: nil)
+      Rails.logger.info "Event #{@event.id}: host removed by user #{current_user.id}"
       redirect_to society_event_path(@society, @event), notice: "Host removed."
     else
       membership = @society.society_memberships.find_by(user_id: params[:host_id], status: "active")
       if membership
         @event.update!(host: membership.user)
+        Rails.logger.info "Event #{@event.id}: host set to user #{membership.user_id} by user #{current_user.id}"
         redirect_to society_event_path(@society, @event), notice: "#{membership.user.full_name} is now hosting this event."
       else
+        Rails.logger.warn "Event #{@event.id}: host assignment rejected: user #{params[:host_id]} is not an active member of society #{@society.id}"
         redirect_to society_event_path(@society, @event), alert: "The host must be an active member of this society."
       end
     end

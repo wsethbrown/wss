@@ -51,6 +51,7 @@ class EventRsvpsController < ApplicationController
     authorize @rsvp
 
     @rsvp.destroy
+    Rails.logger.info "Event #{@event.id}: RSVP cancelled by user #{current_user.id}"
     redirect_to @event, notice: 'RSVP was successfully cancelled.'
   end
 
@@ -75,8 +76,12 @@ class EventRsvpsController < ApplicationController
     # dedup covers host == organizer, and nobody is emailed about their own.
     [@event.organizer, @event.host].compact.uniq.each do |recipient|
       next if recipient.id == current_user.id
-      next unless recipient.event_emails?
+      unless recipient.event_emails?
+        Rails.logger.info "Event #{@event.id}: RSVP notification to user #{recipient.id} skipped (event emails muted)"
+        next
+      end
 
+      Rails.logger.info "Event #{@event.id}: RSVP notification to user #{recipient.id} enqueued"
       EventMailer.rsvp_received(recipient, @rsvp).deliver_later
     end
   end

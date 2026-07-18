@@ -9,20 +9,34 @@ class EventReminderJob < ApplicationJob
     return if event.start_time.blank?
 
     run_at = event.start_time - 24.hours
-    return if run_at <= Time.current # under 24h away: no reminder, they just heard about it
+    if run_at <= Time.current # under 24h away: no reminder, they just heard about it
+      Rails.logger.info "EventReminderJob: event #{event.id} starts within 24h; no reminder scheduled"
+      return
+    end
 
+    Rails.logger.info "EventReminderJob: event #{event.id} reminder scheduled for #{run_at}"
     set(wait_until: run_at).perform_later(event.id, event.start_time.to_i)
   end
 
   def perform(event_id, scheduled_start)
     event = Event.find_by(id: event_id)
-    return unless event
-    return unless event.start_time.to_i == scheduled_start # rescheduled: stale job
-    return if event.start_time <= Time.current
+    unless event
+      Rails.logger.info "EventReminderJob: event #{event_id} no longer exists; skipping"
+      return
+    end
+    unless event.start_time.to_i == scheduled_start # rescheduled: stale job
+      Rails.logger.info "EventReminderJob: event #{event.id} was rescheduled; stale reminder skipped"
+      return
+    end
+    if event.start_time <= Time.current
+      Rails.logger.info "EventReminderJob: event #{event.id} already started; reminder skipped"
+      return
+    end
 
-    event.event_rsvps.where(status: "yes").includes(:user).map(&:user).uniq.each do |user|
-      next unless user.event_emails?
-
+    attendees = event.event_rsvps.where(status: "yes").includes(:user).map(&:user).uniq
+    recipients = attendees.select(&:event_emails?)
+    Rails.logger.info "EventReminderJob: event #{event.id}: emailing #{recipients.size} of #{attendees.size} yes-RSVPs (rest muted)"
+    recipients.each do |user|
       EventMailer.event_reminder(user, event).deliver_later
     end
   end

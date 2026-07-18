@@ -8,7 +8,10 @@ class Account::ShelfItemsController < ApplicationController
   def create
     item = current_user.shelf_items.new(shelf_item_params)
     item.position = (current_user.shelf_items.maximum(:position) || 0) + 1
-    @alert = item.errors.full_messages.to_sentence unless item.save
+    unless item.save
+      @alert = item.errors.full_messages.to_sentence
+      Rails.logger.info "Shelf item rejected for user #{current_user.id}: #{@alert}"
+    end
     respond
   end
 

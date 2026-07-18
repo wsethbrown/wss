@@ -12,6 +12,7 @@ class EmailRsvpsController < ApplicationController
     status = VALID_STATUSES.include?(params[:status]) ? params[:status] : nil
 
     unless status
+      Rails.logger.warn "Email RSVP rejected for event #{event.id}, user #{user.id}: unknown status #{params[:status].inspect}"
       return redirect_to society_event_path(event.society, event), alert: "That RSVP link is not valid."
     end
 
@@ -19,20 +20,28 @@ class EmailRsvpsController < ApplicationController
     rsvp.status = status
 
     if rsvp.save
+      Rails.logger.info "Email RSVP recorded: user #{user.id} marked #{status} for event #{event.id}"
       # Organizer + event host hear about email RSVPs, same as on-site ones.
       [event.organizer, event.host].compact.uniq.each do |recipient|
         next if recipient.id == user.id
-        next unless recipient.event_emails?
+        unless recipient.event_emails?
+          Rails.logger.info "Event #{event.id}: RSVP notification to user #{recipient.id} skipped (event emails muted)"
+          next
+        end
 
+        Rails.logger.info "Event #{event.id}: RSVP notification to user #{recipient.id} enqueued"
         EventMailer.rsvp_received(recipient, rsvp).deliver_later
       end
       redirect_to society_event_path(event.society, event),
                   notice: "You're marked #{status} for #{event.title}."
     else
+      Rails.logger.error "Email RSVP save failed for user #{user.id}, event #{event.id}: #{rsvp.errors.full_messages.to_sentence}"
       redirect_to society_event_path(event.society, event),
                   alert: rsvp.errors.full_messages.to_sentence
     end
-  rescue ActiveSupport::MessageVerifier::InvalidSignature, ActiveRecord::RecordNotFound
+  rescue ActiveSupport::MessageVerifier::InvalidSignature, ActiveRecord::RecordNotFound => e
+    # Expired/forged token or a since-deleted event/user; never log the token.
+    Rails.logger.warn "Email RSVP link rejected: #{e.class}"
     redirect_to root_path, alert: "That RSVP link is no longer valid."
   end
 

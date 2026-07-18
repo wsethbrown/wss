@@ -8,7 +8,10 @@ class Events::CommentsController < ApplicationController
   def create
     authorize @event, :comment?
     comment = @event.event_comments.new(comment_params.merge(user: current_user))
-    @alert = comment.errors.full_messages.to_sentence unless comment.save
+    unless comment.save
+      @alert = comment.errors.full_messages.to_sentence
+      Rails.logger.info "Event #{@event.id}: comment by user #{current_user.id} rejected: #{@alert}"
+    end
     respond
   end
 
