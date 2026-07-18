@@ -55,4 +55,10 @@ class EventPolicy < ApplicationPolicy
     return false unless user.present?
     user.admin? || record.organizer == user || record.society.has_admin?(user)
   end
+
+  # RSVP replies (statuses + notes): managers plus the event's host.
+  def view_rsvps?
+    return false unless user.present?
+    record.host_id == user.id || manage_rsvps?
+  end
 end

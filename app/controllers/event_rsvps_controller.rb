@@ -71,11 +71,14 @@ class EventRsvpsController < ApplicationController
   # The host hears about every response (with the guest's note) unless they
   # responded to their own event or muted event emails.
   def notify_organizer
-    organizer = @event.organizer
-    return if organizer.nil? || organizer.id == current_user.id
-    return unless organizer.event_emails?
+    # The organizer and the event's host (if any) both hear about replies;
+    # dedup covers host == organizer, and nobody is emailed about their own.
+    [@event.organizer, @event.host].compact.uniq.each do |recipient|
+      next if recipient.id == current_user.id
+      next unless recipient.event_emails?
 
-    EventMailer.rsvp_received(organizer, @rsvp).deliver_later
+      EventMailer.rsvp_received(recipient, @rsvp).deliver_later
+    end
   end
 
   def rsvp_success_message(status)

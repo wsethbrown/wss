@@ -1,6 +1,10 @@
 class Event < ApplicationRecord
   belongs_to :society
   belongs_to :organizer, class_name: "User"
+  # Per-event host: a society member given the night. Assigned by society
+  # admins/the organizer; sees this event's RSVP replies and joins the RSVP
+  # emails, but gains no other management rights.
+  belongs_to :host, class_name: "User", optional: true
 
   # Associations
   has_many :event_rsvps, dependent: :destroy

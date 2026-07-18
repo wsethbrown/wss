@@ -19,9 +19,12 @@ class EmailRsvpsController < ApplicationController
     rsvp.status = status
 
     if rsvp.save
-      # The host still hears about email RSVPs, same as on-site ones.
-      if event.organizer && event.organizer.id != user.id && event.organizer.event_emails?
-        EventMailer.rsvp_received(event.organizer, rsvp).deliver_later
+      # Organizer + event host hear about email RSVPs, same as on-site ones.
+      [event.organizer, event.host].compact.uniq.each do |recipient|
+        next if recipient.id == user.id
+        next unless recipient.event_emails?
+
+        EventMailer.rsvp_received(recipient, rsvp).deliver_later
       end
       redirect_to society_event_path(event.society, event),
                   notice: "You're marked #{status} for #{event.title}."

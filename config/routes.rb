@@ -86,6 +86,8 @@ Rails.application.routes.draw do
     
     # Events are now nested under societies
     resources :events do
+      # Society admins/the organizer hand the night to a member (the Host).
+      member { patch :assign_host }
       resources :event_rsvps, only: [:create, :update, :destroy]
     end
   end

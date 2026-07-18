@@ -192,6 +192,71 @@
           </div>
         <% end %>
 
+        <!-- Host: shown to everyone once assigned; managed by update? holders. -->
+        <% if @event.host || policy(@event).update? %>
+          <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h2 class="text-lg font-semibold text-gray-900">Host</h2>
+            </div>
+            <div class="p-6 space-y-4">
+              <% if @event.host %>
+                <%= link_to profile_path(@event.host), class: "flex items-center space-x-3 hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors" do %>
+                  <% if @event.host.has_profile_image? %>
+                    <img src="<%= @event.host.profile_image_url %>" alt="<%= @event.host.full_name %>" class="w-8 h-8 rounded-full">
+                  <% else %>
+                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium" style="background-color: <%= @event.host.avatar_color %>;">
+                      <%= @event.host.initials %>
+                    </div>
+                  <% end %>
+                  <p class="text-sm font-medium text-gray-900 truncate"><%= @event.host.full_name %></p>
+                <% end %>
+              <% else %>
+                <p class="text-sm text-gray-500">No host assigned yet.</p>
+              <% end %>
+              <% if policy(@event).update? %>
+                <%= form_with url: assign_host_society_event_path(@event.society, @event), method: :patch, local: true, class: "space-y-2" do %>
+                  <select name="host_id"
+                          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500">
+                    <option value="">No host</option>
+                    <% @event.society.society_memberships.where(status: "active").includes(:user).map(&:user).uniq.sort_by(&:full_name).each do |member| %>
+                      <option value="<%= member.id %>" <%= "selected" if @event.host_id == member.id %>><%= member.full_name %></option>
+                    <% end %>
+                  </select>
+                  <button type="submit"
+                          class="w-full px-4 py-2 bg-whiskey-600 text-white text-sm font-medium rounded-lg hover:bg-whiskey-700 transition cursor-pointer">
+                    Set host
+                  </button>
+                <% end %>
+                <p class="text-xs text-gray-500">The host sees this event's RSVP replies.</p>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
+        <!-- RSVP replies: the host and event managers only. -->
+        <% if policy(@event).view_rsvps? && @event.event_rsvps.any? %>
+          <div class="bg-white shadow-sm rounded-lg overflow-hidden">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h2 class="text-lg font-semibold text-gray-900">RSVP replies</h2>
+              <p class="text-xs text-gray-500 mt-1">Only the host and event managers see this.</p>
+            </div>
+            <div class="p-6 space-y-4">
+              <% @event.event_rsvps.includes(:user).order(updated_at: :desc).each do |rsvp| %>
+                <div class="flex items-start justify-between gap-3">
+                  <div class="min-w-0">
+                    <p class="text-sm font-medium text-gray-900 truncate"><%= rsvp.user.full_name %></p>
+                    <% if rsvp.note.present? %>
+                      <p class="mt-0.5 text-sm italic text-gray-600">&ldquo;<%= rsvp.note %>&rdquo;</p>
+                    <% end %>
+                  </div>
+                  <% chip = { "yes" => "bg-green-100 text-green-800", "maybe" => "bg-amber-100 text-amber-800", "no" => "bg-gray-100 text-gray-600" }[rsvp.status] %>
+                  <span class="shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= chip %>"><%= rsvp.status.capitalize %></span>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+
         <!-- Event Stats -->
         <%= render "stats", event: @event %>
 

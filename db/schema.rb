@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_18_201041) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_18_203540) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -169,6 +169,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_201041) do
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
     t.boolean "pours_hidden_until_complete", default: false, null: false
+    t.bigint "host_id"
+    t.index ["host_id"], name: "index_events_on_host_id"
     t.index ["location"], name: "index_events_on_location"
     t.index ["organizer_id"], name: "index_events_on_organizer_id"
     t.index ["society_id", "start_time"], name: "index_events_on_society_id_and_start_time"
@@ -565,6 +567,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_201041) do
   add_foreign_key "event_rsvps", "events"
   add_foreign_key "event_rsvps", "users"
   add_foreign_key "events", "societies"
+  add_foreign_key "events", "users", column: "host_id"
   add_foreign_key "events", "users", column: "organizer_id"
   add_foreign_key "favorites", "users"
   add_foreign_key "presentation_tags", "presentations"

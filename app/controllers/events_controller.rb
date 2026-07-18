@@ -1,5 +1,5 @@
 class EventsController < ApplicationController
-  before_action :set_event, only: [:show, :edit, :update, :destroy]
+  before_action :set_event, only: [:show, :edit, :update, :destroy, :assign_host]
 
   def index
     @events = policy_scope(Event).includes(:society, :organizer, :event_rsvps)
@@ -91,6 +91,26 @@ class EventsController < ApplicationController
       redirect_to @event, notice: 'Event was successfully updated.'
     else
       render :edit, status: :unprocessable_entity
+    end
+  end
+
+  # Hand the night to a member. The host must be an active member of the
+  # society (or blank to clear); assignment rights = event update rights.
+  def assign_host
+    @society = @event.society
+    authorize @event, :update?
+
+    if params[:host_id].blank?
+      @event.update!(host: nil)
+      redirect_to society_event_path(@society, @event), notice: "Host removed."
+    else
+      membership = @society.society_memberships.find_by(user_id: params[:host_id], status: "active")
+      if membership
+        @event.update!(host: membership.user)
+        redirect_to society_event_path(@society, @event), notice: "#{membership.user.full_name} is now hosting this event."
+      else
+        redirect_to society_event_path(@society, @event), alert: "The host must be an active member of this society."
+      end
     end
   end
 

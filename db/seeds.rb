@@ -172,7 +172,7 @@ if Rails.env.development?
       description: "A narrative flight tracing how sherry-cask maturation reshapes a Speyside spirit.",
       location: "Creature Comforts, Athens", start_offset: 6.days, duration_hours: 2 },
     { society: societies[0], title: "June: Bourbon & the Corn Question",
-      description: "Why mash bill matters — a story told through four pours.",
+      description: "Why mash bill matters, a story told through four pours.",
       location: "Member's home", start_offset: 34.days, duration_hours: 2 },
     { society: societies[1], title: "Islay Cask-Strength Showdown",
       description: "Blind-taste four cask-strength Islay drams and rank them.",
@@ -205,7 +205,7 @@ if Rails.env.development?
 
   pour_specs = [
     { name: "Ardbeg 10", distillery: "Ardbeg", region: "Islay",
-      style: "Single Malt Scotch", abv: 46.0, label: "Pour #1 — the blind" },
+      style: "Single Malt Scotch", abv: 46.0, label: "Pour #1, the blind" },
     { name: "GlenDronach 12", distillery: "GlenDronach", region: "Highlands",
       style: "Single Malt Scotch", abv: 43.0, label: nil },
     { name: "Four Roses Small Batch", distillery: "Four Roses", region: "Kentucky",
@@ -244,7 +244,7 @@ if Rails.env.development?
 
   # Event reviews pass every real gate (pours listed + revealed, RSVPs yes).
   scores = {
-    admin_user => { pours[0] => [4.5, "Smoke first, then pears — the blind fooled nobody."],
+    admin_user => { pours[0] => [4.5, "Smoke first, then pears, the blind fooled nobody."],
                     pours[1] => [3.5, "Sherry-sweet, a little thin on the finish."],
                     pours[2] => [4.0, "Rye spice over caramel. Crowd-pleaser."] },
     test_user  => { pours[0] => [4.0, "Campfire in a glass."],
@@ -258,7 +258,7 @@ if Rails.env.development?
       end
     end
   end
-  puts "Review demo chain: #{night.title} — #{night.event_bottles.count} pours, #{night.reviews.count} event reviews"
+  puts "Review demo chain: #{night.title}, #{night.event_bottles.count} pours, #{night.reviews.count} event reviews"
 end
 
 
