@@ -191,23 +191,27 @@ class SocietyCreationTest < ActionDispatch::IntegrationTest
     # Creator should be able to edit
     get edit_society_path(society)
     assert_response :success
-    assert_select "h1", /Community Settings/
+    assert_select "h1", text: /./ # the reskinned edit page titles itself with the society name
+    assert_match "Edit society", response.body
     
-    # Update society
+    # Update society: description is the short blurb, about the long story.
     patch society_path(society), params: {
       society: {
         name: "Updated Society Name",
-        description: "Updated description"
+        description: "Updated description",
+        about: "The long-form story of this society, told at length."
       }
     }
-    
     assert_redirected_to society_path(society)
     follow_redirect!
     assert_select ".flash-notice", "Society was successfully updated."
-    
+
     society.reload
     assert_equal "Updated Society Name", society.name
     assert_equal "Updated description", society.description
+    assert_equal "The long-form story of this society, told at length.", society.about
+    # The About section renders the long story; the masthead keeps the blurb.
+    assert_match "The long-form story of this society", response.body
     
     # Different user should not be able to edit
     delete destroy_user_session_path

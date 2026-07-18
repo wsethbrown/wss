@@ -1,7 +1,7 @@
 class SocietiesController < ApplicationController
   include ActivityLogger
 
-  before_action :authenticate_user!, except: [:index, :show]
+  before_action :authenticate_user!, except: [:index, :show, :join_by_invite]
   before_action :set_society, only: [:show, :edit, :update, :destroy]
 
   # Society-specific authorization failures redirect back to the listing with a
@@ -54,20 +54,7 @@ class SocietiesController < ApplicationController
     # bottle, their LATEST review at this society's events. A re-taster's
     # newer score replaces their older one instead of double-weighting them,
     # and "N reviewers" is exactly the mean's denominator.
-    latest_per_member = <<~SQL
-      INNER JOIN (
-        SELECT DISTINCT ON (reviews.user_id, reviews.bottle_id) reviews.id
-        FROM reviews
-        INNER JOIN events ON events.id = reviews.event_id
-        WHERE events.society_id = #{@society.id.to_i}
-        ORDER BY reviews.user_id, reviews.bottle_id, reviews.created_at DESC, reviews.id DESC
-      ) latest ON latest.id = reviews.id
-    SQL
-    @review_board = Bottle
-      .joins(:reviews).joins(latest_per_member)
-      .select("bottles.*, AVG(reviews.rating) AS board_avg, COUNT(DISTINCT reviews.user_id) AS board_reviewers")
-      .group("bottles.id")
-      .order(Arel.sql("board_avg DESC, bottles.name ASC"))
+    @review_board = @society.review_board
     @board_reviews = Review.joins(:event).where(events: { society_id: @society.id })
                            .includes(:user).recent_first.group_by(&:bottle_id)
   end
@@ -139,13 +126,20 @@ class SocietiesController < ApplicationController
 
   # Join via invite link, valid for private societies (the link IS the invite).
   def join_by_invite
-    unless user_signed_in?
-      redirect_to auth_path, alert: "Sign in to accept this invite" and return
-    end
-
     society = Society.find_by(invite_token: params[:token])
     unless society
-      redirect_to societies_path, alert: "That invite link is no longer valid" and return
+      redirect_to(user_signed_in? ? societies_path : root_path, alert: "That invite link is no longer valid") and return
+    end
+
+    unless user_signed_in?
+      # The public peek (owner-approved July 2026): the link IS the invite,
+      # so the society introduces itself here, private ones included, but
+      # member identities stay off the page. The token rides the session;
+      # whichever way they sign up or in, consume_pending_invite joins them.
+      session[:pending_invite_token] = society.invite_token
+      @society = society
+      @top_board = society.review_board.limit(3)
+      render :invite and return
     end
 
     if society.has_member?(current_user)
@@ -182,7 +176,7 @@ class SocietiesController < ApplicationController
   end
 
   def society_params
-    permitted = params.require(:society).permit(:name, :description, :location, :is_private, :profile_picture, :banner_image, :banner_position)
+    permitted = params.require(:society).permit(:name, :description, :about, :location, :is_private, :profile_picture, :banner_image, :banner_position)
 
     # Convert is_private string to boolean
     if permitted[:is_private].present?

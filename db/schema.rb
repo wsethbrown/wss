@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_18_203540) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_18_211932) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -190,6 +190,22 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_203540) do
     t.index ["user_id"], name: "index_favorites_on_user_id"
   end
 
+  create_table "notifications", force: :cascade do |t|
+    t.bigint "user_id", null: false
+    t.bigint "actor_id"
+    t.string "notifiable_type"
+    t.bigint "notifiable_id"
+    t.string "action", null: false
+    t.datetime "read_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["actor_id"], name: "index_notifications_on_actor_id"
+    t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
+    t.index ["user_id", "created_at"], name: "index_notifications_on_user_id_and_created_at"
+    t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
+    t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
   create_table "presentation_tags", force: :cascade do |t|
     t.bigint "presentation_id", null: false
     t.bigint "tag_id", null: false
@@ -304,6 +320,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_203540) do
     t.string "banner_position", default: "center center"
     t.string "invite_token"
     t.integer "favorites_count", default: 0, null: false
+    t.text "about"
     t.index ["creator_id"], name: "index_societies_on_creator_id"
     t.index ["invite_token"], name: "index_societies_on_invite_token", unique: true
     t.index ["location"], name: "index_societies_on_location"
@@ -319,6 +336,20 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_203540) do
     t.datetime "updated_at", null: false
     t.index ["society_id"], name: "index_society_applications_on_society_id"
     t.index ["user_id"], name: "index_society_applications_on_user_id"
+  end
+
+  create_table "society_invitations", force: :cascade do |t|
+    t.bigint "society_id", null: false
+    t.bigint "user_id", null: false
+    t.bigint "invited_by_id", null: false
+    t.string "status", default: "pending", null: false
+    t.datetime "responded_at"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["invited_by_id"], name: "index_society_invitations_on_invited_by_id"
+    t.index ["society_id", "user_id"], name: "index_society_invitations_on_pending_pair", unique: true, where: "((status)::text = 'pending'::text)"
+    t.index ["society_id"], name: "index_society_invitations_on_society_id"
+    t.index ["user_id"], name: "index_society_invitations_on_user_id"
   end
 
   create_table "society_memberships", force: :cascade do |t|
@@ -570,6 +601,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_203540) do
   add_foreign_key "events", "users", column: "host_id"
   add_foreign_key "events", "users", column: "organizer_id"
   add_foreign_key "favorites", "users"
+  add_foreign_key "notifications", "users"
+  add_foreign_key "notifications", "users", column: "actor_id"
   add_foreign_key "presentation_tags", "presentations"
   add_foreign_key "presentation_tags", "tags"
   add_foreign_key "presentations", "users", column: "author_id"
@@ -585,6 +618,9 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_203540) do
   add_foreign_key "societies", "users", column: "creator_id"
   add_foreign_key "society_applications", "societies"
   add_foreign_key "society_applications", "users"
+  add_foreign_key "society_invitations", "societies"
+  add_foreign_key "society_invitations", "users"
+  add_foreign_key "society_invitations", "users", column: "invited_by_id"
   add_foreign_key "society_memberships", "societies"
   add_foreign_key "society_memberships", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

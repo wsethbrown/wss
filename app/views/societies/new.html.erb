@@ -36,13 +36,22 @@
           <p class="mt-1 text-sm text-gray-500">Choose a memorable name that reflects your community's personality and focus.</p>
         </div>
 
-        <!-- Society Description -->
+        <!-- Short description: the masthead/card blurb -->
         <div>
-          <%= form.label :description, class: "block text-sm font-medium text-gray-700 mb-2" %>
-          <%= form.text_area :description, rows: 5,
+          <%= form.label :description, "Short description", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_area :description, rows: 2,
               class: "w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
-              placeholder: "Describe your society's mission, what makes it special, and what members can expect..." %>
-          <p class="mt-1 text-sm text-gray-500">Share your vision and help potential members understand what makes your community unique.</p>
+              placeholder: "One or two sentences that introduce the society." %>
+          <p class="mt-1 text-sm text-gray-500">Appears under the society name, on society cards, and in link previews.</p>
+        </div>
+
+        <!-- About: the long-form story -->
+        <div>
+          <%= form.label :about, "About", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_area :about, rows: 6,
+              class: "w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
+              placeholder: "The full story: how you gather, what you pour, what members can expect..." %>
+          <p class="mt-1 text-sm text-gray-500">The long version, shown in the About section of your society page.</p>
         </div>
 
         <!-- Location -->
@@ -111,15 +120,15 @@
               <%= form.radio_button :is_private, true, checked: @society.is_private, class: "peer sr-only", id: "private_society" %>
               <div class="h-full rounded-xl border-2 border-gray-200 p-6 transition hover:border-whiskey-300 peer-checked:border-whiskey-600 peer-checked:bg-whiskey-50 peer-focus-visible:ring-2 peer-focus-visible:ring-whiskey-500 peer-focus-visible:ring-offset-2">
                 <h3 class="text-lg font-semibold text-gray-900">Private society</h3>
-                <p class="mt-0.5 text-sm text-gray-500">Application required</p>
+                <p class="mt-0.5 text-sm text-gray-500">Invite only</p>
                 <p class="mt-3 text-sm leading-relaxed text-gray-600">
-                  Members must apply to join and be approved by admins. Ideal for creating curated, exclusive communities with shared values and serious commitment.
+                  Members join by invitation: share your invite link or invite them by email. Ideal for keeping the circle to people you know.
                 </p>
                 <p class="mt-4 flex items-center gap-1.5 text-sm font-medium text-whiskey-700">
                   <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                   </svg>
-                  Curated membership
+                  Invite-only membership
                 </p>
               </div>
             </label>

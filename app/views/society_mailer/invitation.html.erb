@@ -1,0 +1,7 @@
+<%= render "mailers/layout_open" %>
+      <p class="eyebrow">Society invitation</p>
+      <h2 class="title" style="margin-top:0;"><%= @society.name %></h2>
+      <p><%= @inviter.full_name %> invited you to join <strong><%= @society.name %></strong> on Whiskey Share Society.</p>
+      <a class="btn" href="<%= notifications_url %>">View the invitation</a>
+      <p class="hint">Accept or decline from your notifications. Signing in takes one click with a magic link.</p>
+<%= render "mailers/layout_close" %>

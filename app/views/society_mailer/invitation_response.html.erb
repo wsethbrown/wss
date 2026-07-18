@@ -1,0 +1,6 @@
+<%= render "mailers/layout_open" %>
+      <p class="eyebrow">Invitation update</p>
+      <h2 class="title" style="margin-top:0;"><%= @responder.full_name %> <%= @verb %></h2>
+      <p><%= @responder.full_name %> <%= @verb %> your invitation to <strong><%= @society.name %></strong>.</p>
+      <a class="btn" href="<%= society_url(@society) %>">See the society</a>
+<%= render "mailers/layout_close" %>

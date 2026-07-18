@@ -9,6 +9,9 @@ class ApplicationController < ActionController::Base
   before_action :set_timezone
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
+  # Invite-link peek: whoever signs up or in after viewing /invite/:token
+  # joins that society on their first signed-in page load.
+  before_action :consume_pending_invite
 
   # Add CSRF protection logging
   rescue_from ActionController::InvalidAuthenticityToken, with: :handle_csrf_error
@@ -18,6 +21,27 @@ class ApplicationController < ActionController::Base
   end
 
   private
+
+  # If a signed-out visitor viewed an invite-link peek, the society's token
+  # waits in the session; the first signed-in GET joins them and sends them
+  # to their new society. Runs everywhere, exits in one comparison when idle.
+  def consume_pending_invite
+    return unless request.get? && user_signed_in? && session[:pending_invite_token].present?
+
+    token = session.delete(:pending_invite_token)
+    society = Society.find_by(invite_token: token)
+    return unless society
+
+    if society.has_member?(current_user)
+      return
+    end
+
+    society.society_memberships.create!(user: current_user, role: :member, status: :active)
+    log_activity(:society_joined, society)
+    redirect_to society_path(society), notice: "Welcome to #{society.name}!"
+  rescue ActiveRecord::RecordInvalid => e
+    Rails.logger.error "Pending invite failed: #{e.message}"
+  end
 
   def set_timezone
     Time.zone = browser_timezone if browser_timezone.present?

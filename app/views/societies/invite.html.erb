@@ -1,0 +1,79 @@
+<% content_for :title, "You're invited to #{@society.name} - Whiskey Share Society" %>
+<%# The signed-out invite peek. The link is the invite, so the society gets
+    to introduce itself, private ones included, but no member identities
+    appear here. Signing up or in consumes the session token and joins. %>
+<div class="min-h-screen bg-whiskey-50">
+  <div class="relative w-full overflow-hidden bg-char pt-16">
+    <% if @society.banner_image.attached? %>
+      <%= image_tag @society.banner_image,
+          class: "absolute inset-0 h-full w-full object-cover",
+          style: "object-position: #{@society.banner_position || 'center center'};" %>
+      <div class="absolute inset-0 bg-gradient-to-t from-char via-char/80 to-char/60"></div>
+    <% else %>
+      <div class="pointer-events-none absolute inset-0" aria-hidden="true"
+           style="background: radial-gradient(ellipse 70% 50% at 50% 110%, rgba(201, 136, 74, 0.22), transparent 70%);"></div>
+    <% end %>
+
+    <div class="relative z-10 mx-auto max-w-3xl px-6 py-16 text-center">
+      <p class="eyebrow mb-3 text-whiskey-300/90">You're invited</p>
+      <div class="rule-double mx-auto mb-6 w-20 text-whiskey-300"></div>
+      <h1 class="font-display text-4xl font-semibold leading-tight text-cream md:text-5xl"><%= @society.name %></h1>
+      <% if @society.description.present? %>
+        <p class="mx-auto mt-4 max-w-xl text-lg leading-relaxed text-cream/70"><%= @society.description %></p>
+      <% end %>
+      <div class="mt-6 flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-sm text-cream/60">
+        <% if @society.location.present? %><span><%= @society.location %></span><% end %>
+        <% if @society.public? %>
+          <span><%= pluralize(@society.member_count, 'member') %></span>
+          <span>Founded by <%= @society.creator.full_name %>, <%= @society.created_at.strftime("%B %Y") %></span>
+        <% else %>
+          <span>A private society</span>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <div class="mx-auto max-w-3xl px-6 py-12 space-y-8">
+    <% if @society.about.present? %>
+      <div class="overflow-hidden rounded-2xl border border-whiskey-200 bg-white shadow-sm">
+        <div class="border-b border-whiskey-100 px-6 py-4">
+          <h2 class="text-lg font-semibold text-gray-900">About this society</h2>
+        </div>
+        <div class="p-6 leading-relaxed text-gray-700"><%= simple_format(@society.about) %></div>
+      </div>
+    <% end %>
+
+    <% if @top_board.any? %>
+      <div class="overflow-hidden rounded-2xl border border-whiskey-200 bg-white shadow-sm">
+        <div class="border-b border-whiskey-100 px-6 py-4">
+          <h2 class="text-lg font-semibold text-gray-900">From the review board</h2>
+          <p class="mt-0.5 text-xs text-gray-500">What this society has been pouring, rated at their tastings.</p>
+        </div>
+        <div class="divide-y divide-whiskey-100">
+          <% @top_board.each do |bottle| %>
+            <div class="flex items-center justify-between gap-4 px-6 py-4">
+              <div class="min-w-0">
+                <p class="font-display text-lg font-semibold text-gray-900 truncate"><%= bottle.name %></p>
+                <p class="text-xs text-gray-500"><%= [bottle.distillery, bottle.style].compact_blank.join(" · ") %></p>
+              </div>
+              <div class="shrink-0 text-right">
+                <%= render "bottles/rating", value: bottle.board_avg.to_f %>
+                <p class="mt-0.5 text-xs text-gray-500"><%= pluralize(bottle.board_reviewers, "reviewer") %></p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <div class="rounded-2xl border border-whiskey-200 bg-white p-8 text-center shadow-sm">
+      <h2 class="font-display text-2xl font-semibold text-gray-900">Pull up a chair</h2>
+      <p class="mx-auto mt-3 max-w-md text-gray-600">
+        Create an account or sign in and you'll join <%= @society.name %> automatically.
+      </p>
+      <%= link_to "Continue", auth_path,
+          class: "mt-6 inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-10 py-3 font-semibold text-white transition hover:bg-whiskey-700" %>
+      <p class="mt-4 text-xs text-gray-500">One click with Google or Apple, or a magic link to your email. No password needed.</p>
+    </div>
+  </div>
+</div>

@@ -1,43 +1,23 @@
 <!-- Society Edit Page -->
-<div class="min-h-screen bg-whiskey-50 pt-24 pb-12 px-4 sm:px-6 lg:px-8">
-  <!-- Background Effects -->
-  <div class="absolute inset-0 pointer-events-none">
-    <div class="absolute top-1/4 left-1/6 w-40 h-40 bg-blue-200/20 rounded-full blur-3xl animate-pulse"></div>
-    <div class="absolute bottom-1/4 right-1/6 w-32 h-32 bg-whiskey-200/25 rounded-full blur-2xl animate-pulse delay-1000"></div>
-  </div>
-
-  <div class="max-w-4xl mx-auto relative z-10">
+<div class="min-h-screen bg-whiskey-50 px-4 pt-28 pb-16 sm:px-6 lg:px-8">
+  <div class="mx-auto max-w-3xl">
     <!-- Header -->
-    <div class="text-center mb-12">
-      <div class="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-amber-100/80 backdrop-blur-sm border border-amber-200/50 text-amber-800 font-bold text-sm mb-8 shadow-lg">
-        <span class="w-2 h-2 bg-amber-500 rounded-full animate-pulse"></span>
-        <span>✏️ Edit Society</span>
-      </div>
-
-      <h1 class="text-5xl md:text-6xl font-display font-semibold tracking-tight mb-6 leading-tight">
-        <span class="block text-gray-900">Update Your</span>
-        <span class="block bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 bg-clip-text text-transparent">Community Settings</span>
-      </h1>
-
-      <p class="text-xl md:text-2xl text-gray-700 max-w-3xl mx-auto leading-relaxed font-medium">
-        Refine your society's profile and <strong class="text-gray-900">keep your community fresh</strong> with updated images and information.
+    <div class="mb-10 text-center">
+      <p class="eyebrow mb-3 text-whiskey-600">Edit society</p>
+      <h1 class="font-display text-4xl font-semibold leading-tight text-gray-900 md:text-5xl"><%= @society.name %></h1>
+      <div class="rule-double mx-auto mt-6 w-20 text-whiskey-800"></div>
+      <p class="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-gray-600">
+        Update the profile, images, and privacy. Changes are visible to members right away.
       </p>
     </div>
 
     <!-- Form Card -->
-    <div class="bg-white/90 backdrop-blur-xl border border-white/50 rounded-3xl shadow-2xl p-8 md:p-12">
+    <div class="rounded-2xl border border-whiskey-200 bg-white p-6 shadow-sm sm:p-10">
       <%= form_with(model: @society, local: true, html: { class: "space-y-8", multipart: true }) do |form| %>
         <% if @society.errors.any? %>
-          <div class="rounded-2xl bg-red-50 border border-red-200 p-6">
-            <div class="flex items-center gap-3 mb-4">
-              <div class="w-8 h-8 bg-red-500 rounded-full flex items-center justify-center">
-                <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clip-rule="evenodd"></path>
-                </svg>
-              </div>
-              <h3 class="text-lg font-semibold text-red-800">Please fix the following errors:</h3>
-            </div>
-            <ul class="list-disc list-inside text-red-700 space-y-1">
+          <div class="rounded-xl border border-red-200 bg-red-50 p-5">
+            <h3 class="mb-2 text-sm font-semibold text-red-800">Please fix the following:</h3>
+            <ul class="list-inside list-disc space-y-1 text-sm text-red-700">
               <% @society.errors.full_messages.each do |message| %>
                 <li class="error-message"><%= message %></li>
               <% end %>
@@ -45,224 +25,138 @@
           </div>
         <% end %>
 
-        <!-- Current Images Preview -->
-        <% if @society.profile_picture.attached? || @society.banner_image.attached? %>
-          <div class="space-y-6 bg-gray-50 rounded-2xl p-6">
-            <h3 class="text-lg font-semibold text-gray-900 flex items-center gap-2">
-              👁️ Current Images
-            </h3>
-            
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <!-- Current Profile Picture -->
-              <% if @society.profile_picture.attached? %>
-                <div class="space-y-2">
-                  <h4 class="font-medium text-gray-700">Profile Picture</h4>
-                  <div class="w-32 h-32 rounded-2xl overflow-hidden bg-gray-200 mx-auto">
-                    <%= image_tag @society.profile_picture, class: "w-full h-full object-cover" %>
-                  </div>
-                </div>
-              <% end %>
-
-              <!-- Current Banner Image -->
-              <% if @society.banner_image.attached? %>
-                <div class="space-y-2">
-                  <h4 class="font-medium text-gray-700">Banner Image</h4>
-                  <div class="w-full h-24 rounded-2xl overflow-hidden bg-gray-200">
-                    <%= image_tag @society.banner_image, class: "w-full h-full object-cover" %>
-                  </div>
-                </div>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
-
         <!-- Society Name -->
-        <div class="space-y-3">
-          <%= form.label :name, class: "block text-lg font-semibold text-gray-900" do %>
-            <span class="flex items-center gap-2">
-              🏷️ Society Name
-              <span class="text-red-500">*</span>
-            </span>
+        <div>
+          <%= form.label :name, class: "block text-sm font-medium text-gray-700 mb-2" do %>
+            Society name <span class="text-whiskey-600">*</span>
           <% end %>
-          <%= form.text_field :name, 
-              class: "w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors placeholder-gray-400 bg-white/80",
+          <%= form.text_field :name,
+              class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
               placeholder: "e.g., Single Malt Enthusiasts, Urban Whiskey Club" %>
-          <p class="text-sm text-gray-600">Choose a memorable name that reflects your community's personality and focus.</p>
         </div>
 
-        <!-- Society Description -->
-        <div class="space-y-3">
-          <%= form.label :description, class: "block text-lg font-semibold text-gray-900" do %>
-            <span class="flex items-center gap-2">
-              📝 Description
-            </span>
-          <% end %>
-          <%= form.text_area :description, 
-              rows: 5,
-              class: "w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors placeholder-gray-400 bg-white/80 resize-none",
-              placeholder: "Describe your society's mission, what makes it special, and what members can expect..." %>
-          <p class="text-sm text-gray-600">Share your vision and help potential members understand what makes your community unique.</p>
+        <!-- Short description: the masthead/card blurb -->
+        <div>
+          <%= form.label :description, "Short description", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_area :description, rows: 2,
+              class: "w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
+              placeholder: "One or two sentences that introduce the society." %>
+          <p class="mt-1 text-sm text-gray-500">Appears under the society name, on society cards, and in link previews.</p>
+        </div>
+
+        <!-- About: the long-form story -->
+        <div>
+          <%= form.label :about, "About", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_area :about, rows: 6,
+              class: "w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
+              placeholder: "The full story: how you gather, what you pour, what members can expect..." %>
+          <p class="mt-1 text-sm text-gray-500">The long version, shown in the About section of your society page.</p>
         </div>
 
         <!-- Location -->
-        <div class="space-y-3">
-          <%= form.label :location, class: "block text-lg font-semibold text-gray-900" do %>
-            <span class="flex items-center gap-2">
-              Location
-            </span>
-          <% end %>
-          <%= form.text_field :location, 
-              class: "w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors placeholder-gray-400 bg-white/80",
+        <div>
+          <%= form.label :location, class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.text_field :location,
+              class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
               placeholder: "e.g., New York, NY or Online" %>
-          <p class="text-sm text-gray-600">Where will your society primarily meet? This helps members find local communities.</p>
         </div>
 
-        <!-- Profile Picture Upload -->
-        <div class="space-y-3">
-          <%= form.label :profile_picture, class: "block text-lg font-semibold text-gray-900" do %>
-            <span class="flex items-center gap-2">
-              🖼️ Profile Picture
-              <% if @society.profile_picture.attached? %>
-                <span class="text-sm font-normal text-amber-600">(Replace current)</span>
-              <% end %>
-            </span>
+        <!-- Profile Picture -->
+        <div>
+          <%= form.label :profile_picture, "Profile picture", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <% if @society.profile_picture.attached? %>
+            <div class="mb-3 flex items-center gap-4">
+              <div class="h-20 w-20 overflow-hidden rounded-xl bg-gray-100">
+                <%= image_tag @society.profile_picture, class: "h-full w-full object-cover" %>
+              </div>
+              <p class="text-sm text-gray-500">Current picture. Uploading a new file replaces it.</p>
+            </div>
           <% end %>
-          <%= form.file_field :profile_picture, 
-              accept: "image/*",
-              class: "w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors bg-white/80 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100" %>
-          <p class="text-sm text-gray-600">Upload an image that represents your society. This will replace the default icon. Recommended size: 400x400px.</p>
+          <%= form.file_field :profile_picture, accept: "image/*",
+              class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500 file:mr-4 file:rounded-full file:border-0 file:bg-whiskey-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-whiskey-800 hover:file:bg-whiskey-200" %>
+          <p class="mt-1 text-sm text-gray-500">Recommended size: 400x400px.</p>
         </div>
 
-        <!-- Banner Image Upload -->
-        <div class="space-y-3" data-controller="banner-crop">
-          <%= form.label :banner_image, class: "block text-lg font-semibold text-gray-900" do %>
-            <span class="flex items-center gap-2">
-              🌄 Banner Image
-              <% if @society.banner_image.attached? %>
-                <span class="text-sm font-normal text-amber-600">(Replace current)</span>
-              <% end %>
-            </span>
-          <% end %>
-          <%= form.file_field :banner_image, 
-              accept: "image/*",
+        <!-- Banner Image -->
+        <div data-controller="banner-crop">
+          <%= form.label :banner_image, "Banner image", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.file_field :banner_image, accept: "image/*",
               data: { banner_crop_target: "input", action: "change->banner-crop#fileChanged" },
-              class: "w-full px-6 py-4 text-lg border border-gray-300 rounded-2xl focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-colors bg-white/80 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-amber-50 file:text-amber-700 hover:file:bg-amber-100" %>
-          <p class="text-sm text-gray-600">Upload a banner image for your society's page. This will appear at the top of your society's detail page. Recommended size: 1200x400px.</p>
-          
-          <!-- Banner Image Preview & Crop -->
+              class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500 file:mr-4 file:rounded-full file:border-0 file:bg-whiskey-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-whiskey-800 hover:file:bg-whiskey-200" %>
+          <p class="mt-1 text-sm text-gray-500">Appears at the top of your society's page. Recommended size: 1200x400px.</p>
+
+          <!-- Banner Preview & Position -->
           <div data-banner-crop-target="container" class="<%= @society.banner_image.attached? ? '' : 'hidden' %> mt-4">
-            <label class="block text-sm font-medium text-gray-700 mb-2">Position your banner image:</label>
-            <div class="relative bg-gray-100 rounded-2xl overflow-hidden border-2 border-gray-200 h-64 md:h-80">
-              <% if @society.banner_image.attached? %>
-                <img data-banner-crop-target="preview" src="<%= url_for(@society.banner_image) %>" alt="Banner preview" class="absolute inset-0 w-full h-full object-cover cursor-move" style="object-position: <%= @society.banner_position || 'center center' %>; transform: scale(1.1);">
-              <% else %>
-                <img data-banner-crop-target="preview" src="" alt="Banner preview" class="absolute inset-0 w-full h-full object-cover cursor-move" style="object-position: center center; transform: scale(1.1);">
-              <% end %>
-              <div class="absolute inset-2 border-2 border-dashed border-amber-400 pointer-events-none rounded-xl"></div>
-              <div class="absolute top-2 right-2 bg-black/50 text-white text-xs px-2 py-1 rounded">
+            <label class="mb-2 block text-sm font-medium text-gray-700">Position your banner image:</label>
+            <div class="relative h-64 overflow-hidden rounded-xl bg-gray-100 md:h-80">
+              <img data-banner-crop-target="preview"
+                   src="<%= @society.banner_image.attached? ? url_for(@society.banner_image) : "" %>"
+                   alt="Banner preview" class="absolute inset-0 h-full w-full cursor-move object-cover"
+                   style="object-position: <%= @society.banner_position || 'center center' %>; transform: scale(1.1);">
+              <div class="pointer-events-none absolute inset-2 rounded-lg border-2 border-dashed border-whiskey-400"></div>
+              <div class="absolute right-2 top-2 rounded bg-black/50 px-2 py-1 text-xs text-white">
                 Click and drag to reposition
               </div>
             </div>
             <input type="hidden" name="society[banner_position]" data-banner-crop-target="position" value="<%= @society.banner_position || 'center center' %>">
-            <p class="text-xs text-gray-500 mt-2">The image will be cropped to fit the banner area. Drag the image to position it how you'd like it to appear.</p>
+            <p class="mt-2 text-xs text-gray-500">The image will be cropped to fit the banner area. Drag the image to position it how you'd like it to appear.</p>
           </div>
         </div>
 
         <!-- Privacy Setting -->
-        <div class="space-y-6">
-          <%= form.label :is_private, class: "block text-lg font-semibold text-gray-900" do %>
-            <span class="flex items-center gap-2">
-              🔐 Privacy Setting
-              <span class="text-red-500">*</span>
-            </span>
-          <% end %>
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <fieldset>
+          <legend class="mb-1 block text-sm font-medium text-gray-700">Privacy <span class="text-whiskey-600">*</span></legend>
+          <div class="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
             <!-- Public Option -->
-            <div class="relative">
-              <%= form.radio_button :is_private, false, 
-                  class: "peer sr-only",
-                  id: "public_society" %>
-              <%= form.label :is_private, value: false, for: "public_society",
-                  class: "block cursor-pointer" do %>
-                <div class="p-6 border-2 border-gray-200 rounded-2xl transition-all duration-300 peer-checked:border-green-500 peer-checked:bg-green-50 hover:border-green-300 bg-white/80 backdrop-blur-sm">
-                  <div class="flex items-center gap-4 mb-4">
-                    <div class="w-12 h-12 bg-gradient-to-r from-green-500 to-emerald-600 rounded-2xl flex items-center justify-center">
-                      <span class="text-2xl">🌐</span>
-                    </div>
-                    <div>
-                      <h3 class="text-xl font-bold text-gray-900">Public Society</h3>
-                      <p class="text-sm text-gray-600">Open to everyone</p>
-                    </div>
-                  </div>
-                  <p class="text-gray-700 leading-relaxed">
-                    Anyone can discover and join your society instantly. Perfect for growing a large, welcoming community and meeting new whiskey enthusiasts.
-                  </p>
-                  <div class="mt-4 flex items-center gap-2 text-green-600 text-sm font-medium">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                    </svg>
-                    Instant membership
-                  </div>
-                </div>
-              <% end %>
-            </div>
+            <label class="block cursor-pointer">
+              <%= form.radio_button :is_private, false, checked: !@society.is_private, class: "peer sr-only", id: "public_society" %>
+              <div class="h-full rounded-xl border-2 border-gray-200 p-6 transition hover:border-whiskey-300 peer-checked:border-whiskey-600 peer-checked:bg-whiskey-50 peer-focus-visible:ring-2 peer-focus-visible:ring-whiskey-500 peer-focus-visible:ring-offset-2">
+                <h3 class="text-lg font-semibold text-gray-900">Public society</h3>
+                <p class="mt-0.5 text-sm text-gray-500">Open to everyone</p>
+                <p class="mt-3 text-sm leading-relaxed text-gray-600">
+                  Anyone can discover and join your society instantly. Perfect for growing a large, welcoming community and meeting new whiskey enthusiasts.
+                </p>
+                <p class="mt-4 flex items-center gap-1.5 text-sm font-medium text-whiskey-700">
+                  <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  Instant membership
+                </p>
+              </div>
+            </label>
 
             <!-- Private Option -->
-            <div class="relative">
-              <%= form.radio_button :is_private, true, 
-                  class: "peer sr-only",
-                  id: "private_society" %>
-              <%= form.label :is_private, value: true, for: "private_society",
-                  class: "block cursor-pointer" do %>
-                <div class="p-6 border-2 border-gray-200 rounded-2xl transition-all duration-300 peer-checked:border-amber-500 peer-checked:bg-amber-50 hover:border-amber-300 bg-white/80 backdrop-blur-sm">
-                  <div class="flex items-center gap-4 mb-4">
-                    <div class="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-600 rounded-2xl flex items-center justify-center">
-                      <span class="text-2xl">🔒</span>
-                    </div>
-                    <div>
-                      <h3 class="text-xl font-bold text-gray-900">Private Society</h3>
-                      <p class="text-sm text-gray-600">Application required</p>
-                    </div>
-                  </div>
-                  <p class="text-gray-700 leading-relaxed">
-                    Members must apply to join and be approved by admins. Ideal for creating curated, exclusive communities with shared values and serious commitment.
-                  </p>
-                  <div class="mt-4 flex items-center gap-2 text-amber-600 text-sm font-medium">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                    </svg>
-                    Curated membership
-                  </div>
-                </div>
-              <% end %>
-            </div>
+            <label class="block cursor-pointer">
+              <%= form.radio_button :is_private, true, checked: @society.is_private, class: "peer sr-only", id: "private_society" %>
+              <div class="h-full rounded-xl border-2 border-gray-200 p-6 transition hover:border-whiskey-300 peer-checked:border-whiskey-600 peer-checked:bg-whiskey-50 peer-focus-visible:ring-2 peer-focus-visible:ring-whiskey-500 peer-focus-visible:ring-offset-2">
+                <h3 class="text-lg font-semibold text-gray-900">Private society</h3>
+                <p class="mt-0.5 text-sm text-gray-500">Invite only</p>
+                <p class="mt-3 text-sm leading-relaxed text-gray-600">
+                  Members join by invitation: share your invite link or invite them by email. Ideal for keeping the circle to people you know.
+                </p>
+                <p class="mt-4 flex items-center gap-1.5 text-sm font-medium text-whiskey-700">
+                  <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+                  </svg>
+                  Invite-only membership
+                </p>
+              </div>
+            </label>
           </div>
-        </div>
+        </fieldset>
 
         <!-- Action Buttons -->
-        <div class="flex flex-col sm:flex-row gap-4 pt-8">
-          <%= form.submit "Update Society", 
-              class: "flex-1 py-4 px-8 bg-gradient-to-r from-amber-600 via-orange-600 to-red-600 text-white text-lg font-bold rounded-2xl hover:from-amber-700 hover:via-orange-700 hover:to-red-700 transition-all duration-300 shadow-lg hover:shadow-xl hover:scale-105 transform" %>
-          
-          <%= link_to "Cancel", @society, 
-              class: "flex-1 py-4 px-8 bg-gray-100 text-gray-700 text-lg font-semibold rounded-2xl hover:bg-gray-200 transition-all duration-300 text-center border-2 border-gray-200 hover:border-gray-300" %>
+        <div class="flex flex-col gap-4 pt-2 sm:flex-row">
+          <%= form.submit "Update society",
+              class: "flex-1 cursor-pointer rounded-xl bg-whiskey-600 px-8 py-4 text-lg font-semibold text-white transition hover:bg-whiskey-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2" %>
+          <%= link_to "Cancel", @society,
+              class: "flex-1 rounded-xl border border-gray-200 bg-gray-100 px-8 py-4 text-center text-lg font-semibold text-gray-700 transition hover:bg-gray-200" %>
         </div>
 
-        <!-- Security Note -->
-        <div class="bg-gradient-to-r from-amber-50 to-orange-50 rounded-2xl p-6 border border-amber-100">
-          <div class="flex items-center gap-3 mb-4">
-            <div class="w-8 h-8 bg-amber-500 rounded-full flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd"></path>
-              </svg>
-            </div>
-            <h3 class="text-lg font-semibold text-amber-900">🔒 Admin Access Required</h3>
-          </div>
-          <p class="text-amber-800">Only society admins can edit these settings. Changes will be immediately visible to all members and visitors.</p>
-        </div>
+        <p class="text-sm text-gray-500">
+          Only society admins can edit these settings. Changes are immediately visible to members and visitors.
+        </p>
       <% end %>
     </div>
   </div>
 </div>
-

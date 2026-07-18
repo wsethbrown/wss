@@ -7,6 +7,26 @@ class Society < ApplicationRecord
 
   # Associations
   has_many :society_memberships, dependent: :destroy
+  has_many :society_invitations, dependent: :destroy
+
+  # The review board relation: bottles ranked by THIS society's event reviews,
+  # latest-per-member (owner-pinned math, see wss-reviews). Shared by the
+  # society page and the public invite peek; callers add their own limit.
+  def review_board
+    latest_per_member = <<~SQL
+      INNER JOIN (
+        SELECT DISTINCT ON (reviews.user_id, reviews.bottle_id) reviews.id
+        FROM reviews
+        INNER JOIN events ON events.id = reviews.event_id
+        WHERE events.society_id = #{id.to_i}
+        ORDER BY reviews.user_id, reviews.bottle_id, reviews.created_at DESC, reviews.id DESC
+      ) latest ON latest.id = reviews.id
+    SQL
+    Bottle.joins(:reviews).joins(latest_per_member)
+          .select("bottles.*, AVG(reviews.rating) AS board_avg, COUNT(DISTINCT reviews.user_id) AS board_reviewers")
+          .group("bottles.id")
+          .order(Arel.sql("board_avg DESC, bottles.name ASC"))
+  end
   has_many :members, through: :society_memberships, source: :user
   has_many :events, dependent: :destroy
   has_many :admins, -> { where(society_memberships: { role: 'admin', status: 'active' }) },

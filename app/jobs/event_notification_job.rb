@@ -14,7 +14,15 @@ class EventNotificationJob < ApplicationJob
 
     case kind.to_s
     when "created"
-      recipients(event.society.society_memberships.where(status: "active").includes(:user).map(&:user), event) do |user|
+      members = event.society.society_memberships.where(status: "active").includes(:user).map(&:user)
+      # In-app notifications go to every member; the event_emails mute only
+      # silences EMAIL, the bell still rings.
+      members.uniq.each do |user|
+        next if user.id == event.organizer_id
+
+        Notification.notify!(user: user, actor: event.organizer, notifiable: event, action: "event_created")
+      end
+      recipients(members, event) do |user|
         EventMailer.event_created(user, event).deliver_later
       end
     when "updated"

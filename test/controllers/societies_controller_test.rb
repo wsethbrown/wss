@@ -197,7 +197,8 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
     sign_in @user # creator of @society
     get edit_society_url(@society)
     assert_response :success
-    assert_select "h1", /Community Settings/
+    assert_select "h1", text: /./ # the reskinned edit page titles itself with the society name
+    assert_match "Edit society", response.body
   end
 
   test "should not get edit when not authorized" do

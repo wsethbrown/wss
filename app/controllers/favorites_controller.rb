@@ -6,7 +6,13 @@ class FavoritesController < ApplicationController
   def create
     favoritable = favoritable_class.find(params[:favoritable_id])
     favorite = current_user.favorites.find_or_initialize_by(favoritable: favoritable)
+    fresh_follow = !favorite.persisted?
     if favorite.persisted? || favorite.save
+      # A person gaining a follower hears about it (deduped in the model, so
+      # unfollow/refollow cycles never stack rows).
+      if fresh_follow && favoritable.is_a?(User)
+        Notification.notify!(user: favoritable, actor: current_user, notifiable: favoritable, action: "follow")
+      end
       swap_button_or_redirect favoritable
     else
       redirect_back_or_to favoritable, alert: favorite.errors.full_messages.to_sentence

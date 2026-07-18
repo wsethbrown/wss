@@ -94,6 +94,15 @@ Rails.application.routes.draw do
 
   # Society member management (remove / change role) by society managers.
   resources :society_memberships, only: [:update, :destroy]
+
+  # Email invitations into a society (create carries society_id; accept and
+  # decline are the invitee's, from the notifications page).
+  resources :society_invitations, only: [:create] do
+    member { patch :accept; patch :decline }
+  end
+
+  # In-app notifications (the nav bell).
+  resources :notifications, only: [:index]
   
   # Keep top-level event routes for existing functionality
   # but they should redirect to the society page

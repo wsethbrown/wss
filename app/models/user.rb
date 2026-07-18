@@ -107,6 +107,13 @@ class User < ApplicationRecord
   has_many :shelf_items, -> { order(:position, :id) }, dependent: :destroy
   # Admin invitations: who set this account up, if anyone.
   belongs_to :invited_by, class_name: "User", optional: true
+  # In-app notifications: received, plus rows where this user is the actor
+  # (both go when the account goes).
+  has_many :notifications, dependent: :destroy
+  has_many :authored_notifications, class_name: "Notification", foreign_key: :actor_id, dependent: :destroy
+  # Society email invitations (received / sent).
+  has_many :society_invitations, dependent: :destroy
+  has_many :sent_society_invitations, class_name: "SocietyInvitation", foreign_key: :invited_by_id, dependent: :destroy
   has_many :review_votes, dependent: :destroy
   has_many :review_reports, dependent: :destroy
   has_many :favorites, dependent: :destroy
