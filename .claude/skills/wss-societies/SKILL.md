@@ -52,6 +52,17 @@ wss-membership-model for the free-vs-paid split.
   event creation → end_time + 7 days, enforced in the MODEL so it can't be
   bypassed; authors + Event#managed_by? delete. Flat, event-scoped chatter —
   deliberately NOT the rejected forum; don't generalize it into one.
+- **Event hosts (owner-approved July 2026):** `events.host_id` (nullable, a
+  User). Assigned from the Host card on the event page by `policy(event).update?`
+  holders (organizer/society admins) via `PATCH assign_host` — must be an
+  ACTIVE society member; blank clears. The host gets EXACTLY two powers:
+  the "RSVP replies" sidebar panel (statuses + notes; gate is
+  `EventPolicy#view_rsvps?` = managers OR host) and a seat on rsvp_received
+  emails (both RSVP paths fan out to [organizer, host].compact.uniq, skipping
+  self + muted). NO edit/delete/reassign rights — don't add host to
+  update?/managed_by?. This is the member half of the approved deck-reviews
+  host field; free-text host_name + events.presentation_id come with that
+  feature (see the deck-reviews spec notes) — extend, don't parallel-build.
 - Society page sidebar = "Next tasting" card (next event + RSVP link, or a
   schedule prompt for managers). A redundant "Society Stats" card was removed
   deliberately — counts live in the masthead; don't bring it back.
