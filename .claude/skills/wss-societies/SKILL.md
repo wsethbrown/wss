@@ -28,13 +28,28 @@ wss-membership-model for the free-vs-paid split.
   VIEWER shares with them (fellow members already know); own profile shows
   all. Never list a private membership to an outsider.
 
-## Invites (the only door into a private society)
+## Invites (the doors into a private society)
 - societies.invite_token (unique, lazily generated via invite_token!).
 - GET /invite/:token → join_by_invite: signed-in + valid token joins (works
   for private — the link IS the invite); already-member and bad-token paths
-  redirect gracefully; signed-out → auth first.
-- Managers see the invite-link card on the society page; "Generate new link"
-  (regenerate_invite) REVOKES all previously shared links.
+  redirect gracefully. **Signed-out gets the PEEK** (owner-approved July
+  2026, societies/invite.html.erb): masthead + About + top-3 review board +
+  join CTA; private societies show NO member identities/counts/founder. The
+  token is stashed in session and ApplicationController#consume_pending_invite
+  auto-joins on the first signed-in GET, whatever auth door they used.
+- **Email invitations** (SocietyInvitation, owner-approved July 2026):
+  manage_members? holders invite an EXISTING account by email from the
+  society-page card; invitee gets a bell notification + SocietyMailer email
+  and accepts/declines from /notifications; the inviter is notified both
+  ways (bell + email). Refused: current members, a second pending invite,
+  and anyone with MAX_DECLINES(3) declines for that society (permanent).
+  Unknown emails create nothing; the flash points at the invite link.
+- Managers see one "Invite members" card (email form + pending list + the
+  link, which is click-to-copy via clipboard_controller with a toast);
+  "Generate new link" (regenerate_invite) REVOKES all previously shared links.
+- societies.description = the SHORT blurb (masthead/cards/og); societies.about
+  = the long-form story ("About This Society" section + the peek, rendered
+  with simple_format, falls back to description when blank). Don't merge them.
 
 ## Member management (SocietyMembershipsController)
 - Guarded by SocietyPolicy#manage_members? (creator, society admins/officers,

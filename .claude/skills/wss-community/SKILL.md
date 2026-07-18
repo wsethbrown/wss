@@ -115,3 +115,20 @@ it's current behavior, not a bug in scope.
   label pill — that direction was already rejected.
 - Contact addresses and Cloudflare routes are two separate systems that must be
   hand-kept in sync; the routing config is not in git.
+
+## In-app notifications (the bell, owner-approved July 2026)
+
+- `Notification` (user=recipient, actor, polymorphic notifiable, action,
+  read_at). ACTIONS whitelist in the model; every action MUST have a text +
+  link mapping in NotificationsHelper or its rows silently render nothing.
+- `Notification.notify!` is the ONLY entry point: skips self-notifications,
+  dedups follow/review_vote (DEDUPED_ACTIONS find_or_create), rescues+logs.
+- Creation points: FavoritesController (User follows only, fresh saves only),
+  ReviewVotesController (fresh votes only), EventNotificationJob "created"
+  (ALL active members — the event_emails mute silences EMAIL, not the bell),
+  and SocietyInvitation create/accept/decline.
+- UI: nav bell (desktop + mobile menu) with unread count; /notifications
+  lists 50, highlights unread once, then marks all read on view. Pending
+  society_invite rows carry inline Accept/Decline button_to's.
+- The bell count runs on every signed-in page render; keep it a single
+  indexed COUNT and never join through it.
