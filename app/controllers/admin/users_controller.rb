@@ -1,5 +1,5 @@
 class Admin::UsersController < Admin::BaseController
-  before_action :set_user, only: [:show, :edit, :update, :update_role]
+  before_action :set_user, only: [:show, :edit, :update, :update_role, :resend_invitation]
 
   def index
     @users = User.all
@@ -90,6 +90,15 @@ class Admin::UsersController < Admin::BaseController
 
     @user.update!(admin_role: role)
     redirect_to admin_user_path(@user), notice: "Role updated: #{@user.email} is now #{role_label(role)}."
+  end
+
+  def resend_invitation
+    result = Auth::InvitationService.resend!(@user)
+    if result.success?
+      redirect_to admin_user_path(@user), notice: result.message
+    else
+      redirect_to admin_user_path(@user), alert: result.message
+    end
   end
 
   private

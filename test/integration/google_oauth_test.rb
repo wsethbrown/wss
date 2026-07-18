@@ -5,8 +5,9 @@ class GoogleOAuthTest < ActionDispatch::IntegrationTest
     # Clear any existing OAuth mocks
     clear_oauth_mocks
     
-    # Clean up any existing test emails
-    Dir.glob("#{Rails.root}/tmp/mail/*").each { |file| File.delete(file) }
+    # Clean up any existing test emails. rm_f: parallel workers race on this
+    # shared directory, and a file already deleted by a sibling is success.
+    Dir.glob("#{Rails.root}/tmp/mail/*").each { |file| FileUtils.rm_f(file) }
     
     # Ensure we start with a clean database state
   end

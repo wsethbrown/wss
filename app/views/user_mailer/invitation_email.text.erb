@@ -1,0 +1,9 @@
+You're invited to Whiskey Share Society
+
+<%= @inviter ? "#{@inviter.first_name} set up" : "We set up" %> a Whiskey Share Society account for <%= @user.email %>. Accept the invitation to claim it:
+
+<%= @invitation_url %>
+
+The link works for 14 days. After you accept, sign in any time with a magic link sent to this address or with Google.
+
+Not expecting this? You can safely ignore this email.

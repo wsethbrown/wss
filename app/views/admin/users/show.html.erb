@@ -167,5 +167,18 @@
 
     <!-- Admin Status -->
     <%= render "role_card", user: @user %>
+
+    <% if @user.invitation_sent_at.present? && @user.invitation_accepted_at.nil? %>
+      <!-- Pending invitation -->
+      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
+        <h3 class="text-lg font-semibold text-gray-900 mb-2">Invitation pending</h3>
+        <p class="text-sm text-gray-600 mb-4">
+          Invited <%= time_ago_in_words(@user.invitation_sent_at) %> ago<%= " by #{@user.invited_by.full_name}" if @user.invited_by %>.
+          They haven't accepted yet; the link works for 14 days.
+        </p>
+        <%= button_to "Re-send invitation", resend_invitation_admin_user_path(@user), method: :post,
+            class: "w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition" %>
+      </div>
+    <% end %>
   </div>
 </div>

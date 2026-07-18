@@ -105,6 +105,8 @@ class User < ApplicationRecord
   has_many :activity_logs, dependent: :destroy
   has_many :reviews, dependent: :destroy
   has_many :shelf_items, -> { order(:position, :id) }, dependent: :destroy
+  # Admin invitations: who set this account up, if anyone.
+  belongs_to :invited_by, class_name: "User", optional: true
   has_many :review_votes, dependent: :destroy
   has_many :review_reports, dependent: :destroy
   has_many :favorites, dependent: :destroy

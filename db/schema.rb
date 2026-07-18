@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_17_200652) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_18_201041) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -533,9 +533,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_17_200652) do
     t.boolean "founding_member", default: false, null: false
     t.datetime "founding_revoked_at"
     t.boolean "event_emails", default: true, null: false
+    t.string "invitation_token_digest"
+    t.datetime "invitation_sent_at"
+    t.datetime "invitation_accepted_at"
+    t.bigint "invited_by_id"
     t.index ["admin_role"], name: "index_users_on_admin_role"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["founding_member"], name: "index_users_on_founding_member"
+    t.index ["invitation_token_digest"], name: "index_users_on_invitation_token_digest"
+    t.index ["invited_by_id"], name: "index_users_on_invited_by_id"
     t.index ["is_admin"], name: "index_users_on_is_admin"
     t.index ["magic_link_token"], name: "index_users_on_magic_link_token", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
@@ -588,4 +594,5 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_17_200652) do
   add_foreign_key "user_presentations", "users"
   add_foreign_key "user_tags", "tags"
   add_foreign_key "user_tags", "users"
+  add_foreign_key "users", "users", column: "invited_by_id"
 end

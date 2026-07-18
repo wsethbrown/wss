@@ -28,6 +28,9 @@ Rails.application.routes.draw do
   post "magic_links", to: "magic_links#create"
   get "magic_links/:token", to: "magic_links#show", as: "magic_link"
 
+  # Admin invitations: the claim link from the invite email.
+  get "invitations/:token", to: "invitations#show", as: :invitation
+
   # Single root for all users
   root to: 'home#index'
 
@@ -111,8 +114,10 @@ Rails.application.routes.draw do
     resources :users, only: [:index, :show, :edit, :update] do
       # Admin-role changes are a dedicated, guarded action, never part of the
       # general user update (same rule as credits: no mass-assignment path).
-      member { patch :update_role }
+      member { patch :update_role; post :resend_invitation }
     end
+    # Invite a new member: creates the account and emails the claim link.
+    resources :invitations, only: [:new, :create]
     resources :subscriptions, only: [:index, :edit, :update] do
       member do
         post :cancel

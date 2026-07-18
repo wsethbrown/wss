@@ -1,8 +1,12 @@
 <div class="max-w-7xl mx-auto">
   <!-- Header -->
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-900">User Management</h1>
-    <p class="text-gray-600 mt-2">Search and manage all users in the system</p>
+  <div class="mb-8 flex flex-wrap items-start justify-between gap-4">
+    <div>
+      <h1 class="text-3xl font-bold text-gray-900">User Management</h1>
+      <p class="text-gray-600 mt-2">Search and manage all users in the system</p>
+    </div>
+    <%= link_to "Invite a member", new_admin_invitation_path,
+        class: "px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition" %>
   </div>
 
   <!-- Stats Cards -->
@@ -137,6 +141,9 @@
                   <div class="ml-4">
                     <div class="text-sm font-medium text-gray-900">
                       <%= user.full_name %>
+                      <% if user.invitation_sent_at.present? && user.invitation_accepted_at.nil? %>
+                        <span class="ml-1 inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">Invited</span>
+                      <% end %>
                     </div>
                     <div class="text-xs text-gray-500">
                       ID: <%= user.id %>

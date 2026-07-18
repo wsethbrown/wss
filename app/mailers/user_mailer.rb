@@ -23,6 +23,17 @@ class UserMailer < ApplicationMailer
     )
   end
 
+  def invitation_email(user, token)
+    @user = user
+    @inviter = user.invited_by
+    @invitation_url = invitation_url(token: token)
+
+    mail(
+      to: @user.email,
+      subject: "You're invited to Whiskey Share Society"
+    )
+  end
+
   def email_change_verification(user, new_email, token)
     @user = user
     @new_email = new_email

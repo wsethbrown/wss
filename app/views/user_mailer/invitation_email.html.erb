@@ -1,0 +1,7 @@
+<%= render "mailers/layout_open" %>
+      <p class="eyebrow">You're invited</p>
+      <h2 class="title" style="margin-top:0;">Your account is ready</h2>
+      <p><%= @inviter ? "#{@inviter.first_name} set up" : "We set up" %> a Whiskey Share Society account for <strong><%= @user.email %></strong>. Accept the invitation to claim it.</p>
+      <a class="btn" href="<%= @invitation_url %>">Accept your invitation</a>
+      <p class="hint">The link works for 14 days. After you accept, sign in any time with a magic link sent to this address or with Google.</p>
+<%= render "mailers/layout_close", footer_note: "Not expecting this? You can safely ignore this email." %>
