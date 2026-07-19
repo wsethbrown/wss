@@ -88,6 +88,37 @@ class DeckPourLinksTest < ActionDispatch::IntegrationTest
                     "the legacy pour field must be gone from the form"
   end
 
+  test "a linked pour makes the whole card the link, with no nested anchors" do
+    PresentationBottle.create!(presentation: @deck, bottle: @bottle, position: 1, notes: "Pear and oak.")
+    get presentation_path(@deck)
+    assert_response :success
+
+    card = css_select("a[href='#{bottle_path(@bottle)}']").find { |a| a.css("h3").any? }
+    assert card, "the pour card itself must be the link, not just its title"
+    assert_equal 0, card.css("a").size, "a nested anchor is invalid and steals the click"
+    assert_match "Pear and oak.", card.to_s, "the whole card, notes included, is inside the link"
+  end
+
+  # display_name appends the distillery; the card prints origin separately, so
+  # using it there printed the distillery twice.
+  test "a pour card titles the bottle without repeating its origin" do
+    @bottle.update!(distillery: "Hikari Distillery, Fukuoka")
+    PresentationBottle.create!(presentation: @deck, bottle: @bottle, position: 1)
+    get presentation_path(@deck)
+
+    card = css_select("a[href='#{bottle_path(@bottle)}']").find { |a| a.css("h3").any? }
+    assert_equal "Tied Dram", card.css("h3").text.strip
+    assert_equal 1, card.to_s.scan("Hikari Distillery, Fukuoka").size
+  end
+
+  test "an unlinked pour is not a link" do
+    PresentationBottle.create!(presentation: @deck, name: "Mint Julep", position: 1)
+    get presentation_path(@deck)
+    assert_match "Mint Julep", response.body
+    assert_empty css_select("a").select { |a| a.text.include?("Mint Julep") },
+                 "a pour with no catalog bottle has nowhere to link to"
+  end
+
   test "the deck page shows its linked pours" do
     PresentationBottle.create!(presentation: @deck, bottle: @bottle, position: 1, label: "the opener")
     get presentation_path(@deck)

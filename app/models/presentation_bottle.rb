@@ -38,6 +38,14 @@ class PresentationBottle < ApplicationRecord
 
   # What the pour list shows. A linked row follows the catalog, so renaming a
   # bottle updates every deck that pours it.
+  #
+  # `title` is the bare name, for surfaces that show the origin separately (the
+  # deck's pour cards). `display_name` appends the distillery to disambiguate
+  # two bottles of the same name, for surfaces that show the name alone (admin
+  # pickers, search results). Using display_name on a card that also renders
+  # origin_text prints the distillery twice.
+  def title = bottle&.name.presence || name.to_s
+
   def display_name = bottle&.display_name.presence || name.to_s
 
   def origin_text

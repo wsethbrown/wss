@@ -315,57 +315,22 @@
 
             <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
               <% pour_list.each do |pour| %>
-                <div class="rounded-2xl border border-gray-200 bg-white p-7 transition-shadow hover:shadow-lg">
-                  <div class="flex items-baseline justify-between gap-4">
-                    <h3 class="font-display text-xl font-semibold leading-tight text-gray-900">
-                      <% if pour.linked? %>
-                        <%= link_to pour.display_name, bottle_path(pour.bottle), class: "hover:text-whiskey-700" %>
-                      <% else %>
-                        <%= pour.display_name %>
-                      <% end %>
-                    </h3>
-                    <% if pour.price.present? %>
-                      <span class="shrink-0 rounded-full bg-whiskey-100 px-3 py-1 text-sm font-semibold text-whiskey-800"><%= pour.price %></span>
-                    <% end %>
+                <%# A linked pour makes the WHOLE card the link to the bottle,
+                    not just its title: the card is one idea, and a 20px title
+                    is a poor click target on a phone. The card's contents are
+                    in a partial with no links of its own, since a nested <a>
+                    would be invalid and would steal the click. %>
+                <% card = "block rounded-2xl border border-gray-200 bg-white p-7 transition" %>
+                <% if pour.linked? %>
+                  <%= link_to bottle_path(pour.bottle),
+                      class: "#{card} hover:border-whiskey-300 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2" do %>
+                    <%= render "presentations/pour_card", pour: pour %>
+                  <% end %>
+                <% else %>
+                  <div class="<%= card %>">
+                    <%= render "presentations/pour_card", pour: pour %>
                   </div>
-
-                  <% if pour.label.present? %>
-                    <p class="mt-1 text-sm italic text-whiskey-700/80"><%= pour.label %></p>
-                  <% end %>
-
-                  <% if pour.origin_text.present? %>
-                    <p class="mt-2 flex items-start gap-1.5 text-sm text-gray-500">
-                      <svg class="mt-0.5 h-4 w-4 shrink-0 text-whiskey-500" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                      </svg>
-                      <span><%= pour.origin_text %></span>
-                    </p>
-                  <% end %>
-
-                  <%# Only a catalog-linked pour can carry a score, and it's the
-                      bottle's score across ALL tastings, not this deck's nights,
-                      so it has to say so. %>
-                  <% if pour.linked? && pour.bottle.average_rating.present? %>
-                    <div class="mt-4 flex items-center gap-2">
-                      <%= render "bottles/rating", value: pour.bottle.average_rating %>
-                      <span class="text-xs text-gray-500">overall rating</span>
-                    </div>
-                  <% end %>
-
-                  <% if pour.style_text.present? %>
-                    <div class="mt-5 border-t border-gray-100 pt-4">
-                      <p class="text-sm leading-relaxed text-gray-600"><%= pour.style_text %></p>
-                    </div>
-                  <% end %>
-
-                  <% if pour.notes.present? %>
-                    <div class="mt-4">
-                      <p class="eyebrow mb-1 text-whiskey-700/70">Tasting notes</p>
-                      <p class="text-sm leading-relaxed text-gray-700"><%= pour.notes %></p>
-                    </div>
-                  <% end %>
-                </div>
+                <% end %>
               <% end %>
             </div>
           </section>
