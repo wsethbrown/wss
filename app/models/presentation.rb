@@ -10,6 +10,9 @@ class Presentation < ApplicationRecord
   # Events that ran this deck keep their record; restrict, don't cascade.
   has_many :presentation_reviews, dependent: :destroy
   # The deck's pour list, linked to catalog bottles (see PresentationBottle).
+  # This is what the deck RECOMMENDS. It is NOT what any society actually
+  # poured: bottles go missing from local shelves, prices move, and rooms
+  # substitute freely by design. Keep the two facts apart (see #pours_from_nights).
   has_many :presentation_bottles, -> { ordered }, dependent: :destroy
   has_many :bottles, through: :presentation_bottles
   has_many :events, dependent: :nullify
@@ -79,6 +82,45 @@ class Presentation < ApplicationRecord
   # read, so bulk listings cost no extra queries. Recompute, never increment:
   # one aggregate over the reviews table is the only writer, which keeps the
   # cache self-healing if a row is ever changed out from under us.
+  # One row per bottle that was ACTUALLY poured on a finished night that ran
+  # this deck, with the scores from those nights only.
+  #
+  # This is deliberately not the deck's pour list. A society pours what it can
+  # get and what it wants: the recommended bottle may be unavailable locally,
+  # too expensive, or simply not to the room's taste. Substitutions are normal
+  # and are worth surfacing rather than hiding, so each row records whether the
+  # bottle was on the deck's list (`on_deck_list`).
+  #
+  # `average` comes from event-tagged reviews on those nights only, never a
+  # bottle's global score, so the page can't imply a rating came from running
+  # this deck when it didn't.
+  PouredBottle = Struct.new(:bottle, :nights, :average, :reviews_count, :on_deck_list,
+                            keyword_init: true)
+
+  def nights_run
+    events.where(end_time: ..Time.current)
+  end
+
+  def pours_from_nights
+    night_ids = nights_run.pluck(:id)
+    return [] if night_ids.empty?
+
+    times_poured = EventBottle.where(event_id: night_ids).group(:bottle_id).count
+    return [] if times_poured.empty?
+
+    scores = Review.where(event_id: night_ids, bottle_id: times_poured.keys)
+                   .group(:bottle_id)
+                   .pluck(Arel.sql("bottle_id, AVG(rating), COUNT(*)"))
+                   .to_h { |id, avg, count| [ id, [ avg&.to_f&.round(2), count ] ] }
+
+    listed = bottle_ids.to_set
+    Bottle.where(id: times_poured.keys).map do |bottle|
+      average, count = scores[bottle.id]
+      PouredBottle.new(bottle: bottle, nights: times_poured[bottle.id], average: average,
+                       reviews_count: count.to_i, on_deck_list: listed.include?(bottle.id))
+    end.sort_by { |pour| [ -pour.nights, pour.bottle.name ] }
+  end
+
   def refresh_review_stats!
     stats = presentation_reviews.pick(Arel.sql("COUNT(*), AVG(rating)"))
     count, average = stats || [0, nil]
