@@ -34,6 +34,7 @@ class BottlesController < ApplicationController
         # Prefill fodder for the deck pour form, so an admin doesn't retype
         # what the catalog already knows (bottle_search#autofill).
         origin: b.origin_line, style: b.style,
+        price: b.suggested_price, notes: b.suggested_notes,
         url: bottle_path(b), review_url: new_bottle_review_path(b) }
     }
   end

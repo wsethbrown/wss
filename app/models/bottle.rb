@@ -85,6 +85,32 @@ class Bottle < ApplicationRecord
     [ name, distillery ].compact_blank.join(" · ")
   end
 
+  # Starting points for a deck's pour list, drawn from real tastings.
+  #
+  # These are the ROOM's number and the ROOM's words, not the deck author's, so
+  # they only ever prefill an EMPTY field on the deck form, where the author
+  # sees them and edits from there. They are deliberately not a render-time
+  # fallback the way origin and style are: origin and style are facts about the
+  # bottle, while price and tasting notes are market data and opinion, and
+  # printing those on a deck page unread would put words in the author's mouth.
+  #
+  # Nothing flows the other way. A deck author's edits live on their pour row;
+  # the bottle's own page stays the record of the bottle.
+  def suggested_price
+    summary = price_summary
+    return if summary.blank?
+
+    value = summary[:median] || ((summary[:low] + summary[:high]) / 2.0)
+    "$#{value.round}"
+  end
+
+  def suggested_notes(limit = 5)
+    words = top_descriptors(limit)
+    return if words.empty?
+
+    "#{words.map(&:capitalize).join(', ')}."
+  end
+
   # Where the bottle comes from, as one line.
   #
   # Distillery and region overlap constantly in real entries, and usually only

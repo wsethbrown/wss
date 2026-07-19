@@ -115,6 +115,36 @@ class DeckPourLinksTest < ActionDispatch::IntegrationTest
                  "the row must show whether it is linked, not imply it"
   end
 
+  # The pour row's fields are per-DECK. The bottle's own page is the record of
+  # the bottle, and nothing an admin types into a deck may leak back into it.
+  test "editing a pour never writes back to the catalog bottle" do
+    @bottle.update!(style: "Bourbon", region: "Kentucky", distillery: "Buffalo Trace")
+    before = @bottle.attributes
+    sign_in @admin
+    save_deck({ "0" => { bottle_id: @bottle.id, position: 1,
+                         origin: "Somewhere else entirely", style: "Rewritten for this deck",
+                         price: "$999", notes: "The deck author's own words." } })
+
+    pour = @deck.reload.presentation_bottles.sole
+    assert_equal "Rewritten for this deck", pour.style_text
+    assert_equal "$999", pour.price
+    assert_equal before, @bottle.reload.attributes, "the bottle record must be untouched"
+  end
+
+  test "a bottle's suggestions never render as the deck's own price or notes" do
+    # Facts about the bottle (origin, style) may fall back at render time.
+    # Market data and opinion may not: they are prefill-only, so an unread
+    # suggestion can't appear on a deck page as the author's word.
+    @bottle.update!(style: "Bourbon")
+    Review.new(user: users(:jane), bottle: @bottle, rating: 4.0, nose: "pear", palate: "oak",
+               price_paid: 50).save!(validate: false)
+    pour = PresentationBottle.create!(presentation: @deck, bottle: @bottle, position: 1)
+
+    assert_equal "Bourbon", pour.style_text, "style is a fact about the bottle"
+    assert_nil pour.price, "price is prefilled at authoring time, never inferred at render"
+    assert_nil pour.notes, "tasting notes are the author's, never borrowed silently"
+  end
+
   # The pour form prefills origin and style from the catalog, so the payload
   # the search endpoint returns is load-bearing, not decorative.
   test "bottle search returns the fields a pour row prefills from" do
@@ -126,6 +156,28 @@ class DeckPourLinksTest < ActionDispatch::IntegrationTest
     match = JSON.parse(response.body).find { |b| b["id"] == @bottle.id }
     assert_equal "Buffalo Trace, Kentucky", match["origin"]
     assert_equal "Bourbon", match["style"]
+  end
+
+  # Descriptors come from the structured tasting sections, not the free notes
+  # field, so that is what a suggestion can be built from.
+  test "bottle search suggests a price and notes once there are tastings" do
+    Review.new(user: users(:jane), bottle: @bottle, rating: 4.0, nose: "pear", palate: "oak",
+               notes: "Lovely.", price_paid: 50).save!(validate: false)
+    sign_in @admin
+    get search_bottles_path(q: "Tied")
+
+    match = JSON.parse(response.body).find { |b| b["id"] == @bottle.id }
+    assert_equal "$50", match["price"]
+    assert match["notes"].present?, "descriptors tasters actually used"
+  end
+
+  test "an untasted bottle suggests nothing rather than inventing it" do
+    sign_in @admin
+    get search_bottles_path(q: "Tied")
+
+    match = JSON.parse(response.body).find { |b| b["id"] == @bottle.id }
+    assert_nil match["price"]
+    assert_nil match["notes"]
   end
 
   test "the pour form marks the fields the catalog can prefill" do

@@ -55,7 +55,9 @@
     <div>
       <%= f.label :price, "Price", class: "mb-1 block text-xs font-medium text-gray-600" %>
       <%= f.text_field :price, placeholder: "e.g., $45",
+          data: { bottle_fill: "price" },
           class: "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+      <p class="mt-1 text-xs text-gray-500">Suggested from what tasters paid. Yours to change.</p>
     </div>
     <div>
       <%= f.label :label, "Role on the night", class: "mb-1 block text-xs font-medium text-gray-600" %>
@@ -71,7 +73,9 @@
     <div class="md:col-span-2">
       <%= f.label :notes, "Tasting notes", class: "mb-1 block text-xs font-medium text-gray-600" %>
       <%= f.text_area :notes, rows: 2, placeholder: "e.g., Pear, oak, subtle spice. Pour it for the 1820s chapter.",
+          data: { bottle_fill: "notes" },
           class: "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+      <p class="mt-1 text-xs text-gray-500">Suggested from the words tasters used. Rewrite it in the deck's voice.</p>
     </div>
   </div>
 
