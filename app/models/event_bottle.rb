@@ -6,6 +6,9 @@ class EventBottle < ApplicationRecord
 
   validates :position, presence: true, numericality: { only_integer: true, greater_than: 0 }
   validates :label, length: { maximum: 100 }
+  # The host's own words for tonight. Prefilled from the bottle when the pour
+  # is added, then theirs; never written back to the bottle.
+  validates :notes, length: { maximum: 2000 }
   validates :bottle_id, uniqueness: { scope: :event_id, message: "is already on this event's pour list" }
 
   scope :ordered, -> { order(:position, :id) }

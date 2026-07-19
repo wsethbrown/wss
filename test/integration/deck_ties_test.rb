@@ -432,3 +432,62 @@ class WrittenPourMigrationTest < ActiveSupport::TestCase
     assert_equal 1, deck.reload.presentation_bottles.count
   end
 end
+
+# An event's pour list carries the HOST's framing for tonight, prefilled from
+# the bottle and edited freely. A deck's pour notes are a sales pitch; these
+# are "I bought these, here's what I think." Neither writes back to the bottle.
+class EventPourNotesTest < ActionDispatch::IntegrationTest
+  setup do
+    @host = users(:john)
+    @society = Society.create!(name: "Pour Notes Club", description: "x", creator: @host, is_private: false)
+    @event = Event.new(society: @society, organizer: @host, title: "Tonight", description: "x",
+                       location: "den", start_time: 1.day.from_now, end_time: 1.day.from_now + 2.hours)
+    @event.save!(validate: false)
+    @bottle = Bottle.create!(name: "Notes Dram", distillery: "Somewhere", created_by: @host)
+  end
+
+  test "a host adds a pour with their own notes for the night" do
+    sign_in @host
+    post event_event_bottles_path(@event),
+         params: { event_bottle: { bottle_id: @bottle.id, label: "the blind",
+                                   notes: "Opens the night; the sherry ties to the 1890s chapter." } }
+
+    pour = @event.reload.event_bottles.sole
+    assert_equal "Opens the night; the sherry ties to the 1890s chapter.", pour.notes
+  end
+
+  test "a host edits a pour's notes without touching the bottle" do
+    pour = EventBottle.create!(event: @event, bottle: @bottle, position: 1, notes: "First take.")
+    before = @bottle.attributes
+    sign_in @host
+
+    patch event_event_bottle_path(@event, pour), params: { event_bottle: { notes: "Rewritten for tonight." } }
+    assert_equal "Rewritten for tonight.", pour.reload.notes
+    assert_equal before, @bottle.reload.attributes, "the bottle's record is not the host's scratchpad"
+  end
+
+  test "a pour cannot be repointed at another bottle through an edit" do
+    other = Bottle.create!(name: "Other Dram", created_by: @host)
+    pour = EventBottle.create!(event: @event, bottle: @bottle, position: 1)
+    sign_in @host
+
+    patch event_event_bottle_path(@event, pour), params: { event_bottle: { bottle_id: other.id, notes: "x" } }
+    assert_equal @bottle, pour.reload.bottle, "repointing would silently reassign the night's reviews"
+  end
+
+  test "someone who cannot manage the pours cannot edit their notes" do
+    pour = EventBottle.create!(event: @event, bottle: @bottle, position: 1, notes: "Host's words.")
+    sign_in users(:jane)
+
+    patch event_event_bottle_path(@event, pour), params: { event_bottle: { notes: "Not mine to write." } }
+    assert_equal "Host's words.", pour.reload.notes
+  end
+
+  test "the add-pour form offers a notes box the catalog can prefill" do
+    sign_in @host
+    get society_event_path(@society, @event)
+    assert_response :success
+    assert_match 'data-bottle-fill="notes"', response.body
+    assert_match "event_bottle[notes]", response.body
+  end
+end

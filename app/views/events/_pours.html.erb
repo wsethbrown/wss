@@ -45,6 +45,26 @@
                 <% end %>
               </div>
             </div>
+            <%# The host's framing of this pour for tonight. Prefilled from the
+                bottle when added, then the host's own words; edits stay here
+                and never touch the bottle's record. %>
+            <% if pour.notes.present? %>
+              <p class="mt-3 text-sm leading-relaxed text-gray-700"><%= pour.notes %></p>
+            <% end %>
+            <% if user_signed_in? && policy(@event).manage_pours? %>
+              <details class="mt-2">
+                <summary class="cursor-pointer text-sm font-semibold text-whiskey-700 hover:text-whiskey-600">
+                  <%= pour.notes.present? ? "Edit these notes" : "Add notes for tonight" %>
+                </summary>
+                <%= form_with url: event_event_bottle_path(@event, pour), method: :patch, class: "mt-2 space-y-2" do %>
+                  <%= text_area_tag "event_bottle[notes]", pour.notes, rows: 3,
+                      placeholder: "What you make of it, and what it's doing on tonight's list.",
+                      class: "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+                  <%= submit_tag "Save notes", class: "cursor-pointer rounded-xl bg-whiskey-600 px-3 py-1.5 text-sm font-semibold text-white transition hover:bg-whiskey-700" %>
+                <% end %>
+              </details>
+            <% end %>
+
             <% if night_reviews.any? %>
               <details class="mt-3 border-t border-gray-100 pt-3">
                 <summary class="cursor-pointer text-sm font-semibold text-whiskey-700 hover:text-whiskey-600">
@@ -70,10 +90,14 @@
 
     <% if user_signed_in? && policy(@event).manage_pours? %>
       <div class="mt-6 border-t border-gray-100 pt-6">
-        <%= form_with url: event_event_bottles_path(@event), method: :post, class: "space-y-3" do %>
-          <div class="relative" data-controller="bottle-search"
-               data-bottle-search-url-value="<%= search_bottles_path %>"
-               data-bottle-search-return-to-value="<%= society_event_path(@event.society, @event) %>">
+        <%# bottle-search wraps the WHOLE form so picking a bottle can prefill
+            the notes box ([data-bottle-fill]) with what tasters have said about
+            it. A starting point for the host to rewrite, not a verdict. %>
+        <%= form_with url: event_event_bottles_path(@event), method: :post, class: "space-y-3",
+                      data: { controller: "bottle-search",
+                              bottle_search_url_value: search_bottles_path,
+                              bottle_search_return_to_value: society_event_path(@event.society, @event) } do %>
+          <div class="relative">
             <input type="search" placeholder="Add a pour, search bottles or distilleries…" autocomplete="off"
                    data-bottle-search-target="input" data-action="input->bottle-search#query"
                    class="w-full rounded-lg border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-whiskey-500">
@@ -81,12 +105,16 @@
             <div data-bottle-search-target="results"
                  class="absolute inset-x-0 top-full z-20 mt-1 hidden overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"></div>
           </div>
-          <div class="flex items-center gap-3">
-            <%# Single-quoted attribute: the examples carry double quotes. %>
-            <input type="text" name="event_bottle[label]" placeholder='How it appears on the pour list, e.g. "the blind" (optional)'
-                   class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500">
-            <%= submit_tag "Add pour", class: "cursor-pointer shrink-0 rounded-xl bg-whiskey-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-whiskey-700" %>
+          <%# Single-quoted attribute: the examples carry double quotes. %>
+          <input type="text" name="event_bottle[label]" placeholder='How it appears on the pour list, e.g. "the blind" (optional)'
+                 class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500">
+          <div>
+            <%= text_area_tag "event_bottle[notes]", nil, rows: 3, data: { bottle_fill: "notes" },
+                placeholder: "What you make of it, and what it's doing on tonight's list.",
+                class: "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+            <p class="mt-1 text-xs text-gray-500">Filled in from what tasters have said, if anything. Make it yours.</p>
           </div>
+          <%= submit_tag "Add pour", class: "cursor-pointer rounded-xl bg-whiskey-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-whiskey-700" %>
         <% end %>
 
         <%= button_to (@event.pours_hidden_until_complete? ? "Reveal the pours now" : "Keep the pours secret until the night ends"),
