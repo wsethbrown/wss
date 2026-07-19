@@ -14,6 +14,47 @@ Legend: **[code]** = engineering work · **[owner]** = only the owner can do it 
 
 ## Highest priority
 
+- **Deploy discipline (shipped 2026-07-19, don't regress). [code, done]**
+  CI had NEVER passed before this date, so it was decoration and deploys
+  ignored it. Now: `bin/kamal-deploy deploy` refuses unless HEAD is committed,
+  pushed and CI-green (`--force` overrides and says so loudly), and `bin/smoke`
+  runs after every deploy. **Never "fix" a red build by deleting the check.**
+  NOTE: running `bin/kamal-deploy deploy` really deploys once CI is green;
+  there is no dry-run. Don't run it to "test the gate".
+
+- **Infrastructure plan agreed with the owner 2026-07-19, in this order. [code]**
+  1. **Restore drill on a schedule.** A manual restore was verified once on
+     2026-07-19 (server-side into a scratch DB, 45 tables, row counts matched
+     production, zero ledger drift, scratch dropped). Turn that into a weekly
+     job so silent backup rot is caught without anyone remembering to look.
+  2. **Staging environment, seeded from a SCRUBBED production restore**
+     (owner decision: scrub, not seed-only, not raw). Rewrite emails/names,
+     drop Stripe ids and tokens, keep data shape and volume. Deploy to staging
+     first, smoke there, then production.
+  3. **Browser regression tests.** The 700 tests are all request-level, which
+     is why several things shipped today that passed tests but were visibly
+     broken in the page (dead Remove link, pour-card wiring). Rails system
+     tests over the flows that earn money: purchase + access, deck pour list
+     editing, RSVP, sign-in. Keep the set focused so CI stays fast.
+  4. **Devise 5.x upgrade.** Clears the two advisories waived in
+     `.bundler-audit.yml`. Real auth migration: verify password, magic link and
+     OAuth sign-in end to end. `test/models/devise_exemption_test.rb` fails if
+     anyone enables `:confirmable`/`:timeoutable` while the waiver stands.
+
+- **Cloudflare is replacing our robots.txt. [owner]** Discovered 2026-07-19 by
+  `bin/smoke`. Cloudflare's managed robots.txt serves in front of the origin,
+  so our `Sitemap:` line and our `Disallow:` rules for `/admin/`, `/account`,
+  `/magic_links/`, `/invitations/`, `/email_rsvps/` never reach crawlers, which
+  now see `Allow: /`. Fix in the Cloudflare dashboard (disable the managed
+  robots.txt, or merge our directives into it). Then restore the content
+  assertion in `bin/smoke` (it currently checks reachability only, with a note).
+
+- **Backups: what they do and don't cover. [awareness]** Nightly `pg_dump` to
+  R2 at 09:00 UTC, 14 kept (`DatabaseBackupJob`, `config/recurring.yml`).
+  Postgres ONLY: Active Storage uploads (deck PDFs, images) live in R2 and rely
+  on R2's own durability, they are not in the dump.
+
+
 - **Google Maps cost watch (owner rule, July 2026). [watch + one-flag response]**
   Places autocomplete (location fields) runs on the "WSS Location Autocomplete"
   key in the Whiskey Share Society GCloud project (billing account "My Maps

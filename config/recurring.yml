@@ -5,3 +5,11 @@ production:
     queue: default
     # 09:00 UTC = 4–5am US Eastern, the quietest hour for a US audience.
     schedule: every day at 9am
+
+  # Proves the nightly dump can actually be restored (see
+  # BackupRestoreDrillJob). Sunday 10:00 UTC, an hour after the backup, so it
+  # always drills a fresh one.
+  weekly_restore_drill:
+    class: BackupRestoreDrillJob
+    queue: default
+    schedule: every sunday at 10am
