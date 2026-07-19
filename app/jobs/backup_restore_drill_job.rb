@@ -1,4 +1,5 @@
 require "aws-sdk-s3" # gem is require:false; the job loads it on demand
+require "pg"
 
 # Weekly proof that the nightly backup can actually be restored.
 #
@@ -13,7 +14,7 @@ require "aws-sdk-s3" # gem is require:false; the job loads it on demand
 # So this pulls the NEWEST backup out of R2, restores it into a throwaway
 # database beside the real one, checks the data is really there, and drops it.
 # It never touches the production database: it only ever CREATEs and DROPs
-# `DRILL_DB`, and every statement it runs is against that name.
+# its own drill database, and every statement it runs is against that name.
 #
 # Runs from config/recurring.yml. Invoke by hand with:
 #   bin/kamal-deploy app exec --reuse --roles=web \
@@ -21,7 +22,11 @@ require "aws-sdk-s3" # gem is require:false; the job loads it on demand
 class BackupRestoreDrillJob < ApplicationJob
   queue_as :default
 
-  DRILL_DB = "wss_restore_drill".freeze
+  # A prefix, not the whole name: the database is suffixed with the process id
+  # so two drills can never collide. Without that, a manual run alongside the
+  # scheduled one would DROP the other's database mid-restore, and each would
+  # report a failure the other caused.
+  DRILL_DB_PREFIX = "wss_restore_drill".freeze
   PREFIX = "db-backups/".freeze
 
   # Tables whose emptiness would mean the restore silently lost the business.
@@ -88,26 +93,28 @@ class BackupRestoreDrillJob < ApplicationJob
     path
   end
 
-  # NOTE: every psql call below targets DRILL_DB or the `postgres` maintenance
-  # database. Nothing here names the production database.
+  # NOTE: every statement below targets `drill_db` or the `postgres`
+  # maintenance database. Nothing here names the production database.
   def recreate_drill_database!
-    psql!("postgres", "DROP DATABASE IF EXISTS #{DRILL_DB}")
-    psql!("postgres", "CREATE DATABASE #{DRILL_DB}")
+    maintenance do |conn|
+      conn.exec("DROP DATABASE IF EXISTS #{drill_db}")
+      conn.exec("CREATE DATABASE #{drill_db}")
+    end
   end
 
   def drop_drill_database!
-    psql!("postgres", "DROP DATABASE IF EXISTS #{DRILL_DB}")
+    maintenance { |conn| conn.exec("DROP DATABASE IF EXISTS #{drill_db}") }
     Rails.logger.info("[restore-drill] drill database dropped")
   rescue => e
     # Leaving it behind wastes disk and holds a copy of production data, so
     # this is worth shouting about even though the drill itself may have passed.
-    Rails.logger.error("[restore-drill] could not drop #{DRILL_DB}: #{e.class}: #{e.message}")
+    Rails.logger.error("[restore-drill] could not drop #{drill_db}: #{e.class}: #{e.message}")
   end
 
   def restore!(path)
     # bash for pipefail: without it a corrupt gzip would "succeed" into an
     # empty psql, which is precisely the false pass this job must not give.
-    command = "set -o pipefail; gunzip -c #{path.shellescape} | psql #{conn_args} -d #{DRILL_DB} -q -v ON_ERROR_STOP=1"
+    command = "set -o pipefail; gunzip -c #{path.shellescape} | psql #{conn_args} -d #{drill_db} -q -v ON_ERROR_STOP=1"
     ok = system({ "PGPASSWORD" => db[:password].to_s }, "bash", "-c", command, out: File::NULL)
     raise DrillFailed, "psql restore of #{path} failed" unless ok
   end
@@ -117,7 +124,7 @@ class BackupRestoreDrillJob < ApplicationJob
 
     CRITICAL_TABLES.each do |table|
       production = count_in(db[:database], table)
-      restored = count_in(DRILL_DB, table)
+      restored = count_in(drill_db, table)
 
       raise DrillFailed, "#{table}: production has #{production} rows, restore has #{restored}" if production != restored
 
@@ -126,31 +133,51 @@ class BackupRestoreDrillJob < ApplicationJob
 
     # The credit ledger is the money. A restore that loses its consistency is
     # worse than no restore, because it looks usable.
-    drift = count_query(DRILL_DB, <<~SQL)
+    drift = count_query(drill_db, <<~SQL)
       SELECT count(*) FROM users u
       WHERE u.credits <> COALESCE((SELECT SUM(amount) FROM credit_transactions ct WHERE ct.user_id = u.id), 0)
     SQL
     raise DrillFailed, "#{drift} user(s) have credits that disagree with the ledger in the restored copy" if drift.positive?
 
-    tables = count_query(DRILL_DB, "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'")
+    tables = count_query(drill_db, "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'")
     raise DrillFailed, "restored schema has only #{tables} tables" if tables < 20
 
     Rails.logger.info("[restore-drill] verified #{tables} tables, ledger consistent" \
                       "#{empty.any? ? ", note: #{empty.join(', ')} empty in production too" : ''}")
   end
 
+  # Table names come only from CRITICAL_TABLES, a frozen literal list.
   def count_in(database, table) = count_query(database, "SELECT count(*) FROM #{table}")
 
   def count_query(database, sql)
-    out = `PGPASSWORD=#{db[:password].to_s.shellescape} psql #{conn_args} -d #{database.to_s.shellescape} -tAc #{sql.shellescape}`
-    raise DrillFailed, "query failed against #{database}" unless $?.success?
-
-    out.strip.to_i
+    connect(database) { |conn| conn.exec(sql).getvalue(0, 0).to_i }
+  rescue PG::Error => e
+    raise DrillFailed, "query failed against #{database}: #{e.message}"
   end
 
+  def maintenance(&block) = connect("postgres", &block)
+
+  def connect(database)
+    conn = PG::Connection.new(
+      host: db[:host], port: db[:port] || 5432,
+      user: db[:username], password: db[:password], dbname: database
+    )
+    yield conn
+  ensure
+    conn&.close
+  end
+
+  # Only the restore itself still shells out: replaying a pg_dump needs psql,
+  # and the pipeline needs bash for pipefail. The command is a constant with a
+  # shellescaped path, no caller-supplied input.
   def conn_args
     "-h #{db[:host].to_s.shellescape} -p #{(db[:port] || 5432)} -U #{db[:username].to_s.shellescape}"
   end
+
+  # Interpolated into DDL, so it must never be caller-supplied: it is a frozen
+  # constant plus an integer pid. PostgreSQL has no bind parameters for
+  # database names, which is why this is built rather than passed.
+  def drill_db = "#{DRILL_DB_PREFIX}_#{Process.pid}"
 
   def db = @db ||= ActiveRecord::Base.connection_db_config.configuration_hash
 
