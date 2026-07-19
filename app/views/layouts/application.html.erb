@@ -28,6 +28,9 @@
     <meta property="og:url" content="<%= request.original_url %>">
     <meta name="twitter:card" content="summary_large_image">
 
+    <%# Google Search Console ownership. Must stay in place to stay verified —
+        removing it un-verifies the property (July 2026). %>
+    <meta name="google-site-verification" content="kV1Ee-JDw9ZQcY6fJQJyEAQ-kJ3Qm6EjYoRFDgqCI7E">
     <%# SEO: canonical always points at the prod host, path only (no query
         strings); pages override with content_for :canonical. %>
     <link rel="canonical" href="<%= content_for(:canonical).presence || "https://whiskeysharesociety.com#{request.path}" %>">
