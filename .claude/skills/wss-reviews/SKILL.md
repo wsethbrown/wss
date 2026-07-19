@@ -68,8 +68,10 @@ read before extending). Plans in `docs/superpowers/plans/2026-07-06-*` and `-07-
   societies_controller.rb:57): bottles ranked by AVG of THIS society's event reviews,
   latest-per-member (`DISTINCT ON (user_id, bottle_id)` newest-first) so a re-taster
   refreshes rather than double-votes; `COUNT(DISTINCT user_id)` reviewers. Inherits the
-  page's Pundit gate. **Open question (owner pending): weight by event or reviewer
-  instead of raw row? Leave plain latest-per-member AVG until decided.**
+  page's Pundit gate. **DECIDED (owner ruling, July 2026): plain latest-per-member AVG
+  stays.** Every member gets one vote, their most recent take, weighted equally; it is
+  explainable and weighting schemes only matter at volumes a club never reaches. Do NOT
+  convert this to per-event or per-reviewer weighting.
 - Events/pours with reviews refuse destroy (`dependent: :restrict_with_error` on
   `Event#reviews`; `before_destroy` guard on `EventBottle`) — the night is on the record.
 

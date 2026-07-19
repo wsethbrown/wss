@@ -43,14 +43,6 @@ Legend: **[code]** = engineering work · **[owner]** = only the owner can do it 
   the deck and shown on library/homepage cards). Still open from that phase: deck names on review
   provenance cards, and "search by chapter". Read wss-reviews before extending.
 
-## Society review board
-
-- **Placement + weighting question. [code, blocked on owner decision]**
-  Where the review board sits on the society page is undecided, AND the aggregation method is an
-  **open owner decision**: plain AVG vs per-event weighting vs per-reviewer weighting.
-  **Leave plain AVG until the owner decides** — do not silently pick a weighting scheme.
-  Related verdict/aggregation code lives in the review system (see wss-reviews).
-
 ## Watch item — Aug 9, 2026 (first real renewal)
 
 - **Owner's live subscription renews ~Aug 9, 2026. [owner watch, no code]**
@@ -71,8 +63,10 @@ Legend: **[code]** = engineering work · **[owner]** = only the owner can do it 
 
 ## Gotchas / Traps
 
-- **Don't decide the review-board weighting yourself.** It's an owner call; plain AVG is the
-  deliberate placeholder, not a bug to "fix."
+- **The review board's plain AVG is DECIDED, not a placeholder.** Owner ruling (July 2026):
+  every member gets one vote, their most recent take, weighted equally. Explainable beats clever,
+  and weighting only matters at volumes a club doesn't reach. Do NOT "improve" it into per-event
+  or per-reviewer weighting; revisit only if a society complains a single night skewed a bottle.
 - **Don't build an in-app refund flow.** Refunds are the owner's manual Stripe-dashboard action by
   design (see wss-payments-credits) — not a backlog gap.
 - **The Aug 9 item is a verification watch, not a build task.** The code is already in place and
