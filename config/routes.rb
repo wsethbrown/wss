@@ -88,8 +88,9 @@ Rails.application.routes.draw do
     
     # Events are now nested under societies
     resources :events do
-      # Society admins/the organizer hand the night to a member (the Host).
-      member { patch :assign_host }
+      # Society admins/the organizer hand the night to a member (the Host);
+      # managers + the host set which deck the night runs (optional).
+      member { patch :assign_host; patch :assign_deck }
       resources :event_rsvps, only: [:create, :update, :destroy]
     end
   end
@@ -185,6 +186,8 @@ Rails.application.routes.draw do
   # a single flow for credit, paid (Stripe checkout), and free decks.
   resources :presentations do
     member { get :present }
+    # Deck reviews: stars + short text from owners/attendees (model-gated).
+    resources :deck_reviews, only: [:create, :update, :destroy], controller: 'presentations/reviews'
     resources :purchases, only: [ :new, :create ], controller: 'presentations/purchases'
     resources :downloads, only: [], controller: 'presentations/downloads' do
       collection do

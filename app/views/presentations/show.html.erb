@@ -364,8 +364,66 @@
           </div>
         <% end %>
 
-        <%# Reviews intentionally removed: the previous section rendered hard-coded
-            fictional testimonials. When a real Review model exists, rebuild here. %>
+        <%# Deck reviews: the real thing. Only owners and attendees may write
+            one (model-enforced); everyone may read them. %>
+        <section id="reviews" class="mb-16">
+          <% deck_reviews = @presentation.presentation_reviews.recent.includes(:user).to_a %>
+          <% my_review = user_signed_in? ? deck_reviews.find { |r| r.user_id == current_user.id } : nil %>
+          <h2 class="font-display text-2xl font-semibold text-gray-900">Reviews</h2>
+          <% if deck_reviews.any? %>
+            <div class="mt-1 flex items-center gap-2">
+              <%= render "bottles/rating", value: @presentation.average_review_rating %>
+              <span class="text-sm text-gray-500"><%= pluralize(deck_reviews.size, "review") %>, from people who bought this deck or tasted along at a night that ran it</span>
+            </div>
+          <% else %>
+            <p class="mt-1 text-sm text-gray-500">No reviews yet. They come from people who own this deck or attended a night that ran it.</p>
+          <% end %>
+
+          <% if user_signed_in? && PresentationReview.eligible?(current_user, @presentation) %>
+            <div class="mt-6 rounded-2xl border border-whiskey-200 bg-whiskey-50/60 p-6">
+              <h3 class="mb-4 text-sm font-semibold text-gray-900"><%= my_review ? "Update your review" : "How did it pour?" %></h3>
+              <%= form_with model: my_review || PresentationReview.new,
+                    url: my_review ? presentation_deck_review_path(@presentation, my_review) : presentation_deck_reviews_path(@presentation),
+                    method: my_review ? :patch : :post, local: true, class: "space-y-4" do |form| %>
+                <%= render "shared/star_input", form: form %>
+                <div>
+                  <%= form.label :body, "A few words (optional)", class: "mb-2 block text-sm font-medium text-gray-700" %>
+                  <%= form.text_area :body, rows: 3, maxlength: 1000,
+                      class: "w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
+                      placeholder: "How the night went, what landed, what you poured alongside..." %>
+                </div>
+                <div class="flex items-center gap-4">
+                  <%= form.submit my_review ? "Update review" : "Post review",
+                      class: "cursor-pointer rounded-xl bg-whiskey-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-whiskey-700" %>
+                  <% if my_review %>
+                    <%= button_to "Remove", presentation_deck_review_path(@presentation, my_review), method: :delete,
+                        data: { turbo_confirm: "Remove your review?" },
+                        class: "cursor-pointer text-sm font-semibold text-red-600 hover:text-red-500" %>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+
+          <% if deck_reviews.any? %>
+            <div class="mt-6 divide-y divide-whiskey-100 rounded-2xl border border-whiskey-200 bg-white">
+              <% deck_reviews.each do |review| %>
+                <div class="p-5">
+                  <div class="flex items-center justify-between gap-3">
+                    <div class="flex items-center gap-2 min-w-0">
+                      <%= link_to review.user.full_name, profile_path(review.user), class: "truncate text-sm font-semibold text-gray-900 hover:text-whiskey-700" %>
+                      <span class="text-xs text-gray-400"><%= review.created_at.strftime("%B %-d, %Y") %></span>
+                    </div>
+                    <%= render "bottles/rating", value: review.rating.to_f %>
+                  </div>
+                  <% if review.body.present? %>
+                    <p class="mt-2 text-sm leading-relaxed text-gray-700"><%= review.body %></p>
+                  <% end %>
+                </div>
+              <% end %>
+            </div>
+          <% end %>
+        </section>
       </div>
 
       <!-- Right Column - Sidebar -->

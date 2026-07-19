@@ -30,7 +30,14 @@ wss-production-launch.
    see wss-payments-credits.
 6. **Design carte blanche for NON-copy visual work** — but REJECTED directions
    in DESIGN_BRIEF.md stay rejected; never re-propose them.
-7. **Read the docs trio when context is missing**: OVERHAUL_PLAN.md (history),
+7. **Logging ships WITH the code, always.** Every new controller action, service,
+   model callback, and job gets logging as part of the work — not a later pass.
+   info for real state changes and silent no-ops, warn for refusals/invalid
+   tokens/permission denials, error in EVERY rescue (a bare rescue with no log is
+   a bug). Always include ids (`user 42`, `event 17`); NEVER log tokens, secrets,
+   session, or full params. Full standard in CLAUDE.md ("Logging"). Owner
+   directive, July 2026: this is part of the definition of done.
+8. **Read the docs trio when context is missing**: OVERHAUL_PLAN.md (history),
    SECTION_NOTES.md (per-section state + punch list), DESIGN_BRIEF.md
    (design direction incl. REJECTED ideas). Check wss-backlog before building
    anything new — it may already be planned or half-decided.

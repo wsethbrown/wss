@@ -5,6 +5,15 @@ class Event < ApplicationRecord
   # admins/the organizer; sees this event's RSVP replies and joins the RSVP
   # emails, but gains no other management rights.
   belongs_to :host, class_name: "User", optional: true
+  # The deck presented that night. OPTIONAL by owner rule: events without a
+  # WSS deck are first-class. host_name is the guest-presenter fallback when
+  # the host isn't a member (host_id wins whenever both are set).
+  belongs_to :presentation, optional: true
+
+  # The display name for whoever runs the night, member or guest.
+  def host_display_name
+    host&.full_name.presence || host_name.presence
+  end
 
   # Associations
   has_many :event_rsvps, dependent: :destroy

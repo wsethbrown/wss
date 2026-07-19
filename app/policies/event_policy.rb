@@ -68,4 +68,9 @@ class EventPolicy < ApplicationPolicy
     return false unless user.present?
     record.host_id == user.id || update?
   end
+
+  # The night's deck: same circle as the pours (managers + host).
+  def manage_deck?
+    manage_pours?
+  end
 end

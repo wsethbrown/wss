@@ -6,6 +6,14 @@ class Presentation < ApplicationRecord
 
   belongs_to :author, class_name: 'User'
   has_many :user_presentations, dependent: :destroy
+  # Deck reviews (stars + short text; eligibility in PresentationReview).
+  # Events that ran this deck keep their record; restrict, don't cascade.
+  has_many :presentation_reviews, dependent: :destroy
+  has_many :events, dependent: :nullify
+
+  def average_review_rating
+    presentation_reviews.average(:rating)&.to_f
+  end
   has_many :presentation_tags, dependent: :destroy
   has_many :tags, through: :presentation_tags
   has_many :purchasers, through: :user_presentations, source: :user

@@ -201,8 +201,35 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 
 This ensures continuity across sessions and maintains a clear development roadmap.
 
+### Logging (STANDING RULE — applies to every change, not just debugging)
+
+**Logging is part of the definition of done.** New code ships with the logging it
+needs to be diagnosed in production from logs alone. Do not add it later "if there's
+a problem" — by then the evidence is gone. Ask of every new path: *if this fails at
+2am for one user, could I tell what happened from the logs?* If not, add a line.
+
+Log at these points, with the IDs needed to trace the actor and the record:
+- **Significant state changes** (`info`): a record created/destroyed that matters
+  (invitations, memberships, hosts, decks assigned), money or credits moving, emails
+  and notifications enqueued (say how many and who was skipped and why), background
+  jobs starting/finishing/no-oping.
+- **Rejected or refused actions** (`warn`): failed auth, invalid/expired tokens,
+  permission denials, validation refusals that a user will complain about.
+- **Every rescue** (`error`): never swallow an exception silently. Include the class,
+  message, and the ids in play. A bare `rescue => e` with no log is a bug.
+- **Silent no-ops** (`info`): guard clauses that return early (record gone, feature
+  flag off, mute enabled) — the absence of an effect must be explainable.
+
+Rules:
+- Include identifiers (`user 42`, `event 17`, `society 3`), never bare "failed".
+- **NEVER log secrets**: tokens, API keys, passwords, session, full params, raw
+  magic-link/invite/RSVP tokens. Log that a token was invalid, never its value.
+  (See Security Guidelines above — this is non-negotiable.)
+- Match existing phrasing so logs read consistently; grep a neighbouring
+  controller/service/job before inventing a new format.
+
 ### Debugging
-- You should use extensive logging to debug problems.
+- Use extensive logging to debug problems; leave the useful lines in place afterward.
 
 ### Stripe Webhook Configuration
 For the credit system and subscriptions to work properly, you need to configure Stripe webhooks:

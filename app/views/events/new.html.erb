@@ -69,6 +69,34 @@
           <p class="mt-1 text-sm text-gray-500">Help members understand what makes this event worth attending.</p>
         </div>
 
+        <!-- The deck (optional by owner rule; nights without a WSS deck are first-class) -->
+        <% deck_choices = Presentation.published.where(author_id: [@society&.creator_id, current_user.id].compact.uniq) %>
+        <% if deck_choices.any? %>
+          <div>
+            <%= form.label :presentation_id, "The deck (optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+            <%= form.collection_select :presentation_id, deck_choices, :id, :title,
+                { include_blank: "No deck for this night" },
+                { class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500" } %>
+            <p class="mt-1 text-sm text-gray-500">Attach the deck this night presents. Plenty of nights run without one.</p>
+          </div>
+        <% end %>
+
+        <!-- Host (member match = real host; anything else = guest presenter) -->
+        <div>
+          <%= form.label :host_query, "Host (optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <input type="text" name="event[host_query]" id="event_host_query" list="member-names"
+                 value="<%= params.dig(:event, :host_query) %>" placeholder="Who runs the night?"
+                 class="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500">
+          <% if @society %>
+            <datalist id="member-names">
+              <% @society.society_memberships.where(status: "active").includes(:user).map(&:user).uniq.each do |member| %>
+                <option value="<%= member.full_name %>"></option>
+              <% end %>
+            </datalist>
+          <% end %>
+          <p class="mt-1 text-sm text-gray-500">A member's name makes them the host, with the host powers (RSVP replies, the pour list). Any other name is kept as a guest presenter.</p>
+        </div>
+
         <!-- Location -->
         <div>
           <%= form.label :location, class: "block text-sm font-medium text-gray-700 mb-2" %>

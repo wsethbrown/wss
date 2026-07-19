@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_18_223427) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_18_231417) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -170,9 +170,12 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_223427) do
     t.datetime "updated_at", null: false
     t.boolean "pours_hidden_until_complete", default: false, null: false
     t.bigint "host_id"
+    t.bigint "presentation_id"
+    t.string "host_name"
     t.index ["host_id"], name: "index_events_on_host_id"
     t.index ["location"], name: "index_events_on_location"
     t.index ["organizer_id"], name: "index_events_on_organizer_id"
+    t.index ["presentation_id"], name: "index_events_on_presentation_id"
     t.index ["society_id", "start_time"], name: "index_events_on_society_id_and_start_time"
     t.index ["society_id"], name: "index_events_on_society_id"
     t.index ["start_time"], name: "index_events_on_start_time"
@@ -204,6 +207,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_223427) do
     t.index ["user_id", "created_at"], name: "index_notifications_on_user_id_and_created_at"
     t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
     t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "presentation_reviews", force: :cascade do |t|
+    t.bigint "presentation_id", null: false
+    t.bigint "user_id", null: false
+    t.decimal "rating", precision: 2, scale: 1, null: false
+    t.text "body"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["presentation_id", "user_id"], name: "index_presentation_reviews_on_presentation_id_and_user_id", unique: true
+    t.index ["presentation_id"], name: "index_presentation_reviews_on_presentation_id"
+    t.index ["user_id"], name: "index_presentation_reviews_on_user_id"
   end
 
   create_table "presentation_tags", force: :cascade do |t|
@@ -611,12 +626,15 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_223427) do
   add_foreign_key "event_comments", "users"
   add_foreign_key "event_rsvps", "events"
   add_foreign_key "event_rsvps", "users"
+  add_foreign_key "events", "presentations"
   add_foreign_key "events", "societies"
   add_foreign_key "events", "users", column: "host_id"
   add_foreign_key "events", "users", column: "organizer_id"
   add_foreign_key "favorites", "users"
   add_foreign_key "notifications", "users"
   add_foreign_key "notifications", "users", column: "actor_id"
+  add_foreign_key "presentation_reviews", "presentations"
+  add_foreign_key "presentation_reviews", "users"
   add_foreign_key "presentation_tags", "presentations"
   add_foreign_key "presentation_tags", "tags"
   add_foreign_key "presentations", "users", column: "author_id"

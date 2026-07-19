@@ -1,5 +1,5 @@
 class EventsController < ApplicationController
-  before_action :set_event, only: [:show, :edit, :update, :destroy, :assign_host]
+  before_action :set_event, only: [:show, :edit, :update, :destroy, :assign_host, :assign_deck]
 
   def index
     @events = policy_scope(Event).includes(:society, :organizer, :event_rsvps)
@@ -37,6 +37,18 @@ class EventsController < ApplicationController
     @society = Society.find(event_params[:society_id]) if event_params[:society_id]
     @event = Event.new(event_params)
     @event.organizer = current_user
+    resolve_host_query
+    # A deck can only be attached by someone entitled to offer it; anything
+    # else silently drops (decks are optional, never a hard failure). Checked
+    # against ownership directly, NOT deck_options_for — that helper always
+    # allows the event's current deck, which here is the one being smuggled.
+    if @event.presentation_id.present?
+      offerable_ids = [@event.society&.creator_id, current_user.id, @event.host_id].compact.uniq
+      unless Presentation.published.exists?(id: @event.presentation_id, author_id: offerable_ids)
+        Rails.logger.warn "Event create by user #{current_user.id}: deck #{@event.presentation_id} dropped, not offerable for society #{@event.society_id}"
+        @event.presentation_id = nil
+      end
+    end
 
     # Convert times from browser timezone to UTC for storage
     if browser_timezone.present?
@@ -96,6 +108,29 @@ class EventsController < ApplicationController
     end
   end
 
+  # Set (or clear) the deck the night runs. Managers + the host; the deck
+  # must be published and owned by the society creator, the organizer, or
+  # the host, or blank to clear (decks are optional on events, owner rule).
+  def assign_deck
+    @society = @event.society
+    authorize @event, :manage_deck?
+
+    if params[:presentation_id].blank?
+      @event.update!(presentation: nil)
+      Rails.logger.info "Event #{@event.id}: deck cleared by user #{current_user.id}"
+      redirect_to society_event_path(@society, @event), notice: "Deck removed from this event."
+    else
+      deck = deck_options_for(@event).find { |p| p.id == params[:presentation_id].to_i }
+      if deck
+        @event.update!(presentation: deck)
+        Rails.logger.info "Event #{@event.id}: deck set to presentation #{deck.id} by user #{current_user.id}"
+        redirect_to society_event_path(@society, @event), notice: "This night runs #{deck.title}."
+      else
+        redirect_to society_event_path(@society, @event), alert: "That deck isn't available for this event."
+      end
+    end
+  end
+
   # Hand the night to a member. The host must be an active member of the
   # society (or blank to clear); assignment rights = event update rights.
   def assign_host
@@ -135,12 +170,40 @@ class EventsController < ApplicationController
     @event = Event.find(params[:id])
   end
 
+  # The creation form's host field is one input: an active-member name match
+  # becomes the real host (host powers included); anything else is kept as
+  # the guest presenter's name.
+  def resolve_host_query
+    query = params.dig(:event, :host_query).to_s.strip
+    return if query.blank?
+
+    member = @society&.society_memberships&.where(status: "active")&.includes(:user)
+                     &.map(&:user)&.find { |u| u.full_name.strip.casecmp?(query) }
+    if member
+      Rails.logger.info "Event create by user #{current_user.id}: host field matched member #{member.id}"
+      @event.host = member
+    else
+      Rails.logger.info "Event create by user #{current_user.id}: host field kept as a guest presenter name (no member match)"
+      @event.host_name = query
+    end
+  end
+
+  # Decks offerable on an event: published, owned by the society creator,
+  # the organizer, or the host. The current deck stays selectable.
+  def deck_options_for(event)
+    owner_ids = [event.society.creator_id, event.organizer_id, event.host_id].compact.uniq
+    options = Presentation.published.where(author_id: owner_ids).to_a
+    options |= [event.presentation] if event.presentation
+    options
+  end
+  helper_method :deck_options_for
+
   def event_params
     # society_id is permitted only on create (the nested form); update must not
     # re-home an event, that would re-attribute its reviews/board rows and
     # switch their veiling.
     permitted = [:title, :description, :location, :start_time, :end_time, :pours_hidden_until_complete]
-    permitted << :society_id if action_name == "create" || action_name == "new"
+    permitted.push(:society_id, :presentation_id) if action_name == "create" || action_name == "new"
     params.require(:event).permit(*permitted)
   end
 end
