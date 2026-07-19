@@ -367,8 +367,13 @@
           </section>
         <% end %>
 
-        <!-- Whiskey Recommendations -->
-        <% if @presentation.parsed_whiskey_recommendations.any? %>
+        <%# LEGACY pour list: freeform `whiskey_recommendations` text, parsed by
+            hand. It says the same thing as the catalog-linked list above, so it
+            renders ONLY as the fallback when no bottles have been linked yet.
+            Otherwise a deck shows two pour lists under the same eyebrow.
+            Linking a deck's bottles retires this block for that deck; deleting
+            the field outright is the Phase 5 migration (see OVERHAUL_PLAN). %>
+        <% if linked_pours.empty? && @presentation.parsed_whiskey_recommendations.any? %>
           <section class="mb-16">
             <p class="eyebrow text-whiskey-600 mb-2">The pour list</p>
             <h2 class="font-display text-3xl font-semibold text-gray-900 mb-4">What to pour</h2>

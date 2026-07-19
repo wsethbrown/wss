@@ -59,6 +59,19 @@ class DeckPourLinksTest < ActionDispatch::IntegrationTest
     assert_match "Tied Dram", response.body
   end
 
+  # The linked list and the legacy freeform recommendations are the same fact
+  # in two storage formats, so only one may ever render.
+  test "linked pours replace the legacy written recommendations" do
+    @deck.update_column(:whiskey_recommendations, "Old Text Dram|Somewhere, Kentucky|50|A written recommendation.")
+    get presentation_path(@deck)
+    assert_match "What to pour", response.body, "with nothing linked, the written list is the pour list"
+
+    PresentationBottle.create!(presentation: @deck, bottle: @bottle, position: 1)
+    get presentation_path(@deck)
+    assert_match "What this deck calls for", response.body
+    assert_no_match "What to pour", response.body, "a deck must never show two pour lists"
+  end
+
   # A deck's list is what it RECOMMENDS; a society pours what it can get.
   # These must never be presented as the same fact (owner directive).
   test "a deck with a pour list but no nights claims nothing about tastings" do

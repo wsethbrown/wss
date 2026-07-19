@@ -42,13 +42,13 @@
     thought of these pours and lets a bottle page name the decks using it. %>
 <section id="pours" class="mt-8 scroll-mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
   <h3 class="font-display text-xl font-semibold text-gray-900">
-    Pours in the catalog
+    The pour list
     <span class="ml-1 align-middle text-xs font-sans font-medium uppercase tracking-wide text-gray-400">optional</span>
   </h3>
   <p class="mb-5 mt-1 text-sm text-gray-500">
-    Appears on: the deck page, showing what societies scored these bottles, and on each bottle's own
-    page as "poured in this deck". Linking is what connects a deck to real tasting notes; the cards
-    above stay the deck's own written recommendations.
+    The bottles this deck is built around, linked to the catalog. Shows on the deck page under
+    "What this deck calls for", and on each bottle's own page as "poured in this deck". Linking
+    replaces the written recommendations above, so a deck never shows two pour lists.
   </p>
 
   <% pours = @presentation.presentation_bottles.includes(:bottle) %>
