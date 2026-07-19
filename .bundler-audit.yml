@@ -1,0 +1,33 @@
+# Advisories bundle-audit should not fail the build on.
+#
+# The bar for adding an entry here is HIGH: the advisory must be genuinely
+# unreachable in this app, with the reason written down and a stated condition
+# that would invalidate it. "We'll get to it" is not a reason — that belongs in
+# the backlog with a red build, not in this file. A permanently-red build is
+# how the whole pipeline came to be ignored in the first place.
+#
+# Review this file whenever Devise's module list in app/models/user.rb changes.
+---
+ignore:
+  # Both entries: Devise 4.9.4. Fixing them means Devise 5.x, a major upgrade
+  # of the most security-sensitive part of the app, which deserves its own
+  # careful pass rather than riding along in a dependency sweep.
+  #
+  # Neither advisory is reachable here. User enables exactly:
+  #   database_authenticatable, registerable, recoverable,
+  #   rememberable, validatable, omniauthable
+  # (see app/models/user.rb). Both bugs live in modules we do not enable.
+
+  # "Confirmable change-email race condition permits user to confirm an email
+  # they have no access to." Requires :confirmable. Not enabled: WSS verifies
+  # ownership through magic links and OAuth, and has no confirmation flow.
+  # INVALIDATED IF: :confirmable is added to the devise list.
+  - GHSA-57hq-95w6-v4fc
+
+  # "Open redirect via unvalidated request.referrer in the Timeoutable session
+  # timeout handler." Requires the :timeoutable MODULE, which no Devise model
+  # enables, so the handler that reads request.referrer never runs. Note that
+  # Devise.timeout_in reads 30 minutes regardless: that is Devise's default and
+  # is inert without the module, so it is not evidence either way.
+  # INVALIDATED IF: any Devise model adds :timeoutable.
+  - GHSA-jp94-3292-c3xv
