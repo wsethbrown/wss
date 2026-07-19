@@ -88,6 +88,28 @@ class DeckPourLinksTest < ActionDispatch::IntegrationTest
                     "the legacy pour field must be gone from the form"
   end
 
+  # The pour form prefills origin and style from the catalog, so the payload
+  # the search endpoint returns is load-bearing, not decorative.
+  test "bottle search returns the fields a pour row prefills from" do
+    @bottle.update!(distillery: "Buffalo Trace", region: "Kentucky", style: "Bourbon")
+    sign_in @admin
+    get search_bottles_path(q: "Tied")
+    assert_response :success
+
+    match = JSON.parse(response.body).find { |b| b["id"] == @bottle.id }
+    assert_equal "Buffalo Trace, Kentucky", match["origin"]
+    assert_equal "Bourbon", match["style"]
+  end
+
+  test "the pour form marks the fields the catalog can prefill" do
+    PresentationBottle.create!(presentation: @deck, bottle: @bottle, position: 1)
+    sign_in @admin
+    get edit_admin_presentation_path(@deck)
+    assert_match 'data-bottle-fill="origin"', response.body
+    assert_match 'data-bottle-fill="style"', response.body
+    assert_match 'data-controller="bottle-search"', response.body
+  end
+
   test "a linked pour makes the whole card the link, with no nested anchors" do
     PresentationBottle.create!(presentation: @deck, bottle: @bottle, position: 1, notes: "Pear and oak.")
     get presentation_path(@deck)

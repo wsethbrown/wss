@@ -85,6 +85,21 @@ class Bottle < ApplicationRecord
     [ name, distillery ].compact_blank.join(" · ")
   end
 
+  # Where the bottle comes from, as one line.
+  #
+  # Distillery and region overlap constantly in real entries, and usually only
+  # PARTLY: a real row here has distillery "Hikari Distillery (Hikari Shuzo),
+  # Fukuoka, Kyushu" and region "Japan, Fukuoka, Kyushu". Joining those prints
+  # the place twice, and a substring test can't catch it because neither
+  # contains the other. So dedupe comma-separated parts, keeping first
+  # appearance and order: the example yields "Hikari Distillery (Hikari
+  # Shuzo), Fukuoka, Kyushu, Japan".
+  def origin_line
+    parts = [ distillery, region ].compact_blank.flat_map { |value| value.split(",") }
+                                  .map(&:strip).reject(&:blank?)
+    parts.uniq { |part| part.downcase }.join(", ")
+  end
+
   # The public score: each reviewer counts once, via their latest tasting
   # (re-tastes at events arrive in Phase 2 and refresh their contribution).
   def average_rating

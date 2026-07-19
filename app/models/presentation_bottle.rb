@@ -51,7 +51,7 @@ class PresentationBottle < ApplicationRecord
   def origin_text
     return origin if origin.present?
 
-    [ bottle&.distillery, bottle&.region ].compact_blank.join(", ").presence
+    bottle&.origin_line.presence
   end
 
   def style_text = style.presence || bottle&.style

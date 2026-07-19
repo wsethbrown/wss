@@ -55,4 +55,25 @@ class BottlePriceSummaryTest < ActiveSupport::TestCase
     assert_in_delta 77.5, summary[:low], 0.01
     assert_in_delta 142.5, summary[:high], 0.01 # IQR blunts but includes the outlier's pull
   end
+
+  # Distillery and region overlap constantly in real entries, usually only
+  # partly, and joining them blindly printed the place twice on deck pages.
+  test "origin_line drops parts the distillery already names" do
+    bottle = Bottle.new(distillery: "Hikari Distillery (Hikari Shuzo), Fukuoka, Kyushu",
+                        region: "Japan, Fukuoka, Kyushu")
+    assert_equal "Hikari Distillery (Hikari Shuzo), Fukuoka, Kyushu, Japan", bottle.origin_line
+  end
+
+  test "origin_line keeps distinct parts and survives blanks" do
+    assert_equal "Buffalo Trace, Kentucky",
+                 Bottle.new(distillery: "Buffalo Trace", region: "Kentucky").origin_line
+    assert_equal "Speyside", Bottle.new(region: "Speyside").origin_line
+    assert_equal "Ardbeg", Bottle.new(distillery: "Ardbeg").origin_line
+    assert_equal "", Bottle.new.origin_line
+  end
+
+  test "origin_line matching ignores case" do
+    assert_equal "Buffalo Trace, Kentucky",
+                 Bottle.new(distillery: "Buffalo Trace, Kentucky", region: "KENTUCKY").origin_line
+  end
 end

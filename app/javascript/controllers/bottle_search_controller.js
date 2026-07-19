@@ -108,9 +108,27 @@ export default class extends Controller {
       if (this.hasCustomNameTarget) this.customNameTarget.value = ""
       this.inputTarget.value = match.display_name
       this.resultsTarget.classList.add("hidden")
+      this.autofill(match)
       if (this.submitOnSelectValue) this.submitForm()
     })
     return el
+  }
+
+  // Copy what the catalog already knows into any [data-bottle-fill] field in
+  // scope, so an admin adding a bottle to a deck's pour list doesn't retype
+  // its origin and style every time.
+  //
+  // EMPTY FIELDS ONLY. These are per-deck values the author may have already
+  // written by hand, and silently overwriting someone's typing is worse than
+  // making them fill in a blank. Filled values stay editable: the catalog is
+  // the starting point, not the last word.
+  autofill(match) {
+    this.element.querySelectorAll("[data-bottle-fill]").forEach((field) => {
+      if (field.value.trim() !== "") return
+
+      const value = match[field.dataset.bottleFill]
+      if (value) field.value = value
+    })
   }
 
   // Pressing Enter in the search box (instead of picking a row) adds the

@@ -31,6 +31,9 @@ class BottlesController < ApplicationController
     bottles = Bottle.search(params[:q]).order(:name).limit(8)
     render json: bottles.map { |b|
       { id: b.id, name: b.name, display_name: b.display_name,
+        # Prefill fodder for the deck pour form, so an admin doesn't retype
+        # what the catalog already knows (bottle_search#autofill).
+        origin: b.origin_line, style: b.style,
         url: bottle_path(b), review_url: new_bottle_review_path(b) }
     }
   end

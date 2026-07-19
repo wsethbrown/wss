@@ -7,7 +7,12 @@
     The written fields belong to the deck author either way, so they show for
     both. Destroy is a checkbox, not a request: the row goes when the deck is
     saved, like everything else on this form. %>
-<div class="pour-row rounded-lg border border-gray-200 bg-gray-50 p-4" data-pour-list-target="row">
+<%# bottle-search is scoped to the WHOLE row, not just the search box, so that
+    picking a bottle can prefill this row's origin and style fields
+    ([data-bottle-fill]). They have to be inside the controller's element to be
+    in scope. %>
+<div class="pour-row rounded-lg border border-gray-200 bg-gray-50 p-4" data-pour-list-target="row"
+     data-controller="bottle-search" data-bottle-search-url-value="<%= search_bottles_path %>">
   <div class="mb-3 flex items-start justify-between gap-3">
     <h4 class="text-sm font-medium text-gray-700">Pour</h4>
     <label class="flex cursor-pointer items-center gap-1.5 text-sm text-red-600 hover:text-red-800">
@@ -19,8 +24,7 @@
 
   <%# The catalog link. bottle-search writes the id into the hidden field; the
       visible field is only a picker, so it is deliberately unnamed. %>
-  <div class="relative mb-3" data-controller="bottle-search"
-       data-bottle-search-url-value="<%= search_bottles_path %>">
+  <div class="relative mb-3">
     <label class="mb-1 block text-xs font-medium text-gray-600">
       Catalog bottle <span class="text-gray-400">optional, but it is what earns this deck real scores</span>
     </label>
@@ -45,7 +49,9 @@
     <div>
       <%= f.label :origin, "Origin", class: "mb-1 block text-xs font-medium text-gray-600" %>
       <%= f.text_field :origin, placeholder: "e.g., Speyside, or Kentucky, 1803",
+          data: { bottle_fill: "origin" },
           class: "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+      <p class="mt-1 text-xs text-gray-500">Filled in from the catalog when you link a bottle; edit freely.</p>
     </div>
     <div>
       <%= f.label :price, "Price", class: "mb-1 block text-xs font-medium text-gray-600" %>
@@ -60,6 +66,7 @@
     <div class="md:col-span-2">
       <%= f.label :style, "Style", class: "mb-1 block text-xs font-medium text-gray-600" %>
       <%= f.text_area :style, rows: 2, placeholder: "e.g., Light and fruity. How it's made, how it's matured.",
+          data: { bottle_fill: "style" },
           class: "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
     </div>
     <div class="md:col-span-2">
