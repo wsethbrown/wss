@@ -18,8 +18,20 @@ require "action_cable/engine"
 # you've limited to :test, :development, or :production.
 Bundler.require(*Rails.groups)
 
+require_relative "../lib/rack/private_from_search"
+
 module Wss
   class Application < Rails::Application
+    # Private paths announce themselves as noindex at the Rack layer, because
+    # Cloudflare replaces our robots.txt at the edge and a controller filter is
+    # discarded by Warden's failure app (see the middleware).
+    #
+    # OUTERMOST on purpose (insert_before 0): Warden sits above the app, so a
+    # middleware added with `use` never sees the sign-in redirect it generates,
+    # which is exactly the response that must carry the header. From the top it
+    # stamps whatever comes back, including 404s and static files.
+    config.middleware.insert_before 0, Rack::PrivateFromSearch
+
     # Initialize configuration defaults for originally generated Rails version.
     config.load_defaults 8.0
 
