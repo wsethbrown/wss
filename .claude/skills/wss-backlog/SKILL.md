@@ -1,6 +1,6 @@
 ---
 name: wss-backlog
-description: WSS pending-work register — deferred/half-decided items (SEO trio, review-board weighting, the Aug 9 renewal watch, real deck uploads, prod OAuth URI, SMTP, business registration) with each item's blocker and owner. Use BEFORE building anything new, so you don't rediscover or duplicate work already scoped, deferred, or blocked on an owner decision.
+description: WSS pending-work register — deferred/half-decided items (Maps + email cost watches, Search Console, review-board weighting, the Aug 9 renewal watch, real deck uploads) with each item's blocker and owner. Use BEFORE building anything new, so you don't rediscover or duplicate work already scoped, deferred, or blocked on an owner decision.
 ---
 
 # WSS Backlog — check here before building anything new
@@ -36,17 +36,12 @@ Legend: **[code]** = engineering work · **[owner]** = only the owner can do it 
   tags, and JSON-LD (Organization + deck Product) shipped July 2026. Remaining owner step: verify
   the domain in Search Console and submit https://whiskeysharesociety.com/sitemap.xml.
 
-## Deck reviews (owner-approved design, awaiting the owner's go)
+## Review system, remaining ties
 
-- **[code] Part A — events carry their deck + host.** Event creation gets a deck select (decks
-  owned by the society owner OR the event host) and the host field ON THE FORM: member
-  autocomplete with profile link, free-text `host_name` fallback for guest presenters. The member
-  half already shipped (`events.host_id`, see wss-societies) — EXTEND it, don't parallel-build.
-- **[code] Part B — PresentationReview.** Star rating (half-steps) + short text on deck pages.
-  Eligibility (owner rule): reviewer purchased the deck OR attended an event that ran it
-  (RSVP yes). This ties societies to the marketplace.
-- Related: wss-reviews "Phase 3" ties (deck names on provenance cards, review badges on deck
-  pages, search by chapter).
+- **[code] wss-reviews "Phase 3" leftovers.** Deck reviews SHIPPED (July 2026: events carry an
+  optional deck + host, PresentationReview with the purchased-or-attended rule, ratings cached on
+  the deck and shown on library/homepage cards). Still open from that phase: deck names on review
+  provenance cards, and "search by chapter". Read wss-reviews before extending.
 
 ## Society review board
 
