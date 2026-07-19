@@ -51,6 +51,23 @@ class DeckPourLinksTest < ActionDispatch::IntegrationTest
     end
   end
 
+  # The pour controls sit inside the deck form but post elsewhere, so they are
+  # owned by hidden forms via the HTML5 `form` attribute. If that wiring breaks
+  # the buttons go dead silently, which is how the first attempt failed.
+  test "the admin pour controls are owned by real forms, not nested ones" do
+    pour = PresentationBottle.create!(presentation: @deck, bottle: @bottle, position: 1)
+    sign_in @admin
+    get edit_admin_presentation_path(@deck)
+    assert_response :success
+
+    assert_match 'id="link-pour-form"', response.body
+    assert_match 'form="link-pour-form"', response.body
+    assert_match "id=\"unlink-pour-#{pour.id}\"", response.body
+    assert_match "form=\"unlink-pour-#{pour.id}\"", response.body
+    assert_equal 1, response.body.scan("· The pour list").size,
+                 "the admin must show one pour list section, not two"
+  end
+
   test "the deck page shows its linked pours" do
     PresentationBottle.create!(presentation: @deck, bottle: @bottle, position: 1, label: "the opener")
     get presentation_path(@deck)

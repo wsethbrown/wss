@@ -323,9 +323,10 @@
       <section id="f-pours" class="scroll-mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm" data-controller="whiskey-recommendations">
         <h3 class="font-display text-xl font-semibold text-gray-900">6 · The pour list <span class="ml-1 align-middle text-xs font-sans font-medium uppercase tracking-wide text-gray-400">optional</span></h3>
         <p class="mb-5 mt-1 text-sm text-gray-500">
-          Appears on: the "What to pour" cards, and in the buyer's "what you get" manifest with a count.
-          Bottles, cocktails, or anything else the night pours, one card each, with where to find it
-          and what it costs. Empty = the section is hidden.
+          Appears on: the deck's pour list section, and in the buyer's "what you get" manifest with a
+          count. Bottles, cocktails, or anything else the night pours. Write them out below, or link
+          them to catalog bottles further down, which is the better option where the bottle exists.
+          Empty = the section is hidden.
         </p>
 
         <%= form.hidden_field :whiskey_recommendations, id: 'whiskey_recommendations_hidden' %>
@@ -389,6 +390,12 @@
             </div>
           </div>
         </template>
+
+        <%# The catalog-linked half of the same pour list. Edit-only: linking
+            needs a persisted deck to hang the rows off. %>
+        <% if presentation.persisted? %>
+          <%= render "admin/presentations/catalog_pours", presentation: presentation %>
+        <% end %>
       </section>
 
       <!-- ═══ 7 · WHAT BUYERS DOWNLOAD ═══ -->
