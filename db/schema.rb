@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_18_231417) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_19_123853) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -258,6 +258,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_18_231417) do
     t.integer "preview_pages", default: 3
     t.integer "preview_slide_count", default: 3, null: false
     t.boolean "featured", default: false, null: false
+    t.integer "reviews_count", default: 0, null: false
+    t.decimal "reviews_average", precision: 3, scale: 2
     t.index ["author_id"], name: "index_presentations_on_author_id"
     t.index ["category"], name: "index_presentations_on_category"
     t.index ["download_count"], name: "index_presentations_on_download_count"

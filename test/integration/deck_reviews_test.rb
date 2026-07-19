@@ -151,3 +151,43 @@ class EventDeckHostTest < ActionDispatch::IntegrationTest
     assert_equal @deck, event.reload.presentation
   end
 end
+
+# The cached summary on the deck (reviews_count / reviews_average) is what
+# the library and homepage cards read, so it must track reality through
+# every path. Recomputed, never incremented.
+class DeckReviewStatsTest < ActiveSupport::TestCase
+  setup do
+    @deck = Presentation.create!(author: users(:admin), title: "Stats Deck", content: "x", price: 5)
+    @deck.update_column(:published, true)
+    @a = users(:john)
+    @b = users(:jane)
+    [@a, @b].each { |u| UserPresentation.create!(user: u, presentation: @deck, purchase_type: "direct", purchased_at: Time.current) }
+  end
+
+  test "a deck with no reviews reports nothing to show" do
+    assert_equal 0, @deck.reviews_count
+    assert_nil @deck.average_review_rating
+    assert_not @deck.reviewed?
+  end
+
+  test "the cache follows creates, edits, and deletes" do
+    r1 = PresentationReview.create!(presentation: @deck, user: @a, rating: 4.0)
+    assert_equal [1, 4.0], [@deck.reload.reviews_count, @deck.average_review_rating]
+
+    PresentationReview.create!(presentation: @deck, user: @b, rating: 5.0)
+    assert_equal [2, 4.5], [@deck.reload.reviews_count, @deck.average_review_rating]
+
+    r1.update!(rating: 2.0) # an edit must move the average
+    assert_equal 3.5, @deck.reload.average_review_rating
+
+    r1.destroy
+    assert_equal [1, 5.0], [@deck.reload.reviews_count, @deck.average_review_rating]
+  end
+
+  test "refreshing is idempotent and self-healing" do
+    PresentationReview.create!(presentation: @deck, user: @a, rating: 3.0)
+    @deck.update_columns(reviews_count: 99, reviews_average: 1.0) # simulate drift
+    @deck.refresh_review_stats!
+    assert_equal [1, 3.0], [@deck.reload.reviews_count, @deck.average_review_rating]
+  end
+end

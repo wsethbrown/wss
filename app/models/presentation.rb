@@ -11,8 +11,23 @@ class Presentation < ApplicationRecord
   has_many :presentation_reviews, dependent: :destroy
   has_many :events, dependent: :nullify
 
+  # The cached summary (reviews_count / reviews_average) is what deck cards
+  # read, so bulk listings cost no extra queries. Recompute, never increment:
+  # one aggregate over the reviews table is the only writer, which keeps the
+  # cache self-healing if a row is ever changed out from under us.
+  def refresh_review_stats!
+    stats = presentation_reviews.pick(Arel.sql("COUNT(*), AVG(rating)"))
+    count, average = stats || [0, nil]
+    update_columns(reviews_count: count.to_i, reviews_average: average)
+    Rails.logger.info "Deck #{id}: review stats refreshed to #{count.to_i} review(s), average #{average&.to_f || 'none'}"
+  end
+
   def average_review_rating
-    presentation_reviews.average(:rating)&.to_f
+    reviews_average&.to_f
+  end
+
+  def reviewed?
+    reviews_count.to_i.positive?
   end
   has_many :presentation_tags, dependent: :destroy
   has_many :tags, through: :presentation_tags

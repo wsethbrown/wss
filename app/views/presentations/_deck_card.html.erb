@@ -26,7 +26,18 @@
       </div>
     <% end %>
     <div class="flex flex-1 flex-col p-6">
-      <p class="eyebrow text-whiskey-600"><%= deck.category.presence || 'Whiskey' %><%= " · #{deck.difficulty}" if deck.difficulty.present? %></p>
+      <div class="flex items-baseline justify-between gap-3">
+        <p class="eyebrow text-whiskey-600"><%= deck.category.presence || 'Whiskey' %><%= " · #{deck.difficulty}" if deck.difficulty.present? %></p>
+        <%# Rating only when there are real reviews: an empty star row would be
+            a rating nobody gave (see the fabricated-content rule). %>
+        <% if deck.reviewed? %>
+          <span class="flex shrink-0 items-baseline gap-1 whitespace-nowrap"
+                title="<%= "#{number_with_precision(deck.average_review_rating, precision: 1)} out of 5 from #{pluralize(deck.reviews_count, 'review')}" %>">
+            <%= render "bottles/rating", value: deck.average_review_rating %>
+            <span class="text-xs font-medium text-gray-500"><%= deck.reviews_count %></span>
+          </span>
+        <% end %>
+      </div>
       <h3 class="mt-2 font-display text-xl font-semibold text-gray-900"><%= deck.title %></h3>
       <p class="mt-2 line-clamp-3 text-gray-600"><%= deck.excerpt(140) %></p>
       <div class="mt-auto flex items-center justify-between pt-6">

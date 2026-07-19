@@ -16,6 +16,17 @@ class PresentationReview < ApplicationRecord
 
   scope :recent, -> { order(created_at: :desc) }
 
+  # Keep the deck's cached summary honest through every path (create, rating
+  # edit, delete). after_commit so it reflects what actually landed.
+  after_commit :refresh_presentation_stats
+
+  private def refresh_presentation_stats
+    presentation.refresh_review_stats!
+  rescue => e
+    Rails.logger.error "Deck #{presentation_id}: review stats refresh failed after review #{id}: #{e.class}: #{e.message}"
+  end
+  public
+
   def self.eligible?(user, presentation)
     return false unless user && presentation
     return true if UserPresentation.exists?(user_id: user.id, presentation_id: presentation.id)
