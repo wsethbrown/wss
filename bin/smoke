@@ -1,0 +1,76 @@
+#!/usr/bin/env bash
+# Post-deploy smoke check: does the live site actually work?
+#
+# A green deploy only proves the container booted and answered /up. It does not
+# prove the pages render: a bad migration, a missing column, or a view error
+# shows up as a 500 on one page while health checks stay happy. This walks the
+# paths that matter and fails loudly if any of them break.
+#
+# Deliberately shallow and fast. It is a canary, not a test suite: the suite
+# runs in CI before the deploy, this catches what only production can show
+# (real data, real assets, real env).
+#
+# Usage: bin/smoke [base-url]     (default: https://whiskeysharesociety.com)
+set -uo pipefail
+
+BASE="${1:-https://whiskeysharesociety.com}"
+FAILED=0
+
+check() {
+  local path="$1" expect="${2:-200}" must_contain="${3:-}"
+  local body code tmp
+  tmp="$(mktemp)"
+  code="$(curl -sS -o "$tmp" -w "%{http_code}" --max-time 20 "$BASE$path" 2>/dev/null || echo "000")"
+
+  if [ "$code" != "$expect" ]; then
+    printf '  FAIL  %-28s expected %s, got %s\n' "$path" "$expect" "$code"
+    FAILED=1
+  elif [ -n "$must_contain" ] && ! grep -qF -- "$must_contain" "$tmp"; then
+    printf '  FAIL  %-28s %s but missing %s\n' "$path" "$code" "\"$must_contain\""
+    FAILED=1
+  else
+    printf '  ok    %-28s %s\n' "$path" "$code"
+  fi
+  rm -f "$tmp"
+}
+
+echo "Smoke checking $BASE"
+
+# The paths a visitor actually hits. Each carries a string that only renders
+# when the page truly built, so a styled error page can't pass as a success.
+check /              200 "Whiskey Share Society"
+check /presentations 200 "Decks"
+check /societies     200 "Societies"
+check /reviews       200 "Reviews"
+check /membership    200
+check /auth          200
+check /sitemap.xml   200 "<urlset"
+# NOTE: asserts reachability only, NOT content. Cloudflare's managed
+# robots.txt currently replaces ours in front of the origin, so the app's own
+# Disallow rules and Sitemap line never reach crawlers. That is a Cloudflare
+# dashboard setting, not a deploy regression, so it must not fail every
+# deploy. Restore the content assertion once the override is turned off.
+check /robots.txt    200
+check /up            200
+
+# A deck page: the surface most likely to break on a data migration, since it
+# renders the pour list, reviews and purchase state together.
+DECK_PATH="$(curl -sS --max-time 20 "$BASE/presentations" 2>/dev/null \
+             | grep -oE '/presentations/[0-9]+' | head -1 || true)"
+if [ -n "$DECK_PATH" ]; then
+  check "$DECK_PATH" 200
+else
+  echo "  WARN  no deck link found on /presentations (empty library?)"
+fi
+
+# A route that must NOT exist. If this ever answers 200, an auth-bypass
+# controller is back (see OVERHAUL_PLAN Phase 0).
+check "/callback?code=x" 404
+
+if [ "$FAILED" -ne 0 ]; then
+  echo "SMOKE FAILED. The deploy is live and something is broken."
+  echo "Roll back with: bin/kamal-deploy rollback"
+  exit 1
+fi
+
+echo "Smoke passed."

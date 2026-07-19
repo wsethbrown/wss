@@ -7,6 +7,8 @@ set -e
 # baked into the image or this script.
 #
 # Usage: source ~/.wss-production.env && bin/kamal-deploy setup|deploy|logs|...
+#
+# `deploy` is gated on a green CI run for HEAD (see below); --force overrides.
 
 if ! docker info >/dev/null 2>&1; then
   echo "Docker Desktop isn't running — start it first." >&2
@@ -27,13 +29,104 @@ for var in KAMAL_REGISTRY_PASSWORD WSS_DATABASE_PASSWORD \
   ENV_ARGS+=(-e "$var")
 done
 
+# ---------------------------------------------------------------- deploy gate
+# A deploy ships whatever is committed at HEAD, so the only honest question is
+# "did HEAD pass CI?". This used to go unasked: CI was red for the entire life
+# of the repo and every deploy went out anyway. Now `deploy` refuses unless
+# HEAD is pushed and its CI run is green.
+#
+# `bin/kamal-deploy deploy --force` skips the check for emergencies. It says so
+# loudly in the output: an override anyone can see is fine, a silent one isn't.
+if [ "$1" = "deploy" ]; then
+  FORCE=""
+  ARGS=()
+  for arg in "$@"; do
+    if [ "$arg" = "--force" ]; then FORCE="yes"; else ARGS+=("$arg"); fi
+  done
+  set -- "${ARGS[@]}"
+
+  if [ -n "$FORCE" ]; then
+    echo "!! DEPLOY GATE OVERRIDDEN (--force): shipping without a green CI run."
+  else
+    SHA="$(git rev-parse HEAD)"
+
+    if ! git diff --quiet HEAD 2>/dev/null || ! git diff --cached --quiet HEAD 2>/dev/null; then
+      echo "Uncommitted changes: a deploy builds from HEAD, so they would NOT ship." >&2
+      echo "Commit them, or run: bin/kamal-deploy deploy --force" >&2
+      exit 1
+    fi
+
+    if ! git branch -r --contains "$SHA" 2>/dev/null | grep -q .; then
+      echo "HEAD ($(git rev-parse --short HEAD)) isn't pushed, so CI has never seen it." >&2
+      echo "Push it, or run: bin/kamal-deploy deploy --force" >&2
+      exit 1
+    fi
+
+    if ! command -v gh >/dev/null 2>&1; then
+      echo "gh CLI not found, cannot check CI. Install it, or run: bin/kamal-deploy deploy --force" >&2
+      exit 1
+    fi
+
+    echo "Deploy gate: checking CI for $(git rev-parse --short HEAD)…"
+    STATUS="$(gh run list --commit "$SHA" --limit 1 --json status,conclusion \
+              --jq '.[0] | "\(.status):\(.conclusion // "none")"' 2>/dev/null || echo "")"
+
+    case "$STATUS" in
+      completed:success)
+        echo "Deploy gate: CI green. Shipping." ;;
+      "" | "null:none")
+        echo "No CI run found for $(git rev-parse --short HEAD). It may still be queuing." >&2
+        echo "Wait for it, or run: bin/kamal-deploy deploy --force" >&2
+        exit 1 ;;
+      completed:*)
+        echo "CI FAILED for $(git rev-parse --short HEAD) (${STATUS#completed:})." >&2
+        echo "Fix it, or run: bin/kamal-deploy deploy --force" >&2
+        exit 1 ;;
+      *)
+        echo "CI is still running for $(git rev-parse --short HEAD) (${STATUS%%:*})." >&2
+        echo "Wait for it, or run: bin/kamal-deploy deploy --force" >&2
+        exit 1 ;;
+    esac
+  fi
+fi
+
 TTY_ARGS=(-i); [ -t 0 ] && TTY_ARGS=(-it)
 
-exec docker run "${TTY_ARGS[@]}" --rm \
-  -v "${PWD}:/workdir" \
-  -v "${HOME}/.ssh:/root/.ssh:ro" \
-  -v "/run/host-services/ssh-auth.sock:/ssh-agent" \
-  -e SSH_AUTH_SOCK=/ssh-agent \
-  -v /var/run/docker.sock:/var/run/docker.sock \
-  "${ENV_ARGS[@]}" \
-  ghcr.io/basecamp/kamal:latest "$@"
+run_kamal() {
+  docker run "${TTY_ARGS[@]}" --rm \
+    -v "${PWD}:/workdir" \
+    -v "${HOME}/.ssh:/root/.ssh:ro" \
+    -v "/run/host-services/ssh-auth.sock:/ssh-agent" \
+    -e SSH_AUTH_SOCK=/ssh-agent \
+    -v /var/run/docker.sock:/var/run/docker.sock \
+    "${ENV_ARGS[@]}" \
+    ghcr.io/basecamp/kamal:latest "$@"
+}
+
+# For anything but `deploy`, hand straight through.
+if [ "${1:-}" != "deploy" ]; then
+  exec_status=0
+  run_kamal "$@" || exec_status=$?
+  exit $exec_status
+fi
+
+# A deploy isn't done when the container is healthy: health checks pass while
+# individual pages 500. Smoke-check the live site and say so plainly if it's
+# broken, rather than leaving it to be discovered.
+DEPLOY_STATUS=0
+run_kamal "$@" || DEPLOY_STATUS=$?
+
+if [ "$DEPLOY_STATUS" -ne 0 ]; then
+  echo "Deploy failed (exit $DEPLOY_STATUS). Skipping the smoke check." >&2
+  exit "$DEPLOY_STATUS"
+fi
+
+echo
+if [ -x "$(dirname "$0")/smoke" ]; then
+  "$(dirname "$0")/smoke" || {
+    echo >&2
+    echo "Deploy completed but the site is not healthy. Roll back with:" >&2
+    echo "  bin/kamal-deploy rollback" >&2
+    exit 1
+  }
+fi
