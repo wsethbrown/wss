@@ -15,6 +15,11 @@ class Presentation < ApplicationRecord
   # substitute freely by design. Keep the two facts apart (see #pours_from_nights).
   has_many :presentation_bottles, -> { ordered }, dependent: :destroy
   has_many :bottles, through: :presentation_bottles
+  # Pours are edited inline on the deck form, so they save with the deck.
+  # A row with no name and no bottle is an empty card the author never filled
+  # in; drop it rather than fail the whole save on a validation error.
+  accepts_nested_attributes_for :presentation_bottles, allow_destroy: true,
+    reject_if: ->(attrs) { attrs[:bottle_id].blank? && attrs[:name].blank? }
   has_many :events, dependent: :nullify
 
   has_many :presentation_tags, dependent: :destroy
@@ -82,6 +87,14 @@ class Presentation < ApplicationRecord
   # read, so bulk listings cost no extra queries. Recompute, never increment:
   # one aggregate over the reviews table is the only writer, which keeps the
   # cache self-healing if a row is ever changed out from under us.
+  # THE pour list. Every reader goes through this: the deck page, the buyer's
+  # manifest, the admin rail. `whiskey_recommendations` is legacy storage that
+  # has been migrated onto this association and is no longer read anywhere but
+  # the migration itself.
+  def pour_list = presentation_bottles.ordered.includes(:bottle)
+
+  def pours_count = presentation_bottles.size
+
   # One row per bottle that was ACTUALLY poured on a finished night that ran
   # this deck, with the scores from those nights only.
   #

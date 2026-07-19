@@ -4,7 +4,7 @@
     honest answer to "is this deck ready to sell?" %>
 <%
   takeaways_count = presentation.parsed_what_youll_learn.size
-  pours_count     = presentation.parsed_whiskey_recommendations.size
+  pours_count     = presentation.pours_count
   story_words     = presentation.content.to_s.split.size
   tasting_notes_n = [presentation.nose_notes, presentation.palate_notes,
                      presentation.finish_notes, presentation.body_notes].count(&:present?)
@@ -320,82 +320,38 @@
       </section>
 
       <!-- ═══ 6 · THE POUR LIST ═══ -->
-      <section id="f-pours" class="scroll-mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm" data-controller="whiskey-recommendations">
+      <%# ONE pour list. Rows are nested attributes on the deck, so they save
+          with "Save deck" like every other section, and a row can either point
+          at a catalog bottle (giving the deck real tasting scores and naming
+          the deck on that bottle's page) or just carry text for a pour that
+          isn't catalogued, like a cocktail. %>
+      <section id="f-pours" class="scroll-mt-8 rounded-2xl border border-gray-200 bg-white p-6 shadow-sm"
+               data-controller="pour-list">
         <h3 class="font-display text-xl font-semibold text-gray-900">6 · The pour list <span class="ml-1 align-middle text-xs font-sans font-medium uppercase tracking-wide text-gray-400">optional</span></h3>
         <p class="mb-5 mt-1 text-sm text-gray-500">
           Appears on: the deck's pour list section, and in the buyer's "what you get" manifest with a
-          count. Bottles, cocktails, or anything else the night pours. Write them out below, or link
-          them to catalog bottles further down, which is the better option where the bottle exists.
-          Empty = the section is hidden.
+          count. Bottles, cocktails, or anything else the night pours, one card each. Link a pour to
+          a catalog bottle wherever the bottle exists: that is what puts real tasting scores on this
+          deck and names this deck on the bottle's own page. Empty = the section is hidden.
         </p>
 
-        <%= form.hidden_field :whiskey_recommendations, id: 'whiskey_recommendations_hidden' %>
-        <input type="hidden" id="existing-recommendations" value="<%= presentation.whiskey_recommendations %>" />
+        <div data-pour-list-target="container" class="space-y-4 mb-4">
+          <%= form.fields_for :presentation_bottles do |pour_form| %>
+            <%= render "admin/presentations/pour_fields", f: pour_form %>
+          <% end %>
+        </div>
 
-        <div data-whiskey-recommendations-target="container" class="space-y-4 mb-4"></div>
-
-        <button type="button"
-                data-action="click->whiskey-recommendations#addRecommendation"
+        <button type="button" data-action="click->pour-list#add"
                 class="inline-flex items-center gap-2 px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
           Add a pour
         </button>
 
-        <template data-whiskey-recommendations-target="template">
-          <div class="recommendation-item p-4 bg-gray-50 rounded-lg border border-gray-200">
-            <div class="flex justify-between items-start mb-3">
-              <h4 class="text-sm font-medium text-gray-700">Pour</h4>
-              <button type="button"
-                      data-action="click->whiskey-recommendations#removeRecommendation"
-                      class="text-red-600 hover:text-red-800 transition">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-              </button>
-            </div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Name</label>
-                <input type="text"
-                       class="whiskey-name w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
-                       placeholder="e.g., Glenfiddich 12, or Mint Julep"
-                       data-action="input->whiskey-recommendations#fieldChanged">
-              </div>
-              <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Origin</label>
-                <input type="text"
-                       class="whiskey-region w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
-                       placeholder="e.g., Speyside, or Kentucky, 1803"
-                       data-action="input->whiskey-recommendations#fieldChanged">
-              </div>
-              <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Price</label>
-                <input type="text"
-                       class="whiskey-price w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
-                       placeholder="e.g., $45"
-                       data-action="input->whiskey-recommendations#fieldChanged">
-              </div>
-              <div>
-                <label class="block text-xs font-medium text-gray-600 mb-1">Style</label>
-                <input type="text"
-                       class="whiskey-style w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
-                       placeholder="e.g., Light &amp; Fruity"
-                       data-action="input->whiskey-recommendations#fieldChanged">
-              </div>
-              <div class="md:col-span-2">
-                <label class="block text-xs font-medium text-gray-600 mb-1">Notes</label>
-                <input type="text"
-                       class="whiskey-notes w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-whiskey-500 text-sm"
-                       placeholder="e.g., Pear, oak, subtle spice, pour it for the 1820s chapter"
-                       data-action="input->whiskey-recommendations#fieldChanged">
-              </div>
-            </div>
-          </div>
+        <template data-pour-list-target="template">
+          <%= form.fields_for :presentation_bottles, PresentationBottle.new, child_index: "NEW_RECORD" do |pour_form| %>
+            <%= render "admin/presentations/pour_fields", f: pour_form %>
+          <% end %>
         </template>
-
-        <%# The catalog-linked half of the same pour list. Edit-only: linking
-            needs a persisted deck to hang the rows off. %>
-        <% if presentation.persisted? %>
-          <%= render "admin/presentations/catalog_pours", presentation: presentation %>
-        <% end %>
       </section>
 
       <!-- ═══ 7 · WHAT BUYERS DOWNLOAD ═══ -->

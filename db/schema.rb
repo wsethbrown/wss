@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_19_135859) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_19_140100) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -211,11 +211,16 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_19_135859) do
 
   create_table "presentation_bottles", force: :cascade do |t|
     t.bigint "presentation_id", null: false
-    t.bigint "bottle_id", null: false
+    t.bigint "bottle_id"
     t.integer "position", default: 0, null: false
     t.string "label"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "name"
+    t.string "price"
+    t.text "origin"
+    t.text "style"
+    t.text "notes"
     t.index ["bottle_id"], name: "index_presentation_bottles_on_bottle_id"
     t.index ["presentation_id", "bottle_id"], name: "index_presentation_bottles_on_presentation_id_and_bottle_id", unique: true
     t.index ["presentation_id"], name: "index_presentation_bottles_on_presentation_id"

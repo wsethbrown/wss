@@ -79,7 +79,6 @@ class Admin::PresentationsController < Admin::BaseController
     handle_file_uploads(@presentation)
     
     # Process whiskey recommendations if present
-    process_whiskey_recommendations(@presentation)
 
     if @presentation.save
       DeckSlideRenderJob.perform_later(@presentation.id) if @presentation.pdf_file.attached?
@@ -97,7 +96,6 @@ class Admin::PresentationsController < Admin::BaseController
     handle_file_uploads(@presentation)
     
     # Process whiskey recommendations if present
-    process_whiskey_recommendations(@presentation)
     
     if @presentation.update(presentation_params)
       # A new deck file makes the old slide previews stale, re-render.
@@ -153,28 +151,6 @@ class Admin::PresentationsController < Admin::BaseController
     end
   end
   
-  def process_whiskey_recommendations(presentation)
-    # Process the pipe-separated whiskey recommendations into JSON format
-    if params[:presentation][:whiskey_recommendations].present?
-      recommendations = []
-      params[:presentation][:whiskey_recommendations].split("\n").each do |line|
-        parts = line.split('|')
-        next if parts.length < 4
-        
-        recommendations << {
-          name: parts[0].strip,
-          region: parts[1].strip,
-          price: parts[2].strip,
-          style: parts[3].strip,
-          notes: parts[4]&.strip
-        }
-      end
-      
-      # Store as JSON
-      presentation.whiskey_recommendations_json = recommendations if recommendations.any?
-    end
-  end
-
   def presentation_params
     params.require(:presentation).permit(
       :title, 
@@ -185,8 +161,6 @@ class Admin::PresentationsController < Admin::BaseController
       :price, 
       :duration,
       :difficulty,
-      :whiskey_recommendations,
-      :whiskey_recommendations_json,
       :tasting_notes,
       :nose_notes,
       :palate_notes,
@@ -202,7 +176,11 @@ class Admin::PresentationsController < Admin::BaseController
       :recommendations_sheet,
       :scorecard,
       :featured,
-      supplemental_materials: []
+      supplemental_materials: [],
+      # The deck's pour list rides along as nested rows, so it saves with the
+      # deck like every other section (see PresentationBottle).
+      presentation_bottles_attributes: [ :id, :bottle_id, :name, :origin, :style,
+                                         :price, :notes, :label, :position, :_destroy ]
     )
   end
 end

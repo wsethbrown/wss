@@ -11,61 +11,81 @@ class DeckPourLinksTest < ActionDispatch::IntegrationTest
     @bottle = Bottle.create!(name: "Tied Dram", distillery: "Somewhere", created_by: @admin)
   end
 
-  test "an admin links a bottle to a deck's pour list" do
+  # Pours save with the deck now: one form, one Save button, nested rows.
+  def save_deck(pours)
+    patch admin_presentation_path(@deck), params: {
+      presentation: { title: @deck.title, content: @deck.content, price: @deck.price,
+                      presentation_bottles_attributes: pours }
+    }
+  end
+
+  test "an admin adds a catalog-linked pour by saving the deck" do
     sign_in @admin
     assert_difference "PresentationBottle.count", 1 do
-      post admin_presentation_presentation_bottles_path(@deck),
-           params: { presentation_bottle: { bottle_id: @bottle.id, label: "the opener" } }
+      save_deck({ "0" => { bottle_id: @bottle.id, label: "the opener", position: 1 } })
     end
-    assert_equal [@bottle], @deck.reload.bottles.to_a
+    pour = @deck.reload.presentation_bottles.first
+    assert_equal @bottle, pour.bottle
+    assert_predicate pour, :linked?
+  end
+
+  # A cocktail has no catalog bottle, and losing that was the whole reason the
+  # old freeform field couldn't simply be deleted.
+  test "an admin adds a free-text pour with no catalog bottle" do
+    sign_in @admin
+    assert_difference "PresentationBottle.count", 1 do
+      save_deck({ "0" => { name: "Mint Julep", origin: "Kentucky, 1803", price: "$12",
+                           notes: "Pour it for the Derby chapter.", position: 1 } })
+    end
+    pour = @deck.reload.presentation_bottles.first
+    assert_equal "Mint Julep", pour.display_name
+    assert_not pour.linked?
+    assert_equal "Kentucky, 1803", pour.origin_text
+    assert_equal "Pour it for the Derby chapter.", pour.notes
+  end
+
+  test "a pour with neither a bottle nor a name is dropped, not an error" do
+    sign_in @admin
+    assert_no_difference "PresentationBottle.count" do
+      save_deck({ "0" => { name: "", bottle_id: "", position: 1 } })
+    end
+    assert_redirected_to admin_presentation_path(@deck)
   end
 
   test "the same bottle cannot be linked twice" do
     PresentationBottle.create!(presentation: @deck, bottle: @bottle, position: 1)
-    sign_in @admin
-    assert_no_difference "PresentationBottle.count" do
-      post admin_presentation_presentation_bottles_path(@deck), params: { presentation_bottle: { bottle_id: @bottle.id } }
-    end
+    duplicate = @deck.presentation_bottles.new(bottle: @bottle, position: 2)
+    assert_not duplicate.valid?
+    assert_match "already on this deck's pour list", duplicate.errors.full_messages.join
   end
 
-  test "picking no bottle is refused with a usable message" do
+  test "an admin removes a pour by saving the deck" do
+    pour = PresentationBottle.create!(presentation: @deck, bottle: @bottle, position: 1)
     sign_in @admin
-    assert_no_difference "PresentationBottle.count" do
-      post admin_presentation_presentation_bottles_path(@deck), params: { presentation_bottle: { bottle_id: "" } }
+    assert_difference "PresentationBottle.count", -1 do
+      save_deck({ "0" => { id: pour.id, _destroy: "1" } })
     end
-    assert_match "Pick a bottle", flash[:alert]
   end
 
   test "a non-admin cannot touch the pour list" do
     sign_in users(:jane)
     assert_no_difference "PresentationBottle.count" do
-      post admin_presentation_presentation_bottles_path(@deck), params: { presentation_bottle: { bottle_id: @bottle.id } }
+      save_deck({ "0" => { bottle_id: @bottle.id, position: 1 } })
     end
   end
 
-  test "an admin unlinks a pour" do
-    pour = PresentationBottle.create!(presentation: @deck, bottle: @bottle, position: 1)
-    sign_in @admin
-    assert_difference "PresentationBottle.count", -1 do
-      delete admin_presentation_presentation_bottle_path(@deck, pour)
-    end
-  end
-
-  # The pour controls sit inside the deck form but post elsewhere, so they are
-  # owned by hidden forms via the HTML5 `form` attribute. If that wiring breaks
-  # the buttons go dead silently, which is how the first attempt failed.
-  test "the admin pour controls are owned by real forms, not nested ones" do
-    pour = PresentationBottle.create!(presentation: @deck, bottle: @bottle, position: 1)
+  test "the admin form edits the pour list inline, with no second section" do
+    PresentationBottle.create!(presentation: @deck, bottle: @bottle, position: 1)
     sign_in @admin
     get edit_admin_presentation_path(@deck)
     assert_response :success
 
-    assert_match 'id="link-pour-form"', response.body
-    assert_match 'form="link-pour-form"', response.body
-    assert_match "id=\"unlink-pour-#{pour.id}\"", response.body
-    assert_match "form=\"unlink-pour-#{pour.id}\"", response.body
+    assert_match "presentation[presentation_bottles_attributes]", response.body,
+                 "pours must be nested fields on the deck form"
     assert_equal 1, response.body.scan("· The pour list").size,
                  "the admin must show one pour list section, not two"
+    assert_no_match "whiskey_recommendations", response.body,
+                    "the legacy pour field must be gone from the form"
   end
 
   test "the deck page shows its linked pours" do
@@ -74,19 +94,6 @@ class DeckPourLinksTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match "What this deck calls for", response.body
     assert_match "Tied Dram", response.body
-  end
-
-  # The linked list and the legacy freeform recommendations are the same fact
-  # in two storage formats, so only one may ever render.
-  test "linked pours replace the legacy written recommendations" do
-    @deck.update_column(:whiskey_recommendations, "Old Text Dram|Somewhere, Kentucky|50|A written recommendation.")
-    get presentation_path(@deck)
-    assert_match "What to pour", response.body, "with nothing linked, the written list is the pour list"
-
-    PresentationBottle.create!(presentation: @deck, bottle: @bottle, position: 1)
-    get presentation_path(@deck)
-    assert_match "What this deck calls for", response.body
-    assert_no_match "What to pour", response.body, "a deck must never show two pour lists"
   end
 
   # A deck's list is what it RECOMMENDS; a society pours what it can get.
@@ -228,5 +235,68 @@ class DeckProvenanceTest < ActionDispatch::IntegrationTest
     assert_match "Provenance Deck", response.body, "the deck is public catalog info"
     assert_no_match society.name, response.body, "the veil must still hide who gathered"
     assert_match "A private society", response.body
+  end
+end
+
+# The written pour cards were migrated onto presentation_bottles. This pins the
+# conversion rules, because the legacy column is the only copy of that content
+# until it's dropped.
+class WrittenPourMigrationTest < ActiveSupport::TestCase
+  setup do
+    @admin = users(:admin)
+    require Rails.root.join("db/migrate/20260719140100_migrate_written_pours_into_the_pour_list.rb").to_s
+  end
+
+  def deck_with(written)
+    deck = Presentation.create!(author: @admin, title: "Legacy #{Presentation.count}", content: "x", price: 5)
+    deck.update_column(:whiskey_recommendations, written)
+    deck
+  end
+
+  def migrate!
+    MigrateWrittenPoursIntoThePourList.new.tap { |m| m.verbose = false }.up
+  end
+
+  test "a written card becomes a free-text pour, keeping every field" do
+    deck = deck_with("Mint Julep|Kentucky, 1803|$12|Bourbon and mint|Pour it for the Derby chapter.")
+    migrate!
+
+    pour = deck.reload.presentation_bottles.sole
+    assert_equal "Mint Julep", pour.display_name
+    assert_not pour.linked?, "no catalog bottle by that name, so it stays text"
+    assert_equal "Kentucky, 1803", pour.origin
+    assert_equal "$12", pour.price
+    assert_equal "Bourbon and mint", pour.style
+    assert_equal "Pour it for the Derby chapter.", pour.notes
+  end
+
+  test "a written card matching a catalog bottle is linked to it" do
+    bottle = Bottle.create!(name: "Glenfiddich 12", created_by: @admin)
+    deck = deck_with("glenfiddich 12|Speyside|$45|Light and fruity|Pear and oak.")
+    migrate!
+
+    pour = deck.reload.presentation_bottles.sole
+    assert_equal bottle, pour.bottle, "matching is case-insensitive"
+    assert_equal "Pear and oak.", pour.notes, "the author's own notes survive the link"
+  end
+
+  test "order is preserved" do
+    deck = deck_with("First|a|$1|s|n\nSecond|a|$2|s|n\nThird|a|$3|s|n")
+    migrate!
+    assert_equal %w[First Second Third], deck.reload.presentation_bottles.ordered.map(&:display_name)
+  end
+
+  test "a deck that already has a pour list is left alone" do
+    deck = deck_with("Written|a|$1|s|n")
+    existing = PresentationBottle.create!(presentation: deck, name: "Already here", position: 1)
+    migrate!
+    assert_equal [ existing ], deck.reload.presentation_bottles.to_a
+  end
+
+  test "running it twice does not duplicate a pour list" do
+    deck = deck_with("Only One|a|$1|s|n")
+    migrate!
+    migrate!
+    assert_equal 1, deck.reload.presentation_bottles.count
   end
 end

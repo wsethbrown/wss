@@ -34,17 +34,3 @@
 </div>
 
 <%= render 'form', presentation: @presentation, submit_text: 'Save deck' %>
-
-<%# Owner forms for the catalog pour controls rendered inside section 6 of the
-    deck form. They live out here because a nested <form> is invalid HTML; the
-    controls up there claim them by id with the HTML5 `form` attribute, so the
-    markup stays valid and the controls stay where they belong. Deliberately
-    empty apart from their CSRF and _method fields. %>
-<%= form_with url: admin_presentation_presentation_bottles_path(@presentation),
-              method: :post, id: "link-pour-form", class: "hidden" do %>
-<% end %>
-<% @presentation.presentation_bottles.each do |pour| %>
-  <%= form_with url: admin_presentation_presentation_bottle_path(@presentation, pour),
-                method: :delete, id: "unlink-pour-#{pour.id}", class: "hidden" do %>
-  <% end %>
-<% end %>

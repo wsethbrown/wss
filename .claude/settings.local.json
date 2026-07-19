@@ -1,7 +1,31 @@
 {
   "permissions": {
     "allow": [
-      "Bash(bin/dev:*)"
+      "Bash(bin/dev:*)",
+      "Bash(tail -25 /tmp/wss-test.out)",
+      "Bash(curl -s http://localhost:3000/)",
+      "Bash(git add *)",
+      "Bash(git commit -q -m 'Homepage: accent '\\\\''Whiskey Share Society'\\\\'' in founding-story line \\(owner-approved\\) *)",
+      "Bash(git push *)",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' https://whiskeysharesociety.com/)",
+      "Bash(echo \"HTTP: $\\(curl -s -o /dev/null -w '%{http_code}' https://whiskeysharesociety.com/\\)\")",
+      "Bash(curl -s https://whiskeysharesociety.com/)",
+      "Bash(awk '/def set_presentation/,/^  end/' app/controllers/presentations_controller.rb)",
+      "Bash(awk '/def can_download_full_presentation\\\\?/,/^  end/' app/models/presentation.rb)",
+      "Bash(awk '/def purchased_by\\\\?/,/^  end/' app/models/presentation.rb)",
+      "Bash(awk '/def can_access_presentation\\\\?/,/^  end/' app/models/user.rb)",
+      "Bash(awk '/create_table \"user_presentations\"/,/^  end/' db/schema.rb)",
+      "Bash(awk '/def update/,/^  end/' app/controllers/admin/presentations_controller.rb)",
+      "Bash(awk '/def handle_file_uploads/,/^ end/' app/controllers/admin/presentations_controller.rb)",
+      "Bash(git rm *)",
+      "Bash(docker compose *)",
+      "Bash(git commit -q -m 'Scorecards: custom upload + always-included blank; retire the generator \\(owner-approved\\) *)",
+      "Bash(echo \"home: $\\(curl -s -o /dev/null -w '%{http_code}' https://whiskeysharesociety.com/\\)\")",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' https://whiskeysharesociety.com/up)",
+      "Bash(echo \"up:   $\\(curl -s -o /dev/null -w '%{http_code}' https://whiskeysharesociety.com/up\\)\")",
+      "Bash(curl -s -o /dev/null -w '%{http_code}' https://whiskeysharesociety.com/presentations/1/scorecard)",
+      "Bash(echo \"old scorecard route \\(expect 404\\): $\\(curl -s -o /dev/null -w '%{http_code}' https://whiskeysharesociety.com/presentations/1/scorecard\\)\")",
+      "Bash(echo \"exit=$?\")"
     ]
   }
 }

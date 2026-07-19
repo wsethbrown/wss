@@ -126,7 +126,6 @@ Rails.application.routes.draw do
       collection { post :import }
       member { post :publish; post :unpublish; post :render_slides }
       # The deck's pour list, linked to catalog bottles (Phase 3 deck ties).
-      resources :presentation_bottles, only: [:create, :destroy]
     end
     resources :users, only: [:index, :show, :edit, :update] do
       # Admin-role changes are a dedicated, guarded action, never part of the

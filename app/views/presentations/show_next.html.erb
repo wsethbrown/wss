@@ -73,7 +73,7 @@
         ("Speaker script" if @presentation.speaker_notes.attached?),
         ("Presentation outline" if @presentation.outline_file.attached?),
         ("Printable whiskey list" if @presentation.recommendations_sheet.attached?),
-        ("Bottle list, #{@presentation.parsed_whiskey_recommendations.size} pours with tasting notes" if @presentation.parsed_whiskey_recommendations.any?)
+        ("Bottle list, #{@presentation.pours_count} pours with tasting notes" if @presentation.pours_count.positive?)
       ].compact %>
       <div class="mx-auto mt-8 grid max-w-xl gap-x-8 gap-y-3 text-left sm:grid-cols-2">
         <% manifest.each do |item| %>
@@ -208,7 +208,7 @@
 <!-- ACT 6 · The tasting spread -->
 <% tasting = { 'Nose' => @presentation.nose_notes, 'Palate' => @presentation.palate_notes,
                'Finish' => @presentation.finish_notes, 'Body' => @presentation.body_notes }.compact_blank %>
-<% recs = @presentation.parsed_whiskey_recommendations %>
+<% recs = @presentation.pour_list %>
 <% if tasting.any? || recs.any? %>
   <section class="w-full bg-whiskey-50 px-4 py-20">
     <div class="mx-auto max-w-4xl">
