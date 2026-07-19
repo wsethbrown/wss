@@ -41,6 +41,11 @@ class PresentationsController < ApplicationController
     # Page views are deliberately not logged: one ActivityLog row (with IP+UA)
     # per authenticated view was over half the table and nothing consumed it.
 
+    # Returning from Stripe Checkout: verify and grant here, then redirect to
+    # the clean URL so the message is a real flash (one showing, gone on
+    # refresh) instead of a banner the query string keeps resurrecting.
+    return if handle_checkout_return
+
     # Reading access: owners (with valid access) and admins read the whole
     # story; everyone else gets a teaser that fades into the purchase CTA.
     @full_story = user_signed_in? && @presentation.can_download_full_presentation?(current_user)
@@ -97,6 +102,44 @@ class PresentationsController < ApplicationController
   end
 
   private
+
+  # Stripe sends the buyer back with ?purchase=success&session_id=... We
+  # confirm the payment with Stripe and grant access on the spot (the webhook
+  # stays the backstop, and both are idempotent). Returns true when it has
+  # redirected. Never trusts the query string alone: the old banner claimed
+  # "you now have access" on any URL carrying purchase=success.
+  def handle_checkout_return
+    return false if params[:purchase].blank?
+
+    if params[:purchase] == "cancelled"
+      redirect_to presentation_path(@presentation), alert: "Purchase cancelled. You can try again any time." and return true
+    end
+    return false unless params[:purchase] == "success"
+
+    unless user_signed_in?
+      redirect_to presentation_path(@presentation) and return true
+    end
+
+    if params[:session_id].present? && !@presentation.purchased_by?(current_user)
+      begin
+        session = Stripe::Checkout::Session.retrieve(params[:session_id])
+        Presentations::CheckoutFulfillment.fulfill!(session, expected_user: current_user)
+      rescue Stripe::StripeError => e
+        Rails.logger.error "Checkout return for presentation #{@presentation.id}, user #{current_user.id}: Stripe lookup failed: #{e.message}"
+      end
+    end
+
+    if @presentation.reload.purchased_by?(current_user)
+      Rails.logger.info "Checkout return: user #{current_user.id} confirmed owning presentation #{@presentation.id}"
+      redirect_to presentation_path(@presentation), notice: "Purchase complete. #{@presentation.title} is yours." and return true
+    end
+
+    # Paid but not yet granted: the webhook is still the safety net, so say
+    # something true rather than promising access we can't see.
+    Rails.logger.warn "Checkout return: user #{current_user.id} has no purchase row yet for presentation #{@presentation.id}; webhook pending"
+    redirect_to presentation_path(@presentation),
+                alert: "Payment received. Your deck is still unlocking, refresh in a moment and it will be here." and return true
+  end
 
   def set_presentation
     @presentation = Presentation.find(params[:id])

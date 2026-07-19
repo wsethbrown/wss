@@ -233,41 +233,11 @@ class WebhooksController < ApplicationController
     # Handle presentation purchases
     metadata = session.try(:metadata) || session["metadata"]
     mode = session.try(:mode) || session["mode"]
-    
+
     if mode == "payment" && metadata && (metadata["presentation_id"] || metadata.try(:[], "presentation_id"))
-      user_id = metadata["user_id"] || metadata.try(:[], "user_id")
-      presentation_id = metadata["presentation_id"] || metadata.try(:[], "presentation_id")
-      
-      user = User.find_by(id: user_id)
-      unless user
-        session_id = session.try(:id) || session["id"]
-        Rails.logger.error "User not found for checkout session: #{session_id}, user_id: #{user_id}"
-        return
-      end
-
-      # Check if presentation purchase already exists (prevent duplicates)
-      existing_purchase = UserPresentation.find_by(user: user, presentation_id: presentation_id)
-      if existing_purchase
-        Rails.logger.info "Presentation purchase already exists: user #{user.id}, presentation #{presentation_id}"
-        return
-      end
-
-      # Get the payment intent to retrieve the amount paid
-      payment_intent_id = session.try(:payment_intent) || session["payment_intent"]
-      payment_intent = Stripe::PaymentIntent.retrieve(payment_intent_id)
-      
-      # Create user_presentation record for direct purchase
-      UserPresentation.create!(
-        user: user,
-        presentation_id: presentation_id,
-        purchase_type: 'direct',
-        purchase_price: (payment_intent.try(:amount) || payment_intent["amount"]) / 100.0, # Convert from cents
-        stripe_payment_intent_id: payment_intent.try(:id) || payment_intent["id"],
-        purchased_at: Time.current
-      )
-
-      session_id = session.try(:id) || session["id"]
-      Rails.logger.info "Direct presentation purchase completed: user #{user.id}, presentation #{presentation_id}, session #{session_id}"
+      # Same code path the post-checkout return uses, so the two can never
+      # drift; both are idempotent, whichever arrives first wins.
+      Presentations::CheckoutFulfillment.fulfill!(session)
     elsif mode == "subscription" && metadata && (metadata["plan"] || metadata.try(:[], "plan"))
       # Handle subscription creation from checkout
       # This is already handled by customer.subscription.created event

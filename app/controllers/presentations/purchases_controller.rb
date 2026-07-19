@@ -8,7 +8,8 @@ class Presentations::PurchasesController < ApplicationController
   # The single purchase flow for every deck:
   #   - free decks    → claimed instantly, no payment involved
   #   - credit        → spends 1 credit (requires an active subscription)
-  #   - direct        → Stripe Checkout; access granted by the webhook on payment
+  #   - direct        → Stripe Checkout; access granted on return (verified with
+  #                     Stripe) and by the webhook as backstop, both idempotent
   def new
     @can_use_credit = can_use_credit?
   end
@@ -100,7 +101,13 @@ class Presentations::PurchasesController < ApplicationController
       # No payment_method_types: omitting it lets Stripe Checkout offer every
       # method enabled in the dashboard (cards, Apple Pay, Google Pay, Link, ...).
       mode: 'payment',
-      success_url: presentation_url(@presentation, purchase: 'success'),
+      # session_id lets the return path verify the payment with Stripe and
+      # grant access immediately, instead of waiting on the webhook (which
+      # can lag, and never arrives in local dev without `stripe listen`).
+      # APPENDED AS A STRING ON PURPOSE: passing it through the URL helper
+      # percent-encodes the braces, Stripe then never substitutes the real
+      # id and the return path can't look the session up. Keep it literal.
+      success_url: "#{presentation_url(@presentation, purchase: 'success')}&session_id={CHECKOUT_SESSION_ID}",
       cancel_url: new_presentation_purchase_url(@presentation),
       metadata: {
         user_id: current_user.id,
