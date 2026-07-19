@@ -54,7 +54,7 @@ class Admin::AnalyticsController < Admin::BaseController
       .count
       .sort_by { |_, count| -count }
       .first(10)
-      .map { |id, count| [Presentation.find(id), count] }
+      .map { |id, count| [ Presentation.find(id), count ] }
 
     # Recent downloads
     @recent_downloads = DownloadLog

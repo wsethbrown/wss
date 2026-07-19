@@ -2,7 +2,7 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
   include ActivityLogger
 
   # Apple posts its callback as a form; skip forgery protection for that provider only.
-  protect_from_forgery except: [:apple]
+  protect_from_forgery except: [ :apple ]
 
   def google_oauth2
     handle_auth("Google")

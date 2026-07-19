@@ -12,6 +12,6 @@ class CreatePresentationBottles < ActiveRecord::Migration[8.0]
       t.string :label
       t.timestamps
     end
-    add_index :presentation_bottles, [:presentation_id, :bottle_id], unique: true
+    add_index :presentation_bottles, [ :presentation_id, :bottle_id ], unique: true
   end
 end

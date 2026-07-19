@@ -9,7 +9,7 @@ class CreateSocietyMemberships < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :society_memberships, [:user_id, :society_id], unique: true
+    add_index :society_memberships, [ :user_id, :society_id ], unique: true
     add_index :society_memberships, :role
     add_index :society_memberships, :status
   end

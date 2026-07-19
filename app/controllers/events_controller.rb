@@ -1,5 +1,5 @@
 class EventsController < ApplicationController
-  before_action :set_event, only: [:show, :edit, :update, :destroy, :assign_host, :assign_deck]
+  before_action :set_event, only: [ :show, :edit, :update, :destroy, :assign_host, :assign_deck ]
 
   def index
     @events = policy_scope(Event).includes(:society, :organizer, :event_rsvps)
@@ -8,8 +8,8 @@ class EventsController < ApplicationController
                    .order(:start_time)
                    .page(params[:page])
 
-    @events = @events.upcoming if params[:filter] == 'upcoming'
-    @events = @events.past if params[:filter] == 'past'
+    @events = @events.upcoming if params[:filter] == "upcoming"
+    @events = @events.past if params[:filter] == "past"
   end
 
   def show
@@ -43,7 +43,7 @@ class EventsController < ApplicationController
     # against ownership directly, NOT deck_options_for — that helper always
     # allows the event's current deck, which here is the one being smuggled.
     if @event.presentation_id.present?
-      offerable_ids = [@event.society&.creator_id, current_user.id, @event.host_id].compact.uniq
+      offerable_ids = [ @event.society&.creator_id, current_user.id, @event.host_id ].compact.uniq
       unless Presentation.published.exists?(id: @event.presentation_id, author_id: offerable_ids)
         Rails.logger.warn "Event create by user #{current_user.id}: deck #{@event.presentation_id} dropped, not offerable for society #{@event.society_id}"
         @event.presentation_id = nil
@@ -65,7 +65,7 @@ class EventsController < ApplicationController
       Rails.logger.info "Event #{@event.id} created in society #{@event.society_id} by user #{current_user.id}; member notifications enqueued"
       EventNotificationJob.perform_later(@event.id, "created")
       EventReminderJob.schedule(@event)
-      redirect_to @event, notice: 'Event was successfully created.'
+      redirect_to @event, notice: "Event was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -102,7 +102,7 @@ class EventsController < ApplicationController
         EventNotificationJob.perform_later(@event.id, "updated", changed)
         EventReminderJob.schedule(@event) if changed.include?("time")
       end
-      redirect_to @event, notice: 'Event was successfully updated.'
+      redirect_to @event, notice: "Event was successfully updated."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -158,7 +158,7 @@ class EventsController < ApplicationController
     authorize @event
 
     if @event.destroy
-      redirect_to events_url, notice: 'Event was successfully deleted.'
+      redirect_to events_url, notice: "Event was successfully deleted."
     else
       redirect_to society_event_path(@event.society, @event), alert: @event.errors.full_messages.to_sentence
     end
@@ -191,9 +191,9 @@ class EventsController < ApplicationController
   # Decks offerable on an event: published, owned by the society creator,
   # the organizer, or the host. The current deck stays selectable.
   def deck_options_for(event)
-    owner_ids = [event.society.creator_id, event.organizer_id, event.host_id].compact.uniq
+    owner_ids = [ event.society.creator_id, event.organizer_id, event.host_id ].compact.uniq
     options = Presentation.published.where(author_id: owner_ids).to_a
-    options |= [event.presentation] if event.presentation
+    options |= [ event.presentation ] if event.presentation
     options
   end
   helper_method :deck_options_for
@@ -202,7 +202,7 @@ class EventsController < ApplicationController
     # society_id is permitted only on create (the nested form); update must not
     # re-home an event, that would re-attribute its reviews/board rows and
     # switch their veiling.
-    permitted = [:title, :description, :location, :start_time, :end_time, :pours_hidden_until_complete]
+    permitted = [ :title, :description, :location, :start_time, :end_time, :pours_hidden_until_complete ]
     permitted.push(:society_id, :presentation_id) if action_name == "create" || action_name == "new"
     params.require(:event).permit(*permitted)
   end

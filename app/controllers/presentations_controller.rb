@@ -1,8 +1,8 @@
 class PresentationsController < ApplicationController
   include ActivityLogger
   include DesignPreview
-  
-  before_action :set_presentation, only: [:show, :present, :edit, :update, :destroy]
+
+  before_action :set_presentation, only: [ :show, :present, :edit, :update, :destroy ]
 
   def index
     # The library is fully empty only when there are no published decks at all,
@@ -11,10 +11,10 @@ class PresentationsController < ApplicationController
 
     # Filter options come from the catalog itself, so a new category shows up
     # automatically and an empty one never renders a dead filter.
-    @categories = Presentation.published.where.not(category: [nil, ''])
+    @categories = Presentation.published.where.not(category: [ nil, "" ])
                               .distinct.order(:category).pluck(:category)
-    @popular_tags = Tag.joins(:presentation_tags).group('tags.id')
-                       .order(Arel.sql('COUNT(presentation_tags.id) DESC')).limit(12)
+    @popular_tags = Tag.joins(:presentation_tags).group("tags.id")
+                       .order(Arel.sql("COUNT(presentation_tags.id) DESC")).limit(12)
     @difficulties = %w[Beginner Intermediate Advanced] &
                     Presentation.published.distinct.pluck(:difficulty).compact
 
@@ -25,12 +25,12 @@ class PresentationsController < ApplicationController
     @presentations = @presentations.by_tag(params[:tag])
 
     @presentations = case params[:sort]
-                     when 'newest'     then @presentations.recent
-                     when 'price_low'  then @presentations.order(:price)
-                     when 'price_high' then @presentations.order(price: :desc)
-                     # Default view pins featured decks to the top, then popularity.
-                     else                   @presentations.order(featured: :desc).popular
-                     end
+    when "newest"     then @presentations.recent
+    when "price_low"  then @presentations.order(:price)
+    when "price_high" then @presentations.order(price: :desc)
+    # Default view pins featured decks to the top, then popularity.
+    else                   @presentations.order(featured: :desc).popular
+    end
 
     @presentations = @presentations.page(params[:page]).per(12)
 
@@ -74,7 +74,7 @@ class PresentationsController < ApplicationController
     authorize @presentation
 
     if @presentation.save
-      redirect_to @presentation, notice: 'Presentation was successfully created.'
+      redirect_to @presentation, notice: "Presentation was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -88,7 +88,7 @@ class PresentationsController < ApplicationController
     authorize @presentation
 
     if @presentation.update(presentation_params)
-      redirect_to @presentation, notice: 'Presentation was successfully updated.'
+      redirect_to @presentation, notice: "Presentation was successfully updated."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -98,7 +98,7 @@ class PresentationsController < ApplicationController
     authorize @presentation
 
     @presentation.destroy
-    redirect_to presentations_url, notice: 'Presentation was successfully deleted.'
+    redirect_to presentations_url, notice: "Presentation was successfully deleted."
   end
 
   private

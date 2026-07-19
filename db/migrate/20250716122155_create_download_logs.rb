@@ -11,8 +11,8 @@ class CreateDownloadLogs < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :download_logs, [:presentation_id, :file_type]
-    add_index :download_logs, [:user_id, :downloaded_at]
+    add_index :download_logs, [ :presentation_id, :file_type ]
+    add_index :download_logs, [ :user_id, :downloaded_at ]
     add_index :download_logs, :downloaded_at
   end
 end

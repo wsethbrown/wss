@@ -13,11 +13,11 @@ class Admin::ActivitiesController < Admin::BaseController
 
     # Filter by date range
     activities = case params[:date_range]
-                 when "today" then activities.today
-                 when "week" then activities.this_week
-                 when "month" then activities.this_month
-                 else activities
-                 end
+    when "today" then activities.today
+    when "week" then activities.this_week
+    when "month" then activities.this_month
+    else activities
+    end
 
     # Search
     if params[:search].present?

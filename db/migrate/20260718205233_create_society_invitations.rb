@@ -9,7 +9,7 @@ class CreateSocietyInvitations < ActiveRecord::Migration[8.0]
       t.timestamps
     end
     # One live invitation per person per society at a time.
-    add_index :society_invitations, [:society_id, :user_id], unique: true,
+    add_index :society_invitations, [ :society_id, :user_id ], unique: true,
               where: "status = 'pending'", name: "index_society_invitations_on_pending_pair"
   end
 end

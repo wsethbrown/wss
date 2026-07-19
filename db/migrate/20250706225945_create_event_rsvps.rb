@@ -8,7 +8,7 @@ class CreateEventRsvps < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :event_rsvps, [:user_id, :event_id], unique: true
+    add_index :event_rsvps, [ :user_id, :event_id ], unique: true
     add_index :event_rsvps, :status
   end
 end

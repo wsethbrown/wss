@@ -21,12 +21,12 @@ class OmniauthNamesTest < ActiveSupport::TestCase
 
   test "a real name still splits into first and last" do
     user = User.from_omniauth(auth(email: "nat@example.com", name: "Nat McCarty"))
-    assert_equal ["Nat", "McCarty"], [user.first_name, user.last_name]
+    assert_equal [ "Nat", "McCarty" ], [ user.first_name, user.last_name ]
   end
 
   test "a multi-word surname stays intact" do
     user = User.from_omniauth(auth(email: "pappy@example.com", name: "Julian Van Winkle"))
-    assert_equal ["Julian", "Van Winkle"], [user.first_name, user.last_name]
+    assert_equal [ "Julian", "Van Winkle" ], [ user.first_name, user.last_name ]
   end
 
   test "a single-word name is a first name, not duplicated into last" do
@@ -37,6 +37,6 @@ class OmniauthNamesTest < ActiveSupport::TestCase
 
   test "explicit first/last from the provider win" do
     user = User.from_omniauth(auth(email: "seth@example.com", name: "ignored@example.com", first: "Seth", last: "Brown"))
-    assert_equal ["Seth", "Brown"], [user.first_name, user.last_name]
+    assert_equal [ "Seth", "Brown" ], [ user.first_name, user.last_name ]
   end
 end

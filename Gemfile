@@ -49,13 +49,13 @@ group :development, :test do
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
-  
+
   # Load environment variables from .env file
   gem "dotenv-rails"
-  
+
   # JWT token decoding for Apple OAuth
   gem "jwt"
-  
+
   # System testing with Capybara
   gem "capybara"
   gem "selenium-webdriver"
@@ -71,8 +71,8 @@ end
 group :development do
   # Use console on exceptions pages [https://github.com/rails/web-console]
   gem "web-console"
-  gem 'foreman'
-  gem 'claude-on-rails'
+  gem "foreman"
+  gem "claude-on-rails"
 end
 
 gem "hotwire-rails", "~> 0.1.3"

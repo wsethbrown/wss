@@ -1,8 +1,8 @@
 class SocietiesController < ApplicationController
   include ActivityLogger
 
-  before_action :authenticate_user!, except: [:index, :show, :join_by_invite]
-  before_action :set_society, only: [:show, :edit, :update, :destroy]
+  before_action :authenticate_user!, except: [ :index, :show, :join_by_invite ]
+  before_action :set_society, only: [ :show, :edit, :update, :destroy ]
 
   # Society-specific authorization failures redirect back to the listing with a
   # message describing the attempted action, rather than the app-wide default.
@@ -15,16 +15,16 @@ class SocietiesController < ApplicationController
                                              .with_attached_profile_picture
                                              .with_attached_banner_image
                                              .order(created_at: :desc)
-      
+
       # For search results, show all societies the user has access to (excluding their own)
       scope = policy_scope(Society).includes(:creator, :society_memberships, :members, :events)
                                    .with_attached_profile_picture
                                    .with_attached_banner_image
                                    .where.not(id: @user_societies.pluck(:id))
-      
+
       # Apply search filters
       scope = apply_search_filters(scope)
-      
+
       @societies = scope.order(created_at: :desc)
     else
       # For unauthorized users, show only public societies
@@ -33,10 +33,10 @@ class SocietiesController < ApplicationController
                      .with_attached_profile_picture
                      .with_attached_banner_image
                      .where(is_private: false)
-      
+
       # Apply search filters for public users too
       scope = apply_search_filters(scope)
-      
+
       @societies = scope.order(created_at: :desc)
     end
   end
@@ -69,7 +69,7 @@ class SocietiesController < ApplicationController
     authorize @society
 
     if @society.save
-      redirect_to @society, notice: 'Society was successfully created.'
+      redirect_to @society, notice: "Society was successfully created."
     else
       render :new, status: :unprocessable_entity
     end
@@ -83,7 +83,7 @@ class SocietiesController < ApplicationController
     authorize @society
 
     if @society.update(society_params)
-      redirect_to @society, notice: 'Society was successfully updated.'
+      redirect_to @society, notice: "Society was successfully updated."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -93,7 +93,7 @@ class SocietiesController < ApplicationController
     authorize @society
 
     @society.destroy
-    redirect_to societies_url, notice: 'Society was successfully deleted.'
+    redirect_to societies_url, notice: "Society was successfully deleted."
   end
 
   def join
@@ -104,9 +104,9 @@ class SocietiesController < ApplicationController
 
     if membership.save
       log_activity(:society_joined, @society)
-      redirect_to @society, notice: 'Successfully joined the society!'
+      redirect_to @society, notice: "Successfully joined the society!"
     else
-      redirect_to @society, alert: 'Unable to join the society.'
+      redirect_to @society, alert: "Unable to join the society."
     end
   end
 
@@ -119,9 +119,9 @@ class SocietiesController < ApplicationController
     if membership&.destroy
       log_activity(:society_left, @society)
       SocietyActivity.record!(society: @society, user: current_user, action: "left")
-      redirect_to societies_path, notice: 'Successfully left the society.'
+      redirect_to societies_path, notice: "Successfully left the society."
     else
-      redirect_to @society, alert: 'Unable to leave the society.'
+      redirect_to @society, alert: "Unable to leave the society."
     end
   end
 

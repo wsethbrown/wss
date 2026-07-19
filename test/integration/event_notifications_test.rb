@@ -24,7 +24,7 @@ class EventNotificationsTest < ActionDispatch::IntegrationTest
   test "creating an event notifies active members except the organizer" do
     event = build_event
     EventNotificationJob.perform_now(event.id, "created")
-    assert_equal [@member.email], enqueued_mail_recipients("event_created")
+    assert_equal [ @member.email ], enqueued_mail_recipients("event_created")
   end
 
   test "muted members are skipped" do
@@ -77,7 +77,7 @@ class EventNotificationsTest < ActionDispatch::IntegrationTest
     event = build_event
     EventRsvp.create!(user: @member, event: event, status: "yes")
     sign_in @organizer
-    assert_enqueued_with(job: EventNotificationJob, args: [event.id, "updated", ["location"]]) do
+    assert_enqueued_with(job: EventNotificationJob, args: [ event.id, "updated", [ "location" ] ]) do
       patch society_event_path(@society, event), params: { event: { location: "New spot" } }
     end
   end
@@ -96,7 +96,7 @@ class EventNotificationsTest < ActionDispatch::IntegrationTest
     EventRsvp.create!(user: @member, event: event, status: "yes")
     EventRsvp.create!(user: users(:seth), event: event, status: "no")
     EventReminderJob.perform_now(event.id, event.start_time.to_i)
-    assert_equal [@member.email], enqueued_mail_recipients("event_reminder")
+    assert_equal [ @member.email ], enqueued_mail_recipients("event_reminder")
   end
 
   test "a stale reminder stamp is a no-op" do

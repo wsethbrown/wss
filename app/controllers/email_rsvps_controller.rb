@@ -22,7 +22,7 @@ class EmailRsvpsController < ApplicationController
     if rsvp.save
       Rails.logger.info "Email RSVP recorded: user #{user.id} marked #{status} for event #{event.id}"
       # Organizer + event host hear about email RSVPs, same as on-site ones.
-      [event.organizer, event.host].compact.uniq.each do |recipient|
+      [ event.organizer, event.host ].compact.uniq.each do |recipient|
         next if recipient.id == user.id
         unless recipient.event_emails?
           Rails.logger.info "Event #{event.id}: RSVP notification to user #{recipient.id} skipped (event emails muted)"

@@ -8,19 +8,19 @@ class ActivityLog < ApplicationRecord
   # for months. presentation_viewed was retired (per-view rows, unused);
   # downloads live in DownloadLog, not here.
   ACTIVITY_TYPES = {
-    login: 'User Login',
-    logout: 'User Logout',
-    presentation_purchased: 'Presentation Purchased',
-    society_joined: 'Society Joined',
-    society_left: 'Society Left',
-    event_rsvp: 'Event RSVP',
-    profile_updated: 'Profile Updated',
-    subscription_created: 'Subscription Created',
-    subscription_canceled: 'Subscription Canceled',
-    subscription_paused: 'Subscription Paused',
-    subscription_resumed: 'Subscription Resumed',
-    credits_used: 'Credits Used',
-    credits_added: 'Credits Added'
+    login: "User Login",
+    logout: "User Logout",
+    presentation_purchased: "Presentation Purchased",
+    society_joined: "Society Joined",
+    society_left: "Society Left",
+    event_rsvp: "Event RSVP",
+    profile_updated: "Profile Updated",
+    subscription_created: "Subscription Created",
+    subscription_canceled: "Subscription Canceled",
+    subscription_paused: "Subscription Paused",
+    subscription_resumed: "Subscription Resumed",
+    credits_used: "Credits Used",
+    credits_added: "Credits Added"
   }.freeze
 
   validates :activity_type, presence: true, inclusion: { in: ACTIVITY_TYPES.keys.map(&:to_s) }
@@ -39,13 +39,13 @@ class ActivityLog < ApplicationRecord
     return nil unless trackable
 
     case trackable_type
-    when 'Presentation'
+    when "Presentation"
       trackable.title
-    when 'Society'
+    when "Society"
       trackable.name
-    when 'Event'
+    when "Event"
       trackable.title
-    when 'User'
+    when "User"
       trackable.full_name
     else
       trackable.try(:name) || trackable.try(:title) || "#{trackable_type} ##{trackable_id}"

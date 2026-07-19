@@ -75,14 +75,14 @@ module Presentations
     # The charged amount, straight from Stripe when we can read it; the deck's
     # list price is the fallback so a Stripe hiccup never blocks access.
     def self.payment_details(payment_intent_id, presentation, session_id)
-      return [presentation.price, nil] if payment_intent_id.blank?
+      return [ presentation.price, nil ] if payment_intent_id.blank?
 
       intent = Stripe::PaymentIntent.retrieve(payment_intent_id)
       amount = (intent.try(:amount) || intent["amount"]).to_i / 100.0
-      [amount, intent.try(:id) || intent["id"]]
+      [ amount, intent.try(:id) || intent["id"] ]
     rescue Stripe::StripeError => e
       Rails.logger.warn "Checkout #{session_id}: could not read payment intent #{payment_intent_id} (#{e.message}); recording list price"
-      [presentation.price, payment_intent_id]
+      [ presentation.price, payment_intent_id ]
     end
     private_class_method :payment_details
   end

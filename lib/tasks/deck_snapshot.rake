@@ -48,7 +48,7 @@ namespace :decks do
   end
 
   desc "Load a deck snapshot into this environment (development only)"
-  task :import, [:path] => :environment do |_t, args|
+  task :import, [ :path ] => :environment do |_t, args|
     if Rails.env.production?
       abort "decks:import refuses to run in production — this is a prod -> dev tool."
     end

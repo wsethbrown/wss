@@ -4,7 +4,7 @@ Rails.application.config.middleware.use OmniAuth::Builder do
 end
 
 # Enable proper CSRF protection
-OmniAuth.config.allowed_request_methods = [:post]
+OmniAuth.config.allowed_request_methods = [ :post ]
 OmniAuth.config.silence_get_warning = true
 
 # Handle failures properly

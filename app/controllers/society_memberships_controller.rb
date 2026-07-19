@@ -9,7 +9,7 @@ class SocietyMembershipsController < ApplicationController
     new_role = params[:role]
 
     unless %w[member officer].include?(new_role) && @membership.user_id != @membership.society.creator_id
-      redirect_to @membership.society, alert: 'That role change is not allowed' and return
+      redirect_to @membership.society, alert: "That role change is not allowed" and return
     end
 
     @membership.update!(role: new_role)

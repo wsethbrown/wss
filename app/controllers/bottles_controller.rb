@@ -1,9 +1,9 @@
 class BottlesController < ApplicationController
-  before_action :authenticate_user!, only: [:new, :create]
+  before_action :authenticate_user!, only: [ :new, :create ]
 
   def show
     @bottle = Bottle.find_by!(slug: params[:id])
-    @reviews = @bottle.reviews.includes(:user, event: [:society, :event_bottles]).order(votes_count: :desc, created_at: :desc).page(params[:page]).per(10)
+    @reviews = @bottle.reviews.includes(:user, event: [ :society, :event_bottles ]).order(votes_count: :desc, created_at: :desc).page(params[:page]).per(10)
     @my_review = current_user && @bottle.reviews.find_by(user: current_user, event_id: nil)
     # Society verdict cards lead the Tastings list. The expandable member
     # rows show every event review (the aggregate itself dedups re-tastes).
@@ -23,7 +23,7 @@ class BottlesController < ApplicationController
     @verdict = @bottle.society_verdicts.find { |s| s.id == @society.id }
     raise ActiveRecord::RecordNotFound unless @verdict
     @reviews = @bottle.reviews.joins(:event).where(events: { society_id: @society.id })
-                      .includes(:user, event: [:society, :event_bottles])
+                      .includes(:user, event: [ :society, :event_bottles ])
                       .order(created_at: :desc)
   end
 

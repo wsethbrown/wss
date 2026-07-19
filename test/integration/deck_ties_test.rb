@@ -108,7 +108,7 @@ class DeckPourLinksTest < ActionDispatch::IntegrationTest
     sign_in @admin
     get edit_admin_presentation_path(@deck)
 
-    assert_equal 1, response.body.scan('presentation_bottles_attributes][0][name]').size,
+    assert_equal 1, response.body.scan("presentation_bottles_attributes][0][name]").size,
                  "name and catalog bottle are one field, not two"
     assert_match "data-bottle-search-name-field-value", response.body
     assert_match "Linked to #{@bottle.display_name}", response.body,
@@ -351,7 +351,7 @@ class DeckProvenanceTest < ActionDispatch::IntegrationTest
     rsvp.save!(validate: false)
     review = Review.new(user: @author, bottle: @bottle, event: event, rating: 4.0, notes: "Good pour")
     review.save!(validate: false)
-    [society, event, review]
+    [ society, event, review ]
   end
 
   test "a public night names its deck on the bottle page" do

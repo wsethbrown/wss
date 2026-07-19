@@ -9,11 +9,11 @@ class ReviewTest < ActiveSupport::TestCase
 
   test "rating must be a half step between 0.5 and 5.0" do
     review = reviews(:john_eagle_rare)
-    [0.0, 5.5, 4.3, -1].each do |bad|
+    [ 0.0, 5.5, 4.3, -1 ].each do |bad|
       review.rating = bad
       assert_not review.valid?, "#{bad} should be invalid"
     end
-    [0.5, 3.0, 4.5, 5.0].each do |good|
+    [ 0.5, 3.0, 4.5, 5.0 ].each do |good|
       review.rating = good
       assert review.valid?, "#{good} should be valid"
     end
@@ -89,10 +89,10 @@ class ReviewDescriptorTest < ActiveSupport::TestCase
 
   test "tagged scope matches all given tags, words and families alike" do
     r = reviews(:john_eagle_rare) # nose "Toffee, orange peel", palate "Cherry, leather"
-    assert_includes Review.tagged(["toffee"]), r
-    assert_includes Review.tagged(["toffee", "cherry"]), r
-    assert_includes Review.tagged(["sweet"]), r          # family covers toffee
-    assert_not_includes Review.tagged(["peat"]), r
-    assert_not_includes Review.tagged(["toffee", "peat"]), r # ALL must match
+    assert_includes Review.tagged([ "toffee" ]), r
+    assert_includes Review.tagged([ "toffee", "cherry" ]), r
+    assert_includes Review.tagged([ "sweet" ]), r          # family covers toffee
+    assert_not_includes Review.tagged([ "peat" ]), r
+    assert_not_includes Review.tagged([ "toffee", "peat" ]), r # ALL must match
   end
 end

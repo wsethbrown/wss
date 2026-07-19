@@ -15,6 +15,6 @@ class CreateEvents < ActiveRecord::Migration[8.0]
     add_index :events, :title
     add_index :events, :location
     add_index :events, :start_time
-    add_index :events, [:society_id, :start_time]
+    add_index :events, [ :society_id, :start_time ]
   end
 end

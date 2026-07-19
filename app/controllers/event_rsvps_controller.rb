@@ -2,12 +2,12 @@ class EventRsvpsController < ApplicationController
   include ActivityLogger
 
   before_action :set_event
-  before_action :set_rsvp, only: [:update, :destroy]
+  before_action :set_rsvp, only: [ :update, :destroy ]
 
   def create
     # Get the status from params, default to 'yes' if not provided
-    status = params[:status] || 'yes'
-    
+    status = params[:status] || "yes"
+
     @rsvp = @event.event_rsvps.build(user: current_user, status: status, note: params[:note].presence)
     authorize @rsvp, :create?
 
@@ -22,7 +22,7 @@ class EventRsvpsController < ApplicationController
       end
     else
       respond_to do |format|
-        format.html { redirect_to @event, alert: 'Unable to RSVP to the event.' }
+        format.html { redirect_to @event, alert: "Unable to RSVP to the event." }
         format.turbo_stream { render turbo_stream: turbo_stream.update("flash-messages", partial: "shared/flash_messages") }
       end
     end
@@ -41,7 +41,7 @@ class EventRsvpsController < ApplicationController
       end
     else
       respond_to do |format|
-        format.html { redirect_to @event, alert: 'Unable to update RSVP.' }
+        format.html { redirect_to @event, alert: "Unable to update RSVP." }
         format.turbo_stream { render turbo_stream: turbo_stream.update("flash-messages", partial: "shared/flash_messages") }
       end
     end
@@ -52,7 +52,7 @@ class EventRsvpsController < ApplicationController
 
     @rsvp.destroy
     Rails.logger.info "Event #{@event.id}: RSVP cancelled by user #{current_user.id}"
-    redirect_to @event, notice: 'RSVP was successfully cancelled.'
+    redirect_to @event, notice: "RSVP was successfully cancelled."
   end
 
   private
@@ -74,7 +74,7 @@ class EventRsvpsController < ApplicationController
   def notify_organizer
     # The organizer and the event's host (if any) both hear about replies;
     # dedup covers host == organizer, and nobody is emailed about their own.
-    [@event.organizer, @event.host].compact.uniq.each do |recipient|
+    [ @event.organizer, @event.host ].compact.uniq.each do |recipient|
       next if recipient.id == current_user.id
       unless recipient.event_emails?
         Rails.logger.info "Event #{@event.id}: RSVP notification to user #{recipient.id} skipped (event emails muted)"
@@ -88,14 +88,14 @@ class EventRsvpsController < ApplicationController
 
   def rsvp_success_message(status)
     case status
-    when 'yes'
-      'Great! You\'re attending this event.'
-    when 'maybe'
+    when "yes"
+      "Great! You're attending this event."
+    when "maybe"
       'You\'ve marked this event as "maybe" - you can change this anytime before the event.'
-    when 'no'
-      'You\'ve declined this event. You can change your mind anytime before the event.'
+    when "no"
+      "You've declined this event. You can change your mind anytime before the event."
     else
-      'RSVP updated successfully.'
+      "RSVP updated successfully."
     end
   end
 end

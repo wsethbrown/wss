@@ -7,7 +7,7 @@ class Favorite < ApplicationRecord
   # authors and each does a Century-badge check.
   belongs_to :favoritable, polymorphic: true, counter_cache: true
 
-  validates :favoritable_id, uniqueness: { scope: [:user_id, :favoritable_type] }
+  validates :favoritable_id, uniqueness: { scope: [ :user_id, :favoritable_type ] }
   validate :not_yourself
   validate :society_must_be_visible, if: -> { favoritable.is_a?(Society) }
 

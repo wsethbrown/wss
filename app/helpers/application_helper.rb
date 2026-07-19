@@ -3,14 +3,14 @@ module ApplicationHelper
   def nav_link_to(name, path, options = {})
     active = current_page?(path)
     classes = [
-      'transition-colors',
-      'hover:text-whiskey-200',
-      'px-3',
-      'py-2',
-      'rounded-lg',
-      'font-medium',
-      active ? 'text-whiskey-300' : 'text-cream/80'
+      "transition-colors",
+      "hover:text-whiskey-200",
+      "px-3",
+      "py-2",
+      "rounded-lg",
+      "font-medium",
+      active ? "text-whiskey-300" : "text-cream/80"
     ]
-    link_to name, path, options.merge(class: classes.join(' '))
+    link_to name, path, options.merge(class: classes.join(" "))
   end
 end

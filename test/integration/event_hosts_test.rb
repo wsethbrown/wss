@@ -12,7 +12,7 @@ class EventHostsTest < ActionDispatch::IntegrationTest
     @member = users(:jane)
     @host = users(:one)
     @society = Society.create!(name: "Host Club", description: "x", creator: @organizer, is_private: false)
-    [@member, @host].each { |u| SocietyMembership.create!(user: u, society: @society, role: "member", status: "active") }
+    [ @member, @host ].each { |u| SocietyMembership.create!(user: u, society: @society, role: "member", status: "active") }
     st = 3.days.from_now
     @event = Event.create!(society: @society, organizer: @organizer, title: "Host Night",
                            description: "x", location: "den", start_time: st, end_time: st + 2.hours)

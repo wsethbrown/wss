@@ -13,6 +13,6 @@ class CreateActivityLogs < ActiveRecord::Migration[8.0]
 
     add_index :activity_logs, :activity_type
     add_index :activity_logs, :created_at
-    add_index :activity_logs, [:user_id, :created_at]
+    add_index :activity_logs, [ :user_id, :created_at ]
   end
 end

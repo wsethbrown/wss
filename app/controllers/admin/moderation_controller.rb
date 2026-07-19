@@ -5,7 +5,7 @@
 class Admin::ModerationController < Admin::BaseController
   def index
     @open_reports = ReviewReport.open_reports
-                                .includes(review: [:user, :bottle])
+                                .includes(review: [ :user, :bottle ])
                                 .order(created_at: :desc)
                                 .group_by(&:review)
 

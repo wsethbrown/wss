@@ -1,7 +1,7 @@
 # Create sample presentations if none exist
 if Presentation.count == 0
   puts "Creating sample presentations..."
-  
+
   # Find or create admin user
   admin = User.find_by(email: 'seth@whiskeysharesociety.com')
   unless admin
@@ -13,7 +13,7 @@ if Presentation.count == 0
       role: 'admin'
     )
   end
-  
+
   presentations = [
     {
       title: 'Introduction to Scotch Whisky',
@@ -61,7 +61,7 @@ if Presentation.count == 0
       whiskey_recommendations: "Nikka From the Barrel|Japan|$$|Bold & Complex\nYamazaki 12|Japan|$$$|Fruity & Elegant\nHakushu 12|Japan|$$$|Fresh & Smoky\nHibiki Harmony|Japan|$$|Balanced Blend"
     }
   ]
-  
+
   presentations.each do |attrs|
     presentation = Presentation.create!(
       title: attrs[:title],
@@ -81,9 +81,9 @@ if Presentation.count == 0
       rating: rand(4.5..5.0).round(1),
       review_count: rand(10..150)
     )
-    
+
     puts "Created presentation: #{presentation.title}"
   end
-  
+
   puts "Created #{Presentation.count} presentations"
 end

@@ -6,7 +6,7 @@ class SitemapsController < ApplicationController
 
   def show
     @host = HOST
-    @static_paths = ["/", "/membership", "/reviews", "/societies", "/presentations", "/contact"]
+    @static_paths = [ "/", "/membership", "/reviews", "/societies", "/presentations", "/contact" ]
     @societies = Society.where(is_private: false).select(:id, :updated_at)
     @presentations = Presentation.published.select(:id, :updated_at)
     @bottles = Bottle.select(:id, :slug, :updated_at)

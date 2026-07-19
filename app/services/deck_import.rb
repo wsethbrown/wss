@@ -63,7 +63,7 @@ class DeckImport
     end
 
     slides = pages.map { |page| page.lines.map(&:strip).reject(&:blank?) }
-    slides = [[title_from(filename)]] if slides.flatten.empty?
+    slides = [ [ title_from(filename) ] ] if slides.flatten.empty?
 
     build_result(slides, [])
   end
@@ -78,7 +78,7 @@ class DeckImport
 
     content = body_slides.map { |paras|
       next if paras.empty?
-      ["## #{paras.first}", *paras.drop(1)].join("\n\n")
+      [ "## #{paras.first}", *paras.drop(1) ].join("\n\n")
     }.compact.join("\n\n")
 
     description = (slides.first&.second.presence || body_slides.dig(0, 1).to_s).truncate(200)

@@ -51,7 +51,7 @@ class WebhooksBasilCompatTest < ActionDispatch::IntegrationTest
           customer: "cus_basil_test",
           status: "active",
           current_period_end: @period_end,
-          items: { data: [{ id: "si_1", price: { id: ENV["STRIPE_MONTHLY_PRICE_ID"] } }] }
+          items: { data: [ { id: "si_1", price: { id: ENV["STRIPE_MONTHLY_PRICE_ID"] } } ] }
         }
       }
     }.to_json

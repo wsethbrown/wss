@@ -1,6 +1,6 @@
 class WebhooksController < ApplicationController
   include ActivityLogger
-  
+
   # Skip CSRF protection for webhooks
   skip_before_action :verify_authenticity_token
   before_action :authenticate_stripe_webhook
@@ -99,11 +99,11 @@ class WebhooksController < ApplicationController
     # Check for pause collection information
     pause_collection = subscription.try(:pause_collection) || subscription["pause_collection"]
     is_paused = pause_collection.present?
-    
+
     # Determine final status
     final_status = subscription.try(:status) || subscription["status"]
     paused_at = is_paused ? Time.current : nil
-    
+
     user.update!(
       subscription_status: final_status,
       subscription_plan: plan_name,
@@ -114,12 +114,12 @@ class WebhooksController < ApplicationController
 
     # Pausing does NOT touch founding status (owner rule); only deletion does.
     grant_founding_status(user, plan_name)
-    
+
     # Log activity if subscription was canceled
     if cancel_at_period_end
       log_activity_for_user(user, :subscription_canceled, nil, { plan: plan_name, ends_at: period_end })
     end
-    
+
     # Log activity if subscription was paused/resumed
     if is_paused && user.subscription_paused_at_previously_was.nil?
       log_activity_for_user(user, :subscription_paused, nil, { plan: plan_name })
@@ -152,7 +152,7 @@ class WebhooksController < ApplicationController
       user.update!(founding_member: false, founding_revoked_at: Time.current)
       Rails.logger.info "Founding member status revoked for user #{user.id} (subscription cancelled)"
     end
-    
+
     # If subscription is ending immediately (not at period end), expire credits
     cancel_at = subscription.try(:cancel_at) || subscription["cancel_at"]
     if cancel_at.nil? || cancel_at <= Time.current.to_i
@@ -197,7 +197,7 @@ class WebhooksController < ApplicationController
       else
         Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice_id}"
       end
-    elsif (invoice.try(:lines) || invoice["lines"])
+    elsif invoice.try(:lines) || invoice["lines"]
       # Handle invoice lines that are subscription related
       lines_data = invoice.try(:lines).try(:data) || invoice.dig("lines", "data") || []
       subscription_line = lines_data.find { |line| line_subscription_id(line) }
@@ -286,7 +286,7 @@ class WebhooksController < ApplicationController
   def find_user_by_customer_id(customer_id_obj)
     # Handle both string customer IDs and customer objects
     customer_id = customer_id_obj.is_a?(String) ? customer_id_obj : (customer_id_obj.try(:id) || customer_id_obj["id"] || customer_id_obj)
-    
+
     User.find_by(stripe_customer_id: customer_id).tap do |user|
       Rails.logger.error "User not found for Stripe customer: #{customer_id}" unless user
     end
@@ -297,7 +297,7 @@ class WebhooksController < ApplicationController
     items = subscription.try(:items) || subscription["items"]
     items_data = items.try(:data) || items["data"] || []
     first_item = items_data.first
-    
+
     if first_item
       price = first_item.try(:price) || first_item["price"]
       price_id = price.try(:id) || price["id"] if price

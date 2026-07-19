@@ -26,9 +26,9 @@ class SubscriptionsPauseTest < ActionDispatch::IntegrationTest
 
   test "pause subscription fails without stripe subscription id" do
     @user.update!(stripe_subscription_id: nil)
-    
+
     post subscriptions_pause_path
-    
+
     assert_redirected_to account_path(anchor: "subscription")
     assert_match /No active subscription found/, flash[:alert]
   end
@@ -40,7 +40,7 @@ class SubscriptionsPauseTest < ActionDispatch::IntegrationTest
       "sub_test123",
       {
         pause_collection: {
-          behavior: 'keep_as_draft',
+          behavior: "keep_as_draft",
           resumes_at: 1.month.from_now.to_i
         }
       }
@@ -71,7 +71,7 @@ class SubscriptionsPauseTest < ActionDispatch::IntegrationTest
     mock_subscription = OpenStruct.new(id: "sub_test123", status: "active")
     Stripe::Subscription.expects(:update).with(
       "sub_test123",
-      { pause_collection: '' }
+      { pause_collection: "" }
     ).returns(mock_subscription)
 
     post subscriptions_resume_path

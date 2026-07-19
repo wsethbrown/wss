@@ -10,9 +10,9 @@ class Admin::CreditsController < Admin::BaseController
               when "negative" then users.where("credits < 0")
               else users
               end
-            else
+    else
               users
-            end
+    end
 
     # Search
     if params[:search].present?
@@ -28,11 +28,11 @@ class Admin::CreditsController < Admin::BaseController
 
     # Sort
     users = case params[:sort]
-            when "most_credits" then users.order(credits: :desc)
-            when "least_credits" then users.order(credits: :asc)
-            when "name" then users.order(:first_name, :last_name)
-            else users.order(credits: :desc)
-            end
+    when "most_credits" then users.order(credits: :desc)
+    when "least_credits" then users.order(credits: :asc)
+    when "name" then users.order(:first_name, :last_name)
+    else users.order(credits: :desc)
+    end
 
     @users = users.includes(:profile_image_attachment).page(params[:page]).per(25)
 

@@ -9,7 +9,7 @@ module SubscriptionRevenue
   def monthly_recurring
     prices = SubscriptionProducts.monthly_cents_by_plan
     cents = User.where(subscription_status: "active")
-                .where.not(subscription_plan: [nil, ""])
+                .where.not(subscription_plan: [ nil, "" ])
                 .group(:subscription_plan)
                 .count
                 .sum { |plan, count| prices[plan.to_s].to_i * count }

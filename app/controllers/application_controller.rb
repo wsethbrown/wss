@@ -17,7 +17,7 @@ class ApplicationController < ActionController::Base
   rescue_from ActionController::InvalidAuthenticityToken, with: :handle_csrf_error
 
   def health
-    render json: { status: 'ok', timestamp: Time.current }
+    render json: { status: "ok", timestamp: Time.current }
   end
 
   private
@@ -53,7 +53,7 @@ class ApplicationController < ActionController::Base
   # join/leave churn stays OFF the bell; it lands on the society Activity
   # page instead).
   def notify_society_admins_of_join(society, joiner)
-    admins = [society.creator] + society.society_memberships.where(role: "admin", status: "active").includes(:user).map(&:user)
+    admins = [ society.creator ] + society.society_memberships.where(role: "admin", status: "active").includes(:user).map(&:user)
     admins.uniq.each do |admin|
       Notification.notify!(user: admin, actor: joiner, notifiable: society, action: "member_joined")
     end
@@ -76,7 +76,7 @@ class ApplicationController < ActionController::Base
     flash[:alert] = "You are not authorized to perform this action."
     redirect_back(fallback_location: root_path)
   end
-  
+
   def handle_csrf_error
     # Log the fact of the failure without leaking tokens, session contents, or params.
     Rails.logger.warn "CSRF verification failed for #{self.class.name}##{action_name} (#{request.method} #{request.path})"

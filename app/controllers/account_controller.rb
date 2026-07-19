@@ -1,6 +1,6 @@
 class AccountController < ApplicationController
   include ActivityLogger
-  
+
   before_action :authenticate_user!
 
   def index
@@ -30,13 +30,13 @@ class AccountController < ApplicationController
     if current_user.update(profile_params)
       log_activity(:profile_updated, current_user, { fields: profile_params.keys })
       respond_to do |format|
-        format.html { redirect_to account_path, notice: 'Profile updated successfully' }
-        format.turbo_stream { redirect_to account_path, notice: 'Profile updated successfully' }
+        format.html { redirect_to account_path, notice: "Profile updated successfully" }
+        format.turbo_stream { redirect_to account_path, notice: "Profile updated successfully" }
       end
     else
       respond_to do |format|
-        format.html { redirect_to account_path, alert: 'Failed to update profile' }
-        format.turbo_stream { redirect_to account_path, alert: 'Failed to update profile' }
+        format.html { redirect_to account_path, alert: "Failed to update profile" }
+        format.turbo_stream { redirect_to account_path, alert: "Failed to update profile" }
       end
     end
   end
@@ -57,11 +57,11 @@ class AccountController < ApplicationController
   def upload_avatar
     if params[:profile_image].present?
       current_user.profile_image.attach(params[:profile_image])
-      message = 'Profile photo updated successfully'
+      message = "Profile photo updated successfully"
     else
-      message = 'No photo selected'
+      message = "No photo selected"
     end
-    
+
     respond_to do |format|
       format.html { redirect_to account_path, notice: message }
       format.turbo_stream { redirect_to account_path, notice: message }
@@ -71,11 +71,11 @@ class AccountController < ApplicationController
   def remove_avatar
     if current_user.profile_image.attached?
       current_user.profile_image.purge
-      message = 'Profile photo removed successfully'
+      message = "Profile photo removed successfully"
     else
-      message = 'No photo to remove'
+      message = "No photo to remove"
     end
-    
+
     respond_to do |format|
       format.html { redirect_to account_path, notice: message }
       format.turbo_stream { redirect_to account_path, notice: message }
@@ -125,7 +125,7 @@ class AccountController < ApplicationController
     UserMailer.email_change_verification(current_user, new_email, token).deliver_now
 
     message = "A verification link has been sent to your current email address (#{current_user.email}). Please check your inbox and click the link to confirm the email change."
-    
+
     respond_to do |format|
       format.html { redirect_to account_path, notice: message }
       format.turbo_stream { redirect_to account_path, notice: message }
@@ -171,8 +171,8 @@ class AccountController < ApplicationController
     if current_user.has_password?
       unless current_user.valid_password?(params[:current_password])
         respond_to do |format|
-          format.html { redirect_to account_path, alert: 'Current password is incorrect' }
-          format.turbo_stream { redirect_to account_path, alert: 'Current password is incorrect' }
+          format.html { redirect_to account_path, alert: "Current password is incorrect" }
+          format.turbo_stream { redirect_to account_path, alert: "Current password is incorrect" }
         end
         return
       end
@@ -181,16 +181,16 @@ class AccountController < ApplicationController
     # Validate new password
     if params[:new_password] != params[:confirm_password]
       respond_to do |format|
-        format.html { redirect_to account_path, alert: 'New passwords do not match' }
-        format.turbo_stream { redirect_to account_path, alert: 'New passwords do not match' }
+        format.html { redirect_to account_path, alert: "New passwords do not match" }
+        format.turbo_stream { redirect_to account_path, alert: "New passwords do not match" }
       end
       return
     end
 
     if params[:new_password].length < 8
       respond_to do |format|
-        format.html { redirect_to account_path, alert: 'New password must be at least 8 characters long' }
-        format.turbo_stream { redirect_to account_path, alert: 'New password must be at least 8 characters long' }
+        format.html { redirect_to account_path, alert: "New password must be at least 8 characters long" }
+        format.turbo_stream { redirect_to account_path, alert: "New password must be at least 8 characters long" }
       end
       return
     end
@@ -203,25 +203,25 @@ class AccountController < ApplicationController
       password: params[:new_password],
       password_set_manually: true
     )
-    
+
     # Keep the user signed in after password change
     bypass_sign_in(current_user)
 
     # Different success messages based on whether password was added or changed
     message = if was_passwordless
-      'Password added successfully! You can now sign in with either magic links or your password.'
+      "Password added successfully! You can now sign in with either magic links or your password."
     else
-      'Password updated successfully'
+      "Password updated successfully"
     end
-    
+
     respond_to do |format|
       format.html { redirect_to account_path, notice: message }
       format.turbo_stream { redirect_to account_path, notice: message }
     end
   rescue => e
     respond_to do |format|
-      format.html { redirect_to account_path, alert: 'Failed to update password. Please try again.' }
-      format.turbo_stream { redirect_to account_path, alert: 'Failed to update password. Please try again.' }
+      format.html { redirect_to account_path, alert: "Failed to update password. Please try again." }
+      format.turbo_stream { redirect_to account_path, alert: "Failed to update password. Please try again." }
     end
   end
 

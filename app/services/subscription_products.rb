@@ -16,7 +16,7 @@ module SubscriptionProducts
 
         if ENV["STRIPE_MONTHLY_PRICE_ID"].present?
           begin
-            monthly_price = Stripe::Price.retrieve({ id: ENV["STRIPE_MONTHLY_PRICE_ID"], expand: ["product"] })
+            monthly_price = Stripe::Price.retrieve({ id: ENV["STRIPE_MONTHLY_PRICE_ID"], expand: [ "product" ] })
             if monthly_price && monthly_price.product
               products << {
                 id: "monthly",
@@ -36,7 +36,7 @@ module SubscriptionProducts
 
         if ENV["STRIPE_QUARTERLY_PRICE_ID"].present?
           begin
-            quarterly_price = Stripe::Price.retrieve({ id: ENV["STRIPE_QUARTERLY_PRICE_ID"], expand: ["product"] })
+            quarterly_price = Stripe::Price.retrieve({ id: ENV["STRIPE_QUARTERLY_PRICE_ID"], expand: [ "product" ] })
             if quarterly_price && quarterly_price.product
               quarterly_interval = quarterly_price.recurring&.interval || "month"
               quarterly_interval_count = quarterly_price.recurring&.interval_count || 1
@@ -65,7 +65,7 @@ module SubscriptionProducts
 
         if ENV["STRIPE_YEARLY_PRICE_ID"].present?
           begin
-            yearly_price = Stripe::Price.retrieve({ id: ENV["STRIPE_YEARLY_PRICE_ID"], expand: ["product"] })
+            yearly_price = Stripe::Price.retrieve({ id: ENV["STRIPE_YEARLY_PRICE_ID"], expand: [ "product" ] })
             if yearly_price && yearly_price.product
               yearly_interval = yearly_price.recurring&.interval || "year"
               monthly_equivalent = if yearly_interval == "year"

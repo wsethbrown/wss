@@ -8,7 +8,7 @@ class CreateReviewReports < ActiveRecord::Migration[8.0]
     end
 
     # One report per person per review; reporting twice is a no-op.
-    add_index :review_reports, [:user_id, :review_id], unique: true
+    add_index :review_reports, [ :user_id, :review_id ], unique: true
     add_index :review_reports, :status
   end
 end

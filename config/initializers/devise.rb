@@ -24,7 +24,7 @@ Devise.setup do |config|
   # Configure the e-mail address which will be shown in Devise::Mailer,
   # note that it will be overwritten if you use your own mailer class
   # with default "from" parameter.
-  config.mailer_sender = 'Whiskey Share Society <noreply@send.whiskeysharesociety.com>'
+  config.mailer_sender = "Whiskey Share Society <noreply@send.whiskeysharesociety.com>"
 
   # Configure the class responsible to send e-mails.
   # config.mailer = 'Devise::Mailer'
@@ -36,7 +36,7 @@ Devise.setup do |config|
   # Load and configure the ORM. Supports :active_record (default) and
   # :mongoid (bson_ext recommended) by default. Other ORMs may be
   # available as additional gems.
-  require 'devise/orm/active_record'
+  require "devise/orm/active_record"
 
   # ==> Configuration for any authentication mechanism
   # Configure which keys are used when authenticating a user. The default is
@@ -58,12 +58,12 @@ Devise.setup do |config|
   # Configure which authentication keys should be case-insensitive.
   # These keys will be downcased upon creating or modifying a user and when used
   # to authenticate or find a user. Default is :email.
-  config.case_insensitive_keys = [:email]
+  config.case_insensitive_keys = [ :email ]
 
   # Configure which authentication keys should have whitespace stripped.
   # These keys will have whitespace before and after removed upon creating or
   # modifying a user and when used to authenticate or find a user. Default is :email.
-  config.strip_whitespace_keys = [:email]
+  config.strip_whitespace_keys = [ :email ]
 
   # Tell if authentication through request.params is enabled. True by default.
   # It can be set to an array that will enable params authentication only for the
@@ -97,7 +97,7 @@ Devise.setup do |config|
   # Notice that if you are skipping storage for all authentication paths, you
   # may want to disable generating routes to Devise's sessions controller by
   # passing skip: :sessions to `devise_for` in your config/routes.rb
-  config.skip_session_storage = [:http_auth]
+  config.skip_session_storage = [ :http_auth ]
 
   # By default, Devise cleans up the CSRF token on authentication to
   # avoid CSRF token fixation attacks. This means that, when using AJAX
@@ -272,18 +272,18 @@ Devise.setup do |config|
   # Add a new OmniAuth provider. Check the wiki for more information on setting
   # up on your models and hooks.
   # config.omniauth :github, 'APP_ID', 'APP_SECRET', scope: 'user,public_repo'
-  
+
   # Google OAuth. Real credentials come from GOOGLE_CLIENT_ID / GOOGLE_CLIENT_SECRET
   # (see .env.example for how to create them). Outside production we fall back to
   # dummy values so the strategy is always registered — routes exist and OmniAuth
   # test mode works — while the sign-in button itself is only shown when real
   # credentials are configured (see AuthHelper#google_sign_in_available?).
   # In production an unconfigured provider is simply not registered.
-  google_id     = ENV['GOOGLE_CLIENT_ID'].presence
-  google_secret = ENV['GOOGLE_CLIENT_SECRET'].presence
+  google_id     = ENV["GOOGLE_CLIENT_ID"].presence
+  google_secret = ENV["GOOGLE_CLIENT_SECRET"].presence
   unless Rails.env.production?
-    google_id     ||= 'google-client-id-not-configured'
-    google_secret ||= 'google-client-secret-not-configured'
+    google_id     ||= "google-client-id-not-configured"
+    google_secret ||= "google-client-secret-not-configured"
   end
 
   if google_id && google_secret
@@ -291,13 +291,13 @@ Devise.setup do |config|
       google_id,
       google_secret,
       {
-        scope: 'email,profile',
-        prompt: 'select_account',
-        name: 'google_oauth2',
-        origin_param: 'origin'
+        scope: "email,profile",
+        prompt: "select_account",
+        name: "google_oauth2",
+        origin_param: "origin"
       }
   end
-    
+
   # Apple "Sign in with Apple" via the omniauth-apple strategy, which verifies the
   # Apple ID token signature for us. Registered only when all required credentials are
   # present, so a missing/rotated key never breaks boot — the Apple button simply hides.
@@ -308,21 +308,21 @@ Devise.setup do |config|
   # and normalized here (a mangled multiline key once reached production as its
   # first line only, and OmniAuth failed with OpenSSL "invalid curve name").
   # Real newlines also pass through unchanged for local use.
-  if ENV['APPLE_CLIENT_ID'].present? && ENV['APPLE_TEAM_ID'].present? &&
-     ENV['APPLE_KEY_ID'].present? && ENV['APPLE_PRIVATE_KEY'].present?
+  if ENV["APPLE_CLIENT_ID"].present? && ENV["APPLE_TEAM_ID"].present? &&
+     ENV["APPLE_KEY_ID"].present? && ENV["APPLE_PRIVATE_KEY"].present?
     # \\+n, not \n: kamal's env transport doubled the backslashes en route to
     # the container, so collapse ANY escape depth. Backslashes never appear in
     # a legitimate PEM, so this cannot corrupt a correctly-delivered key.
-    apple_pem = ENV['APPLE_PRIVATE_KEY'].strip.gsub(/\\+n/, "\n")
+    apple_pem = ENV["APPLE_PRIVATE_KEY"].strip.gsub(/\\+n/, "\n")
     config.omniauth :apple,
-      ENV['APPLE_CLIENT_ID'],
-      '',
+      ENV["APPLE_CLIENT_ID"],
+      "",
       {
-        scope: 'email name',
-        team_id: ENV['APPLE_TEAM_ID'],
-        key_id: ENV['APPLE_KEY_ID'],
+        scope: "email name",
+        team_id: ENV["APPLE_TEAM_ID"],
+        key_id: ENV["APPLE_KEY_ID"],
         pem: apple_pem,
-        name: 'apple',
+        name: "apple",
         # Apple returns its callback as a CROSS-SITE form POST. The app's
         # default SameSite=Lax session cookie is withheld on cross-site POSTs,
         # so the callback arrived sessionless and OmniAuth's state check failed
@@ -330,13 +330,13 @@ Devise.setup do |config|
         # the Apple request+callback phases only; every other response keeps
         # the Lax default. State checking itself stays ON.
         setup: lambda { |env|
-          env['rack.session.options'][:same_site] = :none if env['rack.session.options']
+          env["rack.session.options"][:same_site] = :none if env["rack.session.options"]
         }
       }
   end
-    
+
   # Configure OmniAuth failure handling
-  config.omniauth_path_prefix = '/users/auth'
+  config.omniauth_path_prefix = "/users/auth"
 
   # ==> Warden configuration
   # If you want to use other strategies, that are not supported by Devise, or

@@ -62,14 +62,14 @@ class User < ApplicationRecord
   # Treat an email-shaped name as no name at all: full_name then falls back
   # to the address prefix.
   def self.omniauth_name_parts(auth)
-    return [auth.info.first_name, auth.info.last_name] if auth.info.first_name.present? || auth.info.last_name.present?
+    return [ auth.info.first_name, auth.info.last_name ] if auth.info.first_name.present? || auth.info.last_name.present?
 
     name = auth.info.name.to_s.strip
-    return [nil, nil] if name.blank? || name.match?(URI::MailTo::EMAIL_REGEXP) || name == auth.info.email
+    return [ nil, nil ] if name.blank? || name.match?(URI::MailTo::EMAIL_REGEXP) || name == auth.info.email
 
     parts = name.split(" ")
     # A single-word name is a first name, not a first AND last name.
-    parts.length == 1 ? [parts.first, nil] : [parts.first, parts[1..].join(" ")]
+    parts.length == 1 ? [ parts.first, nil ] : [ parts.first, parts[1..].join(" ") ]
   end
   private_class_method :omniauth_name_parts
 
@@ -163,7 +163,7 @@ class User < ApplicationRecord
   FOUNDING_PLANS = %w[founding_society founding_monthly].freeze
 
   def self.founding_slots_remaining
-    [FOUNDING_MEMBER_CAP - where(founding_member: true).count, 0].max
+    [ FOUNDING_MEMBER_CAP - where(founding_member: true).count, 0 ].max
   end
 
   # Eligible to TAKE a founding offer: never revoked, not already founding.
@@ -416,15 +416,15 @@ class User < ApplicationRecord
 
   def can_access_presentation?(presentation_id)
     return false unless owns_presentation?(presentation_id)
-    
+
     purchase = user_presentations.find_by(presentation_id: presentation_id)
     return false unless purchase
-    
+
     case purchase.purchase_type
-    when 'direct'
+    when "direct"
       # Direct purchases are always accessible
       true
-    when 'credit'
+    when "credit"
       # Credit purchases require active subscription
       has_active_subscription?
     else
@@ -435,12 +435,12 @@ class User < ApplicationRecord
   def presentation_access_type(presentation_id)
     purchase = user_presentations.find_by(presentation_id: presentation_id)
     return nil unless purchase
-    
+
     case purchase.purchase_type
-    when 'direct'
-      'lifetime'
-    when 'credit'
-      has_active_subscription? ? 'subscription' : 'expired'
+    when "direct"
+      "lifetime"
+    when "credit"
+      has_active_subscription? ? "subscription" : "expired"
     else
       nil
     end

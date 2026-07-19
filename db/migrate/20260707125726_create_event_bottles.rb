@@ -9,8 +9,8 @@ class CreateEventBottles < ActiveRecord::Migration[8.0]
       t.timestamps
     end
 
-    add_index :event_bottles, [:event_id, :bottle_id], unique: true
-    add_index :event_bottles, [:event_id, :position]
+    add_index :event_bottles, [ :event_id, :bottle_id ], unique: true
+    add_index :event_bottles, [ :event_id, :position ]
 
     # The secret toggle: while true and the event hasn't ended, the pour list
     # is hidden from everyone except the organizer/society admins.

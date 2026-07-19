@@ -3,8 +3,8 @@ class SocietyMembership < ApplicationRecord
   belongs_to :society
 
   # Enums
-  enum :role, { member: 'member', admin: 'admin', officer: 'officer' }
-  enum :status, { active: 'active', inactive: 'inactive', banned: 'banned' }
+  enum :role, { member: "member", admin: "admin", officer: "officer" }
+  enum :status, { active: "active", inactive: "inactive", banned: "banned" }
 
   # Every path into a society (public join, invite link, email invitation,
   # admin add) lands here, so the Activity ledger records joins at the model.
@@ -16,7 +16,7 @@ class SocietyMembership < ApplicationRecord
   after_update :record_join_activity, if: -> { active? && saved_change_to_status? }
 
   # Validations
-  validates :user_id, uniqueness: { scope: :society_id, message: 'is already a member of this society' }
+  validates :user_id, uniqueness: { scope: :society_id, message: "is already a member of this society" }
   validates :role, presence: true, inclusion: { in: roles.keys }
   validates :status, presence: true, inclusion: { in: statuses.keys }
 
@@ -25,15 +25,15 @@ class SocietyMembership < ApplicationRecord
   scope :active_members, -> { active }
   scope :admins, -> { admin.active }
   scope :officers, -> { officer.active }
-  scope :managers, -> { where(role: [:admin, :officer]).active }
+  scope :managers, -> { where(role: [ :admin, :officer ]).active }
 
   # Instance methods
   def admin?
-    role == 'admin'
+    role == "admin"
   end
 
   def officer?
-    role == 'officer'
+    role == "officer"
   end
 
   def can_manage?

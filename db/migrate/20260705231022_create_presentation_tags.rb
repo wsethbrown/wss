@@ -5,6 +5,6 @@ class CreatePresentationTags < ActiveRecord::Migration[8.0]
       t.references :tag, null: false, foreign_key: true
       t.timestamps
     end
-    add_index :presentation_tags, [:presentation_id, :tag_id], unique: true
+    add_index :presentation_tags, [ :presentation_id, :tag_id ], unique: true
   end
 end

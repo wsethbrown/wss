@@ -16,10 +16,10 @@ class CreateReviews < ActiveRecord::Migration[8.0]
     end
 
     # One review per tasting context...
-    add_index :reviews, [:user_id, :bottle_id, :event_id], unique: true
+    add_index :reviews, [ :user_id, :bottle_id, :event_id ], unique: true
     # ...and NULL event_id rows are all "solo", so they need their own guard
     # (Postgres treats NULLs as distinct in the index above).
-    add_index :reviews, [:user_id, :bottle_id], unique: true,
+    add_index :reviews, [ :user_id, :bottle_id ], unique: true,
               where: "event_id IS NULL", name: "index_reviews_solo_uniqueness"
   end
 end

@@ -115,10 +115,10 @@ class AccountSubscriptionCardsTest < ActionDispatch::IntegrationTest
   private
 
   def sign_in(user)
-    post '/users/sign_in', params: {
+    post "/users/sign_in", params: {
       user: {
         email: user.email,
-        password: 'password'
+        password: "password"
       }
     }
   end

@@ -12,7 +12,7 @@ class ReviewDemoChainTest < ActionDispatch::IntegrationTest
 
     get event_url
     assert_response :success
-    [bottles(:ardbeg_10), bottles(:glendronach_12), bottles(:four_roses_sb)].each do |bottle|
+    [ bottles(:ardbeg_10), bottles(:glendronach_12), bottles(:four_roses_sb) ].each do |bottle|
       assert_select "a[href=?]", bottle_path(bottle)
     end
     assert_match "Campfire in a glass", response.body # seth's other score, one click from his review

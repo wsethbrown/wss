@@ -4,7 +4,7 @@ class Presentation < ApplicationRecord
   # eventual polish (see SECTION_NOTES).
   MAX_IMAGE_SIZE = 15.megabytes
 
-  belongs_to :author, class_name: 'User'
+  belongs_to :author, class_name: "User"
   has_many :user_presentations, dependent: :destroy
   # Deck reviews (stars + short text; eligibility in PresentationReview).
   # Events that ran this deck keep their record; restrict, don't cascade.
@@ -61,13 +61,13 @@ class Presentation < ApplicationRecord
 
   # Scopes
   scope :free, -> { where(price: 0) }
-  scope :paid, -> { where('price > 0') }
+  scope :paid, -> { where("price > 0") }
   scope :published, -> { where(published: true) }
   scope :unpublished, -> { where(published: false) }
   scope :featured, -> { where(featured: true) }
   scope :by_category, ->(category) { where(category: category) if category.present? }
   scope :by_difficulty, ->(difficulty) { where(difficulty: difficulty) if difficulty.present? }
-  scope :search, ->(query) { where('title ILIKE ? OR description ILIKE ?', "%#{query}%", "%#{query}%") if query.present? }
+  scope :search, ->(query) { where("title ILIKE ? OR description ILIKE ?", "%#{query}%", "%#{query}%") if query.present? }
   scope :by_tag, ->(tag_name) { joins(:tags).where(tags: { name: tag_name }) if tag_name.present? }
   scope :recent, -> { order(created_at: :desc) }
   scope :popular, -> { left_joins(:user_presentations).group(:id).order(Arel.sql("COUNT(user_presentations.id) DESC"), created_at: :desc) }
@@ -75,18 +75,14 @@ class Presentation < ApplicationRecord
   # Comma-separated tag editing ("smoky, islay, beginner friendly"). Tags are
   # normalized lowercase; find-or-create under the 'deck' tag category.
   def tag_names
-    tags.pluck(:name).join(', ')
+    tags.pluck(:name).join(", ")
   end
 
   def tag_names=(value)
-    names = value.to_s.split(',').map { |n| n.strip.downcase }.reject(&:blank?).uniq.first(10)
-    self.tags = names.map { |n| Tag.find_or_create_by(name: n) { |t| t.category = 'deck' } }
+    names = value.to_s.split(",").map { |n| n.strip.downcase }.reject(&:blank?).uniq.first(10)
+    self.tags = names.map { |n| Tag.find_or_create_by(name: n) { |t| t.category = "deck" } }
   end
 
-# The cached summary (reviews_count / reviews_average) is what deck cards
-  # read, so bulk listings cost no extra queries. Recompute, never increment:
-  # one aggregate over the reviews table is the only writer, which keeps the
-  # cache self-healing if a row is ever changed out from under us.
   # THE pour list. Every reader goes through this: the deck page, the buyer's
   # manifest, the admin rail. `whiskey_recommendations` is legacy storage that
   # has been migrated onto this association and is no longer read anywhere but
@@ -134,9 +130,13 @@ class Presentation < ApplicationRecord
     end.sort_by { |pour| [ -pour.nights, pour.bottle.name ] }
   end
 
+  # The cached summary (reviews_count / reviews_average) is what deck cards
+  # read, so bulk listings cost no extra queries. Recompute, never increment:
+  # one aggregate over the reviews table is the only writer, which keeps the
+  # cache self-healing if a row is ever changed out from under us.
   def refresh_review_stats!
     stats = presentation_reviews.pick(Arel.sql("COUNT(*), AVG(rating)"))
-    count, average = stats || [0, nil]
+    count, average = stats || [ 0, nil ]
     update_columns(reviews_count: count.to_i, reviews_average: average)
     Rails.logger.info "Deck #{id}: review stats refreshed to #{count.to_i} review(s), average #{average&.to_f || 'none'}"
   end
@@ -159,7 +159,7 @@ class Presentation < ApplicationRecord
   end
 
   def formatted_price
-    return 'Free' if free?
+    return "Free" if free?
     "$#{price}"
   end
 
@@ -239,7 +239,7 @@ class Presentation < ApplicationRecord
         rec = rec.symbolize_keys
         # Ensure price has $ prefix
         if rec[:price].present?
-          rec[:price] = rec[:price].to_s.start_with?('$') ? rec[:price] : "$#{rec[:price]}"
+          rec[:price] = rec[:price].to_s.start_with?("$") ? rec[:price] : "$#{rec[:price]}"
         end
         rec
       end
@@ -249,12 +249,12 @@ class Presentation < ApplicationRecord
     return [] if whiskey_recommendations.blank?
 
     whiskey_recommendations.split("\n").map do |line|
-      parts = line.split('|')
+      parts = line.split("|")
       next if parts.length < 4
 
       price = parts[2].strip
       # Ensure price has $ prefix
-      price = price.start_with?('$') ? price : "$#{price}" if price.present?
+      price = price.start_with?("$") ? price : "$#{price}" if price.present?
 
       {
         name: parts[0].strip,
@@ -325,7 +325,7 @@ class Presentation < ApplicationRecord
     return [] if slides_preview.blank?
 
     slides_preview.split("\n").map do |line|
-      parts = line.split('|')
+      parts = line.split("|")
       next if parts.length < 4
 
       {
@@ -352,7 +352,7 @@ class Presentation < ApplicationRecord
     return 0 if total.zero?
     return 1 if total == 1
 
-    [preview_slide_count || 3, total - 1].min.clamp(1, total - 1)
+    [ preview_slide_count || 3, total - 1 ].min.clamp(1, total - 1)
   end
 
   def slide_render_pending?
@@ -384,11 +384,11 @@ class Presentation < ApplicationRecord
     return unless featured_image.attached?
 
     unless featured_image.content_type.in?(%w[image/jpeg image/jpg image/png image/gif image/webp])
-      errors.add(:featured_image, 'must be a valid image format (JPEG, PNG, GIF, or WebP)')
+      errors.add(:featured_image, "must be a valid image format (JPEG, PNG, GIF, or WebP)")
     end
 
     if featured_image.byte_size > MAX_IMAGE_SIZE
-      errors.add(:featured_image, 'must be less than 15MB')
+      errors.add(:featured_image, "must be less than 15MB")
     end
   end
 
@@ -396,17 +396,17 @@ class Presentation < ApplicationRecord
     return unless pdf_file.attached?
 
     allowed_types = [
-      'application/pdf',
-      'application/vnd.openxmlformats-officedocument.presentationml.presentation', # .pptx
-      'application/vnd.ms-powerpoint' # .ppt
+      "application/pdf",
+      "application/vnd.openxmlformats-officedocument.presentationml.presentation", # .pptx
+      "application/vnd.ms-powerpoint" # .ppt
     ]
 
     unless pdf_file.content_type.in?(allowed_types)
-      errors.add(:pdf_file, 'must be a PDF or PowerPoint file')
+      errors.add(:pdf_file, "must be a PDF or PowerPoint file")
     end
 
     if pdf_file.byte_size > 50.megabytes
-      errors.add(:pdf_file, 'must be less than 50MB')
+      errors.add(:pdf_file, "must be less than 50MB")
     end
   end
 
@@ -415,13 +415,12 @@ class Presentation < ApplicationRecord
 
     supplemental_materials.each do |material|
       unless material.content_type.in?(%w[application/pdf image/jpeg image/jpg image/png application/vnd.ms-powerpoint application/vnd.openxmlformats-officedocument.presentationml.presentation])
-        errors.add(:supplemental_materials, 'must be PDF, image, or PowerPoint files')
+        errors.add(:supplemental_materials, "must be PDF, image, or PowerPoint files")
       end
 
       if material.byte_size > 25.megabytes
-        errors.add(:supplemental_materials, 'files must be less than 25MB each')
+        errors.add(:supplemental_materials, "files must be less than 25MB each")
       end
     end
   end
-
 end

@@ -39,9 +39,9 @@ class PresentationPolicy < ApplicationPolicy
     return false unless user.present?
     record.paid? && record.author != user
   end
-  
+
   def manage?
     return false unless user.present?
-    user.admin? || user.role == 'admin'
+    user.admin? || user.role == "admin"
   end
 end

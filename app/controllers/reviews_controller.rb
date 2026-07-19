@@ -1,8 +1,8 @@
 # The public review section (/reviews): bottle search plus the latest
 # tastings feed. Member actions (edit/update/destroy) for solo reviews.
 class ReviewsController < ApplicationController
-  before_action :authenticate_user!, except: [:index, :search, :show]
-  before_action :set_review, only: [:edit, :update, :destroy]
+  before_action :authenticate_user!, except: [ :index, :search, :show ]
+  before_action :set_review, only: [ :edit, :update, :destroy ]
 
   def index
     @sort = Bottle::SORTS.key?(params[:sort]) ? params[:sort] : "top"
@@ -24,9 +24,9 @@ class ReviewsController < ApplicationController
       if @tags.any? || @distillery
         feed = @tags.any? ? Review.tagged(@tags) : Review.all
         feed = feed.joins(:bottle).where("bottles.distillery ILIKE ?", @distillery) if @distillery
-        feed.includes(:user, :bottle, event: [:society, :event_bottles]).recent_first.limit(30)
+        feed.includes(:user, :bottle, event: [ :society, :event_bottles ]).recent_first.limit(30)
       else
-        Review.includes(:user, :bottle, event: [:society, :event_bottles]).recent_first.limit(10)
+        Review.includes(:user, :bottle, event: [ :society, :event_bottles ]).recent_first.limit(10)
       end
     @circle_reviews = current_user ? Review.for_circle(current_user) : nil
     # Distinguishes "nobody followed yet" from "followed, but no pours yet"
@@ -74,7 +74,7 @@ class ReviewsController < ApplicationController
 
   # A review's own page, the drill-down target for every clamped card.
   def show
-    @review = Review.includes(:user, :bottle, event: [:society, :event_bottles], images_attachments: :blob).find(params[:id])
+    @review = Review.includes(:user, :bottle, event: [ :society, :event_bottles ], images_attachments: :blob).find(params[:id])
   end
 
   def edit; end

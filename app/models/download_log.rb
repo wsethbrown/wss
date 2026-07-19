@@ -2,8 +2,8 @@ class DownloadLog < ApplicationRecord
   belongs_to :user
   belongs_to :presentation
 
-  validates :file_type, presence: true, inclusion: { 
-    in: %w[sneak_peek full_presentation speaker_notes outline recommendations] 
+  validates :file_type, presence: true, inclusion: {
+    in: %w[sneak_peek full_presentation speaker_notes outline recommendations]
   }
   validates :downloaded_at, presence: true
 
@@ -22,9 +22,9 @@ class DownloadLog < ApplicationRecord
   end
 
   def self.popular_downloads(limit = 10)
-    select('presentation_id, COUNT(*) as download_count')
+    select("presentation_id, COUNT(*) as download_count")
       .group(:presentation_id)
-      .order('download_count DESC')
+      .order("download_count DESC")
       .limit(limit)
       .includes(:presentation)
   end

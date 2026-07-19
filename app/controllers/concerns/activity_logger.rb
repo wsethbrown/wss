@@ -21,8 +21,8 @@ module ActivityLogger
     return unless user
 
     ActivityLog.log_activity(
-      user, activity_type, trackable, metadata.merge(initiated_by: 'system'),
-      ip_address: request.remote_ip || 'system', user_agent: request.user_agent || 'webhook'
+      user, activity_type, trackable, metadata.merge(initiated_by: "system"),
+      ip_address: request.remote_ip || "system", user_agent: request.user_agent || "webhook"
     )
   rescue => e
     Rails.logger.error "Failed to log activity: #{e.message}"

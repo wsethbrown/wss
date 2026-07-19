@@ -11,15 +11,15 @@ if Rails.env.production? && ENV["SECRET_KEY_BASE_DUMMY"].blank? && ENV["ALLOW_MI
   end
 end
 
-Stripe.api_key = ENV.fetch('STRIPE_SECRET_KEY', 'sk_test_placeholder')
-Stripe.api_version = '2024-06-20'
+Stripe.api_key = ENV.fetch("STRIPE_SECRET_KEY", "sk_test_placeholder")
+Stripe.api_version = "2024-06-20"
 
 # In development we allow self-signed certs so local webhook tunnels (ngrok/stripe CLI)
 # work. Never relax this outside development.
 Stripe.verify_ssl_certs = false if Rails.env.development?
 
 Rails.configuration.stripe = {
-  publishable_key: ENV.fetch('STRIPE_PUBLISHABLE_KEY', 'pk_test_placeholder'),
-  secret_key: ENV.fetch('STRIPE_SECRET_KEY', 'sk_test_placeholder'),
-  webhook_secret: ENV.fetch('STRIPE_WEBHOOK_SECRET', 'whsec_placeholder')
+  publishable_key: ENV.fetch("STRIPE_PUBLISHABLE_KEY", "pk_test_placeholder"),
+  secret_key: ENV.fetch("STRIPE_SECRET_KEY", "sk_test_placeholder"),
+  webhook_secret: ENV.fetch("STRIPE_WEBHOOK_SECRET", "whsec_placeholder")
 }

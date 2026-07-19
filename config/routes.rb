@@ -3,28 +3,28 @@ Rails.application.routes.draw do
   # and the magic-link flow below. The Apple/Google OAuth callbacks are verified by
   # the OmniAuth strategies (signature-checked); we no longer hand-roll any callback.
   devise_for :users, controllers: {
-    omniauth_callbacks: 'users/omniauth_callbacks',
-    registrations: 'users/registrations'
-  }, skip: [:sessions]
+    omniauth_callbacks: "users/omniauth_callbacks",
+    registrations: "users/registrations"
+  }, skip: [ :sessions ]
 
   devise_scope :user do
     # Devise's :sessions module is skipped in favour of the unified auth page,
     # but we keep the conventional Devise helper names so links/tests using
     # new_user_session_path / user_session_path still resolve.
-    get    '/users/sign_in', to: 'auth#unified', as: 'new_user_session'
+    get    "/users/sign_in", to: "auth#unified", as: "new_user_session"
     # Custom password sign-in (adds 2FA + remember-me handling on top of Devise)
-    post   '/users/sign_in', to: 'auth#sign_in', as: 'user_session'
-    delete '/users/sign_out', to: 'auth#logout', as: 'destroy_user_session'
+    post   "/users/sign_in", to: "auth#sign_in", as: "user_session"
+    delete "/users/sign_out", to: "auth#logout", as: "destroy_user_session"
     # OmniAuth redirects here when a provider errors (declined consent, bad
     # credentials). Without this route the person lands on a bare 404 instead
     # of the sign-in page with an explanation (Apple hit exactly that).
-    get    '/users/auth/failure', to: 'users/omniauth_callbacks#failure'
+    get    "/users/auth/failure", to: "users/omniauth_callbacks#failure"
   end
 
   # Unified authentication page
   get "auth", to: "auth#unified"
   post "auth/email_check", to: "auth#email_check"
-  
+
   # Magic Links
   post "magic_links", to: "magic_links#create"
   get "magic_links/:token", to: "magic_links#show", as: "magic_link"
@@ -33,7 +33,7 @@ Rails.application.routes.draw do
   get "invitations/:token", to: "invitations#show", as: :invitation
 
   # Single root for all users
-  root to: 'home#index'
+  root to: "home#index"
 
   # Public membership page (plans + the start-your-own-club pitch)
   get "membership", to: "home#membership"
@@ -85,64 +85,64 @@ Rails.application.routes.draw do
       # The managers-only member ledger (joins/leaves/roles/invites).
       get :activity
     end
-    
+
     # Events are now nested under societies
     resources :events do
       # Society admins/the organizer hand the night to a member (the Host);
       # managers + the host set which deck the night runs (optional).
       member { patch :assign_host; patch :assign_deck }
-      resources :event_rsvps, only: [:create, :update, :destroy]
+      resources :event_rsvps, only: [ :create, :update, :destroy ]
     end
   end
 
   # Society member management (remove / change role) by society managers.
-  resources :society_memberships, only: [:update, :destroy]
+  resources :society_memberships, only: [ :update, :destroy ]
 
   # Email invitations into a society (create carries society_id; accept and
   # decline are the invitee's, from the notifications page).
-  resources :society_invitations, only: [:create] do
+  resources :society_invitations, only: [ :create ] do
     member { patch :accept; patch :decline }
   end
 
   # In-app notifications (the nav bell).
-  resources :notifications, only: [:index]
-  
+  resources :notifications, only: [ :index ]
+
   # Keep top-level event routes for existing functionality
   # but they should redirect to the society page
-  resources :events, only: [:show] do
-    resources :event_rsvps, only: [:create, :update, :destroy]
+  resources :events, only: [ :show ] do
+    resources :event_rsvps, only: [ :create, :update, :destroy ]
     # The pour list (organizer/society admins manage it; everyone reads it).
     resources :event_bottles, only: [ :create, :update, :destroy ], module: :events
     # Event-tagged reviews; the bottle rides along as ?bottle_id=<slug>.
-    resources :reviews, only: [:new, :create], module: :events
+    resources :reviews, only: [ :new, :create ], module: :events
     # Table talk: society members' comments, open until a week after the night.
-    resources :comments, only: [:create, :destroy], module: :events
+    resources :comments, only: [ :create, :destroy ], module: :events
   end
 
   # Admin panel
   namespace :admin do
-    get 'dashboard', to: 'dashboard#index'
+    get "dashboard", to: "dashboard#index"
     resources :presentations do
       collection { post :import }
       member { post :publish; post :unpublish; post :render_slides }
       # The deck's pour list, linked to catalog bottles (Phase 3 deck ties).
     end
-    resources :users, only: [:index, :show, :edit, :update] do
+    resources :users, only: [ :index, :show, :edit, :update ] do
       # Admin-role changes are a dedicated, guarded action, never part of the
       # general user update (same rule as credits: no mass-assignment path).
       member { patch :update_role; post :resend_invitation }
     end
     # Invite a new member: creates the account and emails the claim link.
-    resources :invitations, only: [:new, :create]
-    resources :subscriptions, only: [:index, :edit, :update] do
+    resources :invitations, only: [ :new, :create ]
+    resources :subscriptions, only: [ :index, :edit, :update ] do
       member do
         post :cancel
         post :pause
         post :resume
       end
     end
-    post 'create_subscription', to: 'subscriptions#create_subscription'
-    resources :credits, only: [:index] do
+    post "create_subscription", to: "subscriptions#create_subscription"
+    resources :credits, only: [ :index ] do
       collection do
         post :bulk_add
         post :grant_monthly
@@ -153,34 +153,34 @@ Rails.application.routes.draw do
         post :adjust
       end
     end
-    resources :activities, only: [:index, :show]
+    resources :activities, only: [ :index, :show ]
 
     # Bottles moderation
-    resources :bottles, only: [:index, :show, :edit, :update] do
+    resources :bottles, only: [ :index, :show, :edit, :update ] do
       member do
         patch :pin_image
         delete :unpin_image
       end
-      resources :reviews, only: [:destroy], module: :bottles do
+      resources :reviews, only: [ :destroy ], module: :bottles do
         member { delete :destroy_image }
       end
-      resources :edits, only: [:destroy], module: :bottles do
+      resources :edits, only: [ :destroy ], module: :bottles do
         member { post :apply }
       end
     end
 
     # Moderation queue: open review reports + pending bottle-edit proposals.
-    get 'moderation', to: 'moderation#index'
+    get "moderation", to: "moderation#index"
     resources :review_reports, only: [] do
       member { post :dismiss }
     end
 
     # Analytics routes
-    get 'analytics/downloads', to: 'analytics#downloads', as: 'downloads_analytics'
-    get 'analytics/presentations/:id/downloads', to: 'analytics#presentation_downloads', as: 'presentation_downloads_analytics'
-    get 'analytics/reviews', to: 'analytics#reviews', as: 'reviews_analytics'
+    get "analytics/downloads", to: "analytics#downloads", as: "downloads_analytics"
+    get "analytics/presentations/:id/downloads", to: "analytics#presentation_downloads", as: "presentation_downloads_analytics"
+    get "analytics/reviews", to: "analytics#reviews", as: "reviews_analytics"
 
-    root to: 'dashboard#index'
+    root to: "dashboard#index"
   end
 
   # Presentations. All purchasing goes through the nested purchases controller —
@@ -188,9 +188,9 @@ Rails.application.routes.draw do
   resources :presentations do
     member { get :present }
     # Deck reviews: stars + short text from owners/attendees (model-gated).
-    resources :deck_reviews, only: [:create, :update, :destroy], controller: 'presentations/reviews'
-    resources :purchases, only: [ :new, :create ], controller: 'presentations/purchases'
-    resources :downloads, only: [], controller: 'presentations/downloads' do
+    resources :deck_reviews, only: [ :create, :update, :destroy ], controller: "presentations/reviews"
+    resources :purchases, only: [ :new, :create ], controller: "presentations/purchases"
+    resources :downloads, only: [], controller: "presentations/downloads" do
       collection do
         get :sneak_peek
         get :full_presentation
@@ -206,30 +206,30 @@ Rails.application.routes.draw do
   end
 
   # Profiles
-  resources :profiles, only: [:show]
+  resources :profiles, only: [ :show ]
 
   # Favorites
-  resources :favorites, only: [:create, :destroy]
+  resources :favorites, only: [ :create, :destroy ]
 
   # Review votes (thumbs-up only)
-  resources :review_votes, only: [:create, :destroy]
+  resources :review_votes, only: [ :create, :destroy ]
 
   # Bottles
-  resources :bottles, only: [:show, :new, :create], param: :id do
+  resources :bottles, only: [ :show, :new, :create ], param: :id do
     collection { get :search }
-    resources :reviews, only: [:new, :create], module: :bottles
-    resources :edits, only: [:new, :create], module: :bottles
+    resources :reviews, only: [ :new, :create ], module: :bottles
+    resources :edits, only: [ :new, :create ], module: :bottles
     # A society's verdict on this bottle: every individual card behind the
     # aggregate. Public societies only (the action re-checks).
     get "verdicts/:society_id", to: "bottles#verdict", as: :verdict, on: :member
   end
   # The review section: /reviews is the public library page (search +
   # latest tastings); individual bottles live at /bottles/:slug.
-  resources :reviews, only: [:index, :show, :edit, :update, :destroy] do
+  resources :reviews, only: [ :index, :show, :edit, :update, :destroy ] do
     collection { get :search; get :start }
     # Flag a review (text or photos) for admin attention. Post-moderation:
     # content stays public until an admin acts on the report.
-    resource :report, only: [:create], module: :reviews
+    resource :report, only: [ :create ], module: :reviews
   end
 
   # One-click RSVP from event emails (signed token carries user + event).

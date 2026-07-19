@@ -3,7 +3,7 @@
 # value for the given bottle+field now has enough DISTINCT proposing users
 # to auto-apply; if so, writes it onto the bottle, marks the winning rows
 # applied, and clears (rejects) every other pending proposal on that field
-#, competing values included, per spec.
+# , competing values included, per spec.
 module BottleEdits
   class AutoApply
     def self.call(bottle:, field:) = new(bottle, field).call

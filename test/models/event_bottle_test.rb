@@ -14,7 +14,7 @@ class EventBottleTest < ActiveSupport::TestCase
   end
 
   test "ordered scope sorts by position" do
-    assert_equal [bottles(:ardbeg_10), bottles(:glendronach_12), bottles(:four_roses_sb)],
+    assert_equal [ bottles(:ardbeg_10), bottles(:glendronach_12), bottles(:four_roses_sb) ],
                  events(:spring_blind).event_bottles.ordered.map(&:bottle)
   end
 

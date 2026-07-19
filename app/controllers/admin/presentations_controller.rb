@@ -1,9 +1,9 @@
 class Admin::PresentationsController < Admin::BaseController
   before_action :require_delete_rights!, only: :destroy
-  before_action :set_presentation, only: [:show, :edit, :update, :destroy, :publish, :unpublish]
-  
+  before_action :set_presentation, only: [ :show, :edit, :update, :destroy, :publish, :unpublish ]
+
   # Temporary fix for schema caching issue
-  before_action :reset_column_information, only: [:new, :create, :edit, :update]
+  before_action :reset_column_information, only: [ :new, :create, :edit, :update ]
 
   def index
     @presentations = Presentation.includes(:author, :user_presentations)
@@ -26,7 +26,7 @@ class Admin::PresentationsController < Admin::BaseController
     file = params[:deck_file]
     content_type = file.respond_to?(:original_filename) && DeckImport.content_type_for(file.original_filename)
     unless file.respond_to?(:read) && content_type
-      redirect_to new_admin_presentation_path, alert: 'Choose a .pptx, .ppt, or .pdf file to import' and return
+      redirect_to new_admin_presentation_path, alert: "Choose a .pptx, .ppt, or .pdf file to import" and return
     end
 
     # Read the upload ONCE; every consumer gets its own copy. Re-reading the
@@ -60,7 +60,7 @@ class Admin::PresentationsController < Admin::BaseController
       # Slide rendering (LibreOffice) is slow and heavy, do it off the request.
       DeckSlideRenderJob.perform_later(deck.id)
       redirect_to edit_admin_presentation_path(deck),
-                  notice: 'Draft imported. The slide previews are rendering and will appear shortly. Review each section, set a price, then publish.'
+                  notice: "Draft imported. The slide previews are rendering and will appear shortly. Review each section, set a price, then publish."
     else
       redirect_to new_admin_presentation_path,
                   alert: "Import failed: #{deck.errors.full_messages.to_sentence}"
@@ -74,15 +74,15 @@ class Admin::PresentationsController < Admin::BaseController
   def create
     @presentation = Presentation.new(presentation_params)
     @presentation.author = current_user
-    
+
     # Handle file uploads with empty strings
     handle_file_uploads(@presentation)
-    
+
     # Process whiskey recommendations if present
 
     if @presentation.save
       DeckSlideRenderJob.perform_later(@presentation.id) if @presentation.pdf_file.attached?
-      redirect_to admin_presentation_path(@presentation), notice: 'Presentation created successfully.'
+      redirect_to admin_presentation_path(@presentation), notice: "Presentation created successfully."
     else
       render :new, status: :unprocessable_entity
     end
@@ -94,13 +94,13 @@ class Admin::PresentationsController < Admin::BaseController
   def update
     # Handle file uploads with empty strings
     handle_file_uploads(@presentation)
-    
+
     # Process whiskey recommendations if present
-    
+
     if @presentation.update(presentation_params)
       # A new deck file makes the old slide previews stale, re-render.
       DeckSlideRenderJob.perform_later(@presentation.id) if presentation_params[:pdf_file].present?
-      redirect_to admin_presentation_path(@presentation), notice: 'Presentation updated successfully.'
+      redirect_to admin_presentation_path(@presentation), notice: "Presentation updated successfully."
     else
       render :edit, status: :unprocessable_entity
     end
@@ -110,7 +110,7 @@ class Admin::PresentationsController < Admin::BaseController
   # blocks publishing without the buyer-download deck file.
   def publish
     if @presentation.update(published: true)
-      redirect_to admin_presentation_path(@presentation), notice: 'Published. The deck is live in the library.'
+      redirect_to admin_presentation_path(@presentation), notice: "Published. The deck is live in the library."
     else
       redirect_to admin_presentation_path(@presentation), alert: @presentation.errors.full_messages.to_sentence
     end
@@ -118,7 +118,7 @@ class Admin::PresentationsController < Admin::BaseController
 
   def unpublish
     @presentation.update_columns(published: false)
-    redirect_to admin_presentation_path(@presentation), notice: 'Unpublished. The deck is back to draft.'
+    redirect_to admin_presentation_path(@presentation), notice: "Unpublished. The deck is back to draft."
   end
 
   # Slide previews normally render automatically on import/upload; this is
@@ -126,16 +126,16 @@ class Admin::PresentationsController < Admin::BaseController
   def render_slides
     DeckSlideRenderJob.perform_later(@presentation.id)
     redirect_to admin_presentation_path(@presentation),
-                notice: 'Slide render queued. Previews refresh in about a minute.'
+                notice: "Slide render queued. Previews refresh in about a minute."
   end
 
   def destroy
     @presentation.destroy!
-    redirect_to admin_presentations_path, notice: 'Presentation deleted successfully.'
+    redirect_to admin_presentations_path, notice: "Presentation deleted successfully."
   end
 
   private
-  
+
   def reset_column_information
     Presentation.reset_column_information
   end
@@ -143,22 +143,22 @@ class Admin::PresentationsController < Admin::BaseController
   def set_presentation
     @presentation = Presentation.find(params[:id])
   end
-  
+
   def handle_file_uploads(presentation)
     # Handle supplemental materials - remove empty strings from array
     if params[:presentation][:supplemental_materials].present?
       params[:presentation][:supplemental_materials].reject!(&:blank?)
     end
   end
-  
+
   def presentation_params
     params.require(:presentation).permit(
-      :title, 
-      :description, 
-      :content, 
-      :category, 
+      :title,
+      :description,
+      :content,
+      :category,
       :tag_names,
-      :price, 
+      :price,
       :duration,
       :difficulty,
       :tasting_notes,

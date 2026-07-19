@@ -4,17 +4,17 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
   test "home page displays all three subscription cards" do
     get root_path
     assert_response :success
-    
+
     # Check that all three subscription plans are displayed
     assert_select "h3", text: "Monthly"
-    assert_select "h3", text: "Quarterly"  
+    assert_select "h3", text: "Quarterly"
     assert_select "h3", text: "Yearly"
   end
 
   test "home page displays correct pricing for each plan" do
     get root_path
     assert_response :success
-    
+
     # Check pricing display (fallback prices)
     assert_select "span", text: "$15.99"  # Monthly
     assert_select "span", text: "$12.99"  # Quarterly
@@ -44,7 +44,7 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
   test "home page shows savings indicators for quarterly and yearly" do
     get root_path
     assert_response :success
-    
+
     # Check for savings badges
     assert_select "div", text: /Save 19%/
     assert_select "div", text: /Save 31%/
@@ -64,7 +64,7 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
   test "subscription cards have Get Started buttons" do
     get root_path
     assert_response :success
-    
+
     # Check for CTA buttons (scoped to the pricing grid; "Get Started" also
     # appears in hero/CTA copy elsewhere on the marketing page).
     assert_select "#plan-cards a", text: /Get Started/, count: 3
@@ -76,7 +76,7 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
   test "subscription cards display correct intervals" do
     get root_path
     assert_response :success
-    
+
     # Check interval display (scoped to the pricing grid). All plans normalise
     # to a per-month figure, shown as "/mo".
     assert_select "#plan-cards span", text: "/mo", count: 3
@@ -85,7 +85,7 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
   test "subscription cards are responsive with 3-column grid" do
     get root_path
     assert_response :success
-    
+
     # Check for responsive grid classes
     assert_select "div.grid.grid-cols-1.md\\:grid-cols-3", count: 1
   end
@@ -93,7 +93,7 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
   test "subscription cards show proper plan descriptions" do
     get root_path
     assert_response :success
-    
+
     # Descriptions speak to commitment/cadence — the only real difference
     # between tiers — not fabricated tiers of features.
     assert_select "p", text: "Pay as you go, cancel anytime"

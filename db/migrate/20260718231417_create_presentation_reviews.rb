@@ -7,6 +7,6 @@ class CreatePresentationReviews < ActiveRecord::Migration[8.0]
       t.text :body
       t.timestamps
     end
-    add_index :presentation_reviews, [:presentation_id, :user_id], unique: true
+    add_index :presentation_reviews, [ :presentation_id, :user_id ], unique: true
   end
 end

@@ -15,16 +15,16 @@ if Rails.env.development?
     user.last_name = 'User'
     user.bio = 'A passionate whiskey enthusiast exploring the world of fine spirits.'
   end
-  
+
   # Add some tags to the test user
   test_user.add_tag('Bourbon')
   test_user.add_tag('Scotch')
   test_user.add_tag('Collector')
   test_user.add_tag('Tasting')
   test_user.add_tag('Blogger')
-  
+
   puts "Created test user: test@example.com / password"
-  
+
   # Create admin user for testing admin panel.
   # Admin rights key off the `is_admin` column (unified in the security pass);
   # the old "@whiskeysharesociety.com email == admin" shortcut is gone, so we
@@ -39,7 +39,7 @@ if Rails.env.development?
   admin_user.update!(is_admin: true) unless admin_user.is_admin?
 
   puts "Created admin user: admin@whiskeysharesociety.com / password (is_admin: true)"
-  
+
   # Create sample presentations
   presentations = [
     {
@@ -76,7 +76,7 @@ if Rails.env.development?
       published: true
     }
   ]
-  
+
   presentations.each do |presentation_data|
     presentation = Presentation.find_or_create_by(title: presentation_data[:title]) do |p|
       p.author = admin_user
@@ -90,7 +90,7 @@ if Rails.env.development?
       # Seed decks have no files; bypass the publish gate (dev-only shortcut).
       p.save!(validate: false) if p.new_record?
       p.update_columns(published: presentation_data[:published])
-      
+
       # Add tasting notes for first presentation
       if presentation_data[:title] == "Introduction to Scotch Whisky"
         p.nose_notes = "Vanilla, honey, light oak, subtle fruit notes"
@@ -102,7 +102,7 @@ if Rails.env.development?
     end
     puts "Created presentation: #{presentation.title}"
   end
-  
+
   # Load additional presentation seeds
   require_relative 'seeds/presentations'
 
@@ -236,7 +236,7 @@ if Rails.env.development?
   # Dev shortcut, mirroring the presentation-seed publish bypass: the "no
   # RSVP after the event" rule doesn't apply to seeded history, so skip
   # validations for these two RSVPs only.
-  [admin_user, test_user].each do |member|
+  [ admin_user, test_user ].each do |member|
     rsvp = night.event_rsvps.find_or_initialize_by(user: member)
     rsvp.status = "yes"
     rsvp.save!(validate: false)
@@ -244,11 +244,11 @@ if Rails.env.development?
 
   # Event reviews pass every real gate (pours listed + revealed, RSVPs yes).
   scores = {
-    admin_user => { pours[0] => [4.5, "Smoke first, then pears, the blind fooled nobody."],
-                    pours[1] => [3.5, "Sherry-sweet, a little thin on the finish."],
-                    pours[2] => [4.0, "Rye spice over caramel. Crowd-pleaser."] },
-    test_user  => { pours[0] => [4.0, "Campfire in a glass."],
-                    pours[1] => [3.0, "Fine, but I came for the peat."] }
+    admin_user => { pours[0] => [ 4.5, "Smoke first, then pears, the blind fooled nobody." ],
+                    pours[1] => [ 3.5, "Sherry-sweet, a little thin on the finish." ],
+                    pours[2] => [ 4.0, "Rye spice over caramel. Crowd-pleaser." ] },
+    test_user  => { pours[0] => [ 4.0, "Campfire in a glass." ],
+                    pours[1] => [ 3.0, "Fine, but I came for the peat." ] }
   }
   scores.each do |member, ratings|
     ratings.each do |bottle, (rating, notes)|
@@ -264,11 +264,11 @@ end
 
 # Tasting fields for the demo reviews (idempotent: plain updates).
 {
-  ["Ardbeg 10", "john@example.com"]    => { nose: "Peat smoke, iodine, pear", palate: "Campfire ash, vanilla, brine", finish: "Long, smoky, salted lemon", body_notes: "Oily, coating" },
-  ["Ardbeg 10", "seth@example.com"]    => { nose: "Bonfire and seaweed", palate: "Smoke, honey, black pepper", finish: "Ash and citrus", body_notes: "Full" },
-  ["GlenDronach 12", "john@example.com"] => { nose: "Sherry, raisin, fig", palate: "Caramel, plum, walnut", finish: "Dry oak, gentle spice", body_notes: "Medium, silky" },
-  ["GlenDronach 12", "seth@example.com"] => { nose: "Toffee and cherry", palate: "Chocolate, raisin", finish: "Short, sweet", body_notes: "Thin" },
-  ["Four Roses Small Batch", "john@example.com"] => { nose: "Rye spice, caramel", palate: "Cinnamon, vanilla, oak", finish: "Warm pepper", body_notes: "Medium" }
+  [ "Ardbeg 10", "john@example.com" ]    => { nose: "Peat smoke, iodine, pear", palate: "Campfire ash, vanilla, brine", finish: "Long, smoky, salted lemon", body_notes: "Oily, coating" },
+  [ "Ardbeg 10", "seth@example.com" ]    => { nose: "Bonfire and seaweed", palate: "Smoke, honey, black pepper", finish: "Ash and citrus", body_notes: "Full" },
+  [ "GlenDronach 12", "john@example.com" ] => { nose: "Sherry, raisin, fig", palate: "Caramel, plum, walnut", finish: "Dry oak, gentle spice", body_notes: "Medium, silky" },
+  [ "GlenDronach 12", "seth@example.com" ] => { nose: "Toffee and cherry", palate: "Chocolate, raisin", finish: "Short, sweet", body_notes: "Thin" },
+  [ "Four Roses Small Batch", "john@example.com" ] => { nose: "Rye spice, caramel", palate: "Cinnamon, vanilla, oak", finish: "Warm pepper", body_notes: "Medium" }
 }.each do |(bottle_name, email), fields|
   bottle = Bottle.find_by(name: bottle_name)
   user = User.find_by(email: email)
@@ -300,8 +300,8 @@ if Rails.env.development?
   john_ardbeg_review = Review.find_by(user: john, bottle: Bottle.find_by(name: "Ardbeg 10"))
   john_eagle_review = Review.find_by(user: john, bottle: Bottle.find_by(name: "Eagle Rare 10"))
 
-  [john_ardbeg_review, john_eagle_review].compact.each do |review|
-    [jane, seth].compact.each do |voter|
+  [ john_ardbeg_review, john_eagle_review ].compact.each do |review|
+    [ jane, seth ].compact.each do |voter|
       voter.review_votes.find_or_create_by!(review: review) unless review.user_id == voter.id
     end
   end

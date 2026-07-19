@@ -21,12 +21,12 @@ class Presentations::PurchasesController < ApplicationController
     end
 
     case params[:purchase_method]
-    when 'credit'
+    when "credit"
       handle_credit_purchase
-    when 'direct'
+    when "direct"
       handle_direct_purchase
     else
-      redirect_to @presentation, alert: 'Choose a purchase method to continue'
+      redirect_to @presentation, alert: "Choose a purchase method to continue"
     end
   end
 
@@ -40,7 +40,7 @@ class Presentations::PurchasesController < ApplicationController
 
   def check_already_purchased
     if @presentation.purchased_by?(current_user)
-      redirect_to @presentation, notice: 'This deck is already in your library'
+      redirect_to @presentation, notice: "This deck is already in your library"
     end
   end
 
@@ -54,41 +54,41 @@ class Presentations::PurchasesController < ApplicationController
   def handle_free_claim
     current_user.user_presentations.create!(
       presentation: @presentation,
-      purchase_type: 'direct',
+      purchase_type: "direct",
       purchase_price: 0,
       purchased_at: Time.current
     )
-    log_activity(:presentation_purchased, @presentation, { purchase_type: 'free', price: 0 })
-    redirect_to @presentation, notice: 'Added to your library. This deck is free.'
+    log_activity(:presentation_purchased, @presentation, { purchase_type: "free", price: 0 })
+    redirect_to @presentation, notice: "Added to your library. This deck is free."
   end
 
   def handle_credit_purchase
     unless current_user.subscription_active?
       redirect_to new_presentation_purchase_path(@presentation),
-                  alert: 'An active membership is required to spend credits'
+                  alert: "An active membership is required to spend credits"
       return
     end
 
     unless current_user.credits > 0
-      redirect_to new_presentation_purchase_path(@presentation), alert: 'Insufficient credits'
+      redirect_to new_presentation_purchase_path(@presentation), alert: "Insufficient credits"
       return
     end
 
     if CreditTransaction.use_credit(current_user, @presentation)
-      log_activity(:presentation_purchased, @presentation, { purchase_type: 'credit', price: 1 })
+      log_activity(:presentation_purchased, @presentation, { purchase_type: "credit", price: 1 })
       log_activity(:credits_used, @presentation, { amount: 1 })
-      redirect_to @presentation, notice: 'Deck unlocked with 1 credit.'
+      redirect_to @presentation, notice: "Deck unlocked with 1 credit."
     else
-      redirect_to new_presentation_purchase_path(@presentation), alert: 'Failed to complete purchase'
+      redirect_to new_presentation_purchase_path(@presentation), alert: "Failed to complete purchase"
     end
   end
 
   def handle_direct_purchase
     session = Stripe::Checkout::Session.create({
       customer: current_user.stripe_customer_id || create_stripe_customer.id,
-      line_items: [{
+      line_items: [ {
         price_data: {
-          currency: 'usd',
+          currency: "usd",
           product_data: {
             name: @presentation.title,
             description: @presentation.excerpt(200),
@@ -97,10 +97,10 @@ class Presentations::PurchasesController < ApplicationController
           unit_amount: @presentation.stripe_amount
         },
         quantity: 1
-      }],
+      } ],
       # No payment_method_types: omitting it lets Stripe Checkout offer every
       # method enabled in the dashboard (cards, Apple Pay, Google Pay, Link, ...).
-      mode: 'payment',
+      mode: "payment",
       # session_id lets the return path verify the payment with Stripe and
       # grant access immediately, instead of waiting on the webhook (which
       # can lag, and never arrives in local dev without `stripe listen`).
@@ -119,7 +119,7 @@ class Presentations::PurchasesController < ApplicationController
   rescue Stripe::StripeError => e
     Rails.logger.error "Stripe error creating checkout for presentation #{@presentation.id}: #{e.message}"
     redirect_to new_presentation_purchase_path(@presentation),
-                alert: 'Payment processing error. Please try again.'
+                alert: "Payment processing error. Please try again."
   end
 
   def create_stripe_customer

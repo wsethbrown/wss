@@ -79,8 +79,8 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create society when authenticated with valid params" do
     sign_in @user
-    
-    assert_difference('Society.count') do
+
+    assert_difference("Society.count") do
       post societies_url, params: {
         society: {
           name: "New Test Society",
@@ -95,16 +95,16 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to society_url(society)
     assert_equal "Society was successfully created.", flash[:notice]
     assert_equal @user, society.creator
-    
+
     # Check that creator is automatically added as admin
     membership = society.society_memberships.find_by(user: @user)
     assert_not_nil membership
-    assert_equal 'admin', membership.role
-    assert_equal 'active', membership.status
+    assert_equal "admin", membership.role
+    assert_equal "active", membership.status
   end
 
   test "should not create society when not authenticated" do
-    assert_no_difference('Society.count') do
+    assert_no_difference("Society.count") do
       post societies_url, params: {
         society: {
           name: "New Test Society",
@@ -121,8 +121,8 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
 
   test "should not create society with invalid params" do
     sign_in @user
-    
-    assert_no_difference('Society.count') do
+
+    assert_no_difference("Society.count") do
       post societies_url, params: {
         society: {
           name: "", # Invalid - blank name
@@ -139,8 +139,8 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
 
   test "should create private society" do
     sign_in @user
-    
-    assert_difference('Society.count') do
+
+    assert_difference("Society.count") do
       post societies_url, params: {
         society: {
           name: "Private Test Society",
@@ -158,8 +158,8 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
 
   test "should handle long description" do
     sign_in @user
-    
-    assert_no_difference('Society.count') do
+
+    assert_no_difference("Society.count") do
       post societies_url, params: {
         society: {
           name: "Test Society",
@@ -176,8 +176,8 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
 
   test "should handle long location" do
     sign_in @user
-    
-    assert_no_difference('Society.count') do
+
+    assert_no_difference("Society.count") do
       post societies_url, params: {
         society: {
           name: "Test Society",
@@ -218,7 +218,7 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
   # Update action tests
   test "should update society when authorized" do
     sign_in @user # creator of @society
-    
+
     patch society_url(@society), params: {
       society: {
         name: "Updated Society Name",
@@ -236,7 +236,7 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
   test "should not update society when not authorized" do
     sign_in users(:jane) # not creator
     original_name = @society.name
-    
+
     patch society_url(@society), params: {
       society: {
         name: "Hacked Name"
@@ -252,7 +252,7 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
 
   test "should not update society with invalid params" do
     sign_in @user
-    
+
     patch society_url(@society), params: {
       society: {
         name: "" # Invalid
@@ -266,8 +266,8 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
   # Destroy action tests
   test "should destroy society when authorized" do
     sign_in @user # creator of @society
-    
-    assert_difference('Society.count', -1) do
+
+    assert_difference("Society.count", -1) do
       delete society_url(@society)
     end
 
@@ -277,8 +277,8 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
 
   test "should not destroy society when not authorized" do
     sign_in users(:jane) # not creator
-    
-    assert_no_difference('Society.count') do
+
+    assert_no_difference("Society.count") do
       delete society_url(@society)
     end
 
@@ -288,7 +288,7 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "should not destroy society when not authenticated" do
-    assert_no_difference('Society.count') do
+    assert_no_difference("Society.count") do
       delete society_url(@society)
     end
 

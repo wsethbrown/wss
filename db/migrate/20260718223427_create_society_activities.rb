@@ -8,6 +8,6 @@ class CreateSocietyActivities < ActiveRecord::Migration[8.0]
       t.string :detail
       t.timestamps
     end
-    add_index :society_activities, [:society_id, :created_at]
+    add_index :society_activities, [ :society_id, :created_at ]
   end
 end

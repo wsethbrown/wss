@@ -2,6 +2,11 @@
 require "rubygems"
 require "bundler/setup"
 
-ARGV.unshift("--ensure-latest")
+# NOTE: Rails ships this wrapper with `--ensure-latest`, which makes Brakeman
+# exit non-zero whenever the pinned gem isn't the newest release upstream.
+# That turns CI red on the day Brakeman publishes a version, with no change to
+# our code and no vulnerability found, which is how this job came to be
+# permanently red and ignored. We want this job to mean "the scan found
+# something". Keeping the gem current is dependency work, not a build gate.
 
 load Gem.bin_path("brakeman", "brakeman")

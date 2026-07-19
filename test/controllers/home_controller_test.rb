@@ -16,33 +16,33 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
   test "fetch_stripe_products returns default products when Stripe is unavailable" do
     controller = HomeController.new
-    
+
     # Mock Stripe API failure
     Stripe::Price.stubs(:retrieve).raises(Stripe::StripeError.new("API Error"))
-    
+
     products = controller.send(:fetch_stripe_products)
 
     assert_equal 3, products.length
-    assert_equal 'monthly', products[0][:id]
-    assert_equal 'quarterly', products[1][:id]
-    assert_equal 'yearly', products[2][:id]
-    assert_equal 'Monthly Membership', products[0][:name]
-    assert_equal 'Quarterly Membership', products[1][:name]
-    assert_equal 'Yearly Membership', products[2][:name]
+    assert_equal "monthly", products[0][:id]
+    assert_equal "quarterly", products[1][:id]
+    assert_equal "yearly", products[2][:id]
+    assert_equal "Monthly Membership", products[0][:name]
+    assert_equal "Quarterly Membership", products[1][:name]
+    assert_equal "Yearly Membership", products[2][:name]
   end
 
   test "fetch_stripe_products returns default products when no Stripe API key" do
     controller = HomeController.new
-    
+
     # Mock missing API key
     Stripe.stubs(:api_key).returns(nil)
 
     products = controller.send(:fetch_stripe_products)
 
     assert_equal 3, products.length
-    assert_equal 'monthly', products[0][:id]
-    assert_equal 'quarterly', products[1][:id]
-    assert_equal 'yearly', products[2][:id]
+    assert_equal "monthly", products[0][:id]
+    assert_equal "quarterly", products[1][:id]
+    assert_equal "yearly", products[2][:id]
   end
 
   test "fetch_stripe_products returns default products when price IDs are not configured" do
@@ -58,9 +58,9 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
       products = controller.send(:fetch_stripe_products)
 
       assert_equal 3, products.length
-      assert_equal 'monthly', products[0][:id]
-      assert_equal 'quarterly', products[1][:id]
-      assert_equal 'yearly', products[2][:id]
+      assert_equal "monthly", products[0][:id]
+      assert_equal "quarterly", products[1][:id]
+      assert_equal "yearly", products[2][:id]
     ensure
       original.each { |k, v| ENV[k] = v }
       Rails.cache.clear
@@ -69,9 +69,9 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
   test "fetch_stripe_products structures product data correctly" do
     controller = HomeController.new
-    
+
     products = controller.send(:fetch_stripe_products)
-    
+
     products.each do |product|
       assert product.key?(:id)
       assert product.key?(:name)
@@ -80,7 +80,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
       assert product.key?(:features)
       assert product.key?(:popular)
       assert product.key?(:price_id)
-      
+
       assert product[:features].is_a?(Array)
       assert product[:features].length > 0
       assert product[:price].is_a?(Integer)
@@ -93,8 +93,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
     products = controller.send(:fetch_stripe_products)
 
-    quarterly_product = products.find { |p| p[:id] == 'quarterly' }
-    yearly_product = products.find { |p| p[:id] == 'yearly' }
+    quarterly_product = products.find { |p| p[:id] == "quarterly" }
+    yearly_product = products.find { |p| p[:id] == "yearly" }
 
     # Yearly is the lowest per-month cost, so it carries the highlight.
     assert_equal false, quarterly_product[:popular]
@@ -106,10 +106,10 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
     products = controller.send(:fetch_stripe_products)
 
-    monthly_product = products.find { |p| p[:id] == 'monthly' }
-    quarterly_product = products.find { |p| p[:id] == 'quarterly' }
+    monthly_product = products.find { |p| p[:id] == "monthly" }
+    quarterly_product = products.find { |p| p[:id] == "quarterly" }
 
     assert_nil monthly_product[:savings]
-    assert_equal '19%', quarterly_product[:savings]
+    assert_equal "19%", quarterly_product[:savings]
   end
 end

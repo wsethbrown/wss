@@ -42,13 +42,13 @@ class SubscriptionsController < ApplicationController
       begin
         active_subscriptions = Stripe::Subscription.list(
           customer: customer.id,
-          status: 'active',
+          status: "active",
           limit: 100
         )
 
         trialing_subscriptions = Stripe::Subscription.list(
           customer: customer.id,
-          status: 'trialing',
+          status: "trialing",
           limit: 100
         )
 
@@ -175,7 +175,7 @@ class SubscriptionsController < ApplicationController
 
     # Fetch available plans
     @stripe_products = fetch_stripe_products
-    @current_plan = current_user.subscription_plan || 'monthly'
+    @current_plan = current_user.subscription_plan || "monthly"
   end
 
   def change_plan
@@ -249,7 +249,7 @@ class SubscriptionsController < ApplicationController
         current_user.stripe_subscription_id,
         {
           pause_collection: {
-            behavior: 'keep_as_draft',
+            behavior: "keep_as_draft",
             resumes_at: 1.month.from_now.to_i  # Auto-resume after 1 month
           }
         }
@@ -257,7 +257,7 @@ class SubscriptionsController < ApplicationController
 
       current_user.update!(
         subscription_paused_at: Time.current,
-        subscription_status: 'paused'
+        subscription_status: "paused"
       )
 
       Rails.logger.info "User #{current_user.email} paused subscription #{current_user.stripe_subscription_id}"
@@ -278,12 +278,12 @@ class SubscriptionsController < ApplicationController
       # Resume payment collection using Stripe API
       Stripe::Subscription.update(
         current_user.stripe_subscription_id,
-        { pause_collection: '' }  # Empty string removes the pause
+        { pause_collection: "" }  # Empty string removes the pause
       )
 
       current_user.update!(
         subscription_paused_at: nil,
-        subscription_status: 'active'
+        subscription_status: "active"
       )
 
       Rails.logger.info "User #{current_user.email} resumed subscription #{current_user.stripe_subscription_id}"
@@ -347,5 +347,4 @@ class SubscriptionsController < ApplicationController
   def fetch_stripe_products
     SubscriptionProducts.all
   end
-
 end
