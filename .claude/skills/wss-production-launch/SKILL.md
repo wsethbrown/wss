@@ -147,3 +147,11 @@ Aug 9 first-renewal watch.
   container stalls page serving.
 - **Mailer silently drops mail** while `SMTP_ADDRESS` is unset — no error,
   magic links just never arrive.
+
+## Google Search Console (verified July 2026)
+
+Property: URL-prefix `https://whiskeysharesociety.com/`, verified by the
+`google-site-verification` meta tag in `app/views/layouts/application.html.erb`.
+**Removing that tag un-verifies the property** — leave it in the head. The
+sitemap (`/sitemap.xml`) is submitted and reading Success; Google re-reads it
+periodically, so new decks/societies get picked up without resubmitting.

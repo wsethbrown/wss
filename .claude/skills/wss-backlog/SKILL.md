@@ -30,12 +30,6 @@ Legend: **[code]** = engineering work · **[owner]** = only the owner can do it 
   the line item in the business budget. Watch volume in the Resend dashboard; event notifications
   (launched July 2026) multiply sends per event, so member growth is the driver.
 
-## SEO
-
-- **Google Search Console. [owner]** The sitemap (/sitemap.xml, linked from robots.txt), canonical
-  tags, and JSON-LD (Organization + deck Product) shipped July 2026. Remaining owner step: verify
-  the domain in Search Console and submit https://whiskeysharesociety.com/sitemap.xml.
-
 ## Review system, remaining ties
 
 - **[code] wss-reviews "Phase 3" leftovers.** Deck reviews SHIPPED (July 2026: events carry an
