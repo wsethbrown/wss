@@ -66,6 +66,10 @@ group :test do
   gem "rails-controller-testing"
   # `.stubs`/`.expects` mocking used across the Stripe and subscription tests
   gem "mocha"
+  # Pinned to 5.x: minitest 6 dropped `minitest/mock`, which four of our tests
+  # require for `stub`. There is no advisory against 5.x, so this is a
+  # deliberate hold rather than drift. Moving to 6 means porting those tests.
+  gem "minitest", "~> 5.25"
 end
 
 group :development do
