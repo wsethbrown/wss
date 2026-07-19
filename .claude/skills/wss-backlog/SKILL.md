@@ -1,6 +1,6 @@
 ---
 name: wss-backlog
-description: WSS pending-work register — deferred/half-decided items (Maps + email cost watches, Search Console, review-board weighting, the Aug 9 renewal watch, real deck uploads) with each item's blocker and owner. Use BEFORE building anything new, so you don't rediscover or duplicate work already scoped, deferred, or blocked on an owner decision.
+description: WSS pending-work register — deferred/half-decided items (Maps + email cost watches, the Aug 9 renewal watch, real deck uploads, review-system leftovers) with each item's blocker and owner. Use BEFORE building anything new, so you don't rediscover or duplicate work already scoped, deferred, or blocked on an owner decision.
 ---
 
 # WSS Backlog — check here before building anything new
