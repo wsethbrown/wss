@@ -296,6 +296,37 @@
         <% end %>
         <% end %>
 
+        <%# Catalog-linked pours: what real rooms scored these bottles (Phase 3
+            deck ties). Only rendered when the deck has links AND at least one
+            has been tasted, so an unrated link never implies a verdict. %>
+        <% linked_pours = @presentation.presentation_bottles.includes(:bottle).to_a %>
+        <% if linked_pours.any? %>
+          <section class="mb-16">
+            <p class="eyebrow text-whiskey-600 mb-2">From the tasting rooms</p>
+            <h2 class="font-display text-3xl font-semibold text-gray-900 mb-4">How these pours scored</h2>
+            <p class="mb-8 text-gray-700">What societies actually thought of the bottles in this deck, from their own tasting nights.</p>
+            <div class="divide-y divide-whiskey-100 rounded-2xl border border-whiskey-200 bg-white">
+              <% linked_pours.each do |pour| %>
+                <% bottle = pour.bottle %>
+                <%= link_to bottle_path(bottle), class: "flex items-center justify-between gap-4 px-6 py-4 transition hover:bg-whiskey-50" do %>
+                  <div class="min-w-0">
+                    <p class="font-display text-lg font-semibold text-gray-900"><%= bottle.name %></p>
+                    <p class="text-sm text-gray-500">
+                      <%= [bottle.distillery, bottle.style].compact_blank.join(" · ") %><%= " · #{pour.label}" if pour.label.present? %>
+                    </p>
+                  </div>
+                  <div class="shrink-0 text-right">
+                    <%= render "bottles/rating", value: bottle.average_rating %>
+                    <% if (count = bottle.reviews.count).positive? %>
+                      <p class="mt-0.5 text-xs text-gray-500"><%= pluralize(count, "tasting") %></p>
+                    <% end %>
+                  </div>
+                <% end %>
+              <% end %>
+            </div>
+          </section>
+        <% end %>
+
         <!-- Whiskey Recommendations -->
         <% if @presentation.parsed_whiskey_recommendations.any? %>
           <section class="mb-16">

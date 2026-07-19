@@ -1,5 +1,8 @@
 class Bottle < ApplicationRecord
   belongs_to :created_by, class_name: "User", optional: true
+  # Decks that call for this bottle (only published decks are ever shown).
+  has_many :presentation_bottles, dependent: :destroy
+  has_many :presentations, through: :presentation_bottles
   has_many :reviews, dependent: :destroy
   has_many :bottle_edits, dependent: :destroy
 

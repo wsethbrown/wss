@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_19_123853) do
+ActiveRecord::Schema[8.0].define(version: 2026_07_19_135859) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -207,6 +207,18 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_19_123853) do
     t.index ["user_id", "created_at"], name: "index_notifications_on_user_id_and_created_at"
     t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
     t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "presentation_bottles", force: :cascade do |t|
+    t.bigint "presentation_id", null: false
+    t.bigint "bottle_id", null: false
+    t.integer "position", default: 0, null: false
+    t.string "label"
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["bottle_id"], name: "index_presentation_bottles_on_bottle_id"
+    t.index ["presentation_id", "bottle_id"], name: "index_presentation_bottles_on_presentation_id_and_bottle_id", unique: true
+    t.index ["presentation_id"], name: "index_presentation_bottles_on_presentation_id"
   end
 
   create_table "presentation_reviews", force: :cascade do |t|
@@ -635,6 +647,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_19_123853) do
   add_foreign_key "favorites", "users"
   add_foreign_key "notifications", "users"
   add_foreign_key "notifications", "users", column: "actor_id"
+  add_foreign_key "presentation_bottles", "bottles"
+  add_foreign_key "presentation_bottles", "presentations"
   add_foreign_key "presentation_reviews", "presentations"
   add_foreign_key "presentation_reviews", "users"
   add_foreign_key "presentation_tags", "presentations"

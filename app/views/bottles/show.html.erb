@@ -84,6 +84,25 @@
     </div>
 
     <div>
+      <%# Decks that call for this bottle (Phase 3 deck ties). PUBLISHED only:
+          a draft deck is not public, and this is a public page. %>
+      <% decks = @bottle.presentations.published.distinct.to_a %>
+      <% if decks.any? %>
+        <div class="mb-8 rounded-2xl border border-whiskey-200 bg-whiskey-50/60 p-5">
+          <p class="eyebrow mb-2 text-whiskey-700">Poured in <%= decks.size == 1 ? "this deck" : "these decks" %></p>
+          <ul class="space-y-1.5">
+            <% decks.each do |deck| %>
+              <li>
+                <%= link_to deck.title, presentation_path(deck), class: "font-display text-lg font-semibold text-gray-900 hover:text-whiskey-700" %>
+                <% if deck.reviewed? %>
+                  <span class="ml-1 align-middle"><%= render "bottles/rating", value: deck.average_review_rating %></span>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+
       <div class="sticky top-[11.5rem] z-20 -mx-2 bg-white px-2 pb-3 pt-3">
         <p class="eyebrow text-whiskey-600">On the record</p>
         <h2 class="mt-1 font-display text-2xl font-semibold text-gray-900">Tastings</h2>
