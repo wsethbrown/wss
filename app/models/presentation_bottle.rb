@@ -33,6 +33,7 @@ class PresentationBottle < ApplicationRecord
   scope :linked, -> { where.not(bottle_id: nil) }
 
   before_validation :take_next_position, on: :create
+  before_validation :let_the_catalog_own_the_name
 
   def linked? = bottle_id.present?
 
@@ -68,5 +69,14 @@ class PresentationBottle < ApplicationRecord
     return if position.present? && position.positive?
 
     self.position = (presentation&.presentation_bottles&.maximum(:position) || 0) + 1
+  end
+
+  # The admin form has ONE name box: typing free text names an uncatalogued
+  # pour, picking a suggestion links a catalog bottle and submits its name in
+  # the same box. A linked row must not keep that copy, or renaming the bottle
+  # would leave every deck showing the old name. The catalog owns the name;
+  # `name` is only for pours that have no catalog bottle.
+  def let_the_catalog_own_the_name
+    self.name = nil if bottle_id.present?
   end
 end

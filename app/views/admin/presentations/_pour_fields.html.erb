@@ -12,7 +12,8 @@
     ([data-bottle-fill]). They have to be inside the controller's element to be
     in scope. %>
 <div class="pour-row rounded-lg border border-gray-200 bg-gray-50 p-4" data-pour-list-target="row"
-     data-controller="bottle-search" data-bottle-search-url-value="<%= search_bottles_path %>">
+     data-controller="bottle-search" data-bottle-search-url-value="<%= search_bottles_path %>"
+     data-bottle-search-name-field-value="true">
   <div class="mb-3 flex items-start justify-between gap-3">
     <h4 class="text-sm font-medium text-gray-700">Pour</h4>
     <label class="flex cursor-pointer items-center gap-1.5 text-sm text-red-600 hover:text-red-800">
@@ -22,30 +23,28 @@
     </label>
   </div>
 
-  <%# The catalog link. bottle-search writes the id into the hidden field; the
-      visible field is only a picker, so it is deliberately unnamed. %>
+  <%# ONE name box. "Catalog bottle" and "Name" were the same field wearing two
+      hats, so they're merged: type free text to name an uncatalogued pour
+      (a cocktail), or pick a suggestion to link the catalog bottle. Linking is
+      what earns this deck real tasting scores, so the state is shown, never
+      implied. The model clears `name` on a linked row: the catalog owns it. %>
+  <% linked = f.object.bottle %>
   <div class="relative mb-3">
-    <label class="mb-1 block text-xs font-medium text-gray-600">
-      Catalog bottle <span class="text-gray-400">optional, but it is what earns this deck real scores</span>
-    </label>
-    <% linked = f.object.bottle %>
-    <input type="search" autocomplete="off" data-bottle-search-target="input"
-           data-action="input->bottle-search#query"
-           value="<%= linked&.display_name %>"
-           placeholder="Search bottles or distilleries…"
-           class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500">
+    <%= f.label :name, "Name", class: "mb-1 block text-xs font-medium text-gray-600" %>
+    <%= f.text_field :name, value: f.object.title, autocomplete: "off",
+        placeholder: "Start typing: Glenfiddich 12, or Mint Julep",
+        data: { bottle_search_target: "input", action: "input->bottle-search#query" },
+        class: "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
     <%= f.hidden_field :bottle_id, data: { bottle_search_target: "bottleId" } %>
     <div data-bottle-search-target="results"
          class="absolute inset-x-0 top-full z-20 mt-1 hidden overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"></div>
+    <p data-bottle-search-target="linkState"
+       class="mt-1 text-xs <%= linked ? 'text-green-700' : 'text-gray-400' %>">
+      <%= linked ? "Linked to #{linked.display_name}" : "Not linked to the catalog, so this pour earns no scores." %>
+    </p>
   </div>
 
   <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-    <div>
-      <%= f.label :name, "Name", class: "mb-1 block text-xs font-medium text-gray-600" %>
-      <%= f.text_field :name, placeholder: "e.g., Glenfiddich 12, or Mint Julep",
-          class: "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
-      <p class="mt-1 text-xs text-gray-500">Leave blank when a catalog bottle is linked; the catalog name is used.</p>
-    </div>
     <div>
       <%= f.label :origin, "Origin", class: "mb-1 block text-xs font-medium text-gray-600" %>
       <%= f.text_field :origin, placeholder: "e.g., Speyside, or Kentucky, 1803",

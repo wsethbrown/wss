@@ -20,20 +20,33 @@ import { Controller } from "@hotwired/stimulus"
 //   submits instead of navigating to /bottles/new — the shelf must never
 //   become a side door into the catalog.
 //
+// - Name mode (fill mode + nameField), the deck pour form. There is ONE name
+//   box: type free text to name an uncatalogued pour, or pick a suggestion to
+//   link a catalog bottle. Picking fills the bare name (not "Name ·
+//   Distillery"), prefills the row's origin/style, and shows the link state;
+//   typing something else unlinks the row again.
+//
 // All rendering is textContent/createElement, user input never becomes HTML.
 export default class extends Controller {
-  static targets = ["input", "results", "bottleId", "customName"]
+  static targets = ["input", "results", "bottleId", "customName", "linkState"]
   static values = {
     url: String,
     grouped: { type: Boolean, default: false },
     returnTo: { type: String, default: "" },
     submitOnSelect: { type: Boolean, default: false },
-    addLabel: { type: String, default: "" }
+    addLabel: { type: String, default: "" },
+    // Name mode (the deck pour form): the search box IS the name field, so it
+    // takes the bottle's bare name rather than "Name · Distillery", and typing
+    // something else unlinks the row. Off everywhere else.
+    nameField: { type: Boolean, default: false }
   }
 
   query() {
     clearTimeout(this.timer)
     const q = this.inputTarget.value.trim()
+    // In name mode the box holds the linked bottle's name. Once it says
+    // something else, the row is no longer that bottle.
+    if (this.nameFieldValue && this.hasBottleIdTarget && q !== this.linkedName) this.unlink()
     if (q.length < 2) { this.resultsTarget.classList.add("hidden"); return }
     this.timer = setTimeout(() => this.fetch(q), 200)
   }
@@ -106,12 +119,32 @@ export default class extends Controller {
     el.addEventListener("click", () => {
       this.bottleIdTarget.value = match.id
       if (this.hasCustomNameTarget) this.customNameTarget.value = ""
-      this.inputTarget.value = match.display_name
+      this.inputTarget.value = this.nameFieldValue ? match.name : match.display_name
+      this.linkedName = this.inputTarget.value
+      this.showLinked(match.display_name)
       this.resultsTarget.classList.add("hidden")
       this.autofill(match)
       if (this.submitOnSelectValue) this.submitForm()
     })
     return el
+  }
+
+  // The row's link state, shown rather than implied: an admin has to be able
+  // to tell at a glance whether this pour earns the deck real scores.
+  showLinked(label) {
+    if (!this.hasLinkStateTarget) return
+    this.linkStateTarget.textContent = `Linked to ${label}`
+    this.linkStateTarget.classList.remove("hidden", "text-gray-400")
+    this.linkStateTarget.classList.add("text-green-700")
+  }
+
+  unlink() {
+    this.bottleIdTarget.value = ""
+    this.linkedName = null
+    if (!this.hasLinkStateTarget) return
+    this.linkStateTarget.textContent = "Not linked to the catalog, so this pour earns no scores."
+    this.linkStateTarget.classList.remove("text-green-700")
+    this.linkStateTarget.classList.add("text-gray-400")
   }
 
   // Copy what the catalog already knows into any [data-bottle-fill] field in
@@ -164,6 +197,14 @@ export default class extends Controller {
     el.textContent = "Nothing on the record yet."
     el.className = "px-4 py-2.5 text-sm text-gray-400"
     return el
+  }
+
+  connect() {
+    // Remember what the box said when it arrived linked, so an untouched row
+    // doesn't unlink itself on the first keystroke elsewhere.
+    if (this.nameFieldValue && this.hasBottleIdTarget && this.bottleIdTarget.value) {
+      this.linkedName = this.inputTarget.value.trim()
+    }
   }
 
   disconnect() { clearTimeout(this.timer) }

@@ -88,6 +88,33 @@ class DeckPourLinksTest < ActionDispatch::IntegrationTest
                     "the legacy pour field must be gone from the form"
   end
 
+  # There is one name box: picking a suggestion submits the bottle's name in it.
+  # A linked row must not keep that copy, or renaming the bottle would leave
+  # every deck showing the old name.
+  test "a linked pour lets the catalog own the name" do
+    sign_in @admin
+    save_deck({ "0" => { bottle_id: @bottle.id, name: "Tied Dram", position: 1 } })
+
+    pour = @deck.reload.presentation_bottles.sole
+    assert_nil pour.name, "the name column is only for pours with no catalog bottle"
+    assert_equal "Tied Dram", pour.title, "the name still displays, via the catalog"
+
+    @bottle.update!(name: "Renamed Dram")
+    assert_equal "Renamed Dram", pour.reload.title, "a linked pour follows the catalog"
+  end
+
+  test "the pour form has one name box, wired to the catalog" do
+    PresentationBottle.create!(presentation: @deck, bottle: @bottle, position: 1)
+    sign_in @admin
+    get edit_admin_presentation_path(@deck)
+
+    assert_equal 1, response.body.scan('presentation_bottles_attributes][0][name]').size,
+                 "name and catalog bottle are one field, not two"
+    assert_match "data-bottle-search-name-field-value", response.body
+    assert_match "Linked to #{@bottle.display_name}", response.body,
+                 "the row must show whether it is linked, not imply it"
+  end
+
   # The pour form prefills origin and style from the catalog, so the payload
   # the search endpoint returns is load-bearing, not decorative.
   test "bottle search returns the fields a pour row prefills from" do
