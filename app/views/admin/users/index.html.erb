@@ -113,21 +113,22 @@
   <!-- Results -->
   <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
     <% if @users.any? %>
+      <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subscription</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Credits</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subscription</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Credits</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
+            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
           </tr>
         </thead>
         <tbody class="bg-white divide-y divide-gray-200">
           <% @users.each do |user| %>
             <tr class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="px-4 py-4 whitespace-nowrap">
                 <div class="flex items-center">
                   <div class="flex-shrink-0 h-10 w-10">
                     <% if user.profile_image.attached? %>
@@ -138,8 +139,11 @@
                       </div>
                     <% end %>
                   </div>
-                  <div class="ml-4">
-                    <div class="text-sm font-medium text-gray-900">
+                  <%# min-w-0 + truncate: an Apple private-relay signup can land
+                      an unbreakable 40-char email in BOTH name fields, which
+                      used to widen the whole table past the viewport. %>
+                  <div class="ml-3 min-w-0 max-w-[11rem]">
+                    <div class="truncate text-sm font-medium text-gray-900" title="<%= user.full_name %>">
                       <%= user.full_name %>
                       <% if user.invitation_sent_at.present? && user.invitation_accepted_at.nil? %>
                         <span class="ml-1 inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">Invited</span>
@@ -151,10 +155,10 @@
                   </div>
                 </div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900"><%= user.email %></div>
+              <td class="px-4 py-4">
+                <div class="max-w-[13rem] truncate text-sm text-gray-900" title="<%= user.email %>"><%= user.email %></div>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="px-4 py-4 whitespace-nowrap">
                 <% if user.subscription_status == 'active' %>
                   <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
                     Active
@@ -170,13 +174,13 @@
                   </span>
                 <% end %>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap">
+              <td class="px-4 py-4 whitespace-nowrap">
                 <span class="text-sm font-medium text-gray-900"><%= user.credits %></span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
                 <%= user.created_at.strftime("%b %d, %Y") %>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
                 <%= link_to "View", admin_user_path(user), class: "text-blue-600 hover:text-blue-900 mr-3" %>
                 <%= link_to "Edit", edit_admin_user_path(user), class: "text-whiskey-600 hover:text-whiskey-900" %>
               </td>
@@ -184,6 +188,8 @@
           <% end %>
         </tbody>
       </table>
+
+      </div>
 
       <!-- Pagination -->
       <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">

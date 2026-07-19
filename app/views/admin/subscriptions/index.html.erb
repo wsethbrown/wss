@@ -137,6 +137,7 @@
   <!-- Subscriptions Table -->
   <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
     <% if @subscriptions.any? %>
+      <div class="overflow-x-auto">
       <table class="min-w-full divide-y divide-gray-200">
         <thead class="bg-gray-50">
           <tr>
@@ -163,8 +164,10 @@
                     <% end %>
                   </div>
                   <div class="ml-4">
-                    <div class="text-sm font-medium text-gray-900"><%= user.full_name %></div>
-                    <div class="text-sm text-gray-500"><%= user.email %></div>
+                    <%# Capped like the other admin tables: one private-relay
+                        address in a name field must not widen the panel. %>
+                    <div class="max-w-[14rem] truncate text-sm font-medium text-gray-900" title="<%= user.full_name %>"><%= user.full_name %></div>
+                    <div class="max-w-[14rem] truncate text-sm text-gray-500" title="<%= user.email %>"><%= user.email %></div>
                   </div>
                 </div>
               </td>
@@ -234,6 +237,8 @@
           <% end %>
         </tbody>
       </table>
+
+      </div>
 
       <!-- Pagination -->
       <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">

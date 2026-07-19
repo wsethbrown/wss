@@ -24,8 +24,8 @@ class User < ApplicationRecord
         user_by_email.update!(
           provider: auth.provider,
           uid: auth.uid,
-          first_name: auth.info.first_name || auth.info.name&.split(" ")&.first,
-          last_name: auth.info.last_name || auth.info.name&.split(" ")&.last
+          first_name: omniauth_first_name(auth),
+          last_name: omniauth_last_name(auth)
         )
         return user_by_email
       elsif user_by_email.provider == auth.provider
@@ -49,10 +49,33 @@ class User < ApplicationRecord
       uid: auth.uid,
       password: Devise.friendly_token[0, 20],
       password_set_manually: false,
-      first_name: auth.info.first_name || auth.info.name&.split(" ")&.first,
-      last_name: auth.info.last_name || auth.info.name&.split(" ")&.last
+      first_name: omniauth_first_name(auth),
+      last_name: omniauth_last_name(auth)
     )
   end
+
+  # Apple sends no name on Hide My Email and on every repeat sign-in; the
+  # strategy then fills auth.info.name with the EMAIL. Splitting that on " "
+  # put the whole address in first_name AND last_name, so the admin table
+  # showed "y2yp…@privaterelay.appleid.com y2yp…@privaterelay.appleid.com"
+  # twice over and its unbreakable width pushed the table past the viewport.
+  # Treat an email-shaped name as no name at all: full_name then falls back
+  # to the address prefix.
+  def self.omniauth_name_parts(auth)
+    return [auth.info.first_name, auth.info.last_name] if auth.info.first_name.present? || auth.info.last_name.present?
+
+    name = auth.info.name.to_s.strip
+    return [nil, nil] if name.blank? || name.match?(URI::MailTo::EMAIL_REGEXP) || name == auth.info.email
+
+    parts = name.split(" ")
+    # A single-word name is a first name, not a first AND last name.
+    parts.length == 1 ? [parts.first, nil] : [parts.first, parts[1..].join(" ")]
+  end
+  private_class_method :omniauth_name_parts
+
+  def self.omniauth_first_name(auth) = omniauth_name_parts(auth).first
+  def self.omniauth_last_name(auth) = omniauth_name_parts(auth).last
+  private_class_method :omniauth_first_name, :omniauth_last_name
 
   def self.new_with_session(params, session)
     super.tap do |user|
