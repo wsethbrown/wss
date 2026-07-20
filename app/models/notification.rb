@@ -7,7 +7,7 @@ class Notification < ApplicationRecord
   belongs_to :actor, class_name: "User", optional: true
   belongs_to :notifiable, polymorphic: true, optional: true
 
-  ACTIONS = %w[follow review_vote event_created society_invite invite_accepted invite_declined member_joined].freeze
+  ACTIONS = %w[follow review_vote event_created society_invite invite_accepted invite_declined member_joined mention].freeze
 
   validates :action, inclusion: { in: ACTIONS }
 

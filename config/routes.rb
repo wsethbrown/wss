@@ -90,7 +90,7 @@ Rails.application.routes.draw do
     resources :events do
       # Society admins/the organizer hand the night to a member (the Host);
       # managers + the host set which deck the night runs (optional).
-      member { patch :assign_host; patch :assign_deck; get :deck_options; get :host_options }
+      member { patch :assign_host; patch :assign_deck; get :deck_options; get :host_options; get :mention_options }
       resources :event_rsvps, only: [ :create, :update, :destroy ]
     end
   end

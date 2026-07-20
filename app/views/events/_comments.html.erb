@@ -24,7 +24,7 @@
                 <% end %>
               </div>
             </div>
-            <p class="mt-1 text-sm text-gray-700 whitespace-pre-line"><%= comment.body %></p>
+            <p class="mt-1 text-sm text-gray-700 whitespace-pre-line"><%= comment_body_with_mentions(comment) %></p>
           </div>
         <% end %>
       </div>
@@ -40,9 +40,20 @@
 
     <% if user_signed_in? && policy(event).comment? && event.comments_open? %>
       <%= form_with url: event_comments_path(event), method: :post, class: "mt-5 space-y-3" do %>
-        <textarea name="event_comment[body]" rows="2" required maxlength="2000"
-                  placeholder="Say something about this night…"
-                  class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500"></textarea>
+        <%# Typing @ suggests members of this society. Picking one only writes
+            the handle into the text: the comment stays plain text and the
+            server resolves it later, so an ignored suggestion is harmless. %>
+        <div class="relative" data-controller="mention-autocomplete"
+             data-mention-autocomplete-url-value="<%= mention_options_society_event_path(event.society, event) %>"
+             data-action="click@document->mention-autocomplete#clickOutside">
+          <textarea name="event_comment[body]" rows="2" required maxlength="2000"
+                    placeholder="Say something about this night… type @ to tag a member"
+                    data-mention-autocomplete-target="input"
+                    data-action="input->mention-autocomplete#type click->mention-autocomplete#type"
+                    class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500"></textarea>
+          <div data-mention-autocomplete-target="results"
+               class="absolute inset-x-0 top-full z-20 mt-1 hidden max-h-56 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"></div>
+        </div>
         <%= submit_tag "Post", class: "cursor-pointer rounded-xl bg-whiskey-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-whiskey-700" %>
       <% end %>
     <% end %>

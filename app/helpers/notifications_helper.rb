@@ -25,6 +25,9 @@ module NotificationsHelper
     when "member_joined"
       return unless actor && target
       "#{actor} joined #{target.name} from an invite link"
+    when "mention"
+      return unless actor && target
+      "#{actor} mentioned you in #{target.event.title}"
     end
   end
 
@@ -41,6 +44,9 @@ module NotificationsHelper
       society_path(target.society) if target
     when "member_joined"
       society_path(target) if target
+    when "mention"
+      # Straight to the thread, anchored on Table talk.
+      society_event_path(target.event.society, target.event, anchor: "table-talk") if target
     end
   end
 end

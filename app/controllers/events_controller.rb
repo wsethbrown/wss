@@ -1,6 +1,6 @@
 class EventsController < ApplicationController
   before_action :set_event, only: [ :show, :edit, :update, :destroy, :assign_host, :assign_deck,
-                                   :deck_options, :host_options ]
+                                   :deck_options, :host_options, :mention_options ]
 
   def index
     @events = policy_scope(Event).includes(:society, :organizer, :event_rsvps)
@@ -141,6 +141,30 @@ class EventsController < ApplicationController
   def deck_options
     authorize @event, :manage_deck?
     render json: autocomplete_matches(deck_options_for(@event), params[:q], &:title)
+  end
+
+  # Who can be tagged in Table talk. Gated on comment?, NOT update?: anyone
+  # who can join the conversation can tag someone in it, and gating it tighter
+  # would leave most commenters unable to autocomplete the names they can
+  # already read on the page.
+  def mention_options
+    authorize @event, :comment?
+
+    query = params[:q].to_s.strip.downcase
+    taggable = Mentions.candidates_for(@event).select { |user| user.handle.present? }
+    matches = taggable.select do |user|
+      query.blank? || user.handle.downcase.start_with?(query) || user.full_name.downcase.include?(query)
+    end
+
+    # A handle shared by two members can't be tagged unambiguously, so it is
+    # not offered: suggesting it would produce a tag that renders as plain
+    # text and notifies nobody (see Mentions).
+    ambiguous = taggable.group_by { |user| user.handle.downcase }.select { |_, v| v.size > 1 }.keys
+    matches.reject! { |user| ambiguous.include?(user.handle.downcase) }
+
+    render json: matches.sort_by { |user| user.handle.downcase }
+                        .first(AUTOCOMPLETE_LIMIT)
+                        .map { |user| { id: user.id, handle: user.handle, name: user.full_name } }
   end
 
   def host_options

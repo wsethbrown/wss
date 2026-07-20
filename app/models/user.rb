@@ -5,6 +5,15 @@ class User < ApplicationRecord
          :recoverable, :rememberable, :validatable,
          :omniauthable, omniauth_providers: [ :google_oauth2, :apple ]
 
+  # The @handle used to tag someone in event comments: their name with the
+  # spaces and punctuation taken out ("Ethan Frank" -> "EthanFrank"). There is
+  # no username column, so this is DERIVED, which means it is not guaranteed
+  # unique: see Mentions, which refuses to resolve an ambiguous one rather
+  # than guess between two people of the same name.
+  def handle
+    [ first_name, last_name ].compact_blank.join.gsub(/[^A-Za-z0-9]/, "").presence
+  end
+
   # OAuth methods
   def self.from_omniauth(auth)
     # First, try to find existing user with this exact provider and uid

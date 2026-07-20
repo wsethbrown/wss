@@ -70,7 +70,9 @@ class EventCommentsTest < ActionDispatch::IntegrationTest
     assert section, "expected #table-talk section"
     assert_includes section.text, "Table talk"
     assert_includes section.text, "Can't wait."
-    assert_select "#table-talk textarea[placeholder=?]", "Say something about this night…"
+    # Assert the box is there by a stable hook, not its placeholder copy,
+    # which changes whenever the prompt is reworded.
+    assert_select "#table-talk textarea[data-mention-autocomplete-target=?]", "input"
   end
 
   test "closed event shows comments but no form, with the closed note" do
