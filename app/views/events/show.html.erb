@@ -256,8 +256,9 @@
                       name: "host_id",
                       url: host_options_society_event_path(@event.society, @event),
                       placeholder: "Search member names…",
-                      current_label: @event.host&.full_name,
-                      hint: "Leave empty to remove the host." %>
+                      current_label: @event.host_display_name,
+                      free_text_name: "host_name",
+                      hint: "Pick a member, or type any name for a guest presenter. Leave empty to remove the host." %>
                   <button type="submit"
                           class="w-full px-4 py-2 bg-whiskey-600 text-white text-sm font-medium rounded-lg hover:bg-whiskey-700 transition cursor-pointer">
                     Set host

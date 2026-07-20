@@ -156,20 +156,32 @@ class EventsController < ApplicationController
     @society = @event.society
     authorize @event, :update?
 
-    if params[:host_id].blank?
-      @event.update!(host: nil)
-      Rails.logger.info "Event #{@event.id}: host removed by user #{current_user.id}"
-      redirect_to society_event_path(@society, @event), notice: "Host removed."
-    else
+    guest_name = params[:host_name].to_s.strip
+
+    if params[:host_id].present?
       membership = @society.society_memberships.find_by(user_id: params[:host_id], status: "active")
       if membership
-        @event.update!(host: membership.user)
+        # A member host wins over any leftover guest name (see Event).
+        @event.update!(host: membership.user, host_name: nil)
         Rails.logger.info "Event #{@event.id}: host set to user #{membership.user_id} by user #{current_user.id}"
         redirect_to society_event_path(@society, @event), notice: "#{membership.user.full_name} is now hosting this event."
       else
         Rails.logger.warn "Event #{@event.id}: host assignment rejected: user #{params[:host_id]} is not an active member of society #{@society.id}"
         redirect_to society_event_path(@society, @event), alert: "The host must be an active member of this society."
       end
+    elsif guest_name.present?
+      # Nobody matched, so this is a guest presenter: someone running the night
+      # who isn't a member. Same rule the create form already applies
+      # (resolve_host_field), so the two ways of setting a host agree.
+      @event.update!(host: nil, host_name: guest_name)
+      Rails.logger.info "Event #{@event.id}: host set to guest presenter name by user #{current_user.id}"
+      redirect_to society_event_path(@society, @event), notice: "#{guest_name} is hosting this event as a guest presenter."
+    else
+      # Clear BOTH: leaving host_name behind would show a host the page says
+      # was just removed.
+      @event.update!(host: nil, host_name: nil)
+      Rails.logger.info "Event #{@event.id}: host removed by user #{current_user.id}"
+      redirect_to society_event_path(@society, @event), notice: "Host removed."
     end
   end
 

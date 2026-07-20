@@ -10,14 +10,20 @@ import { Controller } from "@hotwired/stimulus"
 // Clearing the field means "none". That is how the deck and host fields keep
 // the ability to unset that the old dropdown had via its blank option, so the
 // empty state has to submit cleanly rather than being treated as invalid.
+//
+// With a freeText target, unmatched typing is a valid answer rather than a
+// dead end: the host field uses it for guest presenters who aren't members.
+// Without one (the deck field), only a real record will do, because a deck
+// has to exist to be attached.
 export default class extends Controller {
-  static targets = ["input", "hidden", "results", "empty"]
+  static targets = ["input", "hidden", "results", "freeText"]
   static values = { url: String, minLength: { type: Number, default: 0 } }
 
   connect() {
     // What the box said when it arrived, so typing can tell whether the
     // selection still stands.
     this.chosenLabel = this.inputTarget.value.trim()
+    this.syncFreeText()
   }
 
   disconnect() { clearTimeout(this.timer) }
@@ -30,6 +36,7 @@ export default class extends Controller {
     // the form would submit a stale id while the field showed a different
     // name, which reads as picking someone and silently assigns another.
     if (typed !== this.chosenLabel) this.clearChoice()
+    this.syncFreeText()
 
     if (typed.length < this.minLengthValue) { this.hide(); return }
     this.timer = setTimeout(() => this.fetch(typed), 150)
@@ -57,9 +64,20 @@ export default class extends Controller {
     this.resultsTarget.textContent = ""
 
     if (!matches.length) {
-      const none = document.createElement("p")
-      none.textContent = "Nothing matches."
-      none.className = "px-3 py-2 text-sm text-gray-400"
+      // Say what happens next, rather than leaving a dead end. Clicking is
+      // optional (the text already submits), but a silent no-match reads as
+      // "this won't work".
+      const typed = this.inputTarget.value.trim()
+      const none = document.createElement(this.hasFreeTextTarget && typed ? "button" : "p")
+      if (this.hasFreeTextTarget && typed) {
+        none.type = "button"
+        none.textContent = `Use “${typed}” as a guest presenter`
+        none.className = "block w-full px-3 py-2 text-left text-sm font-medium text-whiskey-700 hover:bg-whiskey-50"
+        none.addEventListener("click", () => this.hide())
+      } else {
+        none.textContent = "Nothing matches."
+        none.className = "px-3 py-2 text-sm text-gray-400"
+      }
       this.resultsTarget.appendChild(none)
     }
 
@@ -80,7 +98,16 @@ export default class extends Controller {
     this.hiddenTarget.value = match.id
     this.inputTarget.value = match.label
     this.chosenLabel = match.label
+    this.syncFreeText()
     this.hide()
+  }
+
+  // The typed text submits only when no record was picked. Sending both would
+  // leave the server guessing which the user meant.
+  syncFreeText() {
+    if (!this.hasFreeTextTarget) return
+
+    this.freeTextTarget.value = this.hiddenTarget.value ? "" : this.inputTarget.value.trim()
   }
 
   clearChoice() {

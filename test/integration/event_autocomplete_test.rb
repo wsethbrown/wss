@@ -90,4 +90,73 @@ class EventAutocompleteTest < ActionDispatch::IntegrationTest
     patch assign_host_society_event_path(@society, @event), params: { host_id: "" }
     assert_nil @event.reload.host
   end
+
+  # A guest presenter is someone running the night who isn't a member. The
+  # create form already allowed this (resolve_host_field); the event page now
+  # agrees rather than being a dead end when nobody matches.
+  test "an unmatched name becomes a guest presenter" do
+    sign_in @organizer
+    patch assign_host_society_event_path(@society, @event),
+          params: { host_id: "", host_name: "Ada Lovelace" }
+
+    @event.reload
+    assert_nil @event.host
+    assert_equal "Ada Lovelace", @event.host_name
+    assert_equal "Ada Lovelace", @event.host_display_name
+  end
+
+  test "picking a member clears any leftover guest name" do
+    @event.update!(host_name: "Ada Lovelace")
+    sign_in @organizer
+    patch assign_host_society_event_path(@society, @event),
+          params: { host_id: @organizer.id, host_name: "" }
+
+    @event.reload
+    assert_equal @organizer, @event.host
+    assert_nil @event.host_name, "two hosts would be showing at once"
+  end
+
+  test "a member id wins if both somehow arrive" do
+    sign_in @organizer
+    patch assign_host_society_event_path(@society, @event),
+          params: { host_id: @organizer.id, host_name: "Ada Lovelace" }
+
+    assert_equal @organizer, @event.reload.host
+    assert_nil @event.host_name
+  end
+
+  test "clearing the box removes a guest presenter too" do
+    @event.update!(host_name: "Ada Lovelace")
+    sign_in @organizer
+    patch assign_host_society_event_path(@society, @event), params: { host_id: "", host_name: "" }
+
+    @event.reload
+    assert_nil @event.host_name, "the page would still show a host it said was removed"
+    assert_nil @event.host
+  end
+
+  test "a guest name is still refused from someone who cannot manage the event" do
+    sign_in @outsider
+    patch assign_host_society_event_path(@society, @event),
+          params: { host_id: "", host_name: "Ada Lovelace" }
+
+    assert_nil @event.reload.host_name
+  end
+
+  # Free text is valid for a host, never for a deck: a deck has to exist.
+  test "the deck field takes no free text, the host field does" do
+    sign_in @organizer
+    get society_event_path(@society, @event)
+
+    assert_match 'name="host_name"', response.body
+    assert_no_match(/name="presentation_name"/, response.body)
+  end
+
+  test "the host field prefills with a guest presenter's name" do
+    @event.update!(host_name: "Ada Lovelace")
+    sign_in @organizer
+    get society_event_path(@society, @event)
+
+    assert_match 'value="Ada Lovelace"', response.body
+  end
 end

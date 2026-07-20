@@ -1,4 +1,5 @@
-<%# locals: name, url, placeholder, current_label, (optional) hint
+<%# locals: name, url, placeholder, current_label, (optional) hint,
+             (optional) free_text_name
     A text field standing in for a select: type to search, click to pick, and
     an empty box means "none". Both the deck and host pickers use it so they
     can't drift apart in behaviour.
@@ -16,6 +17,11 @@
          data-action="input->autocomplete#query focus->autocomplete#open"
          class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500">
   <%= hidden_field_tag name, nil, data: { autocomplete_target: "hidden" } %>
+  <%# Present only where unmatched text is a valid answer. Its absence is what
+      tells the controller that only a real record will do. %>
+  <% if local_assigns[:free_text_name].present? %>
+    <%= hidden_field_tag free_text_name, nil, data: { autocomplete_target: "freeText" } %>
+  <% end %>
   <div data-autocomplete-target="results"
        class="absolute inset-x-0 top-full z-20 mt-1 hidden max-h-56 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"></div>
   <% if local_assigns[:hint].present? %>
