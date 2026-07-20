@@ -98,6 +98,14 @@ Legend: **[code]** = engineering work · **[owner]** = only the owner can do it 
 
 ## Gotchas / Traps
 
+- **Don't extract a shared @mention controller yet (decided 2026-07-20).** Mentions
+  live only in event comments (`Mentions`, `mention_autocomplete_controller.js`).
+  Owner asked for a gem assessment, was given one (Commontator/mention_system/
+  Tribute.js all solve a different-sized problem), and chose purpose-built code.
+  Extraction was offered and declined: "not sure if it'll spread, keep it where
+  it is." **Revisit only if mentions reach a second surface** (reviews, society
+  pages, deck comments) — at that point one shared controller beats copies.
+
 - **The review board's plain AVG is DECIDED, not a placeholder.** Owner ruling (July 2026):
   every member gets one vote, their most recent take, weighted equally. Explainable beats clever,
   and weighting only matters at volumes a club doesn't reach. Do NOT "improve" it into per-event
