@@ -207,16 +207,14 @@
                 <p class="text-sm text-gray-500">No deck attached. Plenty of nights run without one.</p>
               <% end %>
               <% if user_signed_in? && policy(@event).manage_deck? %>
-                <% options = deck_options_for(@event) %>
-                <% if options.any? %>
+                <% if deck_options_for(@event).any? %>
                   <%= form_with url: assign_deck_society_event_path(@event.society, @event), method: :patch, local: true, class: "space-y-2" do %>
-                    <select name="presentation_id"
-                            class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500">
-                      <option value="">No deck</option>
-                      <% options.each do |deck| %>
-                        <option value="<%= deck.id %>" <%= "selected" if @event.presentation_id == deck.id %>><%= deck.title %></option>
-                      <% end %>
-                    </select>
+                    <%= render "events/autocomplete_field",
+                        name: "presentation_id",
+                        url: deck_options_society_event_path(@event.society, @event),
+                        placeholder: "Search deck titles…",
+                        current_label: @event.presentation&.title,
+                        hint: "Leave empty to run this night without a deck." %>
                     <button type="submit"
                             class="w-full px-4 py-2 bg-whiskey-600 text-white text-sm font-medium rounded-lg hover:bg-whiskey-700 transition cursor-pointer">
                       Set deck
@@ -254,13 +252,12 @@
               <% end %>
               <% if policy(@event).update? %>
                 <%= form_with url: assign_host_society_event_path(@event.society, @event), method: :patch, local: true, class: "space-y-2" do %>
-                  <select name="host_id"
-                          class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500">
-                    <option value="">No host</option>
-                    <% @event.society.society_memberships.where(status: "active").includes(:user).map(&:user).uniq.sort_by(&:full_name).each do |member| %>
-                      <option value="<%= member.id %>" <%= "selected" if @event.host_id == member.id %>><%= member.full_name %></option>
-                    <% end %>
-                  </select>
+                  <%= render "events/autocomplete_field",
+                      name: "host_id",
+                      url: host_options_society_event_path(@event.society, @event),
+                      placeholder: "Search member names…",
+                      current_label: @event.host&.full_name,
+                      hint: "Leave empty to remove the host." %>
                   <button type="submit"
                           class="w-full px-4 py-2 bg-whiskey-600 text-white text-sm font-medium rounded-lg hover:bg-whiskey-700 transition cursor-pointer">
                     Set host

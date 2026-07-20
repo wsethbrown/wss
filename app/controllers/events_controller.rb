@@ -1,5 +1,6 @@
 class EventsController < ApplicationController
-  before_action :set_event, only: [ :show, :edit, :update, :destroy, :assign_host, :assign_deck ]
+  before_action :set_event, only: [ :show, :edit, :update, :destroy, :assign_host, :assign_deck,
+                                   :deck_options, :host_options ]
 
   def index
     @events = policy_scope(Event).includes(:society, :organizer, :event_rsvps)
@@ -131,6 +132,24 @@ class EventsController < ApplicationController
     end
   end
 
+  # JSON for the deck and host autocomplete fields on the event page.
+  #
+  # Authorized and scoped EXACTLY like the assignment actions they feed. These
+  # hand back deck titles and member names, so a looser scope here would leak
+  # precisely what assign_deck/assign_host refuse to accept: a search endpoint
+  # is a read of the same data, not a lesser thing.
+  def deck_options
+    authorize @event, :manage_deck?
+    render json: autocomplete_matches(deck_options_for(@event), params[:q], &:title)
+  end
+
+  def host_options
+    authorize @event, :update?
+    members = @event.society.society_memberships.where(status: "active")
+                    .includes(:user).map(&:user).uniq
+    render json: autocomplete_matches(members, params[:q], &:full_name)
+  end
+
   # Hand the night to a member. The host must be an active member of the
   # society (or blank to clear); assignment rights = event update rights.
   def assign_host
@@ -186,6 +205,20 @@ class EventsController < ApplicationController
       Rails.logger.info "Event create by user #{current_user.id}: host field kept as a guest presenter name (no member match)"
       @event.host_name = query
     end
+  end
+
+  # Shared shape for the autocomplete endpoints: [{ id:, label: }], filtered
+  # case-insensitively and capped so a huge society can't return a wall of
+  # names. An empty query returns the first few, so focusing the field shows
+  # what's available rather than an empty box.
+  AUTOCOMPLETE_LIMIT = 10
+
+  def autocomplete_matches(records, query, &label)
+    query = query.to_s.strip.downcase
+    matches = records.select { |record| query.blank? || label.call(record).to_s.downcase.include?(query) }
+    matches.sort_by { |record| label.call(record).to_s.downcase }
+           .first(AUTOCOMPLETE_LIMIT)
+           .map { |record| { id: record.id, label: label.call(record) } }
   end
 
   # Decks offerable on an event: published, owned by the society creator,

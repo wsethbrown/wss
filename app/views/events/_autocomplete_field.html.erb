@@ -1,0 +1,24 @@
+<%# locals: name, url, placeholder, current_label, (optional) hint
+    A text field standing in for a select: type to search, click to pick, and
+    an empty box means "none". Both the deck and host pickers use it so they
+    can't drift apart in behaviour.
+
+    The hidden field carries the id that actually submits; the visible box is
+    only a search. Leaving the box empty submits a blank id, which is how the
+    deck and host keep the "unset" the old dropdown had in its blank option. %>
+<div class="relative" data-controller="autocomplete"
+     data-autocomplete-url-value="<%= url %>"
+     data-action="click@document->autocomplete#clickOutside">
+  <input type="text" autocomplete="off"
+         value="<%= current_label %>"
+         placeholder="<%= placeholder %>"
+         data-autocomplete-target="input"
+         data-action="input->autocomplete#query focus->autocomplete#open"
+         class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500">
+  <%= hidden_field_tag name, nil, data: { autocomplete_target: "hidden" } %>
+  <div data-autocomplete-target="results"
+       class="absolute inset-x-0 top-full z-20 mt-1 hidden max-h-56 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"></div>
+  <% if local_assigns[:hint].present? %>
+    <p class="mt-1 text-xs text-gray-500"><%= hint %></p>
+  <% end %>
+</div>
