@@ -55,37 +55,65 @@ class EventMastheadTest < ActionDispatch::IntegrationTest
 
     assert_nil @event.event_rsvps.find_by(user: @member)
     assert_equal 0, @event.reload.maybe_count, "nobody is counted as maybe until they say so"
-    # No tick anywhere: the resting tint must not read as a confirmed answer.
+    # Nothing is pressed, so CSS reveals no tick; Maybe is only the resting
+    # position, which is a different attribute entirely.
     assert_select "#event-rsvp-buttons [role=group] button[aria-pressed=true]", count: 0
-    assert_select "#event-rsvp-buttons .rsvp-tick", count: 0
-    assert_select "#event-rsvp-buttons .bg-rsvp-maybe\\/20", count: 1
+    assert_select "#event-rsvp-buttons button[data-resting=true][data-answer=maybe]", count: 1
   end
 
-  test "each answer carries its own semantic fill once chosen" do
+  test "whichever answer was given is the pressed one" do
     sign_in @member
-    {
-      "yes" => "bg-rsvp-yes", "maybe" => "bg-rsvp-maybe", "no" => "bg-rsvp-no"
-    }.each do |answer, fill|
+    %w[yes maybe no].each do |answer|
       EventRsvp.where(event: @event).delete_all
       EventRsvp.new(user: @member, event: @event, status: answer).save!(validate: false)
       get society_event_path(@society, @event)
-      assert_select "#event-rsvp-buttons [role=group] button.#{fill}", count: 1
+
+      assert_select "#event-rsvp-buttons button[aria-pressed=true]", count: 1 do |pressed|
+        assert_equal answer, pressed.first["data-answer"]
+      end
+      assert_select "#event-rsvp-buttons button[data-resting=true]", count: 0,
+                    msg: "resting is the pre-answer state; it must not linger"
     end
   end
 
-  # The pop celebrates making a choice; replaying it on every page load would
-  # be noise, so only the turbo-rendered control carries it.
-  test "the answer animation fires on the turbo render, not on page load" do
-    EventRsvp.new(user: @member, event: @event, status: "yes").save!(validate: false)
+  # THE invariant behind the slide: a stream that re-renders the control tears
+  # the indicator out mid-transition and the fill snaps instead of moving.
+  test "no turbo stream re-renders the segmented control" do
+    %w[create update].each do |action|
+      template = Rails.root.join("app/views/event_rsvps/#{action}.turbo_stream.erb").read
+      assert_no_match(/target: *"event-rsvp-buttons"|"event-rsvp-buttons"/, template,
+                      "#{action}.turbo_stream re-renders the control, which breaks the slide")
+      assert_match "rsvp-note-region", template, "the note still has to be refreshed"
+    end
+  end
+
+  # The control never re-renders, so its form action can never change: the
+  # endpoint has to accept the second and third answers too.
+  test "answering twice through the same action works" do
     sign_in @member
+    assert_difference "EventRsvp.count", 1 do
+      post event_event_rsvps_path(@event), params: { status: "yes" }
+    end
+    assert_no_difference "EventRsvp.count" do
+      post event_event_rsvps_path(@event), params: { status: "no" }
+    end
+    assert_equal "no", @event.event_rsvps.find_by(user: @member).status
+  end
 
+  # The note region has the same trap the attendee list had: a target that only
+  # exists once someone has answered can't be replaced by the answer that
+  # creates it, so the note would never appear without a reload.
+  test "the note region renders as a turbo target before anyone answers" do
+    sign_in @member
     get society_event_path(@society, @event)
-    assert_select ".rsvp-answered", count: 0, msg: "a plain page load must not animate"
 
-    patch event_event_rsvp_path(@event, @event.event_rsvps.first),
-          params: { event_rsvp: { status: "no" } },
-          headers: { "Accept" => "text/vnd.turbo-stream.html" }
-    assert_match "rsvp-answered", response.body
+    assert_select "#rsvp-note-region", count: 1
+    assert_select "#rsvp-note-region details", count: 0, msg: "nothing to note yet"
+
+    post event_event_rsvps_path(@event), params: { status: "yes" },
+         headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    assert_match "rsvp-note-region", response.body
+    assert_match "Add a note for the host", response.body
   end
 
   test "the chosen answer is marked by more than colour" do

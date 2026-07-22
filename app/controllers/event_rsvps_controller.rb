@@ -4,16 +4,24 @@ class EventRsvpsController < ApplicationController
   before_action :set_event
   before_action :set_rsvp, only: [ :update, :destroy ]
 
+  # Answering is idempotent: the segmented control posts here every time,
+  # whether or not an RSVP already exists. It has to, because the control is
+  # client-owned and never re-rendered (see events/_rsvp_buttons), so its form
+  # action can't switch from create to update after the first answer. Read this
+  # as "set my answer", not "create a record".
   def create
-    # Get the status from params, default to 'yes' if not provided
     status = params[:status] || "yes"
+    @rsvp = @event.event_rsvps.find_or_initialize_by(user: current_user)
+    existing = @rsvp.persisted?
 
-    @rsvp = @event.event_rsvps.build(user: current_user, status: status, note: params[:note].presence)
-    authorize @rsvp, :create?
+    @rsvp.status = status
+    @rsvp.note = params[:note].presence if params.key?(:note)
+    authorize @rsvp, existing ? :update? : :create?
 
-    if @rsvp.save
-      log_activity(:event_rsvp, @event, { status: status })
-      notify_organizer
+    if save_answer
+      log_activity(:event_rsvp, @event, { status: status }) unless existing
+      notify_organizer if @rsvp.saved_change_to_status? || @rsvp.saved_change_to_note?
+      Rails.logger.info "Event #{@event.id}: RSVP #{existing ? 'changed' : 'recorded'} as #{status} by user #{current_user.id}"
       @success_message = rsvp_success_message(status)
       @event.reload # Reload to get fresh RSVP data
       respond_to do |format|
@@ -21,6 +29,7 @@ class EventRsvpsController < ApplicationController
         format.turbo_stream
       end
     else
+      Rails.logger.warn "Event #{@event.id}: RSVP by user #{current_user.id} refused: #{@rsvp.errors.full_messages.to_sentence}"
       respond_to do |format|
         format.html { redirect_to @event, alert: "Unable to RSVP to the event." }
         format.turbo_stream { render turbo_stream: turbo_stream.update("flash-messages", partial: "shared/flash_messages") }
@@ -59,6 +68,17 @@ class EventRsvpsController < ApplicationController
 
   def set_event
     @event = Event.find(params[:event_id])
+  end
+
+  # Double-clicking the control can put two creates in flight at once; the
+  # unique index catches the loser, so treat it as the change it meant to be
+  # rather than surfacing a database error.
+  def save_answer
+    @rsvp.save
+  rescue ActiveRecord::RecordNotUnique
+    Rails.logger.info "Event #{@event.id}: concurrent RSVP by user #{current_user.id}, applying as a change"
+    @rsvp = @event.event_rsvps.find_by(user: current_user)
+    @rsvp.present? && @rsvp.update(status: params[:status] || "yes")
   end
 
   def set_rsvp

@@ -1,5 +1,7 @@
-<%= turbo_stream.replace "event-rsvp-buttons" do %>
-  <%= render partial: "events/rsvp_buttons", locals: { event: @event, user_rsvp: @rsvp, just_answered: true } %>
+<%# The segmented control is deliberately NOT streamed: re-rendering it tore
+    the sliding indicator out mid-transition. Only the note is server-owned. %>
+<%= turbo_stream.replace "rsvp-note-region" do %>
+  <%= render partial: "events/rsvp_note", locals: { event: @event, user_rsvp: @rsvp } %>
 <% end %>
 
 <%= turbo_stream.replace "header-rsvp-count" do %>

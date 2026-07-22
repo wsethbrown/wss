@@ -251,21 +251,60 @@
 .toast-in { animation: toast-in 0.25s ease-out; }
 
 /* RSVP segmented control.
-   The pop plays only on the element turbo swaps in after an answer (the
-   partial adds .rsvp-answered for that render alone), so it celebrates a
-   choice rather than firing on every page load. */
-@keyframes rsvp-pop {
-  0%   { transform: scale(0.88); }
-  55%  { transform: scale(1.05); }
-  100% { transform: scale(1); }
+
+   The fill is a single sliding indicator rather than a background per button,
+   so answering moves one object instead of swapping three.
+
+   The control is CLIENT-OWNED: no turbo stream re-renders it. That is what
+   makes the slide possible at all — a stream that replaced (or morphed) this
+   region tore the indicator out mid-transition, so it snapped instead of
+   moving. The server still decides what is true; it just re-renders the note
+   region and the counts, not this.
+
+   Because of that, every visual state hangs off aria-pressed rather than
+   server-rendered classes, so the Stimulus controller flips one attribute and
+   CSS does the rest. No markup is duplicated in JavaScript. */
+.rsvp-option { color: color-mix(in srgb, var(--color-cream) 70%, transparent); }
+.rsvp-option:hover { color: var(--color-cream); }
+/* Resting on Maybe before anyone has answered: visible, but never mistakable
+   for a confirmed answer. */
+.rsvp-option[data-resting="true"] { color: var(--color-whiskey-200); }
+.rsvp-option[aria-pressed="true"] { color: #fff; }
+.rsvp-option .rsvp-tick { display: none; }
+.rsvp-option[aria-pressed="true"] .rsvp-tick { display: inline-flex; }
+
+/* Position and width are written by the `segmented` controller (the labels
+   differ in width and CSS can't measure text); how it MOVES lives here.
+   Colour comes off data-fill, deliberately NOT data-answer: the buttons use
+   that one, and sharing it makes [data-answer="yes"] ambiguous. */
+.rsvp-indicator {
+  transition:
+    transform 300ms cubic-bezier(0.32, 1.28, 0.5, 1),
+    width 300ms cubic-bezier(0.32, 1.28, 0.5, 1),
+    background-color 220ms ease;
 }
+.rsvp-indicator[data-fill="yes"]   { background-color: var(--color-rsvp-yes); }
+.rsvp-indicator[data-fill="maybe"] { background-color: var(--color-rsvp-maybe); }
+.rsvp-indicator[data-fill="no"]    { background-color: var(--color-rsvp-no); }
+.rsvp-indicator[data-fill-resting="true"] {
+  background-color: color-mix(in srgb, var(--color-rsvp-maybe) 22%, transparent);
+}
+
+/* First paint and resize place it without animating in from wherever it was. */
+.rsvp-indicator.is-instant { transition: none; }
+
+/* `scale` is its own property, so the pop composes with the translateX the
+   controller writes into `transform` instead of fighting it. */
+@keyframes rsvp-pop { 0% { scale: 1; } 42% { scale: 1.07; } 100% { scale: 1; } }
 @keyframes rsvp-tick {
   from { opacity: 0; transform: scale(0.3) rotate(-15deg); }
   to   { opacity: 1; transform: scale(1) rotate(0deg); }
 }
-.rsvp-answered { animation: rsvp-pop 340ms cubic-bezier(0.34, 1.56, 0.64, 1); }
-.rsvp-answered .rsvp-tick { animation: rsvp-tick 280ms 70ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+.rsvp-indicator.is-popping { animation: rsvp-pop 340ms cubic-bezier(0.34, 1.56, 0.64, 1); }
+.rsvp-option.is-answering .rsvp-tick { animation: rsvp-tick 280ms 60ms cubic-bezier(0.34, 1.56, 0.64, 1) both; }
+
 @media (prefers-reduced-motion: reduce) {
-  .rsvp-answered,
-  .rsvp-answered .rsvp-tick { animation: none; }
+  .rsvp-indicator { transition: none; }
+  .rsvp-indicator.is-popping,
+  .rsvp-option.is-answering .rsvp-tick { animation: none; }
 }

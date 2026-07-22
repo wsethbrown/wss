@@ -1,75 +1,58 @@
-<%# locals: event, user_rsvp, (optional) just_answered
+<%# locals: event, user_rsvp
 
-    ONE root node: turbo_stream.replace swaps this whole element, so the note
-    form must live INSIDE it or each RSVP re-render dumps a second form into
-    the header flex row (that bug shipped once; don't re-split).
+    Two regions with two jobs.
 
-    A segmented control with semantic fills (see --color-rsvp-* in
-    application.css). Colour is never the only signal: the chosen answer is
-    also filled and ticked, so it still reads without colour vision.
+    The CONTROL is client-owned: no turbo stream re-renders it, because any
+    re-render tore the sliding indicator out mid-transition and the fill
+    snapped instead of moving (see segmented_controller.js). Its visual state
+    hangs off aria-pressed so CSS does the work.
 
-    UNANSWERED rests on Maybe, deliberately tinted FAINTLY and with no tick.
-    That distinction is load-bearing: a full fill would tell someone they had
-    answered maybe when no RSVP exists, and their host would still see them as
-    unanswered. Nothing is written until they actually pick. %>
-<%
-  answered = user_rsvp.present?
-  just_answered = local_assigns.fetch(:just_answered, false)
-  fills = {
-    "yes"   => "bg-rsvp-yes text-white shadow",
-    "maybe" => "bg-rsvp-maybe text-white shadow",
-    "no"    => "bg-rsvp-no text-white shadow"
-  }
-  # Literal strings only — Tailwind can't see interpolated class fragments.
-  resting = "bg-rsvp-maybe/20 text-whiskey-200"
-  idle    = "text-cream/70 hover:bg-cream/10 hover:text-cream"
-%>
+    The NOTE has its own id and is the only part the streams replace. It used
+    to live inside the streamed region along with the control, and the original
+    warning here still stands in spirit: one region, one id, one stream target.
+    Splitting it any other way once dumped a second note form into the header.
+
+    UNANSWERED rests on Maybe, deliberately faint and untickd. That distinction
+    is load-bearing: a solid fill would tell someone they had answered maybe
+    when no RSVP exists, and their host would still see them as unanswered.
+    Nothing is written until they actually pick. %>
+<% answered = user_rsvp.present? %>
 <div id="event-rsvp-buttons" class="flex flex-col gap-2 sm:items-end">
   <div class="flex items-center gap-3">
     <span class="text-sm text-cream/60"><%= answered ? "Going?" : "Coming along?" %></span>
-    <div class="inline-flex rounded-full border border-cream/20 bg-cream/5 p-1" role="group" aria-label="Your RSVP">
+
+    <div class="relative inline-flex rounded-full border border-cream/20 bg-cream/5 p-1"
+         role="group" aria-label="Your RSVP"
+         data-controller="segmented"
+         data-action="turbo:submit-end->segmented#submitEnd">
+      <%# Sits behind the labels and carries the fill. Position and width are
+          written by the controller; colour comes off data-fill. %>
+      <span id="rsvp-indicator" aria-hidden="true" data-segmented-target="indicator"
+            class="rsvp-indicator pointer-events-none absolute bottom-1 left-0 top-1 rounded-full"></span>
+
       <% %w[yes maybe no].each do |answer| %>
-        <% chosen = answered && user_rsvp.status == answer %>
-        <% resting_here = !answered && answer == "maybe" %>
-        <%= button_to user_rsvp ? event_event_rsvp_path(event, user_rsvp) : event_event_rsvps_path(event),
-            method: user_rsvp ? :patch : :post,
-            params: user_rsvp ? { event_rsvp: { status: answer } } : { status: answer },
-            aria: { pressed: chosen },
-            class: [
-              "cursor-pointer inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold",
-              "transition duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300",
-              (chosen ? fills[answer] : (resting_here ? resting : idle)),
-              (chosen && just_answered ? "rsvp-answered" : nil)
-            ].compact.join(" ") do %>
-          <% if chosen %>
-            <svg class="rsvp-tick h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-            </svg>
-          <% end %>
+        <%# ALWAYS the same action, whether or not an RSVP exists: this control
+            is never re-rendered, so its form can't switch to an update path
+            after the first answer. The endpoint is idempotent for that reason
+            (see EventRsvpsController#create). %>
+        <%= button_to event_event_rsvps_path(event), method: :post, params: { status: answer },
+            aria: { pressed: (answered && user_rsvp.status == answer) },
+            data: { answer: answer,
+                    resting: (!answered && answer == "maybe" ? "true" : nil),
+                    segmented_target: "option", action: "segmented#pick" },
+            class: "rsvp-option relative z-10 cursor-pointer inline-flex items-center gap-1.5 " \
+                   "rounded-full px-4 py-1.5 text-sm font-semibold transition-colors duration-200 " \
+                   "focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300" do %>
+          <%# Rendered for every option and shown by CSS on the pressed one, so
+              choosing never has to build markup in JavaScript. %>
+          <svg class="rsvp-tick h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+            <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+          </svg>
           <%= answer.capitalize %>
         <% end %>
       <% end %>
     </div>
   </div>
 
-  <%# The note only exists once there's an answer to attach it to, and stays
-      folded away until wanted: it sat permanently open before, competing with
-      the RSVP itself for a field most people never fill in. <details> keeps
-      that working without JavaScript. %>
-  <% if user_rsvp %>
-    <details class="text-sm sm:text-right" <%= "open" if user_rsvp.note.present? %>>
-      <summary class="cursor-pointer list-none text-cream/50 transition hover:text-cream/80 [&::-webkit-details-marker]:hidden">
-        <%= user_rsvp.note.present? ? "Your note to the host" : "Add a note for the host" %>
-      </summary>
-      <%= form_with url: event_event_rsvp_path(event, user_rsvp), method: :patch, local: true,
-                    class: "mt-2 flex items-center gap-2" do |f| %>
-        <label for="rsvp-note" class="sr-only">Note for the host</label>
-        <input type="text" name="event_rsvp[note]" id="rsvp-note" maxlength="300"
-               value="<%= user_rsvp.note %>" placeholder="Bringing a bottle, running late…"
-               class="w-56 rounded-lg border border-cream/20 bg-cream/5 px-3 py-1.5 text-sm text-cream placeholder-cream/40 focus:outline-none focus:ring-2 focus:ring-whiskey-400">
-        <%= f.submit user_rsvp.note.present? ? "Update" : "Send",
-            class: "cursor-pointer rounded-lg border border-cream/20 px-3 py-1.5 text-sm font-semibold text-cream/80 transition hover:bg-cream/10 hover:text-cream" %>
-      <% end %>
-    </details>
-  <% end %>
+  <%= render "events/rsvp_note", event: event, user_rsvp: user_rsvp %>
 </div>
