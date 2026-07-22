@@ -44,6 +44,50 @@ class EventMastheadTest < ActionDispatch::IntegrationTest
     assert_select "#event-rsvp-buttons .bg-red-50", count: 0
   end
 
+  # "Default to maybe" is a RESTING POSITION for the control, never a record.
+  # Writing a maybe on page view would tell every host that people who never
+  # opened the page are undecided, and would create data on a GET.
+  test "an unanswered control rests on maybe without recording anything" do
+    sign_in @member
+    assert_no_difference "EventRsvp.count" do
+      get society_event_path(@society, @event)
+    end
+
+    assert_nil @event.event_rsvps.find_by(user: @member)
+    assert_equal 0, @event.reload.maybe_count, "nobody is counted as maybe until they say so"
+    # No tick anywhere: the resting tint must not read as a confirmed answer.
+    assert_select "#event-rsvp-buttons [role=group] button[aria-pressed=true]", count: 0
+    assert_select "#event-rsvp-buttons .rsvp-tick", count: 0
+    assert_select "#event-rsvp-buttons .bg-rsvp-maybe\\/20", count: 1
+  end
+
+  test "each answer carries its own semantic fill once chosen" do
+    sign_in @member
+    {
+      "yes" => "bg-rsvp-yes", "maybe" => "bg-rsvp-maybe", "no" => "bg-rsvp-no"
+    }.each do |answer, fill|
+      EventRsvp.where(event: @event).delete_all
+      EventRsvp.new(user: @member, event: @event, status: answer).save!(validate: false)
+      get society_event_path(@society, @event)
+      assert_select "#event-rsvp-buttons [role=group] button.#{fill}", count: 1
+    end
+  end
+
+  # The pop celebrates making a choice; replaying it on every page load would
+  # be noise, so only the turbo-rendered control carries it.
+  test "the answer animation fires on the turbo render, not on page load" do
+    EventRsvp.new(user: @member, event: @event, status: "yes").save!(validate: false)
+    sign_in @member
+
+    get society_event_path(@society, @event)
+    assert_select ".rsvp-answered", count: 0, msg: "a plain page load must not animate"
+
+    patch event_event_rsvp_path(@event, @event.event_rsvps.first),
+          params: { event_rsvp: { status: "no" } },
+          headers: { "Accept" => "text/vnd.turbo-stream.html" }
+    assert_match "rsvp-answered", response.body
+  end
+
   test "the chosen answer is marked by more than colour" do
     EventRsvp.new(user: @member, event: @event, status: "yes").save!(validate: false)
     sign_in @member

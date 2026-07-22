@@ -1,5 +1,5 @@
 <%= turbo_stream.replace "event-rsvp-buttons" do %>
-  <%= render partial: "events/rsvp_buttons", locals: { event: @event, user_rsvp: @rsvp } %>
+  <%= render partial: "events/rsvp_buttons", locals: { event: @event, user_rsvp: @rsvp, just_answered: true } %>
 <% end %>
 
 <%= turbo_stream.replace "header-rsvp-count" do %>

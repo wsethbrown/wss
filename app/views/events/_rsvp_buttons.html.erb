@@ -1,26 +1,48 @@
-<%# ONE root node: turbo_stream.replace swaps this whole element, so the note
+<%# locals: event, user_rsvp, (optional) just_answered
+
+    ONE root node: turbo_stream.replace swaps this whole element, so the note
     form must live INSIDE it or each RSVP re-render dumps a second form into
     the header flex row (that bug shipped once; don't re-split).
 
-    A segmented control, not three coloured buttons. The old version used
-    green/amber/red pills with hardcoded hex, which is the traffic-light soup
-    the overhaul purged: it made a low-stakes answer the loudest thing on the
-    page and fought the whiskey palette. One control, one accent, and the
-    chosen answer is filled AND ticked, so state never rests on colour alone. %>
+    A segmented control with semantic fills (see --color-rsvp-* in
+    application.css). Colour is never the only signal: the chosen answer is
+    also filled and ticked, so it still reads without colour vision.
+
+    UNANSWERED rests on Maybe, deliberately tinted FAINTLY and with no tick.
+    That distinction is load-bearing: a full fill would tell someone they had
+    answered maybe when no RSVP exists, and their host would still see them as
+    unanswered. Nothing is written until they actually pick. %>
+<%
+  answered = user_rsvp.present?
+  just_answered = local_assigns.fetch(:just_answered, false)
+  fills = {
+    "yes"   => "bg-rsvp-yes text-white shadow",
+    "maybe" => "bg-rsvp-maybe text-white shadow",
+    "no"    => "bg-rsvp-no text-white shadow"
+  }
+  # Literal strings only — Tailwind can't see interpolated class fragments.
+  resting = "bg-rsvp-maybe/20 text-whiskey-200"
+  idle    = "text-cream/70 hover:bg-cream/10 hover:text-cream"
+%>
 <div id="event-rsvp-buttons" class="flex flex-col gap-2 sm:items-end">
   <div class="flex items-center gap-3">
-    <span class="text-sm text-cream/60">Going?</span>
+    <span class="text-sm text-cream/60"><%= answered ? "Going?" : "Coming along?" %></span>
     <div class="inline-flex rounded-full border border-cream/20 bg-cream/5 p-1" role="group" aria-label="Your RSVP">
       <% %w[yes maybe no].each do |answer| %>
-        <% chosen = user_rsvp&.status == answer %>
+        <% chosen = answered && user_rsvp.status == answer %>
+        <% resting_here = !answered && answer == "maybe" %>
         <%= button_to user_rsvp ? event_event_rsvp_path(event, user_rsvp) : event_event_rsvps_path(event),
             method: user_rsvp ? :patch : :post,
             params: user_rsvp ? { event_rsvp: { status: answer } } : { status: answer },
             aria: { pressed: chosen },
-            class: "cursor-pointer inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 " +
-                   (chosen ? "bg-whiskey-500 text-white shadow" : "text-cream/70 hover:bg-cream/10 hover:text-cream") do %>
+            class: [
+              "cursor-pointer inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold",
+              "transition duration-150 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300",
+              (chosen ? fills[answer] : (resting_here ? resting : idle)),
+              (chosen && just_answered ? "rsvp-answered" : nil)
+            ].compact.join(" ") do %>
           <% if chosen %>
-            <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+            <svg class="rsvp-tick h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
               <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
             </svg>
           <% end %>
