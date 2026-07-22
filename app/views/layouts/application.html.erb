@@ -203,6 +203,7 @@
          constrained container. -->
     <% full_bleed = (controller_name == 'home' && %w[index membership].include?(action_name)) ||
                     (controller_name == 'societies' && %w[index show join_by_invite].include?(action_name)) ||
+                    (controller_name == 'events' && action_name == 'show') ||
                     controller_name == 'presentations' ||
                     (controller_name == 'reviews' && %w[index show].include?(action_name)) ||
                     (controller_name == 'bottles' && action_name == 'show') ||

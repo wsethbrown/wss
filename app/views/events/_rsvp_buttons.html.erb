@@ -1,65 +1,53 @@
-<%# ONE root node: turbo_stream.replace swaps this whole element, so the
-    note form must live INSIDE it or each RSVP re-render dumps a second
-    form into the header flex row (that bug shipped once; don't re-split). %>
-<div id="event-rsvp-buttons" class="flex flex-col items-end gap-3">
-  <div class="flex items-center space-x-2">
-  <span class="text-sm font-medium text-gray-700 mr-2">RSVP:</span>
-  
-  <!-- Yes Button/Badge -->
-  <% if user_rsvp&.yes? %>
-    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold text-white shadow-lg" style="background-color: #047857; border: 2px solid #065f46;">
-      <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-      </svg>
-      Yes
-    </span>
-  <% else %>
-    <%= button_to "Yes", user_rsvp ? event_event_rsvp_path(event, user_rsvp) : event_event_rsvps_path(event),
-        method: user_rsvp ? :patch : :post,
-        params: user_rsvp ? { event_rsvp: { status: 'yes' } } : { status: 'yes' },
-        class: "inline-flex items-center px-4 py-2 border-2 border-green-500 rounded-full shadow-sm text-sm font-medium text-green-700 bg-green-50 hover:bg-green-100 hover:border-green-600 transition-all" %>
-  <% end %>
+<%# ONE root node: turbo_stream.replace swaps this whole element, so the note
+    form must live INSIDE it or each RSVP re-render dumps a second form into
+    the header flex row (that bug shipped once; don't re-split).
 
-  <!-- Maybe Button/Badge -->
-  <% if user_rsvp&.maybe? %>
-    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold text-white shadow-lg" style="background-color: #d97706; border: 2px solid #b45309;">
-      <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-8-3a1 1 0 00-.867.5 1 1 0 11-1.731-1A3 3 0 0113 8a3.001 3.001 0 01-2 2.83V11a1 1 0 11-2 0v-1a1 1 0 011-1 1 1 0 100-2zm0 8a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"></path>
-      </svg>
-      Maybe
-    </span>
-  <% else %>
-    <%= button_to "Maybe", user_rsvp ? event_event_rsvp_path(event, user_rsvp) : event_event_rsvps_path(event),
-        method: user_rsvp ? :patch : :post,
-        params: user_rsvp ? { event_rsvp: { status: 'maybe' } } : { status: 'maybe' },
-        class: "inline-flex items-center px-4 py-2 border-2 border-yellow-500 rounded-full shadow-sm text-sm font-medium text-yellow-700 bg-yellow-50 hover:bg-yellow-100 hover:border-yellow-600 transition-all" %>
-  <% end %>
-
-  <!-- No Button/Badge -->
-  <% if user_rsvp&.no? %>
-    <span class="inline-flex items-center px-4 py-2 rounded-full text-sm font-bold text-white shadow-lg" style="background-color: #dc2626; border: 2px solid #b91c1c;">
-      <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20">
-        <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-      </svg>
-      No
-    </span>
-  <% else %>
-    <%= button_to "No", user_rsvp ? event_event_rsvp_path(event, user_rsvp) : event_event_rsvps_path(event),
-        method: user_rsvp ? :patch : :post,
-        params: user_rsvp ? { event_rsvp: { status: 'no' } } : { status: 'no' },
-        class: "inline-flex items-center px-4 py-2 border-2 border-red-500 rounded-full shadow-sm text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 hover:border-red-600 transition-all" %>
-  <% end %>
+    A segmented control, not three coloured buttons. The old version used
+    green/amber/red pills with hardcoded hex, which is the traffic-light soup
+    the overhaul purged: it made a low-stakes answer the loudest thing on the
+    page and fought the whiskey palette. One control, one accent, and the
+    chosen answer is filled AND ticked, so state never rests on colour alone. %>
+<div id="event-rsvp-buttons" class="flex flex-col gap-2 sm:items-end">
+  <div class="flex items-center gap-3">
+    <span class="text-sm text-cream/60">Going?</span>
+    <div class="inline-flex rounded-full border border-cream/20 bg-cream/5 p-1" role="group" aria-label="Your RSVP">
+      <% %w[yes maybe no].each do |answer| %>
+        <% chosen = user_rsvp&.status == answer %>
+        <%= button_to user_rsvp ? event_event_rsvp_path(event, user_rsvp) : event_event_rsvps_path(event),
+            method: user_rsvp ? :patch : :post,
+            params: user_rsvp ? { event_rsvp: { status: answer } } : { status: answer },
+            aria: { pressed: chosen },
+            class: "cursor-pointer inline-flex items-center gap-1.5 rounded-full px-4 py-1.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 " +
+                   (chosen ? "bg-whiskey-500 text-white shadow" : "text-cream/70 hover:bg-cream/10 hover:text-cream") do %>
+          <% if chosen %>
+            <svg class="h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
+            </svg>
+          <% end %>
+          <%= answer.capitalize %>
+        <% end %>
+      <% end %>
+    </div>
   </div>
-  <%# A short optional note to the host, sent with the RSVP notification.
-      Only shown once the person has responded. %>
+
+  <%# The note only exists once there's an answer to attach it to, and stays
+      folded away until wanted: it sat permanently open before, competing with
+      the RSVP itself for a field most people never fill in. <details> keeps
+      that working without JavaScript. %>
   <% if user_rsvp %>
-    <%= form_with url: event_event_rsvp_path(event, user_rsvp), method: :patch, local: true, class: "flex items-center gap-2" do |f| %>
-      <label for="rsvp-note" class="sr-only">Note for the host</label>
-      <input type="text" name="event_rsvp[note]" id="rsvp-note" maxlength="300"
-             value="<%= user_rsvp.note %>" placeholder="Add a note for the host"
-             class="w-64 rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500">
-      <%= f.submit user_rsvp.note.present? ? "Update note" : "Send note",
-          class: "cursor-pointer rounded-lg border border-whiskey-300 px-3 py-2 text-sm font-medium text-whiskey-800 hover:bg-whiskey-50" %>
-    <% end %>
+    <details class="text-sm sm:text-right" <%= "open" if user_rsvp.note.present? %>>
+      <summary class="cursor-pointer list-none text-cream/50 transition hover:text-cream/80 [&::-webkit-details-marker]:hidden">
+        <%= user_rsvp.note.present? ? "Your note to the host" : "Add a note for the host" %>
+      </summary>
+      <%= form_with url: event_event_rsvp_path(event, user_rsvp), method: :patch, local: true,
+                    class: "mt-2 flex items-center gap-2" do |f| %>
+        <label for="rsvp-note" class="sr-only">Note for the host</label>
+        <input type="text" name="event_rsvp[note]" id="rsvp-note" maxlength="300"
+               value="<%= user_rsvp.note %>" placeholder="Bringing a bottle, running late…"
+               class="w-56 rounded-lg border border-cream/20 bg-cream/5 px-3 py-1.5 text-sm text-cream placeholder-cream/40 focus:outline-none focus:ring-2 focus:ring-whiskey-400">
+        <%= f.submit user_rsvp.note.present? ? "Update" : "Send",
+            class: "cursor-pointer rounded-lg border border-cream/20 px-3 py-1.5 text-sm font-semibold text-cream/80 transition hover:bg-cream/10 hover:text-cream" %>
+      <% end %>
+    </details>
   <% end %>
 </div>

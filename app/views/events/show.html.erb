@@ -1,129 +1,114 @@
 <% content_for :title, "#{@event.title} - Whiskey Share Society" %>
 
-<div class="min-h-screen bg-gray-50">
-  <!-- Flash Messages -->
-  
-  <!-- Event Header -->
-  <div class="bg-white shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <!-- Breadcrumb -->
-      <nav class="flex mb-8" aria-label="Breadcrumb">
-        <ol class="inline-flex items-center space-x-1 md:space-x-3">
-          <li class="inline-flex items-center">
-            <%= link_to society_path(@event.society), class: "inline-flex items-center text-sm font-medium text-gray-700 hover:text-whiskey-600" do %>
-              <%= @event.society.name %>
-            <% end %>
-          </li>
-          <li>
-            <div class="flex items-center">
-              <svg class="w-6 h-6 text-gray-400" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 111.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clip-rule="evenodd"></path>
-              </svg>
-              <span class="ml-1 text-sm font-medium text-gray-500 md:ml-2"><%= @event.title %></span>
-            </div>
-          </li>
-        </ol>
+<div class="min-h-screen bg-whiskey-50">
+  <%# Masthead. Deliberately the same shape as the society show page (char
+      surface, eyebrow → rule-double → display heading, one inline metadata
+      row) so a night reads as part of its society rather than a different app.
+
+      Replaces a white card that named the society twice — once in the
+      breadcrumb, again in a tan chip beside the title — and laid the details
+      out as three icon-in-a-box tiles, which wrapped a date onto three lines
+      in its narrow column. %>
+  <div class="relative w-full overflow-hidden bg-char pt-16">
+    <div class="pointer-events-none absolute inset-0" aria-hidden="true"
+         style="background: radial-gradient(ellipse 70% 50% at 50% 110%, rgba(201, 136, 74, 0.22), transparent 70%);"></div>
+
+    <div class="relative z-10 mx-auto max-w-6xl px-6 py-12 md:py-16">
+      <%# The only place the society is named up here. %>
+      <nav class="mb-8 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
+        <%= link_to @event.society.name, society_path(@event.society),
+            class: "text-cream/50 transition hover:text-cream/90" %>
+        <svg class="h-4 w-4 shrink-0 text-cream/25" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"></path>
+        </svg>
+        <span class="text-cream/70" aria-current="page"><%= @event.title %></span>
       </nav>
 
-      <div class="flex items-start justify-between">
-        <div class="flex-1">
-          <!-- Event Title & Society -->
-          <div class="flex items-center space-x-4 mb-4">
-            <h1 class="font-display text-4xl font-semibold text-gray-900"><%= @event.title %></h1>
-            <%= link_to @event.society, 
-                class: "inline-flex items-center px-3 py-1.5 rounded-md text-sm font-medium bg-whiskey-100 text-whiskey-800 hover:bg-whiskey-200 transition-colors" do %>
-              <%= @event.society.name %>
-            <% end %>
-          </div>
-
-          <!-- Event Status -->
-          <div class="flex items-center space-x-4 mb-6">
-            <% if @event.upcoming? %>
-              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-green-100 text-green-800">
-                Upcoming
-              </span>
-            <% elsif @event.ongoing? %>
-              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
-                🔴 Live Now
-              </span>
+      <div class="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
+        <div class="max-w-2xl">
+          <p class="eyebrow mb-3 flex items-center gap-2 text-whiskey-300/90">
+            <% if @event.ongoing? %>
+              <span class="inline-block h-2 w-2 animate-pulse rounded-full bg-whiskey-400" aria-hidden="true"></span>
+              Happening now
+            <% elsif @event.upcoming? %>
+              Upcoming · in <%= distance_of_time_in_words(Time.current, @event.start_time) %>
             <% else %>
-              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-gray-100 text-gray-800">
-                Completed
+              Completed · <%= time_ago_in_words(@event.start_time) %> ago
+            <% end %>
+          </p>
+          <div class="rule-double mb-6 w-20 text-whiskey-300"></div>
+          <h1 class="font-display text-4xl font-semibold leading-tight text-cream md:text-5xl">
+            <%= @event.title %>
+          </h1>
+
+          <%# One wrapping row instead of three tiles: the same facts, and a
+              date that stays on one line. %>
+          <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-cream/60">
+            <span class="inline-flex items-center gap-2">
+              <svg class="h-4 w-4 shrink-0 text-whiskey-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"></path>
+              </svg>
+              <%= @event.start_time.strftime("%a, %B %-d, %Y") %>
+              <span class="text-cream/35">·</span>
+              <%= @event.start_time.strftime("%-I:%M %p") %> – <%= @event.end_time.strftime("%-I:%M %p") %>
+            </span>
+
+            <% if @event.location.present? %>
+              <span class="inline-flex items-center gap-2">
+                <svg class="h-4 w-4 shrink-0 text-whiskey-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+                </svg>
+                <%= @event.location %>
               </span>
             <% end %>
 
-            <span class="text-sm text-gray-500">
-              Organized by <%= link_to @event.organizer.full_name, profile_path(@event.organizer), class: "font-medium text-gray-700 hover:text-whiskey-600" %>
-            </span>
-          </div>
-
-          <!-- Event Details -->
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-            <!-- Date & Time -->
-            <div class="flex items-start space-x-3">
-              <div class="w-10 h-10 bg-whiskey-100 rounded-lg flex items-center justify-center">
-                <svg class="w-5 h-5 text-whiskey-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-              </div>
-              <div>
-                <h3 class="text-sm font-medium text-gray-900">Date & Time</h3>
-                <p class="text-sm text-gray-600 mt-1">
-                  <%= @event.start_time.strftime("%A, %B %d, %Y") %><br>
-                  <%= @event.start_time.strftime("%I:%M %p") %> - <%= @event.end_time.strftime("%I:%M %p") %>
-                </p>
-              </div>
-            </div>
-
-            <!-- Location -->
-            <% if @event.location.present? %>
-              <div class="flex items-start space-x-3">
-                <div class="w-10 h-10 bg-whiskey-100 rounded-lg flex items-center justify-center">
-                  <svg class="w-5 h-5 text-whiskey-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                  </svg>
-                </div>
-                <div>
-                  <h3 class="text-sm font-medium text-gray-900">Location</h3>
-                  <p class="text-sm text-gray-600 mt-1"><%= @event.location %></p>
-                </div>
-              </div>
-            <% end %>
-
-            <!-- Attendees -->
             <%= render "header_rsvp_count", event: @event %>
+
+            <span class="inline-flex items-center gap-2">
+              <svg class="h-4 w-4 shrink-0 text-whiskey-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"></path>
+              </svg>
+              Organised by <%= link_to @event.organizer.full_name, profile_path(@event.organizer),
+                  class: "font-semibold text-whiskey-300 transition hover:text-whiskey-200" %>
+            </span>
           </div>
         </div>
 
-        <!-- Action Buttons -->
-        <div class="flex items-center space-x-3 ml-6">
+        <%# Actions. RSVP is the reason a member opens this page, so it leads;
+            Edit is an organiser's tool and sits quietly under it rather than
+            competing at the same weight. %>
+        <div class="flex flex-col gap-4 lg:items-end">
           <% if user_signed_in? %>
-            <!-- RSVP Buttons - Yes/Maybe/No -->
             <% if @event.upcoming? && !@event.rsvp_closed? %>
               <% user_rsvp = @event.event_rsvps.find_by(user: current_user) %>
               <%= render "rsvp_buttons", event: @event, user_rsvp: user_rsvp %>
             <% elsif @event.upcoming? %>
               <% user_rsvp = @event.event_rsvps.find_by(user: current_user) %>
-              <% if user_rsvp %>
-                <span class="text-sm text-gray-500">
-                  Your RSVP: <span class="font-medium text-gray-700"><%= user_rsvp.status.capitalize %></span>, RSVPs closed
-                </span>
-              <% else %>
-                <span class="text-sm text-gray-500">RSVPs closed, they close 24 hours before the event</span>
-              <% end %>
+              <div class="rounded-xl border border-cream/15 bg-cream/5 px-4 py-3 text-sm text-cream/60 lg:text-right">
+                <% if user_rsvp %>
+                  You said <span class="font-semibold text-cream"><%= user_rsvp.status %></span>.
+                <% end %>
+                RSVPs closed 24 hours before the night.
+              </div>
             <% else %>
-              <span class="text-sm text-gray-500">Event has ended</span>
+              <div class="rounded-xl border border-cream/15 bg-cream/5 px-4 py-3 text-sm text-cream/60 lg:text-right">
+                This night has passed.
+              </div>
             <% end %>
 
-            <!-- Edit Button (for organizers/admins) -->
             <% if policy(@event).update? %>
-              <%= link_to "Edit Event", edit_society_event_path(@event.society, @event), 
-                  class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" %>
+              <%= link_to edit_society_event_path(@event.society, @event),
+                  class: "inline-flex items-center gap-2 self-start text-sm font-semibold text-cream/60 transition hover:text-cream lg:self-end" do %>
+                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"></path>
+                </svg>
+                Edit this event
+              <% end %>
             <% end %>
           <% else %>
-            <%= link_to "Sign In to RSVP", new_user_session_path, 
-                class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-whiskey-600 hover:bg-whiskey-700" %>
+            <%= link_to "Sign in to RSVP", new_user_session_path,
+                class: "inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400" %>
           <% end %>
         </div>
       </div>
@@ -131,7 +116,7 @@
   </div>
 
   <!-- Main Content -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mx-auto max-w-6xl px-6 py-10">
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
       <!-- Event Description -->
       <div class="lg:col-span-2">
@@ -157,39 +142,7 @@
 
       <!-- Sidebar -->
       <div class="space-y-6">
-        <!-- Yes Attendees -->
-        <% if @event.confirmed_attendees.any? %>
-          <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
-              <h2 class="text-lg font-semibold text-gray-900">Attending (Yes)</h2>
-            </div>
-            <div class="p-6">
-              <div class="space-y-3">
-                <% @event.confirmed_attendees.limit(10).each do |attendee| %>
-                  <%= link_to profile_path(attendee), class: "flex items-center space-x-3 hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors" do %>
-                    <% if attendee.has_profile_image? %>
-                      <img src="<%= attendee.profile_image_url %>" alt="<%= attendee.full_name %>" class="w-8 h-8 rounded-full">
-                    <% else %>
-                      <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium" style="background-color: <%= attendee.avatar_color %>;">
-                        <%= attendee.initials %>
-                      </div>
-                    <% end %>
-                    <div class="flex-1 min-w-0">
-                      <p class="text-sm font-medium text-gray-900 truncate"><%= attendee.full_name %></p>
-                    </div>
-                  <% end %>
-                <% end %>
-              </div>
-              <% if @event.confirmed_attendee_count > 10 %>
-                <div class="mt-4 pt-4 border-t border-gray-200">
-                  <p class="text-sm text-gray-500 text-center">
-                    And <%= @event.confirmed_attendee_count - 10 %> more attendees
-                  </p>
-                </div>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
+        <%= render "attendees", event: @event %>
 
         <!-- The deck (optional): shown to everyone; set by managers + host. -->
         <% if @event.presentation || (user_signed_in? && policy(@event).manage_deck?) %>
