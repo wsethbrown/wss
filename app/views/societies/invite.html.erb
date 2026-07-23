@@ -1,4 +1,6 @@
 <% content_for :title, "You're invited to #{@society.name} - Whiskey Share Society" %>
+<%# Cleaner headline for the link preview: og:site_name already says WSS. %>
+<% content_for :og_title, "You're invited to #{@society.name}" %>
 <%# The signed-out invite peek. The link is the invite, so the society gets
     to introduce itself, private ones included, but no member identities
     appear here. Signing up or in consumes the session token and joins. %>
@@ -12,6 +14,9 @@
      "You've been invited to join #{@society.name} on Whiskey Share Society." %>
 <% content_for :og_image, society_invite_card_url(@society.invite_token,
      v: SocietiesController.invite_card_cache_key(@society).split("/").last) %>
+<% content_for :og_image_width, Og::SocietyCard::W %>
+<% content_for :og_image_height, Og::SocietyCard::H %>
+<% content_for :og_image_type, "image/png" %>
 <div class="min-h-screen bg-whiskey-50">
   <div class="relative w-full overflow-hidden bg-char pt-16">
     <% if @society.banner_image.attached? %>

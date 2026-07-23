@@ -15,18 +15,39 @@
 
     <%# Link previews (Open Graph + Twitter). Pages override with
         content_for :title / :og_description / :og_image. %>
-    <% og_title = content_for(:title) || "Whiskey Share Society" %>
+    <%# Prefer an explicit :og_title so a page can give the link preview a
+        cleaner headline than the browser-tab <title>, which carries the
+        "- Whiskey Share Society" suffix that og:site_name already shows. %>
+    <% og_title = content_for(:og_title).presence || content_for(:title) || "Whiskey Share Society" %>
     <% og_description = content_for(:og_description).presence ||
          "Narrative tasting decks for whiskey nights that hold together, the research done, the script written, the bottles picked." %>
-    <% og_image = content_for(:og_image).presence || "#{request.base_url}/og-image.png" %>
+    <% og_image_override = content_for(:og_image).present? %>
+    <% og_image = og_image_override ? content_for(:og_image) : "#{request.base_url}/og-image.png" %>
+    <%# Dimensions only when we actually know them: the default card and the
+        invite card are both 1200x630, but a deck's featured image or a
+        society banner is arbitrary, so those pages set no size. Giving iMessage
+        the size lets it lay the card out without waiting on the image, which
+        is the difference between a rich preview and the bare-domain fallback. %>
+    <% og_w = content_for(:og_image_width).presence || (og_image_override ? nil : 1200) %>
+    <% og_h = content_for(:og_image_height).presence || (og_image_override ? nil : 630) %>
     <meta name="description" content="<%= og_description %>">
     <meta property="og:site_name" content="Whiskey Share Society">
     <meta property="og:type" content="website">
     <meta property="og:title" content="<%= og_title %>">
     <meta property="og:description" content="<%= og_description %>">
     <meta property="og:image" content="<%= og_image %>">
+    <% if og_w && og_h %>
+      <meta property="og:image:width" content="<%= og_w %>">
+      <meta property="og:image:height" content="<%= og_h %>">
+    <% end %>
+    <% if content_for(:og_image_type).present? %>
+      <meta property="og:image:type" content="<%= content_for(:og_image_type) %>">
+    <% end %>
     <meta property="og:url" content="<%= request.original_url %>">
     <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="<%= og_title %>">
+    <meta name="twitter:description" content="<%= og_description %>">
+    <meta name="twitter:image" content="<%= og_image %>">
 
     <%# Google Search Console ownership. Must stay in place to stay verified —
         removing it un-verifies the property (July 2026). %>

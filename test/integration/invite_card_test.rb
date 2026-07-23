@@ -37,9 +37,15 @@ class InviteCardTest < ActionDispatch::IntegrationTest
     stamp = SocietiesController.invite_card_cache_key(@society).split("/").last
     assert_select "meta[property='og:image'][content=?]",
                   society_invite_card_url(@society.invite_token, v: stamp)
-    assert_select "meta[property='og:title'][content=?]",
-                  "You're invited to Cask Strength Chapter - Whiskey Share Society"
+    # og:title drops the "- Whiskey Share Society" suffix the browser tab
+    # carries, since og:site_name already says it.
+    assert_select "meta[property='og:title'][content=?]", "You're invited to Cask Strength Chapter"
     assert_select "meta[property='og:description'][content=?]", "Neat, always."
+    # The size hints iMessage needs to render the card without waiting on it.
+    assert_select "meta[property='og:image:width'][content='1200']"
+    assert_select "meta[property='og:image:height'][content='630']"
+    assert_select "meta[name='twitter:image'][content=?]",
+                  society_invite_card_url(@society.invite_token, v: stamp)
   end
 
   # A private chapter can be previewed BECAUSE the token authorises it — the
