@@ -1,6 +1,13 @@
 class ApplicationController < ActionController::Base
-  # Only allow modern browsers supporting webp images, web push, badges, import maps, CSS nesting, and CSS :has.
-  allow_browser versions: :modern
+  # REMOVED `allow_browser versions: :modern` (2026-07-23). Its "modern"
+  # threshold 406'd real users: Safari 17 on both Mac and iPhone got a "browser
+  # not supported" page — a huge slice of a consumer audience locked out of the
+  # whole site. It also broke link previews: iMessage's fetcher is Safari-based,
+  # so it received the 406 (no OG tags) and rendered a bare-domain chip instead
+  # of the invite card. This is a progressively-enhanced Hotwire app; a slightly
+  # degraded experience on an old browser beats turning anyone away. If a
+  # browser floor is ever wanted again, set an explicit low version, never
+  # :modern, and confirm current Safari/iOS pass first.
 
   include Pundit::Authorization
   include ActivityLogger
