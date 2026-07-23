@@ -48,6 +48,13 @@ export default class extends Controller {
   }
 
   async fetch(q) {
+    // Ignore responses that arrive out of order. Focusing the field fires one
+    // fetch and typing fires another; on a slow connection the earlier request
+    // can resolve LAST and clobber the correct results with stale ones (that
+    // was the intermittent "member doesn't show" bug). Only the newest request
+    // is allowed to render.
+    const token = (this.requestToken = (this.requestToken || 0) + 1)
+
     let matches
     try {
       const response = await fetch(`${this.urlValue}?q=${encodeURIComponent(q)}`, {
@@ -57,7 +64,7 @@ export default class extends Controller {
       matches = await response.json()
     } catch { return }
 
-    this.render(matches)
+    if (token === this.requestToken) this.render(matches)
   }
 
   render(matches) {

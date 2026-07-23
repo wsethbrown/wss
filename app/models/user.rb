@@ -99,19 +99,30 @@ class User < ApplicationRecord
 
   # Instance methods
   def full_name
-    if first_name.present? && last_name.present?
-      "#{first_name} #{last_name}"
-    elsif first_name.present?
-      first_name
-    elsif last_name.present?
-      last_name
-    else
-      email.split("@").first.titleize
-    end
+    parts =
+      if first_name.present? && last_name.present?
+        "#{first_name} #{last_name}"
+      elsif first_name.present?
+        first_name
+      elsif last_name.present?
+        last_name
+      else
+        return email.split("@").first.titleize
+      end
+    self.class.gently_capitalize(parts)
   end
 
   def display_name
     full_name
+  end
+
+  # Capitalize the first letter of each word WITHOUT touching the rest, so a
+  # name typed in lowercase ("ethan frank") reads as "Ethan Frank" while an
+  # intentional inner capital survives ("McDonald", "d'Arcy" -> "D'Arcy").
+  # Names are derived, never stored, so this is display-only and reversible;
+  # matching everywhere is case-insensitive, so it can't change who matches.
+  def self.gently_capitalize(str)
+    str.to_s.split(" ").map { |word| word.sub(/\A[a-z]/, &:upcase) }.join(" ")
   end
 
   # Active Storage
