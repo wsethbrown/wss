@@ -15,6 +15,14 @@ class SocietyMembership < ApplicationRecord
   after_create :record_join_activity, if: :active?
   after_update :record_join_activity, if: -> { active? && saved_change_to_status? }
 
+  # However someone became a member — accepting the admin invitation, using the
+  # shareable link, or being added — any still-pending admin invitation for them
+  # is now moot. Resolving it here, at the one place every join lands, keeps a
+  # member from lingering in a society's "Awaiting reply" list. accept! already
+  # marks its own invitation, so this only catches the OTHER paths.
+  after_create :settle_pending_invitations, if: :active?
+  after_update :settle_pending_invitations, if: -> { active? && saved_change_to_status? }
+
   # Validations
   validates :user_id, uniqueness: { scope: :society_id, message: "is already a member of this society" }
   validates :role, presence: true, inclusion: { in: roles.keys }
@@ -48,5 +56,15 @@ class SocietyMembership < ApplicationRecord
 
   def record_join_activity
     SocietyActivity.record!(society: society, user: user, action: "joined")
+  end
+
+  # Quietly mark any pending admin invitation as accepted: update_all skips
+  # validations and callbacks on purpose, so it can't re-send the inviter the
+  # "they accepted" email — they joined another way, and the join itself is
+  # already recorded.
+  def settle_pending_invitations
+    resolved = society.society_invitations.pending.where(user_id: user_id)
+                      .update_all(status: "accepted", responded_at: Time.current)
+    Rails.logger.info "Society #{society_id}: #{resolved} pending invitation(s) settled by user #{user_id} joining" if resolved.positive?
   end
 end
