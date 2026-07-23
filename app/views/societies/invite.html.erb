@@ -12,7 +12,11 @@
     when the name or logo changes. %>
 <% content_for :og_description, @society.description.presence ||
      "You've been invited to join #{@society.name} on Whiskey Share Society." %>
-<% content_for :og_image, society_invite_card_url(@society.invite_token,
+<%# The .png extension matters for iMessage: Apple's LinkPresentation is
+    picky about an og:image URL with no file extension and a query string, and
+    silently drops the whole preview to a bare-domain chip. The route already
+    accepts the format; the action serves the same PNG either way. %>
+<% content_for :og_image, society_invite_card_url(@society.invite_token, format: :png,
      v: SocietiesController.invite_card_cache_key(@society).split("/").last) %>
 <% content_for :og_image_width, Og::SocietyCard::W %>
 <% content_for :og_image_height, Og::SocietyCard::H %>

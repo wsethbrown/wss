@@ -36,7 +36,7 @@ class InviteCardTest < ActionDispatch::IntegrationTest
 
     stamp = SocietiesController.invite_card_cache_key(@society).split("/").last
     assert_select "meta[property='og:image'][content=?]",
-                  society_invite_card_url(@society.invite_token, v: stamp)
+                  society_invite_card_url(@society.invite_token, format: :png, v: stamp)
     # og:title drops the "- Whiskey Share Society" suffix the browser tab
     # carries, since og:site_name already says it.
     assert_select "meta[property='og:title'][content=?]", "You're invited to Cask Strength Chapter"
@@ -45,7 +45,7 @@ class InviteCardTest < ActionDispatch::IntegrationTest
     assert_select "meta[property='og:image:width'][content='1200']"
     assert_select "meta[property='og:image:height'][content='630']"
     assert_select "meta[name='twitter:image'][content=?]",
-                  society_invite_card_url(@society.invite_token, v: stamp)
+                  society_invite_card_url(@society.invite_token, format: :png, v: stamp)
   end
 
   # A private chapter can be previewed BECAUSE the token authorises it — the
