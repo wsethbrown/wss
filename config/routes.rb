@@ -75,6 +75,9 @@ Rails.application.routes.draw do
 
   # Invite links: joining via a valid token works for private societies too.
   get "invite/:token", to: "societies#join_by_invite", as: :society_invite
+  # The link-preview card for an invite. Token-gated like the invite itself, so
+  # a private chapter's name and logo never leak to someone guessing an id.
+  get "invite/:token/card", to: "societies#invite_card", as: :society_invite_card
 
   # Societies
   resources :societies do

@@ -1,7 +1,7 @@
 class SocietiesController < ApplicationController
   include ActivityLogger
 
-  before_action :authenticate_user!, except: [ :index, :show, :join_by_invite ]
+  before_action :authenticate_user!, except: [ :index, :show, :join_by_invite, :invite_card ]
   before_action :set_society, only: [ :show, :edit, :update, :destroy ]
 
   # Society-specific authorization failures redirect back to the listing with a
@@ -155,6 +155,38 @@ class SocietiesController < ApplicationController
     log_activity(:society_joined, society)
     notify_society_admins_of_join(society, current_user)
     redirect_to society, notice: "Welcome to #{society.name}!"
+  end
+
+  # PNG link-preview card for an invite (Og::SocietyCard). Reached only with a
+  # valid invite token — the same key that authorises the peek — so it can show
+  # a private society's name and logo without leaking either to an id-guesser.
+  #
+  # Cached by a stamp of the name, logo and banner, so repeated scrapes don't
+  # recompose and any of those changing serves a fresh card. The scrapers'
+  # own caches are busted by the ?v= stamp the invite view appends.
+  def invite_card
+    society = Society.find_by(invite_token: params[:token])
+    unless society
+      Rails.logger.warn "Invite card requested for an unknown or rotated token"
+      head :not_found and return
+    end
+
+    png = Rails.cache.fetch(self.class.invite_card_cache_key(society), expires_in: 1.week) do
+      Rails.logger.info "Rendering invite card for society #{society.id}"
+      Og::SocietyCard.new(society).png
+    end
+
+    expires_in 1.hour, public: true
+    send_data png, type: "image/png", disposition: "inline"
+  end
+
+  # A stamp that changes with anything the card draws, so both our cache and
+  # the ?v= param bust together.
+  def self.invite_card_cache_key(society)
+    parts = [ society.id, society.name,
+              society.profile_picture.attached? ? society.profile_picture.blob.key : "-",
+              society.banner_image.attached? ? society.banner_image.blob.key : "-" ]
+    "invite_card/#{Digest::SHA256.hexdigest(parts.join('|'))[0, 16]}"
   end
 
   # Managers' member ledger: joins, leaves, removals, role changes, invites.

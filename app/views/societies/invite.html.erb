@@ -2,6 +2,16 @@
 <%# The signed-out invite peek. The link is the invite, so the society gets
     to introduce itself, private ones included, but no member identities
     appear here. Signing up or in consumes the session token and joins. %>
+
+<%# Rich link preview: a branded card with the chapter's name and logo instead
+    of a bare domain chip. Same veiling rule as the page itself — the invite
+    token authorises showing the name, private chapters included, and the card
+    endpoint is gated by that same token. The ?v= stamp busts a scraper's cache
+    when the name or logo changes. %>
+<% content_for :og_description, @society.description.presence ||
+     "You've been invited to join #{@society.name} on Whiskey Share Society." %>
+<% content_for :og_image, society_invite_card_url(@society.invite_token,
+     v: SocietiesController.invite_card_cache_key(@society).split("/").last) %>
 <div class="min-h-screen bg-whiskey-50">
   <div class="relative w-full overflow-hidden bg-char pt-16">
     <% if @society.banner_image.attached? %>
