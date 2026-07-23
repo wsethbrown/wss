@@ -187,7 +187,10 @@
             </div>
             <div class="p-6 space-y-4">
               <% if @event.host %>
-                <%= link_to profile_path(@event.host), class: "flex items-center space-x-3 hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors" do %>
+                <%# -mx-2 -mt-2, not -m-2: the hover highlight still bleeds to
+                    the card's top and sides, but stops at the row's bottom so it
+                    can't sit on the search field below it. %>
+                <%= link_to profile_path(@event.host), class: "flex items-center space-x-3 hover:bg-gray-50 rounded-lg p-2 -mx-2 -mt-2 transition-colors" do %>
                   <% if @event.host.has_profile_image? %>
                     <img src="<%= @event.host.profile_image_url %>" alt="<%= @event.host.full_name %>" class="w-8 h-8 rounded-full">
                   <% else %>
