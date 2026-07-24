@@ -16,8 +16,11 @@ module EventsHelper
       user = resolved[Regexp.last_match(1).downcase]
       next raw unless user
 
-      link_to("@#{user.handle}", profile_path(user),
-              class: "font-semibold text-whiskey-700 hover:text-whiskey-600")
+      # Discord-style: the body stores the compact @handle, but it renders as
+      # "@Display Name" in a subtle pill. link_to escapes the name, so a name
+      # with punctuation ("O'Brien") stays safe.
+      link_to("@#{user.full_name}", profile_path(user),
+              class: "mention-pill")
     }.html_safe
   end
 end

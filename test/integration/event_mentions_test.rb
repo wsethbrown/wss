@@ -42,14 +42,23 @@ class EventMentionsTest < ActionDispatch::IntegrationTest
     post_comment("Thanks for hosting @EthanFrank")
     get society_event_path(@society, @event)
 
-    assert_select "a[href=?]", profile_path(@ethan), text: "@EthanFrank"
+    assert_select "a[href=?]", profile_path(@ethan), text: "@Ethan Frank"
+  end
+
+  test "a mention renders as a display-name pill, not the compact handle" do
+    post_comment("cheers @EthanFrank")
+    get society_event_path(@society, @event)
+
+    assert_select "a.mention-pill[href=?]", profile_path(@ethan), text: "@Ethan Frank"
+    assert_select "a.mention-pill", text: "@ethanfrank", count: 0,
+                  msg: "the run-together handle must not be what's shown"
   end
 
   test "matching is case-insensitive but renders the member's real handle" do
     post_comment("cheers @ethanfrank")
     get society_event_path(@society, @event)
 
-    assert_select "a[href=?]", profile_path(@ethan), text: "@EthanFrank"
+    assert_select "a[href=?]", profile_path(@ethan), text: "@Ethan Frank"
   end
 
   test "a handle nobody has stays plain text and notifies nobody" do
@@ -106,7 +115,7 @@ class EventMentionsTest < ActionDispatch::IntegrationTest
 
     assert_no_match "<script>alert(1)</script>", response.body
     assert_match "&lt;script&gt;", response.body
-    assert_select "a[href=?]", profile_path(@ethan), text: "@EthanFrank"
+    assert_select "a[href=?]", profile_path(@ethan), text: "@Ethan Frank"
   end
 
   test "the mention endpoint offers taggable members to a commenter" do
