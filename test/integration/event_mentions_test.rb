@@ -118,6 +118,13 @@ class EventMentionsTest < ActionDispatch::IntegrationTest
     assert_select "a[href=?]", profile_path(@ethan), text: "@Ethan Frank"
   end
 
+  test "the comment box wires up keyboard mention completion" do
+    sign_in @author
+    get society_event_path(@society, @event)
+    assert_select "textarea[data-action*=?]", "keydown->mention-autocomplete#keydown",
+                  msg: "without the keydown binding, Tab/Enter can't complete a mention"
+  end
+
   test "the mention endpoint offers taggable members to a commenter" do
     sign_in @author
     get mention_options_society_event_path(@society, @event), params: { q: "eth" }

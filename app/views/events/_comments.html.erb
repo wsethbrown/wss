@@ -49,7 +49,7 @@
           <textarea name="event_comment[body]" rows="2" required maxlength="2000"
                     placeholder="Say something about this night… type @ to tag a member"
                     data-mention-autocomplete-target="input"
-                    data-action="input->mention-autocomplete#type click->mention-autocomplete#type"
+                    data-action="input->mention-autocomplete#type click->mention-autocomplete#type keydown->mention-autocomplete#keydown"
                     class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500"></textarea>
           <div data-mention-autocomplete-target="results"
                class="absolute inset-x-0 top-full z-20 mt-1 hidden max-h-56 overflow-y-auto rounded-lg border border-gray-200 bg-white shadow-lg"></div>

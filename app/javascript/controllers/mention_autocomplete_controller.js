@@ -54,10 +54,16 @@ export default class extends Controller {
     this.resultsTarget.textContent = ""
     if (!matches.length) { this.hide(); return }
 
-    for (const match of matches) {
+    this.matches = matches
+    this.rows = []
+    // The top match is highlighted by default, so Tab/Enter completes it with
+    // no arrowing — the common case is "type a few letters, tab, done".
+    this.activeIndex = 0
+
+    matches.forEach((match, index) => {
       const row = document.createElement("button")
       row.type = "button"
-      row.className = "block w-full px-3 py-2 text-left text-sm hover:bg-whiskey-50"
+      row.className = "block w-full px-3 py-2 text-left text-sm"
 
       // createElement/textContent throughout: these are member-supplied names
       // being rendered next to a comment box, never innerHTML.
@@ -75,10 +81,54 @@ export default class extends Controller {
         event.preventDefault()
         this.insert(match.handle)
       })
+      // Hovering moves the highlight, so mouse and keyboard agree on "active".
+      row.addEventListener("mousemove", () => this.highlight(index))
+      this.rows.push(row)
       this.resultsTarget.appendChild(row)
-    }
+    })
 
+    this.highlight(0)
     this.resultsTarget.classList.remove("hidden")
+  }
+
+  // Keyboard nav while the menu is open. When it's closed, every key falls
+  // through untouched — Tab still moves focus, Enter still adds a newline.
+  keydown(event) {
+    if (!this.open) return
+
+    switch (event.key) {
+      case "ArrowDown":
+        event.preventDefault()
+        this.highlight((this.activeIndex + 1) % this.rows.length)
+        break
+      case "ArrowUp":
+        event.preventDefault()
+        this.highlight((this.activeIndex - 1 + this.rows.length) % this.rows.length)
+        break
+      case "Tab":
+      case "Enter":
+        // Complete the highlighted match. preventDefault stops Tab leaving the
+        // box and stops Enter inserting a newline — but only with the menu up.
+        event.preventDefault()
+        this.insert(this.matches[this.activeIndex].handle)
+        break
+      case "Escape":
+        event.preventDefault()
+        this.hide()
+        break
+    }
+  }
+
+  highlight(index) {
+    this.activeIndex = index
+    this.rows.forEach((row, i) => {
+      row.classList.toggle("bg-whiskey-100", i === index)
+      row.classList.toggle("bg-transparent", i !== index)
+    })
+  }
+
+  get open() {
+    return this.hasResultsTarget && !this.resultsTarget.classList.contains("hidden") && this.rows?.length > 0
   }
 
   insert(handle) {
