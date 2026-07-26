@@ -58,7 +58,7 @@
 
     <div class="divide-y divide-gray-100 rounded-2xl border border-gray-200 bg-white shadow-sm">
       <% @bottles.each do |bottle| %>
-        <%= link_to bottle_path(bottle), class: "flex items-center justify-between gap-4 px-5 py-4 transition hover:bg-whiskey-50" do %>
+        <%= link_to bottle_path(bottle), class: "flex items-center justify-between gap-4 px-4 py-2 transition hover:bg-whiskey-50" do %>
           <div class="flex items-center gap-3">
             <%= render "bottles/identity_tile", bottle: bottle, tone: :light, size: :sm %>
             <div class="min-w-0">
