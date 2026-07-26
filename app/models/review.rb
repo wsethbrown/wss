@@ -12,6 +12,9 @@ class Review < ApplicationRecord
 
   has_many_attached :images do |attachable|
     attachable.variant :thumb, resize_to_fill: [ 400, 400 ], saver: { quality: 80 }
+    # A review photo can BE a bottle's display_image, so it needs the same
+    # portrait variant the identity tile asks for.
+    attachable.variant :portrait, resize_to_fill: [ 320, 400 ], saver: { quality: 80 }
   end
 
   validates :rating, presence: true, inclusion: { in: VALID_RATINGS }

@@ -1,0 +1,21 @@
+<%# locals: bottle
+    The bottle's photo in a dark identity band (bottle show, review show).
+
+    PORTRAIT, not square: a bottle is tall, and a square crop of a phone
+    snapshot spends most of the frame on the counter behind it.
+
+    It sits directly on the char surface behind a hairline ring, with NO cream
+    backing plate. The plate read as a sticker stuck on the dark band, and per
+    the design system's de-carding rule it was a second elevated surface the
+    masthead didn't need. Same footprint whether there's a photo or the drawn
+    placeholder, so two bottles side by side always agree. %>
+<div class="shrink-0 overflow-hidden rounded-xl bg-oak ring-1 ring-cream/15">
+  <% if bottle.display_image %>
+    <%= image_tag bottle.display_image.variant(:portrait),
+        class: "h-20 w-16 object-cover", alt: bottle.name %>
+  <% else %>
+    <div class="flex h-20 w-16 items-center justify-center">
+      <%= render "bottles/placeholder", bottle: bottle, size: "h-14", tone: :dark %>
+    </div>
+  <% end %>
+</div>

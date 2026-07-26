@@ -6,11 +6,16 @@ class Bottle < ApplicationRecord
   has_many :reviews, dependent: :destroy
   has_many :bottle_edits, dependent: :destroy
 
+  # :thumb is the square crop for list rows. :portrait is for identity bands —
+  # a bottle is tall, and a square crop of a phone snapshot spends most of the
+  # frame on whatever was behind it rather than the bottle.
   has_one_attached :pinned_label_image do |attachable|
     attachable.variant :thumb, resize_to_fill: [ 400, 400 ], saver: { quality: 80 }
+    attachable.variant :portrait, resize_to_fill: [ 320, 400 ], saver: { quality: 80 }
   end
   has_one_attached :label_image do |attachable|
     attachable.variant :thumb, resize_to_fill: [ 400, 400 ], saver: { quality: 80 }
+    attachable.variant :portrait, resize_to_fill: [ 320, 400 ], saver: { quality: 80 }
   end
 
   validates :name, presence: true, length: { maximum: 200 }
