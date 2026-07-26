@@ -1,21 +1,33 @@
-<%# locals: bottle
-    The bottle's photo in a dark identity band (bottle show, review show).
+<%# locals: bottle, (optional) tone (:dark default, :light), (optional) size (:md default, :sm)
+    The one way a bottle's photo is shown anywhere: identity bands and list rows.
 
     PORTRAIT, not square: a bottle is tall, and a square crop of a phone
     snapshot spends most of the frame on the counter behind it.
 
-    It sits directly on the char surface behind a hairline ring, with NO cream
-    backing plate. The plate read as a sticker stuck on the dark band, and per
-    the design system's de-carding rule it was a second elevated surface the
-    masthead didn't need. Same footprint whether there's a photo or the drawn
-    placeholder, so two bottles side by side always agree. %>
-<div class="shrink-0 overflow-hidden rounded-xl bg-oak ring-1 ring-cream/15">
+    No backing plate. On the dark bands the old cream plate read as a sticker
+    stuck on top, and per the design system's de-carding rule it was a second
+    elevated surface. The tile sits on the surface behind a hairline ring
+    instead, and the drawn placeholder occupies the same footprint so two
+    bottles side by side always agree.
+
+    tone: matches the ground it sits on. size: :md for identity bands, :sm for
+    list rows, where it should fill the row rather than float in it. Both keep
+    the same 4:5 portrait. %>
+<%
+  dark = local_assigns.fetch(:tone, :dark) == :dark
+  small = local_assigns.fetch(:size, :md) == :sm
+  # Literal class strings — Tailwind can't see interpolated fragments.
+  box = small ? "h-16 w-12" : "h-20 w-16"
+  skin = dark ? "bg-oak ring-cream/15" : "bg-whiskey-50 ring-gray-200"
+%>
+<div class="shrink-0 overflow-hidden rounded-xl ring-1 <%= skin %>">
   <% if bottle.display_image %>
     <%= image_tag bottle.display_image.variant(:portrait),
-        class: "h-20 w-16 object-cover", alt: bottle.name %>
+        class: "#{box} object-cover", alt: bottle.name %>
   <% else %>
-    <div class="flex h-20 w-16 items-center justify-center">
-      <%= render "bottles/placeholder", bottle: bottle, size: "h-14", tone: :dark %>
+    <div class="flex <%= box %> items-center justify-center">
+      <%= render "bottles/placeholder", bottle: bottle,
+          size: (small ? "h-12" : "h-14"), tone: (dark ? :dark : :light) %>
     </div>
   <% end %>
 </div>

@@ -60,11 +60,7 @@
       <% @bottles.each do |bottle| %>
         <%= link_to bottle_path(bottle), class: "flex items-center justify-between gap-4 px-5 py-4 transition hover:bg-whiskey-50" do %>
           <div class="flex items-center gap-3">
-            <% if bottle.display_image %>
-              <%= image_tag bottle.display_image.variant(:thumb), class: "h-10 w-10 shrink-0 rounded-lg object-cover" %>
-            <% else %>
-              <%= render "bottles/placeholder", bottle: bottle, size: "h-10" %>
-            <% end %>
+            <%= render "bottles/identity_tile", bottle: bottle, tone: :light, size: :sm %>
             <div class="min-w-0">
               <h2 class="truncate font-display text-lg font-semibold text-gray-900"><%= bottle.name %></h2>
               <p class="mt-1 truncate text-sm">
