@@ -105,7 +105,7 @@ gem "stripe", "~> 10.0"
 gem "redcarpet", "~> 3.6"
 
 # Reading .pptx files for deck import (a .pptx is a zip of XML)
-gem "rubyzip", "~> 2.3", require: "zip"
+gem "rubyzip", "~> 3.4", require: "zip"
 
 gem "lograge", "~> 0.15.0"
 gem "sentry-ruby", "~> 6.6"
