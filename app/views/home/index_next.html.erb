@@ -12,6 +12,9 @@
   # ?hero=stage swaps the stacked slides for one large slide on a colour panel
   # that plays through the free-preview slides.
   stage = params[:hero] == "stage"
+  # ?hero=strip: a full-width masthead in the nav colour, with the preview
+  # slides as one swipeable row that sits across the masthead's lower edge.
+  strip = params[:hero] == "strip"
   showcase_slides =
     if @showcase_deck
       @showcase_deck.slide_images.order(:id).first(@showcase_deck.effective_preview_slide_count)
@@ -133,6 +136,30 @@
       .hn .deck { grid-template-columns: 1fr 220px auto; }
       .hn .deck .meta { grid-column: auto; }
     }
+    /* Hero "strip": masthead in the nav colour; slides straddle its lower edge. */
+    .hn { --pad: 24px; }
+    .hn .mast { background: linear-gradient(to bottom, var(--ink) 0, var(--ink) calc(100% - var(--under)), var(--bone) calc(100% - var(--under)));
+                --under: calc(min(600px, 82vw) * .5625 * .42 + 104px); color: var(--bone); padding: 124px 0 56px; }
+    .hn .mast h1 { font-size: clamp(3rem, 9.4vw, 8.75rem); }
+    .hn .mast-row { display: grid; gap: 28px; margin-top: 28px; }
+    .hn .mast .lede { color: var(--bone); opacity: .85; }
+    .hn .mast .link { border-color: var(--bone); }
+    .hn .mast .hero-note { color: var(--bone); opacity: .6; margin-top: 18px; }
+    .hn .strip-wrap { container-type: inline-size; margin-top: 56px; }
+    .hn .strip { display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
+                 padding: 0 max(var(--pad), calc((100cqw - 1240px) / 2 + var(--pad))) 40px;
+                 scroll-padding-left: max(var(--pad), calc((100cqw - 1240px) / 2 + var(--pad))); }
+    .hn .strip::-webkit-scrollbar { display: none; }
+    .hn .strip a { flex: none; width: min(600px, 82vw); scroll-snap-align: start; box-shadow: 0 26px 44px -22px rgba(0, 0, 0, .6); }
+    .hn .strip img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
+    .hn .strip-cap { display: flex; justify-content: space-between; gap: 16px; font-size: 14px; color: var(--mute); margin-top: -16px; }
+    .hn .strip-cap a { color: var(--ink); font-weight: 600; }
+    @media (min-width: 900px) {
+      .hn { --pad: 40px; }
+      .hn .mast { padding-top: 152px; }
+      .hn .mast-row { grid-template-columns: minmax(0, 34em) auto; justify-content: space-between; align-items: end; }
+    }
+
     /* Hero "stage": one slide on a colour panel, playing through the preview slides. */
     .hn .stage { background: var(--ink); margin: 0 -24px; padding: 28px 24px 22px; }
     .hn figure.stage a { padding: 0; }
@@ -183,6 +210,38 @@
 <% end %>
 
 <div class="hn <%= 'hn--g' if green %> <%= 'hn--b' if look_b %>">
+  <% if strip && showcase_slides.any? %>
+  <section class="mast">
+    <div class="wrap">
+      <h1>Every pour has <em>a story.</em></h1>
+      <div class="mast-row">
+        <p class="lede">Narrative tasting decks for whiskey nights that hold together, the research done, the script written, the bottles picked.</p>
+        <div>
+          <div class="hero-cta" style="margin-top:0">
+            <%= link_to "Browse the decks", presentations_path, class: "btn btn--bone" %>
+            <a href="#how-it-works" class="link">See how it works</a>
+          </div>
+          <p class="hero-note">One credit a month with membership · Or buy any deck outright</p>
+        </div>
+      </div>
+    </div>
+    <div class="strip-wrap">
+      <div class="strip">
+        <% showcase_slides.each_with_index do |slide, i| %>
+          <%= link_to presentation_path(@showcase_deck), aria: { label: "#{@showcase_deck.title}, slide #{i + 1}" } do %>
+            <%= image_tag slide, alt: "Slide #{i + 1} of #{@showcase_deck.title}", loading: (i.zero? ? "eager" : "lazy") %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+    <div class="wrap">
+      <p class="strip-cap">
+        <%= link_to @showcase_deck.title, presentation_path(@showcase_deck) %>
+        <span><%= [ "#{@showcase_deck.slide_images.count} slides", @showcase_deck.duration.presence ].compact.join(" · ") %></span>
+      </p>
+    </div>
+  </section>
+  <% else %>
   <!-- Hero -->
   <section class="hero">
     <div class="wrap">
@@ -239,6 +298,7 @@
       </div>
     </div>
   </section>
+  <% end %>
 
   <!-- How it works -->
   <section id="how-it-works" class="band">
