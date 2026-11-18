@@ -1,10 +1,19 @@
 class HomeController < ApplicationController
+  include DesignPreview
+
   def index
     # Fetch Stripe products for pricing display
     @stripe_products = fetch_stripe_products
     @featured_presentations = Presentation.published.recent.limit(3)
     # The one deck to spotlight right now: the most recently featured published deck.
     @spotlight_deck = Presentation.published.featured.recent.first
+
+    if render_next_design?
+      # Preview homepage shows real rendered slides from the newest deck that has them.
+      @showcase_deck = Presentation.published.recent.joins(:slide_images_attachments).distinct.first
+      Rails.logger.info "Home: rendering next-design preview (showcase deck #{@showcase_deck&.id || 'none'})"
+      render "index_next"
+    end
   end
 
   # Standalone membership page: the "start your own whiskey club" pitch plus

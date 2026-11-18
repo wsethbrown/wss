@@ -1,0 +1,284 @@
+<%# PREVIEW homepage — rendered only with ?design=next (see DesignPreview).
+    A shorter, light, image-led page on a neutral ink/bone palette with the
+    logo's orange as the only accent. Copy is reused from the live homepage
+    wherever possible; the styles are scoped to .hn so nothing leaks into the
+    live design. Promote by renaming over index.html.erb once approved. %>
+<%
+  showcase_slides =
+    if @showcase_deck
+      @showcase_deck.slide_images.order(:id).first(@showcase_deck.effective_preview_slide_count)
+    else
+      []
+    end
+  steps = [
+    [ "Pick a deck", "Browse the library and choose the story you want to tell, bourbon, scotch, rye, or something stranger. Filter by difficulty and budget." ],
+    [ "Gather your society", "Start a private society for your friends or join a public one near you. Schedule the night, share the link, and RSVPs take care of themselves." ],
+    [ "Pour and present", "Follow the thread from first nose to final pour. The script keeps the room moving; the tasting notes keep it honest." ]
+  ]
+  rules = [
+    "One presenter a month, everyone takes a turn.",
+    "Research your topic like you mean it.",
+    "Choose the bottles that belong to the story.",
+    "No dry fact sheets. Follow the narrative threads."
+  ]
+  faqs = [
+    [ "What if I'm a complete whiskey beginner?", "Perfect. The decks are written for every experience level. Start with something like Bourbon Basics: the script covers the fundamentals and makes you sound like you've done this before, because the research already has." ],
+    [ "How long is a deck?", "Most run 15–20 minutes, built for a relaxed evening. The structure bends: linger on a tasting when the room is into it, or trim sections for a casual night." ],
+    [ "What equipment do I need?", "Glasses, water for rinsing, and the bottles from the deck's list. Tasting mats and notes come as downloadable PDFs. Nothing fancy required." ],
+    [ "Can I customize a deck?", "Yes. Swap bottles for budget or availability, skip sections, add your own chapter. Decks are guides with a spine, not scripts you owe obedience to." ],
+    [ "How much do the whiskeys cost?", "Every deck recommends bottles across price ranges. You can host a full tasting for $60–80 total, or go deep with bottles north of $200, there's a version of the night for both." ],
+    [ "What's the Century badge?", "The amber star beside certain tasters and societies. It marks anyone followed by 100 or more members, a signal that the room trusts their palate. There's no fee and no application: reach a hundred followers and it appears." ]
+  ]
+%>
+
+<% content_for :head do %>
+  <style>
+    /* Preview-only: carry the neutral palette into the shared nav and footer. */
+    nav.fixed, nav.fixed details > div, footer { background-color: #121211 !important; border-color: #2b2a28 !important; }
+    nav.fixed a.bg-whiskey-500 { background-color: #f3f0ea !important; color: #121211 !important; border-radius: 999px; }
+    footer .text-whiskey-400, footer .text-whiskey-300 { color: #ff6d00 !important; }
+
+    .hn { --ink: #121211; --bone: #f3f0ea; --line: #d9d5cc; --mute: #6b6a66; --accent: #ff6d00;
+          background: var(--bone); color: var(--ink); font-family: "Instrument Sans", system-ui, sans-serif; }
+    .hn *, .hn *::before { box-sizing: border-box; }
+    .hn .wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+    .hn .label { font-size: 13px; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--mute); }
+    .hn .label::before { content: ""; display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--accent); margin-right: 10px; }
+    .hn h1 { font-weight: 600; font-size: clamp(2.75rem, 7.2vw, 6.25rem); line-height: .96; letter-spacing: -.045em; text-wrap: balance; }
+    .hn h1 em, .hn h2 em { font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: -.03em; }
+    .hn h2 { font-weight: 600; font-size: clamp(2rem, 4vw, 3.25rem); line-height: 1.02; letter-spacing: -.035em; text-wrap: balance; }
+    .hn p { text-wrap: pretty; }
+    .hn .lede { font-size: clamp(1.125rem, 1.5vw, 1.375rem); line-height: 1.5; color: #3b3a37; max-width: 34em; }
+    .hn .btn { display: inline-flex; align-items: center; min-height: 48px; padding: 0 24px; border-radius: 999px; background: var(--ink); color: var(--bone); font-weight: 600; font-size: 16px; transition: background .15s; }
+    .hn .btn:hover { background: #33322f; }
+    .hn .btn--bone { background: var(--bone); color: var(--ink); }
+    .hn .btn--bone:hover { background: #fff; }
+    .hn .link { display: inline-flex; align-items: center; min-height: 48px; font-weight: 600; border-bottom: 1.5px solid var(--ink); min-height: 0; padding-bottom: 2px; }
+    .hn .link:hover { border-color: var(--accent); }
+    .hn a:focus-visible, .hn summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
+
+    .hn .hero { padding: 132px 0 72px; }
+    .hn .hero-grid { display: grid; gap: 48px; align-items: end; }
+    .hn .hero-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; margin-top: 36px; }
+    .hn .hero-note { margin-top: 28px; font-size: 14px; color: var(--mute); }
+    .hn figure { margin: 0; }
+    .hn .slide { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--ink); }
+    .hn figcaption { display: flex; justify-content: space-between; gap: 16px; margin-top: 12px; font-size: 14px; color: var(--mute); }
+    .hn .thumbs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 12px; }
+
+    .hn section + section { border-top: 1px solid var(--line); }
+    .hn .band { padding: 88px 0; }
+    .hn .split { display: grid; gap: 40px; }
+    .hn .steps { display: grid; gap: 0; margin-top: 8px; }
+    .hn .step { padding: 28px 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: 56px 1fr; }
+    .hn .step b { font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-weight: 400; font-size: 28px; line-height: 1; color: var(--accent); }
+    .hn .step h3 { font-size: 22px; font-weight: 600; letter-spacing: -.02em; }
+    .hn .step p { margin-top: 8px; color: #3b3a37; font-size: 17px; line-height: 1.55; max-width: 36em; }
+
+    .hn .decks { margin-top: 40px; border-top: 1px solid var(--ink); }
+    .hn .deck { display: grid; grid-template-columns: 1fr auto; gap: 8px 24px; align-items: baseline; padding: 24px 0; border-bottom: 1px solid var(--line); transition: padding .15s; }
+    .hn .deck:hover { padding-left: 12px; }
+    .hn .deck h3 { font-size: clamp(1.5rem, 2.6vw, 2.25rem); font-weight: 600; letter-spacing: -.03em; line-height: 1.08; }
+    .hn .deck .meta { grid-column: 1; font-size: 14px; color: var(--mute); }
+    .hn .deck .price { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
+
+    .hn .dark { background: var(--ink); color: var(--bone); border-top: 0; }
+    .hn .dark + section { border-top: 0; }
+    .hn .dark .label { color: #a3a19b; }
+    .hn .dark .lede { color: #cfccc4; }
+    .hn .rules { list-style: none; margin: 0; padding: 0; counter-reset: r; }
+    .hn .rules li { counter-increment: r; display: grid; grid-template-columns: 48px 1fr; padding: 20px 0; border-top: 1px solid #33322f; font-size: clamp(1.25rem, 2vw, 1.625rem); letter-spacing: -.02em; line-height: 1.25; }
+    .hn .rules li::before { content: counter(r); font-family: "Source Serif 4", Georgia, serif; font-style: italic; color: var(--accent); }
+
+    .hn .pair { display: grid; gap: 56px; }
+    .hn .pair p { margin-top: 16px; color: #3b3a37; font-size: 17px; line-height: 1.6; max-width: 34em; }
+    .hn .pair .link { margin-top: 24px; }
+
+    .hn .plans { margin-top: 32px; border-top: 1px solid var(--ink); }
+    .hn .plan { display: grid; grid-template-columns: 1fr auto; align-items: baseline; padding: 18px 0; border-bottom: 1px solid var(--line); font-size: 18px; }
+    .hn .plan span:last-child { font-weight: 600; font-variant-numeric: tabular-nums; }
+    .hn .plan small { color: var(--mute); font-weight: 400; font-size: 14px; }
+
+    .hn details { border-top: 1px solid var(--line); }
+    .hn details:last-child { border-bottom: 1px solid var(--line); }
+    .hn summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 24px; padding: 20px 0; font-size: 18px; font-weight: 600; letter-spacing: -.01em; }
+    .hn summary::-webkit-details-marker { display: none; }
+    .hn summary::after { content: "+"; font-weight: 400; color: var(--mute); }
+    .hn details[open] summary::after { content: "–"; }
+    .hn details p { padding: 0 0 24px; color: #3b3a37; font-size: 17px; line-height: 1.6; max-width: 40em; }
+
+    @media (min-width: 900px) {
+      .hn .wrap { padding: 0 40px; }
+      .hn .hero { padding: 168px 0 96px; }
+      .hn .hero-grid { grid-template-columns: 1.05fr 1fr; gap: 64px; }
+      .hn .hero-grid.solo { grid-template-columns: 1fr; }
+      .hn .band { padding: 120px 0; }
+      .hn .split { grid-template-columns: 1fr 1.4fr; gap: 80px; }
+      .hn .pair { grid-template-columns: 1fr 1fr; gap: 80px; }
+      .hn .deck { grid-template-columns: 1fr 220px auto; }
+      .hn .deck .meta { grid-column: auto; }
+    }
+    @media (prefers-reduced-motion: reduce) { .hn * { transition: none !important; } }
+  </style>
+<% end %>
+
+<div class="hn">
+  <!-- Hero -->
+  <section class="hero">
+    <div class="wrap">
+      <div class="hero-grid <%= 'solo' if showcase_slides.empty? %>">
+        <div>
+          <p class="label">The Whiskey Share Society · Est. 2019</p>
+          <h1 style="margin-top:24px">Every pour has <em>a story.</em></h1>
+          <p class="lede" style="margin-top:28px">Narrative tasting decks for whiskey nights that hold together, the research done, the script written, the bottles picked.</p>
+          <div class="hero-cta">
+            <%= link_to "Browse the decks", presentations_path, class: "btn" %>
+            <a href="#how-it-works" class="link">See how it works</a>
+          </div>
+          <p class="hero-note">One credit a month with membership · Or buy any deck outright</p>
+        </div>
+
+        <% if showcase_slides.any? %>
+          <%# Real slides from a real deck, limited to its free preview slides. %>
+          <figure>
+            <%= link_to presentation_path(@showcase_deck) do %>
+              <%= image_tag showcase_slides.first, alt: "Opening slide of #{@showcase_deck.title}", class: "slide" %>
+              <% if showcase_slides.size >= 3 %>
+                <div class="thumbs">
+                  <% showcase_slides[1, 2].each_with_index do |slide, i| %>
+                    <%= image_tag slide, alt: "Slide #{i + 2} of #{@showcase_deck.title}", class: "slide", loading: "lazy" %>
+                  <% end %>
+                </div>
+              <% end %>
+            <% end %>
+            <figcaption>
+              <span><%= @showcase_deck.title %></span>
+              <span><%= [ "#{@showcase_deck.slide_images.count} slides", @showcase_deck.duration.presence ].compact.join(" · ") %></span>
+            </figcaption>
+          </figure>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- How it works -->
+  <section id="how-it-works" class="band">
+    <div class="wrap split">
+      <div>
+        <p class="label">How it works</p>
+        <h2 style="margin-top:20px">From bottle to story in <em>three steps.</em></h2>
+      </div>
+      <div class="steps">
+        <% steps.each_with_index do |(title, body), i| %>
+          <div class="step">
+            <b><%= i + 1 %></b>
+            <div>
+              <h3><%= title %></h3>
+              <p><%= body %></p>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Latest decks, as a list -->
+  <% if @featured_presentations.any? %>
+    <section class="band">
+      <div class="wrap">
+        <div style="display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap">
+          <div>
+            <p class="label">From the library</p>
+            <h2 style="margin-top:20px">Latest decks</h2>
+          </div>
+          <%= link_to "See the full library", presentations_path, class: "link" %>
+        </div>
+        <div class="decks">
+          <% @featured_presentations.each do |deck| %>
+            <%= link_to presentation_path(deck), class: "deck" do %>
+              <h3><%= deck.title %></h3>
+              <span class="meta"><%= [ deck.category.presence, deck.difficulty.presence, deck.duration.presence ].compact.join(" · ") %></span>
+              <span class="price"><%= deck.price.to_f.zero? ? "Free" : number_to_currency(deck.price) %></span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </section>
+  <% end %>
+
+  <!-- Origin -->
+  <section class="band dark">
+    <div class="wrap split">
+      <div>
+        <p class="label">Why we exist</p>
+        <h2 style="margin-top:20px">Born from a <em>monthly ritual.</em></h2>
+        <p class="lede" style="margin-top:28px">The first Whiskey Share Society started as a circle of friends in 2019. Each month one of us drew a topic, did the research, bought the bottles, and told its story over a deck of slides.</p>
+        <div style="margin-top:32px"><%= link_to "Find your society", societies_path, class: "btn btn--bone" %></div>
+      </div>
+      <div>
+        <p class="label">House rules</p>
+        <ol class="rules" style="margin-top:20px">
+          <% rules.each do |rule| %><li><span><%= rule %></span></li><% end %>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- Societies + tasting record -->
+  <section class="band">
+    <div class="wrap pair">
+      <div>
+        <p class="label">The company you keep</p>
+        <h2 style="margin-top:20px">Societies</h2>
+        <p>Societies are how those spaces organize: public ones open to new members, private ones that run on invitations, each with its own calendar of tasting nights and its own record of every pour the room has judged.</p>
+        <%= link_to "Browse societies", societies_path, class: "link" %>
+      </div>
+      <div>
+        <p class="label">The pours, on the record</p>
+        <h2 style="margin-top:20px">The tasting record</h2>
+        <p>Every bottle the society tastes gets written down, nose, palate, finish, price, and personal thoughts, in a record you can search by bottle, distillery, or the flavor you're chasing.</p>
+        <%= link_to "Read the record", reviews_path, class: "link" %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Membership: live prices as a list, detail on /membership -->
+  <section id="pricing" class="band">
+    <div class="wrap split">
+      <div>
+        <p class="label">Membership</p>
+        <h2 style="margin-top:20px">Choose <em>your pour.</em></h2>
+      </div>
+      <div>
+        <p class="lede">One membership, three ways to pay it. Every plan unlocks the same thing, a deck credit every month and a society of your own.</p>
+        <div class="plans">
+          <% @stripe_products.each do |product| %>
+            <div class="plan">
+              <span><%= product[:name].to_s.gsub(" Membership", "") %></span>
+              <span>$<%= sprintf("%.2f", product[:price] / 100.0) %> <small>/mo</small></span>
+            </div>
+          <% end %>
+        </div>
+        <div style="margin-top:32px"><%= link_to "See the plans", membership_path, class: "btn" %></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section id="faq" class="band">
+    <div class="wrap split">
+      <div>
+        <p class="label">Before you pour</p>
+        <h2 style="margin-top:20px">Questions, answered.</h2>
+      </div>
+      <div>
+        <% faqs.each do |q, a| %>
+          <details>
+            <summary><%= q %></summary>
+            <p><%= a %></p>
+          </details>
+        <% end %>
+      </div>
+    </div>
+  </section>
+</div>
