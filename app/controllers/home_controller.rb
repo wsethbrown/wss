@@ -11,6 +11,10 @@ class HomeController < ApplicationController
     if render_next_design?
       # Preview homepage shows real rendered slides from the newest deck that has them.
       @showcase_deck = Presentation.published.recent.joins(:slide_images_attachments).distinct.first
+      # Real public data for the step tiles: the next tasting night at a public
+      # society and the top-rated bottles, the same rows /reviews shows everyone.
+      @next_event = Event.upcoming.joins(:society).where(societies: { is_private: false }).includes(:society).first
+      @top_bottles = Bottle.with_score.where("agg.reviewers > 0").order(Arel.sql(Bottle::SORTS.fetch("top"))).limit(3)
       Rails.logger.info "Home: rendering next-design preview (showcase deck #{@showcase_deck&.id || 'none'})"
       render "index_next"
     end

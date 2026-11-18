@@ -9,7 +9,7 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
   test "design=next preview is hidden from visitors" do
     get root_path(design: "next")
     assert_response :success
-    assert_select "div.hn", 0
+    assert_select "div.hm", 0
   end
 
   test "design=next preview renders for admins" do
@@ -18,8 +18,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     sign_in admin
     get root_path(design: "next")
     assert_response :success
-    assert_select "div.hn h1", /Every pour has/
-    assert_select "div.hn section.sl", 7
+    assert_select "div.hm h1", /Every pour has/
+    assert_select "div.hm .tile", 3
   end
 
   test "should load stripe products for pricing display" do
