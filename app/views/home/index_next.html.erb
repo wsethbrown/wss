@@ -1,31 +1,22 @@
 <%# PREVIEW homepage — rendered only with ?design=next (see DesignPreview).
-    A shorter, light, image-led page on a neutral ink/bone palette with the
-    logo's orange as the only accent. Copy is reused from the live homepage
-    wherever possible; the styles are scoped to .hn so nothing leaks into the
-    live design. Promote by renaming over index.html.erb once approved. %>
+
+    One idea governs the page: the site is laid out the way the decks are.
+    Each section is a "slide" — a flat colour field with one heading, one block
+    of content, and a slide number — using the deck template's own rules:
+      * three colours with jobs (green = title and turning points, cream =
+        narrative, mustard = things you act on), never decoration
+      * sans headings, serif body, a 5/7 column split on every slide
+      * sharp rectangles and ruled lists; no cards, shadows or rounded corners
+    The three "how it works" steps are the spine of the page, so each step
+    carries the content it describes. Copy is reused from the live homepage
+    apart from the "Step n of 3" kickers. Styles are scoped to .hn. %>
 <%
-  # Two looks share this template: default (ink/bone/orange, sans headings) and
-  # ?look=b (bottle green/cream/mustard, serif headings, slides in a row).
-  # ?look=c keeps the default layout and sans headings with the green palette.
-  look_b = params[:look] == "b"
-  green = look_b || params[:look] == "c"
-  # ?hero=stage swaps the stacked slides for one large slide on a colour panel
-  # that plays through the free-preview slides.
-  stage = params[:hero] == "stage"
-  # ?hero=strip: a full-width masthead in the nav colour, with the preview
-  # slides as one swipeable row that sits across the masthead's lower edge.
-  strip = params[:hero] == "strip"
   showcase_slides =
     if @showcase_deck
       @showcase_deck.slide_images.order(:id).first(@showcase_deck.effective_preview_slide_count)
     else
       []
     end
-  steps = [
-    [ "Pick a deck", "Browse the library and choose the story you want to tell, bourbon, scotch, rye, or something stranger. Filter by difficulty and budget." ],
-    [ "Gather your society", "Start a private society for your friends or join a public one near you. Schedule the night, share the link, and RSVPs take care of themselves." ],
-    [ "Pour and present", "Follow the thread from first nose to final pour. The script keeps the room moving; the tasting notes keep it honest." ]
-  ]
   rules = [
     "One presenter a month, everyone takes a turn.",
     "Research your topic like you mean it.",
@@ -40,377 +31,262 @@
     [ "How much do the whiskeys cost?", "Every deck recommends bottles across price ranges. You can host a full tasting for $60–80 total, or go deep with bottles north of $200, there's a version of the night for both." ],
     [ "What's the Century badge?", "The amber star beside certain tasters and societies. It marks anyone followed by 100 or more members, a signal that the room trusts their palate. There's no fee and no application: reach a hundred followers and it appears." ]
   ]
+  total = 7
 %>
 
 <% content_for :head do %>
   <style>
-    /* Preview-only: carry the neutral palette into the shared nav and footer. */
-    nav.fixed, nav.fixed details > div, footer { background-color: <%= green ? "#16332a" : "#121211" %> !important; border-color: <%= green ? "#2b4a3f" : "#2b2a28" %> !important; }
-    nav.fixed a.bg-whiskey-500 { background-color: #f3f0ea !important; color: #121211 !important; border-radius: 999px; }
-    footer .text-whiskey-400, footer .text-whiskey-300 { color: <%= green ? "#e8b33a" : "#ff6d00" %> !important; }
+    /* Preview-only: bring the shared nav and footer into the same system. */
+    nav.fixed, nav.fixed details > div, footer { background-color: #16332a !important; border-color: rgba(245, 241, 230, .18) !important; }
+    nav.fixed .font-display { font-family: "Instrument Sans", system-ui, sans-serif !important; letter-spacing: -.03em; }
+    nav.fixed a.bg-whiskey-500 { background-color: #e8b33a !important; color: #16332a !important; border-radius: 0 !important; }
+    footer .text-whiskey-400, footer .text-whiskey-300 { color: #e8b33a !important; }
 
-    .hn { --ink: #121211; --bone: #f3f0ea; --line: #d9d5cc; --mute: #6b6a66; --accent: #ff6d00;
-          background: var(--bone); color: var(--ink); font-family: "Instrument Sans", system-ui, sans-serif; }
+    .hn { --green: #16332a; --cream: #f5f1e6; --must: #e8b33a; --pad: 24px;
+          font-family: "Source Serif 4", Georgia, serif; }
     .hn *, .hn *::before { box-sizing: border-box; }
-    .hn .wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
-    .hn .rules-title { font-size: 22px; font-weight: 600; letter-spacing: -.02em; }
-    .hn h1 { font-weight: 600; font-size: clamp(2.75rem, 7.2vw, 6.25rem); line-height: .96; letter-spacing: -.045em; text-wrap: balance; }
-    .hn h1 em, .hn h2 em { font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: -.03em; }
-    .hn h2 { font-weight: 600; font-size: clamp(2rem, 4vw, 3.25rem); line-height: 1.02; letter-spacing: -.035em; text-wrap: balance; }
-    .hn p { text-wrap: pretty; }
-    .hn .lede { font-size: clamp(1.125rem, 1.5vw, 1.375rem); line-height: 1.5; color: #3b3a37; max-width: 34em; }
-    .hn .btn { display: inline-flex; align-items: center; min-height: 48px; padding: 0 24px; border-radius: 999px; background: var(--ink); color: var(--bone); font-weight: 600; font-size: 16px; transition: background .15s; }
-    .hn .btn:hover { background: #33322f; }
-    .hn .btn--bone { background: var(--bone); color: var(--ink); }
-    .hn .btn--bone:hover { background: #fff; }
-    .hn .link { display: inline-flex; align-items: center; min-height: 48px; font-weight: 600; border-bottom: 1.5px solid var(--ink); min-height: 0; padding-bottom: 2px; }
-    .hn .link:hover { border-color: var(--accent); }
-    .hn a:focus-visible, .hn summary:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; }
 
-    .hn .hero { padding: 132px 0 72px; }
-    .hn .hero-grid { display: grid; gap: 48px; align-items: end; }
-    .hn .hero-cta { display: flex; flex-wrap: wrap; align-items: center; gap: 24px; margin-top: 36px; }
-    .hn .hero-note { margin-top: 28px; font-size: 14px; color: var(--mute); }
-    .hn figure { margin: 0; }
-    .hn .slide { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--ink); border: 1px solid var(--line); }
-    .hn figcaption { display: flex; justify-content: space-between; gap: 16px; margin-top: 12px; font-size: 14px; color: var(--mute); }
-    /* The hero deck: a hard-shadowed lead slide with the next two overlapping its lower edge. */
-    .hn figure a { display: block; padding: 0 14px 0 0; }
-    .hn .slide--main { border: 2px solid var(--ink); box-shadow: 14px 14px 0 var(--accent); }
-    .hn .thumbs { position: relative; display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: 86%; margin: -6% 0 0 auto; }
-    .hn .thumbs .slide { border: 2px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); transition: transform .15s; }
-    .hn figure a:hover .thumbs .slide { transform: translateY(-4px); }
-    .hn figcaption { margin-top: 26px; }
+    /* A slide: one colour field. */
+    .hn .sl { background: var(--bg); color: var(--fg); padding: 88px 0 28px; }
+    .hn .s-green { --bg: var(--green); --fg: var(--cream); --soft: rgba(245, 241, 230, .78); --rule: rgba(245, 241, 230, .28); --btn-bg: var(--must); --btn-fg: var(--green); --num: var(--must); }
+    .hn .s-cream { --bg: var(--cream); --fg: var(--green); --soft: #3d5247; --rule: rgba(22, 51, 42, .2); --btn-bg: var(--green); --btn-fg: var(--cream); --num: #b07a10; }
+    .hn .s-must  { --bg: var(--must); --fg: var(--green); --soft: #2a4337; --rule: rgba(22, 51, 42, .32); --btn-bg: var(--green); --btn-fg: var(--cream); --num: var(--green); }
 
-    .hn section + section { border-top: 1px solid var(--line); }
-    .hn .band { padding: 88px 0; }
-    .hn .split { display: grid; gap: 40px; }
-    .hn .steps { display: grid; gap: 0; margin-top: 8px; }
-    .hn .step { padding: 28px 0; border-top: 1px solid var(--line); display: grid; grid-template-columns: 56px 1fr; }
-    .hn .step b { font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-weight: 400; font-size: 28px; line-height: 1; color: var(--accent); }
-    .hn .step h3 { font-size: 22px; font-weight: 600; letter-spacing: -.02em; }
-    .hn .step p { margin-top: 8px; color: #3b3a37; font-size: 17px; line-height: 1.55; max-width: 36em; }
+    .hn .wrap { max-width: 1240px; margin: 0 auto; padding: 0 var(--pad); }
+    .hn .cols { display: grid; gap: 40px; }
+    .hn .no { margin-top: 72px; text-align: right; font: 500 14px "Instrument Sans", sans-serif; opacity: .6; font-variant-numeric: tabular-nums; }
 
-    .hn .decks { margin-top: 40px; border-top: 1px solid var(--ink); }
-    .hn .deck { display: grid; grid-template-columns: 1fr auto; gap: 8px 24px; align-items: baseline; padding: 24px 0; border-bottom: 1px solid var(--line); transition: padding .15s; }
-    .hn .deck:hover { padding-left: 12px; }
-    .hn .deck h3 { font-size: clamp(1.5rem, 2.6vw, 2.25rem); font-weight: 600; letter-spacing: -.03em; line-height: 1.08; }
-    .hn .deck .meta { grid-column: 1; font-size: 14px; color: var(--mute); }
-    .hn .deck .price { font-size: 18px; font-weight: 600; font-variant-numeric: tabular-nums; }
+    /* Type: sans headings, serif body — the same pairing as the slides. */
+    .hn h1, .hn h2, .hn h3, .hn .kick, .hn .act, .hn .go, .hn .meta, .hn summary, .hn .price {
+      font-family: "Instrument Sans", system-ui, sans-serif; }
+    .hn h1 { font-weight: 600; font-size: clamp(3.25rem, 10.4vw, 9.75rem); line-height: .9; letter-spacing: -.055em; text-wrap: balance; }
+    .hn h2 { font-weight: 600; font-size: clamp(2.5rem, 5.6vw, 4.75rem); line-height: .96; letter-spacing: -.045em; text-wrap: balance; }
+    .hn .kick { font-weight: 600; font-size: clamp(1.125rem, 1.6vw, 1.5rem); letter-spacing: -.02em; color: var(--num); margin-bottom: 16px; }
+    .hn p { font-size: 20px; line-height: 1.5; color: var(--soft); text-wrap: pretty; max-width: 33em; }
+    .hn p.lead { font-size: clamp(1.375rem, 2.1vw, 1.875rem); line-height: 1.34; color: var(--fg); max-width: 26em; }
+    .hn h2 + p { margin-top: 24px; }
 
-    .hn .dark { background: var(--ink); color: var(--bone); border-top: 0; }
-    .hn .dark + section { border-top: 0; }
-    .hn .dark .lede { color: #cfccc4; }
-    .hn .rules { list-style: none; margin: 0; padding: 0; counter-reset: r; }
-    .hn .rules li { counter-increment: r; display: grid; grid-template-columns: 48px 1fr; padding: 20px 0; border-top: 1px solid #33322f; font-size: clamp(1.25rem, 2vw, 1.625rem); letter-spacing: -.02em; line-height: 1.25; }
-    .hn .rules li::before { content: counter(r); font-family: "Source Serif 4", Georgia, serif; font-style: italic; color: var(--accent); }
+    /* Actions: solid rectangles and plain arrow links. */
+    .hn .act { display: inline-flex; align-items: center; min-height: 54px; padding: 0 28px; background: var(--btn-bg); color: var(--btn-fg); font-weight: 600; font-size: 17px; letter-spacing: -.01em; transition: transform .12s; }
+    .hn .act:hover { transform: translateY(-2px); }
+    .hn .go { display: inline-flex; align-items: center; gap: 10px; min-height: 54px; font-weight: 600; font-size: 17px; }
+    .hn .go::after { content: "→"; transition: transform .12s; }
+    .hn .go:hover::after { transform: translateX(4px); }
+    .hn .acts { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 28px; margin-top: 32px; }
+    .hn a:focus-visible, .hn summary:focus-visible { outline: 3px solid var(--fg); outline-offset: 3px; }
 
-    .hn .pair { display: grid; gap: 56px; }
-    .hn .pair p { margin-top: 16px; color: #3b3a37; font-size: 17px; line-height: 1.6; max-width: 34em; }
-    .hn .pair .link { margin-top: 24px; }
+    /* Ruled lists: a heavy top rule, hairlines between rows. */
+    .hn .rows { border-top: 4px solid var(--fg); list-style: none; margin: 0; padding: 0; }
+    .hn .rows > .row, .hn .rows > li { display: grid; grid-template-columns: 1fr auto; gap: 4px 24px; align-items: baseline; padding: 18px 0; border-bottom: 1px solid var(--rule); }
+    .hn .rows h3 { font-weight: 600; font-size: clamp(1.375rem, 2.2vw, 1.875rem); letter-spacing: -.035em; line-height: 1.1; }
+    .hn .meta { grid-column: 1; font-size: 14px; color: var(--soft); }
+    .hn .price { font-weight: 600; font-size: 18px; font-variant-numeric: tabular-nums; }
+    .hn .price small { font-weight: 400; font-size: 14px; }
+    .hn a.row:hover h3 { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 5px; }
+    .hn ol.rows { counter-reset: r; }
+    .hn ol.rows > li { counter-increment: r; grid-template-columns: 44px 1fr; font-size: clamp(1.25rem, 1.9vw, 1.625rem); line-height: 1.25; }
+    .hn ol.rows > li::before { content: counter(r); font: 600 1em "Instrument Sans", sans-serif; color: var(--num); }
 
-    .hn .plans { margin-top: 32px; border-top: 1px solid var(--ink); }
-    .hn .plan { display: grid; grid-template-columns: 1fr auto; align-items: baseline; padding: 18px 0; border-bottom: 1px solid var(--line); font-size: 18px; }
-    .hn .plan span:last-child { font-weight: 600; font-variant-numeric: tabular-nums; }
-    .hn .plan small { color: var(--mute); font-weight: 400; font-size: 14px; }
+    /* Slide 1: the title slide. */
+    .hn .title { min-height: 100svh; display: flex; flex-direction: column; justify-content: flex-end; padding-top: 120px; }
+    .hn .title p.lead { margin-top: 28px; color: var(--soft); }
+    .hn .title .foot { display: flex; justify-content: space-between; gap: 16px; margin-top: 64px; padding-top: 18px; border-top: 1px solid var(--rule); font: 500 14px "Instrument Sans", sans-serif; opacity: .75; }
+    .hn .title .foot span:last-child { font-variant-numeric: tabular-nums; }
 
-    .hn details { border-top: 1px solid var(--line); }
-    .hn details:last-child { border-bottom: 1px solid var(--line); }
-    .hn summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 24px; padding: 20px 0; font-size: 18px; font-weight: 600; letter-spacing: -.01em; }
+    /* Real slides from a deck: the same object as the page, at thumbnail size. */
+    .hn .deck { margin: 0 0 40px; }
+    .hn .deck .frames { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .hn .deck .frames > :first-child { grid-column: 1 / -1; }
+    .hn .deck img { display: block; width: 100%; height: 100%; aspect-ratio: 16 / 9; object-fit: cover; border: 2px solid var(--fg); }
+    .hn .deck figcaption { display: flex; justify-content: space-between; gap: 16px; margin-top: 12px; font: 500 14px "Instrument Sans", sans-serif; color: var(--soft); }
+    .hn .deck figcaption a { color: var(--fg); font-weight: 600; }
+    .hn .listhead { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 14px; }
+    .hn .listhead h3 { font-weight: 600; font-size: 20px; letter-spacing: -.02em; }
+    .hn .listhead .go { min-height: 0; }
+
+    .hn details { border-bottom: 1px solid var(--rule); }
+    .hn summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 24px; padding: 20px 0; font-size: 20px; font-weight: 600; letter-spacing: -.02em; }
     .hn summary::-webkit-details-marker { display: none; }
-    .hn summary::after { content: "+"; font-weight: 400; color: var(--mute); }
+    .hn summary::after { content: "+"; font-weight: 400; }
     .hn details[open] summary::after { content: "–"; }
-    .hn details p { padding: 0 0 24px; color: #3b3a37; font-size: 17px; line-height: 1.6; max-width: 40em; }
+    .hn details p { padding: 0 0 24px; font-size: 18px; }
 
-    @media (min-width: 900px) {
-      .hn .wrap { padding: 0 40px; }
-      .hn .hero { padding: 168px 0 96px; }
-      .hn .hero-grid { grid-template-columns: 1fr 1.12fr; gap: 56px; align-items: center; }
-      .hn figure a { padding-right: 22px; }
-      .hn .slide--main { box-shadow: 22px 22px 0 var(--accent); }
-      .hn .thumbs .slide { box-shadow: 8px 8px 0 var(--ink); }
-      .hn .hero-grid.solo { grid-template-columns: 1fr; }
-      .hn .band { padding: 120px 0; }
-      .hn .split { grid-template-columns: 1fr 1.4fr; gap: 80px; }
-      .hn .pair { grid-template-columns: 1fr 1fr; gap: 80px; }
-      .hn .deck { grid-template-columns: 1fr 220px auto; }
-      .hn .deck .meta { grid-column: auto; }
-    }
-    /* Hero "strip": masthead in the nav colour; slides straddle its lower edge. */
-    .hn { --pad: 24px; }
-    .hn .mast { background: linear-gradient(to bottom, var(--ink) 0, var(--ink) calc(100% - var(--under)), var(--bone) calc(100% - var(--under)));
-                --under: calc(min(600px, 82vw) * .5625 * .42 + 104px); color: var(--bone); padding: 124px 0 56px; }
-    .hn .mast h1 { font-size: clamp(3rem, 9.4vw, 8.75rem); }
-    .hn .mast-row { display: grid; gap: 28px; margin-top: 28px; }
-    .hn .mast .lede { color: var(--bone); opacity: .85; }
-    .hn .mast .link { border-color: var(--bone); }
-    .hn .mast .hero-note { color: var(--bone); opacity: .6; margin-top: 18px; }
-    .hn .strip-wrap { container-type: inline-size; margin-top: 56px; }
-    .hn .strip { display: flex; gap: 20px; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none;
-                 padding: 0 max(var(--pad), calc((100cqw - 1240px) / 2 + var(--pad))) 40px;
-                 scroll-padding-left: max(var(--pad), calc((100cqw - 1240px) / 2 + var(--pad))); }
-    .hn .strip::-webkit-scrollbar { display: none; }
-    .hn .strip a { flex: none; width: min(600px, 82vw); scroll-snap-align: start; box-shadow: 0 26px 44px -22px rgba(0, 0, 0, .6); }
-    .hn .strip img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; }
-    .hn .strip-cap { display: flex; justify-content: space-between; gap: 16px; font-size: 14px; color: var(--mute); margin-top: -16px; }
-    .hn .strip-cap a { color: var(--ink); font-weight: 600; }
     @media (min-width: 900px) {
       .hn { --pad: 40px; }
-      .hn .mast { padding-top: 152px; }
-      .hn .mast-row { grid-template-columns: minmax(0, 34em) auto; justify-content: space-between; align-items: end; }
+      .hn .sl { padding: 128px 0 32px; }
+      .hn .title { padding-top: 140px; }
+      .hn .cols { grid-template-columns: 5fr 7fr; gap: 72px; }
+      .hn .no { margin-top: 104px; }
+      .hn .deck .frames { grid-template-columns: 2fr 1fr; gap: 10px; }
+      .hn .deck .frames > :first-child { grid-column: 1; grid-row: 1 / span 2; }
+      .hn .rows > .row { grid-template-columns: 1fr 230px auto; }
+      .hn .rows .meta { grid-column: auto; }
+      .hn ol.rows > li { grid-template-columns: 56px 1fr; }
+      .hn .rows.plans > .row { grid-template-columns: 1fr auto; }
     }
-
-    /* Hero "stage": one slide on a colour panel, playing through the preview slides. */
-    .hn .stage { background: var(--ink); margin: 0 -24px; padding: 28px 24px 22px; }
-    .hn figure.stage a { padding: 0; }
-    .hn .stage .reel { position: relative; aspect-ratio: 16 / 9; box-shadow: 0 28px 56px -18px rgba(0, 0, 0, .65); }
-    .hn .stage .frame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; animation: hn-reel <%= [ showcase_slides.size, 1 ].max * 4 %>s infinite; }
-    .hn .stage .ticks { display: flex; gap: 6px; margin-top: 22px; }
-    .hn .stage .ticks span { flex: 1; height: 3px; background: var(--bone); opacity: .25; animation: hn-tick <%= [ showcase_slides.size, 1 ].max * 4 %>s infinite; }
-    .hn .stage figcaption { color: var(--bone); opacity: .8; }
-    @keyframes hn-reel { 0% { opacity: 0; } 3% { opacity: 1; } <%= (100.0 / [ showcase_slides.size, 1 ].max).round(2) %>% { opacity: 1; } <%= ((100.0 / [ showcase_slides.size, 1 ].max) + 3).round(2) %>% { opacity: 0; } 100% { opacity: 0; } }
-    @keyframes hn-tick { 0% { opacity: 1; background: var(--accent); } <%= (100.0 / [ showcase_slides.size, 1 ].max).round(2) %>% { opacity: 1; background: var(--accent); } <%= ((100.0 / [ showcase_slides.size, 1 ].max) + 3).round(2) %>% { opacity: .25; background: var(--bone); } 100% { opacity: .25; background: var(--bone); } }
-    @keyframes hn-tick-g { 0% { opacity: 1; background: #e8b33a; } <%= (100.0 / [ showcase_slides.size, 1 ].max).round(2) %>% { opacity: 1; background: #e8b33a; } <%= ((100.0 / [ showcase_slides.size, 1 ].max) + 3).round(2) %>% { opacity: .25; background: var(--bone); } 100% { opacity: .25; background: var(--bone); } }
-    @media (min-width: 900px) {
-      .hn .stage { margin: 0 calc(-40px - max(0px, (100vw - 1240px) / 2)) 0 0; padding: 56px calc(40px + max(0px, (100vw - 1240px) / 2)) 30px 56px; }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .hn .stage .frame, .hn .stage .ticks span { animation: none; }
-      .hn .stage .frame:first-child { opacity: 1; }
-    }
-
-    /* Green palette (looks b and c) */
-    .hn--g { --ink: #16332a; --bone: #f5f1e6; --line: #d5cfbd; --mute: #5d6b62; --accent: #c98a12; }
-    .hn--b h1, .hn--b h2, .hn--b .deck h3, .hn--b .step h3, .hn--b .rules-title { font-family: "Fraunces", Georgia, serif; font-weight: 500; letter-spacing: -.025em; }
-    .hn--b h1 em, .hn--b h2 em { font-family: inherit; font-weight: 400; letter-spacing: -.02em; }
-    .hn--b h1 { font-size: clamp(2.75rem, 8.4vw, 7.5rem); max-width: 11em; }
-    .hn--b .btn { border-radius: 6px; }
-    .hn--g .btn:hover { background: #24493c; }
-    .hn--g .btn--bone:hover { background: #fff; }
-    .hn--g .dark { background: var(--ink); }
-    .hn--g .dark .rules li { border-top-color: #2f5546; }
-    .hn--g .dark .rules li::before { color: #e8b33a; }
-    .hn--g .lede, .hn--g .step p, .hn--g .pair p, .hn--g details p { color: #33453c; }
-    /* Look b only: serif headings, slides in a row */
-    .hn--g .dark .lede { color: #d5d9cd; }
-    .hn--b .hero-grid { grid-template-columns: 1fr; align-items: start; }
-    .hn--g .stage .ticks span { animation-name: hn-tick-g; }
-    .hn--b figure a { display: grid; gap: 12px; }
-    .hn--b figure a { padding: 0; }
-    .hn--b .thumbs { margin: 0; width: auto; }
-    .hn--b .slide--main { box-shadow: none; }
-    .hn--b .thumbs .slide { box-shadow: none; }
-    @media (min-width: 900px) {
-      .hn--b figure a { grid-template-columns: repeat(3, 1fr); }
-      .hn--b .thumbs { display: contents; }
-    }
-
     @media (prefers-reduced-motion: reduce) { .hn * { transition: none !important; } }
   </style>
 <% end %>
 
-<div class="hn <%= 'hn--g' if green %> <%= 'hn--b' if look_b %>">
-  <% if strip && showcase_slides.any? %>
-  <section class="mast">
+<div class="hn">
+  <!-- 1 · Title -->
+  <section class="sl s-green title">
     <div class="wrap">
-      <h1>Every pour has <em>a story.</em></h1>
-      <div class="mast-row">
-        <p class="lede">Narrative tasting decks for whiskey nights that hold together, the research done, the script written, the bottles picked.</p>
-        <div>
-          <div class="hero-cta" style="margin-top:0">
-            <%= link_to "Browse the decks", presentations_path, class: "btn btn--bone" %>
-            <a href="#how-it-works" class="link">See how it works</a>
-          </div>
-          <p class="hero-note">One credit a month with membership · Or buy any deck outright</p>
-        </div>
+      <h1>Every pour has a story.</h1>
+      <p class="lead">Narrative tasting decks for whiskey nights that hold together, the research done, the script written, the bottles picked.</p>
+      <div class="acts">
+        <%= link_to "Browse the decks", presentations_path, class: "act" %>
+        <a href="#step-1" class="go">See how it works</a>
       </div>
-    </div>
-    <div class="strip-wrap">
-      <div class="strip">
-        <% showcase_slides.each_with_index do |slide, i| %>
-          <%= link_to presentation_path(@showcase_deck), aria: { label: "#{@showcase_deck.title}, slide #{i + 1}" } do %>
-            <%= image_tag slide, alt: "Slide #{i + 1} of #{@showcase_deck.title}", loading: (i.zero? ? "eager" : "lazy") %>
-          <% end %>
-        <% end %>
+      <div class="foot">
+        <span>The Whiskey Share Society · Est. 2019</span>
+        <span>1 / <%= total %></span>
       </div>
-    </div>
-    <div class="wrap">
-      <p class="strip-cap">
-        <%= link_to @showcase_deck.title, presentation_path(@showcase_deck) %>
-        <span><%= [ "#{@showcase_deck.slide_images.count} slides", @showcase_deck.duration.presence ].compact.join(" · ") %></span>
-      </p>
     </div>
   </section>
-  <% else %>
-  <!-- Hero -->
-  <section class="hero">
-    <div class="wrap">
-      <div class="hero-grid <%= 'solo' if showcase_slides.empty? %>">
-        <div>
-          <h1>Every pour has <em>a story.</em></h1>
-          <p class="lede" style="margin-top:28px">Narrative tasting decks for whiskey nights that hold together, the research done, the script written, the bottles picked.</p>
-          <div class="hero-cta">
-            <%= link_to "Browse the decks", presentations_path, class: "btn" %>
-            <a href="#how-it-works" class="link">See how it works</a>
-          </div>
-          <p class="hero-note">One credit a month with membership · Or buy any deck outright</p>
-        </div>
 
-        <% if showcase_slides.any? %>
-          <%# Real slides from a real deck, limited to its free preview slides. %>
-          <% if stage %>
-          <% n = showcase_slides.size %>
-          <figure class="stage">
-            <%= link_to presentation_path(@showcase_deck), aria: { label: "#{@showcase_deck.title}, preview slides" } do %>
-              <div class="reel">
-                <% showcase_slides.each_with_index do |slide, i| %>
-                  <%= image_tag slide, alt: (i.zero? ? "Opening slide of #{@showcase_deck.title}" : ""), class: "frame", style: "animation-delay: #{i * 4}s" %>
+  <!-- 2 · Step 1 -->
+  <section id="step-1" class="sl s-cream">
+    <div class="wrap">
+      <div class="cols">
+        <div>
+          <div class="kick">Step 1 of 3</div>
+          <h2>Pick a deck</h2>
+          <p>Browse the library and choose the story you want to tell, bourbon, scotch, rye, or something stranger. Filter by difficulty and budget.</p>
+        </div>
+        <div>
+          <% if showcase_slides.any? %>
+            <%# Real slides, limited to the deck's free-preview slides. %>
+            <figure class="deck">
+              <%= link_to presentation_path(@showcase_deck), class: "frames", aria: { label: "#{@showcase_deck.title}, opening slides" } do %>
+                <% showcase_slides.first(3).each_with_index do |slide, i| %>
+                  <span><%= image_tag slide, alt: "Slide #{i + 1} of #{@showcase_deck.title}", loading: (i.zero? ? "eager" : "lazy") %></span>
                 <% end %>
-              </div>
-              <div class="ticks" aria-hidden="true">
-                <% n.times do |i| %><span style="animation-delay: <%= i * 4 %>s"></span><% end %>
-              </div>
-            <% end %>
-            <figcaption>
-              <span><%= @showcase_deck.title %></span>
-              <span><%= [ "#{@showcase_deck.slide_images.count} slides", @showcase_deck.duration.presence ].compact.join(" · ") %></span>
-            </figcaption>
-          </figure>
-          <% else %>
-          <figure>
-            <%= link_to presentation_path(@showcase_deck) do %>
-              <%= image_tag showcase_slides.first, alt: "Opening slide of #{@showcase_deck.title}", class: "slide slide--main" %>
-              <% if showcase_slides.size >= 3 %>
-                <div class="thumbs">
-                  <% showcase_slides[1, 2].each_with_index do |slide, i| %>
-                    <%= image_tag slide, alt: "Slide #{i + 2} of #{@showcase_deck.title}", class: "slide", loading: "lazy" %>
-                  <% end %>
-                </div>
               <% end %>
-            <% end %>
-            <figcaption>
-              <span><%= @showcase_deck.title %></span>
-              <span><%= [ "#{@showcase_deck.slide_images.count} slides", @showcase_deck.duration.presence ].compact.join(" · ") %></span>
-            </figcaption>
-          </figure>
+              <figcaption>
+                <%= link_to @showcase_deck.title, presentation_path(@showcase_deck) %>
+                <span><%= [ "#{@showcase_deck.slide_images.count} slides", @showcase_deck.duration.presence ].compact.join(" · ") %></span>
+              </figcaption>
+            </figure>
           <% end %>
-        <% end %>
-      </div>
-    </div>
-  </section>
-  <% end %>
-
-  <!-- How it works -->
-  <section id="how-it-works" class="band">
-    <div class="wrap split">
-      <div>
-        <h2>From bottle to story in <em>three steps.</em></h2>
-      </div>
-      <div class="steps">
-        <% steps.each_with_index do |(title, body), i| %>
-          <div class="step">
-            <b><%= i + 1 %></b>
-            <div>
-              <h3><%= title %></h3>
-              <p><%= body %></p>
+          <% if @featured_presentations.any? %>
+            <div class="listhead">
+              <h3>Latest decks</h3>
+              <%= link_to "See the full library", presentations_path, class: "go" %>
             </div>
-          </div>
-        <% end %>
-      </div>
-    </div>
-  </section>
-
-  <!-- Latest decks, as a list -->
-  <% if @featured_presentations.any? %>
-    <section class="band">
-      <div class="wrap">
-        <div style="display:flex;justify-content:space-between;align-items:end;gap:24px;flex-wrap:wrap">
-          <div>
-            <h2>Latest decks</h2>
-          </div>
-          <%= link_to "See the full library", presentations_path, class: "link" %>
-        </div>
-        <div class="decks">
-          <% @featured_presentations.each do |deck| %>
-            <%= link_to presentation_path(deck), class: "deck" do %>
-              <h3><%= deck.title %></h3>
-              <span class="meta"><%= [ deck.category.presence, deck.difficulty.presence, deck.duration.presence ].compact.join(" · ") %></span>
-              <span class="price"><%= deck.price.to_f.zero? ? "Free" : number_to_currency(deck.price) %></span>
-            <% end %>
-          <% end %>
-        </div>
-      </div>
-    </section>
-  <% end %>
-
-  <!-- Origin -->
-  <section class="band dark">
-    <div class="wrap split">
-      <div>
-        <h2>Born from a <em>monthly ritual.</em></h2>
-        <p class="lede" style="margin-top:28px">The first Whiskey Share Society started as a circle of friends in 2019. Each month one of us drew a topic, did the research, bought the bottles, and told its story over a deck of slides.</p>
-        <div style="margin-top:32px"><%= link_to "Find your society", societies_path, class: "btn btn--bone" %></div>
-      </div>
-      <div>
-        <h3 class="rules-title">House rules</h3>
-        <ol class="rules" style="margin-top:20px">
-          <% rules.each do |rule| %><li><span><%= rule %></span></li><% end %>
-        </ol>
-      </div>
-    </div>
-  </section>
-
-  <!-- Societies + tasting record -->
-  <section class="band">
-    <div class="wrap pair">
-      <div>
-        <h2>Societies</h2>
-        <p>Societies are how those spaces organize: public ones open to new members, private ones that run on invitations, each with its own calendar of tasting nights and its own record of every pour the room has judged.</p>
-        <%= link_to "Browse societies", societies_path, class: "link" %>
-      </div>
-      <div>
-        <h2>The tasting record</h2>
-        <p>Every bottle the society tastes gets written down, nose, palate, finish, price, and personal thoughts, in a record you can search by bottle, distillery, or the flavor you're chasing.</p>
-        <%= link_to "Read the record", reviews_path, class: "link" %>
-      </div>
-    </div>
-  </section>
-
-  <!-- Membership: live prices as a list, detail on /membership -->
-  <section id="pricing" class="band">
-    <div class="wrap split">
-      <div>
-        <h2>Choose <em>your pour.</em></h2>
-      </div>
-      <div>
-        <p class="lede">One membership, three ways to pay it. Every plan unlocks the same thing, a deck credit every month and a society of your own.</p>
-        <div class="plans">
-          <% @stripe_products.each do |product| %>
-            <div class="plan">
-              <span><%= product[:name].to_s.gsub(" Membership", "") %></span>
-              <span>$<%= sprintf("%.2f", product[:price] / 100.0) %> <small>/mo</small></span>
+            <div class="rows">
+              <% @featured_presentations.each do |deck| %>
+                <%= link_to presentation_path(deck), class: "row" do %>
+                  <h3><%= deck.title %></h3>
+                  <span class="meta"><%= [ deck.category.presence, deck.difficulty.presence, deck.duration.presence ].compact.join(" · ") %></span>
+                  <span class="price"><%= deck.price.to_f.zero? ? "Free" : number_to_currency(deck.price) %></span>
+                <% end %>
+              <% end %>
             </div>
           <% end %>
         </div>
-        <div style="margin-top:32px"><%= link_to "See the plans", membership_path, class: "btn" %></div>
       </div>
+      <div class="no">2 / <%= total %></div>
     </div>
   </section>
 
-  <!-- FAQ -->
-  <section id="faq" class="band">
-    <div class="wrap split">
-      <div>
-        <h2>Questions, answered.</h2>
+  <!-- 3 · Step 2 -->
+  <section class="sl s-must">
+    <div class="wrap">
+      <div class="cols">
+        <div>
+          <div class="kick">Step 2 of 3</div>
+          <h2>Gather your society</h2>
+        </div>
+        <div>
+          <p class="lead">Start a private society for your friends or join a public one near you. Schedule the night, share the link, and RSVPs take care of themselves.</p>
+          <p style="margin-top:24px">Societies are how those spaces organize: public ones open to new members, private ones that run on invitations, each with its own calendar of tasting nights and its own record of every pour the room has judged.</p>
+          <div class="acts"><%= link_to "Browse societies", societies_path, class: "act" %></div>
+        </div>
       </div>
-      <div>
-        <% faqs.each do |q, a| %>
-          <details>
-            <summary><%= q %></summary>
-            <p><%= a %></p>
-          </details>
-        <% end %>
+      <div class="no">3 / <%= total %></div>
+    </div>
+  </section>
+
+  <!-- 4 · Step 3 -->
+  <section class="sl s-green">
+    <div class="wrap">
+      <div class="cols">
+        <div>
+          <div class="kick">Step 3 of 3</div>
+          <h2>Pour and present</h2>
+        </div>
+        <div>
+          <p class="lead">Follow the thread from first nose to final pour. The script keeps the room moving; the tasting notes keep it honest.</p>
+          <p style="margin-top:24px">Every bottle the society tastes gets written down, nose, palate, finish, price, and personal thoughts, in a record you can search by bottle, distillery, or the flavor you're chasing.</p>
+          <div class="acts"><%= link_to "Read the record", reviews_path, class: "act" %></div>
+        </div>
       </div>
+      <div class="no">4 / <%= total %></div>
+    </div>
+  </section>
+
+  <!-- 5 · Origin -->
+  <section class="sl s-cream">
+    <div class="wrap">
+      <div class="cols">
+        <div>
+          <h2>Born from a monthly ritual.</h2>
+          <p>The first Whiskey Share Society started as a circle of friends in 2019. Each month one of us drew a topic, did the research, bought the bottles, and told its story over a deck of slides.</p>
+          <div class="acts"><%= link_to "Find your society", societies_path, class: "go" %></div>
+        </div>
+        <div>
+          <div class="listhead"><h3>House rules</h3></div>
+          <ol class="rows">
+            <% rules.each do |rule| %><li><span><%= rule %></span></li><% end %>
+          </ol>
+        </div>
+      </div>
+      <div class="no">5 / <%= total %></div>
+    </div>
+  </section>
+
+  <!-- 6 · Membership -->
+  <section id="pricing" class="sl s-must">
+    <div class="wrap">
+      <div class="cols">
+        <div>
+          <h2>Choose your pour.</h2>
+          <p>One membership, three ways to pay it. Every plan unlocks the same thing, a deck credit every month and a society of your own.</p>
+        </div>
+        <div>
+          <div class="rows plans">
+            <% @stripe_products.each do |product| %>
+              <div class="row">
+                <h3><%= product[:name].to_s.gsub(" Membership", "") %></h3>
+                <span class="price">$<%= sprintf("%.2f", product[:price] / 100.0) %> <small>/mo</small></span>
+              </div>
+            <% end %>
+          </div>
+          <div class="acts"><%= link_to "See the plans", membership_path, class: "act" %></div>
+        </div>
+      </div>
+      <div class="no">6 / <%= total %></div>
+    </div>
+  </section>
+
+  <!-- 7 · Questions -->
+  <section id="faq" class="sl s-cream">
+    <div class="wrap">
+      <div class="cols">
+        <div>
+          <h2>Questions, answered.</h2>
+        </div>
+        <div class="rows">
+          <% faqs.each do |q, a| %>
+            <details>
+              <summary><%= q %></summary>
+              <p><%= a %></p>
+            </details>
+          <% end %>
+        </div>
+      </div>
+      <div class="no">7 / <%= total %></div>
     </div>
   </section>
 </div>
