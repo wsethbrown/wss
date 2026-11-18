@@ -68,7 +68,13 @@
     .hn figure { margin: 0; }
     .hn .slide { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; background: var(--ink); border: 1px solid var(--line); }
     .hn figcaption { display: flex; justify-content: space-between; gap: 16px; margin-top: 12px; font-size: 14px; color: var(--mute); }
-    .hn .thumbs { display: grid; grid-template-columns: repeat(2, 1fr); gap: 12px; margin-top: 12px; }
+    /* The hero deck: a hard-shadowed lead slide with the next two overlapping its lower edge. */
+    .hn figure a { display: block; padding: 0 14px 0 0; }
+    .hn .slide--main { border: 2px solid var(--ink); box-shadow: 14px 14px 0 var(--accent); }
+    .hn .thumbs { position: relative; display: grid; grid-template-columns: repeat(2, 1fr); gap: 14px; width: 86%; margin: -6% 0 0 auto; }
+    .hn .thumbs .slide { border: 2px solid var(--ink); box-shadow: 6px 6px 0 var(--ink); transition: transform .15s; }
+    .hn figure a:hover .thumbs .slide { transform: translateY(-4px); }
+    .hn figcaption { margin-top: 26px; }
 
     .hn section + section { border-top: 1px solid var(--line); }
     .hn .band { padding: 88px 0; }
@@ -113,7 +119,10 @@
     @media (min-width: 900px) {
       .hn .wrap { padding: 0 40px; }
       .hn .hero { padding: 168px 0 96px; }
-      .hn .hero-grid { grid-template-columns: 1.05fr 1fr; gap: 64px; }
+      .hn .hero-grid { grid-template-columns: 1fr 1.12fr; gap: 56px; align-items: center; }
+      .hn figure a { padding-right: 22px; }
+      .hn .slide--main { box-shadow: 22px 22px 0 var(--accent); }
+      .hn .thumbs .slide { box-shadow: 8px 8px 0 var(--ink); }
       .hn .hero-grid.solo { grid-template-columns: 1fr; }
       .hn .band { padding: 120px 0; }
       .hn .split { grid-template-columns: 1fr 1.4fr; gap: 80px; }
@@ -137,7 +146,10 @@
     .hn--g .dark .lede { color: #d5d9cd; }
     .hn--b .hero-grid { grid-template-columns: 1fr; align-items: start; }
     .hn--b figure a { display: grid; gap: 12px; }
-    .hn--b .thumbs { margin-top: 0; }
+    .hn--b figure a { padding: 0; }
+    .hn--b .thumbs { margin: 0; width: auto; }
+    .hn--b .slide--main { box-shadow: none; }
+    .hn--b .thumbs .slide { box-shadow: none; }
     @media (min-width: 900px) {
       .hn--b figure a { grid-template-columns: repeat(3, 1fr); }
       .hn--b .thumbs { display: contents; }
@@ -166,7 +178,7 @@
           <%# Real slides from a real deck, limited to its free preview slides. %>
           <figure>
             <%= link_to presentation_path(@showcase_deck) do %>
-              <%= image_tag showcase_slides.first, alt: "Opening slide of #{@showcase_deck.title}", class: "slide" %>
+              <%= image_tag showcase_slides.first, alt: "Opening slide of #{@showcase_deck.title}", class: "slide slide--main" %>
               <% if showcase_slides.size >= 3 %>
                 <div class="thumbs">
                   <% showcase_slides[1, 2].each_with_index do |slide, i| %>
