@@ -9,6 +9,9 @@
   # ?look=c keeps the default layout and sans headings with the green palette.
   look_b = params[:look] == "b"
   green = look_b || params[:look] == "c"
+  # ?hero=stage swaps the stacked slides for one large slide on a colour panel
+  # that plays through the free-preview slides.
+  stage = params[:hero] == "stage"
   showcase_slides =
     if @showcase_deck
       @showcase_deck.slide_images.order(:id).first(@showcase_deck.effective_preview_slide_count)
@@ -130,6 +133,25 @@
       .hn .deck { grid-template-columns: 1fr 220px auto; }
       .hn .deck .meta { grid-column: auto; }
     }
+    /* Hero "stage": one slide on a colour panel, playing through the preview slides. */
+    .hn .stage { background: var(--ink); margin: 0 -24px; padding: 28px 24px 22px; }
+    .hn figure.stage a { padding: 0; }
+    .hn .stage .reel { position: relative; aspect-ratio: 16 / 9; box-shadow: 0 28px 56px -18px rgba(0, 0, 0, .65); }
+    .hn .stage .frame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; animation: hn-reel <%= [ showcase_slides.size, 1 ].max * 4 %>s infinite; }
+    .hn .stage .ticks { display: flex; gap: 6px; margin-top: 22px; }
+    .hn .stage .ticks span { flex: 1; height: 3px; background: var(--bone); opacity: .25; animation: hn-tick <%= [ showcase_slides.size, 1 ].max * 4 %>s infinite; }
+    .hn .stage figcaption { color: var(--bone); opacity: .8; }
+    @keyframes hn-reel { 0% { opacity: 0; } 3% { opacity: 1; } <%= (100.0 / [ showcase_slides.size, 1 ].max).round(2) %>% { opacity: 1; } <%= ((100.0 / [ showcase_slides.size, 1 ].max) + 3).round(2) %>% { opacity: 0; } 100% { opacity: 0; } }
+    @keyframes hn-tick { 0% { opacity: 1; background: var(--accent); } <%= (100.0 / [ showcase_slides.size, 1 ].max).round(2) %>% { opacity: 1; background: var(--accent); } <%= ((100.0 / [ showcase_slides.size, 1 ].max) + 3).round(2) %>% { opacity: .25; background: var(--bone); } 100% { opacity: .25; background: var(--bone); } }
+    @keyframes hn-tick-g { 0% { opacity: 1; background: #e8b33a; } <%= (100.0 / [ showcase_slides.size, 1 ].max).round(2) %>% { opacity: 1; background: #e8b33a; } <%= ((100.0 / [ showcase_slides.size, 1 ].max) + 3).round(2) %>% { opacity: .25; background: var(--bone); } 100% { opacity: .25; background: var(--bone); } }
+    @media (min-width: 900px) {
+      .hn .stage { margin: 0 calc(-40px - max(0px, (100vw - 1240px) / 2)) 0 0; padding: 56px calc(40px + max(0px, (100vw - 1240px) / 2)) 30px 56px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .hn .stage .frame, .hn .stage .ticks span { animation: none; }
+      .hn .stage .frame:first-child { opacity: 1; }
+    }
+
     /* Green palette (looks b and c) */
     .hn--g { --ink: #16332a; --bone: #f5f1e6; --line: #d5cfbd; --mute: #5d6b62; --accent: #c98a12; }
     .hn--b h1, .hn--b h2, .hn--b .deck h3, .hn--b .step h3, .hn--b .rules-title { font-family: "Fraunces", Georgia, serif; font-weight: 500; letter-spacing: -.025em; }
@@ -145,6 +167,7 @@
     /* Look b only: serif headings, slides in a row */
     .hn--g .dark .lede { color: #d5d9cd; }
     .hn--b .hero-grid { grid-template-columns: 1fr; align-items: start; }
+    .hn--g .stage .ticks span { animation-name: hn-tick-g; }
     .hn--b figure a { display: grid; gap: 12px; }
     .hn--b figure a { padding: 0; }
     .hn--b .thumbs { margin: 0; width: auto; }
@@ -176,6 +199,25 @@
 
         <% if showcase_slides.any? %>
           <%# Real slides from a real deck, limited to its free preview slides. %>
+          <% if stage %>
+          <% n = showcase_slides.size %>
+          <figure class="stage">
+            <%= link_to presentation_path(@showcase_deck), aria: { label: "#{@showcase_deck.title}, preview slides" } do %>
+              <div class="reel">
+                <% showcase_slides.each_with_index do |slide, i| %>
+                  <%= image_tag slide, alt: (i.zero? ? "Opening slide of #{@showcase_deck.title}" : ""), class: "frame", style: "animation-delay: #{i * 4}s" %>
+                <% end %>
+              </div>
+              <div class="ticks" aria-hidden="true">
+                <% n.times do |i| %><span style="animation-delay: <%= i * 4 %>s"></span><% end %>
+              </div>
+            <% end %>
+            <figcaption>
+              <span><%= @showcase_deck.title %></span>
+              <span><%= [ "#{@showcase_deck.slide_images.count} slides", @showcase_deck.duration.presence ].compact.join(" · ") %></span>
+            </figcaption>
+          </figure>
+          <% else %>
           <figure>
             <%= link_to presentation_path(@showcase_deck) do %>
               <%= image_tag showcase_slides.first, alt: "Opening slide of #{@showcase_deck.title}", class: "slide slide--main" %>
@@ -192,6 +234,7 @@
               <span><%= [ "#{@showcase_deck.slide_images.count} slides", @showcase_deck.duration.presence ].compact.join(" · ") %></span>
             </figcaption>
           </figure>
+          <% end %>
         <% end %>
       </div>
     </div>
