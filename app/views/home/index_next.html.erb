@@ -6,7 +6,9 @@
 <%
   # Two looks share this template: default (ink/bone/orange, sans headings) and
   # ?look=b (bottle green/cream/mustard, serif headings, slides in a row).
+  # ?look=c keeps the default layout and sans headings with the green palette.
   look_b = params[:look] == "b"
+  green = look_b || params[:look] == "c"
   showcase_slides =
     if @showcase_deck
       @showcase_deck.slide_images.order(:id).first(@showcase_deck.effective_preview_slide_count)
@@ -37,9 +39,9 @@
 <% content_for :head do %>
   <style>
     /* Preview-only: carry the neutral palette into the shared nav and footer. */
-    nav.fixed, nav.fixed details > div, footer { background-color: <%= look_b ? "#16332a" : "#121211" %> !important; border-color: <%= look_b ? "#2b4a3f" : "#2b2a28" %> !important; }
+    nav.fixed, nav.fixed details > div, footer { background-color: <%= green ? "#16332a" : "#121211" %> !important; border-color: <%= green ? "#2b4a3f" : "#2b2a28" %> !important; }
     nav.fixed a.bg-whiskey-500 { background-color: #f3f0ea !important; color: #121211 !important; border-radius: 999px; }
-    footer .text-whiskey-400, footer .text-whiskey-300 { color: <%= look_b ? "#e8b33a" : "#ff6d00" %> !important; }
+    footer .text-whiskey-400, footer .text-whiskey-300 { color: <%= green ? "#e8b33a" : "#ff6d00" %> !important; }
 
     .hn { --ink: #121211; --bone: #f3f0ea; --line: #d9d5cc; --mute: #6b6a66; --accent: #ff6d00;
           background: var(--bone); color: var(--ink); font-family: "Instrument Sans", system-ui, sans-serif; }
@@ -119,19 +121,20 @@
       .hn .deck { grid-template-columns: 1fr 220px auto; }
       .hn .deck .meta { grid-column: auto; }
     }
-    /* Look B */
-    .hn--b { --ink: #16332a; --bone: #f5f1e6; --line: #d5cfbd; --mute: #5d6b62; --accent: #c98a12; }
+    /* Green palette (looks b and c) */
+    .hn--g { --ink: #16332a; --bone: #f5f1e6; --line: #d5cfbd; --mute: #5d6b62; --accent: #c98a12; }
     .hn--b h1, .hn--b h2, .hn--b .deck h3, .hn--b .step h3, .hn--b .rules-title { font-family: "Fraunces", Georgia, serif; font-weight: 500; letter-spacing: -.025em; }
     .hn--b h1 em, .hn--b h2 em { font-family: inherit; font-weight: 400; letter-spacing: -.02em; }
     .hn--b h1 { font-size: clamp(2.75rem, 8.4vw, 7.5rem); max-width: 11em; }
     .hn--b .btn { border-radius: 6px; }
-    .hn--b .btn:hover { background: #24493c; }
-    .hn--b .btn--bone:hover { background: #fff; }
-    .hn--b .dark { background: var(--ink); }
-    .hn--b .dark .rules li { border-top-color: #2f5546; }
-    .hn--b .dark .rules li::before, .hn--b .dark h2 em { color: #e8b33a; }
-    .hn--b .lede, .hn--b .step p, .hn--b .pair p, .hn--b details p { color: #33453c; }
-    .hn--b .dark .lede { color: #d5d9cd; }
+    .hn--g .btn:hover { background: #24493c; }
+    .hn--g .btn--bone:hover { background: #fff; }
+    .hn--g .dark { background: var(--ink); }
+    .hn--g .dark .rules li { border-top-color: #2f5546; }
+    .hn--g .dark .rules li::before { color: #e8b33a; }
+    .hn--g .lede, .hn--g .step p, .hn--g .pair p, .hn--g details p { color: #33453c; }
+    /* Look b only: serif headings, slides in a row */
+    .hn--g .dark .lede { color: #d5d9cd; }
     .hn--b .hero-grid { grid-template-columns: 1fr; align-items: start; }
     .hn--b figure a { display: grid; gap: 12px; }
     .hn--b .thumbs { margin-top: 0; }
@@ -144,7 +147,7 @@
   </style>
 <% end %>
 
-<div class="hn <%= 'hn--b' if look_b %>">
+<div class="hn <%= 'hn--g' if green %> <%= 'hn--b' if look_b %>">
   <!-- Hero -->
   <section class="hero">
     <div class="wrap">

@@ -23,7 +23,12 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
 
     get root_path(design: "next", look: "b")
     assert_response :success
-    assert_select "div.hn.hn--b h1", /Every pour has/
+    assert_select "div.hn.hn--g.hn--b h1", /Every pour has/
+
+    get root_path(design: "next", look: "c")
+    assert_response :success
+    assert_select "div.hn.hn--g h1", /Every pour has/
+    assert_select "div.hn--b", 0
   end
 
   test "should load stripe products for pricing display" do
