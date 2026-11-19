@@ -22,32 +22,33 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "div.hm .tile", 3
   end
 
-  test "design=next2 preview renders for admins and is hidden from visitors" do
+  test "design=next2 study renders for admins; visitors get the live homepage" do
     get root_path(design: "next2")
     assert_response :success
-    assert_select "div.hx", 0
+    assert_select "div.hx .story", 1
+    assert_select "div.hx .tile--wide", 0
 
     admin = User.create!(email: "preview-admin2@example.com", password: "password123",
                          first_name: "Pre", last_name: "View", admin_role: :full)
     sign_in admin
     get root_path(design: "next2")
     assert_response :success
-    assert_select "div.hx h1", /Every pour/
-    assert_select "div.hx .tile", 4
+    assert_select "div.hx .tile--wide", 1
+    assert_select "div.hx .story", 0
   end
 
-  test "design=next3 preview renders its four pinned slides for admins only" do
-    get root_path(design: "next3")
+  test "homepage is a four-beat presentation with a slide per beat" do
+    get root_path
     assert_response :success
-    assert_select "div.hx .story", 0
-
-    admin = User.create!(email: "preview-admin3@example.com", password: "password123",
-                         first_name: "Pre", last_name: "View", admin_role: :full)
-    sign_in admin
-    get root_path(design: "next3")
-    assert_response :success
+    assert_select "div.hx h1", /Every pour/
     assert_select "div.hx .story .beat", 4
     assert_select "div.hx .story .face", 4
+  end
+
+  test "homepage lists live plan prices and links to membership" do
+    get root_path
+    assert_select "#pricing .plan", 3
+    assert_select "#pricing a[href=?]", membership_path, minimum: 1
   end
 
   test "should load stripe products for pricing display" do

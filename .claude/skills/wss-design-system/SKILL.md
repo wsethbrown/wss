@@ -5,65 +5,43 @@ description: WSS visual identity, tokens, layout rules, CSS traps (sticky/overfl
 
 # WSS Design System
 
-Source of truth: app/assets/tailwind/application.css (@theme tokens +
-components). Full direction + rejections: DESIGN_BRIEF.md.
+**The 2026 redesign replaced the char/amber/Fraunces system.** Source of truth:
+`docs/redesign/DESIGN_SYSTEM.md` (rules, tokens, components, rejected directions) and
+`app/assets/tailwind/application.css` (tokens). Reference implementation: the homepage,
+`app/views/home/index.html.erb`. Read the design-system doc before any UI change.
 
-## Identity: two surfaces, one thread
-- **char** (#191009) — dark "tasting room" for narrative surfaces: nav,
-  footer, heroes/mastheads, deck covers, FAQ. Elevated dark = **oak**
-  (#261a10), hairlines = **oak-edge**.
-- **paper** — whiskey-50/white for utility: catalogs, forms, account, admin.
-- **whiskey-50..950** — the only accent scale. NEVER purple/blue/emerald
-  one-offs; the old site's gradient soup was purged deliberately.
-- **The thread** — thin amber line motif (.thread): hero underline, deck
-  reading progress. Signature; use sparingly.
+## In one paragraph
+Warm paper ground; white rounded cards with a hairline edge and no shadow; bottle green
+(`char`/`ink`) for headings, primary buttons, the floating nav, the footer and at most one
+solid panel per view; the logo orange (`mark`) only as a small mark. Instrument Sans for
+headings and UI, Source Serif 4 for long reads and one italic turning phrase per page
+heading. Every visual is real product data. Sentence case, no small-caps eyebrows.
 
-## Type
-Fraunces (font-display; headings only) · Instrument Sans (font-sans; UI) ·
-Source Serif 4 (font-reading; deck stories via .prose-deck). Google Fonts
-loaded in both layouts.
+## Traps (each cost hours)
+1. **`whiskey-*` is green now.** The scale kept its name; 50-200 are paper and hairlines,
+   500-950 are greens. `bg-whiskey-600` on a `bg-char` surface is invisible.
+2. **position: sticky dies if any ancestor is a scroll container.** Never `height: 100%`
+   or `overflow-x: hidden` on body/main; body uses `overflow-x: clip`. The homepage's
+   pinned presentation depends on this.
+3. **The nav floats** 12px from the top, so pages start at `pt-24`. Full-bleed pages
+   (see the `full_bleed` list in `layouts/application.html.erb`) clear it themselves.
+4. **Admin layout**: fixed sidebar + `main.ml-60.min-w-0`. Never `flex-1` on main.
+5. **Attachments have no filename column**: order `slide_images` by `:id`.
+6. **Tailwind can't see dynamic classes** (`bg-<%= color %>-50`). Never interpolate.
+7. **A global `.btn` exists.** Don't reuse that class name for a page-scoped style.
+8. **Rebuild CSS** after touching `application.css`: `bin/rails tailwindcss:build`
+   (the dev Procfile watcher does it; a bare `rails server` does not).
 
-## Reusable pieces (use these, don't reinvent)
-.eyebrow (small-caps letterspaced label) · .rule-double (label masthead rule)
-· .thread · .prose-deck / .prose-deck--dropcap (rendered markdown reading
-styles) · .pagination (kaminari) · btn/card/badge component classes.
-Every heading pattern: eyebrow → font-display heading → .rule-double.
-
-## Layout rules & CSS traps (each cost hours — respect them)
-1. **position: sticky dies if any ancestor scroll-container exists.**
-   NEVER put `height: 100%` or `overflow-x: hidden` on body/main. Body uses
-   `overflow-x: clip` (clip ≠ scroll container). Pinned sections use
-   grid + `md:self-start md:sticky md:top-0 md:h-screen`.
-2. **Full-bleed pages** (home, societies index/show, all presentations pages)
-   manage their own nav clearance INSIDE their masthead (pt-16/pt-28). The
-   layout adds NO top padding for them (a leftover pt-20 once rendered as a
-   white strip above every masthead). See the `full_bleed` conditional in
-   layouts/application.html.erb.
-3. **Admin layout**: fixed sidebar + `main.ml-60.min-w-0`. NEVER flex-1 on
-   main — with a fixed (out-of-flow) sidebar it takes full viewport width and
-   overflows right by exactly 240px.
-4. **Attachments have no filename column** — order slide_images by :id (job
-   attaches in page order). `.order(:filename)` 500s.
-5. **No emoji as icons.** SVG (heroicons-style inline) only. One exception:
-   the 🥃 empty-state glyph on societies index.
-6. **Tailwind can't see dynamic classes** (`bg-<%= color %>-50`). Never
-   interpolate class fragments.
-
-## Copy voice
-Plain verbs, sentence case, specific. Whiskey-label vernacular where natural
-("Est. 2019", "the pour", chapters). No hype ("world-class"), no invented
-claims (guarantees, stats). CTAs say what happens: "Get this deck — $12.99".
+## Copy
+User-facing copy is proposed, never just edited. Redesign work reuses existing words and
+lists anything new for owner approval. No fabricated content.
 
 ## REJECTED directions — do not re-propose
-- **Skeuomorphism** (wooden shelf planks, book spines, brass plaques):
-  built, owner-rejected July 2026 as costume-not-design. Evolution must be
-  editorial (type/layout weight), never literal object imitation.
-- Glassmorphism, gradient-text headings, animated blur blobs: the pre-
-  overhaul look. Purged; do not reintroduce.
-- **De-carding principle**: prefer rules/whitespace over adding more white
-  rounded boxes; max one elevated surface per view.
+Brown/amber palette; any yellow or mustard; flat full-bleed colour-block sections with
+oversized type; letterspaced small-caps eyebrows; display-serif headings; glassmorphism,
+gradient text, blur blobs; skeuomorphism (shelves, spines, plaques); hard offset sticker
+shadows; title-on-a-box deck covers.
 
-## Preview system for risky redesigns
-`?design=next` renders `<action>_next.html.erb` variants (DesignPreview
-concern; all sessions in dev, admin-only in prod). Build bold ideas as
-parallel templates; promote by renaming over the original in one commit.
+## Design studies kept for reference
+`/?design=next` and `/?design=next2` render two earlier homepage studies (admin-only in
+production). The owner asked to keep them; do not delete without asking.

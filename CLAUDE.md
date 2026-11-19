@@ -20,7 +20,9 @@ source of truth for what's done and what's next. Key invariants established ther
 - **Stripe webhooks:** Idempotent via the `StripeEvent` claim table — process each event once.
 - **Secrets:** No `.pem`/`.key`/`.env`/`*.log` in git (see `.gitignore`); use env vars / credentials.
   The previously committed Apple signing key is compromised and must be rotated.
-- **Design:** One warm `whiskey-*` Tailwind palette is the brand accent (not indigo/amber).
+- **Design:** The 2026 redesign is the direction: paper ground, white hairline cards, bottle
+  green for ink and solid objects, the logo orange as a small mark only (never yellow/amber).
+  `whiskey-*` is now the green-neutral scale. Rules and components: **@docs/redesign/DESIGN_SYSTEM.md**.
 
 ## Development Commands
 
@@ -189,6 +191,9 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 - **@SecurityChecklist.md** - Comprehensive security checklist, best practices, and incident response procedures
 - **@Backlog.md** - Task management system using file-based kanban boards and workflow documentation
 - **@admin_panel_todo.md** - Admin panel development plan, requirements, and progress tracking
+- **@docs/redesign/DESIGN_SYSTEM.md** - The 2026 design system: surfaces, colour, type, components, rejected directions
+- **@docs/redesign/ARCHITECTURE_REVIEW.md** - November 2026 architecture and backend review, findings by severity
+- **@docs/redesign/TASKS.md** - The redesign and backend task list with acceptance criteria and test plans
 
 ### Admin Panel Development
 **IMPORTANT**: When working on admin panel features:

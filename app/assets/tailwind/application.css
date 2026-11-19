@@ -7,47 +7,56 @@
 @source not "../documents";
 
 /*
-  Whiskey Share Society design system.
+  Whiskey Share Society design system (2026 redesign).
 
-  Identity: a two-surface world drawn from the product itself.
-, "char"  : the tasting room. Dark barrel-char brown for narrative surfaces
-                (nav, hero, deck reader chrome, footer). Amber is the pour.
-, "paper" : the label. Warm cream/white for utility surfaces (catalog,
-                forms, account, admin) with whiskey-label details: small-caps
-                eyebrows, thin double rules, stamp badges.
+  One surface language, taken from the homepage:
+  - paper : the warm off-white page ground (whiskey-50).
+  - card  : white rounded surfaces with a hairline edge, for anything grouped.
+  - green : deep bottle green (char) for ink, primary actions and the solid
+            objects: the floating nav, panels, the footer.
+  - mark  : the logo orange, used only as a small mark (a numeral, a star,
+            a date label). Never a fill for large areas, never yellow.
 
-  Signature motif: the THREAD, a thin amber line that connects a pour to its
-  story (the founding ritual). It underlines the hero headline, connects the
-  how-it-works steps, and tracks reading progress in the deck reader.
+  The `whiskey-*` scale keeps its name because several hundred utilities use
+  it, but it is now the green-neutral brand scale: 50-200 are paper and
+  hairlines, 300-400 are quiet text on green, 500-950 are the greens.
+  `char` / `oak` / `cream` are the dark surface, its raised surface and the
+  text on it.
 
-  Type:
-, Display : Fraunces (engraved whiskey-label soul), headings only.
-, UI/body : Instrument Sans.
-, Reading : Source Serif 4, deck content only (.prose-deck).
+  Type: Instrument Sans for headings and UI (`font-display`, `font-sans`),
+  Source Serif 4 for long reads and the one italic turning phrase in a
+  heading (`font-reading`).
 
-  Tailwind v4 exposes @theme tokens as utilities automatically, e.g.
-  bg-whiskey-600, bg-char, font-display.
+  See docs/redesign/DESIGN_SYSTEM.md for the rules and the component recipes.
 */
 @theme {
-  --color-whiskey-50: #fbf6ef;
-  --color-whiskey-100: #f4e7d5;
-  --color-whiskey-200: #e8cca7;
-  --color-whiskey-300: #d9ab74;
-  --color-whiskey-400: #c9884a;
-  --color-whiskey-500: #b86e2f;
-  --color-whiskey-600: #a15825;
-  --color-whiskey-700: #82441f;
-  --color-whiskey-800: #6a3820;
-  --color-whiskey-900: #582f1e;
-  --color-whiskey-950: #32180e;
+  --color-whiskey-50: #f6f4ee;
+  --color-whiskey-100: #ecebe3;
+  --color-whiskey-200: #dedccf;
+  --color-whiskey-300: #c3c8ba;
+  --color-whiskey-400: #8fa397;
+  --color-whiskey-500: #3d6b5a;
+  --color-whiskey-600: #16332a;
+  --color-whiskey-700: #10261f;
+  --color-whiskey-800: #0d1f19;
+  --color-whiskey-900: #0a1814;
+  --color-whiskey-950: #06100d;
+
+  /* Named surfaces and marks */
+  --color-paper: #f6f4ee;
+  --color-ink: #16332a;
+  --color-mute: #5f6b64;
+  --color-hairline: #dfe3dc;
+  --color-mark: #ff6d00;
+  --color-mark-soft: #ff8a33;
 
   /* Dark narrative surfaces */
-  --color-char: #191009;      /* barrel char, page-level dark */
-  --color-oak: #261a10;       /* elevated dark surface */
-  --color-oak-edge: #3d2c1c;  /* hairline borders on dark */
+  --color-char: #16332a;      /* bottle green, the dark surface */
+  --color-oak: #1d4034;        /* raised surface on green */
+  --color-oak-edge: #2f5546;   /* hairline borders on green */
 
   /* Text on dark */
-  --color-cream: #f6edda;
+  --color-cream: #f6f4ee;
 
   /* RSVP answers. A DELIBERATE, NAMED exception to the whiskey-only accent
      rule (owner call, July 2026): going / hesitant / not coming is genuinely
@@ -61,7 +70,7 @@
   --color-rsvp-maybe: #a15825;
   --color-rsvp-no: #a8503a;
 
-  --font-display: "Fraunces", Georgia, "Times New Roman", serif;
+  --font-display: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
   --font-sans: "Instrument Sans", ui-sans-serif, system-ui, sans-serif;
   --font-reading: "Source Serif 4", Georgia, "Times New Roman", serif;
 }
@@ -70,24 +79,32 @@
   /* Buttons. Each variant @applies only real utilities (Tailwind v4 does not let you
      @apply another component class), and shares a base look via the .btn utilities. */
   .btn {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-whiskey-500;
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-whiskey-500;
   }
   .btn-primary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-whiskey-500 bg-whiskey-600 text-white hover:bg-whiskey-700;
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-whiskey-500 bg-whiskey-600 text-white hover:bg-whiskey-700;
   }
   .btn-secondary {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-whiskey-500 border border-whiskey-300 bg-white text-whiskey-800 hover:bg-whiskey-50;
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-whiskey-500 border border-whiskey-300 bg-white text-whiskey-800 hover:bg-whiskey-50;
   }
   .btn-ghost {
-    @apply inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-whiskey-500 text-gray-700 hover:bg-gray-100;
+    @apply inline-flex items-center justify-center gap-2 rounded-2xl px-5 py-3 text-sm font-semibold transition focus:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-whiskey-500 text-gray-700 hover:bg-gray-100;
   }
 
   /* Cards */
   .card {
-    @apply rounded-2xl border border-gray-200 bg-white shadow-sm;
+    @apply rounded-[26px] border border-hairline bg-white;
   }
   .card-hover {
-    @apply rounded-2xl border border-gray-200 bg-white shadow-sm transition hover:-translate-y-0.5 hover:shadow-md;
+    @apply rounded-[26px] border border-hairline bg-white transition hover:-translate-y-0.5 hover:border-whiskey-300;
+  }
+  /* A paper inset inside a card, for a short list of real data. */
+  .inset {
+    @apply rounded-[18px] bg-paper px-4 py-1.5;
+  }
+  /* The solid green panel: one per view at most. */
+  .panel-ink {
+    @apply rounded-[30px] bg-char text-cream;
   }
 
   /* Badges */
@@ -107,42 +124,23 @@
     background-color: color-mix(in srgb, var(--color-whiskey-500) 26%, transparent);
   }
 
-  /* Label vernacular ------------------------------------------------------- */
-
-  /* Small-caps letterspaced eyebrow, as on a whiskey label's top line. */
+  /* Small label above a heading. Sentence case, no tracking: the old
+     letterspaced small-caps eyebrow is retired. Use sparingly; a heading
+     rarely needs one. */
   .eyebrow {
-    @apply text-[0.6875rem] font-semibold uppercase tracking-[0.18em];
+    @apply text-[0.8125rem] font-semibold normal-case tracking-normal;
   }
-
-  /* Thin double rule, as under a label's masthead. */
+  /* A single hairline divider (kept under its old name for existing views). */
   .rule-double {
     border-top: 1px solid currentColor;
-    position: relative;
-    opacity: 0.35;
+    opacity: 0.18;
   }
-  .rule-double::after {
-    content: "";
-    position: absolute;
-    left: 0;
-    right: 0;
-    top: 3px;
-    border-top: 1px solid currentColor;
-  }
-
-  /* The thread, the signature amber line. Draws in on load where used. */
+  /* A short orange mark line (kept under its old name for existing views). */
   .thread {
     display: block;
     height: 2px;
-    background: linear-gradient(90deg, var(--color-whiskey-400), var(--color-whiskey-600));
-    transform-origin: left center;
-    animation: thread-draw 900ms cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-  @keyframes thread-draw {
-    from { transform: scaleX(0); }
-    to   { transform: scaleX(1); }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .thread { animation: none; }
+    border-radius: 2px;
+    background: var(--color-mark);
   }
 
   /* Kaminari pagination */
@@ -166,13 +164,13 @@
 }
 
 /* Deck reading experience -------------------------------------------------- */
-/* Applied to rendered Markdown. Editorial column: Source Serif body, Fraunces
+/* Applied to rendered Markdown. Editorial column: Source Serif body, sans
    headings, a drop cap opening the story, and label-style section rules. */
 .prose-deck {
   font-family: var(--font-reading);
   font-size: 1.125rem;
   line-height: 1.8;
-  color: #33271c;
+  color: #1b2924;
   max-width: 65ch;
 }
 .prose-deck > :first-child { margin-top: 0; }
@@ -181,18 +179,18 @@
 .prose-deck h3,
 .prose-deck h4 {
   font-family: var(--font-display);
-  color: #241a10;
+  color: #16332a;
   line-height: 1.2;
   font-weight: 600;
 }
 .prose-deck h1 { font-size: 2rem;    margin: 2.5rem 0 1rem; }
-.prose-deck h2 { font-size: 1.5rem;  margin: 2.5rem 0 0.75rem; padding-top: 1.5rem; border-top: 1px solid #e5d9c3; }
+.prose-deck h2 { font-size: 1.5rem;  margin: 2.5rem 0 0.75rem; padding-top: 1.5rem; border-top: 1px solid #dfe3dc; }
 .prose-deck h3 { font-size: 1.1875rem; margin: 1.75rem 0 0.5rem; color: var(--color-whiskey-700); }
 .prose-deck h4 { font-size: 1.0625rem; margin: 1.5rem 0 0.5rem; }
 .prose-deck p  { margin: 0 0 1.25rem; }
 .prose-deck a  { color: var(--color-whiskey-700); text-decoration: underline; text-underline-offset: 3px; }
 .prose-deck a:hover { color: var(--color-whiskey-600); }
-.prose-deck strong { color: #241a10; }
+.prose-deck strong { color: #16332a; }
 .prose-deck ul, .prose-deck ol { margin: 0 0 1.25rem; padding-left: 1.5rem; }
 .prose-deck ul { list-style: disc; }
 .prose-deck ol { list-style: decimal; }
@@ -202,22 +200,22 @@
   padding: 0.25rem 0 0.25rem 1.25rem;
   border-left: 2px solid var(--color-whiskey-400);
   font-style: italic;
-  color: #5c4a35;
+  color: #3d5247;
 }
 .prose-deck hr {
   border: none;
-  border-top: 1px solid #e5d9c3;
+  border-top: 1px solid #dfe3dc;
   margin: 2.5rem auto;
   width: 8rem;
 }
 .prose-deck code {
   font-size: 0.9em;
-  background: #f4ecdd;
+  background: #ecebe3;
   border-radius: 0.25rem;
   padding: 0.1em 0.35em;
 }
 .prose-deck pre {
-  background: #f4ecdd;
+  background: #ecebe3;
   border-radius: 0.5rem;
   padding: 1rem;
   overflow-x: auto;
@@ -235,12 +233,12 @@
   text-transform: uppercase;
   letter-spacing: 0.1em;
   text-align: left;
-  color: #6b5942;
-  border-bottom: 2px solid #e5d9c3;
+  color: #5f6b64;
+  border-bottom: 2px solid #dfe3dc;
   padding: 0.5rem 0.75rem 0.5rem 0;
 }
 .prose-deck td {
-  border-bottom: 1px solid #efe6d2;
+  border-bottom: 1px solid #e8e9e2;
   padding: 0.625rem 0.75rem 0.625rem 0;
   vertical-align: top;
 }
@@ -320,3 +318,7 @@
   .rsvp-indicator.is-popping,
   .rsvp-option.is-answering .rsvp-tick { animation: none; }
 }
+
+/* Headings set in the display face run tight, as on the homepage. Unlayered on
+   purpose so it applies wherever font-display is used. */
+.font-display { letter-spacing: -0.035em; }

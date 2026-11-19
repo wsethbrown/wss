@@ -1,3 +1,7 @@
+> **Superseded, November 2026.** The owner chose a new direction; the current rules are in
+> `docs/redesign/DESIGN_SYSTEM.md`. This brief is kept as history. Its de-carding principle
+> and char/amber identity no longer apply; its rejection of skeuomorphism still does.
+
 # WSS — From-Scratch Visual Rethink (design brief)
 
 The current design system (char/paper, Fraunces, amber thread) is sound.

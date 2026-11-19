@@ -71,7 +71,7 @@
     <%# Brand type: Fraunces (display), Instrument Sans (UI), Source Serif 4 (deck reading) %>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400..900;1,9..144,400..700&family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:ital,wght@0,400..700;1,400..700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400..700;1,8..60,400..600&display=swap" rel="stylesheet">
 
     <%# Includes all stylesheet files in app/assets/stylesheets %>
     <%= stylesheet_link_tag "tailwind", "data-turbo-track": "reload" %>
@@ -124,14 +124,15 @@
     </style>
   </head>
 
-  <body class="bg-white text-black min-h-screen font-sans">
+  <body class="bg-paper text-gray-900 min-h-screen font-sans">
     <!-- Top Navigation Bar -->
-    <nav class="fixed top-0 left-0 w-full z-50 bg-char/95 backdrop-blur border-b border-oak-edge">
-      <div class="max-w-6xl mx-auto flex items-center justify-between px-6 py-3">
+    <%# A floating rounded bar, inset from the viewport edges. Solid, not glass. %>
+    <nav class="fixed left-1/2 top-3 z-50 w-[min(1240px,calc(100%-1.5rem))] -translate-x-1/2 rounded-[22px] bg-char shadow-[0_10px_30px_-12px_rgba(22,51,42,0.45)]">
+      <div class="flex items-center justify-between py-2 pl-4 pr-2.5">
         <!-- Logo -->
         <a href="/" class="flex items-center gap-3 text-cream hover:text-whiskey-200 transition">
-          <%= image_tag "wss-logo-inverted.png", alt: "Whiskey Share Society", class: "h-10 w-auto" %>
-          <span class="hidden sm:inline font-display text-xl font-semibold tracking-tight">Whiskey Share Society</span>
+          <%= image_tag "wss-logo-inverted.png", alt: "Whiskey Share Society", class: "h-9 w-auto" %>
+          <span class="hidden sm:inline font-display text-[17px] font-semibold">Whiskey Share Society</span>
         </a>
         <!-- Navigation Links -->
         <div class="hidden md:flex gap-2 items-center">
@@ -141,12 +142,12 @@
           <%= nav_link_to 'Membership', membership_path %>
           <% if user_signed_in? %>
             <% if current_user.subscription_active? && current_user.credits > 0 %>
-              <div class="ml-2 flex items-center gap-2 rounded-full border border-whiskey-500/40 bg-whiskey-500/10 px-3 py-1">
-                <svg class="w-4 h-4 text-whiskey-300" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+              <div class="ml-2 flex items-center gap-2 rounded-xl bg-cream/10 px-3 py-1.5">
+                <svg class="w-4 h-4 text-mark-soft" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                   <path d="M8.433 7.418c.155-.103.346-.196.567-.267v1.698a2.305 2.305 0 01-.567-.267C8.07 8.34 8 8.114 8 8c0-.114.07-.34.433-.582zM11 12.849v-1.698c.22.071.412.164.567.267.364.243.433.468.433.582 0 .114-.07.34-.433.582a2.305 2.305 0 01-.567.267z"/>
                   <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-13a1 1 0 10-2 0v.092a4.535 4.535 0 00-1.676.662C6.602 6.234 6 7.009 6 8c0 .99.602 1.765 1.324 2.246.48.32 1.054.545 1.676.662v1.941c-.391-.127-.68-.317-.843-.504a1 1 0 10-1.51 1.31c.562.649 1.413 1.076 2.353 1.253V15a1 1 0 102 0v-.092a4.535 4.535 0 001.676-.662C13.398 13.766 14 12.991 14 12c0-.99-.602-1.765-1.324-2.246A4.535 4.535 0 0011 9.092V7.151c.391.127.68.317.843.504a1 1 0 101.511-1.31c-.563-.649-1.413-1.076-2.354-1.253V5z" clip-rule="evenodd"/>
                 </svg>
-                <span class="text-sm font-semibold text-whiskey-200"><%= current_user.credits %> Credit<%= 's' if current_user.credits != 1 %></span>
+                <span class="text-sm font-semibold text-cream"><%= current_user.credits %> Credit<%= 's' if current_user.credits != 1 %></span>
               </div>
             <% end %>
             <div class="ml-3 flex items-center gap-4">
@@ -157,7 +158,7 @@
                   <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"></path>
                 </svg>
                 <% if unread_count > 0 %>
-                  <span class="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-whiskey-500 px-1 text-[10px] font-bold text-white"><%= unread_count > 9 ? "9+" : unread_count %></span>
+                  <span class="absolute -top-1.5 -right-1.5 flex h-4 min-w-4 items-center justify-center rounded-full bg-mark px-1 text-[10px] font-bold text-char"><%= unread_count > 9 ? "9+" : unread_count %></span>
                 <% end %>
               <% end %>
               <%= link_to account_path, class: "flex items-center gap-2 text-cream/90 hover:text-cream transition" do %>
@@ -175,7 +176,7 @@
             </div>
           <% else %>
             <%= nav_link_to 'Sign in', auth_path %>
-            <%= link_to 'Join the Society', auth_path, class: 'ml-2 inline-flex items-center rounded-xl bg-whiskey-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-whiskey-400' %>
+            <%= link_to 'Join the Society', auth_path, class: 'ml-2 inline-flex items-center rounded-[14px] bg-cream px-4 py-2.5 text-sm font-semibold text-char transition hover:bg-white' %>
           <% end %>
         </div>
 
@@ -186,7 +187,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5"></path>
             </svg>
           </summary>
-          <div class="absolute right-0 mt-2 w-56 rounded-2xl border border-oak-edge bg-char p-2 shadow-xl">
+          <div class="absolute right-0 mt-3 w-56 rounded-2xl border border-oak-edge bg-char p-2 shadow-xl">
             <%= link_to 'Societies', societies_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
             <%= link_to 'Decks', presentations_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
             <%= link_to 'Reviews', reviews_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
@@ -196,14 +197,14 @@
               <%= link_to notifications_path, class: 'flex items-center justify-between rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' do %>
                 <span>Notifications</span>
                 <% if mobile_unread > 0 %>
-                  <span class="flex h-5 min-w-5 items-center justify-center rounded-full bg-whiskey-500 px-1.5 text-xs font-bold text-white"><%= mobile_unread > 9 ? "9+" : mobile_unread %></span>
+                  <span class="flex h-5 min-w-5 items-center justify-center rounded-full bg-mark px-1.5 text-xs font-bold text-char"><%= mobile_unread > 9 ? "9+" : mobile_unread %></span>
                 <% end %>
               <% end %>
               <%= link_to 'Account', account_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
               <%= link_to 'Sign Out', destroy_user_session_path, data: { 'turbo-method': :delete, 'turbo-confirm': 'Are you sure you want to sign out?' }, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/60 hover:bg-oak' %>
             <% else %>
               <%= link_to 'Sign in', auth_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
-              <%= link_to 'Join the Society', auth_path, class: 'mt-1 block rounded-xl bg-whiskey-500 px-4 py-2.5 text-center font-semibold text-white hover:bg-whiskey-400' %>
+              <%= link_to 'Join the Society', auth_path, class: 'mt-1 block rounded-xl bg-cream px-4 py-2.5 text-center font-semibold text-char hover:bg-white' %>
             <% end %>
           </div>
         </details>
@@ -237,21 +238,22 @@
         <%= yield %>
       </main>
     <% else %>
-      <main class="max-w-6xl mx-auto px-4 min-h-[80vh] pt-20">
+      <main class="max-w-6xl mx-auto px-4 min-h-[80vh] pt-24 pb-16">
         <%= yield %>
       </main>
     <% end %>
 
     <!-- Footer -->
-    <footer class="relative w-full bg-char text-cream py-16 px-4 mt-0 border-t border-oak-edge" style="margin-bottom:0;">
-      <div class="max-w-6xl mx-auto">
+    <%# A rounded green panel, inset like the nav. %>
+    <footer class="relative mx-auto mb-3 mt-0 w-[min(1240px,calc(100%-1.5rem))] rounded-[30px] bg-char px-6 py-14 text-cream sm:px-10">
+      <div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-10 mb-12">
           <div class="lg:col-span-2">
             <div class="flex items-center gap-3 mb-5">
               <%= image_tag "wss-logo-inverted.png", alt: "Whiskey Share Society", class: "h-12 w-auto" %>
               <span class="font-display text-2xl font-semibold">Whiskey Share Society</span>
             </div>
-            <p class="eyebrow text-whiskey-300/80 mb-3">Discover &middot; Share &middot; Savor</p>
+            <p class="eyebrow text-mark-soft mb-3">Discover &middot; Share &middot; Savor</p>
             <p class="text-cream/60 max-w-md leading-relaxed">
               Narrative tasting decks and the societies that gather around them.
               Born from a monthly ritual among friends, est. 2019.

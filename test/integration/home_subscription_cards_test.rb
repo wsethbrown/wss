@@ -1,8 +1,10 @@
 require "test_helper"
 
+# The plan cards moved off the homepage in the 2026 redesign (it shows live
+# prices as a short list and links here); /membership is their home now.
 class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
   test "home page displays all three subscription cards" do
-    get root_path
+    get membership_path
     assert_response :success
 
     # Check that all three subscription plans are displayed
@@ -12,7 +14,7 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
   end
 
   test "home page displays correct pricing for each plan" do
-    get root_path
+    get membership_path
     assert_response :success
 
     # Check pricing display (fallback prices)
@@ -22,7 +24,7 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
   end
 
   test "home page highlights a best-value plan" do
-    get root_path
+    get membership_path
     assert_response :success
 
     # One highlighted plan (yearly — the lowest per-month cost).
@@ -30,7 +32,7 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
   end
 
   test "home page shows the free-vs-membership split, not per-plan feature ladders" do
-    get root_path
+    get membership_path
     assert_response :success
 
     # Cards carry no feature lists; benefits live in a free-vs-paid comparison.
@@ -42,7 +44,7 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
   end
 
   test "home page shows savings indicators for quarterly and yearly" do
-    get root_path
+    get membership_path
     assert_response :success
 
     # Check for savings badges
@@ -51,7 +53,7 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
   end
 
   test "subscription cards have brand card styling" do
-    get root_path
+    get membership_path
     assert_response :success
 
     # Plan cards are white label-style cards; the popular plan is set off with a
@@ -62,7 +64,7 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
   end
 
   test "subscription cards have Get Started buttons" do
-    get root_path
+    get membership_path
     assert_response :success
 
     # Check for CTA buttons (scoped to the pricing grid; "Get Started" also
@@ -74,7 +76,7 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
   end
 
   test "subscription cards display correct intervals" do
-    get root_path
+    get membership_path
     assert_response :success
 
     # Check interval display (scoped to the pricing grid). All plans normalise
@@ -83,7 +85,7 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
   end
 
   test "subscription cards are responsive with 3-column grid" do
-    get root_path
+    get membership_path
     assert_response :success
 
     # Check for responsive grid classes
@@ -91,7 +93,7 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
   end
 
   test "subscription cards show proper plan descriptions" do
-    get root_path
+    get membership_path
     assert_response :success
 
     # Descriptions speak to commitment/cadence — the only real difference
