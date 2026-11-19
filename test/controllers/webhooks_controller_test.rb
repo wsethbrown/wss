@@ -196,7 +196,72 @@ class WebhooksControllerTest < ActionDispatch::IntegrationTest
     assert_equal 1, @user.reload.credits
   end
 
+  # ---------------------------------------------------------------------------
+  # B6 follow-up: a Stripe failure while re-fetching the subscription. Transient
+  # errors release the claim and answer 5xx so Stripe retries; a subscription
+  # Stripe no longer knows is acknowledged (200) and changes nothing.
+  # ---------------------------------------------------------------------------
+
+  TRANSIENT_STRIPE_ERRORS = [
+    -> { Stripe::APIConnectionError.new("connection reset") },
+    -> { Stripe::RateLimitError.new("too many requests") }
+  ].freeze
+
+  %w[customer.subscription.updated customer.subscription.created].each do |type|
+    TRANSIENT_STRIPE_ERRORS.each do |error|
+      klass = error.call.class
+      test "#{type}: a transient #{klass.name} on retrieve returns 5xx, releases the claim and changes nothing" do
+        event_id = "evt_b6_transient_#{type.split('.').last}_#{klass.name.demodulize}"
+        CreditTransaction.record!(user: @user, amount: 1, transaction_type: "granted", description: "setup")
+        before = subscription_snapshot
+
+        Stripe::Subscription.stubs(:retrieve).raises(error.call)
+        post_event(event_id, type, sub_payload("sub_b5", "incomplete"))
+        Stripe::Subscription.unstub(:retrieve)
+
+        assert_response :internal_server_error
+        assert_not StripeEvent.exists?(stripe_event_id: event_id), "claim released"
+        assert_equal before, subscription_snapshot
+
+        # Stripe's redelivery of the same event is processed, not skipped.
+        with_retrieved("sub_b5" => fresh_sub("sub_b5", "past_due")) do
+          post_event(event_id, type, sub_payload("sub_b5", "incomplete"))
+        end
+        assert_response :success
+        assert_equal "success", JSON.parse(response.body)["status"]
+        assert_equal "past_due", @user.reload.subscription_status
+        assert StripeEvent.processed?(event_id)
+        assert_equal 1, @user.credits
+        assert_equal CreditTransaction.balance_for(@user), @user.credits
+      end
+    end
+
+    test "#{type}: a subscription Stripe no longer knows is acknowledged, logged and changes nothing" do
+      event_id = "evt_b6_gone_#{type.split('.').last}"
+      CreditTransaction.record!(user: @user, amount: 1, transaction_type: "granted", description: "setup")
+      before = subscription_snapshot
+
+      Rails.logger.stubs(:warn)
+      Rails.logger.expects(:warn).with(regexp_matches(/sub_b5 for user #{@user.id} could not be retrieved from Stripe/)).once
+      Stripe::Subscription.stubs(:retrieve).raises(Stripe::InvalidRequestError.new("No such subscription: 'sub_b5'", "id"))
+      post_event(event_id, type, sub_payload("sub_b5", "incomplete"))
+      Stripe::Subscription.unstub(:retrieve)
+
+      assert_response :success
+      assert StripeEvent.processed?(event_id), "acknowledged; Stripe will not retry"
+      assert_equal before, subscription_snapshot
+    end
+  end
+
   private
+
+  # Subscription fields plus the ledger, for "changes nothing" assertions.
+  def subscription_snapshot
+    @user.reload
+    [ @user.attributes.slice(*%w[stripe_subscription_id subscription_status subscription_plan subscription_ends_at
+                                 cancel_at_period_end subscription_paused_at credits founding_member]),
+      CreditTransaction.where(user: @user).order(:id).pluck(:id, :amount) ]
+  end
 
   def founding_society_checkout(order:)
     @user.update!(stripe_subscription_id: nil, subscription_plan: nil, subscription_status: nil)
