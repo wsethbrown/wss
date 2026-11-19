@@ -2,9 +2,6 @@ class Admin::PresentationsController < Admin::BaseController
   before_action :require_delete_rights!, only: :destroy
   before_action :set_presentation, only: [ :show, :edit, :update, :destroy, :publish, :unpublish ]
 
-  # Temporary fix for schema caching issue
-  before_action :reset_column_information, only: [ :new, :create, :edit, :update ]
-
   def index
     @presentations = Presentation.includes(:author, :user_presentations)
                                 .order(created_at: :desc)
@@ -135,10 +132,6 @@ class Admin::PresentationsController < Admin::BaseController
   end
 
   private
-
-  def reset_column_information
-    Presentation.reset_column_information
-  end
 
   def set_presentation
     @presentation = Presentation.find(params[:id])

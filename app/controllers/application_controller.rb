@@ -13,7 +13,7 @@ class ApplicationController < ActionController::Base
   include ActivityLogger
 
   # before_action :authenticate_user!
-  before_action :set_timezone
+  around_action :set_timezone
 
   rescue_from Pundit::NotAuthorizedError, with: :user_not_authorized
   # Invite-link peek: whoever signs up or in after viewing /invite/:token
@@ -66,8 +66,14 @@ class ApplicationController < ActionController::Base
     end
   end
 
-  def set_timezone
-    Time.zone = browser_timezone if browser_timezone.present?
+  # Scoped to the request: assigning Time.zone would leak this visitor's zone
+  # into the next request served by the same thread.
+  def set_timezone(&block)
+    if browser_timezone.present?
+      Time.use_zone(browser_timezone, &block)
+    else
+      yield
+    end
   end
 
   def browser_timezone

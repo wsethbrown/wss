@@ -97,3 +97,33 @@ class BackupRestoreDrillJobTest < ActiveSupport::TestCase
     end
   end
 end
+
+# I9: the dump is up to a day older than the live database, so equal counts is
+# the wrong test. A restore must be non-empty where production has rows and
+# never larger than production.
+class BackupRestoreDrillCountsTest < ActiveSupport::TestCase
+  def verify_with(production:, restored:)
+    job = BackupRestoreDrillJob.new
+    job.stubs(:db).returns({ database: "wss_test" })
+    job.stubs(:count_in).with("wss_test", anything).returns(production)
+    job.stubs(:count_in).with(job.send(:drill_db), anything).returns(restored)
+    job.stubs(:count_query).returns(0).then.returns(25)
+    job.send(:verify!)
+  end
+
+  test "a restore older than production (fewer rows) still passes" do
+    assert_nothing_raised { verify_with(production: 10, restored: 8) }
+  end
+
+  test "a restore that lost everything fails" do
+    assert_raises(BackupRestoreDrillJob::DrillFailed) { verify_with(production: 10, restored: 0) }
+  end
+
+  test "a restore with more rows than production fails" do
+    assert_raises(BackupRestoreDrillJob::DrillFailed) { verify_with(production: 10, restored: 11) }
+  end
+
+  test "an empty table in both passes" do
+    assert_nothing_raised { verify_with(production: 0, restored: 0) }
+  end
+end

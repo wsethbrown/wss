@@ -126,9 +126,16 @@ class BackupRestoreDrillJob < ApplicationJob
       production = count_in(db[:database], table)
       restored = count_in(drill_db, table)
 
-      raise DrillFailed, "#{table}: production has #{production} rows, restore has #{restored}" if production != restored
+      # The dump is up to a day older than the live database, so exact equality
+      # would false-alarm as soon as there is traffic. What a bad restore looks
+      # like is "nothing came back" or "more than production ever had".
+      if production.zero?
+        raise DrillFailed, "#{table}: production is empty but restore has #{restored} rows" unless restored.zero?
 
-      empty << table if production.zero?
+        empty << table
+      elsif restored.zero? || restored > production
+        raise DrillFailed, "#{table}: production has #{production} rows, restore has #{restored} (expected 1..#{production})"
+      end
     end
 
     # The credit ledger is the money. A restore that loses its consistency is

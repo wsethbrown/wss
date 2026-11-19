@@ -477,7 +477,8 @@ Waits for the decisions listed in `ACCOUNT_DELETION.md` (produced by B4).
 
 ## Wave B1 addition (parallel with B1–B4)
 
-### [ ] B13 · Job and config hygiene — `sonnet`
+### [x] B13 · Job and config hygiene — `sonnet`
+Result: mail-job args not logged, finished-job cleanup recurring + purge rake (not run), mail retry on transient errors, fan-out/reminder idempotent via cache claims, drill 0<restored<=prod, Stripe timeouts and complete-set caching, production boot guard (founding price ids not required), `Time.use_zone` around_action, schema-cache reset removed.
 **Findings:** I1, I6, I9, I14, I20, I21, I25, I27.
 **Owns:** `config/initializers/*` (new files plus `stripe.rb`), `app/jobs/application_job.rb`,
 `event_notification_job.rb`, `event_reminder_job.rb`, `backup_restore_drill_job.rb`,

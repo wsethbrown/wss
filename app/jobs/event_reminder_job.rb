@@ -37,7 +37,10 @@ class EventReminderJob < ApplicationJob
     recipients = attendees.select(&:event_emails?)
     Rails.logger.info "EventReminderJob: event #{event.id}: emailing #{recipients.size} of #{attendees.size} yes-RSVPs (rest muted)"
     recipients.each do |user|
-      EventMailer.event_reminder(user, event).deliver_later
+      sent = once("event_reminder:#{event.id}:#{scheduled_start}:#{user.id}") do
+        EventMailer.event_reminder(user, event).deliver_later
+      end
+      Rails.logger.info "EventReminderJob: event #{event.id}: user #{user.id} already reminded; skipping duplicate" unless sent
     end
   end
 end
