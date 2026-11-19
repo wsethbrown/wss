@@ -1,8 +1,7 @@
 class PresentationsController < ApplicationController
   include ActivityLogger
-  include DesignPreview
 
-  before_action :set_presentation, only: [ :show, :present, :edit, :update, :destroy ]
+  before_action :set_presentation, only: [ :show, :present ]
 
   def index
     # The library is fully empty only when there are no published decks at all,
@@ -33,8 +32,6 @@ class PresentationsController < ApplicationController
     end
 
     @presentations = @presentations.page(params[:page]).per(12)
-
-    maybe_render_next
   end
 
   def show
@@ -51,8 +48,6 @@ class PresentationsController < ApplicationController
     @full_story = user_signed_in? && @presentation.can_download_full_presentation?(current_user)
 
     @more_decks = Presentation.published.where.not(id: @presentation.id).recent.limit(3)
-
-    maybe_render_next
   end
 
   # Full-screen in-browser slide player, the tasting venue. Owners/admins only.
@@ -62,43 +57,6 @@ class PresentationsController < ApplicationController
       redirect_to presentation_path(@presentation) and return
     end
     render layout: false
-  end
-
-  def new
-    @presentation = Presentation.new
-    authorize @presentation
-  end
-
-  def create
-    @presentation = current_user.presentations.build(presentation_params)
-    authorize @presentation
-
-    if @presentation.save
-      redirect_to @presentation, notice: "Presentation was successfully created."
-    else
-      render :new, status: :unprocessable_entity
-    end
-  end
-
-  def edit
-    authorize @presentation
-  end
-
-  def update
-    authorize @presentation
-
-    if @presentation.update(presentation_params)
-      redirect_to @presentation, notice: "Presentation was successfully updated."
-    else
-      render :edit, status: :unprocessable_entity
-    end
-  end
-
-  def destroy
-    authorize @presentation
-
-    @presentation.destroy
-    redirect_to presentations_url, notice: "Presentation was successfully deleted."
   end
 
   private
@@ -150,9 +108,5 @@ class PresentationsController < ApplicationController
   # don't exist (no existence leak). Admins see them with a draft banner.
   def ensure_deck_visible!
     raise ActiveRecord::RecordNotFound unless @presentation.published? || current_user&.admin?
-  end
-
-  def presentation_params
-    params.require(:presentation).permit(:title, :description, :content, :price, :category)
   end
 end

@@ -22,6 +22,14 @@ send.whiskeysharesociety.com, every sender is
 stay on the verified subdomain or Resend rejects). First prod magic link
 verified delivered end-to-end.
 
+## Admin invitations (fourth sign-in path)
+Auth::InvitationService (admin/invitations_controller, admin/users#resend_invitation,
+InvitationsController#show at /invitations/:token). An admin creates the User and
+emails a claim link: HMAC-digested single-use token on dedicated invitation columns,
+14-day expiry, deliver_later. Accepting signs the invitee in once; afterwards they use
+magic link or Google like everyone else. Same token discipline as magic links — never
+log the raw token.
+
 ## Google OAuth
 - Strategy registers with real env creds in production; with DUMMY fallbacks
   in dev/test (so routes + OmniAuth test mode always work). The button only
@@ -32,7 +40,12 @@ verified delivered end-to-end.
   Secret creates a second (two max; delete lost ones). Redirect URIs must
   include each environment's /users/auth/google_oauth2/callback.
 - Users::OmniauthCallbacksController#handle_auth → User.from_omniauth
-  (links by provider/uid, then by email if no provider set).
+  (links by provider/uid, then by email if no provider set). A changed uid for
+  the same provider on an existing email is rebound and logged at warn
+  ("OAuth uid rebind", ids only). The Google strategy (omniauth-google-oauth2
+  1.2.2) exposes auth.info.email_verified, and auth.info.email is already nil
+  unless Google reports email_verified true, so email linking only sees verified
+  addresses.
 
 ## Apple (LIVE in production since July 2026)
 Strategy registers ONLY when all four APPLE_* env vars exist; they are set in

@@ -39,7 +39,10 @@ class User < ApplicationRecord
         return user_by_email
       elsif user_by_email.provider == auth.provider
         # Same provider, update uid if needed
-        user_by_email.update!(uid: auth.uid) if user_by_email.uid != auth.uid
+        if user_by_email.uid != auth.uid
+          Rails.logger.warn "OAuth uid rebind: user #{user_by_email.id} provider #{auth.provider} uid changed (was #{user_by_email.uid.inspect}, now #{auth.uid.inspect})"
+          user_by_email.update!(uid: auth.uid)
+        end
         return user_by_email
       else
         # User already has a different OAuth provider

@@ -188,7 +188,7 @@ Rails.application.routes.draw do
 
   # Presentations. All purchasing goes through the nested purchases controller —
   # a single flow for credit, paid (Stripe checkout), and free decks.
-  resources :presentations do
+  resources :presentations, only: [ :index, :show ] do
     member { get :present }
     # Deck reviews: stars + short text from owners/attendees (model-gated).
     resources :deck_reviews, only: [ :create, :update, :destroy ], controller: "presentations/reviews"

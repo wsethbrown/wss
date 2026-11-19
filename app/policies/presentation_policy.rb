@@ -18,30 +18,4 @@ class PresentationPolicy < ApplicationPolicy
   def show?
     true
   end
-
-  def create?
-    return false unless user.present?
-    user.admin? || user.societies.exists?
-  end
-
-  def update?
-    return false unless user.present?
-    user.admin? || record.author == user
-  end
-
-  def destroy?
-    return false unless user.present?
-    # Authors delete their own decks; admin-override delete needs full rights.
-    user.can_delete? || record.author == user
-  end
-
-  def purchase?
-    return false unless user.present?
-    record.paid? && record.author != user
-  end
-
-  def manage?
-    return false unless user.present?
-    user.admin? || user.role == "admin"
-  end
 end

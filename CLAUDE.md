@@ -7,9 +7,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 A full refresh/refactor is in progress on branch `overhaul/full-refresh`. **@OVERHAUL_PLAN.md** is the
 source of truth for what's done and what's next. Key invariants established there (do not regress):
 
-- **Auth:** Only three paths — Devise password, magic link (`Auth::MagicLinkService`), and OmniAuth
-  (Google always; Apple only when `APPLE_*` env vars are set). There are NO hand-rolled OAuth
-  callbacks; never add one, and never disable OAuth/JWT signature verification.
+- **Auth:** Three self-serve paths — Devise password, magic link (`Auth::MagicLinkService`), and OmniAuth
+  (Google always; Apple only when `APPLE_*` env vars are set) — plus a fourth, admin-initiated one:
+  admin invitations (`Auth::InvitationService`, `InvitationsController` at `/invitations/:token`). An
+  admin creates the account and emails a 14-day, single-use claim link (HMAC-digested token on dedicated
+  invitation columns); accepting it signs the invitee in once, after which they use the other paths.
+  There are NO hand-rolled OAuth callbacks; never add one, and never disable OAuth/JWT signature verification.
 - **Admin:** Roles are the `users.admin_role` enum (none/limited/full). `User#admin?` is true for any
   admin tier; `User#can_delete?` is true only for full (limited admins keep every admin power except
   hard-deleting records). `admin_role` is the source of truth; the old `is_admin` boolean is vestigial.
