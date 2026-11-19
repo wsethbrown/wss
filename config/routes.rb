@@ -204,6 +204,8 @@ Rails.application.routes.draw do
         # and the standard blank card, always included as a fallback.
         get :scorecard
         get :blank_scorecard
+        # Extras (supplemental_materials), owner-gated, by attachment id.
+        get "supplemental/:attachment_id", action: :supplemental, as: :supplemental
       end
     end
   end

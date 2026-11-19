@@ -4,7 +4,7 @@ class DownloadLog < ApplicationRecord
 
   # Must list every type Presentations::DownloadsController#track_download writes.
   FILE_TYPES = %w[
-    sneak_peek full_presentation speaker_notes outline recommendations scorecard blank_scorecard
+    sneak_peek full_presentation speaker_notes outline recommendations scorecard blank_scorecard supplemental
   ].freeze
 
   validates :file_type, presence: true, inclusion: { in: FILE_TYPES }

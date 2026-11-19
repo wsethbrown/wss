@@ -184,4 +184,82 @@ class Presentations::DownloadsControllerTest < ActionDispatch::IntegrationTest
     get download_path(:outline)
     assert_response :not_found
   end
+
+  # Extras (supplemental_materials): one route taking the attachment id.
+  def attach_extra
+    @deck.supplemental_materials.attach(io: StringIO.new("extra body"), filename: "extra.pdf", content_type: "application/pdf")
+    @deck.supplemental_materials.attachments.last
+  end
+
+  def supplemental_path(attachment)
+    supplemental_presentation_downloads_path(@deck, attachment_id: attachment.id)
+  end
+
+  test "supplemental: signed out is sent to sign in" do
+    get supplemental_path(attach_extra)
+    assert_redirected_to auth_path
+  end
+
+  test "supplemental: member without ownership is sent to purchase" do
+    sign_in @user
+    get supplemental_path(attach_extra)
+    assert_redirected_to new_presentation_purchase_path(@deck)
+  end
+
+  test "supplemental: lapsed credit owner is sent to pricing" do
+    lapse!
+    own("credit")
+    sign_in @user
+    get supplemental_path(attach_extra)
+    assert_redirected_to root_path(anchor: "pricing")
+  end
+
+  test "supplemental: active credit owner, direct owner and admin get a short-lived URL" do
+    extra = attach_extra
+    activate!
+    own("credit")
+    sign_in @user
+    get supplemental_path(extra)
+    assert_short_lived_service_url
+    sign_out @user
+
+    sign_in users(:admin)
+    get supplemental_path(extra)
+    assert_short_lived_service_url
+  end
+
+  test "supplemental: lapsed direct owner gets a short-lived URL and a log row" do
+    extra = attach_extra
+    lapse!
+    own("direct")
+    sign_in @user
+    assert_difference -> { DownloadLog.where(user: @user, file_type: "supplemental").count }, 1 do
+      get supplemental_path(extra)
+    end
+    assert_short_lived_service_url
+  end
+
+  test "supplemental: an attachment of another deck is a 404" do
+    other = Presentation.create!(author: users(:admin), title: "Other", content: "x", price: 5)
+    other.supplemental_materials.attach(io: StringIO.new("secret"), filename: "secret.pdf", content_type: "application/pdf")
+    foreign = other.supplemental_materials.attachments.last
+    own("direct")
+    sign_in @user
+    get supplemental_path(foreign)
+    assert_response :not_found
+    # a non-supplemental attachment of this deck is also not reachable
+    sign_in @user
+    get supplemental_presentation_downloads_path(@deck, attachment_id: @deck.pdf_file.attachment.id)
+    assert_response :not_found
+  end
+
+  test "the deck page links extras through the downloads route, not a permanent blob link" do
+    extra = attach_extra
+    own("direct")
+    sign_in @user
+    get presentation_path(@deck)
+    assert_response :success
+    assert_includes response.body, supplemental_path(extra)
+    assert_no_match %r{/rails/active_storage/blobs/}, response.body
+  end
 end

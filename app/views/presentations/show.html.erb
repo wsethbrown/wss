@@ -182,7 +182,7 @@
             <ul class="mt-1 divide-y divide-hairline">
               <% @presentation.supplemental_materials.each do |material| %>
                 <li>
-                  <%= link_to rails_blob_path(material, disposition: 'attachment'),
+                  <%= link_to supplemental_presentation_downloads_path(@presentation, attachment_id: material.id),
                       class: "flex min-h-12 items-center justify-between gap-4 py-3 font-semibold text-ink transition hover:text-whiskey-700" do %>
                     <span class="truncate"><%= material.filename %></span>
                     <%= download_icon %>

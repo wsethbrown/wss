@@ -82,6 +82,15 @@ class Presentations::DownloadsController < ApplicationController
               disposition: "attachment"
   end
 
+  # An "Extra" (supplemental material). Scoped to this deck's own extras so an
+  # attachment id from another deck or slot is a 404.
+  def supplemental
+    attachment = @presentation.supplemental_materials.attachments.find(params[:attachment_id])
+    track_download("supplemental")
+
+    redirect_to_private_file(attachment)
+  end
+
   private
 
   BLANK_SCORECARD_PATH = Rails.root.join("app/assets/documents/wss_scorecard_blank.pdf").freeze
