@@ -8,9 +8,9 @@ class HomeController < ApplicationController
     # The one deck to spotlight right now: the most recently featured published deck.
     @spotlight_deck = Presentation.published.featured.recent.first
 
-    # Two saved previews: ?design=next (the approved direction) and
-    # ?design=next2 (the same system pushed further).
-    preview = { "next" => "index_next", "next2" => "index_next2" }[params[:design]]
+    # Saved previews: ?design=next (the approved direction), next2 (a milder
+    # push) and next3 (the pinned-presentation version).
+    preview = { "next" => "index_next", "next2" => "index_next2", "next3" => "index_next3" }[params[:design]]
     if preview && design_preview_allowed?
       # Real rendered slides from the newest deck that has them.
       @showcase_deck = Presentation.published.recent.joins(:slide_images_attachments).distinct.first
