@@ -322,3 +322,18 @@
 /* Headings set in the display face run tight, as on the homepage. Unlayered on
    purpose so it applies wherever font-display is used. */
 .font-display { letter-spacing: -0.035em; }
+
+/* Shared small components (D0). Recipes from docs/redesign/DESIGN_SYSTEM.md. */
+@layer components {
+  /* A filter or tag chip: 12px radius, hairline, white. */
+  .chip {
+    @apply inline-flex min-h-9 items-center rounded-xl border border-hairline bg-white px-3.5 text-sm font-medium text-ink transition hover:border-whiskey-300;
+  }
+  .chip[aria-current="true"], .chip[aria-pressed="true"] {
+    @apply border-ink bg-ink text-white;
+  }
+  /* Step or count marker: a 32px paper square with a bold numeral. */
+  .step-marker {
+    @apply inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-[11px] bg-paper text-sm font-bold tabular-nums text-ink;
+  }
+}
