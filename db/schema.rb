@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_11_19_150000) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_19_160000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -175,6 +175,7 @@ ActiveRecord::Schema[8.0].define(version: 2026_11_19_150000) do
     t.bigint "host_id"
     t.bigint "presentation_id"
     t.string "host_name"
+    t.string "time_zone"
     t.index ["host_id"], name: "index_events_on_host_id"
     t.index ["location"], name: "index_events_on_location"
     t.index ["organizer_id"], name: "index_events_on_organizer_id"

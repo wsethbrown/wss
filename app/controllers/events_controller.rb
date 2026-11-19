@@ -66,6 +66,11 @@ class EventsController < ApplicationController
       end
     end
 
+    # Emails render in the event's own zone (B15). Order: the organiser's
+    # browser zone, then Event::FALLBACK_TIME_ZONE. (No per-user zone is
+    # stored anywhere, so there is no "society creator's last zone" step.)
+    @event.time_zone = browser_timezone.presence || Event::FALLBACK_TIME_ZONE
+
     authorize @event
 
     if @event.save
@@ -92,7 +97,9 @@ class EventsController < ApplicationController
     updated_params = event_params
     if browser_timezone.present? && (params[:event][:start_time].present? || params[:event][:end_time].present?)
       Time.use_zone(browser_timezone) do
+        # Times are read in the editor's zone, so the event adopts it (B15).
         updated_params = updated_params.merge(
+          time_zone: browser_timezone,
           start_time: submitted_time(params[:event][:start_time], @event.start_time),
           end_time: submitted_time(params[:event][:end_time], @event.end_time)
         )

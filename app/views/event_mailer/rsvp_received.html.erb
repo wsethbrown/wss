@@ -3,10 +3,11 @@
       <h2 class="title" style="margin-top:0;"><%= @guest.full_name %> RSVP'd <%= @rsvp.status %></h2>
       <div class="details">
         <p><strong><%= @event.title %></strong></p>
-        <p><%= @event.start_time.strftime("%A, %B %-d") %></p>
+        <p><%= @event.start_date_label %></p>
       </div>
       <% if @rsvp.note.present? %>
         <div class="note">&ldquo;<%= @rsvp.note %>&rdquo;</div>
       <% end %>
       <a class="btn" href="<%= society_event_url(@event.society, @event) %>">See all RSVPs</a>
+<p class="hint"><a href="<%= @mute_url %>">Turn off event emails</a></p>
 <%= render "mailers/layout_close", footer_note: "You can turn off event emails any time in your account settings at whiskeysharesociety.com." %>

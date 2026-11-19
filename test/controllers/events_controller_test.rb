@@ -182,4 +182,23 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
       assert_response :redirect
     end
   end
+
+  test "create stores the organiser's browser zone on the event (B15)" do
+    sign_in users(:john)
+    cookies[:browser_timezone] = "America/Chicago"
+    post society_events_path(@society), params: { event: { society_id: @society.id, title: "Zone Night",
+                                                            description: "x", location: "x",
+                                                            start_time: "2030-03-01T19:30", end_time: "2030-03-01T21:30" } }
+    event = Event.find_by!(title: "Zone Night")
+    assert_equal "America/Chicago", event.time_zone
+    assert_match(/7:30 PM CST\z/, event.start_time_label)
+  end
+
+  test "create without a zone cookie uses the fallback zone (B15)" do
+    sign_in users(:john)
+    post society_events_path(@society), params: { event: { society_id: @society.id, title: "Fallback Night",
+                                                            description: "x", location: "x",
+                                                            start_time: 3.days.from_now, end_time: 3.days.from_now + 1.hour } }
+    assert_equal Event::FALLBACK_TIME_ZONE, Event.find_by!(title: "Fallback Night").time_zone
+  end
 end

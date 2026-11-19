@@ -1,0 +1,13 @@
+<% content_for :title, "Event emails - Whiskey Share Society" %>
+<%# Opened from the footer of an event email. The GET changes nothing, so a
+    mail scanner following the link mutes no one; the button POSTs. %>
+<div class="mx-auto w-full max-w-md py-8">
+  <div class="card p-7 text-center sm:p-8">
+    <h1 class="font-display text-3xl font-semibold text-ink">Turn off event emails</h1>
+    <p class="mt-2 text-mute">Society events (new events, changes, reminders) for <%= @user.email %>.</p>
+    <%= form_with url: event_mute_path, method: :post, class: "mt-7", data: { turbo: false } do %>
+      <%= hidden_field_tag :token, @token, id: nil %>
+      <%= button_tag "Turn off event emails", type: "submit", class: "btn btn-primary min-h-12 w-full cursor-pointer" %>
+    <% end %>
+  </div>
+</div>

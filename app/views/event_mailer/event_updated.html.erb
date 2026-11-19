@@ -4,8 +4,9 @@
       <p class="meta">Updated: <%= @changed_fields.join(" and ") %></p>
       <div class="details">
         <p><strong><%= @event.society.name %></strong></p>
-        <p><%= @event.start_time.strftime("%A, %B %-d at %-l:%M %p") %></p>
+        <p><%= @event.start_time_label %></p>
         <% if @event.location.present? %><p><%= @event.location %></p><% end %>
       </div>
       <p class="see"><a href="<%= society_event_url(@event.society, @event) %>">See the full event page</a></p>
+<p class="hint"><a href="<%= @mute_url %>">Turn off event emails</a></p>
 <%= render "mailers/layout_close", footer_note: "You can turn off event emails any time in your account settings at whiskeysharesociety.com." %>

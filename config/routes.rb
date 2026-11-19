@@ -245,6 +245,11 @@ Rails.application.routes.draw do
   get "email_rsvps/:status", to: "email_rsvps#show", as: :email_rsvp
   post "email_rsvps/:status", to: "email_rsvps#create"
 
+  # One-click "stop event emails" (signed token, no session; B15). The
+  # List-Unsubscribe-Post header points mail clients at the POST.
+  get "event_mute", to: "event_mutes#show", as: :event_mute
+  post "event_mute", to: "event_mutes#create"
+
   # SEO: the sitemap (public pages only; the veil rules hold).
   get "sitemap.xml", to: "sitemaps#show", format: :xml
 

@@ -15,6 +15,24 @@ class Event < ApplicationRecord
     host&.full_name.presence || host_name.presence
   end
 
+  # The zone an event's times are meant in (B15). Set from the organiser's
+  # browser zone at create; events with none stored fall back to this.
+  FALLBACK_TIME_ZONE = "America/New_York".freeze
+
+  def effective_time_zone
+    (time_zone.present? && ActiveSupport::TimeZone[time_zone]) || ActiveSupport::TimeZone[FALLBACK_TIME_ZONE]
+  end
+
+  # "Thursday, January 14 at 7:30 PM EST", independent of the ambient Time.zone
+  # (mail renders in the jobs process, where that is UTC).
+  def start_time_label
+    local_start.strftime("%A, %B %-d at %-l:%M %p %Z")
+  end
+
+  def start_date_label
+    local_start.strftime("%A, %B %-d")
+  end
+
   # Associations
   has_many :event_rsvps, dependent: :destroy
   has_many :attendees, through: :event_rsvps, source: :user
@@ -29,6 +47,7 @@ class Event < ApplicationRecord
   validates :description, length: { maximum: 2000 }
   validates :location, length: { maximum: 200 }
   validates :start_time, presence: true
+  validate :time_zone_is_known
   validates :end_time, presence: true
   validate :end_time_after_start_time
 
@@ -169,6 +188,15 @@ class Event < ApplicationRecord
   end
 
   private
+
+  def local_start
+    start_time.in_time_zone(effective_time_zone)
+  end
+
+  def time_zone_is_known
+    return if time_zone.blank? || ActiveSupport::TimeZone[time_zone]
+    errors.add(:time_zone, "is not a known time zone")
+  end
 
   def end_time_after_start_time
     return unless start_time && end_time
