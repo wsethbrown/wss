@@ -181,8 +181,14 @@ class WebhooksController < ApplicationController
       invoice_id = invoice.try(:id) || invoice["id"]
       case billing_reason
       when "subscription_cycle"
-        CreditTransaction.grant_monthly_credit(user, "Monthly subscription renewal")
-        Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice_id}, credit added for renewal"
+        # M4: refresh status (and pause) from the subscription we just
+        # retrieved before granting. A past_due member whose retry succeeded
+        # is active again in Stripe, but our row still says past_due until
+        # customer.subscription.updated arrives, which would silently skip
+        # the credit. The grant shares the daily job's per-month ledger key.
+        refresh_subscription_state(user, subscription)
+        outcome = CreditTransaction.grant_monthly_credit(user, "Monthly subscription renewal")
+        Rails.logger.info "Payment succeeded for user #{user.id}: #{invoice_id}, renewal credit #{outcome}"
       when "subscription_create"
         # The welcome credit's webhook path (fallback behind the synchronous
         # grant on the checkout success redirect). No active-status guard:
@@ -243,6 +249,22 @@ class WebhooksController < ApplicationController
       # This is already handled by customer.subscription.created event
       session_id = session.try(:id) || session["id"]
       Rails.logger.info "Subscription checkout completed: #{session_id}"
+    end
+  end
+
+  # Writes the retrieved subscription's status and pause state onto the user
+  # (subscription_cycle only). A missing status leaves the row as it was.
+  def refresh_subscription_state(user, subscription)
+    status = subscription.try(:status) || subscription["status"]
+    return Rails.logger.warn("Renewal for user #{user.id}: retrieved subscription has no status; keeping #{user.subscription_status.inspect}") if status.blank?
+
+    paused = (subscription.try(:pause_collection) || subscription["pause_collection"]).present?
+    attrs = { subscription_status: status }
+    attrs[:subscription_paused_at] = paused ? (user.subscription_paused_at || Time.current) : nil
+    previous = user.subscription_status
+    user.update!(attrs)
+    if previous != status
+      Rails.logger.info "Renewal for user #{user.id}: subscription status refreshed from Stripe #{previous.inspect} -> #{status.inspect}"
     end
   end
 

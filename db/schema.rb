@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.0].define(version: 2026_07_23_180000) do
+ActiveRecord::Schema[8.0].define(version: 2026_11_19_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -99,6 +99,8 @@ ActiveRecord::Schema[8.0].define(version: 2026_07_23_180000) do
     t.text "description"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "grant_key"
+    t.index ["grant_key"], name: "index_credit_transactions_on_grant_key", unique: true
     t.index ["presentation_id"], name: "index_credit_transactions_on_presentation_id"
     t.index ["transaction_type"], name: "index_credit_transactions_on_transaction_type"
     t.index ["user_id", "created_at"], name: "index_credit_transactions_on_user_id_and_created_at"

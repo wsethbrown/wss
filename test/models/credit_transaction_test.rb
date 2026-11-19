@@ -66,4 +66,51 @@ class CreditTransactionTest < ActiveSupport::TestCase
       CreditTransaction.record!(user: @user, amount: 1, transaction_type: "bogus")
     end
   end
+
+  # --- B5: one monthly grant per (user, calendar month) ----------------------
+  test "grant_monthly_credit grants once per calendar month and reports why it no-ops" do
+    @user.update!(subscription_ends_at: nil) # open-ended, so the 2027 dates stay active
+    travel_to Time.utc(2027, 3, 14, 11) do
+      assert_equal :granted, CreditTransaction.grant_monthly_credit(@user)
+      assert_equal :already_granted, CreditTransaction.grant_monthly_credit(@user)
+      assert_equal "monthly:#{@user.id}:2027-03", CreditTransaction.where(user: @user).last.grant_key
+    end
+    travel_to Time.utc(2027, 4, 1, 11) do
+      assert_equal :granted, CreditTransaction.grant_monthly_credit(@user)
+    end
+    assert_equal 2, @user.reload.credits
+    assert_equal CreditTransaction.balance_for(@user), @user.credits
+  end
+
+  test "grant_monthly_credit no-ops for inactive and paused members" do
+    @user.update!(subscription_status: "past_due")
+    assert_equal :inactive, CreditTransaction.grant_monthly_credit(@user)
+    @user.update!(subscription_status: "active", subscription_paused_at: 1.day.ago)
+    assert_equal :paused, CreditTransaction.grant_monthly_credit(@user)
+    assert_equal 0, @user.reload.credits
+  end
+
+  test "a welcome credit right after this month's monthly credit does not double" do
+    @user.update!(subscription_ends_at: nil) # open-ended, so the 2027 dates stay active
+    travel_to Time.utc(2027, 5, 10, 9) do
+      CreditTransaction.grant_monthly_credit(@user)
+    end
+    travel_to Time.utc(2027, 5, 10, 15) do
+      assert_not CreditTransaction.grant_welcome_credit(@user)
+    end
+    assert_equal 1, @user.reload.credits
+  end
+
+  test "a re-subscriber later in the same month still earns a welcome credit" do
+    @user.update!(subscription_ends_at: nil) # open-ended, so the 2027 dates stay active
+    travel_to Time.utc(2027, 5, 2, 9) do
+      CreditTransaction.grant_monthly_credit(@user)
+      CreditTransaction.expire_all_credits(@user, "Subscription cancelled")
+    end
+    travel_to Time.utc(2027, 5, 25, 9) do
+      assert CreditTransaction.grant_welcome_credit(@user)
+    end
+    assert_equal 1, @user.reload.credits
+    assert_equal CreditTransaction.balance_for(@user), @user.credits
+  end
 end
