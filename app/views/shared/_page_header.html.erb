@@ -6,10 +6,10 @@
       back     (Array [label, path], optional) — a quiet back link above the title
       clear_nav (Boolean, optional) — true only on full-bleed pages, which clear the
                 floating nav themselves; normal pages get that from the layout.
-    Usage:
-      <%= render "shared/page_header", title: "Pick <em>a deck</em>".html_safe, lede: "..." do %>
-        <%= link_to "New", new_path, class: "btn btn-primary" %>
-      <% end %> %>
+    Usage (no ERB tags in this comment: a closing tag would end it early):
+      render "shared/page_header", title: "Pick <em>a deck</em>".html_safe, lede: "...",
+             actions: link_to("New", new_path, class: "btn btn-primary")
+    or pass the action as a block to render. %>
 <% back = local_assigns[:back] %>
 <% lede = local_assigns[:lede] %>
 <% actions = local_assigns[:actions] || (block_given? ? yield : nil) %>
