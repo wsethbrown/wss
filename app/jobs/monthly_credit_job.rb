@@ -49,16 +49,9 @@ class MonthlyCreditJob < ApplicationJob
     User.where(subscription_status: "active")
   end
 
-  # Day of the month the member's billing renews on; the 1st when unknown.
-  def self.anchor_day(user)
-    user.subscription_ends_at&.utc&.day || 1
-  end
+  def self.anchor_day(user) = CreditTransaction.anchor_day(user)
 
-  # The date this month's credit falls due, clamped to the month's last day.
-  def self.anchor_date(user, year, month)
-    last = Date.new(year, month, -1).day
-    Date.new(year, month, [ anchor_day(user), last ].min)
-  end
+  def self.anchor_date(user, year, month) = CreditTransaction.anchor_date(user, year, month)
 
   def self.due_on?(user, date)
     date >= anchor_date(user, date.year, date.month)

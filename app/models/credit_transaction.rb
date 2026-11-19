@@ -46,8 +46,34 @@ class CreditTransaction < ApplicationRecord
   # renewal webhook, the admin "grant monthly" button and the welcome credit
   # all share one ledger key per (user, month), checked under the user's row
   # lock and backed by a unique index, so no path can double-grant.
+  #
+  # The key names the member's BILLING month: the month of the latest anchor
+  # date (their billing day, see anchor_date) on or before the grant. In steady
+  # state each anchor date falls in its own calendar month, so this is one
+  # credit per calendar month; but a renewal for the Feb 28 period that settles
+  # just after midnight on Mar 1 still counts as February's credit instead of
+  # taking March's (which once left a 58-day gap until the next credit).
   def self.monthly_grant_key(user, at = Time.current)
-    "monthly:#{user.id}:#{at.utc.strftime('%Y-%m')}"
+    "monthly:#{user.id}:#{billing_month(user, at).strftime('%Y-%m')}"
+  end
+
+  # Day of the month the member's billing renews on; the 1st when unknown.
+  # Stripe keeps the period end on the billing day of the month.
+  def self.anchor_day(user)
+    user.subscription_ends_at&.utc&.day || 1
+  end
+
+  # The anchor date in a given month, clamped to the month's last day (an
+  # anchor of the 31st falls on Feb 28 and Apr 30).
+  def self.anchor_date(user, year, month)
+    Date.new(year, month, [ anchor_day(user), Date.new(year, month, -1).day ].min)
+  end
+
+  # First day of the month holding the latest anchor date on or before `at`.
+  def self.billing_month(user, at = Time.current)
+    date = at.utc.to_date
+    date = date.prev_month if date < anchor_date(user, date.year, date.month)
+    date.beginning_of_month
   end
 
   def self.monthly_credit_granted?(user, at = Time.current)

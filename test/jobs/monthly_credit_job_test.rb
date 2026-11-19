@@ -186,4 +186,122 @@ class MonthlyCreditJobTest < ActiveJob::TestCase
       assert_match "Nothing was granted", out
     end
   end
+
+  # --- Month-end anchors and late subscribers (advisor follow-up) ----------
+
+  # Next period end the way Stripe computes it: same anchor day, clamped to the
+  # last day of a shorter month (Jan 31 -> Feb 28 -> Mar 31).
+  def next_period_end(anchor_day, after)
+    nxt = after.to_date.next_month
+    Time.utc(nxt.year, nxt.month, [ anchor_day, Date.new(nxt.year, nxt.month, -1).day ].min, 9)
+  end
+
+  # Day by day: at 09:00 Stripe renews a monthly member whose period has ended
+  # (period end advances, the renewal webhook path grants), at 11:00 the job runs.
+  def simulate_days(user, from:, to:, monthly_anchor: nil)
+    (from..to).each do |day|
+      if monthly_anchor
+        travel_to Time.utc(day.year, day.month, day.day, 9) do
+          if user.reload.subscription_ends_at <= Time.current
+            user.update!(subscription_ends_at: next_period_end(monthly_anchor, user.subscription_ends_at))
+            CreditTransaction.grant_monthly_credit(user, "Monthly subscription renewal")
+          end
+        end
+      end
+      travel_to(Time.utc(day.year, day.month, day.day, 11)) { MonthlyCreditJob.perform_now }
+    end
+  end
+
+  def grant_dates(user)
+    CreditTransaction.where(user: user, transaction_type: "granted").order(:created_at).map { |t| t.created_at.utc.to_date }
+  end
+
+  def assert_one_per_month_without_gaps(dates, months)
+    assert_equal months, dates.map { |d| d.strftime("%Y-%m") }, "exactly one credit per calendar month"
+    dates.each_cons(2) do |a, b|
+      assert (b - a) <= 31, "gap of #{(b - a).to_i} days between #{a} and #{b}"
+    end
+  end
+
+  JAN_TO_MAY = %w[2027-01 2027-02 2027-03 2027-04 2027-05].freeze
+
+  test "a monthly member anchored on the 31st gets one credit a month, on the last day of short months" do
+    travel_to Time.utc(2027, 1, 31, 8) do
+      subscribe!(@user, plan: "monthly", ends_at: Time.utc(2027, 2, 28, 9))
+      assert CreditTransaction.grant_welcome_credit(@user)
+    end
+    simulate_days(@user, from: Date.new(2027, 1, 1), to: Date.new(2027, 5, 31), monthly_anchor: 31)
+
+    dates = grant_dates(@user)
+    assert_one_per_month_without_gaps(dates, JAN_TO_MAY)
+    assert_equal [ Date.new(2027, 1, 31), Date.new(2027, 2, 28), Date.new(2027, 3, 31),
+                   Date.new(2027, 4, 30), Date.new(2027, 5, 31) ], dates
+    assert_equal 5, @user.reload.credits
+    assert_ledger_invariant
+  end
+
+  test "a yearly member anchored on the 31st gets one credit a month, Feb and Apr on the last day" do
+    travel_to Time.utc(2026, 12, 31, 16) do
+      subscribe!(@user, plan: "yearly", ends_at: Time.utc(2027, 12, 31, 16))
+    end
+    simulate_days(@user, from: Date.new(2027, 1, 1), to: Date.new(2027, 5, 31))
+
+    dates = grant_dates(@user)
+    assert_one_per_month_without_gaps(dates, JAN_TO_MAY)
+    assert_equal [ Date.new(2027, 1, 31), Date.new(2027, 2, 28), Date.new(2027, 3, 31),
+                   Date.new(2027, 4, 30), Date.new(2027, 5, 31) ], dates
+    assert_ledger_invariant
+  end
+
+  test "members anchored on the 29th and 30th get one credit a month, February on the 28th" do
+    jane = users(:jane)
+    travel_to Time.utc(2026, 12, 29, 16) do
+      subscribe!(@user, plan: "yearly", ends_at: Time.utc(2027, 12, 29, 16))
+    end
+    travel_to Time.utc(2027, 1, 30, 8) do
+      subscribe!(jane, plan: "monthly", ends_at: Time.utc(2027, 2, 28, 9))
+      assert CreditTransaction.grant_welcome_credit(jane)
+    end
+    simulate_days(jane, from: Date.new(2027, 1, 1), to: Date.new(2027, 5, 31), monthly_anchor: 30)
+
+    yearly = grant_dates(@user)
+    assert_one_per_month_without_gaps(yearly, JAN_TO_MAY)
+    assert_equal [ 29, 28, 29, 29, 29 ], yearly.map(&:day)
+
+    monthly = grant_dates(jane)
+    assert_one_per_month_without_gaps(monthly, JAN_TO_MAY)
+    assert_equal [ Date.new(2027, 1, 30), Date.new(2027, 2, 28), Date.new(2027, 3, 30),
+                   Date.new(2027, 4, 30), Date.new(2027, 5, 30) ], monthly
+    assert_ledger_invariant
+  end
+
+  test "a member who subscribes late in a month gets the welcome, then one credit a month on the anchor day" do
+    travel_to Time.utc(2027, 1, 28, 15) do
+      subscribe!(@user, plan: "monthly", ends_at: Time.utc(2027, 2, 28, 15))
+      assert CreditTransaction.grant_welcome_credit(@user)
+    end
+    simulate_days(@user, from: Date.new(2027, 1, 28), to: Date.new(2027, 5, 31), monthly_anchor: 28)
+
+    dates = grant_dates(@user)
+    assert_one_per_month_without_gaps(dates, JAN_TO_MAY)
+    assert_equal [ Date.new(2027, 1, 28), Date.new(2027, 2, 28), Date.new(2027, 3, 28),
+                   Date.new(2027, 4, 28), Date.new(2027, 5, 28) ], dates
+    assert_equal CreditTransaction::WELCOME_DESCRIPTION,
+                 CreditTransaction.where(user: @user).order(:created_at).first.description
+    assert_equal 5, @user.reload.credits
+    assert_ledger_invariant
+  end
+
+  test "a yearly member who subscribes late in a month gets the welcome, then one credit a month" do
+    travel_to Time.utc(2027, 1, 28, 15) do
+      subscribe!(@user, plan: "yearly", ends_at: Time.utc(2028, 1, 28, 15))
+      assert CreditTransaction.grant_welcome_credit(@user)
+    end
+    simulate_days(@user, from: Date.new(2027, 1, 28), to: Date.new(2027, 5, 31))
+
+    dates = grant_dates(@user)
+    assert_one_per_month_without_gaps(dates, JAN_TO_MAY)
+    assert dates.all? { |d| d.day == 28 }
+    assert_ledger_invariant
+  end
 end

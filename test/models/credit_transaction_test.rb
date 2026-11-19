@@ -113,4 +113,22 @@ class CreditTransactionTest < ActiveSupport::TestCase
     assert_equal 1, @user.reload.credits
     assert_equal CreditTransaction.balance_for(@user), @user.credits
   end
+
+  test "a renewal that settles just after midnight on the 1st counts for the billing month it pays" do
+    @user.update!(subscription_ends_at: Time.utc(2027, 2, 28, 23, 30))
+    travel_to Time.utc(2027, 2, 28, 23, 29) do
+      assert_equal :granted, CreditTransaction.grant_monthly_credit(@user)
+    end
+    # Stripe renewed the Feb 28 period; the invoice is paid on Mar 1 UTC.
+    @user.update!(subscription_ends_at: Time.utc(2027, 3, 28, 23, 30))
+    travel_to Time.utc(2027, 3, 1, 0, 40) do
+      assert_equal "monthly:#{@user.id}:2027-02", CreditTransaction.monthly_grant_key(@user)
+      assert_equal :already_granted, CreditTransaction.grant_monthly_credit(@user, "Monthly subscription renewal")
+    end
+    travel_to Time.utc(2027, 3, 28, 23, 0) do
+      assert_equal :granted, CreditTransaction.grant_monthly_credit(@user)
+    end
+    assert_equal 2, @user.reload.credits
+    assert_equal CreditTransaction.balance_for(@user), @user.credits
+  end
 end
