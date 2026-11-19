@@ -266,7 +266,8 @@ Do not change any wording, link or the `.text.erb` files.
 test still renders; button text contrast at least 4.5:1.
 **Tests:** `bin/rails test test/mailers`.
 
-### [~] B15b · Keep an event's zone on edit; zone check before deploy — `sonnet` (advisor ruling, after D11)
+### [x] B15b · Keep an event's zone on edit; zone check before deploy — `sonnet` (advisor ruling, after D11)
+Result: update never overwrites `time_zone`; event page and edit form show the viewer zone and, when different, the time at the event; read-only `rake events:zones`.
 **Owns:** `EventsController#update` (stop overwriting `time_zone`), `app/views/events/show.html.erb` and `events/_form.html.erb` (zone abbreviation next to times), `lib/tasks/events.rake` (new), matching tests.
 **Do:** `events.time_zone` is set once at creation and never overwritten on update (the typed time is still converted from the editor's browser zone to the correct instant). Show the event zone's abbreviation beside the time on the event page and the edit form. Add `rake events:zones`: prints upcoming events with society, society location and current zone (read-only). Do not infer zones from location text.
 **Acceptance:** an edit from a Pacific browser leaves an Eastern event Eastern and the mailed time correct; the rake task changes nothing.
@@ -513,6 +514,9 @@ admin invitations as the fourth sign-in path; log (do not change) OAuth uid rebi
 in `app/` references the removed code (`grep`); suite green.
 **Tests:** `test/controllers/presentations_controller_test.rb`, `test/policies/presentation_policy_test.rb`.
 
+### [~] D12 · Final fixes — `sonnet` (advisor rulings after D11, B16, B17)
+**Do:** add token `mark-deep` (#e65c00) for orange graphics on light surfaces (stars, score bars) and keep `mark` for marks on green and the logo; DESIGN_SYSTEM colour table and rule. Deck page: slide images and og_image use variants, then drop the test exemption. Library filter auto-submit inline script → Stimulus. Active Storage transform jobs off the mail worker. SECTION_NOTES "known pre-existing issues" list.
+
 ## Blocked on the owner
 
 ### [!] B11 · Two-factor sign-in (S7)
@@ -594,7 +598,8 @@ that member's event emails, and is single-purpose; headers present. New copy lis
 
 ## Wave B4 — after the design track (D11 done)
 
-### [~] B16 · Images and query counts — `sonnet`
+### [x] B16 · Images and query counts — `sonnet`
+Result: preprocessed named variants on displayed attachments via `image_variant`; society board capped at 15 and members eager-loaded; reviews-index N+1 fixed; unread count once per request; admin Stripe lookup moved to the controller with a timeout; flat query-count tests.
 **Findings:** I13, I15, I22, I28, M21 if B7 left it.
 **Owns:** attachment variant definitions in `app/models/*`, `DesignHelper` cover/avatar
 internals, `app/controllers/societies_controller.rb` (`show` loading),
@@ -610,7 +615,8 @@ the layout each stay under a stated bound that does not grow with the number of 
 no `url_for(…image)` of an original remains in views (`grep`) outside downloads.
 **Tests:** `test/integration/query_counts_test.rb` (new), existing controller tests.
 
-### [~] B17 · Scripts, semantics and dead code — `sonnet`
+### [x] B17 · Scripts, semantics and dead code — `sonnet`
+Result: account and deck-page scripts are Stimulus controllers with disconnect cleanup; account tab semantics and arrow keys; events-attended counts past yes RSVPs; broken rake task removed; dead CLAUDE.md references removed; skills updated. SocietyApplication kept pending the owner.
 **Findings:** I17, I18, I19, I24, I26.
 **Owns:** new Stimulus controllers replacing the inline scripts in `account/index` and
 `presentations/show`, `app/views/profiles/show.html.erb` (the count only),
@@ -628,7 +634,7 @@ ten times leaves one listener of each kind (checked in the browser); a profile w
 past `yes` RSVPs shows 2; `grep` finds no reference to the missing documents.
 **Tests:** `test/system/account_navigation_test.rb`, `test/controllers/profiles_controller_test.rb`.
 
-### [ ] B18 · Test gaps and CI — `sonnet` (last backend task)
+### [~] B18 · Test gaps and CI — `sonnet` (last backend task)
 **Findings:** I16, S15 (report-only CSP).
 **Owns:** new tests only, `.github/workflows/ci.yml`,
 `config/initializers/content_security_policy.rb`.
