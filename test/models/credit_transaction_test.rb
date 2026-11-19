@@ -131,4 +131,46 @@ class CreditTransactionTest < ActiveSupport::TestCase
     assert_equal 2, @user.reload.credits
     assert_equal CreditTransaction.balance_for(@user), @user.credits
   end
+
+  # --- B7 / M2, M20 -----------------------------------------------------------
+  test "a persisted ledger row cannot be updated or destroyed" do
+    row = CreditTransaction.record!(user: @user, amount: 2, transaction_type: "granted")
+    assert_raises(ActiveRecord::ReadOnlyRecord) { row.update!(amount: 50) }
+    assert_raises(ActiveRecord::ReadOnlyRecord) { row.destroy }
+    assert_equal 2, CreditTransaction.balance_for(@user)
+    assert_equal 2, @user.reload.credits
+  end
+
+  test "destroying a user does not cascade into the ledger" do
+    CreditTransaction.record!(user: @user, amount: 2, transaction_type: "granted")
+    assert_no_difference -> { CreditTransaction.count } do
+      assert_not @user.destroy
+    end
+    assert User.exists?(@user.id)
+  end
+
+  test "use_credit twice for the same deck spends one credit and keeps one row" do
+    CreditTransaction.record!(user: @user, amount: 2, transaction_type: "granted")
+    assert CreditTransaction.use_credit(@user, @presentation)
+    assert_not CreditTransaction.use_credit(@user.reload, @presentation)
+
+    assert_equal 1, @user.reload.credits
+    assert_equal 1, @user.user_presentations.where(presentation: @presentation).count
+    assert_equal 1, CreditTransaction.where(user: @user, transaction_type: "used").count
+    assert_equal CreditTransaction.balance_for(@user), @user.credits
+  end
+
+  # Simulates the loser of a race: the in-lock ownership check passed (it ran
+  # before the winner committed) so the insert reaches the unique index. The
+  # whole spend must roll back, credit included.
+  test "use_credit that loses the race at the unique index spends nothing" do
+    CreditTransaction.record!(user: @user, amount: 2, transaction_type: "granted")
+    UserPresentation.create!(user: @user, presentation: @presentation, purchase_type: "credit", purchased_at: Time.current)
+    UserPresentation.stubs(:owned?).returns(false)
+
+    assert_no_difference -> { CreditTransaction.count } do
+      assert_not CreditTransaction.use_credit(@user, @presentation)
+    end
+    assert_equal 2, @user.reload.credits
+  end
 end

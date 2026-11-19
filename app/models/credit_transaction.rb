@@ -24,6 +24,14 @@ class CreditTransaction < ApplicationRecord
 
   after_create :recompute_cached_balance
 
+  # The ledger is append-only (B7 / M20): a persisted row is never edited or
+  # deleted; corrections are new rows (Admin -> Credits -> adjust). This guards
+  # the model layer (update, destroy and dependent: cascades raise); raw SQL
+  # and delete_all can still bypass it.
+  def readonly?
+    persisted? || super
+  end
+
   # --- Ledger API ---------------------------------------------------------
   # Every credit change goes through here. Locks the user row so concurrent
   # grants/spends can't race the cached balance.
@@ -170,9 +178,20 @@ class CreditTransaction < ApplicationRecord
   end
 
   # Spends one credit to grant access to a presentation. Returns true/false.
+  # The ownership re-check runs inside the user's row lock, so a double-click
+  # (or two tabs) cannot spend two credits on one deck; the unique index on
+  # user_presentations is the backstop and rolls the whole spend back.
   def self.use_credit(user, presentation)
     user.with_lock do
-      return false unless user.credits.to_i.positive?
+      unless user.credits.to_i.positive?
+        Rails.logger.info "Credit not spent by user #{user.id} on presentation #{presentation.id}: no credits"
+        return false
+      end
+
+      if UserPresentation.owned?(user, presentation)
+        Rails.logger.warn "Credit not spent by user #{user.id} on presentation #{presentation.id}: deck already owned"
+        return false
+      end
 
       create!(
         user: user,
@@ -188,8 +207,14 @@ class CreditTransaction < ApplicationRecord
         purchased_at: Time.current
       )
     end
+    Rails.logger.info "Credit spent by user #{user.id} on presentation #{presentation.id}"
     true
-  rescue ActiveRecord::RecordInvalid
+  rescue ActiveRecord::RecordInvalid => e
+    Rails.logger.warn "Credit spend failed for user #{user.id}, presentation #{presentation.id}: #{e.message}"
+    false
+  rescue ActiveRecord::RecordNotUnique
+    # A concurrent unlock won; the transaction rolled back, so no credit left.
+    Rails.logger.warn "Credit spend by user #{user.id} on presentation #{presentation.id} lost a race to an existing ownership row; rolled back"
     false
   end
 

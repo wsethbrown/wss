@@ -144,7 +144,8 @@ class User < ApplicationRecord
   has_many :purchased_presentations, through: :user_presentations, source: :presentation
   has_many :user_tags, dependent: :destroy
   has_many :tags, through: :user_tags
-  has_many :credit_transactions, dependent: :destroy
+  # The ledger is append-only and never cascades (B7): deleting a user with a ledger is refused.
+  has_many :credit_transactions, dependent: :restrict_with_error
   has_many :activity_logs, dependent: :destroy
   has_many :reviews, dependent: :destroy
   has_many :shelf_items, -> { order(:position, :id) }, dependent: :destroy

@@ -5,7 +5,12 @@ class Presentation < ApplicationRecord
   MAX_IMAGE_SIZE = 15.megabytes
 
   belongs_to :author, class_name: "User"
-  has_many :user_presentations, dependent: :destroy
+  # Buyers' ownership and the credit ledger are never cascaded away (B7 / M12):
+  # a deck anyone owns or spent a credit on is unpublished, not deleted.
+  has_many :user_presentations, dependent: :restrict_with_error
+  has_many :credit_transactions, dependent: :restrict_with_error
+  # Download history is an audit trail; it is never cascaded away.
+  has_many :download_logs, dependent: :restrict_with_error
   # Deck reviews (stars + short text; eligibility in PresentationReview).
   # Events that ran this deck keep their record; restrict, don't cascade.
   has_many :presentation_reviews, dependent: :destroy

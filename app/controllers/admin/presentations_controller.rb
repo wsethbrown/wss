@@ -127,8 +127,14 @@ class Admin::PresentationsController < Admin::BaseController
   end
 
   def destroy
-    @presentation.destroy!
-    redirect_to admin_presentations_path, notice: "Presentation deleted successfully."
+    if @presentation.destroy
+      Rails.logger.info "Admin #{current_user.id} deleted presentation #{@presentation.id}"
+      redirect_to admin_presentations_path, notice: "Presentation deleted successfully."
+    else
+      Rails.logger.warn "Admin #{current_user.id} refused deleting presentation #{@presentation.id}: #{@presentation.errors.full_messages.to_sentence}"
+      redirect_to admin_presentations_path,
+                  alert: "This deck has owners or credit history, so it can't be deleted. Unpublish it instead."
+    end
   end
 
   private
