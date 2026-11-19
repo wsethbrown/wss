@@ -20,7 +20,8 @@ class SocietyActivityTest < ActionDispatch::IntegrationTest
 
   test "an invite-link join is recorded AND notifies the admins" do
     sign_in @member
-    get society_invite_path(@society.invite_token!)
+    # B8: the link's GET is a confirm page; the button's POST joins.
+    post society_invite_path(@society.invite_token!)
     assert @society.society_activities.exists?(user: @member, action: "joined")
     assert @creator.notifications.exists?(action: "member_joined", actor: @member)
   end

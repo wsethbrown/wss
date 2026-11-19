@@ -89,87 +89,31 @@ class AccountController < ApplicationController
     end
   end
 
+  # Email change (B8, S6): Auth::EmailChangeService sends the confirm link to
+  # the NEW address and a notice to the current one; only a digest is stored.
   def request_email_change
-    new_email = params[:new_email]
-
-    # Validate new email
-    if new_email.blank?
-      respond_to do |format|
-        format.html { redirect_to account_path, alert: "Please enter a new email address." }
-        format.turbo_stream { redirect_to account_path, alert: "Please enter a new email address." }
-      end
-      return
-    end
-
-    if new_email == current_user.email
-      respond_to do |format|
-        format.html { redirect_to account_path, alert: "The new email address must be different from your current email." }
-        format.turbo_stream { redirect_to account_path, alert: "The new email address must be different from your current email." }
-      end
-      return
-    end
-
-    # Check if email is already taken
-    if User.where(email: new_email).exists?
-      respond_to do |format|
-        format.html { redirect_to account_path, alert: "This email address is already in use." }
-        format.turbo_stream { redirect_to account_path, alert: "This email address is already in use." }
-      end
-      return
-    end
-
-    # Generate verification token
-    token = SecureRandom.urlsafe_base64(32)
-
-    # Store the email change request
-    current_user.update!(
-      unconfirmed_email: new_email,
-      email_change_token: token,
-      email_change_token_expires_at: 1.hour.from_now
-    )
-
-    # Send verification email
-    UserMailer.email_change_verification(current_user, new_email, token).deliver_now
-
-    message = "A verification link has been sent to your current email address (#{current_user.email}). Please check your inbox and click the link to confirm the email change."
+    result = Auth::EmailChangeService.request(current_user, params[:new_email])
+    flash_key = result.success? ? :notice : :alert
 
     respond_to do |format|
-      format.html { redirect_to account_path, notice: message }
-      format.turbo_stream { redirect_to account_path, notice: message }
+      format.html { redirect_to account_path, flash_key => result.message }
+      format.turbo_stream { redirect_to account_path, flash_key => result.message }
     end
   end
 
   def verify_email_change
-    token = params[:token]
+    result = Auth::EmailChangeService.confirm(params[:token])
 
-    user = User.find_by(email_change_token: token)
-
-    if user.nil?
-      flash[:alert] = "Invalid verification link."
+    unless result.success?
+      flash[:alert] = result.message
       redirect_to account_path
       return
     end
-
-    if user.email_change_token_expires_at < Time.current
-      flash[:alert] = "Verification link has expired. Please request a new email change."
-      user.update!(unconfirmed_email: nil, email_change_token: nil, email_change_token_expires_at: nil)
-      redirect_to account_path
-      return
-    end
-
-    # Update the email
-    old_email = user.email
-    user.update!(
-      email: user.unconfirmed_email,
-      unconfirmed_email: nil,
-      email_change_token: nil,
-      email_change_token_expires_at: nil
-    )
 
     # Sign out all sessions for security
-    sign_out(user)
+    sign_out(result.user)
 
-    flash[:notice] = "Your email has been successfully changed from #{old_email} to #{user.email}. Please sign in again with your new email address."
+    flash[:notice] = result.message
     redirect_to auth_path
   end
 

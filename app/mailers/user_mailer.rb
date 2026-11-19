@@ -34,23 +34,23 @@ class UserMailer < ApplicationMailer
     )
   end
 
-  def email_change_verification(user, new_email, token)
+  # The current address hears that a change was asked for, with no link: the
+  # change can only be completed from the new mailbox (B8, S6).
+  def email_change_notice(user, new_email)
     @user = user
     @new_email = new_email
-    @token = token
-    @verification_url = verify_email_change_url(token: @token)
 
     mail(
-      to: @user.email,  # Send to current email for verification
-      subject: "Verify Your Email Change Request"
+      to: @user.email,
+      subject: "Your email address is being changed"
     )
   end
 
+  # The confirm link goes ONLY to the new address (B8, S6).
   def email_change_confirmation(user, new_email, token)
     @user = user
     @new_email = new_email
-    @token = token
-    @verification_url = verify_email_change_url(token: @token)
+    @verification_url = verify_email_change_url(token: token)
 
     mail(
       to: @new_email,

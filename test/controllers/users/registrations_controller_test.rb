@@ -37,4 +37,18 @@ class Users::RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "form[action=?][method=post] input[name=_method][value=delete]", user_registration_path, count: 0
     assert_includes response.body, contact_path
   end
+
+  # B8 (S6): the email is the sign-in credential; it changes only through the
+  # account page's confirm-from-the-new-mailbox flow, never here.
+  test "the Devise account update cannot change the email" do
+    put user_registration_path, params: { user: { email: "hijack@example.com", current_password: "password" } }
+    assert_redirected_to account_path
+    assert_equal "test@example.com", @user.reload.email
+  end
+
+  test "a Devise account update carrying the same email in another case still saves" do
+    put user_registration_path, params: { user: { email: "TEST@example.com", first_name: "Renamed", current_password: "password" } }
+    assert_equal "Renamed", @user.reload.first_name
+    assert_equal "test@example.com", @user.email
+  end
 end

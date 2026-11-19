@@ -1,0 +1,16 @@
+<% content_for :title, "You're invited to #{@society.name} - Whiskey Share Society" %>
+<%# Signed-in landing for an invite link (B8): one card, one button. The GET
+    changes nothing, so a mail scanner or link previewer joins no one; the
+    button POSTs to societies#accept_invite. The layout treats this action as
+    full-bleed, so the page clears the nav itself. %>
+<div class="mx-auto w-full max-w-md px-4 pb-16 pt-28">
+  <div class="card p-7 text-center sm:p-8">
+    <h1 class="font-display text-3xl font-semibold text-ink">You're invited to <%= @society.name %></h1>
+    <% if @society.description.present? %>
+      <p class="mt-2 text-mute"><%= @society.description %></p>
+    <% end %>
+    <%= button_to "Join this society", society_invite_path(@invite_token), method: :post,
+        class: "btn btn-primary min-h-12 w-full cursor-pointer", form_class: "mt-7",
+        form: { data: { turbo: false } } %>
+  </div>
+</div>

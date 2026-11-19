@@ -160,7 +160,7 @@ class EmailRsvpTest < ActionDispatch::IntegrationTest
   test "a valid token records the RSVP and notifies the host, no sign-in needed" do
     token = EmailRsvpsController.token_for(@member, @event)
     assert_enqueued_emails 1 do
-      get email_rsvp_path(status: "yes", token: token)
+      post email_rsvp_path(status: "yes"), params: { token: token }
     end
     assert_redirected_to society_event_path(@society, @event)
     assert_equal "yes", @event.event_rsvps.find_by(user: @member).status
@@ -168,22 +168,22 @@ class EmailRsvpTest < ActionDispatch::IntegrationTest
 
   test "clicking a second link updates the same RSVP" do
     token = EmailRsvpsController.token_for(@member, @event)
-    get email_rsvp_path(status: "yes", token: token)
-    get email_rsvp_path(status: "no", token: token)
+    post email_rsvp_path(status: "yes"), params: { token: token }
+    post email_rsvp_path(status: "no"), params: { token: token }
     assert_equal "no", @event.event_rsvps.find_by(user: @member).status
     assert_equal 1, @event.event_rsvps.where(user: @member).count
   end
 
   test "a tampered token is rejected safely" do
-    get email_rsvp_path(status: "yes", token: "garbage--forged")
+    post email_rsvp_path(status: "yes"), params: { token: "garbage--forged" }
     assert_redirected_to root_path
     assert_equal 0, @event.event_rsvps.count
   end
 
   test "an unknown status is rejected" do
     token = EmailRsvpsController.token_for(@member, @event)
-    get email_rsvp_path(status: "yes", token: token) # valid first
-    get "/email_rsvps/definitely?token=#{token}"
+    post email_rsvp_path(status: "yes"), params: { token: token } # valid first
+    post "/email_rsvps/definitely", params: { token: token }
     assert_equal "yes", @event.event_rsvps.find_by(user: @member).status
   end
 

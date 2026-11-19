@@ -1,6 +1,7 @@
 class Users::RegistrationsController < Devise::RegistrationsController
   before_action :configure_sign_up_params, only: [ :create ]
   before_action :configure_account_update_params, only: [ :update ]
+  before_action :refuse_email_change, only: [ :update ]
 
   def create
     super do |resource|
@@ -21,11 +22,23 @@ class Users::RegistrationsController < Devise::RegistrationsController
 
   protected
 
+  # B8 (S6): the email is the sign-in credential, so it changes only through
+  # the account page, where the new mailbox must confirm. The form still posts
+  # the current address; only a real change is refused.
+  def refuse_email_change
+    submitted = params.dig(:user, :email)
+    return if submitted.nil?
+    return if Auth::EmailChangeService.normalize(submitted) == Auth::EmailChangeService.normalize(current_user.email)
+
+    Rails.logger.warn "[Account] Email change through registration update refused for user #{current_user.id}; use the account page"
+    redirect_to account_path, alert: "To change your email address, use the Email Address section of your account page."
+  end
+
   def configure_sign_up_params
     devise_parameter_sanitizer.permit(:sign_up, keys: [ :first_name, :last_name ])
   end
 
   def configure_account_update_params
-    devise_parameter_sanitizer.permit(:account_update, keys: [ :first_name, :last_name ])
+    devise_parameter_sanitizer.permit(:account_update, keys: [ :first_name, :last_name ], except: [ :email ])
   end
 end

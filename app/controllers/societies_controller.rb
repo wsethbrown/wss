@@ -150,6 +150,27 @@ class SocietiesController < ApplicationController
       redirect_to society, notice: "You are already a member" and return
     end
 
+    # B8 (S12): mail scanners and link previewers follow GET links, so a
+    # signed-in GET only shows a one-button confirm page; its POST joins.
+    Rails.logger.info "Invite link confirm page shown: user #{current_user.id}, society #{society.id}"
+    @society = society
+    @invite_token = params[:token]
+    render :invite_confirm
+  end
+
+  # POST /invite/:token, from the confirm page's button (signed in).
+  def accept_invite
+    society = Society.find_by(invite_token: params[:token])
+    unless society
+      # Never log the presented token.
+      Rails.logger.warn "Invite join rejected for user #{current_user.id}: no society matches the presented token"
+      redirect_to societies_path, alert: "That invite link is no longer valid" and return
+    end
+
+    if society.has_member?(current_user)
+      redirect_to society, notice: "You are already a member" and return
+    end
+
     society.society_memberships.create!(user: current_user, role: :member, status: :active)
     Rails.logger.info "Invite link join: user #{current_user.id} joined society #{society.id}"
     log_activity(:society_joined, society)

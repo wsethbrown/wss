@@ -56,9 +56,16 @@ class InvitePeekTest < ActionDispatch::IntegrationTest
     assert @society.society_memberships.exists?(user: joiner, status: "active")
   end
 
-  test "a signed-in visitor still joins immediately" do
+  # B8 (S12): a GET of the link (which a mail scanner may make) changes
+  # nothing; the signed-in visitor joins with the confirm page's one button.
+  test "a signed-in visitor joins with one click on the confirm page" do
     sign_in users(:jane)
     get society_invite_path(@token)
+    assert_response :success
+    assert_not @society.society_memberships.exists?(user: users(:jane))
+    assert_select "form[method=post][action=?] button", society_invite_path(@token), count: 1
+
+    post society_invite_path(@token)
     assert_redirected_to society_path(@society)
     assert @society.society_memberships.exists?(user: users(:jane), status: "active")
   end

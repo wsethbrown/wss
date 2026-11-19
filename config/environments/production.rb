@@ -55,6 +55,9 @@ Rails.application.configure do
       ip: controller.request.remote_ip
     }
   end
+  # Sign-in and invite tokens are path segments (/magic_links/:token,
+  # /invite/:token, ...): log them as [FILTERED], never the live credential.
+  config.lograge.before_format = ->(data, payload) { LogPathScrubber.lograge_before_format(data, payload) }
 
   # Don't log any deprecations.
   config.active_support.report_deprecations = false

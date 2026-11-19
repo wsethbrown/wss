@@ -75,6 +75,8 @@ Rails.application.routes.draw do
 
   # Invite links: joining via a valid token works for private societies too.
   get "invite/:token", to: "societies#join_by_invite", as: :society_invite
+  # Signed in, the GET shows a one-button confirm page; this POST joins (B8, S12).
+  post "invite/:token", to: "societies#accept_invite"
   # The link-preview card for an invite. Token-gated like the invite itself, so
   # a private chapter's name and logo never leak to someone guessing an id.
   get "invite/:token/card", to: "societies#invite_card", as: :society_invite_card
@@ -238,7 +240,10 @@ Rails.application.routes.draw do
   end
 
   # One-click RSVP from event emails (signed token carries user + event).
-  get "email_rsvps/:status", to: "email_rsvps#create", as: :email_rsvp
+  # The GET only shows a one-button confirm page (mail scanners follow links);
+  # the POST records the answer (B8, S12).
+  get "email_rsvps/:status", to: "email_rsvps#show", as: :email_rsvp
+  post "email_rsvps/:status", to: "email_rsvps#create"
 
   # SEO: the sitemap (public pages only; the veil rules hold).
   get "sitemap.xml", to: "sitemaps#show", format: :xml
