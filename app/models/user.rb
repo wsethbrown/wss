@@ -129,7 +129,12 @@ class User < ApplicationRecord
   end
 
   # Active Storage
-  has_one_attached :profile_image
+  # :avatar covers every avatar size the site draws (up to 128px, doubled for retina);
+  # :thumb is for larger profile surfaces. Preprocessed in the jobs process.
+  has_one_attached :profile_image do |attachable|
+    attachable.variant :avatar, resize_to_fill: [ 256, 256 ], saver: { quality: 80 }, preprocessed: true
+    attachable.variant :thumb, resize_to_fill: [ 512, 512 ], saver: { quality: 80 }, preprocessed: true
+  end
 
   # Profile image validation
   validate :profile_image_validation

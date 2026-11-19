@@ -40,7 +40,7 @@
         <div class="grid grid-cols-2 gap-4 md:grid-cols-3">
           <% @presentation.slide_images.order(:id).each_with_index do |slide, i| %>
             <figure>
-              <%= image_tag slide, alt: "Slide #{i + 1}", loading: 'lazy', class: 'w-full rounded-xl border border-hairline' %>
+              <%= image_tag image_variant(slide, :card), alt: "Slide #{i + 1}", loading: 'lazy', class: 'w-full rounded-xl border border-hairline' %>
               <figcaption class="mt-1 text-center text-xs text-mute tabular-nums"><%= i + 1 %></figcaption>
             </figure>
           <% end %>
@@ -131,7 +131,7 @@
       <% if @presentation.featured_image.attached? %>
         <div class="mt-6 grid grid-cols-2 gap-4 md:grid-cols-4">
           <figure>
-            <%= image_tag @presentation.featured_image, class: 'aspect-video w-full rounded-xl border border-hairline object-cover' %>
+            <%= image_tag image_variant(@presentation.featured_image, :card), class: 'aspect-video w-full rounded-xl border border-hairline object-cover' %>
             <figcaption class="mt-1 text-center text-xs text-mute">Cover</figcaption>
           </figure>
         </div>

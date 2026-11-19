@@ -1,6 +1,12 @@
 class Admin::UsersController < Admin::BaseController
   before_action :set_user, only: [ :show, :edit, :update, :update_role, :resend_invitation ]
 
+  # The edit page draws the user's live Stripe subscription. The lookup lives here (not in the
+  # template), runs at most once per request, and uses short timeouts so a slow Stripe never
+  # holds an admin page for the SDK default of a minute and a half (I22).
+  helper_method :stripe_subscription_lookup
+  STRIPE_LOOKUP_TIMEOUTS = { open_timeout: 3, read_timeout: 5, max_network_retries: 0 }.freeze
+
   def index
     @users = User.all
 
@@ -158,6 +164,19 @@ class Admin::UsersController < Admin::BaseController
 
   def role_label(role)
     { "none" => "a regular user", "limited" => "an administrator (no delete)", "full" => "a full administrator" }.fetch(role)
+  end
+
+  # { subscription: <Stripe::Subscription or nil>, error: <true when Stripe could not be asked> }
+  def stripe_subscription_lookup
+    @stripe_subscription_lookup ||= begin
+      client = Stripe::StripeClient.new(STRIPE_LOOKUP_TIMEOUTS)
+      # One call: Stripe lists every non-cancelled subscription, newest first.
+      subs = Stripe::Subscription.list({ customer: @user.stripe_customer_id, limit: 10 }, { client: client }).data
+      { subscription: subs.find { |sub| sub.status == "active" } || subs.find { |sub| sub.status == "trialing" }, error: false }
+    rescue Stripe::StripeError => e
+      Rails.logger.error "Admin #{current_user.id} user #{@user.id} edit: Stripe subscription lookup failed: #{e.class}: #{e.message}"
+      { subscription: nil, error: true }
+    end
   end
 
   def set_user

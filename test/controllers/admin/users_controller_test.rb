@@ -129,4 +129,32 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name='disable_2fa']", 0
     assert_select "form[action=?]", admin_create_subscription_path, 3
   end
+
+  # B16 (I22): one Stripe call per edit page, made in the controller with short timeouts.
+  test "edit page asks Stripe once for the subscription" do
+    user = users(:john)
+    user.update_columns(stripe_customer_id: "cus_test_b16")
+    sub = Struct.new(:id, :status, :current_period_end).new("sub_1", "active", 1.month.from_now.to_i)
+    Stripe::Subscription.expects(:list).once.returns(Struct.new(:data).new([ sub ]))
+
+    sign_in users(:admin)
+    get edit_admin_user_path(user)
+    assert_response :success
+    assert_includes response.body, "sub_1"
+  end
+
+  test "edit page still renders, and logs the failure, when Stripe is unreachable" do
+    user = users(:john)
+    user.update_columns(stripe_customer_id: "cus_test_b16")
+    Stripe::Subscription.stubs(:list).raises(Stripe::APIConnectionError.new("timed out"))
+    Rails.logger.expects(:error).with(regexp_matches(/user #{user.id} edit: Stripe subscription lookup failed: Stripe::APIConnectionError/)).once
+    Rails.logger.stubs(:error).with(Not(regexp_matches(/Stripe subscription lookup/))).returns(true)
+
+    sign_in users(:admin)
+    get edit_admin_user_path(user)
+    assert_response :success
+    assert_includes response.body, "Stripe Error"
+    assert_not_includes response.body, "timed out"
+    assert_select "input[name='user[first_name]']"
+  end
 end

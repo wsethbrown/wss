@@ -9,13 +9,8 @@
 <% picture = nil %>
 <% if society.profile_picture.attached? && society.profile_picture.blob.present? %>
   <% begin %>
-    <% content_type = society.profile_picture.blob.content_type&.downcase %>
-    <% picture = if content_type&.include?("heic") || content_type&.include?("heif")
-                   society.profile_picture.variant(resize_to_limit: [200, 200], format: :jpeg)
-                 else
-                   society.profile_picture
-                 end %>
-    <%= image_tag picture, alt: "", class: "w-full h-full object-cover rounded-xl" %>
+    <% picture = society.profile_picture %>
+    <%= image_tag image_variant(picture, :thumb), alt: "", class: "w-full h-full object-cover rounded-xl" %>
   <% rescue => e %>
     <% Rails.logger.error("[society_icon] picture failed for society #{society.id}: #{e.class}: #{e.message}") %>
     <% picture = nil %>

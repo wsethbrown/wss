@@ -70,11 +70,13 @@
       <h2 class="mb-4 text-xl font-semibold text-ink">Subscription management</h2>
 
       <% if @user.stripe_customer_id.present? %>
-        <% begin %>
-          <% active_subs = Stripe::Subscription.list(customer: @user.stripe_customer_id, status: 'active', limit: 1) %>
-          <% trialing_subs = Stripe::Subscription.list(customer: @user.stripe_customer_id, status: 'trialing', limit: 1) %>
-          <% current_sub = active_subs.data.first || trialing_subs.data.first %>
-
+        <% lookup = stripe_subscription_lookup %>
+        <% current_sub = lookup[:subscription] %>
+        <% if lookup[:error] %>
+          <div class="rounded-2xl bg-red-50 p-4" role="alert">
+            <p class="text-sm font-medium text-red-700">Stripe Error</p>
+          </div>
+        <% else %>
           <% if current_sub %>
             <% if @user.subscription_paused? %>
               <%= render "admin/shared/detail_panel", rows: [
@@ -144,11 +146,6 @@
               <% end %>
             </div>
           <% end %>
-        <% rescue Stripe::StripeError => e %>
-          <div class="rounded-2xl bg-red-50 p-4" role="alert">
-            <p class="text-sm font-medium text-red-700">Stripe Error</p>
-            <p class="text-sm text-red-700"><%= e.message %></p>
-          </div>
         <% end %>
       <% else %>
         <div class="rounded-2xl bg-paper p-4">

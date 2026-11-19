@@ -25,7 +25,7 @@
 <div class="mx-auto max-w-3xl px-4 pb-16 pt-28">
   <% if @society.banner_image.attached? %>
     <div class="mb-8 aspect-[3/1] overflow-hidden rounded-[18px] border border-hairline bg-char">
-      <%= image_tag @society.banner_image, alt: "", class: "h-full w-full object-cover",
+      <%= image_tag image_variant(@society.banner_image, :hero), alt: "", class: "h-full w-full object-cover",
           style: "object-position: #{@society.banner_position || 'center center'};" %>
     </div>
   <% end %>

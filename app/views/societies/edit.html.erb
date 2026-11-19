@@ -59,7 +59,7 @@
           <% if @society.profile_picture.attached? %>
             <div class="mb-3 flex items-center gap-4">
               <div class="h-20 w-20 overflow-hidden rounded-[18px] bg-gray-100">
-                <%= image_tag @society.profile_picture, class: "h-full w-full object-cover" %>
+                <%= image_tag image_variant(@society.profile_picture, :thumb), class: "h-full w-full object-cover" %>
               </div>
               <p class="text-sm text-mute">Current picture. Uploading a new file replaces it.</p>
             </div>

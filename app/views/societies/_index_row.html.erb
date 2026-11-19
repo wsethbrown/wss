@@ -11,12 +11,7 @@
   <div class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-whiskey-100 font-display text-base font-semibold text-ink">
     <% picture = society.profile_picture %>
     <% if picture.attached? && picture.blob.present? %>
-      <% content_type = picture.blob.content_type.to_s.downcase %>
-      <% if content_type.include?("heic") || content_type.include?("heif") %>
-        <%= image_tag picture.variant(resize_to_limit: [ 200, 200 ], format: :jpeg), alt: "", class: "h-full w-full object-cover" %>
-      <% else %>
-        <%= image_tag picture, alt: "", class: "h-full w-full object-cover" %>
-      <% end %>
+      <%= image_tag image_variant(picture, :thumb), alt: "", class: "h-full w-full object-cover" %>
     <% else %>
       <span aria-hidden="true"><%= society.name.to_s.split.first(2).map { |w| w[0] }.join.upcase %></span>
     <% end %>

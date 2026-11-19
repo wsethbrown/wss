@@ -118,7 +118,7 @@
             <%= form.label :featured_image, "Banner image", class: admin_label_class %>
             <% if presentation.featured_image.attached? %>
               <div class="mb-3">
-                <%= image_tag presentation.featured_image, class: "h-32 w-auto rounded-[18px] border border-hairline" %>
+                <%= image_tag image_variant(presentation.featured_image, :card), class: "h-32 w-auto rounded-[18px] border border-hairline" %>
               </div>
             <% end %>
             <%= form.file_field :featured_image, accept: "image/jpeg,image/jpg,image/png,image/gif,image/webp", class: admin_field_class %>
@@ -290,7 +290,7 @@
           <div class="grid grid-cols-4 gap-3">
             <% slides.first(8).each_with_index do |slide, i| %>
               <figure>
-                <%= image_tag slide, class: "aspect-video w-full rounded-xl border border-hairline object-cover" %>
+                <%= image_tag image_variant(slide, :card), class: "aspect-video w-full rounded-xl border border-hairline object-cover" %>
                 <figcaption class="mt-1 text-center text-xs text-mute"><%= i + 1 %></figcaption>
               </figure>
             <% end %>

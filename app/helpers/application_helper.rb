@@ -13,4 +13,12 @@ module ApplicationHelper
     ]
     link_to name, path, options.merge(class: classes.join(" "))
   end
+
+  # The bell's unread count, queried once per request however many times the layout
+  # draws it (desktop nav and mobile menu).
+  def unread_notifications_count
+    return 0 unless user_signed_in?
+
+    @unread_notifications_count ||= current_user.notifications.unread.count
+  end
 end

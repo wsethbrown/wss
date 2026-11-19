@@ -14,11 +14,22 @@ module DesignHelper
 
     content_tag(:div, class: wrapper) do
       if image
-        image_tag image, alt: alt || deck.title, loading: "lazy", class: "absolute inset-0 h-full w-full object-cover"
+        image_tag image_variant(image, :card), alt: alt || deck.title, loading: "lazy", class: "absolute inset-0 h-full w-full object-cover"
       else
         "".html_safe
       end
     end
+  end
+
+  # The named variant of an attachment (:card, :hero, :avatar, :thumb), so pages never
+  # serve the full-size upload. Falls back to the attachment itself only when it
+  # cannot be transformed (a type libvips will not resize); that case is logged.
+  def image_variant(attachment, name)
+    return attachment unless attachment.respond_to?(:variable?)
+    return attachment.variant(name) if attachment.variable?
+
+    Rails.logger.warn "[image_variant] #{attachment.blob&.content_type.inspect} is not variable; serving the original (attachment #{attachment.try(:id)})"
+    attachment
   end
 
   # The attachment deck_cover would show, or nil. One query at most; none when the
@@ -40,7 +51,7 @@ module DesignHelper
     style = "width: #{size.to_i}px; height: #{size.to_i}px;"
 
     if user.profile_image.attached?
-      image_tag user.profile_image, alt: user.display_name, class: "#{classes} object-cover", style: style
+      image_tag image_variant(user.profile_image, :avatar), alt: user.display_name, class: "#{classes} object-cover", style: style
     else
       content_tag(:span, user.initials,
                   class: "#{classes} inline-flex items-center justify-center bg-whiskey-100 font-semibold text-ink",

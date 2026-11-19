@@ -247,7 +247,7 @@
           <%= link_to presentation_path(@showcase_deck), class: "player", aria: { label: "#{@showcase_deck.title}, preview slides" } do %>
             <div class="screen reel">
               <% showcase_slides.each_with_index do |slide, i| %>
-                <%= image_tag slide, alt: (i.zero? ? "Opening slide of #{@showcase_deck.title}" : ""), style: "animation-delay: #{i * 4}s" %>
+                <%= image_tag image_variant(slide, :hero), alt: (i.zero? ? "Opening slide of #{@showcase_deck.title}" : ""), style: "animation-delay: #{i * 4}s" %>
               <% end %>
             </div>
             <div class="bar">
@@ -353,7 +353,7 @@
         <div class="tile spot">
           <% if spot_image %>
             <%= link_to presentation_path(@spotlight_deck), class: "spot-img", aria: { hidden: true }, tabindex: -1 do %>
-              <%= image_tag spot_image, alt: "", loading: "lazy" %>
+              <%= image_tag image_variant(spot_image, :card), alt: "", loading: "lazy" %>
             <% end %>
           <% end %>
           <div>

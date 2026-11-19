@@ -3,16 +3,16 @@
 <% if @society.public? %>
   <% content_for :og_description, truncate(@society.description.to_s.squish, length: 200) if @society.description.present? %>
   <% if @society.banner_image.attached? %>
-    <% content_for :og_image, request.base_url + rails_blob_path(@society.banner_image) %>
+    <% content_for :og_image, request.base_url + url_for(image_variant(@society.banner_image, :hero)) %>
   <% end %>
 <% end %>
 
 <%# The layout treats this page as full-bleed (no wrapper), so the page brings its
     own width and clears the floating nav itself. %>
 <%
-  my_membership = user_signed_in? ? current_user.society_memberships.find_by(society: @society) : nil
+  my_membership = @my_membership
   can_manage = user_signed_in? && policy(@society).manage_members?
-  role_by_user = @society.society_memberships.where(user_id: @recent_members.map(&:id)).index_by(&:user_id)
+  role_by_user = @member_roles
   # Same rule as SocietyMembershipsController#may_manage_target?: a society admin can only be
   # demoted or removed by the founder or a global admin. Officers never see those controls.
   can_manage_admins = user_signed_in? && (current_user.id == @society.creator_id || current_user.admin?)
@@ -22,7 +22,7 @@
 <div class="mx-auto max-w-6xl px-4 pb-16 pt-28">
   <% if @society.banner_image.attached? %>
     <div class="mb-8 aspect-[3/1] overflow-hidden rounded-[18px] border border-hairline bg-char">
-      <%= image_tag @society.banner_image, alt: "",
+      <%= image_tag image_variant(@society.banner_image, :hero), alt: "",
           class: "h-full w-full object-cover",
           style: "object-position: #{@society.banner_position || 'center center'};" %>
     </div>
@@ -130,7 +130,7 @@
           </div>
           <div class="divide-y divide-hairline">
             <% @review_board.each do |bottle| %>
-              <div class="px-6 py-4">
+              <div class="px-6 py-4" data-role="board-row">
                 <div class="flex flex-wrap items-baseline justify-between gap-2">
                   <%= link_to bottle.display_name, bottle_path(bottle), class: "font-semibold text-ink hover:underline" %>
                   <span class="flex items-center gap-2 whitespace-nowrap text-sm text-mute">
@@ -159,6 +159,9 @@
               </div>
             <% end %>
           </div>
+          <% if @board_total > @review_board.size %>
+            <p class="border-t border-hairline px-6 py-4 text-sm text-mute tabular-nums">Showing the top <%= @review_board.size %> of <%= @board_total %> bottles.</p>
+          <% end %>
         </section>
       <% end %>
 
@@ -241,9 +244,10 @@
                 </div>
               <% end %>
             </div>
-            <% if @society.member_count > @recent_members.count %>
+            <% total_members = @society.member_count %>
+            <% if total_members > @recent_members.size %>
               <p class="mt-4 border-t border-hairline pt-4 text-center text-sm text-mute tabular-nums">
-                And <%= @society.member_count - @recent_members.count %> more members
+                And <%= total_members - @recent_members.size %> more members
               </p>
             <% end %>
           <% else %>

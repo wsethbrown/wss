@@ -52,4 +52,41 @@ class DesignHelperTest < ActionView::TestCase
     assert_includes html, "<img"
     assert_not_includes html, ">JD<"
   end
+
+  # B16: pages show named variants, never the original upload.
+  test "deck_cover and avatar point at named variants, not the original blob" do
+    deck.featured_image.attach(png)
+    assert_match %r{/rails/active_storage/representations/}, deck_cover(deck)
+    assert_no_match %r{/rails/active_storage/blobs/}, deck_cover(deck)
+
+    user = users(:john)
+    user.profile_image.attach(png)
+    assert_match %r{/rails/active_storage/representations/}, avatar(user, size: 40)
+  end
+
+  test "named variants exist on every displayed attachment" do
+    assert_equal %i[card hero], Presentation.reflect_on_attachment(:featured_image).named_variants.keys.sort
+    assert_equal %i[card hero], Presentation.reflect_on_attachment(:slide_images).named_variants.keys.sort
+    assert_equal %i[avatar thumb], User.reflect_on_attachment(:profile_image).named_variants.keys.sort
+    assert_equal %i[avatar thumb], Society.reflect_on_attachment(:profile_picture).named_variants.keys.sort
+    assert_equal %i[hero], Society.reflect_on_attachment(:banner_image).named_variants.keys
+    [ [ Presentation, :featured_image ], [ Presentation, :slide_images ], [ User, :profile_image ],
+      [ Society, :profile_picture ], [ Society, :banner_image ] ].each do |model, name|
+      model.reflect_on_attachment(name).named_variants.each do |variant, definition|
+        assert definition.preprocessed?(model.new), "#{model}##{name} :#{variant} should be preprocessed"
+      end
+    end
+  end
+
+  test "named variants really process with libvips" do
+    deck.featured_image.attach(png)
+    assert deck.featured_image.variant(:card).processed.image.attached?
+  end
+
+  test "image_variant serves the original only when the file cannot be transformed, and logs it" do
+    deck.supplemental_materials.attach(io: StringIO.new("plain"), filename: "a.txt", content_type: "text/plain")
+    attachment = deck.supplemental_materials.first
+    Rails.logger.expects(:warn).with(regexp_matches(/not variable/)).once
+    assert_equal attachment, image_variant(attachment, :card)
+  end
 end
