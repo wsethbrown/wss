@@ -1,0 +1,32 @@
+<%# The admin section links, grouped. Rendered twice by layouts/admin.html.erb:
+    in the fixed desktop sidebar and in the phone menu. The current section gets
+    aria-current="page", the raised oak fill and a small orange mark.
+    Sections and their matching paths live in AdminHelper#admin_nav_groups;
+    add a section there, not here. Locals: none. %>
+<nav aria-label="Admin sections" class="space-y-5">
+  <% admin_nav_groups.each do |group, items| %>
+    <div>
+      <% if group %>
+        <p class="mb-1 px-3 text-xs font-medium text-cream/60"><%= group %></p>
+      <% end %>
+      <ul class="space-y-0.5">
+        <% items.each do |item| %>
+          <% current = admin_nav_current?(item) %>
+          <li>
+            <%= link_to item[:path],
+                  "aria-current": (current ? "page" : nil),
+                  class: "relative flex min-h-11 items-center gap-3 rounded-xl px-3 text-sm font-medium transition #{current ? 'bg-oak text-cream' : 'text-cream/70 hover:bg-oak/60 hover:text-cream'}" do %>
+              <% if current %>
+                <span class="absolute inset-y-3 left-0 w-0.5 rounded-full bg-mark" aria-hidden="true"></span>
+              <% end %>
+              <svg class="h-5 w-5 shrink-0 <%= current ? 'text-cream' : 'text-cream/50' %>" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="<%= item[:icon] %>"></path>
+              </svg>
+              <%= item[:label] %>
+            <% end %>
+          </li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+</nav>

@@ -1,0 +1,32 @@
+<%# Figures row: the handful of headline numbers at the top of a page
+    (dashboard totals, a section's counts). One card, figures side by side with a
+    hairline rule on their left, wrapping on phones. Real computed values only.
+    Locals:
+      stats (Array of Hashes, required), each:
+        label (String) e.g. "Total users"
+        value (String or number) already formatted, e.g. number_to_currency(x)
+        note  (String, optional) one line of context under the figure
+        path  (String, optional) makes the label a link to the detail page
+    Example:
+      render "admin/shared/stats", stats: [
+        { label: "Total users", value: @total_users, note: "+3 this week" },
+        { label: "Active subscriptions", value: @active_subscriptions } ] %>
+<section class="card mb-6 p-5 sm:p-6">
+  <dl class="grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-[repeat(auto-fit,minmax(10rem,1fr))]">
+    <% stats.each do |stat| %>
+      <div class="min-w-0 border-l-2 border-hairline pl-4">
+        <dt class="text-sm text-mute">
+          <% if stat[:path].present? %>
+            <%= link_to stat[:label], stat[:path], class: "hover:text-ink hover:underline underline-offset-4" %>
+          <% else %>
+            <%= stat[:label] %>
+          <% end %>
+        </dt>
+        <dd class="mt-1 font-display text-3xl font-semibold tabular-nums text-ink"><%= stat[:value] %></dd>
+        <% if stat[:note].present? %>
+          <dd class="mt-1 text-sm text-mute"><%= stat[:note] %></dd>
+        <% end %>
+      </div>
+    <% end %>
+  </dl>
+</section>

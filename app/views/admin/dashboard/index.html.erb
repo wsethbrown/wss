@@ -1,347 +1,123 @@
 <% content_for :title, "Dashboard - Admin" %>
+<%# Admin dashboard, built from the admin/shared pattern partials. Every figure
+    comes from Admin::DashboardController; nothing here computes new numbers
+    beyond percentages and bar heights for display. %>
 
-<div class="mb-8">
-  <h1 class="text-3xl font-bold text-gray-900">Dashboard</h1>
-  <p class="mt-2 text-gray-600">Welcome to the Whiskey Share Society admin panel</p>
-</div>
+<%= render "admin/shared/page_header",
+           title: "Dashboard",
+           lede: "Welcome to the Whiskey Share Society admin panel" do %>
+  <%= link_to "Add new presentation", new_admin_presentation_path, class: "btn btn-primary min-h-11" %>
+<% end %>
 
-<!-- Stats Grid -->
-<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-  <!-- Total Users -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-    <div class="flex items-center justify-between">
-      <div>
-        <p class="text-sm font-medium text-gray-600">Total Users</p>
-        <p class="text-3xl font-bold text-gray-900 mt-2"><%= @total_users %></p>
-        <p class="text-xs text-gray-500 mt-1">
-          <span class="text-green-600">+<%= @new_users_this_week %></span> this week
-        </p>
-      </div>
-      <div class="p-3 bg-blue-50 rounded-xl">
-        <svg class="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-        </svg>
-      </div>
-    </div>
-  </div>
+<%= render "admin/shared/stats", stats: [
+      { label: "Total users", value: @total_users, path: admin_users_path,
+        note: "+#{@new_users_this_week} this week" },
+      { label: "Active subscriptions", value: @active_subscriptions, path: admin_subscriptions_path,
+        note: "#{@total_users.positive? ? number_to_percentage(@active_subscriptions.to_f / @total_users * 100, precision: 0) : '0%'} of users" },
+      { label: "Monthly recurring revenue", value: "$#{number_with_precision(@subscription_mrr, precision: 2)}",
+        note: "$#{number_with_precision(@deck_sales_this_month, precision: 2)} in deck sales this month" },
+      { label: "Presentations", value: @published_presentations, path: admin_presentations_path,
+        note: "#{@total_presentations} total, #{@total_purchases} purchases" },
+      { label: "Downloads", value: @total_downloads_today, path: admin_downloads_analytics_path,
+        note: "Today · #{@total_downloads_week} this week" }
+    ] %>
 
-  <!-- Active Subscriptions -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-    <div class="flex items-center justify-between">
-      <div>
-        <p class="text-sm font-medium text-gray-600">Active Subscriptions</p>
-        <p class="text-3xl font-bold text-gray-900 mt-2"><%= @active_subscriptions %></p>
-        <p class="text-xs text-gray-500 mt-1">
-          <%= number_to_percentage((@active_subscriptions.to_f / @total_users * 100), precision: 0) %> of users
-        </p>
-      </div>
-      <div class="p-3 bg-green-50 rounded-xl">
-        <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-      </div>
-    </div>
-  </div>
-
-  <!-- Total Revenue -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-    <div class="flex items-center justify-between">
-      <div>
-        <p class="text-sm font-medium text-gray-600">Monthly recurring revenue</p>
-        <p class="text-3xl font-bold text-gray-900 mt-2">$<%= number_with_precision(@subscription_mrr, precision: 2) %></p>
-        <p class="text-xs text-gray-500 mt-1">
-          $<%= number_with_precision(@deck_sales_this_month, precision: 2) %> in deck sales this month
-        </p>
-      </div>
-      <div class="p-3 bg-yellow-50 rounded-xl">
-        <svg class="w-8 h-8 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-        </svg>
-      </div>
-    </div>
-  </div>
-
-  <!-- Total Presentations -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-    <div class="flex items-center justify-between">
-      <div>
-        <p class="text-sm font-medium text-gray-600">Presentations</p>
-        <p class="text-3xl font-bold text-gray-900 mt-2"><%= @published_presentations %></p>
-        <p class="text-xs text-gray-500 mt-1">
-          <%= @total_presentations %> total, <%= @total_purchases %> purchases
-        </p>
-      </div>
-      <div class="p-3 bg-purple-50 rounded-xl">
-        <svg class="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 21a4 4 0 01-4-4V5a2 2 0 012-2h4a2 2 0 012 2v12a4 4 0 01-4 4zm0 0h12a2 2 0 002-2v-4a2 2 0 00-2-2h-2.343M11 7.343l1.657-1.657a2 2 0 012.828 0l2.829 2.829a2 2 0 010 2.828l-8.486 8.485M7 17h.01"></path>
-        </svg>
-      </div>
-    </div>
-  </div>
-  
-  <!-- Downloads -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-    <div class="flex items-center justify-between">
-      <div>
-        <p class="text-sm font-medium text-gray-600">Downloads</p>
-        <p class="text-3xl font-bold text-gray-900 mt-2"><%= @total_downloads_today %></p>
-        <p class="text-xs text-gray-500 mt-1">
-          Today • <%= @total_downloads_week %> this week
-        </p>
-      </div>
-      <div class="p-3 bg-whiskey-50 rounded-xl">
-        <svg class="w-8 h-8 text-whiskey-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-        </svg>
-      </div>
-    </div>
-  </div>
-</div>
-
-<!-- Second Row: Charts and Actions -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-  <!-- Recent Signups (2 columns) -->
-  <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-    <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Signups</h2>
-    <div class="h-48 flex items-end justify-between space-x-2">
-      <% max_count = [@signup_chart_data.map { |d| d[:count] }.max, 1].compact.max %>
+<div class="mb-6 grid gap-6 lg:grid-cols-12">
+  <%# Recent signups: plain CSS bars, one per day for the last seven days. %>
+  <section class="card p-5 sm:p-6 lg:col-span-7">
+    <h2 class="text-lg font-semibold text-ink">Recent signups</h2>
+    <% max_count = [ @signup_chart_data.map { |d| d[:count] }.max.to_i, 1 ].max %>
+    <ol class="mt-5 flex h-48 items-end gap-2 sm:gap-3" aria-label="Signups per day, last seven days">
       <% @signup_chart_data.each do |data| %>
-        <div class="flex-1 flex flex-col items-center">
-          <div class="w-full bg-blue-500 rounded-t"
-               style="height: <%= max_count > 0 ? (data[:count].to_f / max_count * 100).to_i : 0 %>%;
-                      min-height: <%= data[:count] > 0 ? '20px' : '2px' %>">
-          </div>
-          <span class="text-xs text-gray-500 mt-2"><%= data[:date] %></span>
-          <span class="text-xs font-medium text-gray-700"><%= data[:count] %></span>
-        </div>
+        <li class="flex h-full min-w-0 flex-1 flex-col items-center justify-end">
+          <span class="mb-1.5 text-sm font-semibold tabular-nums text-ink"><%= data[:count] %></span>
+          <span class="block w-full rounded-t-lg <%= data[:count].positive? ? 'bg-ink' : 'bg-hairline' %>"
+                style="height: <%= data[:count].positive? ? [ (data[:count].to_f / max_count * 100).round, 6 ].max : 2 %>%"
+                aria-hidden="true"></span>
+          <span class="mt-2 whitespace-nowrap text-xs text-mute"><%= data[:date] %></span>
+        </li>
       <% end %>
-    </div>
-  </div>
+    </ol>
+  </section>
 
-  <!-- Quick Actions (1 column) -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-    <h2 class="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h2>
-    <div class="space-y-2">
-      <%= link_to new_admin_presentation_path, class: "flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors" do %>
-        <div class="p-1.5 bg-whiskey-100 rounded-lg">
-          <svg class="w-4 h-4 text-whiskey-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-          </svg>
-        </div>
-        <span class="text-sm font-medium text-gray-900">Add New Presentation</span>
-      <% end %>
-      
-      <%= link_to admin_users_path, class: "flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors" do %>
-        <div class="p-1.5 bg-blue-100 rounded-lg">
-          <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-          </svg>
-        </div>
-        <span class="text-sm font-medium text-gray-900">View All Users</span>
-      <% end %>
-      
-      <%= link_to admin_presentations_path, class: "flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors" do %>
-        <div class="p-1.5 bg-purple-100 rounded-lg">
-          <svg class="w-4 h-4 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path>
-          </svg>
-        </div>
-        <span class="text-sm font-medium text-gray-900">Manage Presentations</span>
-      <% end %>
-      
-      <%= link_to admin_downloads_analytics_path, class: "flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors" do %>
-        <div class="p-1.5 bg-green-100 rounded-lg">
-          <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
-          </svg>
-        </div>
-        <span class="text-sm font-medium text-gray-900">View Analytics</span>
-      <% end %>
-    </div>
+  <div class="lg:col-span-5">
+    <%= render "admin/shared/detail_panel", title: "Revenue breakdown", rows: [
+          [ "Deck sales, one-time purchases, all time", "$#{number_with_precision(@deck_sales_total, precision: 2)}" ],
+          [ "Subscriptions, estimated monthly recurring", "$#{number_with_precision(@subscription_mrr, precision: 2)}" ],
+          [ "Deck sales this month", "$#{number_with_precision(@deck_sales_this_month, precision: 2)}" ]
+        ] %>
   </div>
 </div>
 
-<!-- Third Row: Activity and Analytics -->
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-  <!-- Recent Purchases -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-semibold text-gray-900">Recent Purchases</h2>
-      <%= link_to "All", admin_presentations_path, class: "text-sm text-whiskey-600 hover:text-whiskey-900" %>
-    </div>
-    <% if @recent_purchases.any? %>
-      <div class="space-y-2 max-h-80 overflow-y-auto">
-        <% @recent_purchases.first(6).each do |purchase| %>
-          <div class="flex items-start justify-between p-2 hover:bg-gray-50 rounded-lg transition-colors">
-            <div class="flex-1 min-w-0 mr-2">
-              <p class="text-sm font-medium text-gray-900 truncate"><%= purchase.presentation.title %></p>
-              <p class="text-xs text-gray-500 truncate"><%= purchase.user.full_name %></p>
-            </div>
-            <div class="flex-shrink-0">
-              <% if purchase.purchase_type == 'direct' %>
-                <span class="text-sm font-bold text-gray-900">$<%= purchase.purchase_price.to_i %></span>
-              <% else %>
-                <span class="text-xs px-1.5 py-0.5 rounded-full bg-amber-100 text-amber-800">Credit</span>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
-      </div>
-    <% else %>
-      <p class="text-sm text-gray-500">No recent purchases</p>
+<div class="mb-6 grid gap-6 lg:grid-cols-3">
+  <%= render "admin/shared/table", title: "Recent purchases", link: [ "All", admin_presentations_path ],
+             rows: @recent_purchases.first(6), empty: "No recent purchases.",
+             columns: [ "Deck", [ "Price", :right ] ] do |purchase| %>
+    <%= admin_td(class: "max-w-0 w-full") do %>
+      <span class="block truncate font-medium text-ink"><%= purchase.presentation.title %></span>
+      <span class="block truncate text-xs text-mute"><%= purchase.user.full_name %></span>
     <% end %>
-  </div>
-
-  <!-- Popular Presentations -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-semibold text-gray-900">Top Presentations</h2>
-      <%= link_to "All", admin_presentations_path, class: "text-sm text-whiskey-600 hover:text-whiskey-900" %>
-    </div>
-    <% if @popular_presentations.any? %>
-      <div class="space-y-2">
-        <% @popular_presentations.each_with_index do |presentation, index| %>
-          <div class="flex items-center gap-2 p-2 hover:bg-gray-50 rounded-lg transition-colors">
-            <div class="flex-shrink-0 w-6 h-6 rounded-full bg-whiskey-100 flex items-center justify-center">
-              <span class="text-xs font-bold text-whiskey-600"><%= index + 1 %></span>
-            </div>
-            <div class="flex-1 min-w-0">
-              <%= link_to presentation.title, admin_presentation_path(presentation), class: "text-sm font-medium text-gray-900 hover:text-whiskey-600 truncate block" %>
-              <p class="text-xs text-gray-500"><%= presentation.user_presentations.count %> sales • $<%= presentation.user_presentations.where(purchase_type: 'direct').sum(:purchase_price).to_i %></p>
-            </div>
-          </div>
-        <% end %>
-      </div>
-    <% else %>
-      <p class="text-sm text-gray-500">No presentations yet</p>
+    <%= admin_td(align: :right) do %>
+      <% if purchase.purchase_type == "direct" %>
+        <span class="font-semibold">$<%= purchase.purchase_price.to_i %></span>
+      <% else %>
+        <%= render "admin/shared/status_chip", label: "Credit", tone: :attention %>
+      <% end %>
     <% end %>
-  </div>
+  <% end %>
 
-  <!-- Plan Distribution -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-    <h2 class="text-lg font-semibold text-gray-900 mb-4">Plan Distribution</h2>
+  <%= render "admin/shared/table", title: "Top presentations", link: [ "All", admin_presentations_path ],
+             rows: @popular_presentations, empty: "No presentations yet.",
+             columns: [ "Deck", [ "Sales", :right ] ] do |presentation| %>
+    <%= admin_td(class: "max-w-0 w-full") do %>
+      <span class="flex items-center gap-3">
+        <span class="step-marker"><%= @popular_presentations.to_a.index(presentation) + 1 %></span>
+        <span class="min-w-0">
+          <%= link_to presentation.title, admin_presentation_path(presentation), class: "block truncate font-medium text-ink hover:underline underline-offset-4" %>
+          <span class="block text-xs text-mute tabular-nums">$<%= presentation.user_presentations.where(purchase_type: "direct").sum(:purchase_price).to_i %></span>
+        </span>
+      </span>
+    <% end %>
+    <%= admin_td(presentation.user_presentations.count, align: :right) %>
+  <% end %>
+
+  <%# Plan distribution: one ruled row per plan with a proportional bar. %>
+  <section class="card p-5 sm:p-6">
+    <h2 class="text-lg font-semibold text-ink">Plan distribution</h2>
     <% if @plan_breakdown.any? %>
       <% total_subs = @plan_breakdown.values.sum %>
-      <% colors = ['#4F46E5', '#9333EA', '#EC4899', '#3B82F6'] %>
-      <% chart_data = [] %>
-      <% cumulative = 0 %>
-      <% @plan_breakdown.each_with_index do |(plan, count), index| %>
-        <% percentage = (count.to_f / total_subs * 100) %>
-        <% chart_data << { plan: plan, count: count, percentage: percentage, color: colors[index % colors.length], start: cumulative } %>
-        <% cumulative += percentage %>
-      <% end %>
-      
-      <div class="flex justify-center mb-4">
-        <div class="relative">
-          <svg width="150" height="150" viewBox="0 0 150 150" class="transform -rotate-90" xmlns="http://www.w3.org/2000/svg">
-            <% chart_data.each do |data| %>
-              <% angle = data[:percentage] * 3.6 %>
-              <% large_arc = angle > 180 ? 1 : 0 %>
-              <% x1 = 75 + 60 * Math.cos(data[:start] * Math::PI / 180) %>
-              <% y1 = 75 + 60 * Math.sin(data[:start] * Math::PI / 180) %>
-              <% x2 = 75 + 60 * Math.cos((data[:start] + data[:percentage] * 3.6) * Math::PI / 180) %>
-              <% y2 = 75 + 60 * Math.sin((data[:start] + data[:percentage] * 3.6) * Math::PI / 180) %>
-              <path d="M 75 75 L <%= x1 %> <%= y1 %> A 60 60 0 <%= large_arc %> 1 <%= x2 %> <%= y2 %> Z" 
-                    fill="<%= data[:color] %>" 
-                    stroke="white" 
-                    stroke-width="2"/>
-            <% end %>
-            <circle cx="75" cy="75" r="35" fill="white"/>
-          </svg>
-          <div class="absolute inset-0 flex items-center justify-center">
-            <div class="text-center">
-              <p class="text-xl font-bold text-gray-900"><%= total_subs %></p>
-              <p class="text-xs text-gray-500">Total</p>
+      <p class="mt-1 text-sm text-mute"><span class="font-semibold tabular-nums text-ink"><%= total_subs %></span> total</p>
+      <ul class="mt-4 divide-y divide-hairline">
+        <% @plan_breakdown.each do |plan, count| %>
+          <% share = count.to_f / total_subs * 100 %>
+          <li class="py-3">
+            <div class="flex items-baseline justify-between gap-4 text-sm">
+              <span class="font-medium text-ink"><%= plan.humanize %></span>
+              <span class="tabular-nums text-gray-900"><%= count %> (<%= number_to_percentage(share, precision: 0) %>)</span>
             </div>
-          </div>
-        </div>
-      </div>
-      
-      <div class="space-y-1">
-        <% colors_rgb = ['bg-whiskey-600', 'bg-purple-600', 'bg-pink-600', 'bg-blue-600'] %>
-        <% @plan_breakdown.each_with_index do |(plan, count), index| %>
-          <div class="flex items-center justify-between text-sm">
-            <div class="flex items-center gap-2">
-              <div class="w-2.5 h-2.5 rounded-full <%= colors_rgb[index % colors_rgb.length] %>"></div>
-              <span class="text-gray-700 capitalize"><%= plan.humanize %></span>
+            <div class="mt-2 h-1.5 rounded-full bg-paper" aria-hidden="true">
+              <div class="h-1.5 rounded-full bg-ink" style="width: <%= share.round(1) %>%"></div>
             </div>
-            <span class="font-medium text-gray-900"><%= count %> (<%= number_to_percentage((count.to_f / total_subs * 100), precision: 0) %>)</span>
-          </div>
+          </li>
         <% end %>
-      </div>
+      </ul>
     <% else %>
-      <p class="text-sm text-gray-500 text-center py-8">No active subscriptions</p>
+      <p class="mt-4 text-base text-mute">No active subscriptions.</p>
     <% end %>
-  </div>
+  </section>
 </div>
 
-<!-- Fourth Row: Revenue and Users -->
-<div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-  <!-- Revenue Breakdown -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-    <h2 class="text-lg font-semibold text-gray-900 mb-4">Revenue Breakdown</h2>
-    <div class="space-y-3">
-      <div class="flex items-center justify-between p-3 bg-green-50 rounded-lg">
-        <div class="flex items-center gap-3">
-          <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <div>
-            <p class="text-sm font-medium text-gray-700">Deck sales</p>
-            <p class="text-xs text-gray-500">One-time purchases, all time</p>
-          </div>
-        </div>
-        <p class="text-lg font-bold text-gray-900">$<%= number_with_precision(@deck_sales_total, precision: 2) %></p>
-      </div>
-      
-      <div class="flex items-center justify-between p-3 bg-blue-50 rounded-lg">
-        <div class="flex items-center gap-3">
-          <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-          <div>
-            <p class="text-sm font-medium text-gray-700">Subscriptions</p>
-            <p class="text-xs text-gray-500">Estimated monthly recurring</p>
-          </div>
-        </div>
-        <p class="text-lg font-bold text-gray-900">$<%= number_with_precision(@subscription_mrr, precision: 2) %></p>
-      </div>
-
-      <div class="pt-3 border-t border-gray-200">
-        <div class="flex items-center justify-between">
-          <p class="text-sm font-medium text-gray-600">Deck sales this month</p>
-          <p class="text-xl font-bold text-whiskey-600">$<%= number_with_precision(@deck_sales_this_month, precision: 2) %></p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Recent Users -->
-  <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-    <div class="flex items-center justify-between mb-4">
-      <h2 class="text-lg font-semibold text-gray-900">Recent Users</h2>
-      <%= link_to "View All", admin_users_path, class: "text-sm text-whiskey-600 hover:text-whiskey-900" %>
-    </div>
-    <% if @recent_users.any? %>
-      <div class="grid grid-cols-2 gap-3">
-        <% @recent_users.each do |user| %>
-          <%= link_to admin_user_path(user), class: "flex items-center gap-2 p-2 rounded-lg hover:bg-gray-50 transition-colors border border-gray-100" do %>
-            <% if user.profile_image.attached? %>
-              <%= image_tag user.profile_image, class: "h-8 w-8 rounded-full object-cover" %>
-            <% else %>
-              <div class="h-8 w-8 rounded-full flex items-center justify-center text-white font-semibold text-xs" style="background-color: <%= user.avatar_color %>">
-                <%= user.initials %>
-              </div>
-            <% end %>
-            <div class="flex-1 min-w-0">
-              <p class="text-sm font-medium text-gray-900 truncate"><%= user.full_name %></p>
-              <p class="text-xs text-gray-500 truncate"><%= user.email %></p>
-            </div>
-          <% end %>
-        <% end %>
-      </div>
-    <% else %>
-      <p class="text-sm text-gray-500">No recent users</p>
+<%= render "admin/shared/table", title: "Recent users", link: [ "View all", admin_users_path ],
+           rows: @recent_users, empty: "No recent users.",
+           columns: [ "Member", "Email", [ "Joined", :right ] ] do |user| %>
+  <%= admin_td do %>
+    <%= link_to admin_user_path(user), class: "flex items-center gap-3 font-medium text-ink hover:underline underline-offset-4" do %>
+      <%= avatar(user, size: 32) %>
+      <span class="max-w-[14rem] truncate"><%= user.full_name %></span>
     <% end %>
-  </div>
-</div>
+  <% end %>
+  <%= admin_td(class: "text-mute") do %>
+    <span class="block max-w-[16rem] truncate"><%= user.email %></span>
+  <% end %>
+  <%= admin_td(user.created_at.strftime("%b %d, %Y"), align: :right, class: "text-mute") %>
+<% end %>

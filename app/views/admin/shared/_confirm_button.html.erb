@@ -1,0 +1,26 @@
+<%# Destructive action (delete, cancel, remove photos): a button_to that asks the
+    browser to confirm first (Turbo's data-turbo-confirm), drawn in the problem red.
+    Gating stays with the caller: wrap HARD deletes in
+    current_user.can_delete? so limited admins never see them.
+    Locals:
+      label   (String, required) e.g. "Delete"
+      url     (String, required) the action's path
+      confirm (String, required) the question, e.g. "Permanently delete this review?"
+      method  (Symbol, optional, default :delete) :post for actions like cancel
+      variant (Symbol, optional, default :link) :link for table rows,
+              :button for page headers and panel footers
+      params  (Hash, optional) extra params sent with the form
+    Example:
+      render "admin/shared/confirm_button", label: "Delete", url: admin_presentation_path(deck),
+             confirm: "Are you sure you want to delete this presentation?" %>
+<% variant = local_assigns.fetch(:variant, :link).to_sym %>
+<% classes = if variant == :button
+     "inline-flex min-h-11 cursor-pointer items-center justify-center gap-2 rounded-2xl border border-rsvp-no/30 bg-white px-5 py-2.5 text-sm font-semibold text-rsvp-no transition hover:bg-rsvp-no/10 focus:outline-none focus-visible:ring-2 focus-visible:ring-rsvp-no/40"
+   else
+     "cursor-pointer text-sm font-semibold text-rsvp-no underline-offset-4 hover:underline focus:outline-none focus-visible:ring-2 focus-visible:ring-rsvp-no/40 rounded"
+   end %>
+<%= button_to label, url,
+      method: local_assigns.fetch(:method, :delete),
+      params: local_assigns.fetch(:params, {}),
+      class: classes,
+      form: { class: "inline", data: { turbo_confirm: confirm } } %>
