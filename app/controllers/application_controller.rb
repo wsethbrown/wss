@@ -79,9 +79,28 @@ class ApplicationController < ActionController::Base
   end
   helper_method :browser_timezone
 
-  def user_not_authorized
+  def user_not_authorized(exception = nil)
+    log_authorization_denied(exception)
     flash[:alert] = "You are not authorized to perform this action."
     redirect_back(fallback_location: root_path)
+  end
+
+  # Every Pundit denial is logged (S16) so a "why can't I..." report can be traced:
+  # who, which policy query, which record. Also used by SocietiesController.
+  def log_authorization_denied(exception)
+    return unless exception.is_a?(Pundit::NotAuthorizedError)
+
+    record = exception.record
+    target =
+      if record.nil? then "no record"
+      elsif record.is_a?(Class) then record.name
+      elsif record.respond_to?(:id) then "#{record.class.name} #{record.id || 'new'}"
+      else record.class.name
+      end
+    policy = exception.policy ? exception.policy.class.name : "no policy"
+    actor = current_user ? "user #{current_user.id}" : "signed-out visitor"
+    Rails.logger.warn "Authorization denied: #{actor} #{policy}##{exception.query} on #{target} " \
+                      "(#{self.class.name}##{action_name})"
   end
 
   def handle_csrf_error

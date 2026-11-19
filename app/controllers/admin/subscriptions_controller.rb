@@ -55,10 +55,15 @@ class Admin::SubscriptionsController < Admin::BaseController
     # Edit subscription details
   end
 
+  # Credits are NOT a permitted field here (M7): users.credits is a cache of the
+  # ledger and only the ledger writes it. The "Add credits" box below records a
+  # CreditTransaction instead.
   def update
-    if @user.update(subscription_params)
-      # Log subscription change
-      Rails.logger.info "Admin #{current_user.email} updated subscription for user #{@user.email}"
+    @user.assign_attributes(subscription_params)
+    changed_fields = @user.changed
+    if @user.save
+      Rails.logger.info "Admin #{current_user.id} updated subscription for user #{@user.id}: " \
+                        "#{changed_fields.any? ? changed_fields.join(', ') : 'no field changes'}"
 
       # Handle special actions
       if params[:add_credits].present?
@@ -70,6 +75,7 @@ class Admin::SubscriptionsController < Admin::BaseController
             transaction_type: CreditTransaction::TRANSACTION_TYPES[:admin_adjustment],
             description: "Added via subscription admin by #{current_user.email}"
           )
+          Rails.logger.info "Admin #{current_user.id} adjusted credits for user #{@user.id} by #{credits_to_add} via subscriptions page"
           flash[:notice] = "Added #{credits_to_add} credits to #{@user.full_name}"
         end
       end
@@ -300,9 +306,13 @@ class Admin::SubscriptionsController < Admin::BaseController
         subscription_ends_at: subscription.current_period_end ? Time.at(subscription.current_period_end) : nil
       )
 
-      # Grant initial credit
-      if CreditTransaction.respond_to?(:grant_monthly_credit)
-        CreditTransaction.grant_monthly_credit(@user, "Admin-created subscription - welcome credit")
+      # Welcome credit through the same idempotent entry point the checkout
+      # paths use (M16). grant_monthly_credit silently no-oped here because a
+      # trialing subscription is not "active".
+      if CreditTransaction.grant_welcome_credit(@user)
+        Rails.logger.info "Admin #{current_user.id} subscription for user #{@user.id}: welcome credit granted"
+      else
+        Rails.logger.info "Admin #{current_user.id} subscription for user #{@user.id}: no welcome credit (society-only plan or already welcomed in the last 24h)"
       end
 
       Rails.logger.info "Admin #{current_user.email} created #{plan} subscription #{subscription.id} for user #{@user.email}"
@@ -325,8 +335,7 @@ class Admin::SubscriptionsController < Admin::BaseController
     params.require(:user).permit(
       :subscription_status,
       :subscription_plan,
-      :subscription_ends_at,
-      :credits
+      :subscription_ends_at
     )
   end
 end

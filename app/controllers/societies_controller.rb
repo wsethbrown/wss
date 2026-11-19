@@ -207,7 +207,8 @@ class SocietiesController < ApplicationController
 
   private
 
-  def society_not_authorized
+  def society_not_authorized(exception = nil)
+    log_authorization_denied(exception)
     message =
       case action_name
       when "show"                     then "You are not authorized to view this society."
