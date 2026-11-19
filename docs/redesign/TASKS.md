@@ -266,6 +266,11 @@ Do not change any wording, link or the `.text.erb` files.
 test still renders; button text contrast at least 4.5:1.
 **Tests:** `bin/rails test test/mailers`.
 
+### [ ] B15b · Keep an event's zone on edit; zone check before deploy — `sonnet` (advisor ruling, after D11)
+**Owns:** `EventsController#update` (stop overwriting `time_zone`), `app/views/events/show.html.erb` and `events/_form.html.erb` (zone abbreviation next to times), `lib/tasks/events.rake` (new), matching tests.
+**Do:** `events.time_zone` is set once at creation and never overwritten on update (the typed time is still converted from the editor's browser zone to the correct instant). Show the event zone's abbreviation beside the time on the event page and the edit form. Add `rake events:zones`: prints upcoming events with society, society location and current zone (read-only). Do not infer zones from location text.
+**Acceptance:** an edit from a Pacific browser leaves an Eastern event Eastern and the mailed time correct; the rake task changes nothing.
+
 ### [~] D11 · Consistency, accessibility and docs sweep — `opus` (last)
 **Owns:** any view, for small fixes only; `SECTION_NOTES.md`; `docs/redesign/*`.
 **Do:** Walk every route in `config/routes.rb` that renders HTML, at both widths, signed
@@ -468,6 +473,7 @@ Devise's registration update. Email-RSVP and invite-join links show a one-button
 confirmation page that POSTs, and the RSVP POST re-checks `EventPolicy#rsvp?`. Scrub
 token path segments from lograge output (`/magic_links/[FILTERED]`, and the same for
 `/invitations/`, `/invite/`, `/account/verify_email/`).
+Per-society event-email muting is a possible feature (not built; the mute is the global preference).
 **[owner]** Should magic-link sign-in also become click-to-confirm (protects against mail
 scanners consuming the link, adds one click)? Not in this task unless answered yes.
 **Acceptance:** tests: the old address alone cannot complete an email change; the token
@@ -645,6 +651,7 @@ load with the report-only header and no console CSP errors on the ten main pages
 - **M1** confirm the yearly and quarterly Stripe prices' billing intervals.
 - **M15** confirm which payment methods are enabled in the Stripe dashboard.
 - **S7** check whether any production user has `otp_enabled = true`.
+- **B15 backfill** sets every existing event to America/New_York. Before deploy, run `rake events:zones`, list societies whose location is not in US Eastern time, and set their upcoming events' zones by hand.
 - **B7 migration** deletes duplicate `user_presentations` rows irreversibly (keeps direct over credit). Take a backup before the deploy that runs it.
 - **S3/B3b** confirm in production that `request.remote_ip` shows real visitor addresses (not Cloudflare edges) before relying on the per-IP rate limits; refresh the Cloudflare range list in `config/initializers/trusted_proxies.rb` from cloudflare.com/ips; consider a Cloudflare rate-limiting rule on `/magic_links` as the outer layer.
 - **Deploy config changed (B3b):** `config/deploy.yml` now sets `proxy: forward_headers: true`. After the next deploy, check a production log line shows a real visitor address for `remote_ip` (and the boot line "Trusted proxies: N Cloudflare ranges loaded"), and verify the Cloudflare range list in `config/initializers/trusted_proxies.rb` against cloudflare.com/ips-v4 and /ips-v6 (it was written from memory).
