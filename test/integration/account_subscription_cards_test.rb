@@ -67,16 +67,16 @@ class AccountSubscriptionCardsTest < ActionDispatch::IntegrationTest
     get account_path
     assert_response :success
 
-    assert_select "span", text: /Best Value/
+    assert_select "span", text: /Best value/
   end
 
-  test "account subscription cards have Get Started buttons" do
+  test "account subscription cards have Get started buttons" do
     @user.update!(stripe_subscription_id: nil)
 
     get account_path
     assert_response :success
 
-    assert_select "#plan-cards input[type='submit'][value='Get Started']", count: 3
+    assert_select "#plan-cards input[type='submit'][value='Get started']", count: 3
   end
 
   test "account chooser shows the shared membership benefits once, not per card" do
@@ -92,13 +92,14 @@ class AccountSubscriptionCardsTest < ActionDispatch::IntegrationTest
     assert_select "li", text: /Create and run your own society/
   end
 
-  test "account subscription cards use 3-column grid" do
+  test "account subscription shows one card per plan in a three-column grid" do
     @user.update!(stripe_subscription_id: nil)
 
     get account_path
     assert_response :success
 
-    assert_select "div.grid.grid-cols-1.md\\:grid-cols-3", count: 1
+    assert_select "#plan-cards.grid.lg\\:grid-cols-3", count: 1
+    assert_select "#plan-cards > div", count: 3
   end
 
   test "account subscription cards show commitment-based plan descriptions" do

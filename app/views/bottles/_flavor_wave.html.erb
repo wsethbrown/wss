@@ -6,9 +6,9 @@
   <% families = Review::DESCRIPTOR_LEXICON.keys %>
   <% max = profile.values.max.to_f %>
   <% top = profile.sort_by { |_, n| -n }.first(2).select { |_, n| n.positive? }.map(&:first) %>
-  <section class="rounded-2xl bg-char px-6 pb-8 pt-6 shadow-sm">
+  <section class="panel-ink px-6 pb-8 pt-6">
     <div class="text-center">
-      <p class="eyebrow text-whiskey-300/80">Flavor profile</p>
+      <p class="text-sm font-medium text-cream/70">Flavor profile</p>
       <h2 class="mt-1 font-display text-2xl font-semibold capitalize text-cream"><%= top.join(" & ") %></h2>
 
       <%
@@ -26,21 +26,20 @@
       %>
       <svg viewBox="0 0 <%= w %> 172" class="mt-4 w-full" role="img" aria-label="Flavor profile: strongest in <%= top.join(' and ') %>">
         <% pts.each_with_index do |(x, y), i| %>
-          <line x1="<%= x %>" y1="<%= y %>" x2="<%= x %>" y2="<%= base %>" stroke="#8a6b4f" stroke-opacity="0.55" stroke-width="1.5"></line>
+          <line x1="<%= x %>" y1="<%= y %>" x2="<%= x %>" y2="<%= base %>" stroke="#2f5546" stroke-width="1.5"></line>
         <% end %>
-        <path d="<%= path %>" fill="none" stroke="#d29a5b" stroke-width="4.5" stroke-linecap="round"></path>
+        <path d="<%= path %>" fill="none" stroke="#f6f4ee" stroke-width="4.5" stroke-linecap="round"></path>
         <% families.each_with_index do |family, i| %>
           <% strong = top.include?(family) %>
           <a href="<%= reviews_path(tags: family) %>">
             <text x="<%= xs[i] %>" y="<%= base + (i.even? ? 22 : 42) %>" text-anchor="middle"
-                  font-size="12" letter-spacing="1"
-                  fill="<%= strong ? '#f3e3cd' : '#c9b8a4' %>"
-                  fill-opacity="<%= strong ? 1 : 0.55 %>" font-weight="<%= strong ? 700 : 500 %>"
-                  style="text-transform: uppercase"><%= family.upcase %></text>
+                  font-size="12"
+                  fill="#f6f4ee"
+                  fill-opacity="<%= strong ? 1 : 0.8 %>" font-weight="<%= strong ? 700 : 500 %>"><%= family.capitalize %></text>
           </a>
         <% end %>
       </svg>
-      <p class="mt-2 text-sm text-cream/50">
+      <p class="mt-2 text-sm text-cream/70">
         Drawn from reviews, tap a family to chase it.
       </p>
     </div>

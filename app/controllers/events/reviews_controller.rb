@@ -5,6 +5,7 @@
 class Events::ReviewsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_event_and_bottle
+  after_action :verify_authorized
 
   def new
     @review = Review.new(event: @event, bottle: @bottle)
@@ -25,8 +26,12 @@ class Events::ReviewsController < ApplicationController
 
   private
 
+  # The form names the event and its society, so it is only for people who
+  # may see the event (a private society's members). The model's own gates
+  # still decide whether a review saves.
   def set_event_and_bottle
     @event = Event.find(params[:event_id])
+    authorize @event, :show?
     @bottle = Bottle.find_by!(slug: params[:bottle_id])
   end
 

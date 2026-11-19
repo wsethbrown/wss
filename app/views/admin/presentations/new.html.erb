@@ -1,50 +1,26 @@
 <% content_for :title, "New Presentation - Admin" %>
 
-<% content_for :breadcrumbs do %>
-  <li class="flex items-center">
-    <svg class="w-4 h-4 text-gray-400 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-    </svg>
-    <%= link_to "Presentations", admin_presentations_path, class: "text-gray-500 hover:text-gray-700" %>
-  </li>
-  <li class="flex items-center">
-    <svg class="w-4 h-4 text-gray-400 mx-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-    </svg>
-    <span class="text-gray-900 font-medium">New Presentation</span>
-  </li>
-<% end %>
+<%= render "admin/shared/page_header", title: "New presentation",
+           lede: "Create a new whiskey presentation for the platform.",
+           back: [ "Presentations", admin_presentations_path ] %>
 
-<div class="mb-8">
-  <div class="flex items-center gap-4 mb-4">
-    <%= link_to admin_presentations_path, class: "text-gray-500 hover:text-gray-700" do %>
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-      </svg>
-    <% end %>
-    <h1 class="text-3xl font-bold text-gray-900">New Presentation</h1>
-  </div>
-  <p class="text-gray-600">Create a new whiskey presentation for the platform.</p>
-</div>
+<%# Import from a deck file: parses the .pptx/.ppt/.pdf into a pre-filled draft.
+    The form's action, field name and multipart/turbo settings belong to the
+    controller's `import` action; do not rename them. %>
+<section class="card mb-6 p-5 sm:p-7">
+  <h2 class="text-xl font-semibold text-ink">Start from your deck file</h2>
+  <p class="mt-1 max-w-3xl text-sm text-mute">
+    Upload the .pptx, .ppt, or .pdf and we'll draft the title, story skeleton, and cover
+    image from it, and render every slide for the buyer preview, then you polish and publish.
+  </p>
+  <%= form_with url: import_admin_presentations_path, method: :post, multipart: true, data: { turbo: false },
+        class: "mt-5 flex flex-col gap-3 sm:flex-row sm:items-center" do |f| %>
+    <%= f.file_field :deck_file, accept: ".pptx,.ppt,.pdf", required: true,
+        class: "block w-full min-w-0 text-sm text-gray-900 file:mr-3 file:min-h-11 file:cursor-pointer file:rounded-2xl file:border file:border-hairline file:bg-white file:px-4 file:text-sm file:font-semibold file:text-ink sm:flex-1" %>
+    <%= f.submit "Import draft", class: "btn btn-primary shrink-0" %>
+  <% end %>
+</section>
 
-<!-- Import from a deck file: parses the .pptx into a pre-filled draft. -->
-<div class="mb-8 rounded-2xl border-2 border-dashed border-whiskey-300 bg-whiskey-50 p-6">
-  <div class="flex flex-wrap items-center justify-between gap-4">
-    <div>
-      <h2 class="font-display text-lg font-semibold text-gray-900">Start from your deck file</h2>
-      <p class="mt-1 text-sm text-gray-600">
-        Upload the .pptx, .ppt, or .pdf and we'll draft the title, story skeleton, and cover
-        image from it, and render every slide for the buyer preview, then you polish and publish.
-      </p>
-    </div>
-    <%= form_with url: import_admin_presentations_path, method: :post, multipart: true, data: { turbo: false }, class: "flex items-center gap-3" do |f| %>
-      <%= f.file_field :deck_file, accept: ".pptx,.ppt,.pdf", required: true,
-          class: "text-sm text-gray-700 file:mr-3 file:rounded-lg file:border-0 file:bg-white file:px-4 file:py-2 file:text-sm file:font-semibold file:text-whiskey-800" %>
-      <%= f.submit "Import draft", class: "cursor-pointer rounded-xl bg-whiskey-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-whiskey-700" %>
-    <% end %>
-  </div>
-</div>
-
-<div class="text-center text-sm font-semibold uppercase tracking-wide text-gray-400 mb-8">or fill it in from scratch</div>
+<p class="mb-6 text-sm font-medium text-mute">or fill it in from scratch</p>
 
 <%= render 'form', presentation: @presentation, submit_text: 'Create draft' %>

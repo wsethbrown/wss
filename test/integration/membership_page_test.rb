@@ -12,7 +12,7 @@ class MembershipPageTest < ActionDispatch::IntegrationTest
     assert_select "h3", text: "Monthly"
     assert_select "h3", text: "Quarterly"
     assert_select "h3", text: "Yearly"
-    assert_select "span", text: /Best Value/
+    assert_select "span", text: /Best value/
   end
 
   test "membership page shows the free-vs-member comparison" do

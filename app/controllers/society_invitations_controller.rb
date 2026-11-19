@@ -3,7 +3,14 @@
 # the invitee only, from the notifications page. Three declines close the
 # door (enforced in the model).
 class SocietyInvitationsController < ApplicationController
+  include RateLimitedResponses
+
+  INVITE_LIMIT = 20  # invitations per user per hour
+  INVITE_WINDOW = 1.hour
+
   before_action :authenticate_user!
+  rate_limit to: INVITE_LIMIT, within: INVITE_WINDOW, only: :create, store: RateLimitStore,
+             by: -> { "user-#{current_user.id}" }, with: -> { rate_limit_response("user") }
 
   def create
     society = Society.find(params[:society_id])

@@ -1,4 +1,12 @@
-<div>
-  <h1 class="font-bold text-4xl">Events#edit</h1>
-  <p>Find me in app/views/events/edit.html.erb</p>
+<% content_for :title, "Edit #{@event.title} - Whiskey Share Society" %>
+
+<div class="mx-auto max-w-3xl">
+  <%= render "shared/page_header", title: "Edit event",
+             lede: safe_join([ "Changing the details of ", content_tag(:strong, @event.title, class: "font-semibold text-ink"), "." ]),
+             back: [ @event.title, society_event_path(@event.society, @event) ] %>
+
+  <div class="card p-6 sm:p-10">
+    <%= render "form", event: @event, society: @society, submit_label: "Update event", creating: false,
+               cancel_path: society_event_path(@event.society, @event) %>
+  </div>
 </div>

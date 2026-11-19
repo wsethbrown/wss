@@ -13,7 +13,12 @@ module Presentations
   class CheckoutFulfillment
     # Returns the UserPresentation (new or pre-existing), or nil when the
     # session isn't a paid deck purchase.
-    def self.fulfill!(session, expected_user: nil)
+    #
+    # raise_errors: the webhook passes true so an unexpected error (a database
+    # blip mid-grant) propagates, the webhook answers 5xx, releases its claim
+    # and Stripe retries. The return path leaves it false: the buyer's page
+    # must not error, and the webhook remains the backstop.
+    def self.fulfill!(session, expected_user: nil, raise_errors: false)
       metadata = session.respond_to?(:metadata) ? session.metadata : session["metadata"]
       user_id = metadata && (metadata["user_id"] || metadata[:user_id])
       presentation_id = metadata && (metadata["presentation_id"] || metadata[:presentation_id])
@@ -45,32 +50,52 @@ module Presentations
       end
 
       existing = UserPresentation.find_by(user: user, presentation: presentation)
-      if existing
+      if existing&.direct_purchase?
         Rails.logger.info "Checkout #{session_id}: deck #{presentation.id} already granted to user #{user.id}; nothing to do"
         return existing
       end
 
       payment_intent_id = session.try(:payment_intent) || session["payment_intent"]
       amount_paid, intent_id = payment_details(payment_intent_id, presentation, session_id)
+      paid = { purchase_type: "direct", purchase_price: amount_paid,
+               stripe_payment_intent_id: intent_id, purchased_at: Time.current }
 
-      purchase = UserPresentation.create!(
-        user: user,
-        presentation: presentation,
-        purchase_type: "direct",
-        purchase_price: amount_paid,
-        stripe_payment_intent_id: intent_id,
-        purchased_at: Time.current
-      )
+      # Lock the existing row (if any) so a credit unlock upgrading to a paid
+      # purchase and the other fulfilment path cannot interleave.
+      purchase = UserPresentation.transaction do
+        row = UserPresentation.lock.find_by(user: user, presentation: presentation)
+        if row.nil?
+          UserPresentation.create!(paid.merge(user: user, presentation: presentation))
+        elsif row.credit_purchase?
+          upgrade_credit_row!(row, paid, session_id)
+        else
+          row
+        end
+      end
       Rails.logger.info "Checkout #{session_id}: deck #{presentation.id} granted to user #{user.id} for #{amount_paid} (purchase #{purchase.id})"
       purchase
     rescue ActiveRecord::RecordNotUnique
-      # Webhook and return path landed together; the other one won.
-      Rails.logger.info "Checkout #{session_id}: concurrent fulfillment won the race; deck already granted"
-      UserPresentation.find_by(user_id: user_id, presentation_id: presentation_id)
+      # Webhook and return path landed together; the other one won. If the
+      # winner was a credit unlock, the paid purchase still upgrades it.
+      Rails.logger.info "Checkout #{session_id}: concurrent fulfillment won the race"
+      row = UserPresentation.find_by(user_id: user_id, presentation_id: presentation_id)
+      row = upgrade_credit_row!(row, paid, session_id) if row&.credit_purchase? && paid
+      row
     rescue => e
-      Rails.logger.error "Checkout #{session_id} fulfillment failed for user #{user_id}, presentation #{presentation_id}: #{e.class}: #{e.message}"
+      Rails.logger.error "Checkout #{session_id} fulfillment failed for user #{user_id}, presentation #{presentation_id}: #{e.class}: #{e.message}#{' (re-raising for a Stripe retry)' if raise_errors}"
+      raise if raise_errors
       nil
     end
+
+    # A paid checkout over a credit unlock makes the deck the buyer's for good.
+    # The spent credit is NOT returned (owner decision pending); logged so the
+    # case can be reviewed.
+    def self.upgrade_credit_row!(row, paid, session_id)
+      row.update!(paid)
+      Rails.logger.warn "Checkout #{session_id}: credit unlock of deck #{row.presentation_id} by user #{row.user_id} upgraded to a direct purchase; the spent credit was not returned"
+      row
+    end
+    private_class_method :upgrade_credit_row!
 
     # The charged amount, straight from Stripe when we can read it; the deck's
     # list price is the fallback so a Stripe hiccup never blocks access.

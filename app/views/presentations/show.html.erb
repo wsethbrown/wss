@@ -1,7 +1,7 @@
 <% content_for :title, "#{@presentation.title} - Whiskey Share Society" %>
 <% content_for :og_description, truncate(@presentation.description.to_s.squish, length: 200) if @presentation.description.present? %>
 <% if @presentation.featured_image.attached? %>
-  <% content_for :og_image, request.base_url + rails_blob_path(@presentation.featured_image) %>
+  <% content_for :og_image, request.base_url + url_for(image_variant(@presentation.featured_image, :hero)) %>
 <% end %>
 <%# SEO: Product structured data for the deck (rides the layout's jsonld slot). %>
 <% content_for :jsonld do %>
@@ -15,130 +15,241 @@
   </script>
 <% end %>
 
+<%# The deck page in two acts.
+      Sell: the cover (its first real slide), title and meta, one action bar, the
+            story teaser, the first slides, tasting notes, pours, reviews.
+      Own:  the same page for an owner swaps the offer for Present, the downloads
+            and the whole story.
+    Access is decided in the controller (@full_story) and by the ownership row
+    below; this template only chooses what to show from those two facts.
+    The page is full-bleed in the layout, so it sets its own width and clears the
+    floating nav itself. %>
+
 <%# A credit is the primary way to get a paid deck when the viewer is an active
-    member holding at least one and doesn't already own it. Used by every purchase
-    CTA on the page so they stay consistent. %>
+    member holding at least one and doesn't already own it. %>
 <% viewer_owns = user_signed_in? && @presentation.purchased_by?(current_user) %>
 <% viewer_can_credit = user_signed_in? && !viewer_owns && !@presentation.free? && current_user.subscription_active? && current_user.credits.to_i > 0 %>
+<% owned_purchase = user_signed_in? ? current_user.user_presentations.find_by(presentation_id: @presentation.id) : nil %>
+<% lapsed_credit_owner = owned_purchase && owned_purchase.purchase_type == 'credit' && !current_user.subscription_active? %>
+<%# Rendered slides, loaded once: the cover, the slide count and the teaser all use them. %>
+<% slide_list = @presentation.slide_images.attached? ? @presentation.slide_images_attachments.includes(:blob).order(:id).to_a : [] %>
+<% get_label = if !user_signed_in?
+                 'Sign in to get this deck'
+               elsif @presentation.free?
+                 'Add to my library'
+               else
+                 'Purchase'
+               end %>
+<% get_path = user_signed_in? ? new_presentation_purchase_path(@presentation) : auth_path %>
 
-<%# Purchase outcomes are real flashes now (rendered as overlay toasts by the
-    layout), set by PresentationsController#handle_checkout_return. The old
-    in-page banner pushed the hero down and, being driven by the query
-    string, survived every refresh while asserting access it never checked. %>
+<%# Purchase outcomes are real flashes (overlay toasts from the layout), set by
+    PresentationsController#handle_checkout_return. %>
 
-<% unless @presentation.published? %>
-  <div class="fixed inset-x-0 top-16 z-40 bg-whiskey-600 px-4 py-2 text-center text-sm font-semibold text-white">
-    Draft, visible to admins only. Customers get a 404 until this deck is published.
-  </div>
-<% end %>
-
-<!-- Hero: the deck's cover. Featured image when present, otherwise the char label. -->
-<div class="relative flex min-h-[60vh] w-full flex-col items-center justify-center overflow-hidden bg-char pt-16 text-center <%= 'bg-cover bg-center' if @presentation.featured_image.attached? %>"
-     <% if @presentation.featured_image.attached? %>style="background-image: url('<%= url_for(@presentation.featured_image) %>')"<% end %>>
-  <% if @presentation.featured_image.attached? %>
-    <div class="absolute inset-0 bg-gradient-to-t from-char via-char/60 to-char/40"></div>
-  <% else %>
-    <div class="pointer-events-none absolute inset-0" aria-hidden="true"
-         style="background: radial-gradient(ellipse 70% 45% at 50% 108%, rgba(201, 136, 74, 0.25), transparent 70%);"></div>
+<div class="mx-auto w-full max-w-6xl px-4 pb-20 pt-28">
+  <% unless @presentation.published? %>
+    <p class="mb-6 rounded-2xl border border-hairline bg-whiskey-100 px-4 py-3 text-sm font-semibold text-ink">
+      Draft, visible to admins only. Customers get a 404 until this deck is published.
+    </p>
   <% end %>
 
-  <div class="relative z-10 mx-auto max-w-4xl px-4 py-20">
-    <p class="eyebrow mb-4 text-whiskey-300/90">
-      <%= [@presentation.category.presence, @presentation.difficulty.presence, @presentation.duration_label.presence,
-           (@presentation.slide_images.attached? ? "#{@presentation.slide_images.count} slides" : nil)].compact.join(' · ') %>
-    </p>
-    <div class="rule-double mx-auto mb-8 w-20 text-whiskey-300"></div>
-
-    <h1 class="font-display text-4xl font-semibold leading-tight text-cream md:text-6xl">
-      <%= @presentation.title %>
-    </h1>
-    <p class="mx-auto mt-6 max-w-2xl whitespace-pre-line text-lg leading-relaxed text-cream/70 md:text-xl">
-      <%= @presentation.description %>
-    </p>
-
-    <div class="mt-10 flex flex-col items-center justify-center gap-4 sm:flex-row">
-      <% if user_signed_in? && @presentation.purchased_by?(current_user) %>
-        <%# Owners: open the real deck when the file exists; otherwise read the story. %>
-        <% if @presentation.pdf_file.attached? && @full_story %>
-          <% if @presentation.slide_images.attached? %>
-            <%= link_to "Present", present_presentation_path(@presentation),
-                class: "inline-flex items-center justify-center gap-2 rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400" %>
-          <% end %>
-          <%= link_to full_presentation_presentation_downloads_path(@presentation),
-              class: "inline-flex items-center justify-center gap-2 rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char" do %>
-            Open the deck
-          <% end %>
-          <a href="#deck-story" data-turbo="false" class="inline-flex items-center justify-center gap-2 rounded-xl border border-cream/25 px-7 py-3.5 text-base font-semibold text-cream/90 transition hover:border-cream/50 hover:text-cream focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char">
-            Read the story
-          </a>
-        <% else %>
-          <a href="#deck-story" data-turbo="false" class="inline-flex items-center justify-center gap-2 rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char">
-            Read the story
-          </a>
-        <% end %>
-      <% else %>
-        <%= link_to new_presentation_purchase_path(@presentation),
-            class: "inline-flex items-center justify-center gap-2 rounded-xl bg-whiskey-500 px-7 py-3.5 text-base font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char" do %>
-          <%= @presentation.free? ? 'Add to my library' : 'Purchase' %>
-        <% end %>
+  <!-- Header: title and meta beside the cover. A deck with no slides and no
+       featured image has no cover, so the text takes the full width. -->
+  <% cover_image = slide_list.first || (@presentation.featured_image if @presentation.featured_image.attached?) %>
+  <header class="grid gap-8 md:grid-cols-12 md:items-center">
+    <div class="min-w-0 <%= cover_image ? 'md:col-span-5' : 'md:col-span-8' %>">
+      <h1 class="font-display text-4xl font-semibold text-ink sm:text-5xl"><%= @presentation.title %></h1>
+      <% meta = [@presentation.category.presence, @presentation.difficulty.presence, @presentation.duration_label.presence,
+                 (slide_list.any? ? "#{slide_list.size} slides" : nil)].compact %>
+      <% if meta.any? %>
+        <p class="mt-3 text-sm text-mute"><%= meta.join(' · ') %></p>
       <% end %>
-      <% if @presentation.sneak_peek_file.attached? %>
-        <%= link_to sneak_peek_presentation_downloads_path(@presentation),
-            class: "inline-flex items-center justify-center gap-2 rounded-xl border border-cream/25 px-7 py-3.5 text-base font-semibold text-cream/90 transition hover:border-cream/50 hover:text-cream focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300 focus-visible:ring-offset-2 focus-visible:ring-offset-char" do %>
-          Preview the deck
-        <% end %>
+      <% if @presentation.description.present? %>
+        <p class="mt-5 whitespace-pre-line text-[17px] leading-relaxed text-gray-900"><%= @presentation.description %></p>
       <% end %>
     </div>
-  </div>
-</div>
+    <% if cover_image %>
+      <div class="md:col-span-7">
+        <%= deck_cover @presentation, preloaded: cover_image, alt: "#{@presentation.title}, first slide" %>
+      </div>
+    <% end %>
+  </header>
 
-<!-- Main Content -->
-<div class="relative w-full bg-white">
-  <div class="max-w-7xl mx-auto px-4 py-16">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-12">
-      <!-- Left Column - Main Content -->
-      <div class="lg:col-span-2">
-        <!-- What You'll Learn -->
-        <% if @presentation.parsed_what_youll_learn.any? %>
-          <section class="mb-16">
-            <p class="eyebrow text-whiskey-600 mb-2">The takeaways</p>
-            <h2 class="font-display text-3xl font-semibold text-gray-900 mb-3">What you'll learn</h2>
-            <div class="rule-double text-whiskey-800 mb-8"></div>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-              <% @presentation.parsed_what_youll_learn.each do |point| %>
-                <div class="flex items-start gap-4 p-6 rounded-2xl bg-whiskey-50 border border-whiskey-100">
-                  <div class="w-8 h-8 bg-whiskey-500 rounded-full flex items-center justify-center flex-shrink-0 mt-1">
-                    <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                    </svg>
-                  </div>
-                  <div>
-                    <% if point.is_a?(Hash) && point[:title] %>
-                      <h3 class="font-semibold text-gray-900 mb-2"><%= point[:title] %></h3>
-                      <% if point[:description].present? %>
-                        <p class="text-gray-600 text-sm"><%= point[:description] %></p>
-                      <% end %>
-                    <% else %>
-                      <p class="text-gray-900"><%= point %></p>
-                    <% end %>
-                  </div>
-                </div>
-              <% end %>
-            </div>
-          </section>
+  <!-- The action bar: price or ownership, and the page's main action -->
+  <section id="deck-actions" class="card mt-8 p-5 sm:p-6" aria-label="Get this deck">
+    <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+      <div class="min-w-0">
+        <% if owned_purchase %>
+          <% if lapsed_credit_owner %>
+            <p class="font-display text-2xl font-semibold text-ink">Membership paused</p>
+            <p class="mt-1 text-mute">You unlocked this deck with a credit, reactivate to read it again.</p>
+          <% else %>
+            <p class="font-display text-2xl font-semibold text-ink"><%= owned_purchase.purchase_type == 'direct' ? 'Yours for good' : 'Unlocked' %></p>
+            <p class="mt-1 text-mute"><%= owned_purchase.purchase_type == 'direct' ? 'Bought outright, lifetime access.' : 'Unlocked with a credit via your membership.' %></p>
+          <% end %>
+        <% else %>
+          <p class="font-display text-3xl font-semibold tabular-nums text-ink"><%= @presentation.formatted_price %></p>
+          <p class="mt-1 text-mute"><%= @presentation.free? ? 'Free for everyone' : 'One-time purchase, yours for good' %></p>
+          <% if viewer_can_credit %>
+            <p class="mt-1 text-sm font-semibold text-ink">Members can use a credit at checkout.</p>
+          <% end %>
         <% end %>
+      </div>
 
-        <!-- The Story, narrative deck content, rendered from Markdown -->
-        <section class="mb-16 scroll-mt-24" id="deck-story">
-          <p class="eyebrow text-whiskey-600 mb-2">The story</p>
-          <h2 class="font-display text-3xl font-semibold text-gray-900 mb-3">A taste of the writing</h2>
-          <div class="rule-double text-whiskey-800 mb-10"></div>
+      <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:justify-end">
+        <% if viewer_owns %>
+          <% if lapsed_credit_owner %>
+            <%= link_to "Reactivate membership", root_path(anchor: 'pricing'), class: "btn btn-primary min-h-12" %>
+            <a href="#deck-story" data-turbo="false" class="btn btn-secondary min-h-12">Read the story</a>
+          <% elsif @presentation.pdf_file.attached? && @full_story %>
+            <%# Owners: open the real deck when the file exists. %>
+            <% if slide_list.any? %>
+              <%= link_to "Present", present_presentation_path(@presentation), class: "btn btn-primary min-h-12" %>
+            <% end %>
+            <%= link_to "Open the deck", full_presentation_presentation_downloads_path(@presentation),
+                class: "btn #{slide_list.any? ? 'btn-secondary' : 'btn-primary'} min-h-12" %>
+            <a href="#deck-story" data-turbo="false" class="btn btn-secondary min-h-12">Read the story</a>
+          <% else %>
+            <a href="#deck-story" data-turbo="false" class="btn btn-primary min-h-12">Read the story</a>
+          <% end %>
+        <% else %>
+          <%# One button. The credit-vs-card choice happens on the checkout screen. %>
+          <%= link_to get_label, get_path, class: "btn btn-primary min-h-12" %>
+        <% end %>
+        <% if @presentation.sneak_peek_file.attached? %>
+          <%= link_to "Preview the deck", sneak_peek_presentation_downloads_path(@presentation), class: "btn btn-secondary min-h-12" %>
+        <% end %>
+      </div>
+    </div>
 
-          <div class="relative pl-6 md:pl-10">
-            <%# The thread: a thin amber line that fills as you read, the narrative
-                spine connecting the pour to its story. %>
-            <div class="absolute left-0 top-1 bottom-1 w-[2px] rounded bg-whiskey-100" aria-hidden="true">
-              <div id="deck-thread" class="w-full rounded bg-gradient-to-b from-whiskey-300 to-whiskey-600 transition-[height] duration-150 ease-out" style="height: 0%"></div>
+    <% unless owned_purchase %>
+      <%# What you get, an honest manifest built ONLY from what exists. %>
+      <% manifest = [
+        (slide_list.any? ? "The full deck, #{slide_list.size} slides" : (@presentation.pdf_file.attached? ? "The full presentation file" : nil)),
+        ("The story, #{@presentation.reading_time} min read" if @presentation.content.present?),
+        ("Speaker script" if @presentation.speaker_notes.attached?),
+        ("Presentation outline" if @presentation.outline_file.attached?),
+        ("Printable whiskey list" if @presentation.recommendations_sheet.attached?),
+        ("Bottle list, #{@presentation.pours_count} pours with tasting notes" if @presentation.pours_count.positive?)
+      ].compact %>
+      <% if manifest.any? %>
+        <div class="mt-5 border-t border-hairline pt-5">
+          <h2 class="text-sm font-semibold text-ink">What you get</h2>
+          <ul class="mt-3 grid gap-x-8 gap-y-2 sm:grid-cols-2 lg:grid-cols-3">
+            <% manifest.each do |item| %>
+              <li class="flex items-start gap-2 text-sm text-gray-900">
+                <svg class="mt-0.5 h-4 w-4 shrink-0 text-ink" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5"></path>
+                </svg>
+                <%= item %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      <% end %>
+    <% end %>
+  </section>
+
+  <%# Downloads: owners with access only, one list built from whatever files exist.
+      The box only renders when there is something to download; an empty labeled
+      box reads as broken. %>
+  <% if owned_purchase && !lapsed_credit_owner %>
+    <% downloads = [
+      ['Full presentation', (full_presentation_presentation_downloads_path(@presentation) if @presentation.pdf_file.attached?)],
+      ['Speaker notes',     (speaker_notes_presentation_downloads_path(@presentation) if @presentation.speaker_notes.attached?)],
+      ['Outline',           (outline_presentation_downloads_path(@presentation) if @presentation.outline_file.attached?)],
+      ['Whiskey list',      (recommendations_presentation_downloads_path(@presentation) if @presentation.recommendations_sheet.attached?)],
+      ['Tasting scorecard', (scorecard_presentation_downloads_path(@presentation) if @presentation.scorecard.attached?)],
+      # The blank card is always included, the fallback for pouring your own bottles.
+      ['Blank scorecard',   blank_scorecard_presentation_downloads_path(@presentation)]
+    ].select { |_, path| path } %>
+    <% download_icon = capture do %>
+      <svg class="h-5 w-5 shrink-0 text-mute" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3"></path>
+      </svg>
+    <% end %>
+    <section id="deck-downloads" class="mt-6">
+      <% if downloads.any? %>
+        <div class="card p-5 sm:p-6">
+          <h2 class="font-display text-xl font-semibold text-ink">Downloads</h2>
+          <ul class="mt-3 divide-y divide-hairline">
+            <% downloads.each do |label, path| %>
+              <li>
+                <%= link_to path, class: "flex min-h-12 items-center justify-between gap-4 py-3 font-semibold text-ink transition hover:text-whiskey-700" do %>
+                  <span><%= label %></span>
+                  <%= download_icon %>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+          <% if @presentation.supplemental_materials.attached? %>
+            <h3 class="mt-5 text-sm font-semibold text-mute">Extras</h3>
+            <ul class="mt-1 divide-y divide-hairline">
+              <% @presentation.supplemental_materials.each do |material| %>
+                <li>
+                  <%= link_to supplemental_presentation_downloads_path(@presentation, attachment_id: material.id),
+                      class: "flex min-h-12 items-center justify-between gap-4 py-3 font-semibold text-ink transition hover:text-whiskey-700" do %>
+                    <span class="truncate"><%= material.filename %></span>
+                    <%= download_icon %>
+                  <% end %>
+                </li>
+              <% end %>
+            </ul>
+          <% end %>
+        </div>
+      <% else %>
+        <p class="inset px-5 py-4 text-sm text-mute">The downloadable files for this deck are still being prepared.</p>
+      <% end %>
+    </section>
+  <% end %>
+
+  <%# Each section below: heading in the narrow column, content in the wide one. %>
+  <% section_class = "grid gap-6 border-t border-hairline py-12 md:grid-cols-12 md:gap-10" %>
+  <% heading_class = "font-display text-2xl font-semibold text-ink sm:text-3xl" %>
+
+  <div class="mt-12">
+    <!-- What you'll learn -->
+    <% if @presentation.parsed_what_youll_learn.any? %>
+      <section class="<%= section_class %>">
+        <div class="md:col-span-4">
+          <h2 class="<%= heading_class %>">What you'll learn</h2>
+        </div>
+        <div class="md:col-span-8">
+          <ol class="card divide-y divide-hairline px-5 sm:px-6">
+            <% @presentation.parsed_what_youll_learn.each_with_index do |point, i| %>
+              <li class="flex items-start gap-4 py-5">
+                <span class="step-marker"><%= i + 1 %></span>
+                <div class="min-w-0 pt-1">
+                  <% if point.is_a?(Hash) && point[:title] %>
+                    <h3 class="font-semibold text-ink"><%= point[:title] %></h3>
+                    <% if point[:description].present? %>
+                      <p class="mt-1 text-sm text-mute"><%= point[:description] %></p>
+                    <% end %>
+                  <% else %>
+                    <p class="text-gray-900"><%= point %></p>
+                  <% end %>
+                </div>
+              </li>
+            <% end %>
+          </ol>
+        </div>
+      </section>
+    <% end %>
+
+    <!-- The story, narrative deck content, rendered from Markdown -->
+    <section class="<%= section_class %> scroll-mt-24" id="deck-story" data-controller="deck-thread">
+      <div class="md:col-span-4">
+        <h2 class="<%= heading_class %>"><%= @full_story ? 'The story' : 'A taste of the writing' %></h2>
+        <% if @presentation.content.present? && @presentation.reading_time.positive? %>
+          <p class="mt-2 text-sm text-mute"><%= @presentation.reading_time %> min read</p>
+        <% end %>
+      </div>
+      <div class="md:col-span-8">
+        <div class="card p-6 sm:p-10">
+          <div class="relative pl-6 md:pl-8">
+            <%# The thread: a thin line that fills as you read, the narrative spine
+                connecting the pour to its story. %>
+            <div class="absolute bottom-1 left-0 top-1 w-[2px] rounded bg-whiskey-100" aria-hidden="true">
+              <div id="deck-thread" data-deck-thread-target="thread" class="w-full rounded bg-ink transition-[height] duration-150 ease-out" style="height: 0%"></div>
             </div>
 
             <% if @presentation.content.present? %>
@@ -157,512 +268,305 @@
                     <div class="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white to-transparent" aria-hidden="true"></div>
                   <% end %>
                 </div>
-                <% if story_truncated?(@presentation.content) %>
-                  <div class="mt-2 rounded-2xl border border-whiskey-200 bg-whiskey-50 p-8 text-center">
-                    <p class="font-display text-xl font-semibold text-gray-900">The story keeps going.</p>
-                    <p class="mt-2 text-gray-600">Get the deck to read the rest, slides, script, and downloads included.</p>
-                    <%= link_to user_signed_in? ? new_presentation_purchase_path(@presentation) : auth_path,
-                        class: 'mt-6 inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-7 py-3 font-semibold text-white transition hover:bg-whiskey-700' do %>
-                      <%= if !user_signed_in?
-                            'Sign in to get this deck'
-                          elsif @presentation.free?
-                            'Add to my library'
-                          else
-                            'Purchase'
-                          end %>
-                    <% end %>
-                  </div>
-                <% end %>
               <% end %>
             <% else %>
               <p class="prose-deck whitespace-pre-line"><%= @presentation.description %></p>
             <% end %>
           </div>
-        </section>
 
-        <script>
-          // Fill the story thread to match reading progress through the section.
-          (function () {
-            function initDeckThread() {
-              const story = document.getElementById('deck-story');
-              const thread = document.getElementById('deck-thread');
-              if (!story || !thread) return;
-
-              function update() {
-                const rect = story.getBoundingClientRect();
-                const viewport = window.innerHeight;
-                const total = rect.height - viewport * 0.5;
-                const progress = total > 0 ? Math.min(1, Math.max(0, (viewport * 0.5 - rect.top) / total)) : 1;
-                thread.style.height = (progress * 100).toFixed(1) + '%';
-              }
-
-              update();
-              window.addEventListener('scroll', update, { passive: true });
-              window.addEventListener('resize', update, { passive: true });
-            }
-            document.addEventListener('turbo:load', initDeckThread);
-            document.addEventListener('DOMContentLoaded', initDeckThread);
-          })();
-        </script>
-
-        <!-- Tasting Notes (if present), set like the back of a label -->
-        <% if @presentation.nose_notes.present? || @presentation.palate_notes.present? || @presentation.finish_notes.present? || @presentation.body_notes.present? %>
-          <section class="mb-16">
-            <p class="eyebrow text-whiskey-600 mb-2">Tasting notes</p>
-            <h2 class="font-display text-3xl font-semibold text-gray-900 mb-3">What you'll taste</h2>
-            <div class="rule-double text-whiskey-800 mb-8"></div>
-            <div class="rounded-2xl border border-whiskey-200 bg-whiskey-50 p-8">
-              <dl class="grid grid-cols-1 md:grid-cols-2 gap-x-10 gap-y-6">
-                <% {
-                  "Nose"   => @presentation.nose_notes,
-                  "Palate" => @presentation.palate_notes,
-                  "Finish" => @presentation.finish_notes,
-                  "Body"   => @presentation.body_notes
-                }.each do |label, notes| %>
-                  <% next if notes.blank? %>
-                  <div>
-                    <dt class="eyebrow text-whiskey-700 mb-1"><%= label %></dt>
-                    <dd class="font-reading text-lg text-gray-800 leading-relaxed"><%= notes %></dd>
-                  </div>
-                <% end %>
-              </dl>
+          <% if @presentation.content.present? && !@full_story && story_truncated?(@presentation.content) %>
+            <div class="inset mt-4 p-6 text-center sm:p-8">
+              <p class="font-display text-xl font-semibold text-ink">The story keeps going.</p>
+              <p class="mt-2 text-mute">Get the deck to read the rest, slides, script, and downloads included.</p>
+              <%= link_to get_label, get_path, class: 'btn btn-secondary mt-6 min-h-12' %>
             </div>
-          </section>
-        <% end %>
+          <% end %>
+        </div>
+      </div>
+    </section>
 
-        <!-- The Slides, a teaser for non-owners ONLY. We never show the whole
-             deck here: the preview caps below the slide count and the last one
-             fades into the buy prompt. Owners skip this section entirely, they
-             open the deck itself. Falls back to the text outline when no
-             renders exist. -->
-        <% unless @full_story %>
-        <% if @presentation.slide_images.attached? %>
-          <section class="mb-16">
-            <p class="eyebrow text-whiskey-600 mb-2">The slides</p>
-            <h2 class="font-display text-3xl font-semibold text-gray-900 mb-3">Inside the deck</h2>
-            <div class="rule-double text-whiskey-800 mb-8"></div>
-            <% slides = @presentation.slide_images.order(:id) %>
+    <!-- The slides, a teaser for non-owners ONLY. We never show the whole deck
+         here: the preview caps below the slide count and the last one fades
+         into the buy prompt. Owners skip this section entirely, they open the
+         deck itself. Falls back to the text outline when no renders exist. -->
+    <% unless @full_story %>
+      <% if slide_list.any? %>
+        <section class="<%= section_class %>">
+          <div class="md:col-span-4">
+            <h2 class="<%= heading_class %>">Inside the deck</h2>
+          </div>
+          <div class="md:col-span-8">
             <% count = @presentation.effective_preview_slide_count %>
-            <% visible = slides.first(count) %>
-            <% teasing = slides.size > count %>
-            <div class="space-y-6">
+            <% visible = slide_list.first(count) %>
+            <% teasing = slide_list.size > count %>
+            <div class="card space-y-6 p-3 sm:p-4">
               <% visible.each_with_index do |slide, i| %>
                 <% fade = teasing && i == visible.size - 1 %>
                 <figure class="<%= 'relative' if fade %>">
-                  <%= image_tag slide, alt: "Slide #{i + 1}", loading: 'lazy',
-                      class: 'w-full rounded-2xl border border-whiskey-200 shadow-sm' %>
+                  <%= image_tag image_variant(slide, :hero), alt: "Slide #{i + 1}", loading: 'lazy',
+                      class: 'aspect-video w-full rounded-[18px] border border-hairline object-cover' %>
                   <% if fade %>
                     <%# The last free slide dissolves from about halfway down into
                         the purchase prompt, the paywall, made of the deck itself. %>
-                    <div class="absolute inset-x-0 bottom-0 top-1/2 flex items-end justify-center rounded-b-2xl bg-gradient-to-b from-transparent via-white via-30% to-white">
-                      <div class="mb-8 px-6 text-center">
-                        <p class="font-display text-xl font-semibold text-gray-900"><%= slides.size - count %> more slides in the full deck.</p>
-                        <%= link_to user_signed_in? ? new_presentation_purchase_path(@presentation) : auth_path,
-                            class: 'mt-4 inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-6 py-3 font-semibold text-white shadow-lg shadow-whiskey-950/20 transition hover:bg-whiskey-700' do %>
-                          <%= if !user_signed_in?
-                                'Sign in to get this deck'
-                              elsif @presentation.free?
-                                'Add to my library'
-                              else
-                                'Purchase'
-                              end %>
-                        <% end %>
+                    <div class="absolute inset-x-0 bottom-0 top-1/2 flex items-end justify-center rounded-b-[18px] bg-gradient-to-b from-transparent via-white via-30% to-white">
+                      <div class="mb-6 px-6 text-center">
+                        <p class="font-display text-xl font-semibold text-ink"><%= slide_list.size - count %> more slides in the full deck.</p>
+                        <%= link_to get_label, get_path, class: 'btn btn-secondary mt-4 min-h-12' %>
                       </div>
                     </div>
                   <% else %>
-                    <figcaption class="eyebrow mt-2 text-center text-gray-400">Slide <%= i + 1 %> of <%= slides.size %></figcaption>
+                    <figcaption class="mt-2 text-center text-sm text-mute tabular-nums">Slide <%= i + 1 %> of <%= slide_list.size %></figcaption>
                   <% end %>
                 </figure>
               <% end %>
             </div>
-          </section>
-        <% elsif @presentation.parsed_slides_preview.any? %>
-          <section class="mb-16">
-            <p class="eyebrow text-whiskey-600 mb-2">The slides</p>
-            <h2 class="font-display text-3xl font-semibold text-gray-900 mb-8">Slide-by-slide outline</h2>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+          </div>
+        </section>
+      <% elsif @presentation.parsed_slides_preview.any? %>
+        <section class="<%= section_class %>">
+          <div class="md:col-span-4">
+            <h2 class="<%= heading_class %>">Slide-by-slide outline</h2>
+          </div>
+          <div class="md:col-span-8">
+            <ol class="card divide-y divide-hairline px-5 sm:px-6">
               <% @presentation.parsed_slides_preview.each do |slide| %>
-                <div class="bg-gray-50 rounded-2xl p-6">
-                  <div class="flex items-start justify-between mb-3">
-                    <span class="text-sm font-semibold text-whiskey-600"><%= slide[:slide_number] %></span>
-                    <span class="text-sm text-gray-500"><%= slide[:duration] %></span>
+                <li class="flex items-start gap-4 py-5">
+                  <span class="step-marker"><%= slide[:slide_number] %></span>
+                  <div class="min-w-0 flex-1 pt-1">
+                    <h3 class="font-semibold text-ink"><%= slide[:title] %></h3>
+                    <p class="mt-1 text-sm text-mute"><%= slide[:description] %></p>
                   </div>
-                  <h3 class="font-bold text-gray-900 mb-2"><%= slide[:title] %></h3>
-                  <p class="text-gray-600 text-sm"><%= slide[:description] %></p>
-                </div>
-              <% end %>
-            </div>
-          </section>
-        <% end %>
-        <% end %>
-
-        <%# THE pour list. One section, one storage format: presentation_bottles.
-            A row is either linked to a catalog bottle (then it carries a rating
-            and links to the bottle's page) or plain text (a cocktail, or a
-            bottle nobody has catalogued). The written fields belong to the deck
-            author either way, so they render the same for both.
-
-            Kept SEPARATE from "what societies actually poured" below on purpose
-            (owner directive, 2026-07-19): a room pours what it can get, so what
-            a deck calls for and what got opened are two different facts and
-            their ratings are scoped to match. Never merge those two. %>
-        <% pour_list = @presentation.presentation_bottles.ordered.includes(:bottle).to_a %>
-        <% if pour_list.any? %>
-          <section class="mb-16">
-            <p class="eyebrow text-whiskey-600 mb-2">The pour list</p>
-            <h2 class="font-display text-3xl font-semibold text-gray-900 mb-4">What this deck calls for</h2>
-            <p class="text-gray-700 mb-8">The pours this deck is built around. Pour what you can find; plenty of societies substitute, and the story still works.</p>
-
-            <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-              <% pour_list.each do |pour| %>
-                <%# A linked pour makes the WHOLE card the link to the bottle,
-                    not just its title: the card is one idea, and a 20px title
-                    is a poor click target on a phone. The card's contents are
-                    in a partial with no links of its own, since a nested <a>
-                    would be invalid and would steal the click. %>
-                <% card = "block rounded-2xl border border-gray-200 bg-white p-7 transition" %>
-                <% if pour.linked? %>
-                  <%= link_to bottle_path(pour.bottle),
-                      class: "#{card} hover:border-whiskey-300 hover:shadow-lg focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2" do %>
-                    <%= render "presentations/pour_card", pour: pour %>
+                  <% if slide[:duration].present? %>
+                    <span class="shrink-0 pt-1 text-sm text-mute tabular-nums"><%= slide[:duration] %></span>
                   <% end %>
-                <% else %>
-                  <div class="<%= card %>">
-                    <%= render "presentations/pour_card", pour: pour %>
-                  </div>
-                <% end %>
+                </li>
               <% end %>
-            </div>
-          </section>
-        <% end %>
+            </ol>
+          </div>
+        </section>
+      <% end %>
+    <% end %>
 
-        <%# What rooms actually poured on nights that ran this deck. Scores here
-            are event-tagged reviews from those nights only. %>
-        <% poured = @presentation.pours_from_nights %>
-        <% if poured.any? %>
-          <section class="mb-16">
-            <p class="eyebrow text-whiskey-600 mb-2">From the tasting rooms</p>
-            <h2 class="font-display text-3xl font-semibold text-gray-900 mb-4">What societies actually poured</h2>
-            <p class="mb-8 text-gray-700">Bottles opened on nights that ran this deck, scored by the rooms that were there.</p>
-            <div class="divide-y divide-whiskey-100 rounded-2xl border border-whiskey-200 bg-white">
-              <% poured.each do |pour| %>
-                <%= link_to bottle_path(pour.bottle), class: "flex items-center justify-between gap-4 px-6 py-4 transition hover:bg-whiskey-50" do %>
+    <!-- Tasting notes (if present) -->
+    <% if @presentation.nose_notes.present? || @presentation.palate_notes.present? || @presentation.finish_notes.present? || @presentation.body_notes.present? %>
+      <section class="<%= section_class %>">
+        <div class="md:col-span-4">
+          <h2 class="<%= heading_class %>">What you'll taste</h2>
+        </div>
+        <div class="md:col-span-8">
+          <dl class="card grid gap-x-10 gap-y-6 p-6 sm:grid-cols-2 sm:p-8">
+            <% {
+              "Nose"   => @presentation.nose_notes,
+              "Palate" => @presentation.palate_notes,
+              "Finish" => @presentation.finish_notes,
+              "Body"   => @presentation.body_notes
+            }.each do |label, notes| %>
+              <% next if notes.blank? %>
+              <div>
+                <dt class="text-sm font-semibold text-mute"><%= label %></dt>
+                <dd class="mt-1 font-reading text-lg leading-relaxed text-gray-900"><%= notes %></dd>
+              </div>
+            <% end %>
+          </dl>
+        </div>
+      </section>
+    <% end %>
+
+    <%# THE pour list. One section, one storage format: presentation_bottles.
+        A row is either linked to a catalog bottle (then it carries a rating
+        and links to the bottle's page) or plain text (a cocktail, or a
+        bottle nobody has catalogued). The written fields belong to the deck
+        author either way, so they render the same for both.
+
+        Kept SEPARATE from "what societies actually poured" below on purpose
+        (owner directive, 2026-07-19): a room pours what it can get, so what
+        a deck calls for and what got opened are two different facts and
+        their ratings are scoped to match. Never merge those two. %>
+    <% pour_list = @presentation.presentation_bottles.ordered.includes(:bottle).to_a %>
+    <% if pour_list.any? %>
+      <section class="<%= section_class %>">
+        <div class="md:col-span-4">
+          <h2 class="<%= heading_class %>">What this deck calls for</h2>
+          <p class="mt-3 text-mute">The pours this deck is built around. Pour what you can find; plenty of societies substitute, and the story still works.</p>
+        </div>
+        <div class="grid gap-4 sm:grid-cols-2 md:col-span-8 md:grid-cols-1 lg:grid-cols-2">
+          <% pour_list.each do |pour| %>
+            <%# A linked pour makes the WHOLE card the link to the bottle, not
+                just its title: the card is one idea, and a 20px title is a
+                poor click target on a phone. The card's contents are in a
+                partial with no links of its own, since a nested <a> would be
+                invalid and would steal the click. %>
+            <% if pour.linked? %>
+              <%= link_to bottle_path(pour.bottle),
+                  class: "card-hover block p-6 focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/30" do %>
+                <%= render "presentations/pour_card", pour: pour %>
+              <% end %>
+            <% else %>
+              <div class="card p-6">
+                <%= render "presentations/pour_card", pour: pour %>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
+
+    <%# What rooms actually poured on nights that ran this deck. Scores here
+        are event-tagged reviews from those nights only. %>
+    <% poured = @presentation.pours_from_nights %>
+    <% if poured.any? %>
+      <section class="<%= section_class %>">
+        <div class="md:col-span-4">
+          <h2 class="<%= heading_class %>">What societies actually poured</h2>
+          <p class="mt-3 text-mute">Bottles opened on nights that ran this deck, scored by the rooms that were there.</p>
+        </div>
+        <div class="md:col-span-8">
+          <ul class="card divide-y divide-hairline">
+            <% poured.each do |pour| %>
+              <li>
+                <%= link_to bottle_path(pour.bottle), class: "flex items-center justify-between gap-4 px-5 py-4 transition hover:bg-paper sm:px-6" do %>
                   <div class="min-w-0">
-                    <p class="font-display text-lg font-semibold text-gray-900">
+                    <p class="font-semibold text-ink">
                       <%= pour.bottle.name %>
                       <% unless pour.on_deck_list %>
-                        <span class="ml-1.5 align-middle rounded-full bg-whiskey-100 px-2 py-0.5 text-xs font-semibold text-whiskey-800">substituted</span>
+                        <span class="ml-1.5 inline-flex items-center rounded-lg border border-hairline px-2 py-0.5 align-middle text-xs font-medium text-mute">substituted</span>
                       <% end %>
                     </p>
-                    <p class="text-sm text-gray-500">
+                    <p class="text-sm text-mute">
                       <%= [pour.bottle.distillery, pour.bottle.style].compact_blank.join(" · ") %>
                       <%= " · " if pour.bottle.distillery.present? || pour.bottle.style.present? %><%= pluralize(pour.nights, "night") %>
                     </p>
                   </div>
                   <% if pour.average.present? %>
                     <div class="shrink-0 text-right">
-                      <%= render "bottles/rating", value: pour.average %>
-                      <p class="mt-0.5 text-xs text-gray-500"><%= pluralize(pour.reviews_count, "score") %> on these nights</p>
+                      <%= render "shared/score", value: pour.average %>
+                      <p class="mt-0.5 text-xs text-mute tabular-nums"><%= pluralize(pour.reviews_count, "score") %> on these nights</p>
                     </div>
                   <% end %>
                 <% end %>
-              <% end %>
-            </div>
-          </section>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </section>
+    <% end %>
+
+    <%# Deck reviews: the real thing. Only owners and attendees may write one
+        (model-enforced); everyone may read them. %>
+    <section id="reviews" class="<%= section_class %>">
+      <% deck_reviews = @presentation.presentation_reviews.recent.includes(:user).to_a %>
+      <% my_review = user_signed_in? ? deck_reviews.find { |r| r.user_id == current_user.id } : nil %>
+      <div class="md:col-span-4">
+        <h2 class="<%= heading_class %>">Reviews</h2>
+        <% if deck_reviews.any? %>
+          <div class="mt-3 flex flex-wrap items-center gap-2">
+            <%= render "shared/score", value: @presentation.average_review_rating %>
+            <span class="text-sm text-mute"><%= pluralize(deck_reviews.size, "review") %>, from people who bought this deck or tasted along at a night that ran it</span>
+          </div>
+        <% else %>
+          <p class="mt-3 text-sm text-mute">No reviews yet. They come from people who own this deck or attended a night that ran it.</p>
+        <% end %>
+      </div>
+
+      <div class="space-y-4 md:col-span-8">
+        <% if user_signed_in? && PresentationReview.eligible?(current_user, @presentation) %>
+          <div class="card p-6">
+            <h3 class="mb-4 font-semibold text-ink"><%= my_review ? "Update your review" : "How did it pour?" %></h3>
+            <%= form_with model: my_review || PresentationReview.new,
+                  url: my_review ? presentation_deck_review_path(@presentation, my_review) : presentation_deck_reviews_path(@presentation),
+                  method: my_review ? :patch : :post, local: true, class: "space-y-4" do |form| %>
+              <%= render "shared/star_input", form: form %>
+              <div>
+                <%= form.label :body, "A few words (optional)", class: "mb-2 block text-sm font-medium text-gray-900" %>
+                <%= form.text_area :body, rows: 3, maxlength: 1000,
+                    class: "w-full resize-none rounded-2xl border border-hairline bg-white px-4 py-3 text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-ink/30",
+                    placeholder: "How the night went, what landed, what you poured alongside..." %>
+              </div>
+              <div class="flex items-center gap-4">
+                <%= form.submit my_review ? "Update review" : "Post review", class: "btn btn-secondary min-h-11 cursor-pointer" %>
+                <% if my_review %>
+                  <%= button_to "Remove", presentation_deck_review_path(@presentation, my_review), method: :delete,
+                      data: { turbo_confirm: "Remove your review?" },
+                      class: "min-h-11 cursor-pointer text-sm font-semibold text-red-700 hover:underline" %>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
         <% end %>
 
+        <% if deck_reviews.any? %>
+          <ul class="card divide-y divide-hairline">
+            <% deck_reviews.each do |review| %>
+              <li class="p-5 sm:px-6">
+                <div class="flex items-center justify-between gap-3">
+                  <div class="flex min-w-0 items-center gap-3">
+                    <%= avatar review.user, size: 32 %>
+                    <div class="min-w-0">
+                      <%= link_to review.user.full_name, profile_path(review.user), class: "block truncate text-sm font-semibold text-ink hover:underline" %>
+                      <span class="text-xs text-mute"><%= review.created_at.strftime("%B %-d, %Y") %></span>
+                    </div>
+                  </div>
+                  <span class="shrink-0"><%= render "shared/score", value: review.rating.to_f %></span>
+                </div>
+                <% if review.body.present? %>
+                  <p class="mt-3 text-sm leading-relaxed text-gray-900"><%= review.body %></p>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        <% end %>
+      </div>
+    </section>
 
-        <%# Tags live here, not on library cards: they're a "where next?" device
-            for a reader who finished the teaser, each linking to the library
-            filtered by that tag. %>
+    <!-- The author, and tags as a "where next?" device for a reader who finished the teaser -->
+    <section class="<%= section_class %>">
+      <div class="md:col-span-4">
+        <h2 class="<%= heading_class %>">About the author</h2>
+      </div>
+      <div class="space-y-6 md:col-span-8">
+        <% author = @presentation.author %>
+        <div class="card p-6">
+          <div class="flex items-center gap-4">
+            <%= avatar author, size: 56 %>
+            <div class="min-w-0">
+              <p class="font-semibold text-ink"><%= author.full_name %></p>
+              <% deck_count = Presentation.published.where(author: author).count %>
+              <p class="text-sm text-mute"><%= pluralize(deck_count, 'deck') %> in the library</p>
+            </div>
+          </div>
+          <%# The author's own blurb, from their profile (account settings / admin). %>
+          <% if author.bio.present? %>
+            <p class="mt-4 text-sm leading-relaxed text-gray-900"><%= author.bio %></p>
+          <% end %>
+          <%= link_to "View profile →", profile_path(author), class: "mt-4 inline-block text-sm font-semibold text-ink hover:underline" %>
+        </div>
+
+        <%# Tags link to the library filtered by that tag. %>
         <% if @presentation.tags.any? %>
-          <div class="mb-16 flex flex-wrap items-center gap-2">
-            <span class="eyebrow text-gray-400">Filed under</span>
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="mr-1 text-sm font-medium text-mute">Filed under</span>
             <% @presentation.tags.each do |tag| %>
-              <%= link_to tag.name, presentations_path(tag: tag.name),
-                  class: "rounded-full bg-whiskey-100 px-3 py-1 text-sm font-medium text-whiskey-800 transition hover:bg-whiskey-200" %>
+              <%= link_to tag.name, presentations_path(tag: tag.name), class: "chip" %>
             <% end %>
           </div>
         <% end %>
-
-        <%# Deck reviews: the real thing. Only owners and attendees may write
-            one (model-enforced); everyone may read them. %>
-        <section id="reviews" class="mb-16">
-          <% deck_reviews = @presentation.presentation_reviews.recent.includes(:user).to_a %>
-          <% my_review = user_signed_in? ? deck_reviews.find { |r| r.user_id == current_user.id } : nil %>
-          <h2 class="font-display text-2xl font-semibold text-gray-900">Reviews</h2>
-          <% if deck_reviews.any? %>
-            <div class="mt-1 flex items-center gap-2">
-              <%= render "bottles/rating", value: @presentation.average_review_rating %>
-              <span class="text-sm text-gray-500"><%= pluralize(deck_reviews.size, "review") %>, from people who bought this deck or tasted along at a night that ran it</span>
-            </div>
-          <% else %>
-            <p class="mt-1 text-sm text-gray-500">No reviews yet. They come from people who own this deck or attended a night that ran it.</p>
-          <% end %>
-
-          <% if user_signed_in? && PresentationReview.eligible?(current_user, @presentation) %>
-            <div class="mt-6 rounded-2xl border border-whiskey-200 bg-whiskey-50/60 p-6">
-              <h3 class="mb-4 text-sm font-semibold text-gray-900"><%= my_review ? "Update your review" : "How did it pour?" %></h3>
-              <%= form_with model: my_review || PresentationReview.new,
-                    url: my_review ? presentation_deck_review_path(@presentation, my_review) : presentation_deck_reviews_path(@presentation),
-                    method: my_review ? :patch : :post, local: true, class: "space-y-4" do |form| %>
-                <%= render "shared/star_input", form: form %>
-                <div>
-                  <%= form.label :body, "A few words (optional)", class: "mb-2 block text-sm font-medium text-gray-700" %>
-                  <%= form.text_area :body, rows: 3, maxlength: 1000,
-                      class: "w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
-                      placeholder: "How the night went, what landed, what you poured alongside..." %>
-                </div>
-                <div class="flex items-center gap-4">
-                  <%= form.submit my_review ? "Update review" : "Post review",
-                      class: "cursor-pointer rounded-xl bg-whiskey-600 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-whiskey-700" %>
-                  <% if my_review %>
-                    <%= button_to "Remove", presentation_deck_review_path(@presentation, my_review), method: :delete,
-                        data: { turbo_confirm: "Remove your review?" },
-                        class: "cursor-pointer text-sm font-semibold text-red-600 hover:text-red-500" %>
-                  <% end %>
-                </div>
-              <% end %>
-            </div>
-          <% end %>
-
-          <% if deck_reviews.any? %>
-            <div class="mt-6 divide-y divide-whiskey-100 rounded-2xl border border-whiskey-200 bg-white">
-              <% deck_reviews.each do |review| %>
-                <div class="p-5">
-                  <div class="flex items-center justify-between gap-3">
-                    <div class="flex items-center gap-2 min-w-0">
-                      <%= link_to review.user.full_name, profile_path(review.user), class: "truncate text-sm font-semibold text-gray-900 hover:text-whiskey-700" %>
-                      <span class="text-xs text-gray-400"><%= review.created_at.strftime("%B %-d, %Y") %></span>
-                    </div>
-                    <%= render "bottles/rating", value: review.rating.to_f %>
-                  </div>
-                  <% if review.body.present? %>
-                    <p class="mt-2 text-sm leading-relaxed text-gray-700"><%= review.body %></p>
-                  <% end %>
-                </div>
-              <% end %>
-            </div>
-          <% end %>
-        </section>
       </div>
-
-      <!-- Right Column - Sidebar -->
-      <div class="lg:col-span-1">
-        <!-- Purchase Card -->
-        <div class="sticky top-8">
-          <div class="bg-white border border-whiskey-200 rounded-3xl shadow-xl p-8">
-            <div class="text-center mb-6">
-              <% owned_purchase = user_signed_in? ? current_user.user_presentations.find_by(presentation_id: @presentation.id) : nil %>
-              <% if owned_purchase %>
-                <% if owned_purchase.purchase_type == 'credit' && !current_user.subscription_active? %>
-                  <p class="eyebrow text-whiskey-600 mb-2">In your library</p>
-                  <div class="font-display text-3xl font-semibold text-gray-900 mb-2">Membership paused</div>
-                  <p class="text-gray-600">You unlocked this deck with a credit, reactivate to read it again.</p>
-                <% else %>
-                  <p class="eyebrow text-whiskey-600 mb-2">In your library</p>
-                  <div class="font-display text-3xl font-semibold text-gray-900 mb-2"><%= owned_purchase.purchase_type == 'direct' ? 'Yours for good' : 'Unlocked' %></div>
-                  <p class="text-gray-600"><%= owned_purchase.purchase_type == 'direct' ? 'Bought outright, lifetime access.' : 'Unlocked with a credit via your membership.' %></p>
-                <% end %>
-              <% else %>
-                <div class="font-display text-4xl font-semibold text-gray-900 mb-1"><%= @presentation.formatted_price %></div>
-                <p class="text-gray-600"><%= @presentation.free? ? 'Free for everyone' : 'One-time purchase, yours for good' %></p>
-                <% if viewer_can_credit %>
-                  <p class="mt-2 text-sm font-medium text-whiskey-700">Members can use a credit at checkout.</p>
-                <% end %>
-              <% end %>
-            </div>
-
-            <div class="space-y-4 mb-8">
-              <% if @presentation.duration.present? %>
-                <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-whiskey-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  <span class="text-gray-700"><%= @presentation.duration_label %> presentation</span>
-                </div>
-              <% end %>
-              <div class="flex items-center gap-3">
-                <svg class="w-5 h-5 text-whiskey-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span class="text-gray-700">Professional content</span>
-              </div>
-              <% if @presentation.difficulty.present? %>
-                <div class="flex items-center gap-3">
-                  <svg class="w-5 h-5 text-whiskey-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                  </svg>
-                  <span class="text-gray-700"><%= @presentation.difficulty %> level</span>
-                </div>
-              <% end %>
-              <div class="flex items-center gap-3">
-                <svg class="w-5 h-5 text-whiskey-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                </svg>
-                <span class="text-gray-700">
-                  <%# Honest access terms: credit unlocks last as long as the membership;
-                      direct purchases (and unowned decks bought outright) are forever. %>
-                  <%= owned_purchase&.purchase_type == 'credit' ? 'Access with your membership' : 'Lifetime access when bought outright' %>
-                </span>
-              </div>
-            </div>
-
-            <% if owned_purchase %>
-              <% if owned_purchase.purchase_type == 'credit' && !current_user.subscription_active? %>
-                <!-- Owns via credit but subscription inactive -->
-                <%= link_to root_path(anchor: 'pricing'), class: "block w-full bg-whiskey-600 text-white font-semibold py-4 px-6 rounded-2xl hover:bg-whiskey-700 transition mb-4 text-center" do %>
-                  Reactivate membership
-                <% end %>
-              <% else %>
-                <%# Downloads: one list built from whatever files exist. The box only
-                    renders when there is something to download, an empty labeled box
-                    reads as broken. %>
-                <% downloads = [
-                  ['Full presentation', (full_presentation_presentation_downloads_path(@presentation) if @presentation.pdf_file.attached?)],
-                  ['Speaker notes',     (speaker_notes_presentation_downloads_path(@presentation) if @presentation.speaker_notes.attached?)],
-                  ['Outline',           (outline_presentation_downloads_path(@presentation) if @presentation.outline_file.attached?)],
-                  ['Whiskey list',      (recommendations_presentation_downloads_path(@presentation) if @presentation.recommendations_sheet.attached?)],
-                  ['Tasting scorecard', (scorecard_presentation_downloads_path(@presentation) if @presentation.scorecard.attached?)],
-                  # The blank card is always included, the fallback for pouring your own bottles.
-                  ['Blank scorecard',   blank_scorecard_presentation_downloads_path(@presentation)]
-                ].select { |_, path| path } %>
-
-                <% if downloads.any? %>
-                  <div class="bg-whiskey-50 rounded-2xl p-4 mb-4">
-                    <h4 class="eyebrow text-whiskey-700 mb-3">Downloads</h4>
-                    <div class="space-y-2">
-                      <% downloads.each do |label, path| %>
-                        <%= link_to path,
-                            class: "flex items-center justify-between p-2 bg-white border border-gray-200 rounded-lg hover:border-whiskey-400 transition text-sm" do %>
-                          <span class="font-medium text-gray-700"><%= label %></span>
-                          <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-                          </svg>
-                        <% end %>
-                      <% end %>
-                      <% if @presentation.supplemental_materials.attached? %>
-                        <p class="eyebrow pt-2 text-whiskey-700/70">Extras</p>
-                        <% @presentation.supplemental_materials.each do |material| %>
-                          <%= link_to rails_blob_path(material, disposition: 'attachment'),
-                              class: "flex items-center justify-between p-2 bg-white border border-gray-200 rounded-lg hover:border-whiskey-400 transition text-sm" do %>
-                            <span class="truncate font-medium text-gray-700"><%= material.filename %></span>
-                            <svg class="w-4 h-4 flex-shrink-0 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M9 19l3 3m0 0l3-3m-3 3V10"></path>
-                            </svg>
-                          <% end %>
-                        <% end %>
-                      <% end %>
-                    </div>
-                  </div>
-                <% else %>
-                  <p class="mb-4 rounded-2xl bg-whiskey-50 p-4 text-center text-sm text-gray-600">
-                    The downloadable files for this deck are still being prepared.
-                  </p>
-                <% end %>
-              <% end %>
-            <% end %>
-
-            <% unless owned_purchase %>
-              <%# What you get, an honest manifest built ONLY from what exists. %>
-              <% manifest = [
-                (@presentation.slide_images.attached? ? "The full deck, #{@presentation.slide_images.count} slides" : (@presentation.pdf_file.attached? ? "The full presentation file" : nil)),
-                ("The story, #{@presentation.reading_time} min read" if @presentation.content.present?),
-                ("Speaker script" if @presentation.speaker_notes.attached?),
-                ("Presentation outline" if @presentation.outline_file.attached?),
-                ("Printable whiskey list" if @presentation.recommendations_sheet.attached?),
-                ("Bottle list, #{@presentation.pours_count} pours with tasting notes" if @presentation.pours_count.positive?)
-              ].compact %>
-              <% if manifest.any? %>
-                <div class="mb-6 rounded-2xl bg-whiskey-50 p-4">
-                  <h4 class="eyebrow mb-3 text-whiskey-700">What you get</h4>
-                  <ul class="space-y-2">
-                    <% manifest.each do |item| %>
-                      <li class="flex items-start gap-2 text-sm text-gray-700">
-                        <svg class="mt-0.5 h-4 w-4 flex-shrink-0 text-whiskey-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                          <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-                        </svg>
-                        <%= item %>
-                      </li>
-                    <% end %>
-                  </ul>
-                </div>
-              <% end %>
-              <% if user_signed_in? %>
-                <%# One button. The credit-vs-card choice happens on the checkout screen. %>
-                <%= link_to new_presentation_purchase_path(@presentation), class: "block w-full bg-whiskey-600 text-white font-semibold py-4 px-6 rounded-2xl hover:bg-whiskey-700 transition mb-4 text-center" do %>
-                  <%= @presentation.free? ? 'Add to my library' : 'Purchase' %>
-                <% end %>
-              <% else %>
-                <%= link_to auth_path, class: "block w-full bg-whiskey-600 text-white font-semibold py-4 px-6 rounded-2xl hover:bg-whiskey-700 transition mb-4 text-center" do %>
-                  Sign in to get this deck
-                <% end %>
-              <% end %>
-            <% end %>
-
-            <!-- Sneak Peek Available to All -->
-            <% if @presentation.sneak_peek_file.attached? %>
-              <div class="mt-4 pt-4 border-t border-gray-200">
-                <%= link_to sneak_peek_presentation_downloads_path(@presentation), 
-                    class: "flex items-center justify-center gap-2 text-sm text-whiskey-700 hover:text-whiskey-600 font-medium" do %>
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"></path>
-                  </svg>
-                  View Free Preview
-                <% end %>
-              </div>
-            <% end %>
-          </div>
-
-          <!-- Author Info -->
-          <div class="bg-gray-50 rounded-2xl p-6 mt-6">
-            <h3 class="font-bold text-gray-900 mb-4">About the Author</h3>
-            <% author = @presentation.author %>
-            <div class="flex items-center gap-4">
-              <% if author.profile_image.attached? %>
-                <%= image_tag author.profile_image, class: "h-14 w-14 rounded-full object-cover" %>
-              <% else %>
-                <div class="flex h-14 w-14 items-center justify-center rounded-full bg-whiskey-600">
-                  <span class="font-bold text-white"><%= author.first_name.first %><%= author.last_name.first if author.last_name.present? %></span>
-                </div>
-              <% end %>
-              <div class="min-w-0">
-                <h4 class="font-semibold text-gray-900"><%= author.full_name %></h4>
-                <% deck_count = Presentation.published.where(author: author).count %>
-                <p class="text-sm text-gray-600"><%= pluralize(deck_count, 'deck') %> in the library</p>
-              </div>
-            </div>
-            <%# The author's own blurb, from their profile (account settings / admin). %>
-            <% if author.bio.present? %>
-              <p class="mt-4 text-sm leading-relaxed text-gray-600"><%= author.bio %></p>
-            <% end %>
-            <%= link_to "View profile →", profile_path(author),
-                class: "mt-4 inline-block text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>
-          </div>
-        </div>
-      </div>
-    </div>
+    </section>
   </div>
-</div>
 
-<!-- More from the library, never dead-end a reader -->
-<% if @more_decks&.any? %>
-  <section class="w-full bg-whiskey-50 px-4 py-16">
-    <div class="mx-auto max-w-6xl">
+  <!-- More from the library, never dead-end a reader -->
+  <% if @more_decks&.any? %>
+    <section class="border-t border-hairline pt-12">
       <div class="flex flex-wrap items-end justify-between gap-4">
-        <div>
-          <p class="eyebrow mb-2 text-whiskey-600">Keep pouring</p>
-          <h2 class="font-display text-3xl font-semibold text-gray-900">More from the library</h2>
-        </div>
-        <%= link_to 'See all decks →', presentations_path, class: 'text-sm font-semibold text-whiskey-700 transition hover:text-whiskey-600' %>
+        <h2 class="<%= heading_class %>">More from the library</h2>
+        <%= link_to 'See all decks →', presentations_path, class: 'text-sm font-semibold text-ink hover:underline' %>
       </div>
-      <div class="mt-10 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
+      <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <% @more_decks.each do |deck| %>
           <%= render 'presentations/deck_card', deck: deck,
               owned: user_signed_in? && deck.purchased_by?(current_user) %>
         <% end %>
       </div>
-    </div>
-  </section>
-<% end %>
+    </section>
+  <% end %>
+</div>

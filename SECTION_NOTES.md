@@ -9,79 +9,89 @@
 > 1. Verify in the browser, not just in tests. The dev stack is `./wss up`,
 >    tests are `./wss test`.
 > 2. No fabricated content, ever. No fake reviews/stats/guarantees.
-> 3. The design system lives in app/assets/tailwind/application.css:
->    char/paper surfaces, whiskey scale, Fraunces/Instrument Sans/Source Serif 4,
->    `.eyebrow`, `.rule-double`, `.thread`, `.prose-deck`. Use it; don't invent
->    new one-off colors.
+> 3. The design system is the 2026 redesign: rules in docs/redesign/DESIGN_SYSTEM.md,
+>    tokens and components in app/assets/tailwind/application.css, reference
+>    implementation the homepage. Paper ground, white hairline cards, bottle
+>    green for ink and solid objects, the logo orange as a small mark only.
+>    Use it; don't invent new one-off colors.
+>
+> November 2026: the redesign programme (docs/redesign/TASKS.md) rebuilt every
+> page below. Sections now describe the redesigned state; backend findings and
+> their status live in docs/redesign/ARCHITECTURE_REVIEW.md and TASKS.md.
+> Screenshots of every page at 1440px and 390px: docs/redesign/GALLERY.md.
 
 ---
 
 ## 1. Design system & layout chrome
 
-**State:** Two-surface identity — "char" (#191009, dark) for narrative surfaces,
-paper/white for utility. Signature motif: the amber thread. Nav and footer are
-char, in app/views/layouts/application.html.erb. Full-bleed pages (home,
-societies index/show, all presentations pages) manage their own top padding via
-mastheads; everything else gets the constrained container (see the `full_bleed`
-conditional in the layout — and the comment about the fixed-sidebar/flex trap).
+**State:** Paper ground (`bg-paper`), white `.card` surfaces with a hairline edge,
+at most one green `.panel-ink` per view, Instrument Sans for UI and headings,
+Source Serif 4 for long reads. The nav is a floating rounded green bar 12px from
+the top and the footer an inset rounded green panel, both in
+app/views/layouts/application.html.erb. The layout has `lang="en"`, a skip link
+to `#main-content`, and the nav avatar uses `DesignHelper#avatar` (initials on
+`bg-whiskey-100`; `avatar_color` is no longer used anywhere in views). Shared
+pieces: `shared/_page_header`, `DesignHelper#deck_cover`, `DesignHelper#avatar`,
+`shared/_society_icon` (picture, else initials; no emoji). Rating stars
+(`bottles/_rating`) are inline SVG in the orange mark with the value as sr-only
+text. Turbo ignores `data-confirm`: use `turbo_confirm` (on the form for
+`button_to`).
+
+**Known simplification (left on purpose):** the layout's `full_bleed` list
+(home index/membership, societies index/show/join_by_invite, events#show, every
+presentations page, reviews index/show, bottles#show, the unified auth page)
+renders `<main>` without the standard container, and each of those views carries
+its own `max-w-6xl` / `pt-28` wrapper (or `clear_nav`). Nothing on those pages is
+full-bleed any more, so the list could be removed and the wrappers deleted, but
+that touches a dozen views at once and every one must be re-checked at both
+widths. Do it as one dedicated change, not piecemeal.
 
 **Gaps:**
-- The mobile menu is a bare `<details>` dropdown; fine, but it doesn't close on
+- The mobile menu is a bare `<details>` dropdown; it doesn't close on
   navigation with Turbo. Low priority.
-- `avatar_color` user identicons (User#avatar_color) produce colors outside the
-  brand palette (blues/greens). Harmless; could be re-mapped to whiskey tones.
-- No favicon refresh — still the default icon.png. Consider a glencairn mark.
+- No favicon refresh — still the default icon.png.
 
 ## 2. Homepage (app/views/home/index.html.erb)
 
-**State:** Fully rebuilt. Hero (thread-underlined Fraunces headline), pinned
-how-it-works split (grid + `self-start` sticky — do NOT reintroduce
-`height: 100%` on body or overflow-x hidden on ancestors, it kills sticky),
-ritual/house-rules section, featured decks (real DB records via the shared
-`presentations/_deck_card` partial), pricing (DOM contract pinned by tests —
-see test/integration/home_subscription_cards_test.rb), FAQ accordions.
+**State:** The reference implementation of the 2026 design system: the pinned
+how-it-works player showing real slides and real decks, the spotlight deck
+(admin-featured; its first slide, else its cover, else no image), pricing from
+`@stripe_products` (DOM contract pinned by
+test/integration/home_subscription_cards_test.rb), FAQ. Do NOT reintroduce
+`height: 100%` on body or `overflow-x: hidden` on ancestors; it kills sticky.
+`/?design=next`, `next2` and `next4` render earlier studies (admin-only).
 
 **Gaps:**
-- Pricing cards render from `@stripe_products` (HomeController#fetch_stripe_products,
-  cached 1h, falls back to hardcoded `fallback_products`). Once real Stripe
-  price IDs exist, verify metadata-driven features render correctly.
-- FAQ copy is my rewrite; owner should read it once for voice.
+- FAQ copy should be read once by the owner for voice.
 
 ## 3. Deck library (/presentations)
 
-**State:** Char masthead, honest live filters (search debounce, category +
-difficulty selects derived from the catalog, sort), kaminari pagination
-(12/page, styles in the Tailwind file under `.pagination`), ownership badges,
-two-flavor empty state. Cards are real links (the old page trapped decks
-behind a JS modal).
+**State:** Page header on paper, a filter row (search, category, level, sort),
+the deck grid of `presentations/_deck_card` (cover from the first rendered slide,
+else featured image, else a plain green block; title, one meta line, price or
+"In your library"), kaminari pagination. Covers and ownership are preloaded
+once per page. Default order pins featured decks first, except that a featured
+deck with no cover is never placed above a deck with one
+(test/integration/featured_decks_test.rb).
 
 **Gaps:**
-- Search matches title/description only (Presentation.search scope). Consider
-  including content/category.
-- No "Free" filter; free decks just show "Free" as the price. Fine until
-  there are many.
+- Search matches title/description only (Presentation.search scope).
+- No "Free" filter; free decks just show "Free" as the price.
 
 ## 4. Deck page (/presentations/:id)
 
-**State:** Char cover hero (featured image aware), takeaways grid, THE STORY
-with reading-progress thread and markdown rendering (`render_markdown`,
-sanitized, redcarpet). **The story is gated:** non-owners get the first ~24
-source lines (`preview_markdown` / `story_truncated?` in
-PresentationsHelper), cut at the source so hidden content never reaches the
-DOM, fading into a purchase CTA. Owners/admins (via
-`Presentation#can_download_full_presentation?` → `User#can_access_presentation?`)
-get the full text. Tasting notes set like a back label; sidebar purchase card
-is state-aware (signed-out / credit available / owned direct / owned credit /
-owned credit + lapsed membership); "More from the library" at the bottom.
+**State:** Two acts. Sell: header with title, meta and description beside the
+cover (the cover column is dropped when the deck has no slides and no featured
+image, so the text takes the width), one action bar (`#deck-actions`), the story
+teaser, the first slides, tasting notes, pours, reviews. Own: Present, downloads
+and the whole story. **The story is gated:** non-owners get the first ~24 source
+lines (`preview_markdown` in PresentationsHelper), cut at the source so hidden
+content never reaches the DOM. Access is decided in the controller
+(`@full_story`) and by the ownership row.
 
 **Gaps:**
-- The 24-line teaser threshold is arbitrary; if owners write short stories the
-  gate never triggers (by design). Revisit once real deck content exists —
-  maybe a per-deck `teaser_marker` (e.g. an HTML comment in the markdown).
-- `rating`/`review_count` columns still exist on presentations but are unused
-  (no review system). Either build reviews or drop the columns in a migration.
-- Preview images section says "Slide N" over each image — number comes from
-  position, fine, but consider lightbox viewing.
+- The 24-line teaser threshold is arbitrary; revisit once real deck content
+  exists (maybe a per-deck teaser marker).
 
 ## 5. Purchase & payments
 
@@ -106,76 +116,59 @@ a reactivation message.
 
 ## 6. Societies
 
-**State:** Index = char masthead + my societies + discover grid with honest
-search (name/description + location ILIKE; the fake ZIP-radius UI and its
-geolocation Stimulus controller are deleted). Show = unified char masthead
-(banner-aware), membership-state actions, events + members panels.
-**Privacy is now real:** SocietyPolicy#join? requires public?; policy scope
-hides private societies from non-members; show? gates too.
+**State:** Index: page header on paper, your societies and discover lists, real
+public societies with counts from the database, search. Show: header on paper
+(name, place, counts, member actions), the next event as the one `.panel-ink`,
+events, members (avatars), the review board and invite tools as cards with
+ruled rows; section headings in sentence case. "Leave society" confirms through
+`turbo_confirm`. Private societies show only the invite-only state to
+non-members (SocietyPolicy). Invite links exist (`/invite/:token`).
 
 **Gaps:**
-- `SocietyApplication` model exists with zero routes/UI. Private societies
-  currently say "Invite only" — but there's also no invite system! A private
-  society's only members arrive via... nothing. THIS IS THE BIGGEST MISSING
-  FEATURE: build either (a) invite links/codes, or (b) the application flow
-  (apply → society admin approves in a pending-applications panel on the
-  society page). The model + `pending_applications` method already exist.
-- Society admins can't remove members or promote officers from the UI
-  (SocietyMembership roles exist; `manage_members?` policy exists; no UI).
-- The signed-out societies index variant (bottom half of index.html.erb) is
-  long and partially redundant with the homepage; could be halved.
-- Forums: `Forum` model + `has_many :forums` exist, completely unbuilt. Decide
-  to build or drop.
+- `SocietyApplication` model still has no routes/UI (self-serve requests to
+  join private societies). B17 decides whether to remove it.
+- Forums: `Forum` model exists, unbuilt. Decide to build or drop.
 
 ## 7. Events
 
-**State:** Nested under societies. Create/edit forms work; RSVP Yes/Maybe/No
-with turbo_stream updates; event show has date/location/RSVP panels;
-emoji stripped, display type on titles. "Table talk" comments on the event
-page (`events/_comments`, `Events::CommentsController`, owner-approved July
-2026): society members/organizer post until a week after `end_time`
-(`Event#comments_open?`, window enforced in the EventComment model); authors
-and event managers delete. Flat and event-scoped by design — NOT the
-rejected forum.
+**State:** Event page on paper: header (date, title, place, host), the RSVP
+segmented control (Stimulus `segmented`, state on `aria-pressed`; the
+going/maybe colours are the `rsvp-*` tokens), then cards for details, pours,
+deck, table talk, attending and the society (its picture or initials). RSVP
+updates by turbo_stream. "Table talk" comments: society members/organizer post
+until a week after `end_time` (`Event#comments_open?`).
 
 **Gaps:**
 - events#index IS routed (nested: /societies/:id/events) — earlier draft of
   this note claimed otherwise. A cross-society "my events" page still doesn't
   exist and would be useful (all upcoming events for my societies).
 - No calendar export (.ics) — small, high-value for a meetup product.
-- No event reminders (needs a Solid Queue job + mailer; ActivityLog's
-  `event_rsvp` type was never emitted anywhere either).
+- Event reminders exist (EventReminderJob); event emails render times in UTC
+  until B15 lands (I3).
 - Event image/banner not supported.
 
 ## 8. Account (/account)
 
-**State:** Six JS tabs (Profile, Account Details, My Presentations,
-My Societies, Subscription, Billing). Tab switcher now scrolls to the shown
-panel, syncs the URL hash, and restores any tab from the hash on load.
-Subscription tab: plan cards + pause/resume/cancel via SubscriptionsController
-(Stripe-backed, tested). 2FA (TOTP + backup codes) in Account Details.
-Profile tab: the whiskey shelf is a chip editor (`account/_shelf_editor`,
-`Account::ShelfItemsController`, Turbo Stream refresh) over structured
-`shelf_items` (bottle-linked or free-text; owner-approved July 2026). The
-legacy `users.whiskey_shelf` text column is backfilled + retained but no
-longer written or rendered — drop it once prod backfill is verified.
+**State:** Panels are partials (`account/_*_panel`): Profile, Account details,
+My presentations, My societies, Followed, Subscription, Billing. Section
+navigation is a row of chips on phones and a left column on desktop; tabs are
+switched by the `account-tabs` Stimulus controller (tablist/tab/tabpanel roles,
+arrow keys; URL hash deep links; legacy
+`?subscription` param for Stripe returns). In-panel links to another tab use
+`data-tab-link` (billing's "View plans" → `/account#subscription`). Headings and
+tab labels are sentence case.
 
 **Gaps:**
-- The page is a 1000-line monolith with six panels inline. Split into
-  partials (`account/_profile.html.erb` etc.) before touching anything else.
-- My Presentations panel: big amber gradient placeholder block for decks
-  without cover images — should reuse the char typographic cover from
-  `_deck_card`; the whole panel should probably just use `_deck_card`.
-- Billing history is read from Stripe invoices inline — slow with many
-  invoices; consider caching or lazy Turbo frame.
-- OTP secret (`otp_secret_key`) and backup codes are stored in PLAINTEXT
-  columns. Encrypt with Rails `encrypts` (ActiveRecord encryption) — needs
-  the encryption keys set up in credentials. Flagged since the first review;
-  still open.
+- Billing history is read from Stripe invoices inline — consider a lazy Turbo
+  frame.
+- 2FA is half-built (S7, B11 blocked on the owner).
 
 ## 9. Auth (/auth)
 
-**State:** Unified page: Google OAuth (button gated on real credentials —
+**State:** One centred card on paper (Google button, magic link, password
+toggle; ids `#magic-link-email`, `#password-toggle`, `#signin-email`,
+`#signin-password` are relied on by tests and scripts). Sign-in endpoints are
+rate limited (B3). Unified page: Google OAuth (button gated on real credentials —
 see .env.example for the exact console steps), Apple (gated on APPLE_* env),
 magic links (single-use, HMAC-digested, 15-min expiry, dedicated columns),
 optional password. Devise sessions are hand-rolled in AuthController
@@ -187,28 +180,27 @@ optional password. Devise sessions are hand-rolled in AuthController
   convert to a small Stimulus controller for consistency.
 - Password reset for password-users exists via Devise :recoverable but the
   path isn't linked prominently (magic link covers most cases).
+- The Devise "Edit user" page (/users/edit) shows the email read-only and points
+  to the account page; email changes happen only there (B8).
+- Terms of Service / Privacy Policy links on sign-up are still `href="#"`
+  (owner decision pending; no pages exist).
 - Consider passkeys eventually; magic link + OAuth covers the near term.
 
 ## 10. Admin panel
 
-**State:** Char sidebar shell (layouts/admin.html.erb — note the fixed
-sidebar + `ml-60` main; don't reintroduce flex-1 on main, it overflows the
-viewport by the sidebar width). Sections: Dashboard, Decks, Users,
-Subscriptions, Credits (+ ledger view), Activity, Analytics. All pages
-verified rendering.
+**State:** Green sidebar shell (layouts/admin.html.erb): fixed 240px sidebar
+from `lg`, a sticky top bar with a menu below it, `main` is `lg:ml-60 min-w-0`
+(never flex-1). `lang="en"` and a skip link to `#admin-main`; no breadcrumbs
+(page headers carry their own back link). Every page is built from the pattern
+partials in `app/views/admin/shared/` (page header, filter bar, table, detail
+panel, form card, stats, status chip with ok / attention / problem tones,
+empty state, confirm button), each documented at its top. Money is shown with
+`number_to_currency`. Limited admins see no delete controls (`can_delete?`).
+Details: `.claude/skills/wss-admin`.
 
-**Gaps (assessed, agreed direction, NOT yet implemented):**
-- REMOVE `:credits` from Admin::UsersController#user_params — direct credit
-  edits bypass the ledger. Credit changes only via Credits→adjust (which
-  writes CreditTransaction rows).
-- Tracking cleanup (see §12): stop emitting `presentation_viewed`; drop the
-  ActivityLog download events (DownloadLog covers them); add
-  subscription_paused/resumed to ACTIVITY_TYPES or stop emitting them
-  (currently silently dropped by validation!); make login logging cover all
-  three auth methods or none.
-- No society/event moderation pages; no UI to grant/revoke `is_admin`.
-- Dashboard "Recent Signups" panel has a stray blue button; icon colors are
-  off-palette (blue/purple/yellow tints). Cosmetic.
+**Gaps:**
+- Tracking cleanup (see §12) is still the agreed direction.
+- No society/event moderation pages.
 
 ## 10b. Deck import + slide rendering (build/infra notes)
 
@@ -303,9 +295,16 @@ Decision record from the tracking review (implement in admin cleanup):
 
 ## 14. Test suite
 
-177 runs green, 9 intentional Apple skips. Notable coverage: credit ledger
-invariants, webhook idempotency, magic links, subscription pause/resume,
-society privacy policy, pricing card DOM contract. Thin spots: purchase
-controller states (free/credit/lapsed paths), downloads gating, teaser gate,
-account tab behavior (JS — would need system tests; system test setup exists
-but barely used).
+About 800 tests in test/integration, test/controllers and test/helpers alone run
+green (run the suite as `.claude/skills/wss-testing` describes). View tests
+assert behaviour and content, not Tailwind classes. System tests
+(test/system) need a ChromeDriver that matches the installed Chrome; in the
+redesign sandbox they could not start (version mismatch), so account tab and
+magic-link flows were checked in a real browser with Playwright instead.
+
+## 15. Known pre-existing issues (not caused by the redesign)
+
+- `/events/:id/reviews/new` without a `bottle` param returns 404.
+- CLAUDE.md "Admin Panel Development" refers to `admin_panel_todo.md`, which does not
+  exist. Owner to reword that section.
+- The sign-up Terms and Privacy links are `href="#"`. Owner decision pending.

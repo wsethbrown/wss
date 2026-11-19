@@ -78,13 +78,19 @@ class Admin::CreditsController < Admin::BaseController
   end
 
   def grant_monthly
-    # Grant the monthly credit to all active subscribers through the ledger.
-    active_users = User.where(subscription_status: "active")
-    active_users.find_each do |user|
-      CreditTransaction.grant_monthly_credit(user, "Monthly grant by #{current_user.email}")
+    # Grant this month's credit to every active subscriber who has not had it.
+    # Shares the per-month ledger key with the daily MonthlyCreditJob and the
+    # renewal webhook (M17), so pressing it twice, or after the job ran, grants
+    # nothing more. The count is of credits actually granted.
+    counts = Hash.new(0)
+    User.where(subscription_status: "active").find_each do |user|
+      counts[CreditTransaction.grant_monthly_credit(user, "Monthly grant by #{current_user.email}")] += 1
     end
+    Rails.logger.info "Admin #{current_user.id} ran grant monthly: #{counts[:granted]} granted, " \
+                      "#{counts[:already_granted]} already had this month's credit, #{counts[:paused]} paused, " \
+                      "#{counts[:society_only]} society-only, #{counts[:inactive]} inactive"
 
-    flash[:notice] = "Granted 1 credit to #{active_users.count} active subscribers"
+    flash[:notice] = "Granted 1 credit to #{counts[:granted]} active subscribers"
     redirect_to admin_credits_path
   end
 

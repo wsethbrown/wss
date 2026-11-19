@@ -1,0 +1,20 @@
+<%# Status chip: a short state label on a record (subscription, deck, report).
+    Three semantic tones only, nothing else:
+      :ok        green: active, published, applied
+      :attention neutral: draft, pending, invited, paused, inactive, none
+      :problem   red (rsvp-no): canceled, past due, failed, reported
+    Locals:
+      label (String, required) sentence case, e.g. "Active"
+      tone  (Symbol, optional, default :attention)
+    Example: render "admin/shared/status_chip", label: "Active", tone: :ok
+    Map a model state to a tone in the view; do not interpolate class names. %>
+<% tone = local_assigns.fetch(:tone, :attention).to_sym %>
+<% styles = {
+     ok:        [ "bg-whiskey-100 text-ink",               "bg-whiskey-500" ],
+     attention: [ "bg-white text-mute ring-1 ring-inset ring-hairline", "bg-whiskey-400" ],
+     problem:   [ "bg-rsvp-no/10 text-rsvp-no",            "bg-rsvp-no" ]
+   } %>
+<% chip, dot = styles.fetch(tone, styles[:attention]) %>
+<span class="inline-flex items-center gap-1.5 whitespace-nowrap rounded-lg px-2.5 py-1 text-xs font-semibold <%= chip %>">
+  <span class="h-1.5 w-1.5 rounded-full <%= dot %>" aria-hidden="true"></span><%= label %>
+</span>

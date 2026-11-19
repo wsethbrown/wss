@@ -2,9 +2,6 @@ class Admin::PresentationsController < Admin::BaseController
   before_action :require_delete_rights!, only: :destroy
   before_action :set_presentation, only: [ :show, :edit, :update, :destroy, :publish, :unpublish ]
 
-  # Temporary fix for schema caching issue
-  before_action :reset_column_information, only: [ :new, :create, :edit, :update ]
-
   def index
     @presentations = Presentation.includes(:author, :user_presentations)
                                 .order(created_at: :desc)
@@ -20,12 +17,16 @@ class Admin::PresentationsController < Admin::BaseController
     @presentation = Presentation.new
   end
 
-  # Import a .pptx: parse it into a DRAFT deck (unpublished, price 0) with the
-  # file attached and fields pre-filled, then land on the edit form to polish.
+  # Import a deck file into a DRAFT deck (unpublished, price 0) with the file
+  # attached and fields pre-filled, then land on the edit form to polish.
+  # A .pptx is parsed here (pure XML). A .ppt/.pdf needs LibreOffice/pdftotext,
+  # which never run in the web process: the draft starts from the filename and
+  # DeckImportJob fills in its text. Slides always render in DeckSlideRenderJob.
   def import
     file = params[:deck_file]
     content_type = file.respond_to?(:original_filename) && DeckImport.content_type_for(file.original_filename)
     unless file.respond_to?(:read) && content_type
+      Rails.logger.warn "Admin #{current_user.id} deck import refused: missing or unsupported file"
       redirect_to new_admin_presentation_path, alert: "Choose a .pptx, .ppt, or .pdf file to import" and return
     end
 
@@ -33,7 +34,8 @@ class Admin::PresentationsController < Admin::BaseController
     # request tempfile after attach caused ActiveStorage::IntegrityError (the
     # blob checksummed one read and uploaded another).
     data = file.read
-    parsed = DeckImport.parse(data, file.original_filename)
+    inline = DeckImport.inline_parse?(file.original_filename)
+    parsed = inline ? DeckImport.parse(data, file.original_filename) : DeckImport.placeholder(file.original_filename)
 
     deck = Presentation.new(
       author: current_user,
@@ -57,15 +59,25 @@ class Admin::PresentationsController < Admin::BaseController
     end
 
     if deck.save
-      # Slide rendering (LibreOffice) is slow and heavy, do it off the request.
+      # Text extraction (.ppt/.pdf) and slide rendering are slow and heavy, do
+      # them off the request, in that order, on the renders queue.
+      DeckImportJob.perform_later(deck.id) unless inline
       DeckSlideRenderJob.perform_later(deck.id)
-      redirect_to edit_admin_presentation_path(deck),
-                  notice: "Draft imported. The slide previews are rendering and will appear shortly. Review each section, set a price, then publish."
+      Rails.logger.info "Admin #{current_user.id} imported deck #{deck.id} (#{File.extname(file.original_filename).downcase}); " \
+                        "#{inline ? 'text parsed inline' : 'text extraction queued'}, slide render queued"
+      notice = if inline
+        "Draft imported. The slide previews are rendering and will appear shortly. Review each section, set a price, then publish."
+      else
+        "Draft imported. The deck's text and slide previews are being extracted and will appear shortly. Review each section, set a price, then publish."
+      end
+      redirect_to edit_admin_presentation_path(deck), notice: notice
     else
+      Rails.logger.warn "Admin #{current_user.id} deck import failed validation: #{deck.errors.full_messages.to_sentence}"
       redirect_to new_admin_presentation_path,
                   alert: "Import failed: #{deck.errors.full_messages.to_sentence}"
     end
   rescue Zip::Error, Nokogiri::XML::SyntaxError => e
+    Rails.logger.warn "Admin #{current_user.id} deck import unreadable: #{e.class}: #{e.message}"
     redirect_to new_admin_presentation_path, alert: "Couldn't read that file as a deck: #{e.message}"
   end
 
@@ -130,15 +142,17 @@ class Admin::PresentationsController < Admin::BaseController
   end
 
   def destroy
-    @presentation.destroy!
-    redirect_to admin_presentations_path, notice: "Presentation deleted successfully."
+    if @presentation.destroy
+      Rails.logger.info "Admin #{current_user.id} deleted presentation #{@presentation.id}"
+      redirect_to admin_presentations_path, notice: "Presentation deleted successfully."
+    else
+      Rails.logger.warn "Admin #{current_user.id} refused deleting presentation #{@presentation.id}: #{@presentation.errors.full_messages.to_sentence}"
+      redirect_to admin_presentations_path,
+                  alert: "This deck has owners or credit history, so it can't be deleted. Unpublish it instead."
+    end
   end
 
   private
-
-  def reset_column_information
-    Presentation.reset_column_information
-  end
 
   def set_presentation
     @presentation = Presentation.find(params[:id])

@@ -1,4 +1,9 @@
 class User < ApplicationRecord
+  # The half-built two-factor sign-in was removed (B11). Its three columns stay in
+  # the table, still holding encrypted data on some rows, until a later migration
+  # drops them; ignoring them here means nothing can read or write them by accident.
+  self.ignored_columns += %w[otp_enabled otp_secret_key backup_codes]
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
@@ -39,7 +44,10 @@ class User < ApplicationRecord
         return user_by_email
       elsif user_by_email.provider == auth.provider
         # Same provider, update uid if needed
-        user_by_email.update!(uid: auth.uid) if user_by_email.uid != auth.uid
+        if user_by_email.uid != auth.uid
+          Rails.logger.warn "OAuth uid rebind: user #{user_by_email.id} provider #{auth.provider} uid changed (was #{user_by_email.uid.inspect}, now #{auth.uid.inspect})"
+          user_by_email.update!(uid: auth.uid)
+        end
         return user_by_email
       else
         # User already has a different OAuth provider
@@ -126,7 +134,12 @@ class User < ApplicationRecord
   end
 
   # Active Storage
-  has_one_attached :profile_image
+  # :avatar covers every avatar size the site draws (up to 128px, doubled for retina);
+  # :thumb is for larger profile surfaces. Preprocessed in the jobs process.
+  has_one_attached :profile_image do |attachable|
+    attachable.variant :avatar, resize_to_fill: [ 256, 256 ], saver: { quality: 80 }, preprocessed: true
+    attachable.variant :thumb, resize_to_fill: [ 512, 512 ], saver: { quality: 80 }, preprocessed: true
+  end
 
   # Profile image validation
   validate :profile_image_validation
@@ -144,7 +157,8 @@ class User < ApplicationRecord
   has_many :purchased_presentations, through: :user_presentations, source: :presentation
   has_many :user_tags, dependent: :destroy
   has_many :tags, through: :user_tags
-  has_many :credit_transactions, dependent: :destroy
+  # The ledger is append-only and never cascades (B7): deleting a user with a ledger is refused.
+  has_many :credit_transactions, dependent: :restrict_with_error
   has_many :activity_logs, dependent: :destroy
   has_many :reviews, dependent: :destroy
   has_many :shelf_items, -> { order(:position, :id) }, dependent: :destroy
@@ -191,9 +205,47 @@ class User < ApplicationRecord
     !founding_member? && founding_revoked_at.nil?
   end
 
+  # Stripe price id -> plan name, the single mapping shared by the webhook and
+  # the checkout return path. Unknown or blank ids map to "unknown"; an unset
+  # ENV var never matches a blank id.
+  PLAN_PRICE_ENV = {
+    "monthly" => "STRIPE_MONTHLY_PRICE_ID",
+    "quarterly" => "STRIPE_QUARTERLY_PRICE_ID",
+    "yearly" => "STRIPE_YEARLY_PRICE_ID",
+    "founding_society" => "STRIPE_FOUNDING_SOCIETY_PRICE_ID",
+    "founding_monthly" => "STRIPE_FOUNDING_MONTHLY_PRICE_ID"
+  }.freeze
+
+  def self.plan_for_price_id(price_id)
+    return "unknown" if price_id.blank?
+
+    PLAN_PRICE_ENV.each do |plan, env_key|
+      configured = ENV[env_key]
+      return plan if configured.present? && configured == price_id
+    end
+    Rails.logger.warn "Unknown price ID: #{price_id}"
+    "unknown"
+  end
+
   # The $5 society-only plan runs societies but earns NO deck credits.
   def society_only_plan?
     subscription_plan == "founding_society"
+  end
+
+  # ---- Subscription status (B6 / M19) ---------------------------------------
+  # Stripe's subscription statuses, in Stripe's spelling (US "canceled"). The
+  # webhook once wrote "cancelled" while the admin screens counted "canceled",
+  # splitting cancelled members across two values. "paused" is also what the
+  # in-app pause writes locally. Prefixed so the generated helpers
+  # (subscription_status_active?, User.subscription_status_canceled) never
+  # collide with subscription_active? or the `active` scope.
+  SUBSCRIPTION_STATUSES = %w[incomplete incomplete_expired trialing active past_due canceled unpaid paused].freeze
+  enum :subscription_status, SUBSCRIPTION_STATUSES.index_with(&:itself),
+       prefix: true, validate: { allow_nil: true }
+
+  # Older code paths and rows used the British spelling; store Stripe's.
+  def subscription_status=(value)
+    super(value.to_s == "cancelled" ? "canceled" : value)
   end
 
   # Admin role tiers, assigned via console. `full` can do everything including
@@ -252,7 +304,12 @@ class User < ApplicationRecord
   def century? = followers_count >= CENTURY_THRESHOLD
 
   def rsvped_to?(event)
-    event_rsvps.exists?(event: event, status: "confirmed")
+    event_rsvps.exists?(event: event, status: "yes")
+  end
+
+  # Past events the user RSVP'd "yes" to (the profile's "events attended").
+  def events_attended_count
+    event_rsvps.yes.joins(:event).merge(Event.past).count
   end
 
   def admin_societies
@@ -337,20 +394,6 @@ class User < ApplicationRecord
     end
   end
 
-  # TOTP secret and backup codes are encrypted at rest (ActiveRecord encryption;
-  # keys in env, see config/initializers/active_record_encryption.rb).
-  encrypts :otp_secret_key
-  encrypts :backup_codes
-
-  # 2FA helper methods
-  def two_factor_enabled?
-    otp_enabled? && otp_secret_key.present?
-  end
-
-  def otp_required_for_login?
-    two_factor_enabled?
-  end
-
   # Authentication method helpers
   def has_password?
     password_set_manually? && encrypted_password.present?
@@ -395,7 +438,7 @@ class User < ApplicationRecord
       subscription_paused? ? "Paused" : "Active"
     when "paused"
       "Paused"
-    when "cancelled"
+    when "canceled"
       "Cancelled"
     when "past_due"
       "Past Due"
@@ -483,57 +526,6 @@ class User < ApplicationRecord
     # Credits are added on the 1st of each month
     return nil unless has_active_subscription?
     Date.today.next_month.beginning_of_month
-  end
-
-  def generate_otp_secret
-    self.otp_secret_key = ROTP::Base32.random
-  end
-
-  def generate_backup_codes
-    codes = 8.times.map { SecureRandom.hex(4).upcase }
-    self.backup_codes = codes.to_json
-    codes
-  end
-
-  def backup_codes_array
-    backup_codes.present? ? JSON.parse(backup_codes) : []
-  end
-
-  def verify_otp(code)
-    return false unless two_factor_enabled?
-
-    # Check if it's a backup code
-    if backup_codes_array.include?(code.upcase)
-      # Remove used backup code
-      codes = backup_codes_array
-      codes.delete(code.upcase)
-      update!(backup_codes: codes.to_json)
-      return true
-    end
-
-    # Check TOTP code
-    totp = ROTP::TOTP.new(otp_secret_key)
-    totp.verify(code, drift_ahead: 30, drift_behind: 30)
-  end
-
-  def otp_qr_code
-    return nil unless otp_secret_key.present?
-
-    totp = ROTP::TOTP.new(otp_secret_key)
-    issuer = "Whiskey Share Society"
-    uri = totp.provisioning_uri(email, issuer_name: issuer)
-
-    qr = RQRCode::QRCode.new(uri)
-    qr.as_svg(
-      module_size: 4,
-      standalone: true,
-      use_path: true,
-      viewbox: true,
-      svg_attributes: {
-        class: "qr-code",
-        style: "width: 200px; height: 200px;"
-      }
-    )
   end
 
   def initials

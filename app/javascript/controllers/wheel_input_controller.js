@@ -51,7 +51,7 @@ export default class extends Controller {
     const r = HUB + (R - HUB) * value
     fill.setAttribute("d", value > 0 ? this.sector(i, r) : "")
     label.style.fontWeight = value > 0 ? "700" : "500"
-    label.style.fillOpacity = value > 0 ? "1" : "0.5"
+    label.style.fillOpacity = value > 0 ? "1" : "0.7" // 0.7 keeps an empty label at 4.8:1 on #ecebe3
   }
 
   sector(i, r) {

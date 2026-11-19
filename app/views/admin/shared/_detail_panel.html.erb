@@ -1,0 +1,37 @@
+<%# Detail panel: the facts about one record as definition rows (a user's
+    account, a subscription, a deck's files). Label on the left in mute, value on
+    the right in ink, hairlines between rows.
+    Locals:
+      rows  (Array of [label, value], required) value may be a String, a number,
+            safe HTML (e.g. a status_chip render or a link), or nil (shows "—")
+      title (String, optional) card heading
+      link  (Array [label, path], optional) quiet link beside the title ("Edit")
+      block (optional) rendered under the rows, for the panel's actions
+    Example:
+      render "admin/shared/detail_panel", title: "Account",
+             rows: [["Email", @user.email], ["Credits", @user.credits],
+                    ["Joined", l(@user.created_at.to_date, format: :long)]] %>
+<% title = local_assigns[:title] %>
+<% link = local_assigns[:link] %>
+<% extra = block_given? ? yield : nil %>
+<section class="card p-5 sm:p-6">
+  <% if title.present? %>
+    <div class="mb-3 flex items-center justify-between gap-4">
+      <h2 class="text-lg font-semibold text-ink"><%= title %></h2>
+      <% if link.present? %>
+        <%= link_to link[0], link[1], class: "text-sm #{admin_link_class}" %>
+      <% end %>
+    </div>
+  <% end %>
+  <dl class="divide-y divide-hairline">
+    <% rows.each do |label, value| %>
+      <div class="flex flex-col gap-1 py-3 sm:flex-row sm:items-baseline sm:justify-between sm:gap-6">
+        <dt class="shrink-0 text-sm text-mute"><%= label %></dt>
+        <dd class="min-w-0 break-words text-sm font-medium text-gray-900 sm:text-right"><%= value.presence || "—" %></dd>
+      </div>
+    <% end %>
+  </dl>
+  <% if extra.present? %>
+    <div class="mt-4 flex flex-wrap items-center gap-3 border-t border-hairline pt-4"><%= extra %></div>
+  <% end %>
+</section>

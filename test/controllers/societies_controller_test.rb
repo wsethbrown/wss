@@ -13,9 +13,9 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
   test "should get index when not authenticated" do
     get societies_url
     assert_response :success
-    # Unauthenticated visitors get the marketing landing; its hero headline ends
-    # with "Find Your Society." and it features public societies below.
-    assert_select "h1", /Find Your Society/
+    # Unauthenticated visitors get the landing; its page heading is
+    # "Find your society" and it lists public societies below.
+    assert_select "h1", /Find your society/i
   end
 
   test "should get index when authenticated" do
@@ -294,5 +294,60 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :redirect
     assert_redirected_to new_user_session_path
+  end
+
+  # --- Invite links (B8, S12): GET confirms, POST joins ---------------------
+
+  test "a signed-in GET of a private society's invite link changes nothing" do
+    society = societies(:bourbon_club)
+    token = society.invite_token!
+    sign_in @user
+    assert_no_difference -> { SocietyMembership.count } do
+      get society_invite_path(token)
+    end
+    assert_response :success
+    assert_select "form[method=post][action=?]", society_invite_path(token) do
+      assert_select "button", count: 1
+    end
+    assert_includes response.body, society.name
+  end
+
+  test "the confirm page's POST joins a private society" do
+    society = societies(:bourbon_club)
+    token = society.invite_token!
+    sign_in @user
+    assert_difference -> { society.society_memberships.where(user: @user, status: "active").count }, 1 do
+      post society_invite_path(token)
+    end
+    assert_redirected_to society_path(society)
+  end
+
+  test "a POST with a dead invite token joins nothing" do
+    sign_in @user
+    assert_no_difference -> { SocietyMembership.count } do
+      post society_invite_path("not-a-real-token")
+    end
+    assert_redirected_to societies_path
+  end
+
+  test "an existing member's invite GET and POST just go to the society" do
+    society = societies(:bourbon_club)
+    token = society.invite_token!
+    SocietyMembership.create!(user: @user, society: society, role: "member", status: "active")
+    sign_in @user
+    get society_invite_path(token)
+    assert_redirected_to society_path(society)
+    assert_no_difference -> { SocietyMembership.count } do
+      post society_invite_path(token)
+    end
+    assert_redirected_to society_path(society)
+  end
+
+  test "a signed-out POST to an invite link joins nothing and asks for sign-in" do
+    token = societies(:bourbon_club).invite_token!
+    assert_no_difference -> { SocietyMembership.count } do
+      post society_invite_path(token)
+    end
+    assert_response :redirect
   end
 end

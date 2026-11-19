@@ -59,5 +59,5 @@ Restart web to drop in-process cache.
   Society sandbox". The stripe CLI listener must be started with
   `--api-key $STRIPE_SECRET_KEY` or it may pair to the wrong account and
   webhooks silently never arrive.
-- AR_ENCRYPTION_* keys in .env encrypt 2FA columns — see wss-auth. NEVER
-  regenerate them casually.
+- AR_ENCRYPTION_* keys in .env encrypt the leftover (removed, ignored) 2FA
+  columns — see wss-auth. NEVER regenerate them casually.

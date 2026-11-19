@@ -24,15 +24,18 @@ class EventNotificationJob < ApplicationJob
       members.uniq.each do |user|
         next if user.id == event.organizer_id
 
-        belled += 1 if Notification.notify!(user: user, actor: event.organizer, notifiable: event, action: "event_created")
+        once("event_notification:#{event.id}:created:bell:#{user.id}") do
+          belled += 1 if Notification.notify!(user: user, actor: event.organizer, notifiable: event, action: "event_created")
+        end
       end
-      emailed = recipients(members, event) do |user|
+      emailed = recipients(members, event, "event_notification:#{event.id}:created:mail") do |user|
         EventMailer.event_created(user, event).deliver_later
       end
-      Rails.logger.info "EventNotificationJob: event #{event.id} created: notified #{belled} members in-app, emailed #{emailed} (rest muted)"
+      Rails.logger.info "EventNotificationJob: event #{event.id} created: notified #{belled} members in-app, emailed #{emailed} (rest muted or already sent)"
     when "updated"
       yes_users = event.event_rsvps.where(status: "yes").includes(:user).map(&:user)
-      emailed = recipients(yes_users, event) do |user|
+      # updated_at distinguishes a genuine second edit from a re-run of this job
+      emailed = recipients(yes_users, event, "event_notification:#{event.id}:updated:#{event.updated_at.to_i}:mail") do |user|
         EventMailer.event_updated(user, event, changed_fields).deliver_later
       end
       Rails.logger.info "EventNotificationJob: event #{event.id} updated (#{changed_fields.join(', ')}): emailed #{emailed} of #{yes_users.uniq.size} yes-RSVPs"
@@ -41,16 +44,20 @@ class EventNotificationJob < ApplicationJob
 
   private
 
-  # Yields each eligible recipient; returns how many were yielded so the
-  # caller can log the fan-out.
-  def recipients(users, event)
+  # Yields each eligible recipient not already handled under claim_prefix;
+  # returns how many were yielded so the caller can log the fan-out.
+  def recipients(users, event, claim_prefix)
     count = 0
     users.uniq.each do |user|
       next if user.id == event.organizer_id
       next unless user.event_emails?
 
-      count += 1
-      yield user
+      sent = once("#{claim_prefix}:#{user.id}") { yield user }
+      if sent
+        count += 1
+      else
+        Rails.logger.info "EventNotificationJob: event #{event.id}: user #{user.id} already handled; skipping duplicate"
+      end
     end
     count
   end

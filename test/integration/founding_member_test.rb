@@ -30,9 +30,14 @@ class FoundingMemberTest < ActionDispatch::IntegrationTest
 
   test "the founding monthly plan earns credits like the full plan" do
     u = founding_user(plan: "founding_monthly", email: "fm@example.com")
+    # B5: the welcome credit is the first month's credit, so the monthly
+    # credit lands the following month (one credit per calendar month).
     assert_difference("CreditTransaction.count", 2) do
       assert CreditTransaction.grant_welcome_credit(u)
-      CreditTransaction.grant_monthly_credit(u)
+      assert_equal :already_granted, CreditTransaction.grant_monthly_credit(u)
+      travel 1.month do
+        assert_equal :granted, CreditTransaction.grant_monthly_credit(u)
+      end
     end
     assert_equal 2, u.reload.credits
   end
@@ -80,7 +85,7 @@ class FoundingMemberTest < ActionDispatch::IntegrationTest
   test "the membership page shows the founding offers while slots remain" do
     get membership_path
     assert_response :success
-    assert_match(/The first fifty/, @response.body)
+    assert_match(/the first fifty/i, @response.body)
     assert_match(/Founding Society/, @response.body)
     assert_match(/Founding Monthly/, @response.body)
     assert_match(/50 of 50 founding spots left/, @response.body)

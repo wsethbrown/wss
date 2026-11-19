@@ -1,6 +1,6 @@
 ---
 name: wss-auth
-description: WSS authentication — magic links, Google/Apple OAuth setup and gating, 2FA encryption keys, session handling. Use for sign-in bugs, OAuth config, or anything touching credentials.
+description: WSS authentication — magic links, Google/Apple OAuth setup and gating, session handling, the removed 2FA and its leftover encrypted columns. Use for sign-in bugs, OAuth config, or anything touching credentials.
 ---
 
 # WSS Auth
@@ -9,7 +9,7 @@ description: WSS authentication — magic links, Google/Apple OAuth setup and ga
 One page for everything: Google button, Apple button (only when configured),
 magic link (primary method), and optional password sign-in/up toggle.
 Devise :sessions module is SKIPPED — sessions are hand-rolled in
-AuthController (sign_in adds 2FA + remember-me handling). Helper routes
+AuthController (sign_in adds remember-me handling). Helper routes
 new_user_session_path / user_session_path still resolve (aliased in routes).
 
 ## Magic links (primary auth)
@@ -22,6 +22,14 @@ send.whiskeysharesociety.com, every sender is
 stay on the verified subdomain or Resend rejects). First prod magic link
 verified delivered end-to-end.
 
+## Admin invitations (fourth sign-in path)
+Auth::InvitationService (admin/invitations_controller, admin/users#resend_invitation,
+InvitationsController#show at /invitations/:token). An admin creates the User and
+emails a claim link: HMAC-digested single-use token on dedicated invitation columns,
+14-day expiry, deliver_later. Accepting signs the invitee in once; afterwards they use
+magic link or Google like everyone else. Same token discipline as magic links — never
+log the raw token.
+
 ## Google OAuth
 - Strategy registers with real env creds in production; with DUMMY fallbacks
   in dev/test (so routes + OmniAuth test mode always work). The button only
@@ -32,7 +40,12 @@ verified delivered end-to-end.
   Secret creates a second (two max; delete lost ones). Redirect URIs must
   include each environment's /users/auth/google_oauth2/callback.
 - Users::OmniauthCallbacksController#handle_auth → User.from_omniauth
-  (links by provider/uid, then by email if no provider set).
+  (links by provider/uid, then by email if no provider set). A changed uid for
+  the same provider on an existing email is rebound and logged at warn
+  ("OAuth uid rebind", ids only). The Google strategy (omniauth-google-oauth2
+  1.2.2) exposes auth.info.email_verified, and auth.info.email is already nil
+  unless Google reports email_verified true, so email linking only sees verified
+  addresses.
 
 ## Apple (LIVE in production since July 2026)
 Strategy registers ONLY when all four APPLE_* env vars exist; they are set in
@@ -54,14 +67,19 @@ the apple phases only, else the state check fails csrf_detected. Hide My Email
 creates @privaterelay.appleid.com users (expected; matching real email links
 to the existing account instead).
 
-## 2FA (TOTP + backup codes)
-- Columns otp_secret_key + backup_codes are ENCRYPTED at rest (ActiveRecord
-  encryption, `encrypts` in User). Keys = AR_ENCRYPTION_PRIMARY_KEY /
-  _DETERMINISTIC_KEY / _KEY_DERIVATION_SALT in .env.
-- **LOSING THESE KEYS = LOSING ALL 2FA SECRETS.** They must be backed up
-  (owner's password manager) and provided to production as deploy secrets.
-- support_unencrypted_data is on (pre-encryption rows readable). Never
+## 2FA — REMOVED (B11, November 2026)
+- It was half-built: no challenge step, so enabling it broke password sign-in
+  while magic link, OAuth and invitations ignored it, and there was no UI to
+  enable it. The owner approved removal. There is no 2FA on any sign-in path.
+- The endpoints (account/setup_2fa, enable_2fa, disable_2fa,
+  regenerate_backup_codes), the AuthController branch and the User helpers are
+  gone. The rotp and rqrcode gems are now unused (Gemfile left alone).
+- The columns otp_enabled, otp_secret_key, backup_codes are KEPT in the table
+  and listed in User.ignored_columns until a later migration drops them. Some
+  rows still hold data encrypted with the AR_ENCRYPTION_* keys, so keep those
+  keys configured and backed up until the columns are dropped. Do not
   regenerate keys against a DB with encrypted data.
+- If 2FA comes back, build it across all four sign-in paths, not just password.
 
 ## Login activity
 All three methods log ActivityLog :login with method metadata (password /

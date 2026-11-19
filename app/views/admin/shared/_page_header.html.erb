@@ -1,0 +1,30 @@
+<%# Admin page header: the page's title, one line of context, its primary action.
+    Use at the top of every admin page, instead of a hand-rolled h1 block.
+    Locals:
+      title  (String, required) sentence case, e.g. "Users"
+      lede   (String, optional) one line under the title
+      back   (Array [label, path], optional) quiet back link above the title,
+             e.g. ["Users", admin_users_path]; replaces breadcrumbs on detail pages
+      block  (optional) the page actions, right-aligned on desktop, under the title
+             on phones. At most one "btn btn-primary"; others "btn btn-secondary".
+    Example (no ERB closing tags in this comment, they would end it):
+      render "admin/shared/page_header", title: "Users", lede: "Search and manage all users"
+      ...or with a block whose body is
+        link_to "Invite a member", new_admin_invitation_path, class: "btn btn-primary" %>
+<% back = local_assigns[:back] %>
+<% lede = local_assigns[:lede] %>
+<% actions = block_given? ? yield : nil %>
+<header class="mb-6 flex flex-col gap-4 sm:mb-8 sm:flex-row sm:items-end sm:justify-between">
+  <div class="min-w-0">
+    <% if back.present? %>
+      <%= link_to "← #{back[0]}", back[1], class: "mb-3 inline-flex min-h-11 items-center text-sm font-medium text-mute hover:text-ink sm:min-h-0" %>
+    <% end %>
+    <h1 class="font-display text-3xl font-semibold text-ink sm:text-4xl"><%= title %></h1>
+    <% if lede.present? %>
+      <p class="mt-2 text-base text-mute"><%= lede %></p>
+    <% end %>
+  </div>
+  <% if actions.present? %>
+    <div class="flex shrink-0 flex-wrap items-center gap-3"><%= actions %></div>
+  <% end %>
+</header>

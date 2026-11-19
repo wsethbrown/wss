@@ -13,3 +13,19 @@ production:
     class: BackupRestoreDrillJob
     queue: default
     schedule: every sunday at 10am
+
+  # Finished jobs keep their arguments (mail jobs carry sign-in tokens) and were
+  # never cleared since the Rails default cleanup entry was dropped (I1).
+  clear_solid_queue_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    queue: default
+    schedule: every hour at minute 12
+
+  # One deck credit per member per calendar month on every plan (B5 / M1).
+  # Daily: each member's credit lands on their billing day of the month.
+  # Idempotent per (user, month) in the ledger, so a re-run grants nothing.
+  # 11:00 UTC = 6–7am US Eastern, so the credit is there by morning.
+  monthly_deck_credits:
+    class: MonthlyCreditJob
+    queue: default
+    schedule: every day at 11am

@@ -1,7 +1,7 @@
 <%= @society.name %> has a new tasting night
 
 <%= @event.title %>
-<%= @event.start_time.strftime("%A, %B %-d at %-l:%M %p") %>
+<%= @event.start_time_label %>
 <% if @event.location.present? %><%= @event.location %>
 <% end %>
 See the event: <%= society_event_url(@society, @event) %>
@@ -12,3 +12,5 @@ RSVP with one click:
   No:    <%= @rsvp_urls["no"] %>
 
 You can turn off event emails any time in your account settings.
+
+Turn off event emails: <%= @mute_url %>

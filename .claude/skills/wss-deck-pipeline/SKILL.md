@@ -6,8 +6,10 @@ description: The WSS deck lifecycle — import from pptx/ppt/pdf, background sli
 # WSS Deck Pipeline
 
 ## Import (admin → New Presentation → "Start from your deck file")
-Accepts .pptx (full XML parse: per-slide text + embedded images), .ppt/.pdf
-(LibreOffice→PDF→pdftotext for a per-page draft). Creates an UNPUBLISHED
+Accepts .pptx (full XML parse: per-slide text + embedded images, inline),
+.ppt/.pdf (the draft is created immediately; the text is then extracted by
+DeckImportJob on the `renders` queue via LibreOffice→PDF→pdftotext, filling
+only fields the admin has not already edited). Creates an UNPUBLISHED
 draft: title, story skeleton (## chapter per slide), slide-preview rows,
 cover + up to 3 preview images (only images ≤ Presentation::MAX_IMAGE_SIZE,
 15MB — oversized embeds are skipped, never fatal), the file attached as the
@@ -18,8 +20,9 @@ auto-publish** — the narrative voice is the product.
 1. **Read the upload ONCE** (`data = file.read`), hand every consumer its own
    StringIO. Re-reading the request tempfile after attach ⇒
    ActiveStorage::IntegrityError at save.
-2. **LibreOffice never runs in the web process.** DeckSlideRenderJob renders
-   slides in the jobs container (soffice→pdf→pdftoppm PNGs, attached as
+2. **LibreOffice never runs in the web process.** DeckImportJob (text) and
+   DeckSlideRenderJob render in the jobs container, on the single-thread
+   `renders` queue so mail and default jobs are never starved. DeckSlideRenderJob renders slides (soffice→pdf→pdftoppm PNGs, attached as
    slide_images). Import returns immediately; slides appear when the job
    lands. Inline rendering once crashed the whole dev container.
 
@@ -30,7 +33,7 @@ auto-publish** — the narrative voice is the product.
 - Non-owners see the first ~24 SOURCE lines (preview_markdown cuts the source
   — hidden content never reaches the DOM), fading into a purchase CTA.
   Owners/admins (@full_story via can_download_full_presentation?) read all.
-- The reading UI: .prose-deck with drop cap + the amber thread progress bar.
+- The reading UI: .prose-deck with drop cap + the green thread progress bar (Stimulus `deck-thread` controller).
 
 ## Slides on the deck page
 One "The slides" section: slide_images (order(:id) — NOT :filename, no such
@@ -50,9 +53,10 @@ protect it.
 - Tags: comma-separated tag_names virtual attr (lowercased, max 10,
   find_or_create Tag category 'deck'); chips on cards; popular-tags filter
   row on the library.
-- Story field: EasyMDE (importmap CDN pin) with SERVER-side preview (POST
-  /admin/presentations/preview runs the real render_markdown) — preview must
-  always equal the buyer-facing render.
+- Story field: the `story-chapters` Stimulus controller (chapter cards that
+  serialize back into one Markdown string; `## ` headings mark chapters, a
+  marker shows the teaser cut-off). The old EasyMDE editor and the
+  POST /admin/presentations/preview endpoint no longer exist.
 - Structured editors (Stimulus): what-youll-learn, whiskey-recommendations,
   slides-preview (rows serialize to legacy pipe/dash text formats — no
   migrations). Slide numbers derive from row order.

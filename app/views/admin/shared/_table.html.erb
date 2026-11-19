@@ -1,0 +1,64 @@
+<%# Data table: any list of records (users, subscriptions, ledger rows, decks).
+    A white card with hairline rows, a sticky header (the table scrolls inside the
+    card at 70vh, and sideways on phones), numbers right-aligned.
+    Locals:
+      rows     (collection, required) the records; one table row each
+      columns  (Array, required) one entry per cell, in order. A String, or
+               [label, :right] for numbers and actions. Use "" for an unlabeled
+               actions column (screen readers get "Actions").
+      title    (String, optional) card heading above the table
+      link     (Array [label, path], optional) quiet link beside the title ("All")
+      empty    (String, optional) the one sentence shown when rows is empty
+               (default "Nothing here yet.")
+      empty_action (Array [label, path], optional) the empty state's one action
+      paginate (Boolean, optional) true renders Kaminari pagination under the rows
+    Block: called once per record; output that row's td cells with admin_td, e.g.
+      admin_td(user.email)
+      admin_td(user.credits, align: :right)
+      admin_td(align: :right) with a block holding link_to "Edit", path, class: admin_link_class
+    Example call (no ERB closing tags in this comment, they would end it):
+      render "admin/shared/table", rows: @users, paginate: true,
+             columns: ["User", "Status", ["Credits", :right], ["", :right]] do |user| ... end
+    Status cells use admin/shared/status_chip. Destructive row actions use
+    admin/shared/confirm_button, inside current_user.can_delete? for hard deletes. %>
+<% columns = local_assigns.fetch(:columns) %>
+<% title = local_assigns[:title] %>
+<% link = local_assigns[:link] %>
+<section class="card overflow-hidden">
+  <% if title.present? %>
+    <div class="flex items-center justify-between gap-4 border-b border-hairline px-5 py-4">
+      <h2 class="text-lg font-semibold text-ink"><%= title %></h2>
+      <% if link.present? %>
+        <%= link_to "#{link[0]} →", link[1], class: "text-sm #{admin_link_class}" %>
+      <% end %>
+    </div>
+  <% end %>
+  <% if rows.present? %>
+    <div class="max-h-[70vh] overflow-auto">
+      <table class="min-w-full border-separate border-spacing-0 [&_td:first-child]:pl-5 [&_td:last-child]:pr-5 [&_th:first-child]:pl-5 [&_th:last-child]:pr-5">
+        <thead>
+          <tr>
+            <% columns.each do |column| %>
+              <% label, align = Array(column) %>
+              <th scope="col" class="sticky top-0 z-10 whitespace-nowrap border-b border-hairline bg-white px-4 py-3 text-sm font-medium text-mute <%= align == :right ? 'text-right' : 'text-left' %>">
+                <% if label.blank? %><span class="sr-only">Actions</span><% else %><%= label %><% end %>
+              </th>
+            <% end %>
+          </tr>
+        </thead>
+        <tbody class="text-gray-900 [&>tr:not(:last-child)>td]:border-b [&>tr>td]:border-hairline">
+          <% rows.each do |record| %>
+            <tr class="transition-colors hover:bg-paper"><%= yield record %></tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+    <% if local_assigns[:paginate] && rows.respond_to?(:total_pages) && rows.total_pages > 1 %>
+      <div class="border-t border-hairline px-4 py-3"><%= paginate rows %></div>
+    <% end %>
+  <% else %>
+    <%= render "admin/shared/empty_state",
+               message: local_assigns[:empty] || "Nothing here yet.",
+               action: local_assigns[:empty_action], framed: false %>
+  <% end %>
+</section>

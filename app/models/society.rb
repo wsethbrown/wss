@@ -2,8 +2,15 @@ class Society < ApplicationRecord
   belongs_to :creator, class_name: "User"
 
   # Active Storage attachments
-  has_one_attached :profile_picture
-  has_one_attached :banner_image
+  # Named, preprocessed variants (B16). The banner is positioned with object-position
+  # (banner_position), so :hero resizes to a limit and never crops.
+  has_one_attached :profile_picture do |attachable|
+    attachable.variant :avatar, resize_to_fill: [ 256, 256 ], saver: { quality: 80 }, preprocessed: true
+    attachable.variant :thumb, resize_to_fill: [ 512, 512 ], saver: { quality: 80 }, preprocessed: true
+  end
+  has_one_attached :banner_image do |attachable|
+    attachable.variant :hero, resize_to_limit: [ 2000, 1000 ], saver: { quality: 82 }, preprocessed: true
+  end
 
   # Associations
   has_many :society_memberships, dependent: :destroy

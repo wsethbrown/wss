@@ -7,9 +7,14 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 A full refresh/refactor is in progress on branch `overhaul/full-refresh`. **@OVERHAUL_PLAN.md** is the
 source of truth for what's done and what's next. Key invariants established there (do not regress):
 
-- **Auth:** Only three paths — Devise password, magic link (`Auth::MagicLinkService`), and OmniAuth
-  (Google always; Apple only when `APPLE_*` env vars are set). There are NO hand-rolled OAuth
-  callbacks; never add one, and never disable OAuth/JWT signature verification.
+- **Auth:** Three self-serve paths — Devise password, magic link (`Auth::MagicLinkService`), and OmniAuth
+  (Google always; Apple only when `APPLE_*` env vars are set) — plus a fourth, admin-initiated one:
+  admin invitations (`Auth::InvitationService`, `InvitationsController` at `/invitations/:token`). An
+  admin creates the account and emails a 14-day, single-use claim link (HMAC-digested token on dedicated
+  invitation columns); accepting it signs the invitee in once, after which they use the other paths.
+  There are NO hand-rolled OAuth callbacks; never add one, and never disable OAuth/JWT signature verification.
+  There is no two-factor sign-in: the half-built 2FA was removed (B11). Its columns (`otp_enabled`,
+  `otp_secret_key`, `backup_codes`) stay in the table, ignored by `User`, until a later migration drops them.
 - **Admin:** Roles are the `users.admin_role` enum (none/limited/full). `User#admin?` is true for any
   admin tier; `User#can_delete?` is true only for full (limited admins keep every admin power except
   hard-deleting records). `admin_role` is the source of truth; the old `is_admin` boolean is vestigial.
@@ -20,7 +25,9 @@ source of truth for what's done and what's next. Key invariants established ther
 - **Stripe webhooks:** Idempotent via the `StripeEvent` claim table — process each event once.
 - **Secrets:** No `.pem`/`.key`/`.env`/`*.log` in git (see `.gitignore`); use env vars / credentials.
   The previously committed Apple signing key is compromised and must be rotated.
-- **Design:** One warm `whiskey-*` Tailwind palette is the brand accent (not indigo/amber).
+- **Design:** The 2026 redesign is the direction: paper ground, white hairline cards, bottle
+  green for ink and solid objects, the logo orange as a small mark only (never yellow/amber).
+  `whiskey-*` is now the green-neutral scale. Rules and components: **@docs/redesign/DESIGN_SYSTEM.md**.
 
 ## Development Commands
 
@@ -184,22 +191,9 @@ source of truth for what's done and what's next. Key invariants established ther
 This prevents context loss! Update this file IMMEDIATELY when creating important docs.
 
 ### Key Documentation References
-- **@Architecture.md** - System architecture overview, technology stack, design patterns, and scalability planning
-- **@Database.md** - Complete database schema documentation, relationships, indexes, and common queries
-- **@SecurityChecklist.md** - Comprehensive security checklist, best practices, and incident response procedures
-- **@Backlog.md** - Task management system using file-based kanban boards and workflow documentation
-- **@admin_panel_todo.md** - Admin panel development plan, requirements, and progress tracking
-
-### Admin Panel Development
-**IMPORTANT**: When working on admin panel features:
-1. **Always update admin_panel_todo.md** with progress
-2. Mark completed items with [x]
-3. Add new requirements as discovered
-4. Update the "Last Updated" date
-5. Move completed phases to a "Completed" section
-6. Document any architectural decisions or changes
-
-This ensures continuity across sessions and maintains a clear development roadmap.
+- **@docs/redesign/DESIGN_SYSTEM.md** - The 2026 design system: surfaces, colour, type, components, rejected directions
+- **@docs/redesign/ARCHITECTURE_REVIEW.md** - November 2026 architecture and backend review, findings by severity
+- **@docs/redesign/TASKS.md** - The redesign and backend task list with acceptance criteria and test plans
 
 ### Logging (STANDING RULE — applies to every change, not just debugging)
 

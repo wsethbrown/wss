@@ -1,58 +1,54 @@
-<% content_for :title, "#{@review.user.first_name}'s tasting of #{@review.bottle.name} - Whiskey Share Society" %>
-
-<section class="w-full bg-char px-4 pb-10 pt-24">
-  <div class="mx-auto max-w-2xl text-center">
-    <p class="eyebrow mb-3 text-whiskey-300/90">A tasting, on the record</p>
-    <div class="mb-4 flex justify-center">
-      <%= render "bottles/identity_tile", bottle: @review.bottle %>
+<div class="mx-auto w-full max-w-3xl px-4 pb-16">
+  <header class="pb-8 pt-28 sm:pb-10">
+    <%= link_to "← #{@review.bottle.name}", bottle_path(@review.bottle), class: "mb-4 inline-block text-sm font-medium text-mute hover:text-ink" %>
+    <div class="flex items-center gap-5">
+      <%= render "bottles/identity_tile", bottle: @review.bottle, tone: :light %>
+      <div class="min-w-0">
+        <h1 class="font-display text-3xl font-semibold text-ink sm:text-4xl">
+          <%= link_to @review.bottle.name, bottle_path(@review.bottle), class: "hover:underline" %>
+        </h1>
+        <% if @review.bottle.distillery.present? %>
+          <p class="mt-1 text-[17px] text-mute">
+            <%= link_to @review.bottle.distillery, reviews_path(distillery: @review.bottle.distillery),
+                class: "underline decoration-hairline underline-offset-4 hover:text-ink hover:decoration-ink" %>
+          </p>
+        <% end %>
+      </div>
     </div>
-    <h1 class="font-display text-3xl font-semibold text-cream sm:text-4xl">
-      <%= link_to @review.bottle.name, bottle_path(@review.bottle), class: "transition hover:text-whiskey-200" %>
-    </h1>
-    <% if @review.bottle.distillery.present? %>
-      <p class="mt-2 text-cream/80">
-        <%= link_to @review.bottle.distillery, reviews_path(distillery: @review.bottle.distillery),
-            class: "underline decoration-cream/30 underline-offset-4 transition hover:text-whiskey-200" %>
-      </p>
-    <% end %>
-    <div class="mt-5 flex items-center justify-center gap-3 text-xl">
-      <%= render "bottles/rating", value: @review.rating.to_f %>
-      <span class="font-semibold text-cream"><%= number_with_precision(@review.rating, precision: 2, strip_insignificant_zeros: true) %></span>
+    <div class="mt-5 flex items-center gap-3 text-xl">
+      <%= render "shared/score", value: @review.rating.to_f %>
     </div>
-    <p class="mt-3 text-cream/70">
-      <%= link_to "#{@review.user.first_name} #{@review.user.last_name}", profile_path(@review.user), class: "underline decoration-cream/30 underline-offset-4 transition hover:text-whiskey-200" %> <%= render "shared/century_badge", record: @review.user, tone: :dark %> ·
+    <p class="mt-2 text-mute">
+      <%= link_to "#{@review.user.first_name} #{@review.user.last_name}", profile_path(@review.user), class: "font-medium text-ink underline decoration-hairline underline-offset-4 hover:decoration-ink" %> <%= render "shared/century_badge", record: @review.user %> ·
       <%= @review.created_at.strftime("%B %-d, %Y") %><% if @review.price_paid %> &middot; paid <%= number_to_currency(@review.price_paid, precision: 0) %><% end %>
     </p>
-    
-  </div>
-</section>
+  </header>
 
-<section class="w-full bg-white px-4 py-12">
-  <div class="mx-auto max-w-2xl">
+  <div class="card p-6 sm:p-8">
     <% if @review.notes.present? %>
-      <p class="whitespace-pre-line text-lg leading-relaxed text-gray-700"><%= @review.notes %></p>
+      <p class="whitespace-pre-line text-[17px] leading-relaxed text-gray-900"><%= @review.notes %></p>
     <% end %>
 
     <% tasting = { "Nose" => @review.nose, "Palate" => @review.palate, "Finish" => @review.finish, "Body" => @review.body_notes }.compact_blank %>
     <% if tasting.any? %>
-      <div class="mt-10 border-t border-gray-100 pt-8">
-        <p class="eyebrow text-whiskey-600">The tasting</p>
+      <div class="mt-8 border-t border-hairline pt-8">
+        <h2 class="text-xl font-semibold text-ink">The tasting</h2>
         <% icons = {
           "Nose"   => "M5 12c3-5 11-5 14 0M7 15c2-3 8-3 10 0M9.5 18c1-1.5 4-1.5 5 0",
           "Palate" => "M12 4c3 4 6 7 6 10.5a6 6 0 1 1-12 0C6 11 9 8 12 4z",
           "Finish" => "M12 8v4l2.5 2.5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0z",
           "Body"   => "M12 6a7 3 0 1 0 0 .1M5 6v6c0 1.7 3.1 3 7 3s7-1.3 7-3V6M5 12v6c0 1.7 3.1 3 7 3s7-1.3 7-3v-6"
         } %>
-        <dl class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-4">
+        <dl class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
           <% tasting.each do |label, text| %>
-            <div class="rounded-xl border border-whiskey-100 bg-whiskey-50/60 p-4">
+            <div class="rounded-[18px] bg-paper p-4">
               <dt class="flex items-center gap-2">
-                <svg class="h-4 w-4 text-whiskey-600" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+                <svg class="h-4 w-4 text-ink" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
                   <path stroke-linecap="round" stroke-linejoin="round" d="<%= icons[label] %>"></path>
                 </svg>
-                <span class="eyebrow text-whiskey-700"><%= label %></span>
+                <span class="text-sm font-semibold text-ink"><%= label %></span>
               </dt>
-              <dd class="mt-2 text-gray-700"><%= text %></dd>
+              <dd class="mt-2 text-gray-900"><%= text %></dd>
             </div>
           <% end %>
         </dl>
@@ -61,17 +57,17 @@
         <% if tags.any? %>
           <div class="mt-8 grid items-start gap-8 sm:grid-cols-[1fr_16rem]">
             <div data-controller="tag-picker">
-              <p class="eyebrow text-gray-400">Flavor tags</p>
-              <p class="mt-1 text-sm text-gray-500">Pulled from the words above. Pick one or several to find whiskeys that taste like this.</p>
+              <h3 class="text-base font-semibold text-ink">Flavor tags</h3>
+              <p class="mt-1 text-sm text-mute">Pulled from the words above. Pick one or several to find whiskeys that taste like this.</p>
               <div class="mt-3 flex flex-wrap gap-2">
                 <% tags.each do |word, family| %>
                   <a href="<%= reviews_path(tags: word) %>" data-tag-picker-target="chip" data-tag="<%= word %>" data-on="0"
                      data-action="click->tag-picker#toggle" title="<%= family %> family"
-                     class="rounded-full bg-whiskey-100 px-3 py-1 text-sm font-medium text-whiskey-800 transition hover:bg-whiskey-200"><%= word %></a>
+                     class="chip"><%= word %></a>
                 <% end %>
               </div>
               <a href="#" data-tag-picker-target="go"
-                 class="mt-4 hidden inline-block font-semibold text-whiskey-700 hover:text-whiskey-600"></a>
+                 class="mt-4 hidden inline-block font-semibold text-ink hover:underline"></a>
             </div>
             <%= render "reviews/palate_wheel", review: @review %>
           </div>
@@ -80,11 +76,11 @@
     <% end %>
 
     <% if @review.images.attached? %>
-      <div class="mt-10 border-t border-gray-100 pt-8">
-        <p class="eyebrow text-whiskey-600">Photos</p>
+      <div class="mt-8 border-t border-hairline pt-8">
+        <h2 class="text-xl font-semibold text-ink">Photos</h2>
         <div class="mt-4 grid grid-cols-2 gap-3 sm:grid-cols-3">
           <% @review.images.each do |image| %>
-            <%= image_tag image.variant(:thumb), class: "aspect-square w-full rounded-xl object-cover ring-1 ring-gray-200" %>
+            <%= image_tag image.variant(:thumb), class: "aspect-square w-full rounded-xl object-cover ring-1 ring-hairline" %>
           <% end %>
         </div>
       </div>
@@ -92,25 +88,27 @@
 
     <%= render "reviews/event_card", review: @review %>
 
-    <div class="mt-12 border-t border-gray-100 pt-8">
-      <%= render "bottles/flavor_wave", bottle: @review.bottle %>
-    </div>
+    <% if @review.bottle.flavor_profile.any? %>
+      <div class="mt-8 border-t border-hairline pt-8">
+        <%= render "bottles/flavor_wave", bottle: @review.bottle %>
+      </div>
+    <% end %>
 
-    <div class="mt-10 flex items-center gap-4 border-t border-gray-100 pt-6">
+    <div class="mt-8 flex flex-wrap items-center gap-x-4 gap-y-3 border-t border-hairline pt-6">
       <%= render "review_votes/button", review: @review %>
-      <%= link_to "All tastings of #{@review.bottle.name} →", bottle_path(@review.bottle), class: "font-semibold text-whiskey-700 hover:text-whiskey-600" %>
+      <%= link_to "All tastings of #{@review.bottle.name} →", bottle_path(@review.bottle), class: "font-semibold text-ink hover:underline" %>
       <% if @review.user == current_user %>
-        <%= link_to "Edit your review", edit_review_path(@review), class: "ml-auto rounded-xl bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-700 transition hover:bg-gray-200" %>
+        <%= link_to "Edit your review", edit_review_path(@review), class: "btn btn-secondary ml-auto" %>
       <% elsif user_signed_in? %>
         <%# Post-moderation: flagging sends the review to the admin queue; it stays public until an admin acts. %>
         <% if current_user.review_reports.exists?(review: @review) %>
-          <span class="ml-auto text-sm text-gray-400">Flagged for review</span>
+          <span class="ml-auto text-sm text-mute">Flagged for review</span>
         <% else %>
           <%= button_to "Report", review_report_path(@review), method: :post,
               data: { turbo_confirm: "Flag this review for the admins?" },
-              class: "ml-auto text-sm font-medium text-gray-400 transition hover:text-red-600 cursor-pointer" %>
+              class: "ml-auto min-h-11 text-sm font-medium text-mute transition hover:text-red-700 cursor-pointer" %>
         <% end %>
       <% end %>
     </div>
   </div>
-</section>
+</div>

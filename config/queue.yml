@@ -3,10 +3,20 @@ default: &default
     - polling_interval: 1
       batch_size: 500
   workers:
-    - queues: "*"
+    # Mail (sign-in links), webhooks' follow-ups and everyday jobs. Never takes
+    # the `renders` queue, so a slow or hung LibreOffice run can't hold up a
+    # magic-link email. Mail goes to `default` (deliver_later_queue_name is
+    # unset); `mailers` is listed in case it is ever set to the Rails name.
+    - queues: [ default, mailers ]
       threads: 3
       processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
       polling_interval: 0.1
+    # LibreOffice / poppler (DeckImportJob, DeckSlideRenderJob): memory-heavy,
+    # so exactly one at a time across the jobs container.
+    - queues: [ renders ]
+      threads: 1
+      processes: 1
+      polling_interval: 1
 
 development:
   <<: *default

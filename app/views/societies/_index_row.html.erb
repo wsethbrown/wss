@@ -1,0 +1,41 @@
+<%# One society as a ruled row in a list card. Used only by societies/index
+    (societies/show and the account panel keep their own markup).
+    Locals:
+      society   (Society; :members, :events and :profile_picture preloaded by the controller,
+                 so the counts below use .size and cost no extra queries)
+      label     (String, optional) — a short chip: "Creator", "Member", "Private", "Public"
+      row_class (String, optional) — extra classes on the row link %>
+<% label = local_assigns[:label] %>
+<%= link_to society_path(society),
+      class: ["group flex items-start gap-4 px-5 py-5 transition-colors hover:bg-whiskey-50 sm:px-6", local_assigns[:row_class]].compact.join(" ") do %>
+  <div class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-xl bg-whiskey-100 font-display text-base font-semibold text-ink">
+    <% picture = society.profile_picture %>
+    <% if picture.attached? && picture.blob.present? %>
+      <%= image_tag image_variant(picture, :thumb), alt: "", class: "h-full w-full object-cover" %>
+    <% else %>
+      <span aria-hidden="true"><%= society.name.to_s.split.first(2).map { |w| w[0] }.join.upcase %></span>
+    <% end %>
+  </div>
+
+  <div class="min-w-0 flex-1">
+    <div class="flex flex-wrap items-center gap-x-3 gap-y-1">
+      <h3 class="min-w-0 break-words text-lg font-semibold text-ink group-hover:underline group-hover:decoration-hairline group-hover:underline-offset-4"><%= society.name %></h3>
+      <% if label.present? %>
+        <span class="chip min-h-7 px-2.5 text-xs"><%= label %></span>
+      <% end %>
+    </div>
+    <% if society.description.present? %>
+      <p class="mt-1 line-clamp-2 text-[15px] text-gray-900"><%= society.description %></p>
+    <% end %>
+    <p class="mt-2 flex flex-wrap gap-x-2 text-sm text-mute tabular-nums">
+      <% if society.location.present? %>
+        <span><%= society.location %></span><span aria-hidden="true">·</span>
+      <% end %>
+      <span><%= pluralize(society.members.size, "member") %></span>
+      <span aria-hidden="true">·</span>
+      <span><%= pluralize(society.events.size, "event") %></span>
+    </p>
+  </div>
+
+  <span class="mt-3 hidden shrink-0 text-mute transition-transform group-hover:translate-x-0.5 group-hover:text-ink sm:block" aria-hidden="true">→</span>
+<% end %>

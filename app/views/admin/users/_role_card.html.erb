@@ -1,39 +1,32 @@
 <%# The user's admin tier + the promote/demote control. Rendered on both the
     user view and edit pages (outside the main form; nested forms are invalid).
     Server-side guards mirror the UI: full admins only, never your own role. %>
-<div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-  <h2 class="text-lg font-semibold text-gray-900 mb-4">Role</h2>
+<section class="card p-5 sm:p-6">
+  <h2 class="mb-4 text-lg font-semibold text-ink">Role</h2>
   <% case user.admin_role %>
   <% when "full" %>
-    <span class="px-3 py-2 text-sm font-semibold rounded-full bg-whiskey-100 text-whiskey-800">
-      Administrator (full)
-    </span>
+    <%= render "admin/shared/status_chip", label: "Administrator (full)", tone: :ok %>
   <% when "limited" %>
-    <span class="px-3 py-2 text-sm font-semibold rounded-full bg-whiskey-100 text-whiskey-800">
-      Administrator (no delete)
-    </span>
+    <%= render "admin/shared/status_chip", label: "Administrator (no delete)", tone: :ok %>
   <% else %>
-    <span class="px-3 py-2 text-sm font-semibold rounded-full bg-gray-100 text-gray-700">
-      Regular User
-    </span>
+    <%= render "admin/shared/status_chip", label: "Regular user", tone: :attention %>
   <% end %>
 
   <% if current_user.admin_role_full? %>
     <% if user == current_user %>
-      <p class="mt-4 text-xs text-gray-400">You can't change your own role.</p>
+      <p class="mt-4 text-sm text-mute">You can't change your own role.</p>
     <% else %>
       <%# Stacked, full-width controls: the sidebar card is too narrow for a
-          select + button row (the long role labels pushed the button out of
-          the card). %>
-      <%= form_with url: update_role_admin_user_path(user), method: :patch, local: true, class: "mt-4 space-y-2" do %>
+          select + button row. %>
+      <%= form_with url: update_role_admin_user_path(user), method: :patch, local: true, class: "mt-4 space-y-3" do %>
         <%= select_tag :admin_role,
-            options_for_select([["Regular user", "none"], ["Administrator (no delete)", "limited"], ["Administrator (full)", "full"]], user.admin_role),
-            class: "w-full rounded-lg border border-gray-300 px-3 py-2 text-sm text-gray-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+            options_for_select([ [ "Regular user", "none" ], [ "Administrator (no delete)", "limited" ], [ "Administrator (full)", "full" ] ], user.admin_role),
+            class: admin_field_class, "aria-label": "Admin role" %>
         <%= submit_tag "Update role",
             data: { turbo_confirm: "Change this user's admin role?" },
-            class: "w-full cursor-pointer rounded-lg bg-whiskey-600 px-4 py-2 text-sm font-semibold text-white transition hover:bg-whiskey-700" %>
+            class: "btn btn-primary w-full cursor-pointer" %>
       <% end %>
-      <p class="mt-2 text-xs text-gray-400">No-delete admins have every admin power except permanently deleting records.</p>
+      <p class="mt-3 text-sm text-mute">No-delete admins have every admin power except permanently deleting records.</p>
     <% end %>
   <% end %>
-</div>
+</section>

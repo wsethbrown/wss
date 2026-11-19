@@ -1,44 +1,36 @@
-<%# locals: event — who has said yes.
+<%# locals: event — the table (events/_table: one glass per seat, the
+    glasses summarise the counts) and, under it, who has said yes.
     turbo_stream swaps this on every RSVP, so it needs a stable id AND must
     render even when nobody has answered: a target that only exists once
     someone is attending can't be replaced on the RSVP that creates the first
     attendee, which is exactly when the list was going stale (you said yes and
     your own name didn't appear until a reload). %>
-<div id="event-attendees" class="overflow-hidden rounded-lg bg-white shadow-sm">
-  <div class="border-b border-gray-200 px-6 py-4">
-    <h2 class="text-lg font-semibold text-gray-900">
-      Attending<% if event.yes_count.positive? %> <span class="font-normal text-gray-400">· <%= event.yes_count %></span><% end %>
-    </h2>
-  </div>
-  <div class="p-6">
-    <% if event.confirmed_attendees.any? %>
-      <div class="space-y-3">
-        <% event.confirmed_attendees.limit(10).each do |attendee| %>
-          <%= link_to profile_path(attendee), class: "-m-2 flex items-center space-x-3 rounded-lg p-2 transition-colors hover:bg-gray-50" do %>
-            <% if attendee.has_profile_image? %>
-              <img src="<%= attendee.profile_image_url %>" alt="<%= attendee.full_name %>" class="h-8 w-8 rounded-full">
-            <% else %>
-              <div class="flex h-8 w-8 items-center justify-center rounded-full text-sm font-medium text-white" style="background-color: <%= attendee.avatar_color %>;">
-                <%= attendee.initials %>
-              </div>
-            <% end %>
-            <div class="min-w-0 flex-1">
-              <p class="truncate text-sm font-medium text-gray-900"><%= attendee.full_name %></p>
-            </div>
+<div id="event-attendees" class="card p-6">
+  <h2 class="text-xl font-semibold text-ink">The table</h2>
+  <%= render "events/table", event: event %>
+  <% attendees = event.confirmed_attendees.with_attached_profile_image.limit(10).to_a %>
+  <h3 class="mt-5 text-sm font-semibold text-ink">
+    Attending<% if attendees.any? %> <span class="font-normal tabular-nums text-mute">· <%= event.yes_count %></span><% end %>
+  </h3>
+  <% if attendees.any? %>
+    <ul class="mt-2 divide-y divide-hairline">
+      <% attendees.each do |attendee| %>
+        <li>
+          <%= link_to profile_path(attendee), class: "flex min-h-11 items-center gap-3 py-2 text-sm font-medium text-ink transition hover:text-whiskey-500" do %>
+            <%= avatar(attendee, size: 32) %>
+            <span class="min-w-0 flex-1 truncate"><%= attendee.full_name %></span>
           <% end %>
-        <% end %>
-      </div>
-      <% if event.confirmed_attendee_count > 10 %>
-        <div class="mt-4 border-t border-gray-200 pt-4">
-          <p class="text-center text-sm text-gray-500">
-            And <%= event.confirmed_attendee_count - 10 %> more
-          </p>
-        </div>
+        </li>
       <% end %>
-    <% else %>
-      <p class="text-sm italic text-gray-500">
-        <%= event.past? ? "Nobody marked themselves down." : "No one has said yes yet." %>
+    </ul>
+    <% if event.confirmed_attendee_count > 10 %>
+      <p class="mt-3 border-t border-hairline pt-3 text-sm text-mute">
+        And <%= event.confirmed_attendee_count - 10 %> more
       </p>
     <% end %>
-  </div>
+  <% else %>
+    <p class="mt-3 text-sm text-mute">
+      <%= event.past? ? "Nobody marked themselves down." : "No one has said yes yet." %>
+    </p>
+  <% end %>
 </div>

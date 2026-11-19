@@ -1,0 +1,31 @@
+<%# Page header on paper: a heading, one line of supporting text, the page's main action.
+    Locals:
+      title    (String, may contain one <em> turning phrase; html_safe it yourself if so)
+      lede     (String, optional)
+      actions  (String, optional pre-rendered HTML for the main action) — or pass a block
+      back     (Array [label, path], optional) — a quiet back link above the title
+      clear_nav (Boolean, optional) — true only on full-bleed pages, which clear the
+                floating nav themselves; normal pages get that from the layout.
+    Usage (no ERB tags in this comment: a closing tag would end it early):
+      render "shared/page_header", title: "Pick <em>a deck</em>".html_safe, lede: "...",
+             actions: link_to("New", new_path, class: "btn btn-primary")
+    or pass the action as a block to render. %>
+<% back = local_assigns[:back] %>
+<% lede = local_assigns[:lede] %>
+<% actions = local_assigns[:actions] || (block_given? ? yield : nil) %>
+<header class="<%= local_assigns[:clear_nav] ? 'pt-28' : 'pt-2' %> pb-8 sm:pb-10">
+  <% if back.present? %>
+    <%= link_to "← #{back[0]}", back[1], class: "mb-4 inline-block text-sm font-medium text-mute hover:text-ink" %>
+  <% end %>
+  <div class="flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+    <div class="min-w-0 max-w-2xl">
+      <h1 class="font-display text-4xl font-semibold text-ink sm:text-5xl [&_em]:font-reading [&_em]:font-normal"><%= title %></h1>
+      <% if lede.present? %>
+        <p class="mt-3 text-[17px] text-mute"><%= lede %></p>
+      <% end %>
+    </div>
+    <% if actions.present? %>
+      <div class="flex shrink-0 flex-wrap items-center gap-3"><%= actions %></div>
+    <% end %>
+  </div>
+</header>

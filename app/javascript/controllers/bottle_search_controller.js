@@ -134,8 +134,8 @@ export default class extends Controller {
   showLinked(label) {
     if (!this.hasLinkStateTarget) return
     this.linkStateTarget.textContent = `Linked to ${label}`
-    this.linkStateTarget.classList.remove("hidden", "text-gray-400")
-    this.linkStateTarget.classList.add("text-green-700")
+    this.linkStateTarget.classList.remove("hidden", "text-mute")
+    this.linkStateTarget.classList.add("text-ink")
   }
 
   unlink() {
@@ -143,8 +143,8 @@ export default class extends Controller {
     this.linkedName = null
     if (!this.hasLinkStateTarget) return
     this.linkStateTarget.textContent = "Not linked to the catalog, so this pour earns no scores."
-    this.linkStateTarget.classList.remove("text-green-700")
-    this.linkStateTarget.classList.add("text-gray-400")
+    this.linkStateTarget.classList.remove("text-ink")
+    this.linkStateTarget.classList.add("text-mute")
   }
 
   // Copy what the catalog already knows into any [data-bottle-fill] field in
@@ -180,7 +180,7 @@ export default class extends Controller {
   heading(text) {
     const el = document.createElement("p")
     el.textContent = text
-    el.className = "eyebrow border-b border-gray-100 bg-gray-50 px-4 py-1.5 text-gray-400"
+    el.className = "border-b border-hairline bg-paper px-4 py-1.5 text-xs font-medium text-mute"
     return el
   }
 
@@ -195,7 +195,7 @@ export default class extends Controller {
   empty() {
     const el = document.createElement("p")
     el.textContent = "Nothing on the record yet."
-    el.className = "px-4 py-2.5 text-sm text-gray-400"
+    el.className = "px-4 py-2.5 text-sm text-mute"
     return el
   }
 

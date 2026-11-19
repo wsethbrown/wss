@@ -17,18 +17,18 @@
     when no RSVP exists, and their host would still see them as unanswered.
     Nothing is written until they actually pick. %>
 <% answered = user_rsvp.present? %>
-<div id="event-rsvp-buttons" class="flex flex-col gap-2 sm:items-end">
-  <div class="flex items-center gap-3">
-    <span class="text-sm text-cream/60"><%= answered ? "Going?" : "Coming along?" %></span>
+<div id="event-rsvp-buttons" class="flex flex-col gap-3">
+  <div class="flex flex-wrap items-center justify-between gap-3">
+    <span class="text-sm font-medium text-ink"><%= answered ? "Going?" : "Coming along?" %></span>
 
-    <div class="relative inline-flex rounded-full border border-cream/20 bg-cream/5 p-1"
+    <div class="relative inline-flex rounded-2xl border border-hairline bg-paper p-1"
          role="group" aria-label="Your RSVP"
          data-controller="segmented"
          data-action="turbo:submit-end->segmented#submitEnd">
       <%# Sits behind the labels and carries the fill. Position and width are
           written by the controller; colour comes off data-fill. %>
       <span id="rsvp-indicator" aria-hidden="true" data-segmented-target="indicator"
-            class="rsvp-indicator pointer-events-none absolute bottom-1 left-0 top-1 rounded-full"></span>
+            class="rsvp-indicator pointer-events-none absolute bottom-1 left-0 top-1 rounded-xl"></span>
 
       <% %w[yes maybe no].each do |answer| %>
         <%# ALWAYS the same action, whether or not an RSVP exists: this control
@@ -41,8 +41,8 @@
                     resting: (!answered && answer == "maybe" ? "true" : nil),
                     segmented_target: "option", action: "segmented#pick" },
             class: "rsvp-option relative z-10 cursor-pointer inline-flex items-center gap-1.5 " \
-                   "rounded-full px-4 py-1.5 text-sm font-semibold transition-colors duration-200 " \
-                   "focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-300" do %>
+                   "min-h-11 rounded-xl px-4 text-sm font-semibold transition-colors duration-200 " \
+                   "focus:outline-none focus-visible:ring-2 focus-visible:ring-ink/30" do %>
           <%# Rendered for every option and shown by CSS on the pressed one, so
               choosing never has to build markup in JavaScript. %>
           <svg class="rsvp-tick h-3.5 w-3.5" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">

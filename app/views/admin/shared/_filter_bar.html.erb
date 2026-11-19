@@ -1,0 +1,23 @@
+<%# Filter bar: the search and filter form above an index table. Submits with GET
+    so filters live in the URL (existing param names must stay unchanged).
+    Locals:
+      url    (String, required) the index path, e.g. admin_users_path
+      clear  (String, optional) path for the "Clear filters" link
+      submit (String, optional, default "Search") the button label
+    Block: yields the form builder. Each field is one grid cell: a div with
+    f.label (class admin_label_class) and the input (class admin_field_class).
+    A wide search field adds class "sm:col-span-2" to its div. Up to four cells
+    per row on desktop, one per row on phones.
+    Example:
+      render "admin/shared/filter_bar", url: admin_users_path, clear: admin_users_path do |f|
+        div > f.label :search, "Search users" + f.text_field :search, value: params[:search]
+      end %>
+<%= form_with url: url, method: :get, local: true, class: "card mb-6 p-5" do |f| %>
+  <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4"><%= yield f %></div>
+  <div class="mt-4 flex flex-wrap items-center gap-3">
+    <%= f.submit local_assigns.fetch(:submit, "Search"), class: "btn btn-primary min-h-11 py-2.5" %>
+    <% if local_assigns[:clear].present? %>
+      <%= link_to "Clear filters", local_assigns[:clear], class: "btn btn-secondary min-h-11 py-2.5" %>
+    <% end %>
+  </div>
+<% end %>

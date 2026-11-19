@@ -1,48 +1,62 @@
-<%# The deck library. Char masthead + paper catalog; cards are real links
-    (the old page trapped every deck behind a JS-only modal). %>
-
-<!-- Masthead -->
-<section class="w-full bg-char px-4 pb-14 pt-28">
-  <div class="mx-auto max-w-6xl text-center">
-    <p class="eyebrow mb-4 text-whiskey-300/90">The library</p>
-    <h1 class="font-display text-4xl font-semibold text-cream md:text-5xl">Whiskey Presentations</h1>
-    <p class="mx-auto mt-4 max-w-2xl text-lg text-cream/70">
-      Narrative tasting decks, slides, script, and a bottle list for every budget.
-      Pick the story you want to tell.
-    </p>
-    <% if current_user&.admin? %>
-      <p class="mt-4">
-        <%= link_to "Manage decks in the admin panel", admin_presentations_path, class: "text-sm font-semibold text-whiskey-300 underline underline-offset-4 hover:text-whiskey-200" %>
-      </p>
+<%# The deck library: a page header on paper, a filter row, the deck grid.
+    Cards are real links (the old page trapped every deck behind a JS-only modal).
+    This page is full-bleed in the layout, so it sets its own width and clears
+    the floating nav itself (clear_nav). %>
+<% decks = @presentations.to_a %>
+<%# Covers and ownership, loaded once for the whole page rather than per card.
+    Preloading the slide attachments lets deck_cover pick the first slide without
+    a query per deck; owned ids replace a purchased_by? query per card. %>
+<% ActiveRecord::Associations::Preloader.new(records: decks, associations: [ { slide_images_attachments: :blob }, { featured_image_attachment: :blob } ]).call if decks.any? %>
+<%# Default order pins featured decks first. A featured deck with no cover (no
+    slides, no featured image) is never pinned above a deck that has one: it moves
+    to just after the last deck with a cover on this page. %>
+<% if params[:sort].blank? && decks.any?(&:featured?) %>
+  <% has_cover = decks.index_with { |d| deck_cover_attachment(d).present? } %>
+  <% last_covered = decks.rindex { |d| has_cover[d] } %>
+  <% if last_covered %>
+    <% pulled = decks.first(last_covered).select { |d| d.featured? && !has_cover[d] } %>
+    <% if pulled.any? %>
+      <% rest = decks - pulled %>
+      <% decks = rest.insert(rest.rindex { |d| has_cover[d] } + 1, *pulled) %>
     <% end %>
-  </div>
-</section>
+  <% end %>
+<% end %>
+<% owned_ids = user_signed_in? && decks.any? ? current_user.user_presentations.where(presentation_id: decks.map(&:id)).pluck(:presentation_id).to_set : Set.new %>
 
-<!-- Filters -->
-<section class="w-full border-b border-whiskey-100 bg-whiskey-50 px-4 py-6">
-  <div class="mx-auto max-w-6xl">
-    <%= form_with url: presentations_path, method: :get, local: true, id: "deck-filters", class: "flex flex-col gap-4 md:flex-row md:items-center" do |form| %>
-      <div class="relative flex-1">
-        <svg class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
-        </svg>
-        <%= form.search_field :search, value: params[:search], placeholder: "Search decks...",
-            class: "w-full rounded-xl border border-whiskey-200 bg-white py-3 pl-12 pr-4 text-gray-900 placeholder-gray-400 focus:border-whiskey-500 focus:outline-none focus:ring-2 focus:ring-whiskey-200" %>
-      </div>
+<div class="mx-auto w-full max-w-6xl px-4 pb-20">
+  <%= render "shared/page_header", clear_nav: true,
+        title: "Pick <em>a deck</em>".html_safe,
+        lede: "Narrative tasting decks, slides, script, and a bottle list for every budget.",
+        actions: (current_user&.admin? ? link_to("Manage decks in the admin panel", admin_presentations_path, class: "btn btn-secondary") : nil) %>
 
+  <!-- Filters -->
+  <%= form_with url: presentations_path, method: :get, local: true, id: "deck-filters", data: { controller: "filter-form" }, class: "flex flex-col gap-3 md:flex-row md:items-center" do |form| %>
+    <div class="relative min-w-0 flex-1">
+      <svg class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-mute" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
+      </svg>
+      <%= form.label :search, "Search decks", class: "sr-only" %>
+      <%= form.search_field :search, value: params[:search], placeholder: "Search decks...",
+          data: { filter_form_target: "search", action: "input->filter-form#queue" },
+          class: "w-full rounded-2xl border border-hairline bg-white py-3 pl-12 pr-4 text-gray-900 placeholder-gray-500 focus:border-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/30" %>
+    </div>
+
+    <% select_class = "min-h-12 rounded-2xl border border-hairline bg-white px-4 py-3 text-gray-900 focus:border-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/30" %>
+    <div class="grid grid-cols-2 gap-3 md:flex md:flex-none">
       <%# Filter options come from the catalog itself (see controller). %>
+      <%= form.label :category, "Category", class: "sr-only" %>
       <%= form.select :category,
           options_for_select([['All categories', '']] + @categories.map { |c| [c, c] }, params[:category]),
-          {},
-          class: "rounded-xl border border-whiskey-200 bg-white px-4 py-3 text-gray-900 focus:border-whiskey-500 focus:outline-none focus:ring-2 focus:ring-whiskey-200" %>
+          {}, class: select_class, data: { filter_form_target: "select", action: "change->filter-form#submit" } %>
 
       <% if @difficulties.many? %>
+        <%= form.label :difficulty, "Level", class: "sr-only" %>
         <%= form.select :difficulty,
             options_for_select([['Any level', '']] + @difficulties.map { |d| [d, d] }, params[:difficulty]),
-            {},
-            class: "rounded-xl border border-whiskey-200 bg-white px-4 py-3 text-gray-900 focus:border-whiskey-500 focus:outline-none focus:ring-2 focus:ring-whiskey-200" %>
+            {}, class: select_class, data: { filter_form_target: "select", action: "change->filter-form#submit" } %>
       <% end %>
 
+      <%= form.label :sort, "Sort", class: "sr-only" %>
       <%= form.select :sort,
           options_for_select([
             ['Most popular', 'popular'],
@@ -50,110 +64,75 @@
             ['Price: low to high', 'price_low'],
             ['Price: high to low', 'price_high']
           ], params[:sort]),
-          {},
-          class: "rounded-xl border border-whiskey-200 bg-white px-4 py-3 text-gray-900 focus:border-whiskey-500 focus:outline-none focus:ring-2 focus:ring-whiskey-200" %>
+          {}, class: select_class, data: { filter_form_target: "select", action: "change->filter-form#submit" } %>
 
-      <%= form.submit "Filter", class: "cursor-pointer rounded-xl bg-whiskey-600 px-6 py-3 font-semibold text-white transition hover:bg-whiskey-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2" %>
-    <% end %>
-  </div>
-</section>
+      <%= form.submit "Filter", class: "btn btn-primary min-h-12 cursor-pointer" %>
+    </div>
+  <% end %>
 
-<!-- Catalog -->
-<section class="w-full bg-white px-4 py-14">
-  <div class="mx-auto max-w-6xl">
-    <%# Popular tags as one quiet clickable row. %>
-    <% if @popular_tags.any? %>
-      <div class="mb-8 flex flex-wrap items-center gap-2">
-        <span class="eyebrow text-gray-400">Tags</span>
-        <% @popular_tags.each do |tag| %>
-          <% active = params[:tag] == tag.name %>
-          <%= link_to tag.name,
-              presentations_path(request.query_parameters.except('tag', 'page').merge(active ? {} : { tag: tag.name })),
-              class: "rounded-full px-3 py-1 text-sm font-medium transition #{active ? 'bg-whiskey-600 text-white' : 'bg-whiskey-100 text-whiskey-800 hover:bg-whiskey-200'}" %>
-        <% end %>
-      </div>
-    <% end %>
-
-    <% filtering = params[:search].present? || params[:category].present? || params[:difficulty].present? || params[:tag].present? %>
-    <%# Landing here from a deck's "Filed under" link must not feel like being
-        teleported to a random shelf: the header names the active filter, and
-        each filter chip carries its own ×. %>
-    <div class="mb-8 flex flex-wrap items-center justify-between gap-3">
-      <div class="flex flex-wrap items-center gap-2 text-gray-600">
-        <span><%= pluralize(@presentations.total_count, 'deck') %></span>
-        <% {
-          tag:        ->(v) { %(tagged “#{v}”) },
-          category:   ->(v) { v },
-          difficulty: ->(v) { v },
-          search:     ->(v) { %(matching “#{v}”) }
-        }.each do |param, label| %>
-          <% next if params[param].blank? %>
-          <span class="inline-flex items-center gap-1.5 rounded-full bg-whiskey-600 py-1 pl-3 pr-1.5 text-sm font-medium text-white">
-            <%= label.call(params[param]) %>
-            <%= link_to presentations_path(request.query_parameters.except(param.to_s, 'page')),
-                class: "rounded-full p-0.5 transition hover:bg-whiskey-500", "aria-label": "Remove this filter" do %>
-              <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-            <% end %>
-          </span>
-        <% end %>
-      </div>
-      <% if filtering %>
-        <%= link_to 'Clear all filters', presentations_path, class: 'text-sm font-semibold text-whiskey-700 hover:text-whiskey-600' %>
+  <%# Popular tags as one quiet clickable row. %>
+  <% if @popular_tags.any? %>
+    <div class="mt-5 flex flex-wrap items-center gap-2">
+      <span class="mr-1 text-sm font-medium text-mute">Tags</span>
+      <% @popular_tags.each do |tag| %>
+        <% active = params[:tag] == tag.name %>
+        <%= link_to tag.name,
+            presentations_path(request.query_parameters.except('tag', 'page').merge(active ? {} : { tag: tag.name })),
+            class: "chip", "aria-current": (active ? "true" : nil) %>
       <% end %>
     </div>
+  <% end %>
 
-    <% if @presentations.any? %>
-      <div class="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
-        <% @presentations.each do |deck| %>
-          <%= render 'presentations/deck_card', deck: deck,
-              owned: user_signed_in? && deck.purchased_by?(current_user) %>
-        <% end %>
-      </div>
-      <div class="mt-12">
-        <%= paginate @presentations if @presentations.respond_to?(:total_pages) %>
-      </div>
-    <% elsif @library_empty %>
-      <div class="mx-auto max-w-md py-16 text-center">
-        <p class="font-display text-2xl font-semibold text-gray-900">The library is being stocked.</p>
-        <p class="mt-3 text-gray-600">The first decks are on their way, check back soon, or join a society in the meantime.</p>
-        <%= link_to 'Browse societies', societies_path,
-            class: 'mt-8 inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-6 py-3 font-semibold text-white transition hover:bg-whiskey-700' %>
-      </div>
-    <% else %>
-      <div class="mx-auto max-w-md py-16 text-center">
-        <p class="font-display text-2xl font-semibold text-gray-900">No decks match.</p>
-        <p class="mt-3 text-gray-600">Try a different search, or clear the filters to see the whole library.</p>
-        <%= link_to 'Show all decks', presentations_path,
-            class: 'mt-8 inline-flex items-center justify-center rounded-xl bg-whiskey-600 px-6 py-3 font-semibold text-white transition hover:bg-whiskey-700' %>
-      </div>
+  <% filtering = params[:search].present? || params[:category].present? || params[:difficulty].present? || params[:tag].present? %>
+  <%# Landing here from a deck's "Filed under" link must not feel like being
+      teleported to a random shelf: the header names the active filter, and
+      each filter chip carries its own ×. %>
+  <div class="mb-6 mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-hairline pt-6">
+    <div class="flex flex-wrap items-center gap-2 text-mute">
+      <span class="tabular-nums"><%= pluralize(@presentations.total_count, 'deck') %></span>
+      <% {
+        tag:        ->(v) { %(tagged “#{v}”) },
+        category:   ->(v) { v },
+        difficulty: ->(v) { v },
+        search:     ->(v) { %(matching “#{v}”) }
+      }.each do |param, label| %>
+        <% next if params[param].blank? %>
+        <span class="inline-flex min-h-9 items-center gap-1.5 rounded-xl bg-ink py-1 pl-3.5 pr-1.5 text-sm font-medium text-white">
+          <%= label.call(params[param]) %>
+          <%= link_to presentations_path(request.query_parameters.except(param.to_s, 'page')),
+              class: "inline-flex h-7 w-7 items-center justify-center rounded-lg transition hover:bg-white/15", "aria-label": "Remove this filter" do %>
+            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+          <% end %>
+        </span>
+      <% end %>
+    </div>
+    <% if filtering %>
+      <%= link_to 'Clear all filters', presentations_path, class: 'text-sm font-semibold text-ink hover:underline' %>
     <% end %>
   </div>
-</section>
 
-<script>
-  // Debounced auto-submit keeps the filters live without a dedicated Apply click.
-  (function () {
-    function initFilters() {
-      const form = document.getElementById('deck-filters');
-      if (!form) return;
-      const search = form.querySelector('input[name="search"]');
-      let timer;
+  <!-- Catalog -->
+  <% if decks.any? %>
+    <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+      <% decks.each do |deck| %>
+        <%= render 'presentations/deck_card', deck: deck, owned: owned_ids.include?(deck.id) %>
+      <% end %>
+    </div>
+    <div class="mt-12">
+      <%= paginate @presentations if @presentations.respond_to?(:total_pages) %>
+    </div>
+  <% elsif @library_empty %>
+    <div class="card px-6 py-12 text-center sm:px-10">
+      <p class="font-display text-xl font-semibold text-ink">The library is being stocked.</p>
+      <p class="mt-2 text-mute">The first decks are on their way, check back soon, or join a society in the meantime.</p>
+      <%= link_to 'Browse societies', societies_path, class: 'btn btn-secondary mt-6' %>
+    </div>
+  <% else %>
+    <div class="card px-6 py-12 text-center sm:px-10">
+      <p class="font-display text-xl font-semibold text-ink">No decks match.</p>
+      <p class="mt-2 text-mute">Try a different search, or clear the filters to see the whole library.</p>
+      <%= link_to 'Show all decks', presentations_path, class: 'btn btn-secondary mt-6' %>
+    </div>
+  <% end %>
+</div>
 
-      if (search && !search.dataset.bound) {
-        search.dataset.bound = 'true';
-        search.addEventListener('input', function () {
-          clearTimeout(timer);
-          timer = setTimeout(function () { form.submit(); }, 500);
-        });
-      }
-
-      form.querySelectorAll('select').forEach(function (select) {
-        if (select.dataset.bound) return;
-        select.dataset.bound = 'true';
-        select.addEventListener('change', function () { form.submit(); });
-      });
-    }
-    document.addEventListener('turbo:load', initFilters);
-    document.addEventListener('DOMContentLoaded', initFilters);
-  })();
-</script>

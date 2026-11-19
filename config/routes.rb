@@ -12,7 +12,7 @@ Rails.application.routes.draw do
     # but we keep the conventional Devise helper names so links/tests using
     # new_user_session_path / user_session_path still resolve.
     get    "/users/sign_in", to: "auth#unified", as: "new_user_session"
-    # Custom password sign-in (adds 2FA + remember-me handling on top of Devise)
+    # Custom password sign-in (adds remember-me handling on top of Devise)
     post   "/users/sign_in", to: "auth#sign_in", as: "user_session"
     delete "/users/sign_out", to: "auth#logout", as: "destroy_user_session"
     # OmniAuth redirects here when a provider errors (declined consent, bad
@@ -54,10 +54,6 @@ Rails.application.routes.draw do
   patch "account/change_email", to: "account#request_email_change"
   get "account/verify_email/:token", to: "account#verify_email_change", as: "verify_email_change"
   patch "account/change_password", to: "account#change_password"
-  post "account/setup_2fa", to: "account#setup_2fa"
-  post "account/enable_2fa", to: "account#enable_2fa"
-  post "account/disable_2fa", to: "account#disable_2fa"
-  post "account/regenerate_backup_codes", to: "account#regenerate_backup_codes"
   post "account/shelf_items", to: "account/shelf_items#create", as: :account_shelf_items
   delete "account/shelf_items/:id", to: "account/shelf_items#destroy", as: :account_shelf_item
 
@@ -75,6 +71,8 @@ Rails.application.routes.draw do
 
   # Invite links: joining via a valid token works for private societies too.
   get "invite/:token", to: "societies#join_by_invite", as: :society_invite
+  # Signed in, the GET shows a one-button confirm page; this POST joins (B8, S12).
+  post "invite/:token", to: "societies#accept_invite"
   # The link-preview card for an invite. Token-gated like the invite itself, so
   # a private chapter's name and logo never leak to someone guessing an id.
   get "invite/:token/card", to: "societies#invite_card", as: :society_invite_card
@@ -188,7 +186,7 @@ Rails.application.routes.draw do
 
   # Presentations. All purchasing goes through the nested purchases controller —
   # a single flow for credit, paid (Stripe checkout), and free decks.
-  resources :presentations do
+  resources :presentations, only: [ :index, :show ] do
     member { get :present }
     # Deck reviews: stars + short text from owners/attendees (model-gated).
     resources :deck_reviews, only: [ :create, :update, :destroy ], controller: "presentations/reviews"
@@ -204,6 +202,8 @@ Rails.application.routes.draw do
         # and the standard blank card, always included as a fallback.
         get :scorecard
         get :blank_scorecard
+        # Extras (supplemental_materials), owner-gated, by attachment id.
+        get "supplemental/:attachment_id", action: :supplemental, as: :supplemental
       end
     end
   end
@@ -236,7 +236,15 @@ Rails.application.routes.draw do
   end
 
   # One-click RSVP from event emails (signed token carries user + event).
-  get "email_rsvps/:status", to: "email_rsvps#create", as: :email_rsvp
+  # The GET only shows a one-button confirm page (mail scanners follow links);
+  # the POST records the answer (B8, S12).
+  get "email_rsvps/:status", to: "email_rsvps#show", as: :email_rsvp
+  post "email_rsvps/:status", to: "email_rsvps#create"
+
+  # One-click "stop event emails" (signed token, no session; B15). The
+  # List-Unsubscribe-Post header points mail clients at the POST.
+  get "event_mute", to: "event_mutes#show", as: :event_mute
+  post "event_mute", to: "event_mutes#create"
 
   # SEO: the sitemap (public pages only; the veil rules hold).
   get "sitemap.xml", to: "sitemaps#show", format: :xml

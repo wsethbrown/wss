@@ -38,10 +38,16 @@ class Presentations::PurchasesController < ApplicationController
     raise ActiveRecord::RecordNotFound unless @presentation.published? || current_user&.admin?
   end
 
+  # A direct owner, or a credit owner whose membership is active, already has
+  # the deck. A credit owner whose membership lapsed does not have working
+  # access, so they may still buy it outright (the paid checkout upgrades the
+  # row to a direct purchase; see Presentations::CheckoutFulfillment).
   def check_already_purchased
-    if @presentation.purchased_by?(current_user)
-      redirect_to @presentation, notice: "This deck is already in your library"
-    end
+    owned = current_user.user_presentations.find_by(presentation_id: @presentation.id)
+    return unless owned
+    return if owned.credit_purchase? && !@presentation.free? && !current_user.can_access_presentation?(@presentation.id)
+
+    redirect_to @presentation, notice: "This deck is already in your library"
   end
 
   # Credits are a membership benefit: they can only be spent while the
@@ -58,8 +64,12 @@ class Presentations::PurchasesController < ApplicationController
       purchase_price: 0,
       purchased_at: Time.current
     )
+    Rails.logger.info "User #{current_user.id} claimed free presentation #{@presentation.id}"
     log_activity(:presentation_purchased, @presentation, { purchase_type: "free", price: 0 })
     redirect_to @presentation, notice: "Added to your library. This deck is free."
+  rescue ActiveRecord::RecordNotUnique
+    Rails.logger.info "User #{current_user.id} free claim of presentation #{@presentation.id} lost a race; already owned"
+    redirect_to @presentation, notice: "This deck is already in your library"
   end
 
   def handle_credit_purchase

@@ -58,9 +58,9 @@ class AppleOAuthTest < ActionDispatch::IntegrationTest
     follow_redirect!
     assert_response :success
 
-    # Should show signed in state (Account and Sign Out links)
+    # Should show signed in state (Account and Sign out links)
     assert_select "a[href='#{account_path}']", text: "Account"
-    assert_select "a[href='#{destroy_user_session_path}']", text: "Sign Out"
+    assert_select "a[href='#{destroy_user_session_path}']", text: "Sign out"
   end
 
   test "Apple OAuth callback signs in existing user" do

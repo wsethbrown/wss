@@ -1,214 +1,70 @@
-<div class="max-w-7xl mx-auto">
-  <!-- Header -->
-  <div class="mb-8 flex flex-wrap items-start justify-between gap-4">
-    <div>
-      <h1 class="text-3xl font-bold text-gray-900">User Management</h1>
-      <p class="text-gray-600 mt-2">Search and manage all users in the system</p>
-    </div>
-    <%= link_to "Invite a member", new_admin_invitation_path,
-        class: "px-5 py-2.5 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition" %>
+<% content_for :title, "Users - Admin" %>
+
+<%= render "admin/shared/page_header", title: "Users", lede: "Search and manage all users in the system" do %>
+  <%= link_to "Invite a member", new_admin_invitation_path, class: "btn btn-primary" %>
+<% end %>
+
+<%= render "admin/shared/stats", stats: [
+  { label: "Total users", value: @total_users },
+  { label: "Active subscriptions", value: @active_subscriptions },
+  { label: "Total credits", value: @total_credits }
+] %>
+
+<%= render "admin/shared/filter_bar", url: admin_users_path, clear: admin_users_path do |form| %>
+  <div class="sm:col-span-2">
+    <%= form.label :search, "Search users", class: admin_label_class %>
+    <%= form.text_field :search, value: params[:search], placeholder: "Search by name, email, or ID...", class: admin_field_class %>
   </div>
-
-  <!-- Stats Cards -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm font-medium text-gray-600">Total Users</p>
-          <p class="text-3xl font-bold text-gray-900 mt-2"><%= @total_users %></p>
-        </div>
-        <div class="p-3 bg-blue-100 rounded-lg">
-          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"></path>
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm font-medium text-gray-600">Active Subscriptions</p>
-          <p class="text-3xl font-bold text-green-600 mt-2"><%= @active_subscriptions %></p>
-        </div>
-        <div class="p-3 bg-green-100 rounded-lg">
-          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm font-medium text-gray-600">Total Credits</p>
-          <p class="text-3xl font-bold text-purple-600 mt-2"><%= @total_credits %></p>
-        </div>
-        <div class="p-3 bg-purple-100 rounded-lg">
-          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-        </div>
-      </div>
-    </div>
+  <div>
+    <%= form.label :subscription_status, "Subscription status", class: admin_label_class %>
+    <%= form.select :subscription_status,
+        options_for_select([ [ "All statuses", "" ], [ "Active", "active" ], [ "Inactive", "inactive" ], [ "Canceled", "canceled" ] ], params[:subscription_status]),
+        {}, { class: admin_field_class } %>
   </div>
-
-  <!-- Search and Filters -->
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-    <%= form_with url: admin_users_path, method: :get, local: true, class: "space-y-4" do |form| %>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <!-- Search Input -->
-        <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Search Users</label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
-            </div>
-            <%= form.text_field :search, 
-                value: params[:search], 
-                placeholder: "Search by name, email, or ID...",
-                class: "w-full pl-12 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
-          </div>
-        </div>
-
-        <!-- Subscription Filter -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Subscription Status</label>
-          <%= form.select :subscription_status, 
-              options_for_select([
-                ['All Statuses', ''],
-                ['Active', 'active'],
-                ['Inactive', 'inactive'],
-                ['Canceled', 'canceled']
-              ], params[:subscription_status]),
-              {},
-              { class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
-        </div>
-
-        <!-- Sort -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
-          <%= form.select :sort, 
-              options_for_select([
-                ['Newest First', 'newest'],
-                ['Oldest First', 'oldest'],
-                ['Name', 'name'],
-                ['Most Credits', 'credits']
-              ], params[:sort]),
-              {},
-              { class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-4">
-        <%= form.submit "Search", class: "px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition" %>
-        <%= link_to "Clear Filters", admin_users_path, class: "px-6 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition" %>
-      </div>
-    <% end %>
+  <div>
+    <%= form.label :sort, "Sort by", class: admin_label_class %>
+    <%= form.select :sort,
+        options_for_select([ [ "Newest first", "newest" ], [ "Oldest first", "oldest" ], [ "Name", "name" ], [ "Most credits", "credits" ] ], params[:sort]),
+        {}, { class: admin_field_class } %>
   </div>
+<% end %>
 
-  <!-- Results -->
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-    <% if @users.any? %>
-      <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">User</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Contact</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Subscription</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Credits</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Joined</th>
-            <th class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <% @users.each do |user| %>
-            <tr class="hover:bg-gray-50">
-              <td class="px-4 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <div class="flex-shrink-0 h-10 w-10">
-                    <% if user.profile_image.attached? %>
-                      <%= image_tag user.profile_image, class: "h-10 w-10 rounded-full object-cover" %>
-                    <% else %>
-                      <div class="h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold" style="background-color: <%= user.avatar_color %>">
-                        <%= user.initials %>
-                      </div>
-                    <% end %>
-                  </div>
-                  <%# min-w-0 + truncate: an Apple private-relay signup can land
-                      an unbreakable 40-char email in BOTH name fields, which
-                      used to widen the whole table past the viewport. %>
-                  <div class="ml-3 min-w-0 max-w-[11rem]">
-                    <div class="truncate text-sm font-medium text-gray-900" title="<%= user.full_name %>">
-                      <%= user.full_name %>
-                      <% if user.invitation_sent_at.present? && user.invitation_accepted_at.nil? %>
-                        <span class="ml-1 inline-flex items-center rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">Invited</span>
-                      <% end %>
-                    </div>
-                    <div class="text-xs text-gray-500">
-                      ID: <%= user.id %>
-                    </div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-4 py-4">
-                <div class="max-w-[13rem] truncate text-sm text-gray-900" title="<%= user.email %>"><%= user.email %></div>
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap">
-                <% if user.subscription_status == 'active' %>
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                    Active
-                  </span>
-                  <div class="text-xs text-gray-500 mt-1"><%= user.subscription_plan %></div>
-                <% elsif user.subscription_status == 'canceled' %>
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                    Canceled
-                  </span>
-                <% else %>
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                    No Subscription
-                  </span>
-                <% end %>
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap">
-                <span class="text-sm font-medium text-gray-900"><%= user.credits %></span>
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm text-gray-500">
-                <%= user.created_at.strftime("%b %d, %Y") %>
-              </td>
-              <td class="px-4 py-4 whitespace-nowrap text-sm font-medium">
-                <%= link_to "View", admin_user_path(user), class: "text-blue-600 hover:text-blue-900 mr-3" %>
-                <%= link_to "Edit", edit_admin_user_path(user), class: "text-whiskey-600 hover:text-whiskey-900" %>
-              </td>
-            </tr>
+<%= render "admin/shared/table", rows: @users, paginate: true,
+      columns: [ "User", "Contact", "Subscription", [ "Credits", :right ], "Joined", [ "", :right ] ],
+      empty: (params[:search].present? ? "No users match your search criteria." : "No users in the system yet.") do |user| %>
+  <%# min-w-0 + truncate: an Apple private-relay signup can land an unbreakable
+      40-char email in BOTH name fields, which used to widen the table. %>
+  <%= admin_td do %>
+    <div class="flex items-center gap-3">
+      <%= avatar(user, size: 40) %>
+      <div class="min-w-0 max-w-[11rem]">
+        <div class="truncate font-medium text-gray-900" title="<%= user.full_name %>">
+          <%= user.full_name %>
+          <% if user.invitation_sent_at.present? && user.invitation_accepted_at.nil? %>
+            <%= render "admin/shared/status_chip", label: "Invited", tone: :attention %>
           <% end %>
-        </tbody>
-      </table>
-
+        </div>
+        <div class="text-xs text-mute">ID: <%= user.id %></div>
       </div>
-
-      <!-- Pagination -->
-      <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-        <%= paginate @users %>
-      </div>
+    </div>
+  <% end %>
+  <%= admin_td do %>
+    <div class="max-w-[13rem] truncate" title="<%= user.email %>"><%= user.email %></div>
+  <% end %>
+  <%= admin_td do %>
+    <% if user.subscription_status == "active" %>
+      <%= render "admin/shared/status_chip", label: "Active", tone: :ok %>
+      <div class="mt-1 text-xs text-mute"><%= user.subscription_plan %></div>
+    <% elsif user.subscription_status == "canceled" %>
+      <%= render "admin/shared/status_chip", label: "Canceled", tone: :problem %>
     <% else %>
-      <div class="text-center py-12">
-        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-        </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900">No users found</h3>
-        <p class="mt-1 text-sm text-gray-500">
-          <% if params[:search].present? %>
-            No users match your search criteria.
-          <% else %>
-            No users in the system yet.
-          <% end %>
-        </p>
-      </div>
+      <%= render "admin/shared/status_chip", label: "No subscription", tone: :attention %>
     <% end %>
-  </div>
-</div>
+  <% end %>
+  <%= admin_td(user.credits, align: :right) %>
+  <%= admin_td(user.created_at.strftime("%b %d, %Y"), class: "whitespace-nowrap text-mute") %>
+  <%= admin_td(align: :right) do %>
+    <%= link_to "View", admin_user_path(user), class: "mr-3 #{admin_link_class}" %>
+    <%= link_to "Edit", edit_admin_user_path(user), class: admin_link_class %>
+  <% end %>
+<% end %>

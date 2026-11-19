@@ -1,48 +1,31 @@
-<%# A deck as a label-style card. Used on the homepage and the library index.
+<%# A deck as a card: cover, title, one line of meta, price or ownership.
+    Used on the homepage, the library, the deck page and the account library.
     Locals: deck (Presentation), owned (Boolean, optional) %>
 <% owned = local_assigns.fetch(:owned, false) %>
+<% meta = [ deck.category.presence, deck.difficulty.presence, deck.duration_label ].compact.join(" · ") %>
 <%= link_to presentation_path(deck), class: 'group block h-full' do %>
-  <article class="flex h-full flex-col overflow-hidden rounded-2xl border border-whiskey-200 bg-white shadow-sm transition group-hover:-translate-y-1 group-hover:shadow-md">
-    <% if deck.featured_image.attached? %>
-      <div class="relative">
-        <%= image_tag deck.featured_image, alt: deck.title, class: 'aspect-[16/9] w-full object-cover' %>
-        <% if deck.featured? %>
-          <span class="eyebrow absolute left-3 top-3 rounded-full bg-whiskey-500 px-3 py-1 text-white shadow">Featured</span>
-        <% end %>
-        <% if owned %>
-          <span class="eyebrow absolute right-3 top-3 rounded-full bg-char/85 px-3 py-1 text-whiskey-200">In your library</span>
-        <% end %>
-      </div>
-    <% else %>
-      <%# Typographic cover, like a label. %>
-      <div class="relative flex aspect-[16/9] w-full items-center justify-center bg-char px-6 text-center">
-        <span class="font-display text-2xl font-semibold leading-snug text-cream"><%= deck.title %></span>
-        <% if deck.featured? %>
-          <span class="eyebrow absolute left-3 top-3 rounded-full bg-whiskey-500 px-3 py-1 text-white shadow">Featured</span>
-        <% end %>
-        <% if owned %>
-          <span class="eyebrow absolute right-3 top-3 rounded-full border border-whiskey-500/40 bg-whiskey-500/10 px-3 py-1 text-whiskey-200">In your library</span>
-        <% end %>
-      </div>
-    <% end %>
-    <div class="flex flex-1 flex-col p-6">
-      <div class="flex items-baseline justify-between gap-3">
-        <p class="eyebrow text-whiskey-600"><%= deck.category.presence || 'Whiskey' %><%= " · #{deck.difficulty}" if deck.difficulty.present? %></p>
-        <%# Rating only when there are real reviews: an empty star row would be
-            a rating nobody gave (see the fabricated-content rule). %>
+  <article class="card-hover flex h-full flex-col p-3">
+    <div class="relative">
+      <%= deck_cover deck %>
+      <% if deck.featured? %>
+        <span class="absolute left-2.5 top-2.5 inline-flex min-h-7 items-center rounded-xl bg-white px-2.5 text-xs font-semibold text-ink">Featured</span>
+      <% end %>
+    </div>
+    <div class="flex flex-1 flex-col px-2 pb-2 pt-4">
+      <h3 class="font-display text-xl font-semibold text-ink"><%= deck.title %></h3>
+      <% if meta.present? %>
+        <p class="mt-1 text-sm text-mute"><%= meta %></p>
+      <% end %>
+      <div class="mt-auto flex items-center justify-between gap-3 pt-4">
+        <span class="font-semibold tabular-nums text-ink"><%= owned ? 'In your library' : deck.formatted_price %></span>
+        <%# A rating only when there are real reviews. %>
         <% if deck.reviewed? %>
           <span class="flex shrink-0 items-baseline gap-1 whitespace-nowrap"
                 title="<%= "#{number_with_precision(deck.average_review_rating, precision: 1)} out of 5 from #{pluralize(deck.reviews_count, 'review')}" %>">
-            <%= render "bottles/rating", value: deck.average_review_rating %>
-            <span class="text-xs font-medium text-gray-500"><%= deck.reviews_count %></span>
+            <%= render "shared/score", value: deck.average_review_rating, precision: 1 %>
+            <span class="text-xs font-medium text-mute tabular-nums"><%= deck.reviews_count %></span>
           </span>
         <% end %>
-      </div>
-      <h3 class="mt-2 font-display text-xl font-semibold text-gray-900"><%= deck.title %></h3>
-      <p class="mt-2 line-clamp-3 text-gray-600"><%= deck.excerpt(140) %></p>
-      <div class="mt-auto flex items-center justify-between pt-6">
-        <span class="font-semibold text-gray-900"><%= owned ? 'Read it again' : deck.formatted_price %></span>
-        <span class="text-sm font-semibold text-whiskey-700">Read the story →</span>
       </div>
     </div>
   </article>

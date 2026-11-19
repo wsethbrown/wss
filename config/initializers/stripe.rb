@@ -14,6 +14,13 @@ end
 Stripe.api_key = ENV.fetch("STRIPE_SECRET_KEY", "sk_test_placeholder")
 Stripe.api_version = "2024-06-20"
 
+# The SDK defaults (30s open / 80s read) would let one slow Stripe call hold a
+# page request for over a minute. Fail fast and let the SDK retry connection
+# errors (it only retries when it is safe to, using idempotency keys).
+Stripe.open_timeout = 5
+Stripe.read_timeout = 15
+Stripe.max_network_retries = 2
+
 # In development we allow self-signed certs so local webhook tunnels (ngrok/stripe CLI)
 # work. Never relax this outside development.
 Stripe.verify_ssl_certs = false if Rails.env.development?

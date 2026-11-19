@@ -1,146 +1,17 @@
 <% content_for :title, "Create New Event - Whiskey Share Society" %>
 
-<div class="min-h-screen bg-whiskey-50 px-4 pt-28 pb-16 sm:px-6 lg:px-8">
-  <div class="mx-auto max-w-3xl">
-    <!-- Header -->
-    <div class="mb-10 text-center">
-      <p class="eyebrow mb-3 text-whiskey-600">Create an event</p>
-      <h1 class="font-display text-4xl font-semibold leading-tight text-gray-900 md:text-5xl">Create New Event</h1>
-      <div class="rule-double mx-auto mt-6 w-20 text-whiskey-800"></div>
-      <% if @event.society %>
-        <p class="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-gray-600">
-          Planning an event for <strong class="font-semibold text-gray-900"><%= @event.society.name %></strong>? Let's get the details sorted.
-        </p>
-      <% else %>
-        <p class="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-gray-600">
-          Create an engaging <strong class="font-semibold text-gray-900">whiskey event</strong> for your community.
-        </p>
-      <% end %>
-    </div>
+<div class="mx-auto max-w-3xl">
+    <% lede = if @event.society
+                safe_join([ "Planning an event for ", content_tag(:strong, @event.society.name, class: "font-semibold text-ink"), "? Let's get the details sorted." ])
+              else
+                safe_join([ "Create an engaging ", content_tag(:strong, "whiskey event", class: "font-semibold text-ink"), " for your community." ])
+              end %>
+    <%= render "shared/page_header", title: "Create new event", lede: lede,
+               back: (@event.society ? [ @event.society.name, society_path(@event.society) ] : nil) %>
 
     <!-- Form Card -->
-    <div class="rounded-2xl border border-whiskey-200 bg-white p-6 shadow-sm sm:p-10">
-      <%= form_with(model: [@society, @event].compact, local: true, html: { class: "space-y-8" }) do |form| %>
-        <% if @event.errors.any? %>
-          <div class="rounded-xl border border-red-200 bg-red-50 p-5">
-            <h3 class="mb-2 text-sm font-semibold text-red-800">Please fix the following:</h3>
-            <ul class="list-inside list-disc space-y-1 text-sm text-red-700">
-              <% @event.errors.full_messages.each do |message| %>
-                <li><%= message %></li>
-              <% end %>
-            </ul>
-          </div>
-        <% end %>
-
-        <!-- Society Selection (if not pre-selected) -->
-        <% unless @event.society_id %>
-          <div>
-            <%= form.label :society_id, class: "block text-sm font-medium text-gray-700 mb-2" do %>
-              Society <span class="text-whiskey-600">*</span>
-            <% end %>
-            <%= form.collection_select :society_id,
-                current_user.administered_societies,
-                :id, :name,
-                { prompt: "Select a society..." },
-                { class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500" } %>
-            <p class="mt-1 text-sm text-gray-500">Choose which society this event belongs to.</p>
-          </div>
-        <% else %>
-          <%= form.hidden_field :society_id %>
-        <% end %>
-
-        <!-- Event Title -->
-        <div>
-          <%= form.label :title, class: "block text-sm font-medium text-gray-700 mb-2" do %>
-            Event title <span class="text-whiskey-600">*</span>
-          <% end %>
-          <%= form.text_field :title,
-              class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
-              placeholder: "e.g., Highland Scotch Tasting, Bourbon & BBQ Night" %>
-          <p class="mt-1 text-sm text-gray-500">Give your event a compelling title that captures what makes it special.</p>
-        </div>
-
-        <!-- Event Description -->
-        <div>
-          <%= form.label :description, class: "block text-sm font-medium text-gray-700 mb-2" %>
-          <%= form.text_area :description, rows: 5,
-              class: "w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
-              placeholder: "Describe what attendees can expect, what whiskies will be featured, any special guests, food pairings, etc..." %>
-          <p class="mt-1 text-sm text-gray-500">Help members understand what makes this event worth attending.</p>
-        </div>
-
-        <!-- The deck (optional by owner rule; nights without a WSS deck are first-class) -->
-        <% deck_choices = Presentation.published.where(author_id: [@society&.creator_id, current_user.id].compact.uniq) %>
-        <% if deck_choices.any? %>
-          <div>
-            <%= form.label :presentation_id, "The deck (optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
-            <%= form.collection_select :presentation_id, deck_choices, :id, :title,
-                { include_blank: "No deck for this night" },
-                { class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500" } %>
-            <p class="mt-1 text-sm text-gray-500">Attach the deck this night presents. Plenty of nights run without one.</p>
-          </div>
-        <% end %>
-
-        <!-- Host (member match = real host; anything else = guest presenter) -->
-        <div>
-          <%= form.label :host_query, "Host (optional)", class: "block text-sm font-medium text-gray-700 mb-2" %>
-          <input type="text" name="event[host_query]" id="event_host_query" list="member-names"
-                 value="<%= params.dig(:event, :host_query) %>" placeholder="Who runs the night?"
-                 class="w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500">
-          <% if @society %>
-            <datalist id="member-names">
-              <% @society.society_memberships.where(status: "active").includes(:user).map(&:user).uniq.each do |member| %>
-                <option value="<%= member.full_name %>"></option>
-              <% end %>
-            </datalist>
-          <% end %>
-          <p class="mt-1 text-sm text-gray-500">A member's name makes them the host, with the host powers (RSVP replies, the pour list). Any other name is kept as a guest presenter.</p>
-        </div>
-
-        <!-- Location -->
-        <div>
-          <%= form.label :location, class: "block text-sm font-medium text-gray-700 mb-2" %>
-          <%= form.text_field :location, data: { controller: "location-autocomplete" },
-              class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
-              placeholder: "e.g., The Whiskey Bar, 123 Main St, or Virtual (Zoom)" %>
-          <p class="mt-1 text-sm text-gray-500">Where will your event take place? Include address or virtual meeting details.</p>
-        </div>
-
-        <!-- Date and Time (flatpickr; end auto-fills to start + 3 hours) -->
-        <div class="grid grid-cols-1 gap-6 md:grid-cols-2" data-controller="event-times">
-          <div>
-            <%= form.label :start_time, class: "block text-sm font-medium text-gray-700 mb-2" do %>
-              Start date &amp; time <span class="text-whiskey-600">*</span>
-            <% end %>
-            <%= form.datetime_local_field :start_time, data: { event_times_target: "start" },
-                class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
-            <p class="mt-1 text-sm text-gray-500">When does the event begin?</p>
-          </div>
-
-          <div>
-            <%= form.label :end_time, class: "block text-sm font-medium text-gray-700 mb-2" do %>
-              End date &amp; time <span class="text-whiskey-600">*</span>
-            <% end %>
-            <%= form.datetime_local_field :end_time, data: { event_times_target: "end" },
-                class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
-            <p class="mt-1 text-sm text-gray-500">Fills in three hours after the start; adjust if the night runs long.</p>
-          </div>
-        </div>
-
-        <!-- Action Buttons -->
-        <div class="flex flex-col gap-4 pt-2 sm:flex-row">
-          <%= form.submit "Create event",
-              class: "flex-1 cursor-pointer rounded-xl bg-whiskey-600 px-8 py-4 text-lg font-semibold text-white transition hover:bg-whiskey-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2" %>
-          <%= link_to "Cancel", (@event.society ? society_path(@event.society) : societies_path),
-              class: "flex-1 rounded-xl border border-gray-200 bg-gray-100 px-8 py-4 text-center text-lg font-semibold text-gray-700 transition hover:bg-gray-200" %>
-        </div>
-
-        <!-- Organizer Note -->
-        <div class="rounded-xl border border-whiskey-100 bg-whiskey-50 p-5">
-          <h3 class="mb-1 text-sm font-semibold text-whiskey-900">Event Organizer</h3>
-          <p class="text-sm text-whiskey-800">You'll be set as the organizer of this event and can manage RSVPs and edit details.</p>
-        </div>
-      <% end %>
+    <div class="card p-6 sm:p-10">
+      <%= render "form", event: @event, society: @society, submit_label: "Create event", creating: true,
+                 cancel_path: (@event.society ? society_path(@event.society) : societies_path) %>
     </div>
   </div>
-</div>

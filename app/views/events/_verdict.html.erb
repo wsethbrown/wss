@@ -1,0 +1,29 @@
+<%# The verdict: the night's pours ranked by the room's mean score
+    (event-tagged reviews only, the same mean "The pours" shows). The glass
+    level is the mean out of 5, its numeral the order the pour was served.
+    Renders only once Event#pours_revealed? says so, with no organiser, host
+    or admin bypass: before the reveal nothing of it reaches the page.
+    locals: rows (GlassHelper#verdict_rows) %>
+<section class="card p-6 sm:p-7" aria-labelledby="event-verdict-heading" data-role="verdict">
+  <h2 id="event-verdict-heading" class="text-xl font-semibold text-ink">The verdict</h2>
+  <p class="mt-1 text-sm text-mute">Ranked by the room.</p>
+  <ol class="mt-4 divide-y divide-hairline">
+    <% rows.each_with_index do |row, rank| %>
+      <% bottle = row[:pour].bottle %>
+      <li class="flex items-center gap-4 py-3 first:pt-0 last:pb-0" data-role="verdict-row">
+        <%# Numeral only on the top, 64px glass; the serve order of the rest stays in the sr-only label. %>
+        <span class="flex w-12 flex-none justify-center">
+          <%= render "shared/glass", level: row[:mean] / 5.0, numeral: (row[:number] if rank.zero?), size: rank.zero? ? 64 : 40, label: "Pour #{row[:number]}," %>
+        </span>
+        <div class="min-w-0 flex-1">
+          <%= link_to bottle.display_name, bottle_path(bottle), class: "font-semibold text-ink [overflow-wrap:anywhere] hover:text-whiskey-500" %>
+          <% if row[:pour].label.present? %><p class="mt-0.5 text-sm text-mute [overflow-wrap:anywhere]"><%= row[:pour].label %></p><% end %>
+        </div>
+        <div class="shrink-0 text-right tabular-nums">
+          <span class="block text-lg font-semibold text-ink"><%= number_with_precision(row[:mean], precision: 2, strip_insignificant_zeros: true) %><span class="sr-only"> out of 5</span></span>
+          <span class="block text-sm text-mute"><%= pluralize(row[:count], "reviewer") %></span>
+        </div>
+      </li>
+    <% end %>
+  </ol>
+</section>

@@ -9,20 +9,20 @@
     Folded away until wanted: it sat permanently open before, competing with
     the RSVP itself for a field most people never fill in. <details> keeps that
     working without JavaScript. %>
-<div id="rsvp-note-region" class="text-sm sm:text-right">
+<div id="rsvp-note-region" class="text-sm">
   <% if user_rsvp %>
     <details <%= "open" if user_rsvp.note.present? %>>
-      <summary class="cursor-pointer list-none text-cream/50 transition hover:text-cream/80 [&::-webkit-details-marker]:hidden">
+      <summary class="cursor-pointer list-none font-medium text-mute transition hover:text-ink [&::-webkit-details-marker]:hidden">
         <%= user_rsvp.note.present? ? "Your note to the host" : "Add a note for the host" %>
       </summary>
       <%= form_with url: event_event_rsvp_path(event, user_rsvp), method: :patch, local: true,
-                    class: "mt-2 flex items-center gap-2 sm:justify-end" do |f| %>
+                    class: "mt-2 flex items-center gap-2" do |f| %>
         <label for="rsvp-note" class="sr-only">Note for the host</label>
         <input type="text" name="event_rsvp[note]" id="rsvp-note" maxlength="300"
                value="<%= user_rsvp.note %>" placeholder="Bringing a bottle, running late…"
-               class="w-56 rounded-lg border border-cream/20 bg-cream/5 px-3 py-1.5 text-sm text-cream placeholder-cream/40 focus:outline-none focus:ring-2 focus:ring-whiskey-400">
+               class="min-w-0 flex-1 rounded-2xl border border-hairline bg-white px-4 py-2.5 text-sm text-gray-900 placeholder:text-mute focus:outline-none focus:ring-2 focus:ring-ink/30">
         <%= f.submit user_rsvp.note.present? ? "Update" : "Send",
-            class: "cursor-pointer rounded-lg border border-cream/20 px-3 py-1.5 text-sm font-semibold text-cream/80 transition hover:bg-cream/10 hover:text-cream" %>
+            class: "btn-secondary cursor-pointer px-4 py-2.5" %>
       <% end %>
     </details>
   <% end %>

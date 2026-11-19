@@ -15,6 +15,39 @@ class Event < ApplicationRecord
     host&.full_name.presence || host_name.presence
   end
 
+  # The zone an event's times are meant in (B15). Set from the organiser's
+  # browser zone at create; events with none stored fall back to this.
+  FALLBACK_TIME_ZONE = "America/New_York".freeze
+
+  def effective_time_zone
+    (time_zone.present? && ActiveSupport::TimeZone[time_zone]) || ActiveSupport::TimeZone[FALLBACK_TIME_ZONE]
+  end
+
+  # "Thursday, January 14 at 7:30 PM EST", independent of the ambient Time.zone
+  # (mail renders in the jobs process, where that is UTC).
+  def start_time_label
+    local_start.strftime("%A, %B %-d at %-l:%M %p %Z")
+  end
+
+  # B15b: a viewer's-zone label ("4:30 PM PST") and, only when the viewer's zone
+  # has a different offset at the start time, the event-zone label
+  # ("7:30 PM EST"). Zones are compared by offset, so Chicago/Mexico City do not
+  # produce a redundant note.
+  def start_clock_label(zone = effective_time_zone)
+    start_time.in_time_zone(zone).strftime("%-l:%M %p %Z")
+  end
+
+  def event_zone_label_for(viewer_zone)
+    viewer = viewer_zone.is_a?(ActiveSupport::TimeZone) ? viewer_zone : ActiveSupport::TimeZone[viewer_zone.to_s]
+    return nil if viewer.nil?
+    return nil if viewer.at(start_time).utc_offset == effective_time_zone.at(start_time).utc_offset
+    start_clock_label
+  end
+
+  def start_date_label
+    local_start.strftime("%A, %B %-d")
+  end
+
   # Associations
   has_many :event_rsvps, dependent: :destroy
   has_many :attendees, through: :event_rsvps, source: :user
@@ -29,6 +62,7 @@ class Event < ApplicationRecord
   validates :description, length: { maximum: 2000 }
   validates :location, length: { maximum: 200 }
   validates :start_time, presence: true
+  validate :time_zone_is_known
   validates :end_time, presence: true
   validate :end_time_after_start_time
 
@@ -112,9 +146,27 @@ class Event < ApplicationRecord
     start_time <= 24.hours.from_now
   end
 
+  # OWNER DECISION POINT (B1, Nov 2026): may signed-in NON-members RSVP to
+  # events of PUBLIC societies? Default `true` keeps today's behaviour; flip to
+  # `false` to require society membership for every event. Private societies
+  # always require membership, whatever this says.
+  PUBLIC_EVENTS_OPEN_TO_NON_MEMBERS = true
+
+  # Whether this person may answer this event at all (window aside): the
+  # society's active members, its creator and the organizer; for a public
+  # society, anyone signed in while the switch above is on. Shared by the
+  # on-site RSVP (via can_rsvp? / EventRsvpPolicy) and the emailed RSVP link.
+  def rsvp_eligible?(user)
+    return false unless user && society
+    return true if organizer_id == user.id || society.creator_id == user.id || society.has_member?(user)
+
+    society.public? && PUBLIC_EVENTS_OPEN_TO_NON_MEMBERS
+  end
+
   def can_rsvp?(user)
     return false unless user
     return false if past? || rsvp_closed?
+    return false unless rsvp_eligible?(user)
     !event_rsvps.exists?(user: user)
   end
 
@@ -151,6 +203,15 @@ class Event < ApplicationRecord
   end
 
   private
+
+  def local_start
+    start_time.in_time_zone(effective_time_zone)
+  end
+
+  def time_zone_is_known
+    return if time_zone.blank? || ActiveSupport::TimeZone[time_zone]
+    errors.add(:time_zone, "is not a known time zone")
+  end
 
   def end_time_after_start_time
     return unless start_time && end_time

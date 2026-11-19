@@ -1,6 +1,12 @@
 class Admin::UsersController < Admin::BaseController
   before_action :set_user, only: [ :show, :edit, :update, :update_role, :resend_invitation ]
 
+  # The edit page draws the user's live Stripe subscription. The lookup lives here (not in the
+  # template), runs at most once per request, and uses short timeouts so a slow Stripe never
+  # holds an admin page for the SDK default of a minute and a half (I22).
+  helper_method :stripe_subscription_lookup
+  STRIPE_LOOKUP_TIMEOUTS = { open_timeout: 3, read_timeout: 5, max_network_retries: 0 }.freeze
+
   def index
     @users = User.all
 
@@ -63,10 +69,46 @@ class Admin::UsersController < Admin::BaseController
   def edit
   end
 
+  # Email is the account credential (magic links sign in whoever holds the
+  # mailbox), so an admin email change is guarded (S1): full admins only, and
+  # never on another admin's record. An allowed change revokes every sign-in
+  # credential tied to the old address.
   def update
-    if @user.update(user_params)
+    attrs = user_params
+    email_changing = attrs.key?(:email) &&
+                     attrs[:email].to_s.strip.downcase != @user.email.to_s.downcase
+
+    if email_changing && (refusal = email_change_refusal(@user))
+      Rails.logger.warn "Admin #{current_user.id} refused email change on user #{@user.id}: #{refusal}"
+      redirect_to edit_admin_user_path(@user), alert: refusal and return
+    end
+    attrs = attrs.except(:email) unless email_changing
+
+    @user.assign_attributes(attrs)
+    changed_fields = @user.changed
+
+    if email_changing
+      # Revoke the old address's sign-in paths: magic link, invitation,
+      # password reset, and every remember-me cookie (expire_all_remember_me_on_sign_out
+      # is on, so clearing remember_created_at invalidates outstanding cookies).
+      @user.assign_attributes(
+        magic_link_token: nil, magic_link_sent_at: nil,
+        invitation_token_digest: nil,
+        reset_password_token: nil, reset_password_sent_at: nil,
+        remember_created_at: nil
+      )
+    end
+
+    if @user.save
+      if changed_fields.any?
+        Rails.logger.info "Admin #{current_user.id} updated user #{@user.id}: #{changed_fields.join(', ')}" \
+                          "#{' (sign-in tokens and remembered sessions revoked)' if email_changing}"
+      else
+        Rails.logger.info "Admin #{current_user.id} saved user #{@user.id} with no changes"
+      end
       redirect_to admin_user_path(@user), notice: "User updated successfully."
     else
+      Rails.logger.warn "Admin #{current_user.id} update of user #{@user.id} failed validation: #{@user.errors.attribute_names.join(', ')}"
       render :edit, status: :unprocessable_entity
     end
   end
@@ -77,18 +119,23 @@ class Admin::UsersController < Admin::BaseController
   # yourself out). The role value is whitelisted against the enum.
   def update_role
     unless current_user.admin_role_full?
+      Rails.logger.warn "Admin #{current_user.id} refused role change on user #{@user.id}: not a full admin"
       redirect_to admin_user_path(@user), alert: "Only full administrators can change roles." and return
     end
     if @user == current_user
+      Rails.logger.warn "Admin #{current_user.id} refused role change on own account"
       redirect_to admin_user_path(@user), alert: "You can't change your own role." and return
     end
 
     role = params[:admin_role].to_s
     unless User.admin_roles.key?(role)
+      Rails.logger.warn "Admin #{current_user.id} refused role change on user #{@user.id}: unknown role"
       redirect_to admin_user_path(@user), alert: "Unknown role." and return
     end
 
+    previous = @user.admin_role
     @user.update!(admin_role: role)
+    Rails.logger.info "Admin #{current_user.id} changed role of user #{@user.id} from #{previous} to #{role}"
     redirect_to admin_user_path(@user), notice: "Role updated: #{@user.email} is now #{role_label(role)}."
   end
 
@@ -103,8 +150,33 @@ class Admin::UsersController < Admin::BaseController
 
   private
 
+  # nil when current_user may change this user's email, else the refusal message.
+  def email_change_refusal(user)
+    return "Only full administrators can change email addresses." unless current_user.admin_role_full?
+    return "You can't change another administrator's email." if user != current_user && user.admin?
+    nil
+  end
+
+  def email_editable?(user)
+    email_change_refusal(user).nil?
+  end
+  helper_method :email_editable?
+
   def role_label(role)
     { "none" => "a regular user", "limited" => "an administrator (no delete)", "full" => "a full administrator" }.fetch(role)
+  end
+
+  # { subscription: <Stripe::Subscription or nil>, error: <true when Stripe could not be asked> }
+  def stripe_subscription_lookup
+    @stripe_subscription_lookup ||= begin
+      client = Stripe::StripeClient.new(STRIPE_LOOKUP_TIMEOUTS)
+      # One call: Stripe lists every non-cancelled subscription, newest first.
+      subs = Stripe::Subscription.list({ customer: @user.stripe_customer_id, limit: 10 }, { client: client }).data
+      { subscription: subs.find { |sub| sub.status == "active" } || subs.find { |sub| sub.status == "trialing" }, error: false }
+    rescue Stripe::StripeError => e
+      Rails.logger.error "Admin #{current_user.id} user #{@user.id} edit: Stripe subscription lookup failed: #{e.class}: #{e.message}"
+      { subscription: nil, error: true }
+    end
   end
 
   def set_user

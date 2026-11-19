@@ -1,4 +1,7 @@
-# ActiveRecord encryption keys (used for User OTP secrets / backup codes).
+# ActiveRecord encryption keys. Nothing in the app encrypts with them today: the
+# two-factor columns they protected are ignored since 2FA was removed (B11), but
+# those rows still hold encrypted data until a migration drops the columns, so
+# keep the keys configured and backed up until then.
 # Keys live in env (.env locally, deploy secrets in production) — see
 # .env.example. support_unencrypted_data lets rows written before encryption
 # was enabled keep working; new writes are always encrypted.

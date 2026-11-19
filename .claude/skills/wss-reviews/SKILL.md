@@ -29,7 +29,7 @@ read before extending). Plans in `docs/superpowers/plans/2026-07-06-*` and `-07-
   one solo per bottle.
 - Aggregation: `Bottle#average_rating` = mean of each user's LATEST review across
   contexts. `Bottle.with_score` computes the same in SQL (`avg_rating`/`reviewers`).
-- `bottles/_rating`: stars snap to nearest 0.5; `aria-label` carries the true value.
+- Scores are DISPLAYED with `shared/_score` (one glass from `shared/_glass` at level score/5, beside the number in tabular-nums, sr-only "out of 5"); the old star display partial is gone. Stars survive only as the INPUT control (`star_rating_controller`, `reviews/_form`, `shared/_star_input`). Never draw a second glass or show a glass without its number.
 - Solo CRUD: create nested under bottle (`Bottles::ReviewsController`); edit/delete
   top-level (`ReviewsController`, scoped `current_user.reviews` → 404 for non-authors).
 
@@ -81,7 +81,7 @@ read before extending). Plans in `docs/superpowers/plans/2026-07-06-*` and `-07-
   bottle from its event reviews — same latest-per-member math (`DISTINCT ON (user_id,
   society_id)`) as the board. Rows expose `verdict_avg` / `verdict_reviewers`. These
   cards LEAD the Tastings list on `bottles#show` (`_society_verdict_card.html.erb`).
-- Card body: aggregate stars + `Review.common_descriptors(reviews)` (review.rb:95 — most
+- Card body: aggregate score (glass + number) + `Review.common_descriptors(reviews)` (review.rb:95 — most
   common lexicon words per tasting section, each review counts a word once so one wordy
   taster can't dominate) and `Review.blended_wheel(reviews)` (review.rb:144 — mean of
   each member's wheel profile per family, renormalized).

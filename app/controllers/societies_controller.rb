@@ -8,6 +8,9 @@ class SocietiesController < ApplicationController
   # message describing the attempted action, rather than the app-wide default.
   rescue_from Pundit::NotAuthorizedError, with: :society_not_authorized
 
+  # How many bottles the society page's review board lists before it stops.
+  BOARD_LIMIT = 15
+
   def index
     if user_signed_in?
       # Get user's societies (separate from searchable societies)
@@ -45,7 +48,12 @@ class SocietiesController < ApplicationController
     authorize @society
     @upcoming_events = @society.upcoming_events.limit(5)
     @past_events = @society.past_events.limit(5)
-    @recent_members = @society.members.limit(10)
+    # Member rows: avatars and role lookups are loaded for the whole list at once so the
+    # page's query count does not grow with the member list (I15).
+    @recent_members = @society.members.with_attached_profile_image.limit(10).to_a
+    @member_roles = @society.society_memberships.where(user_id: @recent_members.map(&:id)).index_by(&:user_id)
+    # The viewer's own membership, looked up once for the whole page.
+    @my_membership = user_signed_in? ? @society.society_memberships.find_by(user_id: current_user.id) : nil
 
     # The review board: bottles ranked by THIS society's event reviews only
     # (spec's aggregation table, solo reviews never count here). Inherits
@@ -54,9 +62,19 @@ class SocietiesController < ApplicationController
     # bottle, their LATEST review at this society's events. A re-taster's
     # newer score replaces their older one instead of double-weighting them,
     # and "N reviewers" is exactly the mean's denominator.
-    @review_board = @society.review_board
-    @board_reviews = Review.joins(:event).where(events: { society_id: @society.id })
+    #
+    # Capped at BOARD_LIMIT bottles (I15): the page used to load every bottle and every
+    # review in the society's history. The member reviews are fetched only for the
+    # bottles shown.
+    @review_board = @society.review_board.limit(BOARD_LIMIT).to_a
+    @board_total = if @review_board.size >= BOARD_LIMIT
+                     Bottle.from(@society.review_board.reorder(nil), :bottles).count
+    else
+                     @review_board.size
+    end
+    @board_reviews = Review.joins(:event).where(events: { society_id: @society.id }, bottle_id: @review_board.map(&:id))
                            .includes(:user).recent_first.group_by(&:bottle_id)
+    Rails.logger.info "Society #{@society.id} review board capped: showing #{@review_board.size} of #{@board_total} bottles" if @board_total > @review_board.size
   end
 
   def new
@@ -150,6 +168,27 @@ class SocietiesController < ApplicationController
       redirect_to society, notice: "You are already a member" and return
     end
 
+    # B8 (S12): mail scanners and link previewers follow GET links, so a
+    # signed-in GET only shows a one-button confirm page; its POST joins.
+    Rails.logger.info "Invite link confirm page shown: user #{current_user.id}, society #{society.id}"
+    @society = society
+    @invite_token = params[:token]
+    render :invite_confirm
+  end
+
+  # POST /invite/:token, from the confirm page's button (signed in).
+  def accept_invite
+    society = Society.find_by(invite_token: params[:token])
+    unless society
+      # Never log the presented token.
+      Rails.logger.warn "Invite join rejected for user #{current_user.id}: no society matches the presented token"
+      redirect_to societies_path, alert: "That invite link is no longer valid" and return
+    end
+
+    if society.has_member?(current_user)
+      redirect_to society, notice: "You are already a member" and return
+    end
+
     society.society_memberships.create!(user: current_user, role: :member, status: :active)
     Rails.logger.info "Invite link join: user #{current_user.id} joined society #{society.id}"
     log_activity(:society_joined, society)
@@ -207,7 +246,8 @@ class SocietiesController < ApplicationController
 
   private
 
-  def society_not_authorized
+  def society_not_authorized(exception = nil)
+    log_authorization_denied(exception)
     message =
       case action_name
       when "show"                     then "You are not authorized to view this society."

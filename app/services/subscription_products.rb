@@ -10,8 +10,18 @@ module SubscriptionProducts
     return fallback if Rails.env.test?
     return fallback unless Stripe.api_key.present?
 
+    load_all
+  end
+
+  # Fetches the plans from Stripe. Only a COMPLETE set (every configured price
+  # id came back) is cached for an hour; a partial result from a Stripe blip is
+  # returned for this request but never cached, so it can't hide a plan.
+  def load_all
+    partial = nil
+    expected = %w[STRIPE_MONTHLY_PRICE_ID STRIPE_QUARTERLY_PRICE_ID STRIPE_YEARLY_PRICE_ID].count { |k| ENV[k].present? }
+
     begin
-      Rails.cache.fetch("stripe_products", expires_in: 1.hour) do
+      cached = Rails.cache.fetch("stripe_products", expires_in: 1.hour, race_condition_ttl: 10.seconds, skip_nil: true) do
         products = []
 
         if ENV["STRIPE_MONTHLY_PRICE_ID"].present?
@@ -100,8 +110,15 @@ module SubscriptionProducts
           end
         end
 
-        sorted.empty? ? fallback : sorted
+        if sorted.size == expected && sorted.any?
+          sorted
+        else
+          Rails.logger.warn "SubscriptionProducts: got #{sorted.size} of #{expected} configured plans from Stripe; not caching"
+          partial = sorted
+          nil
+        end
       end
+      cached || partial.presence || fallback
     rescue => e
       Rails.logger.error "Error fetching Stripe products: #{e.message}"
       fallback
@@ -123,8 +140,10 @@ module SubscriptionProducts
     return founding_fallback if Rails.env.test?
     return founding_fallback unless Stripe.api_key.present?
 
-    Rails.cache.fetch("stripe_founding_products", expires_in: 1.hour) do
-      founding_fallback.map do |offer|
+    degraded = nil
+    cached = Rails.cache.fetch("stripe_founding_products", expires_in: 1.hour, race_condition_ttl: 10.seconds, skip_nil: true) do
+      failed = false
+      offers = founding_fallback.map do |offer|
         env_id = offer[:id] == "founding_society" ? "STRIPE_FOUNDING_SOCIETY_PRICE_ID" : "STRIPE_FOUNDING_MONTHLY_PRICE_ID"
         next offer if ENV[env_id].blank?
 
@@ -132,11 +151,20 @@ module SubscriptionProducts
           price = Stripe::Price.retrieve({ id: ENV[env_id] })
           offer.merge(price: price.unit_amount, price_id: price.id)
         rescue => e
+          failed = true
           Rails.logger.error "Error fetching founding price #{env_id}: #{e.message}"
           offer
         end
       end
+      # Fallback display values for a failed fetch must not be cached as live.
+      if failed
+        degraded = offers
+        nil
+      else
+        offers
+      end
     end
+    cached || degraded || founding_fallback
   rescue => e
     Rails.logger.error "Error fetching founding products: #{e.message}"
     founding_fallback

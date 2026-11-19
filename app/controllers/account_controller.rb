@@ -1,7 +1,14 @@
 class AccountController < ApplicationController
   include ActivityLogger
 
+  include RateLimitedResponses
+
+  EMAIL_CHANGE_LIMIT = 5  # email-change requests per user per hour
+  EMAIL_CHANGE_WINDOW = 1.hour
+
   before_action :authenticate_user!
+  rate_limit to: EMAIL_CHANGE_LIMIT, within: EMAIL_CHANGE_WINDOW, only: :request_email_change, store: RateLimitStore,
+             by: -> { "user-#{current_user.id}" }, with: -> { rate_limit_response("user") }
 
   def index
     # Clear any expired email change requests
@@ -82,87 +89,31 @@ class AccountController < ApplicationController
     end
   end
 
+  # Email change (B8, S6): Auth::EmailChangeService sends the confirm link to
+  # the NEW address and a notice to the current one; only a digest is stored.
   def request_email_change
-    new_email = params[:new_email]
-
-    # Validate new email
-    if new_email.blank?
-      respond_to do |format|
-        format.html { redirect_to account_path, alert: "Please enter a new email address." }
-        format.turbo_stream { redirect_to account_path, alert: "Please enter a new email address." }
-      end
-      return
-    end
-
-    if new_email == current_user.email
-      respond_to do |format|
-        format.html { redirect_to account_path, alert: "The new email address must be different from your current email." }
-        format.turbo_stream { redirect_to account_path, alert: "The new email address must be different from your current email." }
-      end
-      return
-    end
-
-    # Check if email is already taken
-    if User.where(email: new_email).exists?
-      respond_to do |format|
-        format.html { redirect_to account_path, alert: "This email address is already in use." }
-        format.turbo_stream { redirect_to account_path, alert: "This email address is already in use." }
-      end
-      return
-    end
-
-    # Generate verification token
-    token = SecureRandom.urlsafe_base64(32)
-
-    # Store the email change request
-    current_user.update!(
-      unconfirmed_email: new_email,
-      email_change_token: token,
-      email_change_token_expires_at: 1.hour.from_now
-    )
-
-    # Send verification email
-    UserMailer.email_change_verification(current_user, new_email, token).deliver_now
-
-    message = "A verification link has been sent to your current email address (#{current_user.email}). Please check your inbox and click the link to confirm the email change."
+    result = Auth::EmailChangeService.request(current_user, params[:new_email])
+    flash_key = result.success? ? :notice : :alert
 
     respond_to do |format|
-      format.html { redirect_to account_path, notice: message }
-      format.turbo_stream { redirect_to account_path, notice: message }
+      format.html { redirect_to account_path, flash_key => result.message }
+      format.turbo_stream { redirect_to account_path, flash_key => result.message }
     end
   end
 
   def verify_email_change
-    token = params[:token]
+    result = Auth::EmailChangeService.confirm(params[:token])
 
-    user = User.find_by(email_change_token: token)
-
-    if user.nil?
-      flash[:alert] = "Invalid verification link."
+    unless result.success?
+      flash[:alert] = result.message
       redirect_to account_path
       return
     end
-
-    if user.email_change_token_expires_at < Time.current
-      flash[:alert] = "Verification link has expired. Please request a new email change."
-      user.update!(unconfirmed_email: nil, email_change_token: nil, email_change_token_expires_at: nil)
-      redirect_to account_path
-      return
-    end
-
-    # Update the email
-    old_email = user.email
-    user.update!(
-      email: user.unconfirmed_email,
-      unconfirmed_email: nil,
-      email_change_token: nil,
-      email_change_token_expires_at: nil
-    )
 
     # Sign out all sessions for security
-    sign_out(user)
+    sign_out(result.user)
 
-    flash[:notice] = "Your email has been successfully changed from #{old_email} to #{user.email}. Please sign in again with your new email address."
+    flash[:notice] = result.message
     redirect_to auth_path
   end
 
@@ -225,82 +176,6 @@ class AccountController < ApplicationController
     end
   end
 
-  def setup_2fa
-    current_user.generate_otp_secret
-    current_user.save!
-
-    render json: {
-      qr_code: current_user.otp_qr_code,
-      secret_key: current_user.otp_secret_key
-    }
-  end
-
-  def enable_2fa
-    code = params[:code]
-
-    unless current_user.otp_secret_key.present?
-      render json: { error: "Please set up 2FA first" }, status: :unprocessable_entity
-      return
-    end
-
-    totp = ROTP::TOTP.new(current_user.otp_secret_key)
-    if totp.verify(code, drift_ahead: 30, drift_behind: 30)
-      current_user.otp_enabled = true
-      backup_codes = current_user.generate_backup_codes
-      current_user.save!
-
-      render json: {
-        success: true,
-        backup_codes: backup_codes,
-        message: "2FA enabled successfully!"
-      }
-    else
-      render json: { error: "Invalid verification code" }, status: :unprocessable_entity
-    end
-  end
-
-  def disable_2fa
-    password = params[:password]
-
-    unless current_user.valid_password?(password)
-      render json: { error: "Invalid password" }, status: :unprocessable_entity
-      return
-    end
-
-    current_user.update!(
-      otp_enabled: false,
-      otp_secret_key: nil,
-      backup_codes: nil
-    )
-
-    render json: {
-      success: true,
-      message: "2FA disabled successfully!"
-    }
-  end
-
-  def regenerate_backup_codes
-    unless current_user.two_factor_enabled?
-      render json: { error: "2FA is not enabled" }, status: :unprocessable_entity
-      return
-    end
-
-    password = params[:password]
-    unless current_user.valid_password?(password)
-      render json: { error: "Invalid password" }, status: :unprocessable_entity
-      return
-    end
-
-    backup_codes = current_user.generate_backup_codes
-    current_user.save!
-
-    render json: {
-      success: true,
-      backup_codes: backup_codes,
-      message: "Backup codes regenerated successfully!"
-    }
-  end
-
   private
 
   # Verifies with Stripe (the ?subscription=success param alone is
@@ -314,11 +189,32 @@ class AccountController < ApplicationController
     subscription = Stripe::Subscription.list(customer: current_user.stripe_customer_id, status: "active", limit: 1).data.first
     return unless subscription && Time.at(subscription.created) > 1.hour.ago
 
+    record_plan_from_checkout_subscription(subscription)
+
     if CreditTransaction.grant_welcome_credit(current_user)
       log_activity(:credits_added, current_user, { amount: 1, reason: "new_subscription" })
     end
   rescue Stripe::StripeError => e
     Rails.logger.error "Welcome-credit sync check failed for user #{current_user.id}: #{e.message}"
+  end
+
+  # The redirect can beat both webhooks, so the local subscription_plan may
+  # still be unset. Read the plan from the subscription's price id (same
+  # mapping as the webhook) so a society-only plan is never given a deck credit.
+  def record_plan_from_checkout_subscription(subscription)
+    items = subscription.respond_to?(:items) ? subscription.items : nil
+    price_id = items&.data&.first&.price&.id
+    plan = User.plan_for_price_id(price_id)
+
+    if plan == "unknown"
+      Rails.logger.info "Checkout return for user #{current_user.id}: plan not determinable from subscription price; leaving plan #{current_user.subscription_plan.inspect}"
+      return
+    end
+
+    if current_user.subscription_plan != plan
+      current_user.update!(subscription_plan: plan)
+    end
+    Rails.logger.info "Checkout return for user #{current_user.id}: plan #{plan.inspect} from price id#{plan == 'founding_society' ? ' (society-only, no deck credit)' : ''}"
   end
 
   def profile_params

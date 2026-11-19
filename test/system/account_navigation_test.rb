@@ -11,108 +11,109 @@ class AccountNavigationTest < ApplicationSystemTestCase
     )
   end
 
+  # Password sign-in through the unified /auth page: the email goes in the
+  # magic-link field, "Use a password instead" reveals the password form for an
+  # existing account, which copies the email into #signin-email.
   def sign_in_user
     visit auth_path
 
-    # Click sign in tab first
-    find('[data-tab="signin"]', wait: 5).click if page.has_css?('[data-tab="signin"]')
+    fill_in "magic-link-email", with: @user.email
+    find("#password-toggle").click
 
-    # Fill in credentials
-    fill_in "Email", with: @user.email
-    fill_in "Password", with: "password123"
-    click_button "Sign In"
+    assert_selector "#password-signin", visible: true
+    assert_selector "#signin-password", visible: true
+    assert_equal @user.email, find("#signin-email", visible: :all).value
+    fill_in "signin-password", with: "password123"
+    within("#password-signin") { click_button "Sign in" }
 
-    # Wait for redirect to account page - remove assertion for now
-    # assert_current_path account_path
+    # Signed in once the nav offers "Sign out" (the sign-in redirect target may vary).
+    assert_link "Sign out"
 
-    # Navigate to account page directly
     visit account_path
+    assert_current_path account_path
+  end
+
+  def assert_tab_selected(name)
+    assert_selector "[data-tab='#{name}'][role='tab'][aria-selected='true']"
+    assert_selector "#tab-#{name}", count: 1
+    assert_selector "##{name}-content[role='tabpanel']", visible: true
+  end
+
+  def assert_only_panel_visible(name)
+    assert_selector "##{name}-content", visible: true
+    %w[profile account-details presentations societies followed subscription billing].each do |other|
+      next if other == name
+      assert_selector "##{other}-content", visible: :hidden
+    end
   end
 
   test "account page loads with profile tab active by default" do
     sign_in_user
 
     assert_text "Account"
-    assert_text "Profile"
-    assert_text "Account Details"
+    assert_selector "[data-tab='profile']", text: "Profile"
+    assert_selector "[data-tab='account-details']", text: "Account details"
 
-    # Profile tab should be active by default
-    profile_tab = find('[data-tab="profile"]')
-    assert profile_tab.has_css?(".text-indigo-600")
-    assert profile_tab.has_css?(".bg-indigo-50")
-
-    # Profile content should be visible
-    assert find("#profile-content", visible: true)
-
-    # Other content should be hidden
-    assert find("#account-details-content", visible: false)
+    # Profile tab is selected and its panel is the only one showing
+    assert_tab_selected("profile")
+    assert_only_panel_visible("profile")
+    assert_selector "[data-tab='account-details'][aria-selected='false']"
   end
 
   test "clicking account details tab shows account details content" do
     sign_in_user
 
-    # Click on Account Details tab
-    click_link "Account Details"
+    find("[data-tab='account-details']").click
 
-    # Account Details tab should now be active
-    account_tab = find('[data-tab="account-details"]')
-    assert account_tab.has_css?(".text-indigo-600")
-    assert account_tab.has_css?(".bg-indigo-50")
-
-    # Account Details content should be visible
-    assert find("#account-details-content", visible: true)
-    assert_text "Email Address"
-    assert_text "Password & Security"
-
-    # Profile content should be hidden
-    assert find("#profile-content", visible: false)
+    assert_tab_selected("account-details")
+    assert_selector "[data-tab='profile'][aria-selected='false']"
+    assert_only_panel_visible("account-details")
+    assert_text "Email address"
+    assert_text "Password & security"
   end
 
   test "clicking between tabs works correctly" do
     sign_in_user
 
-    # Start on Profile (default)
-    assert find("#profile-content", visible: true)
+    assert_only_panel_visible("profile")
 
-    # Click Account Details
-    click_link "Account Details"
-    assert find("#account-details-content", visible: true)
-    assert find("#profile-content", visible: false)
+    find("[data-tab='account-details']").click
+    assert_tab_selected("account-details")
+    assert_only_panel_visible("account-details")
 
-    # Click My Presentations
-    click_link "My Presentations"
-    assert find("#presentations-content", visible: true)
-    assert find("#account-details-content", visible: false)
+    find("[data-tab='presentations']").click
+    assert_tab_selected("presentations")
+    assert_only_panel_visible("presentations")
 
-    # Click back to Profile
-    click_link "Profile"
-    assert find("#profile-content", visible: true)
-    assert find("#presentations-content", visible: false)
+    find("[data-tab='profile']").click
+    assert_tab_selected("profile")
+    assert_only_panel_visible("profile")
   end
 
   test "all navigation tabs are present and clickable" do
     sign_in_user
 
-    # Check all tabs exist
-    assert_link "Profile"
-    assert_link "Account Details"
-    assert_link "My Presentations"
-    assert_link "Subscription"
-    assert_link "Billing"
-    assert_link "My Societies"
-
-    # Test that each tab is clickable and changes content
     tabs = [
-      { name: "Account Details", content_id: "account-details-content" },
-      { name: "My Presentations", content_id: "presentations-content" },
-      { name: "Subscription", content_id: "subscription-content" },
-      { name: "Billing", content_id: "billing-content" },
-      { name: "My Societies", content_id: "societies-content" }
+      { name: "Profile", tab: "profile" },
+      { name: "Account details", tab: "account-details" },
+      { name: "My presentations", tab: "presentations" },
+      { name: "My societies", tab: "societies" },
+      { name: "Followed", tab: "followed" },
+      { name: "Subscription", tab: "subscription" },
+      { name: "Billing", tab: "billing" }
     ]
 
-    tabs.each do |tab|
-      click_link tab[:name]
-      assert find("##{tab[:content_id]}", visible: true)
+    # Check all tabs exist, inside the tab list
+    assert_selector "nav[aria-label='Account sections'] [data-tab]", count: tabs.size
+    tabs.each do |t|
+      assert_selector "[data-tab='#{t[:tab]}']", text: t[:name]
+    end
+
+    # Each tab selects itself and shows only its own panel
+    tabs.each do |t|
+      find("[data-tab='#{t[:tab]}']").click
+      assert_tab_selected(t[:tab])
+      assert_only_panel_visible(t[:tab])
     end
   end
 end

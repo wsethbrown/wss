@@ -1,0 +1,14 @@
+<%# Empty state: one sentence saying what will appear here, and at most one action.
+    No icons, no emoji. admin/shared/table renders this itself when it has no rows.
+    Locals:
+      message (String, required) e.g. "No users match these filters."
+      action  (Array [label, path], optional) e.g. ["Clear filters", admin_users_path]
+      framed  (Boolean, optional, default true) false when already inside a card
+    Example: render "admin/shared/empty_state", message: "No open reports." %>
+<% action = local_assigns[:action] %>
+<div class="<%= local_assigns.fetch(:framed, true) ? 'card' : '' %> px-6 py-10 text-center">
+  <p class="text-base text-mute"><%= message %></p>
+  <% if action.present? %>
+    <%= link_to "#{action[0]} →", action[1], class: "mt-3 inline-flex min-h-11 items-center text-sm #{admin_link_class}" %>
+  <% end %>
+</div>

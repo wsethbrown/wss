@@ -1,0 +1,16 @@
+<% content_for :title, "#{@event.title} - Whiskey Share Society" %>
+<%# The emailed RSVP link lands here (B8): one card, one button. The GET
+    changes nothing, so a mail scanner following the link records no answer. %>
+<div class="mx-auto w-full max-w-md py-8">
+  <div class="card p-7 text-center sm:p-8">
+    <h1 class="font-display text-3xl font-semibold text-ink"><%= @event.title %></h1>
+    <p class="mt-2 text-mute">
+      <%= @event.society.name %> ·
+      <span class="tabular-nums"><%= @event.start_time.strftime("%A, %B %-d at %-l:%M %p") %></span>
+    </p>
+    <%= form_with url: email_rsvp_path(@status), method: :post, class: "mt-7", data: { turbo: false } do %>
+      <%= hidden_field_tag :token, @token, id: nil %>
+      <%= button_tag @button_label, type: "submit", class: "btn btn-primary min-h-12 w-full cursor-pointer" %>
+    <% end %>
+  </div>
+</div>

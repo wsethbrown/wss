@@ -12,7 +12,7 @@ class ProfileShelfTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "#whiskey-shelf a[href=?]", bottle_path(bottles(:eagle_rare)), text: "Eagle Rare 10"
     shelf = css_select("#whiskey-shelf").first.text
-    assert_includes shelf, "4.0"
+    assert css_select("#whiskey-shelf [data-score='4'] svg[data-glass]").any?
     assert_includes shelf, "1 tasting"
   end
 
