@@ -14,8 +14,8 @@
                same information sits beside the glass as visible text.
       css:     optional extra classes on the svg.
 
-    The svg itself is always aria-hidden. Flat on purpose: no shading, no
-    animation (owner ruling against skeuomorphism). %>
+    The svg itself is always aria-hidden. Flat on purpose: no shading. The one
+    motion is the level rising once on appearance (CSS, off under reduced motion). %>
 <%
   level   = local_assigns.fetch(:level, 0).to_f.clamp(0.0, 1.0)
   size    = [ local_assigns.fetch(:size, 32).to_i, 28 ].max
