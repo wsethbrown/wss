@@ -215,7 +215,7 @@ the dashboard shows the same figures as before; a limited admin still sees no de
 controls; admin pages work at 390px.
 **Tests:** `test/controllers/admin/*`.
 
-### [ ] D9a · Admin content sections — `sonnet` (after D8)
+### [~] D9a · Admin content sections — `sonnet` (after D8)
 **Owns:** `app/views/admin/presentations/*`, `admin/bottles/*`, `admin/moderation/*`,
 `admin/invitations/*`.
 **Do:** Apply D8's partials. The deck form is the largest (structured editors, EasyMDE,
@@ -227,7 +227,7 @@ unchanged.
 **Tests:** `test/controllers/admin/presentations_controller_test.rb`,
 `test/controllers/admin/bottles_controller_test.rb`, `test/controllers/admin/moderation*`.
 
-### [ ] D9b · Admin people and money sections — `sonnet` (after D8)
+### [~] D9b · Admin people and money sections — `sonnet` (after D8)
 **Owns:** `app/views/admin/users/*`, `admin/subscriptions/*`, `admin/credits/*`,
 `admin/activities/*`, `admin/analytics/*`.
 **Do:** Apply D8's partials. Tables for users, subscriptions, ledger; analytics as
@@ -443,7 +443,7 @@ its duplicate merge is covered by a test.
 
 ## Wave B3 — hardening (parallel; disjoint files)
 
-### [ ] B8 · Email change and token hygiene — `opus`
+### [~] B8 · Email change and token hygiene — `opus`
 **Findings:** S6, S4, S12 (RSVP and invite links).
 **Owns:** `app/controllers/account_controller.rb` (email-change actions),
 `app/mailers/user_mailer.rb` and its email-change views, `users/registrations_controller.rb`
@@ -465,7 +465,7 @@ lograge scrubber shows no token in the logged path. New page copy is listed for 
 **Tests:** `test/controllers/account_controller_test.rb`, `email_rsvps_controller_test.rb`,
 `societies_controller_test.rb`, `test/mailers/user_mailer_test.rb`.
 
-### [ ] B9 · Private downloads — `sonnet`
+### [~] B9 · Private downloads — `sonnet`
 **Findings:** S5.
 **Owns:** `app/controllers/presentations/downloads_controller.rb`,
 `config/initializers/active_storage.rb`, matching tests. Read `wss-deck-pipeline` first.
@@ -478,7 +478,7 @@ signed-out visitor are refused; the blank scorecard path is unchanged. Note in t
 hand-back whether the existing permanent links can be invalidated without re-uploading.
 **Tests:** `test/controllers/presentations/downloads_controller_test.rb`.
 
-### [ ] B10 · Dead paths and documentation drift — `sonnet`
+### [~] B10 · Dead paths and documentation drift — `sonnet`
 **Findings:** S14, S20, S13 (logging the rebind only).
 **Owns:** `app/controllers/presentations_controller.rb` (remove authoring actions),
 `app/views/presentations/new.html.erb`, `edit.html.erb`, `app/policies/presentation_policy.rb`,
@@ -531,7 +531,7 @@ missing price id raises a clear error (tested through the initializer's guard me
 
 ## Wave B3 additions (parallel with B8–B10)
 
-### [ ] B14 · Deck pipeline safety — `opus`
+### [~] B14 · Deck pipeline safety — `opus`
 **Findings:** I4, I5, I8.
 **Owns:** `app/services/deck_import.rb`, `app/jobs/deck_slide_render_job.rb`,
 `app/jobs/deck_import_job.rb` (new), `config/queue.yml`,
