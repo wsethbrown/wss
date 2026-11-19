@@ -220,7 +220,8 @@ the dashboard shows the same figures as before; a limited admin still sees no de
 controls; admin pages work at 390px.
 **Tests:** `test/controllers/admin/*`.
 
-### [~] D9a · Admin content sections — `sonnet` (after D8)
+### [x] D9a · Admin content sections — `sonnet` (after D8)
+Result: admin decks, bottles, moderation, invitations on D8's patterns; deck form regrouped with all hooks unchanged; /admin/presentations/new fits at 390; breadcrumbs → back link; full deck lifecycle walked in the browser.
 **Owns:** `app/views/admin/presentations/*`, `admin/bottles/*`, `admin/moderation/*`,
 `admin/invitations/*`.
 **Do:** Apply D8's partials. The deck form is the largest (structured editors, EasyMDE,
@@ -232,7 +233,8 @@ unchanged.
 **Tests:** `test/controllers/admin/presentations_controller_test.rb`,
 `test/controllers/admin/bottles_controller_test.rb`, `test/controllers/admin/moderation*`.
 
-### [~] D9b · Admin people and money sections — `sonnet` (after D8)
+### [x] D9b · Admin people and money sections — `sonnet` (after D8)
+Result: users, subscriptions, credits, activity, analytics on D8's patterns; analytics as tables + CSS bars; downloads analytics fits at 390; fixed four Turbo-ignored admin actions and a nested form. Ledger never had a running total (asked advisor).
 **Owns:** `app/views/admin/users/*`, `admin/subscriptions/*`, `admin/credits/*`,
 `admin/activities/*`, `admin/analytics/*`.
 **Do:** Apply D8's partials. Tables for users, subscriptions, ledger; analytics as
@@ -448,7 +450,8 @@ its duplicate merge is covered by a test.
 
 ## Wave B3 — hardening (parallel; disjoint files)
 
-### [~] B8 · Email change and token hygiene — `opus`
+### [x] B8 · Email change and token hygiene — `opus`
+Result: email-change link goes to the new address, token stored as HMAC digest, case-insensitive; Devise update refuses email changes; email-RSVP and invite links confirm then POST (RSVP re-checks policy); lograge scrubs tokens.
 **Findings:** S6, S4, S12 (RSVP and invite links).
 **Owns:** `app/controllers/account_controller.rb` (email-change actions),
 `app/mailers/user_mailer.rb` and its email-change views, `users/registrations_controller.rb`
@@ -470,7 +473,8 @@ lograge scrubber shows no token in the logged path. New page copy is listed for 
 **Tests:** `test/controllers/account_controller_test.rb`, `email_rsvps_controller_test.rb`,
 `societies_controller_test.rb`, `test/mailers/user_mailer_test.rb`.
 
-### [~] B9 · Private downloads — `sonnet`
+### [x] B9 · Private downloads — `sonnet`
+Result: paid files and Extras via 5-minute service URLs after `check_access`; scorecard download logging fixed; per-action, per-access-state tests. Existing permanent links cannot be invalidated selectively.
 **Findings:** S5.
 **Owns:** `app/controllers/presentations/downloads_controller.rb`,
 `config/initializers/active_storage.rb`, matching tests. Read `wss-deck-pipeline` first.
@@ -483,7 +487,8 @@ signed-out visitor are refused; the blank scorecard path is unchanged. Note in t
 hand-back whether the existing permanent links can be invalidated without re-uploading.
 **Tests:** `test/controllers/presentations/downloads_controller_test.rb`.
 
-### [~] B10 · Dead paths and documentation drift — `sonnet`
+### [x] B10 · Dead paths and documentation drift — `sonnet`
+Result: public deck authoring, its views, policy methods and `AdminController` removed; admin invitations documented as the fourth sign-in path; OAuth uid rebinds logged; Google returns only verified emails.
 **Findings:** S14, S20, S13 (logging the rebind only).
 **Owns:** `app/controllers/presentations_controller.rb` (remove authoring actions),
 `app/views/presentations/new.html.erb`, `edit.html.erb`, `app/policies/presentation_policy.rb`,
@@ -536,7 +541,8 @@ missing price id raises a clear error (tested through the initializer's guard me
 
 ## Wave B3 additions (parallel with B8–B10)
 
-### [~] B14 · Deck pipeline safety — `opus`
+### [x] B14 · Deck pipeline safety — `opus`
+Result: .ppt/.pdf text in DeckImportJob; tool timeouts, per-run LibreOffice profile, empty render raises; separate one-thread `renders` worker; one render per deck (advisory lock), attach before purge.
 **Findings:** I4, I5, I8.
 **Owns:** `app/services/deck_import.rb`, `app/jobs/deck_slide_render_job.rb`,
 `app/jobs/deck_import_job.rb` (new), `config/queue.yml`,
@@ -557,7 +563,7 @@ a magic-link mail job is picked up while a render is running (queue config asser
 **Tests:** `test/services/deck_import_test.rb`, `test/jobs/deck_slide_render_job_test.rb`,
 `test/controllers/admin/presentations_controller_test.rb`.
 
-### [ ] B15 · Event emails: right time, easy opt-out — `sonnet`
+### [~] B15 · Event emails: right time, easy opt-out — `sonnet`
 **Findings:** I3, I23.
 **Owns:** a migration adding `events.time_zone`, `app/models/event.rb` (time-zone
 methods), `app/controllers/events_controller.rb` (set it on create/update — after B1 has
