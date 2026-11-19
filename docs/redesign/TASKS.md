@@ -514,7 +514,8 @@ admin invitations as the fourth sign-in path; log (do not change) OAuth uid rebi
 in `app/` references the removed code (`grep`); suite green.
 **Tests:** `test/controllers/presentations_controller_test.rb`, `test/policies/presentation_policy_test.rb`.
 
-### [~] D12 · Final fixes — `sonnet` (advisor rulings after D11, B16, B17)
+### [x] D12 · Final fixes — `sonnet` (advisor rulings after D11, B16, B17)
+Result: `mark-deep` (#e65c00) for orange graphics on light surfaces, orange text on light → ink; deck page variants; library filter → Stimulus; Active Storage transforms on `renders`; known pre-existing issues in SECTION_NOTES §15.
 **Do:** add token `mark-deep` (#e65c00) for orange graphics on light surfaces (stars, score bars) and keep `mark` for marks on green and the logo; DESIGN_SYSTEM colour table and rule. Deck page: slide images and og_image use variants, then drop the test exemption. Library filter auto-submit inline script → Stimulus. Active Storage transform jobs off the mail worker. SECTION_NOTES "known pre-existing issues" list.
 
 ## Blocked on the owner
@@ -634,7 +635,8 @@ ten times leaves one listener of each kind (checked in the browser); a profile w
 past `yes` RSVPs shows 2; `grep` finds no reference to the missing documents.
 **Tests:** `test/system/account_navigation_test.rb`, `test/controllers/profiles_controller_test.rb`.
 
-### [~] B18 · Test gaps and CI — `sonnet` (last backend task)
+### [x] B18 · Test gaps and CI — `sonnet` (last backend task)
+Result: `audit_gems` job (can't be skipped), Postgres 15, `system_test` job (unverified until CI runs it); PresentationPolicy/EventRsvpPolicy/webhook-replay tests; two-connection credit-unlock test (20/20); report-only CSP with `CSP_REPORT_ONLY.md` listing what enforcement would break.
 **Findings:** I16, S15 (report-only CSP).
 **Owns:** new tests only, `.github/workflows/ci.yml`,
 `config/initializers/content_security_policy.rb`.
