@@ -72,6 +72,7 @@ class MagicLinksTest < ApplicationSystemTestCase
     new_email = "newuser@example.com"
 
     visit auth_path
+    assert_selector "#magic-link-form", visible: true
     fill_in "magic-link-email", with: new_email
     click_button "Send magic link"
 
@@ -96,6 +97,9 @@ class MagicLinksTest < ApplicationSystemTestCase
 
   test "magic link actually works for signing in" do
     visit auth_path
+    # Wait for the page (and its Stimulus/inline scripts) to settle before typing;
+    # filling immediately after visit hit a detached node on CI.
+    assert_selector "#magic-link-form", visible: true
     fill_in "magic-link-email", with: @user.email
     click_button "Send magic link"
     assert_text "Check your email for a magic link to sign in."
