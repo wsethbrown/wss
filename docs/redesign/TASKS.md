@@ -186,7 +186,7 @@ panel is reachable by its existing URL/param; billing and subscription actions a
 unchanged.
 **Tests:** `test/controllers/account_controller_test.rb`, `test/system/account_navigation_test.rb`.
 
-### [ ] D4b · Event edit page and events index — `sonnet` (step 3, with D8)
+### [~] D4b · Event edit page and events index — `sonnet` (step 3, with D8)
 **Found by:** D4 (events/edit.html.erb and events/index.html.erb are scaffold stubs; "Edit this event" lands on one).
 **Owns:** `app/views/events/edit.html.erb`, `app/views/events/new.html.erb` and a new shared `events/_form` partial, `app/views/events/index.html.erb`, `app/controllers/events_controller.rb` (`edit`/`index` only), matching tests.
 **Do:** a real edit form sharing a partial with `new` (same fields, same browser-timezone conversion on update, same authorisation as today). For `events#index`: do not design a page; find whether anything links to it, and if nothing does, redirect it to the society page (routes say events live under societies) and test the redirect.
@@ -194,7 +194,7 @@ unchanged.
 
 ## Wave D2 — admin (D8 alone, then D9a and D9b in parallel)
 
-### [ ] D8 · Admin shell and patterns — `opus`
+### [~] D8 · Admin shell and patterns — `opus`
 **Owns:** `app/views/layouts/admin.html.erb`, `app/views/admin/dashboard/*`,
 `app/views/admin/shared/*` (new), `app/helpers/admin_helper.rb`.
 **Do:** Keep the fixed 240px sidebar (`main.ml-60.min-w-0`), restyled: green, the sans
@@ -386,7 +386,7 @@ equals the ledger sum for every user after each scenario. The migration is rever
 **Tests:** `test/jobs/monthly_credit_job_test.rb`, `test/models/credit_transaction_test.rb`,
 `test/controllers/webhooks_controller_test.rb`, `test/controllers/admin/credits_controller_test.rb`.
 
-### [ ] B6 · Webhook correctness — `opus` (after B5)
+### [~] B6 · Webhook correctness — `opus` (after B5)
 **Findings:** M3, M5, M8, M10, M15, M18, M19.
 **Owns:** `app/controllers/webhooks_controller.rb`, `app/models/stripe_event.rb`,
 `app/services/presentations/checkout_fulfillment.rb` (error propagation only),
