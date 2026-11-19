@@ -1,7 +1,14 @@
 class AccountController < ApplicationController
   include ActivityLogger
 
+  include RateLimitedResponses
+
+  EMAIL_CHANGE_LIMIT = 5  # email-change requests per user per hour
+  EMAIL_CHANGE_WINDOW = 1.hour
+
   before_action :authenticate_user!
+  rate_limit to: EMAIL_CHANGE_LIMIT, within: EMAIL_CHANGE_WINDOW, only: :request_email_change, store: RateLimitStore,
+             by: -> { "user-#{current_user.id}" }, with: -> { rate_limit_response("user") }
 
   def index
     # Clear any expired email change requests

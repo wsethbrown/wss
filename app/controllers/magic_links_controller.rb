@@ -1,7 +1,19 @@
 class MagicLinksController < ApplicationController
   include ActivityLogger
+  include RateLimitedResponses
 
-  # Sending and consuming links are public; both are rate-limited by the token expiry.
+  IP_LIMIT = 10      # link requests per IP per window
+  EMAIL_LIMIT = 3    # link requests per target email per window
+  WINDOW = 15.minutes
+
+  # Requesting a link sends real email, so cap it per IP and per target address.
+  rate_limit to: IP_LIMIT, within: WINDOW, only: :create, store: RateLimitStore,
+             name: "magic-link-ip", with: -> { rate_limit_response("ip") }
+  rate_limit to: EMAIL_LIMIT, within: WINDOW, only: :create, store: RateLimitStore,
+             name: "magic-link-email", by: -> { rate_limit_email_key(params[:email]) },
+             with: -> { rate_limit_response("email") }
+
+  # Sending and consuming links are public; consuming is bounded by the token expiry, requesting by the limits below.
   skip_before_action :verify_authenticity_token, only: [ :create ]
 
   def create
