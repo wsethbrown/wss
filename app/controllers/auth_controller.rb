@@ -3,10 +3,12 @@ class AuthController < ApplicationController
   include RateLimitedResponses
 
   # Limits are constants so they are easy to find and tune.
-  SIGN_IN_LIMIT = 10          # password attempts per IP per window
+  # Per-IP limits are a backstop only (shared NATs, offices, a tasting night on
+  # one wifi); the per-email limit is the real guard on any one account.
+  SIGN_IN_LIMIT = 50          # password attempts per IP per window
   SIGN_IN_EMAIL_LIMIT = 10    # password attempts per target email per window
   SIGN_IN_WINDOW = 3.minutes
-  EMAIL_CHECK_LIMIT = 30      # account-existence lookups per IP per minute
+  EMAIL_CHECK_LIMIT = 60      # account-existence lookups per IP per minute
   EMAIL_CHECK_WINDOW = 1.minute
 
   rate_limit to: SIGN_IN_LIMIT, within: SIGN_IN_WINDOW, only: :sign_in, store: RateLimitStore,

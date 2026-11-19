@@ -2,7 +2,8 @@ class MagicLinksController < ApplicationController
   include ActivityLogger
   include RateLimitedResponses
 
-  IP_LIMIT = 10      # link requests per IP per window
+  # Per-IP is a backstop only (shared NATs, one wifi); per-email is the real guard.
+  IP_LIMIT = 50      # link requests per IP per window
   EMAIL_LIMIT = 3    # link requests per target email per window
   WINDOW = 15.minutes
 
