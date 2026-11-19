@@ -602,6 +602,7 @@ load with the report-only header and no console CSP errors on the ten main pages
 - **M1** confirm the yearly and quarterly Stripe prices' billing intervals.
 - **M15** confirm which payment methods are enabled in the Stripe dashboard.
 - **S7** check whether any production user has `otp_enabled = true`.
+- **S3/B3b** confirm in production that `request.remote_ip` shows real visitor addresses (not Cloudflare edges) before relying on the per-IP rate limits; refresh the Cloudflare range list in `config/initializers/trusted_proxies.rb` from cloudflare.com/ips; consider a Cloudflare rate-limiting rule on `/magic_links` as the outer layer.
 
 ---
 
