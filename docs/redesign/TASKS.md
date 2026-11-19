@@ -234,18 +234,20 @@ unchanged.
 `test/controllers/admin/bottles_controller_test.rb`, `test/controllers/admin/moderation*`.
 
 ### [x] D9b · Admin people and money sections — `sonnet` (after D8)
-Result: users, subscriptions, credits, activity, analytics on D8's patterns; analytics as tables + CSS bars; downloads analytics fits at 390; fixed four Turbo-ignored admin actions and a nested form. Ledger never had a running total (asked advisor).
+Result: users, subscriptions, credits, activity, analytics on D8's patterns; analytics as tables + CSS bars; downloads analytics fits at 390; fixed four Turbo-ignored admin actions and a nested form. Running-total criterion dropped by the advisor (never existed).
 **Owns:** `app/views/admin/users/*`, `admin/subscriptions/*`, `admin/credits/*`,
 `admin/activities/*`, `admin/analytics/*`.
 **Do:** Apply D8's partials. Tables for users, subscriptions, ledger; analytics as
 plain tables and simple CSS bars (no chart library).
 **Don't:** add or remove any credit or subscription control here — B2 owns the removal of
 the "Set credit balance" field; if B2 has landed, do not bring it back.
-**Acceptance:** A–E, plus: the ledger view still lists every transaction with its
-running total; filters and pagination keep their params.
+**Acceptance:** A–E, plus: the ledger view still lists every transaction; filters and pagination keep their params. *(The "running total" criterion was dropped by the advisor: no running total ever existed; a running balance would be a new owner request.)*
 **Tests:** `test/controllers/admin/users_controller_test.rb`,
 `test/controllers/admin/subscriptions_controller_test.rb`, `test/controllers/admin/credits_controller_test.rb`,
 `test/controllers/admin/analytics_controller_test.rb`.
+
+### [~] D9c · Admin follow-ups — `sonnet` (advisor rulings after D9a/D9b)
+**Do:** render the admin create-subscription prices from `SubscriptionProducts` (they were hard-coded and stale), after confirming the charge uses the Stripe price id; remove the two dead admin checkboxes; point "View purchases" at an existing filtered view or remove it.
 
 ## Wave D3 — finish
 
@@ -507,7 +509,7 @@ in `app/` references the removed code (`grep`); suite green.
 ### [!] B11 · Two-factor sign-in (S7)
 Half-built: enabling it breaks password sign-in and every other path bypasses it.
 **[owner]** Remove it (small) or build it properly across all four sign-in paths (large)?
-Advisor's recommendation: remove now, revisit after launch.
+Advisor's recommendation: remove now, revisit after launch. An admin "reset a member's 2FA" control is part of whatever the owner decides here (the dead admin checkbox is removed in D9c).
 
 ### [!] B12 · Account deletion service (M6)
 Waits for the decisions listed in `ACCOUNT_DELETION.md` (produced by B4).
