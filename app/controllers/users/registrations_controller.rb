@@ -11,6 +11,14 @@ class Users::RegistrationsController < Devise::RegistrationsController
     end
   end
 
+  # Self-service deletion is disabled: User#destroy cascades into other members'
+  # data and leaves Stripe billing running (docs/redesign/ACCOUNT_DELETION.md).
+  # Deliberately does not call super.
+  def destroy
+    Rails.logger.info "[Account] Self-service deletion refused for user #{current_user&.id.inspect}; redirected to contact"
+    redirect_to contact_path, notice: "To delete your account, please contact us."
+  end
+
   protected
 
   def configure_sign_up_params
