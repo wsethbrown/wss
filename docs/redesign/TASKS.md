@@ -246,12 +246,14 @@ the "Set credit balance" field; if B2 has landed, do not bring it back.
 `test/controllers/admin/subscriptions_controller_test.rb`, `test/controllers/admin/credits_controller_test.rb`,
 `test/controllers/admin/analytics_controller_test.rb`.
 
-### [~] D9c · Admin follow-ups — `sonnet` (advisor rulings after D9a/D9b)
+### [x] D9c · Admin follow-ups — `sonnet` (advisor rulings after D9a/D9b)
+Result: prices from `SubscriptionProducts` (charge confirmed to use the Stripe price id); dead checkboxes and the '#' View Purchases link removed; currency formatting.
 **Do:** render the admin create-subscription prices from `SubscriptionProducts` (they were hard-coded and stale), after confirming the charge uses the Stripe price id; remove the two dead admin checkboxes; point "View purchases" at an existing filtered view or remove it.
 
 ## Wave D3 — finish
 
-### [~] D10 · Emails — `haiku`
+### [x] D10 · Emails — `haiku`
+Result: mail head on the new palette (green fills, paper, white cards, hairlines, mute text, Instrument Sans, 16px buttons); orange only for the note rule; event RSVP buttons on the rsvp tokens; text accents in ink because orange text fails contrast.
 **Owns:** `app/views/layouts/mailer.html.erb`, `app/views/mailers/*`,
 `app/views/*_mailer/*.html.erb`.
 **Do:** Swap the old palette for the new one in inline styles using this exact map:
@@ -264,7 +266,7 @@ Do not change any wording, link or the `.text.erb` files.
 test still renders; button text contrast at least 4.5:1.
 **Tests:** `bin/rails test test/mailers`.
 
-### [ ] D11 · Consistency, accessibility and docs sweep — `opus` (last)
+### [~] D11 · Consistency, accessibility and docs sweep — `opus` (last)
 **Owns:** any view, for small fixes only; `SECTION_NOTES.md`; `docs/redesign/*`.
 **Do:** Walk every route in `config/routes.rb` that renders HTML, at both widths, signed
 out, as a member and as an admin. Fix leftovers: old mastheads, eyebrows, emoji, stray
