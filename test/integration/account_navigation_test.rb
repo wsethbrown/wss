@@ -57,9 +57,11 @@ class AccountNavigationTest < ActionDispatch::IntegrationTest
 
     assert_response :success
 
-    # Profile tab should have active classes (brand "whiskey" accent)
-    assert_select '[data-tab="profile"].text-whiskey-600'
-    assert_select '[data-tab="profile"].bg-whiskey-50'
+    # The profile tab is the filled (active) one; the panel is visible, the others hidden.
+    assert_select '[data-tab="profile"].bg-ink'
+    assert_select '[data-tab="account-details"].bg-white'
+    assert_select "#profile-content.hidden", count: 0
+    assert_select "#account-details-content.hidden", count: 1
   end
 
   test "account details section contains expected content" do

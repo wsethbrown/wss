@@ -2,31 +2,31 @@
     payment method and invoices live in the Stripe Customer Portal (one
     button), never mocked up here. Checkout banners are flash-driven
     (one-shot), set by AccountController#index's redirect. %>
-<div id="subscription-content" class="tab-content hidden min-h-[600px]">
-  <div class="space-y-8">
-    <div class="pb-6 border-b border-gray-200">
-      <h2 class="text-2xl font-bold text-gray-900 mb-2">Subscription</h2>
-      <p class="text-gray-600">Manage your subscription and billing preferences</p>
+<div id="subscription-content" class="tab-content hidden">
+  <div class="space-y-6">
+    <div>
+      <h2 class="font-display text-2xl font-semibold text-ink">Subscription</h2>
+      <p class="mt-1 text-mute">Manage your subscription and billing preferences</p>
     </div>
 
     <% if flash[:checkout_result] == "success" %>
-      <div class="rounded-2xl border border-green-200 bg-green-50 p-4">
+      <div class="rounded-2xl bg-whiskey-100 p-4">
         <div class="flex items-center gap-3">
-          <svg class="h-5 w-5 flex-shrink-0 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+          <svg class="h-5 w-5 shrink-0 text-ink" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
           </svg>
-          <p class="text-sm font-medium text-green-800">
-            You're in, one deck credit added. <%= link_to "Browse the decks", presentations_path, class: "underline hover:text-green-900" %> and spend it well.
+          <p class="text-sm font-medium text-ink">
+            You're in, one deck credit added. <%= link_to "Browse the decks", presentations_path, class: "underline" %> and spend it well.
           </p>
         </div>
       </div>
     <% elsif flash[:checkout_result] == "cancelled" %>
-      <div class="rounded-2xl border border-amber-200 bg-amber-50 p-4">
+      <div class="rounded-2xl border border-hairline bg-paper p-4">
         <div class="flex items-center gap-3">
-          <svg class="h-5 w-5 flex-shrink-0 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+          <svg class="h-5 w-5 shrink-0 text-mute" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
           </svg>
-          <p class="text-sm font-medium text-amber-800">
+          <p class="text-sm font-medium text-ink">
             Subscription checkout was cancelled. You can try again when you're ready.
           </p>
         </div>
@@ -37,15 +37,15 @@
       <% renewal = current_user.subscription_ends_at %>
 
       <!-- Your membership: plan + credits, one card -->
-      <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
+      <div class="card p-6">
         <% if current_user.subscription_paused? %>
-          <div class="mb-5 rounded-xl border border-yellow-200 bg-yellow-50 p-4 text-sm text-yellow-800">
+          <div class="mb-5 rounded-2xl border border-hairline bg-paper p-4 text-sm text-ink">
             <span class="font-semibold">Paused</span> since <%= current_user.subscription_paused_at.strftime('%B %-d, %Y') %>,
             billing resumes automatically on <%= (current_user.subscription_paused_at + 1.month).strftime('%B %-d, %Y') %>.
             You keep access to everything you've unlocked.
           </div>
         <% elsif current_user.cancel_at_period_end? && renewal&.future? %>
-          <div class="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
+          <div class="mb-5 rounded-2xl border border-hairline bg-paper p-4 text-sm text-ink">
             <span class="font-semibold">Ending</span>, your membership runs until <%= renewal.strftime('%B %-d, %Y') %>.
             You keep full access until then.
           </div>
@@ -53,19 +53,19 @@
 
         <div class="flex flex-col gap-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <p class="eyebrow text-whiskey-600">Your membership</p>
-            <h3 class="mt-1 font-display text-2xl font-semibold text-gray-900">
+            <p class="text-sm font-medium text-mute">Your membership</p>
+            <h3 class="mt-1 font-display text-2xl font-semibold text-ink">
               <%= current_user.subscription_plan&.titleize || 'Monthly' %>
               <% if current_user.founding_member? %>
-                <span class="ml-1 inline-flex items-center rounded-full bg-whiskey-100 px-2.5 py-0.5 align-middle text-xs font-semibold text-whiskey-800">Founding Member</span>
+                <span class="ml-1 inline-flex items-center rounded-xl bg-whiskey-100 px-2.5 py-0.5 align-middle text-xs font-semibold text-ink">Founding Member</span>
               <% end %>
               <% if current_user.subscription_paused? %>
-                <span class="ml-1 inline-flex items-center rounded-full bg-yellow-100 px-2.5 py-0.5 align-middle text-xs font-semibold text-yellow-800">Paused</span>
+                <span class="ml-1 inline-flex items-center rounded-xl bg-whiskey-100 px-2.5 py-0.5 align-middle text-xs font-semibold text-ink">Paused</span>
               <% elsif current_user.cancel_at_period_end? %>
-                <span class="ml-1 inline-flex items-center rounded-full bg-amber-100 px-2.5 py-0.5 align-middle text-xs font-semibold text-amber-800">Ending</span>
+                <span class="ml-1 inline-flex items-center rounded-xl bg-whiskey-100 px-2.5 py-0.5 align-middle text-xs font-semibold text-ink">Ending</span>
               <% end %>
             </h3>
-            <p class="mt-1 text-sm text-gray-500">
+            <p class="mt-1 text-sm text-mute">
               <% if current_user.cancel_at_period_end? && renewal %>
                 Access ends <%= renewal.strftime('%B %-d, %Y') %>
               <% elsif renewal %>
@@ -74,44 +74,44 @@
             </p>
           </div>
 
-          <div class="rounded-2xl border border-whiskey-200 bg-whiskey-50 px-6 py-4 text-center sm:text-right">
-            <p class="font-display text-4xl font-semibold text-whiskey-700"><%= current_user.credits || 0 %></p>
-            <p class="text-sm font-medium text-gray-600">deck credit<%= 's' if current_user.credits != 1 %></p>
+          <div class="rounded-[18px] bg-paper px-6 py-4 text-center sm:text-right">
+            <p class="font-display text-4xl font-semibold tabular-nums text-ink"><%= current_user.credits || 0 %></p>
+            <p class="text-sm font-medium text-mute">deck credit<%= 's' if current_user.credits != 1 %></p>
             <% if renewal && !current_user.cancel_at_period_end? %>
-              <p class="mt-1 text-xs text-gray-500">next credit <%= renewal.strftime('%b %-d, %Y') %></p>
+              <p class="mt-1 text-xs text-mute">next credit <%= renewal.strftime('%b %-d, %Y') %></p>
             <% end %>
           </div>
         </div>
 
-        <p class="mt-4 text-sm text-gray-500">
+        <p class="mt-4 text-sm text-mute">
           Credits unlock any deck while your membership is active, you receive one with each renewal.
         </p>
 
-        <div class="mt-5 flex flex-wrap items-center gap-3 border-t border-gray-100 pt-5">
+        <div class="mt-5 flex flex-wrap items-center gap-3 border-t border-hairline pt-5">
           <%= link_to "Adjust plan", subscriptions_plans_path,
-              class: "rounded-xl bg-whiskey-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-whiskey-700" %>
+              class: "btn btn-primary min-h-11" %>
           <%= button_to "Payment method & invoices", subscriptions_portal_path, method: :post,
-              class: "cursor-pointer rounded-xl border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50" %>
+              class: "btn btn-secondary min-h-11 cursor-pointer" %>
         </div>
       </div>
 
       <!-- Pause / cancel -->
-      <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <p class="eyebrow text-gray-400">Need a break?</p>
+      <div class="card p-6">
+        <p class="text-sm font-medium text-mute">Need a break?</p>
         <div class="mt-3 flex flex-wrap items-center gap-3">
           <% if current_user.subscription_can_be_paused? %>
             <%= button_to "Pause subscription", subscriptions_pause_path, method: :post,
                 data: { turbo_confirm: "Pause your subscription? Billing stops for a month and resumes automatically. You keep access to everything you've unlocked." },
-                class: "cursor-pointer rounded-xl border border-gray-300 px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-50" %>
+                class: "btn btn-secondary min-h-11 cursor-pointer" %>
           <% elsif current_user.subscription_can_be_resumed? %>
             <%= button_to "Resume subscription", subscriptions_resume_path, method: :post,
                 data: { turbo_confirm: "Resume your subscription? Billing restarts immediately." },
-                class: "cursor-pointer rounded-xl bg-whiskey-600 px-5 py-2.5 text-sm font-semibold text-white transition hover:bg-whiskey-700" %>
+                class: "btn btn-primary min-h-11 cursor-pointer" %>
           <% end %>
           <% unless current_user.cancel_at_period_end? %>
             <%= button_to "Cancel subscription", subscriptions_cancel_path, method: :post,
                 data: { turbo_confirm: "Cancel your subscription? You'll keep access until the end of your current billing period." },
-                class: "cursor-pointer rounded-xl border border-red-200 px-5 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-50" %>
+                class: "btn min-h-11 cursor-pointer border border-red-200 bg-white text-red-700 hover:bg-red-50" %>
           <% end %>
         </div>
       </div>
@@ -119,22 +119,23 @@
       <%# Non-subscriber chooser, matches the homepage pricing design:
           honest copy, slim price-only cards, one shared benefits list. %>
       <div class="mb-8">
-        <div class="text-center mb-8">
-          <h4 class="font-display text-2xl font-semibold text-gray-900">Start your membership</h4>
-          <p class="mt-2 text-gray-600">Every plan unlocks the same thing, pick the commitment that suits you.</p>
+        <div class="mb-6">
+          <h4 class="font-display text-2xl font-semibold text-ink">Start your membership</h4>
+          <p class="mt-1 text-mute">Every plan unlocks the same thing, pick the commitment that suits you.</p>
         </div>
 
-        <div id="plan-cards" class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div id="plan-cards" class="grid grid-cols-1 gap-4 lg:grid-cols-3">
           <% @stripe_products.each do |product| %>
-            <div class="relative flex flex-col rounded-3xl bg-white p-8 shadow-sm transition hover:-translate-y-1 hover:shadow-lg <%= product[:popular] ? 'border-2 border-whiskey-400' : 'border border-gray-200' %>">
-              <% if product[:popular] %>
-                <div class="absolute -top-4 left-1/2 -translate-x-1/2">
-                  <span class="eyebrow rounded-full border border-whiskey-500 bg-whiskey-600 px-4 py-1.5 text-white shadow-sm">Best Value</span>
+            <% popular = product[:popular] %>
+            <div class="flex flex-col p-6 <%= popular ? 'panel-ink' : 'card' %>">
+              <% if popular %>
+                <div class="mb-3">
+                  <span class="inline-flex items-center rounded-xl bg-white px-2.5 py-0.5 text-xs font-semibold text-ink">Best Value</span>
                 </div>
               <% end %>
-              <div class="text-center">
-                <h3 class="font-display text-2xl font-semibold text-gray-900"><%= product[:name].gsub(' Membership', '') %></h3>
-                <p class="mt-1 text-gray-500"><%=
+              <div>
+                <h3 class="font-display text-2xl font-semibold <%= popular ? 'text-white' : 'text-ink' %>"><%= product[:name].gsub(' Membership', '') %></h3>
+                <p class="mt-1 text-sm <%= popular ? 'text-cream/80' : 'text-mute' %>"><%=
                   case product[:id]
                   when 'monthly' then 'Pay as you go, cancel anytime'
                   when 'quarterly' then 'Billed every three months'
@@ -142,35 +143,35 @@
                   else 'For committed members'
                   end
                 %></p>
-                <div class="mt-6">
-                  <div class="flex items-end justify-center">
-                    <span class="font-display text-5xl font-semibold <%= product[:popular] ? 'text-whiskey-700' : 'text-gray-900' %>">$<%= sprintf('%.2f', product[:price] / 100.0) %></span>
-                    <span class="ml-1 pb-1 text-lg text-gray-400">/mo</span>
+                <div class="mt-5">
+                  <div class="flex items-end">
+                    <span class="font-display text-4xl font-semibold tabular-nums <%= popular ? 'text-white' : 'text-ink' %>">$<%= sprintf('%.2f', product[:price] / 100.0) %></span>
+                    <span class="ml-1 pb-1 text-base <%= popular ? 'text-cream/80' : 'text-mute' %>">/mo</span>
                   </div>
                   <% if product[:id] == 'quarterly' || product[:id] == 'yearly' %>
-                    <div class="mt-1 text-sm text-gray-500">billed <%= product[:id] == 'quarterly' ? 'quarterly' : 'annually' %></div>
+                    <div class="mt-1 text-sm <%= popular ? 'text-cream/80' : 'text-mute' %>">billed <%= product[:id] == 'quarterly' ? 'quarterly' : 'annually' %></div>
                   <% end %>
                   <% if product[:savings] %>
-                    <div class="mt-3 inline-flex items-center rounded-full bg-whiskey-100 px-3 py-1 text-sm font-semibold text-whiskey-800">Save <%= product[:savings] %></div>
+                    <div class="mt-3 inline-flex items-center rounded-xl px-3 py-1 text-sm font-semibold <%= popular ? 'bg-white text-ink' : 'bg-whiskey-100 text-ink' %>">Save <%= product[:savings] %></div>
                   <% end %>
                 </div>
               </div>
-              <div class="mt-8">
+              <div class="mt-auto pt-6">
                 <%= form_with url: subscriptions_checkout_path, method: :post, local: true, data: { turbo: false } do |f| %>
                   <%= f.hidden_field :price_id, value: product[:id] %>
-                  <%= f.submit "Get Started", class: "w-full cursor-pointer rounded-xl px-6 py-3 text-base font-semibold text-white transition focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2 #{product[:popular] ? 'bg-whiskey-600 hover:bg-whiskey-700' : 'bg-gray-900 hover:bg-gray-800'}" %>
+                  <%= f.submit "Get Started", class: "btn min-h-11 w-full cursor-pointer #{popular ? 'bg-white text-ink hover:bg-whiskey-100' : 'btn-primary'}" %>
                 <% end %>
               </div>
             </div>
           <% end %>
         </div>
 
-        <div class="mx-auto mt-8 max-w-3xl rounded-3xl border border-whiskey-100 bg-white p-8 shadow-sm">
-          <h4 class="text-center font-display text-lg font-semibold text-gray-900">Every membership includes</h4>
-          <ul class="mt-6 grid gap-x-8 gap-y-3 text-gray-700 sm:grid-cols-2">
+        <div class="card mt-4 p-6">
+          <h4 class="text-xl font-semibold text-ink">Every membership includes</h4>
+          <ul class="mt-4 grid gap-x-8 gap-y-3 text-gray-900 sm:grid-cols-2">
             <% Membership::BENEFITS.each do |benefit| %>
               <li class="flex items-start gap-3">
-                <svg class="mt-1 h-4 w-4 flex-shrink-0 text-whiskey-500" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
+                <svg class="mt-1 h-4 w-4 shrink-0 text-ink" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                 </svg>
                 <span><%= benefit %></span>
@@ -179,7 +180,7 @@
           </ul>
         </div>
 
-        <p class="mt-6 text-center text-sm text-gray-500">
+        <p class="mt-4 text-sm text-mute">
           Cancel anytime. Credits unlock any deck while your membership is active; decks bought outright are yours for good.
         </p>
       </div>
@@ -187,18 +188,18 @@
 
     <!-- Credits history, real transactions only -->
     <% if current_user.credit_transactions.exists? %>
-      <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-        <div class="flex items-center justify-between">
-          <p class="eyebrow text-gray-400">Credits history</p>
-          <span class="inline-flex items-center rounded-full bg-whiskey-100 px-3 py-1 text-sm font-semibold text-whiskey-800">
+      <div class="card p-6">
+        <div class="flex items-center justify-between gap-3">
+          <p class="text-sm font-medium text-mute">Credits history</p>
+          <span class="inline-flex items-center rounded-xl bg-whiskey-100 px-3 py-1 text-sm font-semibold tabular-nums text-ink">
             <%= current_user.credits %> available
           </span>
         </div>
-        <div class="mt-4 space-y-1">
+        <div class="mt-2">
           <% current_user.credit_transactions.order(created_at: :desc).limit(5).each do |transaction| %>
-            <div class="flex items-center justify-between border-b border-gray-100 py-2.5 last:border-0">
+            <div class="flex items-center justify-between gap-4 border-b border-hairline py-3 last:border-0">
               <div>
-                <p class="text-sm font-medium text-gray-900">
+                <p class="text-sm font-medium text-ink">
                   <%= case transaction.transaction_type
                       when 'granted' then (transaction.description.presence || 'Credit granted')
                       when 'used' then (transaction.presentation&.title || 'Deck unlocked')
@@ -207,9 +208,9 @@
                       else transaction.transaction_type.to_s.titleize
                       end %>
                 </p>
-                <p class="text-xs text-gray-400"><%= transaction.created_at.strftime('%B %-d, %Y') %></p>
+                <p class="text-xs text-mute"><%= transaction.created_at.strftime('%B %-d, %Y') %></p>
               </div>
-              <p class="text-sm font-semibold <%= %w[granted refunded].include?(transaction.transaction_type) ? 'text-green-600' : 'text-red-600' %>">
+              <p class="text-sm font-semibold tabular-nums <%= %w[granted refunded].include?(transaction.transaction_type) ? 'text-ink' : 'text-red-700' %>">
                 <%= %w[granted refunded].include?(transaction.transaction_type) ? '+' : '-' %><%= transaction.amount.abs %>
               </p>
             </div>

@@ -38,8 +38,8 @@ class AccountNavigationTest < ApplicationSystemTestCase
 
     # Profile tab should be active by default
     profile_tab = find('[data-tab="profile"]')
-    assert profile_tab.has_css?(".text-indigo-600")
-    assert profile_tab.has_css?(".bg-indigo-50")
+    assert profile_tab.has_css?(".bg-ink")
+    assert profile_tab.has_css?(".text-white")
 
     # Profile content should be visible
     assert find("#profile-content", visible: true)
@@ -56,8 +56,8 @@ class AccountNavigationTest < ApplicationSystemTestCase
 
     # Account Details tab should now be active
     account_tab = find('[data-tab="account-details"]')
-    assert account_tab.has_css?(".text-indigo-600")
-    assert account_tab.has_css?(".bg-indigo-50")
+    assert account_tab.has_css?(".bg-ink")
+    assert account_tab.has_css?(".text-white")
 
     # Account Details content should be visible
     assert find("#account-details-content", visible: true)
