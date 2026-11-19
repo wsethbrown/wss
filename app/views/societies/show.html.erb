@@ -7,401 +7,306 @@
   <% end %>
 <% end %>
 
-<div class="min-h-screen bg-whiskey-50">
-  <%# Masthead, one header for every society. The banner image, when present,
-      sits behind a char gradient; without one, the char label stands alone. %>
-  <div class="relative w-full overflow-hidden bg-char pt-16">
-    <% if @society.banner_image.attached? %>
-      <%= image_tag @society.banner_image,
-          class: "absolute inset-0 h-full w-full object-cover",
+<%# The layout treats this page as full-bleed (no wrapper), so the page brings its
+    own width and clears the floating nav itself. %>
+<%
+  my_membership = user_signed_in? ? current_user.society_memberships.find_by(society: @society) : nil
+  can_manage = user_signed_in? && policy(@society).manage_members?
+  role_by_user = @society.society_memberships.where(user_id: @recent_members.map(&:id)).index_by(&:user_id)
+  # Same rule as SocietyMembershipsController#may_manage_target?: a society admin can only be
+  # demoted or removed by the founder or a global admin. Officers never see those controls.
+  can_manage_admins = user_signed_in? && (current_user.id == @society.creator_id || current_user.admin?)
+  card_head = "border-b border-hairline px-6 py-4"
+  row_link = "flex items-start gap-4 px-6 py-4 transition hover:bg-paper"
+%>
+<div class="mx-auto max-w-6xl px-4 pb-16 pt-28">
+  <% if @society.banner_image.attached? %>
+    <div class="mb-8 aspect-[3/1] overflow-hidden rounded-[18px] border border-hairline bg-char">
+      <%= image_tag @society.banner_image, alt: "",
+          class: "h-full w-full object-cover",
           style: "object-position: #{@society.banner_position || 'center center'};" %>
-      <div class="absolute inset-0 bg-gradient-to-t from-char via-char/80 to-char/60"></div>
-    <% else %>
-      <div class="pointer-events-none absolute inset-0" aria-hidden="true"
-           style="background: radial-gradient(ellipse 70% 50% at 50% 110%, rgba(201, 136, 74, 0.22), transparent 70%);"></div>
-    <% end %>
-
-    <div class="relative z-10 mx-auto max-w-6xl px-6 py-16">
-      <div class="flex flex-col gap-8 md:flex-row md:items-end md:justify-between">
-        <div class="max-w-2xl">
-          <p class="eyebrow mb-3 text-whiskey-300/90">
-            <%= @society.private? ? 'Private society' : 'Public society' %><%= " · #{@society.location}" if @society.location.present? %>
-          </p>
-          <div class="rule-double mb-6 w-20 text-whiskey-300"></div>
-          <h1 class="font-display text-4xl font-semibold leading-tight text-cream md:text-5xl"><%= @society.name %> <%= render "shared/century_badge", record: @society, tone: :dark %></h1>
-          <% if @society.description.present? %>
-            <p class="mt-4 text-lg leading-relaxed text-cream/70"><%= @society.description %></p>
-          <% end %>
-
-          <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-cream/60">
-            <span class="inline-flex items-center gap-2">
-              <svg class="h-4 w-4 text-whiskey-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"></path>
-              </svg>
-              <%= pluralize(@society.member_count, 'member') %>
-            </span>
-            <span class="inline-flex items-center gap-2">
-              <svg class="h-4 w-4 text-whiskey-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"></path>
-              </svg>
-              <%= pluralize(@society.events.count, 'event') %>
-            </span>
-            <span class="inline-flex items-center gap-2">
-              <svg class="h-4 w-4 text-whiskey-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"></path>
-              </svg>
-              Founded by <%= link_to @society.creator.full_name, profile_path(@society.creator), class: "font-semibold text-whiskey-300 hover:text-whiskey-200" %>,
-              <%= @society.created_at.strftime("%B %Y") %>
-            </span>
-          </div>
-        </div>
-
-        <%# Membership state / actions %>
-        <div class="flex flex-wrap items-center gap-3 md:justify-end">
-          <% if user_signed_in? %>
-            <% membership = current_user.society_memberships.find_by(society: @society) %>
-            <% if membership %>
-              <span class="eyebrow rounded-full border border-whiskey-500/40 bg-whiskey-500/10 px-4 py-2 text-whiskey-200">
-                <%= membership.admin? ? 'Society admin' : (membership.officer? ? 'Officer' : 'Member') %>
-              </span>
-              <% if policy(@society).manage_members? %>
-                <%= link_to "Activity", activity_society_path(@society),
-                    class: "inline-flex items-center rounded-xl border border-cream/25 px-5 py-2.5 text-sm font-semibold text-cream/90 transition hover:border-cream/50 hover:text-cream" %>
-              <% end %>
-              <% if policy(@society).edit? %>
-                <%= link_to "Edit society", edit_society_path(@society),
-                    class: "inline-flex items-center rounded-xl border border-cream/25 px-5 py-2.5 text-sm font-semibold text-cream/90 transition hover:border-cream/50 hover:text-cream" %>
-              <% end %>
-            <% elsif policy(@society).join? %>
-              <%= button_to "Join this society", join_society_path(@society), method: :post,
-                  class: "inline-flex cursor-pointer items-center rounded-xl bg-whiskey-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400" %>
-            <% elsif @society.private? %>
-              <span class="eyebrow rounded-full border border-cream/20 px-4 py-2 text-cream/60">Invite only</span>
-            <% end %>
-          <% else %>
-            <%= link_to "Sign in to join", auth_path,
-                class: "inline-flex items-center rounded-xl bg-whiskey-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400" %>
-          <% end %>
-          <%= render "favorites/button", favoritable: @society, tone: :dark %>
-        </div>
-      </div>
     </div>
-  </div>
+  <% end %>
 
-  <!-- Main Content Section -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Content Grid -->
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Main Content -->
-      <div class="lg:col-span-2 space-y-8">
-        <!-- Upcoming Events -->
-        <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-            <h2 class="text-lg font-semibold text-gray-900">Upcoming Events</h2>
-            <% if user_signed_in? && @society.has_member?(current_user) %>
-              <% membership = current_user.society_memberships.find_by(society: @society) %>
-              <% if membership&.admin? || membership&.officer? %>
-                <%= link_to "Create New Event", new_society_event_path(@society), 
-                    class: "inline-flex items-center px-4 py-2 bg-whiskey-600 border border-transparent rounded-md font-semibold text-xs text-white uppercase tracking-widest hover:bg-whiskey-700 focus:bg-whiskey-700 active:bg-whiskey-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500 focus:ring-offset-2 transition ease-in-out duration-150" %>
-              <% end %>
-            <% end %>
-          </div>
-          <div class="p-6">
-            <% if @upcoming_events.any? %>
-              <div class="space-y-4">
-                <% @upcoming_events.each do |event| %>
-                  <%= link_to society_event_path(@society, event), class: "block" do %>
-                    <div class="flex items-start space-x-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-whiskey-300 transition-all duration-200 cursor-pointer">
-                      <div class="w-12 h-12 bg-whiskey-100 rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-whiskey-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                        </svg>
-                      </div>
-                      <div class="flex-1">
-                        <h3 class="text-sm font-semibold text-gray-900 group-hover:text-whiskey-600"><%= event.title %></h3>
-                        <p class="text-sm text-gray-600 mt-1"><%= truncate(event.description, length: 100) if event.description.present? %></p>
-                        <div class="flex items-center mt-2 text-xs text-gray-500">
-                          <span><%= event.start_time.strftime("%B %d, %Y at %I:%M %p") %></span>
-                          <% if event.location.present? %>
-                            <span class="mx-2">•</span>
-                            <span><%= event.location %></span>
-                          <% end %>
-                        </div>
-                      </div>
-                      <div class="flex-shrink-0">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                      </div>
-                    </div>
-                  <% end %>
-                <% end %>
-              </div>
-            <% else %>
-              <div class="text-center py-8">
-                <svg class="w-12 h-12 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                </svg>
-                <h3 class="text-lg font-medium text-gray-900 mb-2">No upcoming events</h3>
-                <p class="text-gray-500">Check back later for new events.</p>
-              </div>
-            <% end %>
-          </div>
-        </div>
-
-        <!-- Past Events -->
-        <% if @past_events.any? %>
-          <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
-              <h2 class="text-lg font-semibold text-gray-900">Past Events</h2>
-            </div>
-            <div class="p-6">
-              <div class="space-y-4">
-                <% @past_events.each do |event| %>
-                  <%= link_to society_event_path(@society, event), class: "block" do %>
-                    <div class="flex items-start space-x-4 p-4 border border-gray-200 rounded-lg hover:bg-gray-50 hover:border-gray-300 transition-all duration-200 cursor-pointer opacity-75">
-                      <div class="w-12 h-12 bg-gray-100 rounded-lg flex items-center justify-center">
-                        <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                        </svg>
-                      </div>
-                      <div class="flex-1">
-                        <h3 class="text-sm font-semibold text-gray-700"><%= event.title %></h3>
-                        <p class="text-sm text-gray-600 mt-1"><%= truncate(event.description, length: 100) if event.description.present? %></p>
-                        <div class="flex items-center mt-2 text-xs text-gray-500">
-                          <span><%= event.start_time.strftime("%B %d, %Y at %I:%M %p") %></span>
-                          <% if event.location.present? %>
-                            <span class="mx-2">•</span>
-                            <span><%= event.location %></span>
-                          <% end %>
-                        </div>
-                      </div>
-                      <div class="flex-shrink-0">
-                        <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                        </svg>
-                      </div>
-                    </div>
-                  <% end %>
-                <% end %>
-              </div>
-            </div>
-          </div>
+  <%
+    title = safe_join([ @society.name, " ", render("shared/century_badge", record: @society) ])
+    actions = capture do
+  %>
+    <% if user_signed_in? %>
+      <% if my_membership %>
+        <span class="chip" title="Your role in this society"><%= my_membership.admin? ? 'Society admin' : (my_membership.officer? ? 'Officer' : 'Member') %></span>
+        <% if policy(@society).manage_members? %>
+          <%= link_to "Activity", activity_society_path(@society), class: "btn btn-secondary" %>
         <% end %>
+        <% if policy(@society).edit? %>
+          <%= link_to "Edit society", edit_society_path(@society), class: "btn btn-secondary" %>
+        <% end %>
+      <% elsif policy(@society).join? %>
+        <%= button_to "Join this society", join_society_path(@society), method: :post, class: "btn btn-primary cursor-pointer" %>
+      <% elsif @society.private? %>
+        <span class="chip">Invite only</span>
+      <% end %>
+    <% else %>
+      <%= link_to "Sign in to join", auth_path, class: "btn btn-primary" %>
+    <% end %>
+    <%= render "favorites/button", favoritable: @society %>
+  <% end %>
+  <%= render "shared/page_header", title: title, lede: @society.description.presence, actions: actions %>
 
-        <% if @review_board.any? %>
-          <!-- The review board -->
-          <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
-              <h2 class="text-lg font-semibold text-gray-900">The review board</h2>
-              <p class="mt-1 text-sm text-gray-500">Every bottle poured at our events, ranked by the room.</p>
-            </div>
-            <div class="divide-y divide-gray-100">
-              <% @review_board.each do |bottle| %>
-                <div class="px-6 py-4">
-                  <div class="flex flex-wrap items-baseline justify-between gap-2">
-                    <%= link_to bottle.display_name, bottle_path(bottle), class: "font-display text-lg font-semibold text-gray-900 hover:text-whiskey-700" %>
-                    <span class="flex items-center gap-2 whitespace-nowrap text-sm text-gray-500">
-                      <span class="font-semibold text-gray-900"><%= number_with_precision(bottle.board_avg, precision: 2, strip_insignificant_zeros: true) %></span>
-                      <%= render "bottles/rating", value: bottle.board_avg.to_f %>
-                      <%= pluralize(bottle.board_reviewers, "reviewer") %>
-                    </span>
-                  </div>
-                  <% member_reviews = @board_reviews[bottle.id] || [] %>
-                  <% if member_reviews.any? %>
-                    <details class="mt-2">
-                      <summary class="cursor-pointer text-sm font-semibold text-whiskey-700 hover:text-whiskey-600">Member reviews</summary>
-                      <div class="mt-2 space-y-2">
-                        <% member_reviews.each do |review| %>
-                          <div class="rounded-lg bg-whiskey-50 p-3">
-                            <div class="flex flex-wrap items-baseline justify-between gap-2">
-                              <span class="text-sm font-semibold text-gray-900"><%= review.user.first_name %> <%= review.user.last_name %> <%= render "shared/century_badge", record: review.user %></span>
-                              <%= render "bottles/rating", value: review.rating.to_f %>
-                            </div>
-                            <% if review.notes.present? %><p class="mt-1 text-sm text-gray-600"><%= review.notes %></p><% end %>
-                          </div>
-                        <% end %>
-                      </div>
-                    </details>
+  <p class="-mt-4 mb-8 flex flex-wrap items-center gap-x-5 gap-y-1 text-sm text-mute sm:-mt-6">
+    <span><%= @society.private? ? 'Private society' : 'Public society' %><%= " · #{@society.location}" if @society.location.present? %></span>
+    <span class="tabular-nums"><%= pluralize(@society.member_count, 'member') %></span>
+    <span class="tabular-nums"><%= pluralize(@society.events.count, 'event') %></span>
+    <span>Founded by <%= link_to @society.creator.full_name, profile_path(@society.creator), class: "font-semibold text-ink hover:underline" %>,
+      <%= @society.created_at.strftime("%B %Y") %></span>
+  </p>
+
+  <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+    <div class="space-y-8 lg:col-span-2">
+      <!-- Upcoming events -->
+      <section class="card overflow-hidden">
+        <div class="<%= card_head %> flex items-center justify-between gap-3">
+          <h2 class="text-xl font-semibold text-ink">Upcoming Events</h2>
+          <% if my_membership&.admin? || my_membership&.officer? %>
+            <%= link_to "Create New Event", new_society_event_path(@society), class: "btn btn-primary" %>
+          <% end %>
+        </div>
+        <% if @upcoming_events.any? %>
+          <div class="divide-y divide-hairline">
+            <% @upcoming_events.each do |event| %>
+              <%= link_to society_event_path(@society, event), class: row_link do %>
+                <div class="min-w-0 flex-1">
+                  <h3 class="font-semibold text-ink"><%= event.title %></h3>
+                  <% if event.description.present? %>
+                    <p class="mt-1 text-sm text-mute"><%= truncate(event.description, length: 100) %></p>
                   <% end %>
+                  <p class="mt-1 text-sm text-mute">
+                    <span class="tabular-nums"><%= event.start_time.strftime("%B %d, %Y at %I:%M %p") %></span>
+                    <% if event.location.present? %> · <%= event.location %><% end %>
+                  </p>
                 </div>
+                <span class="mt-0.5 font-bold text-ink" aria-hidden="true">→</span>
               <% end %>
-            </div>
-          </div>
-        <% end %>
-
-        <!-- Recent Activity or Society Description -->
-        <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900">About This Society</h2>
-          </div>
-          <div class="p-6">
-            <%# The long-form story; older societies without one fall back to
-                the short blurb so the section never goes blank. %>
-            <% if @society.about.present? %>
-              <div class="text-gray-700 leading-relaxed"><%= simple_format(@society.about) %></div>
-            <% elsif @society.description.present? %>
-              <p class="text-gray-700 leading-relaxed"><%= @society.description %></p>
-            <% else %>
-              <p class="text-gray-500 italic">No description provided.</p>
             <% end %>
           </div>
-        </div>
-      </div>
-
-      <!-- Sidebar -->
-      <div class="space-y-6">
-        <!-- Members -->
-        <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900">Members</h2>
+        <% else %>
+          <div class="px-6 py-8">
+            <h3 class="font-semibold text-ink">No upcoming events</h3>
+            <p class="mt-1 text-mute">Check back later for new events.</p>
           </div>
-          <div class="p-6">
-            <% if @recent_members.any? %>
-              <div class="space-y-3">
-                <% @recent_members.each do |member| %>
-                  <%= link_to profile_path(member), class: "flex items-center space-x-3 hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors" do %>
-                    <% if member.has_profile_image? %>
-                      <img src="<%= member.profile_image_url %>" alt="<%= member.full_name %>" class="w-8 h-8 rounded-full">
-                    <% else %>
-                      <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium" style="background-color: <%= member.avatar_color %>;">
-                        <%= member.initials %>
-                      </div>
-                    <% end %>
-                    <div class="flex-1 min-w-0">
-                      <p class="text-sm font-medium text-gray-900 truncate"><%= member.full_name %></p>
-                      <% membership = member.society_memberships.find_by(society: @society) %>
-                      <% if membership %>
-                        <p class="text-xs text-gray-500 capitalize"><%= membership.role %></p>
+        <% end %>
+      </section>
+
+      <!-- Past events -->
+      <% if @past_events.any? %>
+        <section class="card overflow-hidden">
+          <div class="<%= card_head %>"><h2 class="text-xl font-semibold text-ink">Past Events</h2></div>
+          <div class="divide-y divide-hairline">
+            <% @past_events.each do |event| %>
+              <%= link_to society_event_path(@society, event), class: row_link do %>
+                <div class="min-w-0 flex-1">
+                  <h3 class="font-semibold text-ink"><%= event.title %></h3>
+                  <% if event.description.present? %>
+                    <p class="mt-1 text-sm text-mute"><%= truncate(event.description, length: 100) %></p>
+                  <% end %>
+                  <p class="mt-1 text-sm text-mute">
+                    <span class="tabular-nums"><%= event.start_time.strftime("%B %d, %Y at %I:%M %p") %></span>
+                    <% if event.location.present? %> · <%= event.location %><% end %>
+                  </p>
+                </div>
+                <span class="mt-0.5 font-bold text-ink" aria-hidden="true">→</span>
+              <% end %>
+            <% end %>
+          </div>
+        </section>
+      <% end %>
+
+      <% if @review_board.any? %>
+        <!-- The review board -->
+        <section class="card overflow-hidden">
+          <div class="<%= card_head %>">
+            <h2 class="text-xl font-semibold text-ink">The review board</h2>
+            <p class="mt-1 text-sm text-mute">Every bottle poured at our events, ranked by the room.</p>
+          </div>
+          <div class="divide-y divide-hairline">
+            <% @review_board.each do |bottle| %>
+              <div class="px-6 py-4">
+                <div class="flex flex-wrap items-baseline justify-between gap-2">
+                  <%= link_to bottle.display_name, bottle_path(bottle), class: "font-semibold text-ink hover:underline" %>
+                  <span class="flex items-center gap-2 whitespace-nowrap text-sm text-mute">
+                    <span class="font-semibold tabular-nums text-ink"><%= number_with_precision(bottle.board_avg, precision: 2, strip_insignificant_zeros: true) %></span>
+                    <span class="text-mark"><%= render "bottles/rating", value: bottle.board_avg.to_f %></span>
+                    <%= pluralize(bottle.board_reviewers, "reviewer") %>
+                  </span>
+                </div>
+                <% member_reviews = @board_reviews[bottle.id] || [] %>
+                <% if member_reviews.any? %>
+                  <details class="mt-2">
+                    <summary class="cursor-pointer text-sm font-semibold text-ink">Member reviews</summary>
+                    <div class="inset mt-2 divide-y divide-hairline">
+                      <% member_reviews.each do |review| %>
+                        <div class="py-3">
+                          <div class="flex flex-wrap items-baseline justify-between gap-2">
+                            <span class="text-sm font-semibold text-ink"><%= review.user.first_name %> <%= review.user.last_name %> <%= render "shared/century_badge", record: review.user %></span>
+                            <span class="text-mark"><%= render "bottles/rating", value: review.rating.to_f %></span>
+                          </div>
+                          <% if review.notes.present? %><p class="mt-1 text-sm text-mute"><%= review.notes %></p><% end %>
+                        </div>
+                      <% end %>
+                    </div>
+                  </details>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        </section>
+      <% end %>
+
+      <!-- About -->
+      <section class="card overflow-hidden">
+        <div class="<%= card_head %>"><h2 class="text-xl font-semibold text-ink">About This Society</h2></div>
+        <div class="p-6">
+          <%# The long-form story; older societies without one fall back to
+              the short blurb so the section never goes blank. %>
+          <% if @society.about.present? %>
+            <div class="leading-relaxed text-gray-900"><%= simple_format(@society.about) %></div>
+          <% elsif @society.description.present? %>
+            <p class="leading-relaxed text-gray-900"><%= @society.description %></p>
+          <% else %>
+            <p class="text-mute">No description provided.</p>
+          <% end %>
+        </div>
+      </section>
+    </div>
+
+    <!-- Sidebar -->
+    <div class="space-y-6">
+      <%# Next tasting, the page's one solid object. %>
+      <% next_event = @society.upcoming_events.first %>
+      <section class="panel-ink p-6">
+        <h2 class="text-xl font-semibold">Next tasting</h2>
+        <% if next_event %>
+          <p class="mt-3 text-lg font-semibold leading-snug"><%= next_event.title %></p>
+          <p class="mt-2 text-sm text-cream/75">
+            <%= next_event.start_time.strftime("%A, %B %-d at %-l:%M %p") %>
+            <% if next_event.location.present? %>
+              <span class="mt-0.5 block"><%= next_event.location %></span>
+            <% end %>
+          </p>
+          <%= link_to 'View & RSVP', society_event_path(@society, next_event),
+              class: 'btn mt-5 w-full bg-white text-ink hover:bg-whiskey-100' %>
+        <% else %>
+          <p class="mt-3 text-sm text-cream/75">Nothing on the calendar yet.</p>
+          <% if user_signed_in? && @society.can_manage?(current_user) %>
+            <%= link_to 'Schedule a tasting', new_society_event_path(@society),
+                class: 'btn mt-4 w-full bg-white text-ink hover:bg-whiskey-100' %>
+          <% end %>
+        <% end %>
+      </section>
+
+      <!-- Members -->
+      <section class="card overflow-hidden">
+        <div class="<%= card_head %>"><h2 class="text-xl font-semibold text-ink">Members</h2></div>
+        <div class="p-6">
+          <% if @recent_members.any? %>
+            <div class="space-y-3">
+              <% @recent_members.each do |member| %>
+                <% row_membership = role_by_user[member.id] %>
+                <div>
+                  <%= link_to profile_path(member), class: "-m-2 flex items-center gap-3 rounded-2xl p-2 transition hover:bg-paper" do %>
+                    <%= avatar(member, size: 36) %>
+                    <div class="min-w-0 flex-1">
+                      <p class="truncate text-sm font-semibold text-ink"><%= member.full_name %></p>
+                      <% if row_membership %>
+                        <p class="text-xs capitalize text-mute"><%= row_membership.role %></p>
                       <% end %>
                     </div>
                   <% end %>
-                  <%# Manager controls: promote/demote and remove (never the founder). %>
-                  <% if user_signed_in? && policy(@society).manage_members? %>
-                    <% row_membership = member.society_memberships.find_by(society: @society) %>
-                    <% if row_membership && member.id != @society.creator_id %>
-                      <div class="mt-1 flex items-center gap-3 pl-11 text-xs">
-                        <% if row_membership.role == 'member' %>
-                          <%= button_to 'Make officer', society_membership_path(row_membership, role: 'officer'), method: :patch,
-                              class: 'cursor-pointer font-semibold text-whiskey-700 hover:text-whiskey-600' %>
-                        <% elsif row_membership.role == 'officer' %>
-                          <%= button_to 'Remove officer role', society_membership_path(row_membership, role: 'member'), method: :patch,
-                              class: 'cursor-pointer font-semibold text-whiskey-700 hover:text-whiskey-600' %>
-                        <% end %>
-                        <%= button_to 'Remove', society_membership_path(row_membership), method: :delete,
-                            data: { turbo_confirm: "Remove #{member.full_name} from #{@society.name}?" },
-                            class: 'cursor-pointer font-semibold text-red-600 hover:text-red-500' %>
-                      </div>
-                    <% end %>
-                  <% end %>
-                <% end %>
-              </div>
-              <% if @society.member_count > @recent_members.count %>
-                <div class="mt-4 pt-4 border-t border-gray-200">
-                  <p class="text-sm text-gray-500 text-center">
-                    And <%= @society.member_count - @recent_members.count %> more members
-                  </p>
-                </div>
-              <% end %>
-            <% else %>
-              <p class="text-gray-500 text-sm">No members yet.</p>
-            <% end %>
-          </div>
-        </div>
-
-        <%# Invite link, managers share it; works for private societies too. %>
-        <% if user_signed_in? && policy(@society).manage_members? %>
-          <div class="overflow-hidden rounded-lg bg-white shadow-sm">
-            <div class="border-b border-gray-200 px-6 py-4">
-              <h2 class="text-lg font-semibold text-gray-900">Invite members</h2>
-            </div>
-            <div class="p-6">
-              <%# Invite an existing account by email; they respond from their bell. %>
-              <%= form_with url: society_invitations_path, method: :post, local: true, class: "space-y-2" do %>
-                <input type="hidden" name="society_id" value="<%= @society.id %>">
-                <label for="society-invite-email" class="sr-only">Email address</label>
-                <input type="email" name="email" id="society-invite-email" required placeholder="member@example.com"
-                       class="w-full rounded-lg border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-whiskey-500">
-                <button type="submit"
-                        class="w-full cursor-pointer rounded-lg bg-whiskey-600 px-4 py-2 text-sm font-medium text-white transition hover:bg-whiskey-700">
-                  Send invitation
-                </button>
-              <% end %>
-              <p class="mt-2 text-xs text-gray-500">They get a notification and an email, and you'll hear their answer.</p>
-              <% pending = @society.society_invitations.pending.includes(:user).order(created_at: :desc) %>
-              <% if pending.any? %>
-                <div class="mt-4 border-t border-gray-200 pt-3">
-                  <p class="mb-2 text-xs font-semibold uppercase tracking-wide text-gray-400">Awaiting reply</p>
-                  <% pending.each do |invitation| %>
-                    <p class="text-sm text-gray-700"><%= invitation.user.full_name %>
-                      <span class="text-xs text-gray-400">· invited <%= time_ago_in_words(invitation.created_at) %> ago</span></p>
+                  <%# Manager controls: promote/demote and remove (never the founder, and never a
+                      society admin unless the viewer is the founder or a global admin). %>
+                  <% if can_manage && row_membership && member.id != @society.creator_id && (!row_membership.admin? || can_manage_admins) %>
+                    <div class="mt-3 flex items-center gap-4 pl-12 text-xs" data-role="member-controls">
+                      <% if row_membership.role == 'member' %>
+                        <%= button_to 'Make officer', society_membership_path(row_membership, role: 'officer'), method: :patch,
+                            class: 'cursor-pointer font-semibold text-ink hover:underline' %>
+                      <% elsif row_membership.role == 'officer' %>
+                        <%= button_to 'Remove officer role', society_membership_path(row_membership, role: 'member'), method: :patch,
+                            class: 'cursor-pointer font-semibold text-ink hover:underline' %>
+                      <% end %>
+                      <%= button_to 'Remove', society_membership_path(row_membership), method: :delete,
+                          data: { turbo_confirm: "Remove #{member.full_name} from #{@society.name}?" },
+                          class: 'cursor-pointer font-semibold text-red-700 hover:underline' %>
+                    </div>
                   <% end %>
                 </div>
               <% end %>
-
-              <div class="mt-5 border-t border-gray-200 pt-4">
-                <p class="text-sm text-gray-600">Or share the link, anyone with it can join<%= ', it is the invite for this private society' if @society.private? %>.</p>
-                <div class="relative" data-controller="clipboard">
-                  <div data-clipboard-target="toast"
-                       class="hidden absolute -top-8 left-1/2 -translate-x-1/2 whitespace-nowrap rounded-lg bg-char px-3 py-1 text-xs font-medium text-cream shadow-lg">
-                    Copied to clipboard
-                  </div>
-                  <input type="text" readonly value="<%= society_invite_url(@society.invite_token!) %>"
-                         data-clipboard-target="source" data-action="click->clipboard#copy"
-                         title="Click to copy"
-                         class="mt-3 w-full cursor-pointer rounded-lg border border-whiskey-200 bg-whiskey-50 px-3 py-2 text-xs text-gray-700" />
-                </div>
-                <%= button_to 'Generate new link (revokes old)', regenerate_invite_society_path(@society), method: :post,
-                    class: 'mt-3 cursor-pointer text-xs font-semibold text-whiskey-700 hover:text-whiskey-600' %>
-              </div>
             </div>
-          </div>
-        <% end %>
-
-        <%# Next tasting, the one thing a member actually needs from the sidebar.
-            (Replaced the old "Society Stats" card: member/event counts already
-            live in the masthead, role counts are visible in the member list.) %>
-        <% next_event = @society.upcoming_events.first %>
-        <div class="overflow-hidden rounded-lg bg-char shadow-sm">
-          <div class="border-b border-oak-edge px-6 py-4">
-            <h2 class="eyebrow text-whiskey-300/90">Next tasting</h2>
-          </div>
-          <div class="p-6">
-            <% if next_event %>
-              <p class="font-display text-xl font-semibold leading-snug text-cream"><%= next_event.title %></p>
-              <p class="mt-2 text-sm text-cream/70">
-                <%= next_event.start_time.strftime("%A, %B %-d at %-l:%M %p") %>
-                <% if next_event.location.present? %>
-                  <span class="block mt-0.5"><%= next_event.location %></span>
-                <% end %>
+            <% if @society.member_count > @recent_members.count %>
+              <p class="mt-4 border-t border-hairline pt-4 text-center text-sm text-mute tabular-nums">
+                And <%= @society.member_count - @recent_members.count %> more members
               </p>
-              <%= link_to 'View & RSVP', society_event_path(@society, next_event),
-                  class: 'mt-5 block w-full rounded-xl bg-whiskey-500 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-whiskey-400' %>
-            <% else %>
-              <p class="text-sm text-cream/70">Nothing on the calendar yet.</p>
-              <% if user_signed_in? && @society.can_manage?(current_user) %>
-                <%= link_to 'Schedule a tasting', new_society_event_path(@society),
-                    class: 'mt-4 block w-full rounded-xl bg-whiskey-500 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-whiskey-400' %>
-              <% end %>
             <% end %>
-          </div>
-        </div>
-
-        <!-- Leave Society Button (for members only) -->
-        <% if user_signed_in? && @society.has_member?(current_user) %>
-          <% membership = current_user.society_memberships.find_by(society: @society) %>
-          <% unless membership&.admin? %>
-            <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-              <div class="p-6">
-                <%= button_to "Leave Society", leave_society_path(@society), 
-                    method: :delete, 
-                    data: { confirm: "Are you sure you want to leave this society? This action cannot be undone." },
-                    class: "w-full inline-flex justify-center items-center px-4 py-2 border border-red-300 rounded-md shadow-sm text-sm font-medium text-red-700 bg-red-50 hover:bg-red-100 hover:border-red-400 transition-colors" %>
-              </div>
-            </div>
+          <% else %>
+            <p class="text-sm text-mute">No members yet.</p>
           <% end %>
-        <% end %>
-      </div>
+        </div>
+      </section>
+
+      <%# Invite link, managers share it; works for private societies too. %>
+      <% if can_manage %>
+        <section class="card overflow-hidden">
+          <div class="<%= card_head %>"><h2 class="text-xl font-semibold text-ink">Invite members</h2></div>
+          <div class="p-6">
+            <%# Invite an existing account by email; they respond from their bell. %>
+            <%= form_with url: society_invitations_path, method: :post, local: true, class: "space-y-3" do %>
+              <input type="hidden" name="society_id" value="<%= @society.id %>">
+              <label for="society-invite-email" class="sr-only">Email address</label>
+              <input type="email" name="email" id="society-invite-email" required placeholder="member@example.com"
+                     class="w-full rounded-2xl border border-hairline bg-white px-4 py-3 text-sm focus:outline-none focus:ring-2 focus:ring-ink/30">
+              <button type="submit" class="btn btn-secondary w-full cursor-pointer">Send invitation</button>
+            <% end %>
+            <p class="mt-2 text-sm text-mute">They get a notification and an email, and you'll hear their answer.</p>
+            <% pending = @society.society_invitations.pending.includes(:user).order(created_at: :desc) %>
+            <% if pending.any? %>
+              <div class="mt-4 border-t border-hairline pt-3">
+                <p class="mb-2 text-sm font-medium text-ink">Awaiting reply</p>
+                <div class="inset divide-y divide-hairline">
+                  <% pending.each do |invitation| %>
+                    <p class="py-2 text-sm text-ink"><%= invitation.user.full_name %>
+                      <span class="text-xs text-mute">· invited <%= time_ago_in_words(invitation.created_at) %> ago</span></p>
+                  <% end %>
+                </div>
+              </div>
+            <% end %>
+
+            <div class="mt-5 border-t border-hairline pt-4">
+              <p class="text-sm text-mute">Or share the link, anyone with it can join<%= ', it is the invite for this private society' if @society.private? %>.</p>
+              <div class="relative" data-controller="clipboard">
+                <div data-clipboard-target="toast"
+                     class="absolute -top-8 left-1/2 hidden -translate-x-1/2 whitespace-nowrap rounded-xl bg-char px-3 py-1 text-xs font-medium text-cream shadow-lg">
+                  Copied to clipboard
+                </div>
+                <input type="text" readonly value="<%= society_invite_url(@society.invite_token!) %>"
+                       data-clipboard-target="source" data-action="click->clipboard#copy"
+                       title="Click to copy" aria-label="Invite link"
+                       class="mt-3 w-full cursor-pointer rounded-2xl border border-hairline bg-paper px-4 py-3 text-xs text-ink" />
+              </div>
+              <%= button_to 'Generate new link (revokes old)', regenerate_invite_society_path(@society), method: :post,
+                  class: 'mt-3 cursor-pointer text-xs font-semibold text-ink hover:underline' %>
+            </div>
+          </div>
+        </section>
+      <% end %>
+
+      <!-- Leave society (members only; admins cannot leave) -->
+      <% if my_membership && !my_membership.admin? %>
+        <section class="card p-6">
+          <%= button_to "Leave Society", leave_society_path(@society),
+              method: :delete,
+              data: { confirm: "Are you sure you want to leave this society? This action cannot be undone." },
+              class: "btn w-full cursor-pointer border border-red-200 bg-red-50 text-red-700 hover:bg-red-100" %>
+        </section>
+      <% end %>
     </div>
   </div>
 </div>

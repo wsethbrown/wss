@@ -1,22 +1,13 @@
-<!-- Society Creation Page -->
-<div class="min-h-screen bg-whiskey-50 px-4 pt-28 pb-16 sm:px-6 lg:px-8">
-  <div class="mx-auto max-w-3xl">
-    <!-- Header -->
-    <div class="mb-10 text-center">
-      <p class="eyebrow mb-3 text-whiskey-600">Create a society</p>
-      <h1 class="font-display text-4xl font-semibold leading-tight text-gray-900 md:text-5xl">Build Your Whiskey Community</h1>
-      <div class="rule-double mx-auto mt-6 w-20 text-whiskey-800"></div>
-      <p class="mx-auto mt-6 max-w-xl text-lg leading-relaxed text-gray-600">
-        Create a space where passion meets community. Bring together whiskey enthusiasts who share your interests and values.
-      </p>
-    </div>
+<%= render "shared/page_header", title: "Build Your Whiskey Community",
+    lede: "Create a space where passion meets community. Bring together whiskey enthusiasts who share your interests and values." %>
 
-    <!-- Form Card -->
-    <div class="rounded-2xl border border-whiskey-200 bg-white p-6 shadow-sm sm:p-10">
+<div class="mx-auto max-w-3xl">
+<!-- Form Card -->
+    <div class="card p-6 sm:p-10">
       <%= form_with(model: @society, local: true, html: { class: "space-y-8" }) do |form| %>
         <% if @society.errors.any? %>
-          <div class="rounded-xl border border-red-200 bg-red-50 p-5">
-            <h3 class="mb-2 text-sm font-semibold text-red-800">Please fix the following:</h3>
+          <div class="rounded-2xl border border-red-200 bg-red-50 p-5">
+            <h3 class="mb-2 text-sm font-semibold text-red-700">Please fix the following:</h3>
             <ul class="list-inside list-disc space-y-1 text-sm text-red-700">
               <% @society.errors.full_messages.each do |message| %>
                 <li class="error-message"><%= message %></li>
@@ -27,61 +18,61 @@
 
         <!-- Society Name -->
         <div>
-          <%= form.label :name, class: "block text-sm font-medium text-gray-700 mb-2" do %>
-            Society name <span class="text-whiskey-600">*</span>
+          <%= form.label :name, class: "block text-sm font-medium text-ink mb-2" do %>
+            Society name <span class="text-mark">*</span>
           <% end %>
           <%= form.text_field :name,
-              class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
+              class: "w-full rounded-2xl border border-hairline bg-white px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-ink/30",
               placeholder: "e.g., Single Malt Enthusiasts, Urban Whiskey Club" %>
-          <p class="mt-1 text-sm text-gray-500">Choose a memorable name that reflects your community's personality and focus.</p>
+          <p class="mt-1 text-sm text-mute">Choose a memorable name that reflects your community's personality and focus.</p>
         </div>
 
         <!-- Short description: the masthead/card blurb -->
         <div>
-          <%= form.label :description, "Short description", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.label :description, "Short description", class: "block text-sm font-medium text-ink mb-2" %>
           <%= form.text_area :description, rows: 2,
-              class: "w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
+              class: "w-full resize-none rounded-2xl border border-hairline bg-white px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-ink/30",
               placeholder: "One or two sentences that introduce the society." %>
-          <p class="mt-1 text-sm text-gray-500">Appears under the society name, on society cards, and in link previews.</p>
+          <p class="mt-1 text-sm text-mute">Appears under the society name, on society cards, and in link previews.</p>
         </div>
 
         <!-- About: the long-form story -->
         <div>
-          <%= form.label :about, "About", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.label :about, "About", class: "block text-sm font-medium text-ink mb-2" %>
           <%= form.text_area :about, rows: 6,
-              class: "w-full resize-none rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
+              class: "w-full resize-none rounded-2xl border border-hairline bg-white px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-ink/30",
               placeholder: "The full story: how you gather, what you pour, what members can expect..." %>
-          <p class="mt-1 text-sm text-gray-500">The long version, shown in the About section of your society page.</p>
+          <p class="mt-1 text-sm text-mute">The long version, shown in the About section of your society page.</p>
         </div>
 
         <!-- Location -->
         <div>
-          <%= form.label :location, class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.label :location, class: "block text-sm font-medium text-ink mb-2" %>
           <%= form.text_field :location, data: { controller: "location-autocomplete" },
-              class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-whiskey-500",
+              class: "w-full rounded-2xl border border-hairline bg-white px-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-ink/30",
               placeholder: "e.g., New York, NY or Online" %>
-          <p class="mt-1 text-sm text-gray-500">Where will your society primarily meet? This helps members find local communities.</p>
+          <p class="mt-1 text-sm text-mute">Where will your society primarily meet? This helps members find local communities.</p>
         </div>
 
         <!-- Profile Picture Upload -->
         <div>
-          <%= form.label :profile_picture, "Profile picture", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.label :profile_picture, "Profile picture", class: "block text-sm font-medium text-ink mb-2" %>
           <%= form.file_field :profile_picture, accept: "image/*",
-              class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500 file:mr-4 file:rounded-full file:border-0 file:bg-whiskey-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-whiskey-800 hover:file:bg-whiskey-200" %>
-          <p class="mt-1 text-sm text-gray-500">Upload an image that represents your society. This will replace the default icon. Recommended size: 400x400px.</p>
+              class: "w-full rounded-2xl border border-hairline bg-white px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-ink/30 file:mr-4 file:rounded-xl file:border-0 file:bg-whiskey-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink hover:file:bg-whiskey-200" %>
+          <p class="mt-1 text-sm text-mute">Upload an image that represents your society. This will replace the default icon. Recommended size: 400x400px.</p>
         </div>
 
         <!-- Banner Image Upload -->
         <div>
-          <%= form.label :banner_image, "Banner image", class: "block text-sm font-medium text-gray-700 mb-2" %>
+          <%= form.label :banner_image, "Banner image", class: "block text-sm font-medium text-ink mb-2" %>
           <%= form.file_field :banner_image, accept: "image/*", id: "banner-image-input-new",
-              class: "w-full rounded-lg border border-gray-300 px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-whiskey-500 file:mr-4 file:rounded-full file:border-0 file:bg-whiskey-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-whiskey-800 hover:file:bg-whiskey-200" %>
-          <p class="mt-1 text-sm text-gray-500">Upload a banner image for your society's page. This will appear at the top of your society's detail page. Recommended size: 1200x400px.</p>
+              class: "w-full rounded-2xl border border-hairline bg-white px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-ink/30 file:mr-4 file:rounded-xl file:border-0 file:bg-whiskey-100 file:px-4 file:py-2 file:text-sm file:font-semibold file:text-ink hover:file:bg-whiskey-200" %>
+          <p class="mt-1 text-sm text-mute">Upload a banner image for your society's page. This will appear at the top of your society's detail page. Recommended size: 1200x400px.</p>
 
           <!-- Banner Image Preview & Crop -->
           <div id="banner-preview-container-new" class="mt-4 hidden">
-            <label class="mb-2 block text-sm font-medium text-gray-700">Position your banner image:</label>
-            <div class="relative overflow-hidden rounded-xl bg-gray-100" style="height: 200px;">
+            <label class="mb-2 block text-sm font-medium text-ink">Position your banner image:</label>
+            <div class="relative overflow-hidden rounded-[18px] bg-gray-100" style="height: 200px;">
               <img id="banner-preview-image-new" src="" alt="Banner preview" class="absolute inset-0 h-full w-full cursor-move object-cover" style="object-position: center center;">
               <div class="pointer-events-none absolute inset-0 border-2 border-dashed border-whiskey-400"></div>
               <div class="absolute right-2 top-2 rounded bg-black/50 px-2 py-1 text-xs text-white">
@@ -89,24 +80,24 @@
               </div>
             </div>
             <%= form.hidden_field :banner_position, value: "center center", id: "banner-position-new" %>
-            <p class="mt-2 text-xs text-gray-500">The image will be cropped to fit the banner area. Drag the image to position it how you'd like it to appear.</p>
+            <p class="mt-2 text-xs text-mute">The image will be cropped to fit the banner area. Drag the image to position it how you'd like it to appear.</p>
           </div>
         </div>
 
         <!-- Privacy Setting -->
         <fieldset>
-          <legend class="mb-1 block text-sm font-medium text-gray-700">Privacy <span class="text-whiskey-600">*</span></legend>
+          <legend class="mb-1 block text-sm font-medium text-ink">Privacy <span class="text-mark">*</span></legend>
           <div class="mt-3 grid grid-cols-1 gap-4 md:grid-cols-2">
             <!-- Public Option -->
             <label class="block cursor-pointer">
               <%= form.radio_button :is_private, false, checked: !@society.is_private, class: "peer sr-only", id: "public_society" %>
-              <div class="h-full rounded-xl border-2 border-gray-200 p-6 transition hover:border-whiskey-300 peer-checked:border-whiskey-600 peer-checked:bg-whiskey-50 peer-focus-visible:ring-2 peer-focus-visible:ring-whiskey-500 peer-focus-visible:ring-offset-2">
+              <div class="h-full rounded-[18px] border-2 border-hairline p-6 transition hover:border-whiskey-300 peer-checked:border-ink peer-checked:bg-paper peer-focus-visible:ring-2 peer-focus-visible:ring-ink/30 peer-focus-visible:ring-offset-2">
                 <h3 class="text-lg font-semibold text-gray-900">Public society</h3>
-                <p class="mt-0.5 text-sm text-gray-500">Open to everyone</p>
-                <p class="mt-3 text-sm leading-relaxed text-gray-600">
+                <p class="mt-0.5 text-sm text-mute">Open to everyone</p>
+                <p class="mt-3 text-sm leading-relaxed text-mute">
                   Anyone can discover and join your society instantly. Perfect for growing a large, welcoming community and meeting new whiskey enthusiasts.
                 </p>
-                <p class="mt-4 flex items-center gap-1.5 text-sm font-medium text-whiskey-700">
+                <p class="mt-4 flex items-center gap-1.5 text-sm font-medium text-ink">
                   <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                   </svg>
@@ -118,13 +109,13 @@
             <!-- Private Option -->
             <label class="block cursor-pointer">
               <%= form.radio_button :is_private, true, checked: @society.is_private, class: "peer sr-only", id: "private_society" %>
-              <div class="h-full rounded-xl border-2 border-gray-200 p-6 transition hover:border-whiskey-300 peer-checked:border-whiskey-600 peer-checked:bg-whiskey-50 peer-focus-visible:ring-2 peer-focus-visible:ring-whiskey-500 peer-focus-visible:ring-offset-2">
+              <div class="h-full rounded-[18px] border-2 border-hairline p-6 transition hover:border-whiskey-300 peer-checked:border-ink peer-checked:bg-paper peer-focus-visible:ring-2 peer-focus-visible:ring-ink/30 peer-focus-visible:ring-offset-2">
                 <h3 class="text-lg font-semibold text-gray-900">Private society</h3>
-                <p class="mt-0.5 text-sm text-gray-500">Invite only</p>
-                <p class="mt-3 text-sm leading-relaxed text-gray-600">
+                <p class="mt-0.5 text-sm text-mute">Invite only</p>
+                <p class="mt-3 text-sm leading-relaxed text-mute">
                   Members join by invitation: share your invite link or invite them by email. Ideal for keeping the circle to people you know.
                 </p>
-                <p class="mt-4 flex items-center gap-1.5 text-sm font-medium text-whiskey-700">
+                <p class="mt-4 flex items-center gap-1.5 text-sm font-medium text-ink">
                   <svg class="h-4 w-4" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
                   </svg>
@@ -138,33 +129,33 @@
         <!-- Action Buttons -->
         <div class="flex flex-col gap-4 pt-2 sm:flex-row">
           <%= form.submit "Create society",
-              class: "flex-1 cursor-pointer rounded-xl bg-whiskey-600 px-8 py-4 text-lg font-semibold text-white transition hover:bg-whiskey-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2" %>
+              class: "btn btn-primary flex-1 cursor-pointer" %>
           <%= link_to "Cancel", societies_path,
-              class: "flex-1 rounded-xl border border-gray-200 bg-gray-100 px-8 py-4 text-center text-lg font-semibold text-gray-700 transition hover:bg-gray-200" %>
+              class: "btn btn-secondary flex-1" %>
         </div>
 
         <!-- Pro Tips -->
-        <div class="rounded-xl border border-whiskey-100 bg-whiskey-50 p-6">
-          <h3 class="eyebrow mb-3 text-whiskey-700">Pro tips</h3>
-          <ul class="space-y-2 text-sm text-gray-700">
+        <div class="rounded-[18px] bg-paper p-6">
+          <h3 class="mb-3 text-base font-semibold text-ink">Pro tips</h3>
+          <ul class="space-y-2 text-sm text-ink">
             <li class="flex items-start gap-2">
-              <span class="mt-1 text-whiskey-500">&bull;</span>
+              <span class="mt-1 text-ink">&bull;</span>
               <span><strong class="font-semibold text-gray-900">Be specific:</strong> Names like "Bourbon Lovers NYC" work better than "Whiskey Group"</span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="mt-1 text-whiskey-500">&bull;</span>
+              <span class="mt-1 text-ink">&bull;</span>
               <span><strong class="font-semibold text-gray-900">Set expectations:</strong> Mention meeting frequency, experience level, and what members should bring</span>
             </li>
             <li class="flex items-start gap-2">
-              <span class="mt-1 text-whiskey-500">&bull;</span>
+              <span class="mt-1 text-ink">&bull;</span>
               <span><strong class="font-semibold text-gray-900">Start public:</strong> You can always change to private later as your community grows</span>
             </li>
           </ul>
         </div>
       <% end %>
     </div>
-  </div>
 </div>
+
 
 <script>
 document.addEventListener('DOMContentLoaded', function() {

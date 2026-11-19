@@ -62,4 +62,19 @@ class SocietyMembershipsControllerTest < ActionDispatch::IntegrationTest
     patch society_membership_path(@officer_m), params: { role: "member" }
     assert_equal "officer", @officer_m.reload.role
   end
+
+  # D3: the society page hides the controls the server would refuse.
+  test "an officer sees no controls on admin rows but does on ordinary members" do
+    sign_in @officer
+    get society_path(@society)
+    assert_response :success
+    assert_select "form[action='#{society_membership_path(@admin_m)}']", false
+    assert_select "form[action='#{society_membership_path(@member_m)}']"
+  end
+
+  test "the founder sees remove controls on admin rows" do
+    sign_in @creator
+    get society_path(@society)
+    assert_select "form[action='#{society_membership_path(@admin_m)}']"
+  end
 end
