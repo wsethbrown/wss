@@ -1,7 +1,7 @@
 source "https://rubygems.org"
 
 # Bundle edge Rails instead: gem "rails", github: "rails/rails", branch: "main"
-gem "rails", "~> 8.0.2"
+gem "rails", "~> 8.1.4"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
 # Use postgresql as the database for Active Record
@@ -105,7 +105,7 @@ gem "stripe", "~> 10.0"
 gem "redcarpet", "~> 3.6"
 
 # Reading .pptx files for deck import (a .pptx is a zip of XML)
-gem "rubyzip", "~> 2.3", require: "zip"
+gem "rubyzip", "~> 3.4", require: "zip"
 
 gem "lograge", "~> 0.15.0"
 gem "sentry-ruby", "~> 6.6"

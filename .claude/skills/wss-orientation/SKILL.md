@@ -7,7 +7,7 @@ description: Read FIRST in any WSS (Whiskey Share Society) session — project m
 
 WSS is a subscription marketplace for narrative whiskey tasting decks, plus
 societies (public/private groups) with events/RSVPs and a reviews/community
-layer. Rails 8, Ruby 3.4.3, PostgreSQL, Hotwire, Tailwind v4, Devise+Pundit,
+layer. Rails 8.1, Ruby 3.4.12, PostgreSQL, Hotwire, Tailwind v4, Devise+Pundit,
 Stripe (LIVE), Solid Queue, Docker. Deployed to production — see
 wss-production-launch.
 
