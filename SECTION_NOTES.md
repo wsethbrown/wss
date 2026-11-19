@@ -152,14 +152,13 @@ until a week after `end_time` (`Event#comments_open?`).
 **State:** Panels are partials (`account/_*_panel`): Profile, Account details,
 My presentations, My societies, Followed, Subscription, Billing. Section
 navigation is a row of chips on phones and a left column on desktop; tabs are
-switched by the inline script in `account/index` (URL hash deep links; legacy
+switched by the `account-tabs` Stimulus controller (tablist/tab/tabpanel roles,
+arrow keys; URL hash deep links; legacy
 `?subscription` param for Stripe returns). In-panel links to another tab use
 `data-tab-link` (billing's "View plans" → `/account#subscription`). Headings and
 tab labels are sentence case.
 
 **Gaps:**
-- The tab switcher is still an inline script that adds document listeners on
-  every Turbo visit (I17; B17 converts it to Stimulus with tab semantics).
 - Billing history is read from Stripe invoices inline — consider a lazy Turbo
   frame.
 - 2FA is half-built (S7, B11 blocked on the owner).
@@ -302,3 +301,10 @@ assert behaviour and content, not Tailwind classes. System tests
 (test/system) need a ChromeDriver that matches the installed Chrome; in the
 redesign sandbox they could not start (version mismatch), so account tab and
 magic-link flows were checked in a real browser with Playwright instead.
+
+## 15. Known pre-existing issues (not caused by the redesign)
+
+- `/events/:id/reviews/new` without a `bottle` param returns 404.
+- CLAUDE.md "Admin Panel Development" refers to `admin_panel_todo.md`, which does not
+  exist. Owner to reword that section.
+- The sign-up Terms and Privacy links are `href="#"`. Owner decision pending.

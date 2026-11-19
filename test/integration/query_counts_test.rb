@@ -8,9 +8,7 @@ class QueryCountsTest < ActionDispatch::IntegrationTest
 
   # Views allowed to show an original on purpose, or waiting on their owning task:
   #  - societies/edit.html.erb: the banner cropper edits the full-size original, on purpose.
-  #  - presentations/show.html.erb: B17 owns it; its slide image_tag and og:image still need the
-  #    variants (see the B16 hand-back).
-  EXEMPT_FROM_VARIANT_RULE = %w[societies/edit.html.erb presentations/show.html.erb].freeze
+  EXEMPT_FROM_VARIANT_RULE = %w[societies/edit.html.erb].freeze
 
   # Counts the SQL a block runs, ignoring schema lookups and transaction control.
   def count_queries

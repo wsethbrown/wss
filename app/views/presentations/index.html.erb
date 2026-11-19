@@ -30,13 +30,14 @@
         actions: (current_user&.admin? ? link_to("Manage decks in the admin panel", admin_presentations_path, class: "btn btn-secondary") : nil) %>
 
   <!-- Filters -->
-  <%= form_with url: presentations_path, method: :get, local: true, id: "deck-filters", class: "flex flex-col gap-3 md:flex-row md:items-center" do |form| %>
+  <%= form_with url: presentations_path, method: :get, local: true, id: "deck-filters", data: { controller: "filter-form" }, class: "flex flex-col gap-3 md:flex-row md:items-center" do |form| %>
     <div class="relative min-w-0 flex-1">
       <svg class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-mute" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
         <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"></path>
       </svg>
       <%= form.label :search, "Search decks", class: "sr-only" %>
       <%= form.search_field :search, value: params[:search], placeholder: "Search decks...",
+          data: { filter_form_target: "search", action: "input->filter-form#queue" },
           class: "w-full rounded-2xl border border-hairline bg-white py-3 pl-12 pr-4 text-gray-900 placeholder-gray-500 focus:border-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/30" %>
     </div>
 
@@ -46,13 +47,13 @@
       <%= form.label :category, "Category", class: "sr-only" %>
       <%= form.select :category,
           options_for_select([['All categories', '']] + @categories.map { |c| [c, c] }, params[:category]),
-          {}, class: select_class %>
+          {}, class: select_class, data: { filter_form_target: "select", action: "change->filter-form#submit" } %>
 
       <% if @difficulties.many? %>
         <%= form.label :difficulty, "Level", class: "sr-only" %>
         <%= form.select :difficulty,
             options_for_select([['Any level', '']] + @difficulties.map { |d| [d, d] }, params[:difficulty]),
-            {}, class: select_class %>
+            {}, class: select_class, data: { filter_form_target: "select", action: "change->filter-form#submit" } %>
       <% end %>
 
       <%= form.label :sort, "Sort", class: "sr-only" %>
@@ -63,7 +64,7 @@
             ['Price: low to high', 'price_low'],
             ['Price: high to low', 'price_high']
           ], params[:sort]),
-          {}, class: select_class %>
+          {}, class: select_class, data: { filter_form_target: "select", action: "change->filter-form#submit" } %>
 
       <%= form.submit "Filter", class: "btn btn-primary min-h-12 cursor-pointer" %>
     </div>
@@ -135,30 +136,3 @@
   <% end %>
 </div>
 
-<script>
-  // Debounced auto-submit keeps the filters live without a dedicated Apply click.
-  (function () {
-    function initFilters() {
-      const form = document.getElementById('deck-filters');
-      if (!form) return;
-      const search = form.querySelector('input[name="search"]');
-      let timer;
-
-      if (search && !search.dataset.bound) {
-        search.dataset.bound = 'true';
-        search.addEventListener('input', function () {
-          clearTimeout(timer);
-          timer = setTimeout(function () { form.submit(); }, 500);
-        });
-      }
-
-      form.querySelectorAll('select').forEach(function (select) {
-        if (select.dataset.bound) return;
-        select.dataset.bound = 'true';
-        select.addEventListener('change', function () { form.submit(); });
-      });
-    }
-    document.addEventListener('turbo:load', initFilters);
-    document.addEventListener('DOMContentLoaded', initFilters);
-  })();
-</script>

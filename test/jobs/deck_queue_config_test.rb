@@ -45,6 +45,13 @@ class DeckQueueConfigTest < ActiveJob::TestCase
     assert_equal "renders", DeckImportJob.new.queue_name
   end
 
+  test "Active Storage variant transforms run on the renders queue, not the mail queue" do
+    assert_equal "renders", ActiveStorage::TransformJob.new.queue_name.to_s
+    %w[production development].each do |env|
+      assert_includes workers(env).flat_map { |w| queues_of(w) }, "renders"
+    end
+  end
+
   # A magic-link mail enqueued while a render is queued goes to a queue that
   # only the mail worker serves, so the render worker being busy can't hold it.
   test "a magic-link mail enqueued behind a render is served by the mail worker" do

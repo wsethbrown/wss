@@ -29,7 +29,7 @@
     across ALL tastings, not this deck's nights, so it has to say so. %>
 <% if pour.linked? && pour.bottle.average_rating.present? %>
   <div class="mt-4 flex items-center gap-2">
-    <span class="text-mark"><%= render "bottles/rating", value: pour.bottle.average_rating %></span>
+    <span class="text-mark-deep"><%= render "bottles/rating", value: pour.bottle.average_rating %></span>
     <span class="text-xs text-mute">overall rating</span>
   </div>
 <% end %>

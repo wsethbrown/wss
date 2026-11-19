@@ -49,6 +49,7 @@
   --color-hairline: #dfe3dc;
   --color-mark: #ff6d00;
   --color-mark-soft: #ff8a33;
+  --color-mark-deep: #e65c00;  /* orange graphics on paper/white: 3.5:1 on white, 3.2:1 on paper */
 
   /* Dark narrative surfaces */
   --color-char: #16332a;      /* bottle green, the dark surface */

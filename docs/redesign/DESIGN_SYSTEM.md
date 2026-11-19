@@ -45,13 +45,16 @@ Rules:
 | `whiskey-700` | `#10261f` | Primary button hover |
 | `oak`, `oak-edge` | `#1d4034`, `#2f5546` | Raised surface and hairline on green |
 | `cream` | `#f6f4ee` | Text on green |
-| `mark`, `mark-soft` | `#ff6d00`, `#ff8a33` | The logo orange. Small marks only. |
+| `mark`, `mark-soft` | `#ff6d00`, `#ff8a33` | The logo orange, for marks on green surfaces and the logo. 4.83:1 on green, but only 2.82:1 on white and 2.57:1 on paper, so never on a light surface. |
+| `mark-deep` | `#e65c00` | Orange graphics on white or paper: stars, score bars, unread and live dots, focus outlines. 3.56:1 on white, 3.24:1 on paper (passes 3:1 for graphics). |
 | `rsvp-yes/-maybe/-no` | unchanged | RSVP answers only |
 
 Rules:
 
 - Green and neutrals do all the work. **Orange is a mark, not a fill**: a step numeral, a
-  rating star, a date label, an unread dot. Never a button, a band or a background, except
+  rating star, an unread dot. On white or paper use `mark-deep`; use `mark` only on green
+  and for the logo. **Orange is never text on a light surface** (neither token reaches 4.5:1
+  there): date labels and required-field asterisks are ink. Never a button, a band or a background, except
   the HTML "pour" slide on the homepage, which mirrors the deck template.
 - **No yellow, amber or mustard anywhere.** No blue, purple, emerald or red one-offs.
   Errors use Tailwind `red-700` text on `red-50`; success uses green ink on `whiskey-100`.

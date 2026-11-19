@@ -65,7 +65,7 @@
                 <p class="text-xs text-mute"><%= [bottle.distillery, bottle.style].compact_blank.join(" · ") %></p>
               </div>
               <div class="shrink-0 text-right">
-                <span class="text-mark"><%= render "bottles/rating", value: bottle.board_avg.to_f %></span>
+                <span class="text-mark-deep"><%= render "bottles/rating", value: bottle.board_avg.to_f %></span>
                 <p class="mt-0.5 text-xs text-mute"><%= pluralize(bottle.board_reviewers, "reviewer") %></p>
               </div>
             </div>

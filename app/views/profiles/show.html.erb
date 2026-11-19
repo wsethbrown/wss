@@ -118,7 +118,7 @@
                     <% score = @shelf_scores[item.bottle_id] %>
                     <% if score&.avg_rating %>
                       <span class="shrink-0 whitespace-nowrap text-sm text-mute">
-                        <%= score.avg_rating.to_f.round(1) %> <span class="text-mark">&#9733;</span>
+                        <%= score.avg_rating.to_f.round(1) %> <span class="text-mark-deep">&#9733;</span>
                         &middot; <%= pluralize(score.reviewers, "tasting") %>
                       </span>
                     <% end %>

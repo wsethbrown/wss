@@ -20,7 +20,7 @@
       <div class="min-w-0 max-w-2xl">
         <p class="mb-3 flex items-center gap-2 text-sm font-medium text-mute">
           <% if @event.ongoing? %>
-            <span class="inline-block h-2 w-2 rounded-full bg-mark motion-safe:animate-pulse" aria-hidden="true"></span>
+            <span class="inline-block h-2 w-2 rounded-full bg-mark-deep motion-safe:animate-pulse" aria-hidden="true"></span>
             Happening now
           <% elsif @event.upcoming? %>
             Upcoming · in <%= distance_of_time_in_words(Time.current, @event.start_time) %>
