@@ -10,7 +10,7 @@
             <p class="mt-2 text-[17px] text-mute">Member since <%= @user.created_at.strftime('%B %Y') %></p>
             <div class="mt-3 flex flex-wrap gap-2">
               <span class="chip"><%= pluralize(@visible_societies.count, "society") %></span>
-              <span class="chip"><%= @user.event_rsvps.where(status: 'confirmed').count %> events attended</span>
+              <span class="chip"><%= @user.events_attended_count %> events attended</span>
               <span class="chip"><%= pluralize(@user.followers_count, "follower") %></span>
             </div>
           </div>

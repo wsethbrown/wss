@@ -30,9 +30,11 @@ wss-membership-model for the free-vs-paid split.
 
 ## Invites (the doors into a private society)
 - societies.invite_token (unique, lazily generated via invite_token!).
-- GET /invite/:token → join_by_invite: signed-in + valid token joins (works
-  for private — the link IS the invite); already-member and bad-token paths
-  redirect gracefully. **Signed-out gets the PEEK** (owner-approved July
+- GET /invite/:token → join_by_invite: a signed-in non-member sees a
+  one-button CONFIRM page (invite_confirm; mail scanners follow GETs, so a GET
+  never joins). POST /invite/:token → accept_invite joins (works for private —
+  the link IS the invite); already-member and bad-token paths redirect
+  gracefully. **Signed-out gets the PEEK** (owner-approved July
   2026, societies/invite.html.erb): masthead + About + top-3 review board +
   join CTA; private societies show NO member identities/counts/founder. The
   token is stashed in session and ApplicationController#consume_pending_invite
@@ -62,6 +64,9 @@ wss-membership-model for the free-vs-paid split.
 ## Events
 - Nested under societies; creating from a society page pre-pins society_id.
 - RSVP yes/maybe/no with turbo_stream updates; logs :event_rsvp activity.
+- Emailed RSVP links (GET /email_rsvps/:status) only show a confirm page; its
+  button POSTs to record the answer, re-checking the RSVP policy for the
+  token's user (a removed member's old link is refused).
 - "Table talk" comments (EventComment, owner-approved July 2026): society
   members/organizer/global admin may post (EventPolicy#comment?); window is
   event creation → end_time + 7 days, enforced in the MODEL so it can't be

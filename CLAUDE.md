@@ -189,11 +189,6 @@ source of truth for what's done and what's next. Key invariants established ther
 This prevents context loss! Update this file IMMEDIATELY when creating important docs.
 
 ### Key Documentation References
-- **@Architecture.md** - System architecture overview, technology stack, design patterns, and scalability planning
-- **@Database.md** - Complete database schema documentation, relationships, indexes, and common queries
-- **@SecurityChecklist.md** - Comprehensive security checklist, best practices, and incident response procedures
-- **@Backlog.md** - Task management system using file-based kanban boards and workflow documentation
-- **@admin_panel_todo.md** - Admin panel development plan, requirements, and progress tracking
 - **@docs/redesign/DESIGN_SYSTEM.md** - The 2026 design system: surfaces, colour, type, components, rejected directions
 - **@docs/redesign/ARCHITECTURE_REVIEW.md** - November 2026 architecture and backend review, findings by severity
 - **@docs/redesign/TASKS.md** - The redesign and backend task list with acceptance criteria and test plans

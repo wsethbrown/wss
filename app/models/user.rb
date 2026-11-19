@@ -294,7 +294,12 @@ class User < ApplicationRecord
   def century? = followers_count >= CENTURY_THRESHOLD
 
   def rsvped_to?(event)
-    event_rsvps.exists?(event: event, status: "confirmed")
+    event_rsvps.exists?(event: event, status: "yes")
+  end
+
+  # Past events the user RSVP'd "yes" to (the profile's "events attended").
+  def events_attended_count
+    event_rsvps.yes.joins(:event).merge(Event.past).count
   end
 
   def admin_societies

@@ -236,7 +236,7 @@
     <% end %>
 
     <!-- The story, narrative deck content, rendered from Markdown -->
-    <section class="<%= section_class %> scroll-mt-24" id="deck-story">
+    <section class="<%= section_class %> scroll-mt-24" id="deck-story" data-controller="deck-thread">
       <div class="md:col-span-4">
         <h2 class="<%= heading_class %>"><%= @full_story ? 'The story' : 'A taste of the writing' %></h2>
         <% if @presentation.content.present? && @presentation.reading_time.positive? %>
@@ -249,7 +249,7 @@
             <%# The thread: a thin line that fills as you read, the narrative spine
                 connecting the pour to its story. %>
             <div class="absolute bottom-1 left-0 top-1 w-[2px] rounded bg-whiskey-100" aria-hidden="true">
-              <div id="deck-thread" class="w-full rounded bg-ink transition-[height] duration-150 ease-out" style="height: 0%"></div>
+              <div id="deck-thread" data-deck-thread-target="thread" class="w-full rounded bg-ink transition-[height] duration-150 ease-out" style="height: 0%"></div>
             </div>
 
             <% if @presentation.content.present? %>
@@ -284,31 +284,6 @@
         </div>
       </div>
     </section>
-
-    <script>
-      // Fill the story thread to match reading progress through the section.
-      (function () {
-        function initDeckThread() {
-          const story = document.getElementById('deck-story');
-          const thread = document.getElementById('deck-thread');
-          if (!story || !thread) return;
-
-          function update() {
-            const rect = story.getBoundingClientRect();
-            const viewport = window.innerHeight;
-            const total = rect.height - viewport * 0.5;
-            const progress = total > 0 ? Math.min(1, Math.max(0, (viewport * 0.5 - rect.top) / total)) : 1;
-            thread.style.height = (progress * 100).toFixed(1) + '%';
-          }
-
-          update();
-          window.addEventListener('scroll', update, { passive: true });
-          window.addEventListener('resize', update, { passive: true });
-        }
-        document.addEventListener('turbo:load', initDeckThread);
-        document.addEventListener('DOMContentLoaded', initDeckThread);
-      })();
-    </script>
 
     <!-- The slides, a teaser for non-owners ONLY. We never show the whole deck
          here: the preview caps below the slide count and the last one fades

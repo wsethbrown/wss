@@ -2,7 +2,7 @@
 
 <%= render "shared/page_header", title: "Account" %>
 
-<div class="grid gap-6 md:grid-cols-[14rem_minmax(0,1fr)] md:gap-10">
+<div class="grid gap-6 md:grid-cols-[14rem_minmax(0,1fr)] md:gap-10" data-controller="account-tabs">
   <!-- Section navigation: a row of chips on phones, a left column from md up -->
   <nav aria-label="Account sections" class="flex flex-wrap gap-2 md:sticky md:top-24 md:h-fit md:flex-col">
             <a href="#profile" class="inline-flex min-h-11 items-center gap-2.5 rounded-xl border border-ink bg-ink px-3.5 text-sm font-medium text-white md:w-full group" data-tab="profile">
@@ -61,102 +61,3 @@
     <%= render 'account/subscription_panel' %>
   </div>
 </div>
-
-<script>
-function initializeAccountPage() {
-  const tabs = document.querySelectorAll('[data-tab]');
-  const contents = document.querySelectorAll('.tab-content');
-
-  function activateTab(tabName) {
-    // Get fresh references to tabs and contents
-    const currentTabs = document.querySelectorAll('[data-tab]');
-    const currentContents = document.querySelectorAll('.tab-content');
-    
-    // Remove active classes from all tabs
-    currentTabs.forEach(t => {
-      t.className = 'inline-flex min-h-11 items-center gap-2.5 rounded-xl border border-hairline bg-white px-3.5 text-sm font-medium text-ink transition hover:border-whiskey-300 md:w-full group';
-      const icon = t.querySelector('svg');
-      if (icon) {
-        icon.className = 'h-5 w-5 shrink-0 text-mute';
-      }
-    });
-    
-    // Add active classes to target tab
-    const targetTab = document.querySelector(`[data-tab="${tabName}"]`);
-    if (targetTab) {
-      targetTab.className = 'inline-flex min-h-11 items-center gap-2.5 rounded-xl border border-ink bg-ink px-3.5 text-sm font-medium text-white md:w-full group';
-      const activeIcon = targetTab.querySelector('svg');
-      if (activeIcon) {
-        activeIcon.className = 'h-5 w-5 shrink-0 text-white';
-      }
-    }
-    
-    // Hide all content with fresh references
-    currentContents.forEach(content => {
-      content.classList.add('hidden');
-    });
-    
-    // Show target content
-    const targetContent = document.getElementById(tabName + '-content');
-    if (targetContent) {
-      targetContent.classList.remove('hidden');
-
-      // Bring the newly shown panel into view. When scrolled deep into a long
-      // panel (e.g. Billing History), swapping content above the fold looks
-      // like the click did nothing. Only scroll when actually needed.
-      const navClearance = 96;
-      const panelTop = targetContent.getBoundingClientRect().top + window.scrollY - navClearance;
-      if (window.scrollY > panelTop) {
-        const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-        window.scrollTo({ top: Math.max(panelTop, 0), behavior: reduceMotion ? 'auto' : 'smooth' });
-      }
-    }
-  }
-
-  // Use event delegation instead of individual listeners
-  document.addEventListener('click', function(e) {
-    // In-panel links to another tab (e.g. billing's "View plans").
-    const tabLink = e.target.closest('[data-tab-link]');
-    if (tabLink) {
-      e.preventDefault();
-      activateTab(tabLink.getAttribute('data-tab-link'));
-      history.replaceState(null, '', '#' + tabLink.getAttribute('data-tab-link'));
-      return;
-    }
-    const tabElement = e.target.closest('[data-tab]');
-    if (tabElement) {
-      e.preventDefault();
-      const targetTab = tabElement.getAttribute('data-tab');
-      activateTab(targetTab);
-      // The click handler suppresses native anchor navigation, so mirror the
-      // tab into the hash by hand, keeps deep links and back/forward sane.
-      history.replaceState(null, '', '#' + targetTab);
-    }
-  });
-  
-  // Restore the tab named in the URL (hash deep-link, or legacy ?subscription
-  // param used by Stripe checkout return URLs).
-  const urlParams = new URLSearchParams(window.location.search);
-  const hash = window.location.hash.substring(1);
-
-  if (urlParams.has('subscription')) {
-    activateTab('subscription');
-  } else if (hash && document.getElementById(hash + '-content')) {
-    activateTab(hash);
-  }
-}
-
-// Initialize on DOM ready and Turbo navigation
-document.addEventListener('DOMContentLoaded', initializeAccountPage);
-document.addEventListener('turbo:load', initializeAccountPage);
-
-function showPlanSelector() {
-  document.getElementById('plan-selector').classList.remove('hidden');
-}
-
-function hidePlanSelector(event) {
-  if (!event || event.target === event.currentTarget) {
-    document.getElementById('plan-selector').classList.add('hidden');
-  }
-}
-</script>
