@@ -17,9 +17,40 @@ class HomeController < ApplicationController
     @deck_categories = Presentation.published.where.not(category: [ nil, "" ]).distinct.order(:category).limit(6).pluck(:category)
 
     # Earlier design studies, kept for reference: ?design=next and ?design=next2.
-    preview = { "next" => "index_next", "next2" => "index_next2" }[params[:design]]
+    preview = { "next" => "index_next", "next2" => "index_next2", "next4" => "index_next4" }[params[:design]]
     if preview && design_preview_allowed?
       Rails.logger.info "Home: rendering #{preview} design study"
+      if preview == "index_next4"
+        # "The night, pour by pour" study (docs/redesign/DIRECTION_NIGHT.md).
+        # Public societies only, so nothing private reaches a signed-out page.
+        public_events = Event.joins(:society).where(societies: { is_private: false })
+        @night = public_events.upcoming.includes(:society, :host, :presentation).first
+        @coming_up = public_events.upcoming.includes(:society).limit(3)
+        if @night
+          @night_deck = @night.presentation if @night.presentation&.published?
+          # Pour names only once Event#pours_revealed? says so; the homepage
+          # never uses the host/manager bypass, so a secret pour stays secret.
+          @night_pours = @night.event_bottles.ordered.includes(:bottle).to_a
+          @night_members = @night.society.member_count
+        end
+        # The verdict: the latest revealed public night with event reviews.
+        @verdict_night = public_events.past.includes(:society)
+                                      .where(id: Review.where.not(event_id: nil).select(:event_id))
+                                      .limit(10).detect(&:pours_revealed?)
+        if @verdict_night
+          by_bottle = @verdict_night.reviews.includes(:user).recent_first.group_by(&:bottle_id)
+          @verdict_rows = @verdict_night.event_bottles.ordered.includes(:bottle).each_with_index.filter_map do |pour, i|
+            reviews = by_bottle[pour.bottle_id]
+            next if reviews.blank?
+            { pour: pour, number: i + 1, mean: (reviews.sum(&:rating) / reviews.size).to_f.round(2),
+              count: reviews.size, note: reviews.detect { |r| r.notes.present? } }
+          end.sort_by { |row| [ -row[:mean], row[:number] ] }
+          Rails.logger.info "Home next4: night #{@night&.id || 'none'}, verdict night #{@verdict_night.id} (#{@verdict_rows.size} scored pours)"
+        else
+          Rails.logger.info "Home next4: night #{@night&.id || 'none'}, no revealed public night with reviews"
+        end
+        @night_story_deck = @night_deck if @night_deck&.slide_images&.attached?
+      end
       render preview
     end
   end

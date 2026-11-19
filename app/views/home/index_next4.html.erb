@@ -1,0 +1,425 @@
+<%# Design study: "The night, pour by pour" (?design=next4).
+    Brief: docs/redesign/DIRECTION_NIGHT.md. The homepage walks the arc of a
+    WSS night with real data: the invitation, who is on deck, the story, the
+    pours, the verdict, your table. An act whose data is missing does not
+    render. The night itself is the page's one green panel (the evening is
+    dark); the verdict, the morning after, sits on paper as a tasting sheet.
+    Public societies only (HomeController). Pour names show only when
+    Event#pours_revealed?; no host/manager bypass on a public page.
+    Styles are scoped to .n4; the glass is home/next4/_glass. %>
+<%
+  story_deck = @night_story_deck || @showcase_deck
+  slides = story_deck ? story_deck.slide_images.order(:id).first(story_deck.effective_preview_slide_count) : []
+  reel = [ slides.size, 1 ].max
+  step = (100.0 / reel).round(2)
+  rules = [
+    "One presenter a month, everyone takes a turn.",
+    "Research your topic like you mean it.",
+    "Choose the bottles that belong to the story.",
+    "No dry fact sheets. Follow the narrative threads."
+  ]
+
+  if @night
+    yes = @night.yes_count
+    maybe = @night.maybe_count
+    seats = [ @night_members.to_i, yes + maybe ].max
+    shown_seats = [ seats, 12 ].min
+    seat_levels = Array.new([ yes, shown_seats ].min, 0.62) +
+                  Array.new([ maybe, shown_seats - [ yes, shown_seats ].min ].min, 0.3)
+    seat_levels += Array.new(shown_seats - seat_levels.size, 0)
+    reply_line = @night.total_rsvp_count.zero? ? "No replies yet" :
+      [ "#{yes} going", (maybe.positive? ? "#{maybe} maybe" : nil) ].compact.join(", ")
+    revealed = @night.pours_revealed?
+    host = @night.host
+    host_name = @night.host_display_name
+  end
+
+  if @verdict_night
+    tasters = @verdict_night.reviews.distinct.count(:user_id)
+  end
+%>
+
+<% content_for :head do %>
+  <style>
+    .n4 { --bg: #f6f4ee; --card: #fff; --ink: #16332a; --oak: #1d4034; --edge: #2f5546; --text: #1b2924; --mute: #5f6b64; --line: rgba(22, 51, 42, .12); --mark: #ff6d00; --cream: #f6f4ee; --pad: 16px;
+          background: var(--bg); color: var(--text); font-family: "Instrument Sans", system-ui, sans-serif; overflow-x: clip; }
+    .n4 *, .n4 *::before { box-sizing: border-box; }
+    .n4 .wrap { max-width: 1240px; margin: 0 auto; padding: 0 var(--pad); }
+    .n4 h1, .n4 h2, .n4 h3 { font-weight: 600; color: var(--ink); text-wrap: balance; }
+    .n4 h1 { font-size: clamp(2.75rem, 7.4vw, 6.5rem); line-height: .92; letter-spacing: -.055em; }
+    .n4 h2 { font-size: clamp(2.25rem, 4.6vw, 4rem); line-height: 1; letter-spacing: -.045em; }
+    .n4 h3 { font-size: 22px; letter-spacing: -.03em; line-height: 1.15; }
+    .n4 em { font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: -.03em; }
+    .n4 p { color: var(--mute); line-height: 1.55; text-wrap: pretty; }
+    .n4 .lede { font-size: clamp(1.0625rem, 1.5vw, 1.3125rem); max-width: 30em; }
+    .n4 .serif { font-family: "Source Serif 4", Georgia, serif; }
+    .n4 .num { font-variant-numeric: tabular-nums; }
+    .n4 a:focus-visible { outline: 2px solid var(--mark); outline-offset: 3px; border-radius: 8px; }
+    .n4 .n4-glass { display: block; flex: none; overflow: visible; }
+
+    .n4 .b { display: inline-flex; align-items: center; gap: 8px; min-height: 52px; padding: 0 24px; border-radius: 16px; font-weight: 600; font-size: 16px; letter-spacing: -.01em;
+             background: var(--ink); color: var(--cream); transition: transform .15s, box-shadow .15s; }
+    .n4 .b:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(22, 51, 42, .55); }
+    .n4 .b--quiet { background: var(--card); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+    .n4 .b--light { background: var(--cream); color: var(--ink); }
+    .n4 .acts { display: flex; flex-wrap: wrap; gap: 10px; }
+    .n4 .more { display: inline-flex; align-items: center; gap: 6px; min-height: 44px; font-weight: 600; font-size: 15px; color: var(--ink); }
+    .n4 .more::after { content: "→"; transition: transform .15s; }
+    .n4 .more:hover::after { transform: translateX(3px); }
+
+    /* Opening: a heading on paper, nothing else. */
+    .n4 .intro { padding: 112px 0 36px; display: grid; gap: 24px; align-items: end; }
+    .n4 .intro .note { font-size: 14px; margin-top: 16px; }
+
+    /* Act 1: the night. The page's one green panel. */
+    .n4 .night { background: var(--ink); color: var(--cream); border-radius: 30px; padding: 28px 22px 26px; display: grid; gap: 40px; }
+    .n4 .night p { color: rgba(246, 244, 238, .74); }
+    .n4 .night .soc { display: flex; flex-wrap: wrap; gap: 4px 10px; align-items: center; font-size: 15px; color: rgba(246, 244, 238, .74); }
+    .n4 .night .soc a { color: var(--cream); font-weight: 600; }
+    .n4 .night .soc .dot { width: 7px; height: 7px; border-radius: 9px; background: var(--mark); }
+    .n4 .night .when { margin-top: 26px; font-weight: 600; color: var(--cream); letter-spacing: -.06em; line-height: .86; font-size: clamp(3rem, 14.5vw, 7rem); }
+    .n4 .when span { display: block; }
+    .n4 .when small { font-size: .32em; letter-spacing: -.02em; font-weight: 500; margin-left: .15em; }
+    .n4 .when em { color: var(--cream); letter-spacing: -.045em; }
+    .n4 .date { margin-top: 22px; font-size: clamp(1.25rem, 2vw, 1.6rem); letter-spacing: -.02em; color: var(--cream); }
+    .n4 .date span { color: rgba(246, 244, 238, .6); }
+    .n4 .night h2 { color: var(--cream); font-size: clamp(1.75rem, 3.4vw, 2.75rem); margin-top: 30px; overflow-wrap: anywhere; }
+    .n4 .night .desc { margin-top: 12px; font-size: clamp(1.0625rem, 1.4vw, 1.25rem); max-width: 32em; }
+    .n4 .night .acts { margin-top: 30px; align-items: center; }
+    .n4 .night .more { color: var(--cream); }
+    .n4 .side { display: flex; flex-direction: column; gap: 14px; }
+    .n4 .side .about { margin-top: auto; padding: 4px 4px 0; }
+    .n4 .side .about p { font-size: 17px; line-height: 1.5; margin-top: 8px; }
+    .n4 .side .about b { color: var(--cream); font-weight: 600; }
+    .n4 .bay { background: var(--oak); border-radius: 22px; padding: 20px; box-shadow: inset 0 0 0 1px var(--edge); }
+    .n4 .bay h3 { color: var(--cream); font-size: 18px; letter-spacing: -.02em; }
+    .n4 .bay p { font-size: 15px; margin-top: 4px; }
+    .n4 .seats { display: flex; flex-wrap: wrap; gap: 8px 6px; margin-top: 20px; }
+    .n4 .deck { display: grid; grid-template-columns: 112px 1fr; gap: 14px; align-items: center; margin-top: 14px; color: var(--cream); }
+    .n4 .deck .th { aspect-ratio: 16 / 9; border-radius: 10px; overflow: hidden; background: #0e211b; box-shadow: 0 0 0 1px var(--edge); }
+    .n4 .deck .th img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .n4 .deck b { display: block; font-weight: 600; letter-spacing: -.015em; line-height: 1.2; }
+    .n4 .deck small { display: block; margin-top: 3px; font-size: 14px; color: rgba(246, 244, 238, .66); }
+    .n4 .host { display: flex; align-items: center; gap: 12px; margin-top: 14px; color: var(--cream); font-weight: 600; }
+    .n4 .flight { display: flex; flex-wrap: wrap; gap: 14px 18px; margin-top: 16px; }
+    .n4 .flight li { display: grid; justify-items: center; gap: 8px; min-width: 46px; max-width: 96px; text-align: center; font-size: 13px; line-height: 1.25; color: rgba(246, 244, 238, .8); }
+    .n4 .flight ol, .n4 ol.flight { list-style: none; padding: 0; margin: 16px 0 0; }
+
+    /* Act 3: the story. */
+    .n4 .story { display: grid; gap: 36px; align-items: center; padding: 104px 0 24px; }
+    .n4 .story .lede { margin-top: 18px; }
+    .n4 .story .more { margin-top: 18px; }
+    .n4 .player { display: block; background: var(--ink); border-radius: 28px; padding: 10px; box-shadow: 0 1px 2px rgba(22, 51, 42, .25), 0 50px 90px -36px rgba(22, 51, 42, .6); transition: transform .25s; }
+    .n4 .player:hover { transform: translateY(-4px); }
+    .n4 .reel { position: relative; aspect-ratio: 16 / 9; border-radius: 19px; overflow: hidden; background: #0e211b; }
+    .n4 .reel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; animation: n4-reel <%= reel * 4 %>s infinite; }
+    .n4 .reel img:only-child { opacity: 1; animation: none; }
+    .n4 .player:hover img { animation-play-state: paused; }
+    .n4 .bar { display: flex; align-items: center; gap: 14px; padding: 14px 12px 6px; color: var(--cream); font-size: 14px; }
+    .n4 .bar b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-width: 0; }
+    .n4 .bar span { opacity: .65; white-space: nowrap; }
+    .n4 .ticks { flex: 1; display: flex; gap: 5px; min-width: 32px; }
+    .n4 .ticks i { flex: 1; height: 3px; border-radius: 3px; background: var(--cream); opacity: .22; }
+    .n4 .ticks i:first-child { opacity: 1; }
+    @keyframes n4-reel { 0% { opacity: 0; } 3% { opacity: 1; } <%= step %>% { opacity: 1; } <%= step + 3 %>% { opacity: 0; } 100% { opacity: 0; } }
+
+    /* Act 5: the verdict, a tasting sheet on paper. */
+    .n4 .verdict { display: grid; gap: 32px; padding: 96px 0 24px; }
+    .n4 .verdict .of { margin-top: 22px; font-size: 15px; }
+    .n4 .verdict .of a { color: var(--ink); font-weight: 600; }
+    .n4 .took { display: flex; align-items: center; gap: 18px; margin-top: 30px; }
+    .n4 .took p { font-size: clamp(1.375rem, 2.4vw, 1.875rem); line-height: 1.15; letter-spacing: -.03em; color: var(--ink); font-weight: 500; }
+    .n4 .took b { font-weight: 600; }
+    .n4 .verdict .quote .by { display: block; margin-top: 6px; font-family: "Instrument Sans", system-ui, sans-serif; font-size: 13px; color: var(--mute); }
+    .n4 .verdict .quote { margin-top: 18px; font-size: clamp(1.125rem, 1.6vw, 1.375rem); color: var(--text); max-width: 26em; }
+    .n4 .sheet { background: var(--card); border-radius: 26px; box-shadow: inset 0 0 0 1px var(--line); padding: 8px 20px; }
+    .n4 .sheet .head { display: grid; grid-template-columns: 44px 1fr auto; gap: 14px; padding: 14px 0 12px; font-size: 13px; color: var(--mute); border-bottom: 1px solid var(--line); }
+    .n4 .sheet .head span:last-child { text-align: right; }
+    .n4 .row { display: grid; grid-template-columns: 44px 1fr auto; gap: 14px; align-items: center; padding: 20px 0; }
+    .n4 .row + .row { border-top: 1px solid var(--line); }
+    .n4 .row .name { font-weight: 600; font-size: 19px; letter-spacing: -.02em; color: var(--ink); line-height: 1.2; overflow-wrap: anywhere; }
+    .n4 .row .meta { display: block; margin-top: 3px; font-size: 14px; color: var(--mute); }
+    .n4 .row .said { display: block; margin-top: 8px; font-size: 15.5px; color: var(--text); line-height: 1.45; }
+    .n4 .row .said span { color: var(--mute); font-family: "Instrument Sans", system-ui, sans-serif; font-style: normal; font-size: 13px; }
+    .n4 .row .sc { text-align: right; }
+    .n4 .row .sc b { display: block; font-size: 30px; font-weight: 600; letter-spacing: -.04em; color: var(--ink); line-height: 1; }
+    .n4 .row .sc small { display: block; margin-top: 5px; font-size: 13px; color: var(--mute); white-space: nowrap; }
+    .n4 .row--top .name { font-size: clamp(1.375rem, 2.4vw, 1.875rem); letter-spacing: -.035em; }
+    .n4 .row--top .sc b { font-size: clamp(2.5rem, 4.6vw, 3.75rem); }
+
+    /* Act 6: your table. */
+    .n4 .table { padding: 96px 0 32px; }
+    .n4 .table > p { margin-top: 16px; }
+    .n4 .cards { display: grid; gap: 14px; margin-top: 36px; }
+    .n4 .card4 { background: var(--card); border-radius: 26px; padding: 26px; box-shadow: inset 0 0 0 1px var(--line); display: flex; flex-direction: column; }
+    .n4 .card4 > p { margin-top: 10px; font-size: 16px; }
+    .n4 .card4 .more { margin-top: auto; padding-top: 18px; align-self: flex-start; }
+    .n4 .plans { background: var(--bg); border-radius: 18px; padding: 4px 16px; margin-top: 20px; }
+    .n4 .plans a { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; min-height: 48px; padding: 12px 0; font-size: 15px; color: var(--text); }
+    .n4 .plans a + a { border-top: 1px solid var(--line); }
+    .n4 .plans b { font-weight: 600; }
+    .n4 .plans span { font-weight: 600; color: var(--ink); }
+    .n4 .plans small { color: var(--mute); font-weight: 500; }
+    .n4 .rules { list-style: none; margin: 18px 0 0; padding: 0; }
+    .n4 .rules li { display: flex; gap: 14px; align-items: center; padding: 12px 0; font-size: 16px; color: var(--text); line-height: 1.35; }
+    .n4 .rules li + li { border-top: 1px solid var(--line); }
+    .n4 .rules i { flex: none; display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 11px; background: var(--bg); font-style: normal; font-weight: 700; font-size: 14px; color: var(--ink); }
+
+    @media (min-width: 900px) {
+      .n4 { --pad: 32px; }
+      .n4 .intro { grid-template-columns: 7fr 5fr; gap: 56px; padding: 152px 0 48px; }
+      .n4 .night .when { font-size: clamp(4rem, 7.2vw, 7rem); }
+      .n4 .night { grid-template-columns: minmax(0, 1.35fr) minmax(0, 1fr); gap: 56px; padding: 56px 56px 52px; }
+      .n4 .story { grid-template-columns: 5fr 7fr; gap: 64px; padding: 128px 0 32px; }
+      .n4 .verdict { grid-template-columns: 5fr 7fr; gap: 64px; padding: 128px 0 32px; align-items: start; }
+      .n4 .verdict > div:first-child { position: sticky; top: 112px; }
+      .n4 .sheet { padding: 8px 32px; }
+      .n4 .sheet .head, .n4 .row { grid-template-columns: 56px 1fr auto; gap: 22px; }
+      .n4 .table { padding: 128px 0 48px; }
+      .n4 .cards { grid-template-columns: 1fr 1fr; }
+      .n4 .card4--wide { grid-column: 1 / -1; display: grid; grid-template-columns: 5fr 7fr; gap: 56px; align-items: start; }
+      .n4 .card4--wide .rules { margin-top: 0; }
+      .n4 .card4 { padding: 32px; }
+    }
+
+    @media (prefers-reduced-motion: no-preference) {
+      @supports (animation-timeline: view()) {
+        .n4 .night, .n4 .sheet, .n4 .card4, .n4 .player { animation: n4-rise linear both; animation-timeline: view(); animation-range: entry 0% entry 50%; }
+        @keyframes n4-rise { from { opacity: 0; transform: translateY(32px); } to { opacity: 1; transform: none; } }
+      }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .n4 * { transition: none !important; }
+      .n4 .reel img { animation: none; }
+      .n4 .reel img:first-child { opacity: 1; }
+    }
+  </style>
+<% end %>
+
+<div class="n4">
+  <div class="wrap">
+    <%# Opening: what this is, in one line, before the night. %>
+    <header class="intro">
+      <h1>Every pour<br>has <em>a story.</em></h1>
+      <div>
+        <p class="lede">Narrative tasting decks for whiskey nights that hold together, the research done, the script written, the bottles picked.</p>
+        <p class="note">One credit a month with membership · Or buy any deck outright</p>
+      </div>
+    </header>
+
+    <% if @night %>
+      <%# Acts 1, 2 and 4: the next public night, who is on deck, its pours. %>
+      <section class="night" aria-labelledby="n4-night">
+        <div>
+          <div class="soc">
+            <span class="dot" aria-hidden="true"></span>
+            <%= link_to @night.society.name, society_path(@night.society) %>
+            <span>· in <%= distance_of_time_in_words(Time.current, @night.start_time) %></span>
+          </div>
+          <p class="when" aria-hidden="true">
+            <span><%= @night.start_time.strftime("%A") %>,</span>
+            <span><em><%= @night.start_time.strftime("%-l:%M") %></em><small><%= @night.start_time.strftime("%P") %></small></span>
+          </p>
+          <p class="date num">
+            <%= @night.start_time.strftime("%B %-d") %><% if @night.location.present? %> <span>· <%= @night.location %></span><% end %>
+          </p>
+          <h2 id="n4-night"><span class="sr-only"><%= @night.start_time.strftime("%A %B %-d, %-l:%M %P") %>: </span><%= @night.title %></h2>
+          <% if @night.description.present? %>
+            <p class="desc serif"><%= truncate(@night.description, length: 220) %></p>
+          <% end %>
+          <div class="acts">
+            <%= link_to "RSVP for the night", society_event_path(@night.society, @night), class: "b b--light" %>
+            <%= link_to "Meet the society", society_path(@night.society), class: "more" %>
+          </div>
+        </div>
+
+        <div class="side">
+          <% if host_name || @night_deck %>
+            <%# Act 2: on deck. The host and the deck they bring. %>
+            <div class="bay">
+              <h3>On deck</h3>
+              <% if host_name %>
+                <div class="host">
+                  <% if host %><%= avatar(host, size: 40) %><% end %>
+                  <span><%= host_name %> presents</span>
+                </div>
+              <% end %>
+              <% if @night_deck %>
+                <%= link_to presentation_path(@night_deck), class: "deck" do %>
+                  <span class="th"><% if (cover = deck_cover_attachment(@night_deck)) %><%= image_tag cover, alt: "", loading: "lazy" %><% end %></span>
+                  <span><b><%= @night_deck.title %></b><% if @night_deck.duration.present? %><small><%= @night_deck.duration %></small><% end %></span>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+
+          <% if @night_pours.any? %>
+            <%# Act 4: the pours. Names only once the night reveals them. %>
+            <div class="bay">
+              <h3>The pours</h3>
+              <% unless revealed %><p>The pours are a secret until the night ends.</p><% end %>
+              <ol class="flight">
+                <% @night_pours.each_with_index do |pour, i| %>
+                  <li>
+                    <%= render "home/next4/glass", level: 0.45, numeral: i + 1, size: 64, tone: :cream,
+                               label: revealed ? "Pour #{i + 1}, #{pour.bottle.name}" : "Pour #{i + 1}, poured blind" %>
+                    <% if revealed %><span><%= pour.bottle.name %></span><% end %>
+                  </li>
+                <% end %>
+              </ol>
+            </div>
+          <% end %>
+
+          <%# The table: one glass per seat (members, or more if more replied).
+              Going is a full pour, maybe half, unanswered empty. %>
+          <div class="bay">
+            <h3>The table</h3>
+            <p class="num"><%= reply_line %> · <%= pluralize(@night_members, "member") %></p>
+            <div class="seats" role="img" aria-label="<%= reply_line %>, <%= pluralize(@night_members, 'member') %>">
+              <% seat_levels.each do |lvl| %>
+                <%= render "home/next4/glass", level: lvl, size: 60, tone: :cream %>
+              <% end %>
+              <% if seats > shown_seats %><span class="num" style="align-self:center;color:rgba(246,244,238,.74)">+<%= seats - shown_seats %></span><% end %>
+            </div>
+          </div>
+
+          <% if @night.society.description.present? %>
+            <div class="about">
+              <b><%= @night.society.name %></b>
+              <p class="serif"><%= truncate(@night.society.description, length: 200) %></p>
+            </div>
+          <% end %>
+        </div>
+      </section>
+    <% end %>
+
+    <%# Act 3: the story. The deck player from the live homepage. %>
+    <section class="story" aria-labelledby="n4-story">
+      <div>
+        <h2 id="n4-story">Pick <em>a deck</em></h2>
+        <p class="lede">Browse the library and choose the story you want to tell, bourbon, scotch, rye, or something stranger. Filter by difficulty and budget.</p>
+        <% if @night_story_deck %>
+          <p style="margin-top:14px;font-size:15px">On deck for <%= @night.title %>.</p>
+        <% end %>
+        <%= link_to "See the full library", presentations_path, class: "more" %>
+      </div>
+      <div>
+        <% if slides.any? %>
+          <%= link_to presentation_path(story_deck), class: "player", aria: { label: "#{story_deck.title}, preview slides" } do %>
+            <div class="reel">
+              <% slides.each_with_index do |slide, i| %>
+                <%= image_tag slide, alt: (i.zero? ? "Opening slide of #{story_deck.title}" : ""), style: "animation-delay: #{i * 4}s" %>
+              <% end %>
+            </div>
+            <div class="bar">
+              <b><%= story_deck.title %></b>
+              <div class="ticks" aria-hidden="true"><% [ slides.size, 4 ].min.times do %><i></i><% end %></div>
+              <span class="num"><%= [ "#{story_deck.slide_images.count} slides", story_deck.duration.presence ].compact.join(" · ") %></span>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </section>
+
+    <% if @verdict_rows.present? %>
+      <%# Act 5: the verdict. A real past night at a public society, its pours
+          ranked by the room's mean event-review score (the same mean the event
+          page shows). The glass level is the score out of five; its numeral
+          is the order the pour was served. %>
+      <% top = @verdict_rows.first %>
+      <section class="verdict" aria-labelledby="n4-verdict">
+        <div>
+          <h2 id="n4-verdict">The <em>verdict</em></h2>
+          <% if @verdict_night.description.present? %>
+            <p class="lede serif" style="margin-top:18px"><%= truncate(@verdict_night.description, length: 180) %></p>
+          <% end %>
+          <p class="of num">
+            <%= link_to @verdict_night.title, society_event_path(@verdict_night.society, @verdict_night) %><br>
+            <%= @verdict_night.society.name %> · <%= @verdict_night.start_time.strftime("%B %-d") %> · <%= pluralize(tasters, "taster") %>
+          </p>
+          <div class="took">
+            <%= render "home/next4/glass", level: top[:mean] / 5.0, numeral: top[:number], size: 88, label: "Pour #{top[:number]}" %>
+            <p>Pour <%= top[:number] %> took the night: <b><%= top[:pour].bottle.name %></b>.</p>
+          </div>
+          <% if top[:note] %>
+            <p class="quote serif"><em>“<%= truncate(top[:note].notes, length: 140) %>”</em>
+              <span class="by"><%= top[:note].user.first_name %> <%= top[:note].user.last_name.to_s.first %>.</span></p>
+          <% end %>
+        </div>
+
+        <div class="sheet">
+          <div class="head" aria-hidden="true"><span>Pour</span><span>Ranked by the room</span><span>Score</span></div>
+          <ol style="list-style:none;margin:0;padding:0">
+            <% @verdict_rows.each_with_index do |row, rank| %>
+              <% bottle = row[:pour].bottle %>
+              <li class="row <%= 'row--top' if rank.zero? %>">
+                <%= render "home/next4/glass", level: row[:mean] / 5.0, numeral: row[:number], size: rank.zero? ? 64 : 52,
+                           label: "Pour #{row[:number]}" %>
+                <div style="min-width:0">
+                  <%= link_to bottle.name, bottle_path(bottle), class: "name" %>
+                  <span class="meta"><%= row[:pour].label.presence || "Poured #{row[:number].ordinalize}" %></span>
+                  <% if row[:note] && !rank.zero? %>
+                    <span class="said serif"><em>“<%= truncate(row[:note].notes, length: 110) %>”</em></span>
+                  <% end %>
+                </div>
+                <div class="sc num">
+                  <b><%= number_with_precision(row[:mean], precision: 2, strip_insignificant_zeros: true) %></b>
+                  <small>of 5 · <%= pluralize(row[:count], "review") %></small>
+                </div>
+              </li>
+            <% end %>
+          </ol>
+        </div>
+      </section>
+    <% end %>
+
+    <%# Act 6: your table. %>
+    <section class="table" aria-labelledby="n4-table">
+      <h2 id="n4-table">That's the whole <em>ritual.</em></h2>
+      <p class="lede">Pick your first deck and set a date. The rest is poured, not planned.</p>
+      <div class="cards">
+        <div class="card4">
+          <h3>Gather your society</h3>
+          <p>Start a private society for your friends or join a public one near you. Schedule the night, share the link, and RSVPs take care of themselves.</p>
+          <% if @coming_up.present? %>
+            <div class="plans">
+              <% @coming_up.each do |ev| %>
+                <%= link_to society_event_path(ev.society, ev) do %>
+                  <b style="min-width:0;overflow-wrap:anywhere"><%= ev.title %><small style="display:block;font-weight:500"><%= ev.society.name %></small></b>
+                  <span class="num" style="white-space:nowrap"><%= ev.start_time.strftime("%b %-d") %></span>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+          <%= link_to "Browse societies", societies_path, class: "more" %>
+        </div>
+        <div class="card4">
+          <h3>Choose your pour</h3>
+          <p>One membership, three ways to pay it. Every plan unlocks the same thing, a deck credit every month and a society of your own.</p>
+          <% if @stripe_products.present? %>
+            <div class="plans">
+              <% @stripe_products.each do |product| %>
+                <%= link_to membership_path do %>
+                  <b><%= product[:name].to_s.gsub(" Membership", "") %></b>
+                  <span class="num">$<%= sprintf("%.2f", product[:price] / 100.0) %> <small>/mo</small></span>
+                <% end %>
+              <% end %>
+            </div>
+          <% end %>
+          <%= link_to "See the plans", membership_path, class: "more" %>
+        </div>
+        <div class="card4 card4--wide">
+          <div><h3>Born from a monthly ritual</h3>
+          <p style="margin-top:10px">The first Whiskey Share Society started as a circle of friends in 2019. Each month one of us drew a topic, did the research, bought the bottles, and told its story over a deck of slides.</p></div>
+          <ol class="rules" aria-label="House rules">
+            <% rules.each_with_index do |rule, i| %><li><i><%= i + 1 %></i><%= rule %></li><% end %>
+          </ol>
+        </div>
+      </div>
+      <div class="acts" style="margin:40px 0 64px">
+        <%= link_to "Browse the decks", presentations_path, class: "b" %>
+        <%= link_to "Find your society", societies_path, class: "b b--quiet" %>
+      </div>
+    </section>
+  </div>
+</div>
