@@ -1,467 +1,149 @@
-<% if user_signed_in? %>
-  <!-- Simplified Header for Authenticated Users -->
-  <section class="relative w-full px-4 bg-char pb-10 pt-24">
-    <div class="max-w-7xl mx-auto text-center">
-      <h1 class="text-4xl md:text-5xl font-display font-semibold text-white mb-4">
-        Your Whiskey Societies
-      </h1>
-      <p class="text-xl text-whiskey-200 max-w-2xl mx-auto">
-        Manage your communities and discover new ones
-      </p>
-    </div>
-  </section>
+<%# Societies index. Full-bleed in the application layout (societies#index is in
+    its full_bleed list), so this page sets its own width and clears the nav
+    itself via the page header's clear_nav. Rows come from societies/_index_row,
+    which is used only here. Every count is computed from the database
+    (members/events preloaded by SocietiesController#index). %>
+<% input_class = "w-full rounded-2xl border border-hairline bg-white py-3 pl-12 pr-4 text-gray-900 placeholder-gray-500 focus:border-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/30" %>
 
-  <!-- Main Content for Authenticated Users -->
-  <section class="relative w-full px-4 bg-whiskey-50 pb-16 pt-10">
-    <div class="max-w-7xl mx-auto">
+<div class="mx-auto w-full max-w-6xl px-4 pb-20">
+  <% if user_signed_in? %>
+    <%# Creating a society is a membership benefit (SocietyPolicy#create?).
+        Free accounts join societies but can't start one. %>
+    <% can_create_society = policy(Society).create? %>
 
-      <%# Creating a society is a membership benefit (SocietyPolicy#create?).
-          Free accounts join societies but can't start one. %>
-      <% can_create_society = policy(Society).create? %>
+    <%= render "shared/page_header",
+          title: "Your whiskey societies",
+          lede: "Manage your communities and discover new ones",
+          clear_nav: true,
+          actions: (can_create_society ? link_to("Create a society", new_society_path, class: "btn btn-primary") : nil) %>
 
-      <!-- My Societies Section -->
+    <%# Your societies %>
+    <section class="mb-14" aria-labelledby="your-societies-heading">
+      <h2 id="your-societies-heading" class="mb-5 font-display text-2xl font-semibold text-ink sm:text-3xl">Your societies</h2>
+
       <% if @user_societies.any? %>
-        <div class="mb-16">
-          <div class="flex items-center justify-between mb-8">
-            <h2 class="text-3xl font-bold text-gray-900">My Societies</h2>
-            <% if can_create_society %>
-              <%= link_to new_society_path, class: 'inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-whiskey-600 text-white font-semibold hover:bg-whiskey-700 transition-all duration-200 shadow-lg hover:shadow-xl' do %>
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-                </svg>
-                <span>Create Society</span>
-              <% end %>
-            <% end %>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div class="card overflow-hidden">
+          <ul class="divide-y divide-hairline">
             <% @user_societies.each do |society| %>
-              <%= link_to society_path(society), class: "block group" do %>
-                <div class="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
-                  <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-whiskey-600 rounded-xl flex items-center justify-center">
-                      <%= render 'shared/society_icon', society: society %>
-                    </div>
-                    <div class="flex-1">
-                      <h3 class="text-lg font-bold text-gray-900 group-hover:text-whiskey-600 transition-colors"><%= society.name %></h3>
-                      <span class="px-2 py-1 rounded-full text-xs font-medium bg-whiskey-100 text-whiskey-700">
-                        <%= society.creator == current_user ? 'Creator' : 'Member' %>
-                      </span>
-                    </div>
-                  </div>
-
-                  <p class="text-gray-600 text-sm mb-4 line-clamp-2"><%= society.description %></p>
-
-                  <div class="flex items-center gap-4 text-gray-500 text-sm">
-                    <span class="flex items-center gap-1">
-                      <%= render 'shared/user_group_icon' %>
-                      <%= pluralize(society.members.count, 'member') %>
-                    </span>
-                    <span class="flex items-center gap-1">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                      </svg>
-                      <%= pluralize(society.events.count, 'event') %>
-                    </span>
-                  </div>
-                </div>
-              <% end %>
+              <li>
+                <%= render "societies/index_row", society: society,
+                      label: (society.creator == current_user ? "Creator" : "Member") %>
+              </li>
             <% end %>
-          </div>
+          </ul>
         </div>
       <% else %>
-        <!-- Empty State for My Societies, compact so Discover stays near the top -->
-        <div class="mb-10 flex flex-col items-center gap-4 rounded-2xl border border-whiskey-100 bg-white px-6 py-6 text-center sm:flex-row sm:justify-between sm:text-left">
+        <div class="card flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
-            <h2 class="text-xl font-bold text-gray-900">Start your whiskey journey</h2>
+            <h3 class="text-xl font-semibold text-ink">Start your whiskey journey</h3>
             <% if can_create_society %>
-              <p class="mt-1 text-gray-600">You haven't joined any societies yet, discover one below, or start your own.</p>
+              <p class="mt-1 text-mute">You haven't joined any societies yet, discover one below, or start your own.</p>
             <% else %>
-              <p class="mt-1 text-gray-600">You haven't joined any societies yet, discover one below. Starting your own society is a membership benefit.</p>
+              <p class="mt-1 text-mute">You haven't joined any societies yet, discover one below. Starting your own society is a membership benefit.</p>
             <% end %>
           </div>
-          <% if can_create_society %>
-            <%= link_to new_society_path, class: 'inline-flex shrink-0 items-center gap-2 px-6 py-3 rounded-xl bg-whiskey-600 text-white font-semibold hover:bg-whiskey-700 transition-all duration-200 shadow-lg hover:shadow-xl' do %>
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"></path>
-              </svg>
-              <span>Create a society</span>
-            <% end %>
-          <% else %>
-            <%= link_to account_path(anchor: 'subscription'), class: 'inline-flex shrink-0 items-center gap-2 px-6 py-3 rounded-xl border border-whiskey-300 text-whiskey-800 font-semibold hover:bg-whiskey-50 transition' do %>
-              <span>Become a member</span>
-            <% end %>
+          <% unless can_create_society %>
+            <%= link_to "Become a member", account_path(anchor: "subscription"), class: "btn btn-secondary shrink-0" %>
+          <% end %>
+        </div>
+      <% end %>
+    </section>
+
+    <%# Discover %>
+    <section aria-labelledby="discover-heading">
+      <h2 id="discover-heading" class="mb-5 font-display text-2xl font-semibold text-ink sm:text-3xl">Discover societies</h2>
+
+      <%# Search: name + location text. The old ZIP-radius search was decorative,
+          no coordinates or geocoding existed; it even requested browser
+          geolocation to feed a plain ILIKE that matched nothing. %>
+      <%= form_with url: societies_path, method: :get, local: true, class: "mb-6 flex flex-col gap-3 md:flex-row md:items-center" do |form| %>
+        <div class="relative flex-1">
+          <svg class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-mute" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+          </svg>
+          <%= form.label :search, "Search by name", class: "sr-only" %>
+          <%= form.search_field :search, value: params[:search], placeholder: "Search by name...", class: input_class %>
+        </div>
+        <div class="relative md:w-64">
+          <svg class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-mute" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+          </svg>
+          <%= form.label :location, "City or state", class: "sr-only" %>
+          <%= form.text_field :location, value: params[:location], placeholder: "City or state...", class: input_class %>
+        </div>
+        <div class="flex items-center gap-4">
+          <%= form.submit "Search", class: "btn btn-secondary cursor-pointer min-h-12 px-7" %>
+          <% if params[:search].present? || params[:location].present? %>
+            <%= link_to "Clear", societies_path, class: "text-sm font-semibold text-ink hover:underline" %>
           <% end %>
         </div>
       <% end %>
 
-      <!-- Discover Societies Section -->
-      <div>
-        <h2 class="text-3xl font-bold text-gray-900 mb-8">Discover Societies</h2>
-
-        <%# Search: name + location text. The old ZIP-radius search was decorative,
-            no coordinates or geocoding existed; it even requested browser
-            geolocation to feed a plain ILIKE that matched nothing. %>
-        <div class="mb-8">
-          <div class="bg-white rounded-2xl border border-whiskey-200 p-6 shadow-sm">
-            <%= form_with url: societies_path, method: :get, local: true, class: "flex flex-col gap-4 md:flex-row md:items-center" do |form| %>
-              <div class="relative flex-1">
-                <svg class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-                <%= form.search_field :search, value: params[:search], placeholder: "Search by name...",
-                    class: "w-full rounded-xl border border-whiskey-200 py-3 pl-12 pr-4 text-gray-900 placeholder-gray-400 focus:border-whiskey-500 focus:outline-none focus:ring-2 focus:ring-whiskey-200" %>
-              </div>
-              <div class="relative md:w-64">
-                <svg class="pointer-events-none absolute left-4 top-1/2 h-5 w-5 -translate-y-1/2 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                <%= form.text_field :location, value: params[:location], placeholder: "City or state...",
-                    class: "w-full rounded-xl border border-whiskey-200 py-3 pl-12 pr-4 text-gray-900 placeholder-gray-400 focus:border-whiskey-500 focus:outline-none focus:ring-2 focus:ring-whiskey-200" %>
-              </div>
-              <%= form.submit "Search", class: "cursor-pointer rounded-xl bg-whiskey-600 px-8 py-3 font-semibold text-white transition hover:bg-whiskey-700 focus:outline-none focus-visible:ring-2 focus-visible:ring-whiskey-500 focus-visible:ring-offset-2" %>
-              <% if params[:search].present? || params[:location].present? %>
-                <%= link_to "Clear", societies_path, class: "text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>
-              <% end %>
-            <% end %>
-          </div>
-        </div>
-
-        <!-- Search Results -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <% if @societies.any? %>
+      <% if @societies.any? %>
+        <div class="card overflow-hidden">
+          <ul class="divide-y divide-hairline">
             <% @societies.each do |society| %>
-              <%= link_to society_path(society), class: "block group" do %>
-                <div class="bg-white rounded-2xl border border-gray-200 p-6 hover:shadow-lg transition-all duration-200 hover:-translate-y-1">
-                  <div class="flex items-center gap-3 mb-4">
-                    <div class="w-12 h-12 bg-whiskey-600 rounded-xl flex items-center justify-center">
-                      <%= render 'shared/society_icon', society: society %>
-                    </div>
-                    <div class="flex-1">
-                      <h3 class="text-lg font-bold text-gray-900 group-hover:text-blue-600 transition-colors"><%= society.name %></h3>
-                      <span class="px-2 py-1 rounded-full text-xs font-medium <%= society.is_private ? 'bg-amber-100 text-amber-700' : 'bg-green-100 text-green-700' %>">
-                        <%= society.is_private ? 'Private' : 'Public' %>
-                      </span>
-                    </div>
-                  </div>
-
-                  <p class="text-gray-600 text-sm mb-4 line-clamp-2"><%= society.description %></p>
-
-                  <% if society.location.present? %>
-                    <div class="flex items-center gap-1 text-gray-500 text-sm mb-3">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                      </svg>
-                      <span><%= society.location %></span>
-                    </div>
-                  <% end %>
-
-                  <div class="flex items-center gap-4 text-gray-500 text-sm">
-                    <span class="flex items-center gap-1">
-                      <%= render 'shared/user_group_icon' %>
-                      <%= pluralize(society.members.count, 'member') %>
-                    </span>
-                    <span class="flex items-center gap-1">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                      </svg>
-                      <%= pluralize(society.events.count, 'event') %>
-                    </span>
-                  </div>
-                </div>
-              <% end %>
+              <li>
+                <%= render "societies/index_row", society: society,
+                      label: (society.is_private ? "Private" : "Public") %>
+              </li>
             <% end %>
+          </ul>
+        </div>
+      <% else %>
+        <div class="card p-6">
+          <h3 class="text-xl font-semibold text-ink">No societies found</h3>
+          <% if params[:search].present? || params[:location].present? %>
+            <p class="mt-1 text-mute">Try adjusting your search criteria to find more societies.</p>
+            <%= link_to "Show all societies →", societies_path, class: "mt-4 inline-block font-semibold text-ink hover:underline" %>
           <% else %>
-            <!-- Empty Search Results -->
-            <div class="col-span-full text-center py-12">
-              <div class="text-6xl mb-4">🔍</div>
-              <h3 class="text-xl font-bold text-gray-900 mb-2">No societies found</h3>
-              <p class="text-gray-600 mb-4">
-                <% if params[:search].present? || params[:location].present? %>
-                  Try adjusting your search criteria to find more societies.
-                <% else %>
-                  There are no societies to discover right now.
-                <% end %>
-              </p>
-              <% if params[:search].present? || params[:location].present? %>
-                <%= link_to societies_path, class: 'text-whiskey-600 hover:text-whiskey-700 font-medium' do %>
-                  Show all societies
-                <% end %>
-              <% end %>
-            </div>
+            <p class="mt-1 text-mute">There are no societies to discover right now.</p>
           <% end %>
         </div>
-      </div>
-    </div>
-  </section>
+      <% end %>
+    </section>
 
-<% else %>
-  <!-- Marketing Page for Unauthenticated Users -->
-  <section class="relative min-h-screen flex w-full overflow-hidden bg-char pt-16">
-    <!-- Animated Background Elements -->
-    <div class="absolute inset-0 pointer-events-none">
-      <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-whiskey-400/10 rounded-full blur-3xl animate-pulse"></div>
-      <div class="absolute bottom-1/4 right-1/4 w-80 h-80 bg-whiskey-400/15 rounded-full blur-3xl animate-pulse delay-1000"></div>
-      <div class="absolute top-1/2 left-1/2 w-64 h-64 bg-whiskey-400/10 rounded-full blur-2xl animate-bounce delay-500"></div>
-    </div>
+  <% else %>
+    <%= render "shared/page_header",
+          title: "Find <em>your society</em>".html_safe,
+          lede: "From public meetups to private tastings, discover your perfect whiskey society.",
+          clear_nav: true %>
 
-    <!-- Content Container -->
-    <div class="relative w-full flex items-center justify-center z-10">
-      <div class="px-8 lg:px-16 py-24 w-full max-w-6xl text-center">
-        <h1 class="text-6xl md:text-8xl font-display font-semibold tracking-tight mb-8 leading-[0.9]">
-          <span class="block text-white drop-shadow-2xl">Connect.</span>
-          <span class="block text-white drop-shadow-2xl">Explore.</span>
-          <span class="block text-whiskey-300 mb-8">Belong.</span>
-          <span class="block text-2xl md:text-4xl font-bold text-whiskey-200 -mt-2">Find Your Society.</span>
-        </h1>
-
-        <p class="text-xl md:text-2xl text-whiskey-100 mb-6 leading-relaxed font-medium max-w-4xl mx-auto">
-          Join exclusive whiskey communities where <strong class="text-white">passion meets purpose</strong>. From public meetups to private tastings, discover your perfect whiskey society.
+    <div class="grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start">
+      <%# What a society is. Sentences reused from the homepage ("Gather your
+          society") and /membership; see the D2 hand-back for sources. %>
+      <section class="panel-ink p-7 sm:p-8 md:col-span-5" aria-labelledby="what-heading">
+        <h2 id="what-heading" class="font-display text-2xl font-semibold text-cream sm:text-3xl [&_em]:font-reading [&_em]:font-normal">Gather <em>your society</em></h2>
+        <p class="mt-4 text-[17px] leading-relaxed text-cream/80">
+          Start a private society for your friends or join a public one near you. Schedule the night, share the link, and RSVPs take care of themselves.
         </p>
+        <p class="mt-4 text-sm text-cream/70">Joining a society is free &middot; Membership required to run a society</p>
+        <%= link_to "Join the community", new_user_registration_path,
+              class: "mt-7 inline-flex min-h-11 items-center justify-center gap-2 rounded-2xl bg-cream px-5 py-3 text-sm font-semibold text-ink transition hover:bg-white focus:outline-none focus-visible:ring-2 focus-visible:ring-cream focus-visible:ring-offset-2 focus-visible:ring-offset-char" %>
+      </section>
 
-        <%= link_to new_user_registration_path, class: 'group inline-flex items-center gap-3 px-10 py-5 rounded-full bg-whiskey-500 text-white text-xl font-bold shadow-2xl hover:shadow-whiskey-500/30 transition-all duration-200 hover:-translate-y-0.5' do %>
-          <span>Join the Community</span>
-          <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform duration-300" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-          </svg>
-        <% end %>
-
-        <div class="mt-12 flex flex-col sm:flex-row items-center justify-center gap-8 text-whiskey-200">
-          <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-            </svg>
-            <span class="font-medium">Public & Private Options</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-            </svg>
-            <span class="font-medium">Events & Meetups</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
-              <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path>
-            </svg>
-            <span class="font-medium">Expert Communities</span>
-          </div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- Events Information Section -->
-  <section class="relative w-full py-16 px-4 bg-white">
-    <div class="max-w-7xl mx-auto">
-      <div class="text-center mb-12">
-        <h2 class="text-4xl font-bold text-gray-900 mb-4">Society Events & Gatherings</h2>
-        <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-          Each society hosts unique events, from casual tastings to exclusive masterclasses
-        </p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
-        <!-- Event Type 1 -->
-        <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-          <div class="w-16 h-16 bg-whiskey-500 rounded-xl flex items-center justify-center mb-6">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-            </svg>
-          </div>
-          <h3 class="text-2xl font-bold text-gray-900 mb-3">Regular Tastings</h3>
-          <p class="text-gray-600 mb-4">
-            Weekly or monthly gatherings where members sample curated selections, share tasting notes, and expand their palate together.
-          </p>
-          <ul class="space-y-2 text-sm text-gray-500">
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-              </svg>
-              <span>Guided by experienced members</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-              </svg>
-              <span>Learn proper tasting techniques</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-              </svg>
-              <span>Discover new favorites</span>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Event Type 2 -->
-        <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-          <div class="w-16 h-16 bg-whiskey-600 rounded-xl flex items-center justify-center mb-6">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path>
-            </svg>
-          </div>
-          <h3 class="text-2xl font-bold text-gray-900 mb-3">Educational Sessions</h3>
-          <p class="text-gray-600 mb-4">
-            Deep-dive workshops covering production methods, regional differences, and the rich history behind each dram.
-          </p>
-          <ul class="space-y-2 text-sm text-gray-500">
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-              </svg>
-              <span>Guest speakers & experts</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-              </svg>
-              <span>Distillery spotlights</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-              </svg>
-              <span>Interactive Q&A sessions</span>
-            </li>
-          </ul>
-        </div>
-
-        <!-- Event Type 3 -->
-        <div class="bg-white rounded-2xl p-8 shadow-lg hover:shadow-xl transition-shadow">
-          <div class="w-16 h-16 bg-whiskey-700 rounded-xl flex items-center justify-center mb-6">
-            <svg class="w-8 h-8 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
-            </svg>
-          </div>
-          <h3 class="text-2xl font-bold text-gray-900 mb-3">Exclusive Experiences</h3>
-          <p class="text-gray-600 mb-4">
-            Special access to distillery tours, rare bottle releases, and private tastings reserved for society members.
-          </p>
-          <ul class="space-y-2 text-sm text-gray-500">
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-              </svg>
-              <span>VIP distillery visits</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-              </svg>
-              <span>Limited edition releases</span>
-            </li>
-            <li class="flex items-center gap-2">
-              <svg class="w-4 h-4 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
-              </svg>
-              <span>Master distiller meetings</span>
-            </li>
-          </ul>
-        </div>
-      </div>
-
-      <!-- RSVP System Info -->
-      <div class="bg-gradient-to-r from-whiskey-600 to-whiskey-600 rounded-3xl p-8 md:p-12 text-white text-center">
-        <h3 class="text-3xl font-bold mb-4">Smart RSVP System</h3>
-        <p class="text-xl text-whiskey-100 mb-6 max-w-3xl mx-auto">
-          Easily manage your event attendance with our flexible RSVP options. Let organizers know if you're attending, might attend, or can't make it.
-        </p>
-        <div class="flex flex-wrap justify-center gap-6 mb-8">
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 bg-green-500 rounded-full flex items-center justify-center">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7"></path>
-              </svg>
-            </div>
-            <span class="text-lg font-semibold">Yes, I'm Going</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 bg-yellow-500 rounded-full flex items-center justify-center">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M8.228 9c.549-1.165 2.03-2 3.772-2 2.21 0 4 1.343 4 3 0 1.4-1.278 2.575-3.006 2.907-.542.104-.994.54-.994 1.093m0 3h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-              </svg>
-            </div>
-            <span class="text-lg font-semibold">Maybe</span>
-          </div>
-          <div class="flex items-center gap-3">
-            <div class="w-12 h-12 bg-red-500 rounded-full flex items-center justify-center">
-              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M6 18L18 6M6 6l12 12"></path>
-              </svg>
-            </div>
-            <span class="text-lg font-semibold">Can't Attend</span>
-          </div>
-        </div>
-        <%= link_to auth_path, class: 'inline-flex items-center gap-3 px-8 py-4 rounded-full bg-white text-whiskey-600 font-bold hover:bg-whiskey-50 transition-colors shadow-lg' do %>
-          <span>Join to RSVP for Events</span>
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-          </svg>
-        <% end %>
-      </div>
-    </div>
-  </section>
-
-  <!-- Featured Public Societies -->
-  <section class="relative w-full py-16 px-4 bg-white">
-    <div class="max-w-7xl mx-auto">
-      <div class="text-center mb-12">
-        <h2 class="text-4xl font-bold text-gray-900 mb-4">Featured Public Societies</h2>
-        <p class="text-xl text-gray-600">Get a taste of our vibrant whiskey communities</p>
-      </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <section class="md:col-span-7" aria-labelledby="public-heading">
+        <h2 id="public-heading" class="sr-only">Featured public societies</h2>
         <% if @societies.any? %>
-          <% @societies.limit(6).each do |society| %>
-            <div class="society-card bg-gray-50 rounded-2xl border border-gray-200 p-6">
-              <div class="flex items-center gap-3 mb-4">
-                <div class="w-12 h-12 bg-gradient-to-r from-amber-500 to-orange-600 rounded-xl flex items-center justify-center">
-                  <%= render 'shared/society_icon', society: society %>
-                </div>
-                <div class="flex-1">
-                  <h3 class="text-lg font-bold text-gray-900"><%= society.name %></h3>
-                  <span class="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Public</span>
-                </div>
-              </div>
-
-              <p class="text-gray-600 text-sm mb-4 line-clamp-2"><%= society.description %></p>
-
-              <div class="flex items-center gap-4 text-gray-500 text-sm">
-                <span class="flex items-center gap-1">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17 20h5v-2a4 4 0 00-3-3.87M9 20H4v-2a4 4 0 013-3.87m6 0A4 4 0 005 16m6-4a4 4 0 100-8 4 4 0 000 8zm6 4a4 4 0 00-3-3.87"></path>
-                  </svg>
-                  <%= pluralize(society.members.count, 'member') %>
-                </span>
-                <span class="flex items-center gap-1">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-                  </svg>
-                  <%= pluralize(society.events.count, 'event') %>
-                </span>
-              </div>
-            </div>
-          <% end %>
+          <div class="card overflow-hidden">
+            <ul class="divide-y divide-hairline">
+              <% @societies.limit(6).each do |society| %>
+                <li>
+                  <%= render "societies/index_row", society: society, row_class: "society-card" %>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+          <%= link_to "Join to see all societies →", new_user_registration_path,
+                class: "mt-5 inline-block font-semibold text-ink hover:underline" %>
         <% else %>
-          <div class="col-span-full text-center py-12">
-            <div class="text-6xl mb-4">🥃</div>
-            <h3 class="text-xl font-bold text-gray-900 mb-2">No public societies yet</h3>
-            <p class="text-gray-600">Be the first to create a public whiskey society!</p>
+          <div class="card p-6">
+            <h3 class="text-xl font-semibold text-ink">No public societies yet</h3>
+            <p class="mt-1 text-mute">Be the first to create a public whiskey society!</p>
           </div>
         <% end %>
-      </div>
-
-      <div class="text-center mt-12">
-        <%= link_to new_user_registration_path, class: 'inline-flex items-center gap-2 px-8 py-4 rounded-xl bg-whiskey-600 text-white font-semibold hover:bg-whiskey-700 transition-all duration-200 shadow-lg hover:shadow-xl' do %>
-          <span>Join to See All Societies</span>
-          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
-            <path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z" clip-rule="evenodd"></path>
-          </svg>
-        <% end %>
-      </div>
+      </section>
     </div>
-  </section>
-<% end %>
+  <% end %>
+</div>

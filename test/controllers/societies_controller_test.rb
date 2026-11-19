@@ -13,9 +13,9 @@ class SocietiesControllerTest < ActionDispatch::IntegrationTest
   test "should get index when not authenticated" do
     get societies_url
     assert_response :success
-    # Unauthenticated visitors get the marketing landing; its hero headline ends
-    # with "Find Your Society." and it features public societies below.
-    assert_select "h1", /Find Your Society/
+    # Unauthenticated visitors get the landing; its page heading is
+    # "Find your society" and it lists public societies below.
+    assert_select "h1", /Find your society/i
   end
 
   test "should get index when authenticated" do
