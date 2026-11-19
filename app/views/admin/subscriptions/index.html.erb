@@ -1,263 +1,83 @@
-<div class="max-w-7xl mx-auto">
-  <!-- Header -->
-  <div class="mb-8">
-    <h1 class="text-3xl font-bold text-gray-900">Subscription Management</h1>
-    <p class="text-gray-600 mt-2">Manage user subscriptions and billing</p>
+<% content_for :title, "Subscriptions - Admin" %>
+
+<%= render "admin/shared/page_header", title: "Subscriptions", lede: "Manage user subscriptions and billing" %>
+
+<%= render "admin/shared/stats", stats: [
+  { label: "Active", value: @total_active },
+  { label: "Paused", value: @total_paused },
+  { label: "Canceled", value: @total_canceled },
+  { label: "Monthly recurring revenue", value: "$#{number_with_precision(@total_revenue, precision: 2)}" },
+  { label: "Avg credits/user", value: User.where(subscription_status: "active").average(:credits).to_f.round(1) }
+] %>
+
+<%= render "admin/shared/filter_bar", url: admin_subscriptions_path, clear: admin_subscriptions_path, submit: "Apply Filters" do |form| %>
+  <div class="sm:col-span-2">
+    <%= form.label :search, "Search users", class: admin_label_class %>
+    <%= form.text_field :search, value: params[:search], placeholder: "Search by name or email...", class: admin_field_class %>
   </div>
-
-  <!-- Stats Cards -->
-  <div class="grid grid-cols-1 md:grid-cols-5 gap-6 mb-8">
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm font-medium text-gray-600">Active</p>
-          <p class="text-3xl font-bold text-green-600 mt-2"><%= @total_active %></p>
-        </div>
-        <div class="p-3 bg-green-100 rounded-lg">
-          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm font-medium text-gray-600">Paused</p>
-          <p class="text-3xl font-bold text-amber-600 mt-2"><%= @total_paused %></p>
-        </div>
-        <div class="p-3 bg-amber-100 rounded-lg">
-          <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm font-medium text-gray-600">Canceled</p>
-          <p class="text-3xl font-bold text-red-600 mt-2"><%= @total_canceled %></p>
-        </div>
-        <div class="p-3 bg-red-100 rounded-lg">
-          <svg class="w-6 h-6 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm font-medium text-gray-600">Monthly recurring revenue</p>
-          <p class="text-3xl font-bold text-purple-600 mt-2">$<%= number_with_precision(@total_revenue, precision: 2) %></p>
-        </div>
-        <div class="p-3 bg-purple-100 rounded-lg">
-          <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-          </svg>
-        </div>
-      </div>
-    </div>
-
-    <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-      <div class="flex items-center justify-between">
-        <div>
-          <p class="text-sm font-medium text-gray-600">Avg Credits/User</p>
-          <p class="text-3xl font-bold text-blue-600 mt-2"><%= User.where(subscription_status: 'active').average(:credits).to_f.round(1) %></p>
-        </div>
-        <div class="p-3 bg-blue-100 rounded-lg">
-          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path>
-          </svg>
-        </div>
-      </div>
-    </div>
+  <div>
+    <%= form.label :status, "Status", class: admin_label_class %>
+    <%= form.select :status,
+        options_for_select([ [ "All statuses", "" ], [ "Active", "active" ], [ "Paused", "paused" ], [ "Canceled", "canceled" ], [ "Past due", "past_due" ] ], params[:status]),
+        {}, { class: admin_field_class } %>
   </div>
-
-  <!-- Filters -->
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-8">
-    <%= form_with url: admin_subscriptions_path, method: :get, local: true, class: "space-y-4" do |form| %>
-      <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <!-- Search -->
-        <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-gray-700 mb-2">Search Users</label>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-              </svg>
-            </div>
-            <%= form.text_field :search, 
-                value: params[:search], 
-                placeholder: "Search by name or email...",
-                class: "w-full pl-12 pr-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" %>
-          </div>
-        </div>
-
-        <!-- Status Filter -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
-          <%= form.select :status, 
-              options_for_select([
-                ['All Statuses', ''],
-                ['Active', 'active'],
-                ['Paused', 'paused'],
-                ['Canceled', 'canceled'],
-                ['Past Due', 'past_due']
-              ], params[:status]),
-              {},
-              { class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
-        </div>
-
-        <!-- Sort -->
-        <div>
-          <label class="block text-sm font-medium text-gray-700 mb-2">Sort By</label>
-          <%= form.select :sort, 
-              options_for_select([
-                ['Newest First', 'newest'],
-                ['Ending Soon', 'ending_soon'],
-                ['Customer Name', 'customer']
-              ], params[:sort]),
-              {},
-              { class: "w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500" } %>
-        </div>
-      </div>
-
-      <div class="flex items-center gap-4">
-        <%= form.submit "Apply Filters", class: "px-6 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition" %>
-        <%= link_to "Clear", admin_subscriptions_path, class: "px-6 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition" %>
-      </div>
-    <% end %>
+  <div>
+    <%= form.label :sort, "Sort by", class: admin_label_class %>
+    <%= form.select :sort,
+        options_for_select([ [ "Newest first", "newest" ], [ "Ending soon", "ending_soon" ], [ "Customer name", "customer" ] ], params[:sort]),
+        {}, { class: admin_field_class } %>
   </div>
+<% end %>
 
-  <!-- Subscriptions Table -->
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-    <% if @subscriptions.any? %>
-      <div class="overflow-x-auto">
-      <table class="min-w-full divide-y divide-gray-200">
-        <thead class="bg-gray-50">
-          <tr>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Customer</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Plan</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Credits</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Next Billing</th>
-            <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
-          </tr>
-        </thead>
-        <tbody class="bg-white divide-y divide-gray-200">
-          <% @subscriptions.each do |user| %>
-            <tr class="hover:bg-gray-50">
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="flex items-center">
-                  <div class="flex-shrink-0 h-10 w-10">
-                    <% if user.profile_image.attached? %>
-                      <%= image_tag user.profile_image, class: "h-10 w-10 rounded-full object-cover" %>
-                    <% else %>
-                      <div class="h-10 w-10 rounded-full flex items-center justify-center text-white font-semibold" style="background-color: <%= user.avatar_color %>">
-                        <%= user.initials %>
-                      </div>
-                    <% end %>
-                  </div>
-                  <div class="ml-4">
-                    <%# Capped like the other admin tables: one private-relay
-                        address in a name field must not widen the panel. %>
-                    <div class="max-w-[14rem] truncate text-sm font-medium text-gray-900" title="<%= user.full_name %>"><%= user.full_name %></div>
-                    <div class="max-w-[14rem] truncate text-sm text-gray-500" title="<%= user.email %>"><%= user.email %></div>
-                  </div>
-                </div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <div class="text-sm text-gray-900 capitalize"><%= user.subscription_plan || 'N/A' %></div>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <% if user.subscription_paused? %>
-                  <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-amber-100 text-amber-800">
-                    Paused
-                  </span>
-                <% else %>
-                  <% case user.subscription_status %>
-                  <% when 'active' %>
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800">
-                      Active
-                    </span>
-                  <% when 'canceled' %>
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-red-100 text-red-800">
-                      Canceled
-                    </span>
-                  <% when 'past_due' %>
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-yellow-100 text-yellow-800">
-                      Past Due
-                    </span>
-                  <% else %>
-                    <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
-                      Unknown
-                    </span>
-                  <% end %>
-                <% end %>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap">
-                <span class="text-sm font-medium text-gray-900"><%= user.credits %></span>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                <%= user.subscription_ends_at&.strftime("%b %d, %Y") || "N/A" %>
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                <div class="flex items-center gap-2">
-                  <%= link_to "View", admin_user_path(user), class: "text-blue-600 hover:text-blue-900" %>
-                  <span class="text-gray-300">|</span>
-                  <%= link_to "Edit", edit_admin_subscription_path(user), class: "text-whiskey-600 hover:text-whiskey-900" %>
-                  <% if user.subscription_can_be_paused? %>
-                    <span class="text-gray-300">|</span>
-                    <%= button_to "Pause", pause_admin_subscription_path(user), 
-                        method: :post,
-                        data: { turbo_confirm: "Pause this subscription?" },
-                        class: "text-yellow-600 hover:text-yellow-900 bg-transparent border-0 cursor-pointer underline p-0" %>
-                  <% elsif user.subscription_can_be_resumed? %>
-                    <span class="text-gray-300">|</span>
-                    <%= button_to "Resume", resume_admin_subscription_path(user), 
-                        method: :post,
-                        data: { turbo_confirm: "Resume this subscription?" },
-                        class: "text-green-600 hover:text-green-900 bg-transparent border-0 cursor-pointer underline p-0" %>
-                  <% end %>
-                  <% if user.subscription_status == 'active' && !user.subscription_paused? %>
-                    <span class="text-gray-300">|</span>
-                    <%= button_to "Cancel", cancel_admin_subscription_path(user), 
-                        method: :post,
-                        data: { turbo_confirm: "Are you sure you want to cancel this subscription?" },
-                        class: "text-red-600 hover:text-red-900 bg-transparent border-0 cursor-pointer underline p-0" %>
-                  <% end %>
-                </div>
-              </td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
-
+<%= render "admin/shared/table", rows: @subscriptions, paginate: true,
+      columns: [ "Customer", "Plan", "Status", [ "Credits", :right ], "Next billing", [ "", :right ] ],
+      empty: ((params[:search].present? || params[:status].present?) ? "No subscriptions match your filters." : "No users have subscriptions yet.") do |user| %>
+  <%= admin_td do %>
+    <div class="flex items-center gap-3">
+      <%= avatar(user, size: 40) %>
+      <%# Capped like the other admin tables: one private-relay address in a
+          name field must not widen the panel. %>
+      <div class="min-w-0">
+        <div class="max-w-[14rem] truncate font-medium text-gray-900" title="<%= user.full_name %>"><%= user.full_name %></div>
+        <div class="max-w-[14rem] truncate text-xs text-mute" title="<%= user.email %>"><%= user.email %></div>
       </div>
-
-      <!-- Pagination -->
-      <div class="bg-white px-4 py-3 border-t border-gray-200 sm:px-6">
-        <%= paginate @subscriptions %>
-      </div>
+    </div>
+  <% end %>
+  <%= admin_td(user.subscription_plan || "N/A", class: "capitalize") %>
+  <%= admin_td do %>
+    <% if user.subscription_paused? %>
+      <%= render "admin/shared/status_chip", label: "Paused", tone: :attention %>
     <% else %>
-      <div class="text-center py-12">
-        <svg class="mx-auto h-12 w-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path>
-        </svg>
-        <h3 class="mt-2 text-sm font-medium text-gray-900">No subscriptions found</h3>
-        <p class="mt-1 text-sm text-gray-500">
-          <% if params[:search].present? || params[:status].present? %>
-            No subscriptions match your filters.
-          <% else %>
-            No users have subscriptions yet.
-          <% end %>
-        </p>
-      </div>
+      <% case user.subscription_status %>
+      <% when "active" %>
+        <%= render "admin/shared/status_chip", label: "Active", tone: :ok %>
+      <% when "canceled" %>
+        <%= render "admin/shared/status_chip", label: "Canceled", tone: :problem %>
+      <% when "past_due" %>
+        <%= render "admin/shared/status_chip", label: "Past due", tone: :problem %>
+      <% else %>
+        <%= render "admin/shared/status_chip", label: "Unknown", tone: :attention %>
+      <% end %>
     <% end %>
-  </div>
-</div>
+  <% end %>
+  <%= admin_td(user.credits, align: :right) %>
+  <%= admin_td(user.subscription_ends_at&.strftime("%b %d, %Y") || "N/A", class: "whitespace-nowrap text-mute") %>
+  <%= admin_td(align: :right) do %>
+    <div class="flex items-center justify-end gap-3">
+      <%= link_to "View", admin_user_path(user), class: admin_link_class %>
+      <%= link_to "Edit", edit_admin_subscription_path(user), class: admin_link_class %>
+      <% if user.subscription_can_be_paused? %>
+        <%= render "admin/shared/confirm_button", label: "Pause", url: pause_admin_subscription_path(user),
+                   method: :post, confirm: "Pause this subscription?" %>
+      <% elsif user.subscription_can_be_resumed? %>
+        <%= button_to "Resume", resume_admin_subscription_path(user), method: :post,
+            data: { turbo_confirm: "Resume this subscription?" },
+            class: "cursor-pointer text-sm #{admin_link_class}", form: { class: "inline" } %>
+      <% end %>
+      <% if user.subscription_status == "active" && !user.subscription_paused? %>
+        <%= render "admin/shared/confirm_button", label: "Cancel", url: cancel_admin_subscription_path(user),
+                   method: :post, confirm: "Are you sure you want to cancel this subscription?" %>
+      <% end %>
+    </div>
+  <% end %>
+<% end %>

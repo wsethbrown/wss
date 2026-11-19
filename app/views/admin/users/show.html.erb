@@ -1,184 +1,94 @@
 <% content_for :title, "#{@user.full_name} - Admin" %>
 
-<div class="max-w-7xl mx-auto">
-  <!-- Header -->
-  <div class="mb-8 flex items-center justify-between">
-    <div>
-      <div class="flex items-center gap-2 text-sm text-gray-600 mb-2">
-        <%= link_to "Admin", admin_root_path, class: "hover:text-gray-900" %>
-        <span>/</span>
-        <%= link_to "Users", admin_users_path, class: "hover:text-gray-900" %>
-        <span>/</span>
-        <span class="text-gray-900"><%= @user.full_name %></span>
-      </div>
-      <h1 class="text-3xl font-bold text-gray-900">User Details</h1>
-    </div>
-    <div class="flex gap-4">
-      <%= link_to "Edit User", edit_admin_user_path(@user), class: "px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition" %>
-      <%= link_to "Back to Users", admin_users_path, class: "px-4 py-2 bg-gray-100 text-gray-700 font-medium rounded-lg hover:bg-gray-200 transition" %>
-    </div>
-  </div>
+<%= render "admin/shared/page_header", title: @user.full_name, lede: "User details", back: [ "Users", admin_users_path ] do %>
+  <%= link_to "Edit user", edit_admin_user_path(@user), class: "btn btn-primary" %>
+<% end %>
 
-<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-  <!-- Main Content -->
-  <div class="lg:col-span-2 space-y-6">
-    <!-- User Information -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">User Information</h2>
-      <dl class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
-          <dt class="text-sm font-medium text-gray-500">Email</dt>
-          <dd class="mt-1 text-sm text-gray-900"><%= @user.email %></dd>
-        </div>
-        <div>
-          <dt class="text-sm font-medium text-gray-500">Name</dt>
-          <dd class="mt-1 text-sm text-gray-900"><%= @user.full_name %></dd>
-        </div>
-        <div>
-          <dt class="text-sm font-medium text-gray-500">Joined</dt>
-          <dd class="mt-1 text-sm text-gray-900"><%= @user.created_at.strftime("%B %d, %Y") %></dd>
-        </div>
-        <div>
-          <dt class="text-sm font-medium text-gray-500">Authentication</dt>
-          <dd class="mt-1 text-sm text-gray-900">
-            <% if @user.provider.present? %>
-              <%= @user.provider.humanize %>
-            <% else %>
-              Email/Password
-            <% end %>
-          </dd>
-        </div>
-      </dl>
-    </div>
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+  <div class="space-y-6 lg:col-span-2">
+    <%= render "admin/shared/detail_panel", title: "User information", rows: [
+      [ "Email", @user.email ],
+      [ "Name", @user.full_name ],
+      [ "Joined", @user.created_at.strftime("%B %d, %Y") ],
+      [ "Authentication", (@user.provider.present? ? @user.provider.humanize : "Email/Password") ]
+    ] %>
 
-    <!-- Recent Purchases -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">Recent Purchases</h2>
+    <section class="card p-5 sm:p-6">
+      <h2 class="mb-3 text-lg font-semibold text-ink">Recent purchases</h2>
       <% if @recent_purchases.any? %>
-        <ul class="space-y-3">
+        <ul class="divide-y divide-hairline">
           <% @recent_purchases.each do |purchase| %>
-            <li class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-              <div>
+            <li class="flex items-center justify-between gap-4 py-3">
+              <div class="min-w-0">
                 <p class="text-sm font-medium text-gray-900"><%= purchase.presentation.title %></p>
-                <p class="text-xs text-gray-500">
-                  <%= purchase.purchase_type.capitalize %> • 
-                  <%= purchase.created_at.strftime("%b %d, %Y") %>
-                </p>
+                <p class="text-xs text-mute"><%= purchase.purchase_type.capitalize %> • <%= purchase.created_at.strftime("%b %d, %Y") %></p>
               </div>
-              <% if purchase.purchase_type == 'direct' %>
-                <span class="text-sm text-gray-900">$<%= purchase.purchase_price || purchase.presentation.price %></span>
+              <% if purchase.purchase_type == "direct" %>
+                <span class="text-sm tabular-nums text-gray-900">$<%= purchase.purchase_price || purchase.presentation.price %></span>
               <% else %>
-                <span class="text-sm text-gray-500">1 Credit</span>
+                <span class="text-sm text-mute">1 Credit</span>
               <% end %>
             </li>
           <% end %>
         </ul>
       <% else %>
-        <p class="text-sm text-gray-500">No purchases yet.</p>
+        <p class="text-sm text-mute">No purchases yet.</p>
       <% end %>
-    </div>
+    </section>
 
-    <!-- Society Memberships -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">Society Memberships</h2>
+    <section class="card p-5 sm:p-6">
+      <h2 class="mb-3 text-lg font-semibold text-ink">Society memberships</h2>
       <% if @society_memberships.any? %>
-        <ul class="space-y-3">
+        <ul class="divide-y divide-hairline">
           <% @society_memberships.each do |membership| %>
-            <li class="flex items-center justify-between py-2 border-b border-gray-100 last:border-0">
-              <div>
+            <li class="flex items-center justify-between gap-4 py-3">
+              <div class="min-w-0">
                 <p class="text-sm font-medium text-gray-900"><%= membership.society.name %></p>
-                <p class="text-xs text-gray-500">
-                  <%= membership.role.capitalize %> • 
-                  Joined <%= membership.created_at.strftime("%b %d, %Y") %>
-                </p>
+                <p class="text-xs text-mute"><%= membership.role.capitalize %> • Joined <%= membership.created_at.strftime("%b %d, %Y") %></p>
               </div>
-              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                <%= membership.status.capitalize %>
-              </span>
+              <%= render "admin/shared/status_chip", label: membership.status.capitalize,
+                         tone: (membership.status == "active" ? :ok : :attention) %>
             </li>
           <% end %>
         </ul>
       <% else %>
-        <p class="text-sm text-gray-500">Not a member of any societies.</p>
+        <p class="text-sm text-mute">Not a member of any societies.</p>
       <% end %>
-    </div>
+    </section>
   </div>
 
-  <!-- Sidebar -->
   <div class="space-y-6">
-    <!-- Profile Picture -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">Profile Picture</h2>
-      <div class="flex justify-center">
-        <% if @user.profile_image.attached? %>
-          <%= image_tag @user.profile_image, class: "h-32 w-32 rounded-full object-cover" %>
-        <% else %>
-          <div class="h-32 w-32 rounded-full flex items-center justify-center text-white font-semibold text-3xl" style="background-color: <%= @user.avatar_color %>">
-            <%= @user.initials %>
-          </div>
-        <% end %>
-      </div>
-    </div>
+    <section class="card p-5 sm:p-6">
+      <h2 class="mb-4 text-lg font-semibold text-ink">Profile picture</h2>
+      <div class="flex justify-center"><%= avatar(@user, size: 128) %></div>
+    </section>
 
-    <!-- Subscription Status -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6">
-      <h2 class="text-lg font-semibold text-gray-900 mb-4">Subscription</h2>
-      <dl class="space-y-3">
-        <div>
-          <dt class="text-sm font-medium text-gray-500">Status</dt>
-          <dd class="mt-1">
-            <% if @user.has_active_subscription? %>
-              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-green-100 text-green-800">
-                Active
-              </span>
-            <% else %>
-              <span class="px-2 py-1 text-xs font-semibold rounded-full bg-gray-100 text-gray-800">
-                None
-              </span>
-            <% end %>
-          </dd>
-        </div>
-        <% if @user.has_active_subscription? %>
-          <div>
-            <dt class="text-sm font-medium text-gray-500">Plan</dt>
-            <dd class="mt-1 text-sm text-gray-900"><%= @user.subscription_plan_display %></dd>
-          </div>
-          <div>
-            <dt class="text-sm font-medium text-gray-500">Renews</dt>
-            <dd class="mt-1 text-sm text-gray-900">
-              <%= @user.subscription_ends_at&.strftime("%B %d, %Y") || "N/A" %>
-            </dd>
-          </div>
-        <% end %>
-        <div>
-          <dt class="text-sm font-medium text-gray-500">Credits</dt>
-          <dd class="mt-1 text-2xl font-semibold text-gray-900"><%= @user.credits || 0 %></dd>
-        </div>
-      </dl>
+    <% sub_status = @user.has_active_subscription? ? render("admin/shared/status_chip", label: "Active", tone: :ok) : render("admin/shared/status_chip", label: "None", tone: :attention) %>
+    <% sub_rows = [ [ "Status", sub_status ] ] %>
+    <% if @user.has_active_subscription? %>
+      <% sub_rows << [ "Plan", @user.subscription_plan_display ] %>
+      <% sub_rows << [ "Renews", @user.subscription_ends_at&.strftime("%B %d, %Y") || "N/A" ] %>
+    <% end %>
+    <% sub_rows << [ "Credits", (@user.credits || 0).to_s ] %>
+    <%= render "admin/shared/detail_panel", title: "Subscription", rows: sub_rows do %>
       <% if @user.has_active_subscription? %>
-        <div class="mt-4 pt-4 border-t border-gray-200">
-          <%= button_to "Cancel Subscription", cancel_admin_subscription_path(@user), 
-              method: :post,
-              data: { turbo_confirm: "Are you sure you want to cancel #{@user.full_name}'s subscription?" },
-              class: "w-full px-4 py-2 bg-red-600 text-white font-medium rounded-lg hover:bg-red-700 transition" %>
-        </div>
+        <%= render "admin/shared/confirm_button", label: "Cancel subscription", url: cancel_admin_subscription_path(@user),
+                   method: :post, variant: :button,
+                   confirm: "Are you sure you want to cancel #{@user.full_name}'s subscription?" %>
       <% end %>
-    </div>
+    <% end %>
 
-    <!-- Admin Status -->
     <%= render "role_card", user: @user %>
 
     <% if @user.invitation_sent_at.present? && @user.invitation_accepted_at.nil? %>
-      <!-- Pending invitation -->
-      <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-        <h3 class="text-lg font-semibold text-gray-900 mb-2">Invitation pending</h3>
-        <p class="text-sm text-gray-600 mb-4">
+      <section class="card p-5 sm:p-6">
+        <h2 class="mb-2 text-lg font-semibold text-ink">Invitation pending</h2>
+        <p class="mb-4 text-sm text-mute">
           Invited <%= time_ago_in_words(@user.invitation_sent_at) %> ago<%= " by #{@user.invited_by.full_name}" if @user.invited_by %>.
           They haven't accepted yet; the link works for 14 days.
         </p>
-        <%= button_to "Re-send invitation", resend_invitation_admin_user_path(@user), method: :post,
-            class: "w-full px-4 py-2 bg-blue-600 text-white font-medium rounded-lg hover:bg-blue-700 transition" %>
-      </div>
+        <%= button_to "Re-send invitation", resend_invitation_admin_user_path(@user), method: :post, class: "btn btn-secondary w-full" %>
+      </section>
     <% end %>
   </div>
 </div>

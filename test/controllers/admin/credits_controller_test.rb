@@ -45,6 +45,6 @@ class Admin::CreditsControllerTest < ActionDispatch::IntegrationTest
   test "the credits page still offers the grant monthly action" do
     get admin_credits_path
     assert_response :success
-    assert_select "a[href='#{grant_monthly_admin_credits_path}']"
+    assert_select "form[action='#{grant_monthly_admin_credits_path}'] button, form[action='#{grant_monthly_admin_credits_path}'] input[type=submit]"
   end
 end

@@ -1,0 +1,31 @@
+<%# Simple CSS bars: a labelled row per value, the bar's width relative to the
+    largest value (no chart library). Real counts only.
+    Locals:
+      title (String, optional) card heading
+      items (Array of [label, count], required)
+      total (Numeric, optional) when given, each row also shows its percentage
+    Example: render "admin/analytics/bars", title: "Downloads by type", items: [["Outline", 4]] %>
+<% items = local_assigns.fetch(:items) %>
+<% max = [ items.map { |_, count| count.to_i }.max.to_i, 1 ].max %>
+<% total = local_assigns[:total].to_f %>
+<section class="card p-5 sm:p-6">
+  <% if local_assigns[:title].present? %>
+    <h2 class="mb-4 text-lg font-semibold text-ink"><%= local_assigns[:title] %></h2>
+  <% end %>
+  <ul class="space-y-3">
+    <% items.each do |label, count| %>
+      <li>
+        <div class="mb-1 flex items-baseline justify-between gap-3 text-sm">
+          <span class="min-w-0 truncate text-gray-900"><%= label %></span>
+          <span class="shrink-0 font-semibold tabular-nums text-ink">
+            <%= number_with_delimiter(count.to_i) %>
+            <% if total > 0 %><span class="font-normal text-mute">(<%= number_to_percentage(count.to_f / total * 100, precision: 0) %>)</span><% end %>
+          </span>
+        </div>
+        <div class="h-2 overflow-hidden rounded-full bg-whiskey-100" aria-hidden="true">
+          <div class="h-full rounded-full bg-ink" style="width: <%= (count.to_f / max * 100).round(1) %>%"></div>
+        </div>
+      </li>
+    <% end %>
+  </ul>
+</section>
