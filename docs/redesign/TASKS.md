@@ -1,5 +1,10 @@
 # Task list — site redesign and backend fixes
 
+> **Ops, before anything else: merge wsethbrown/wss#36 first.** It carries the dependency
+> security fixes (79 open advisories on the current lockfile, including a Critical Active
+> Storage one; see `DEPENDENCY_AUDIT.md`). After it merges, this branch must merge the base
+> in and re-run the full suite on Rails 8.1 before it is merged.
+
 Read `ORCHESTRATION.md` first (roles, waves, gates, definition of done, environment).
 Design rules: `DESIGN_SYSTEM.md`. Backend evidence: `ARCHITECTURE_REVIEW.md`
 (finding ids like **M2**, **S4**, **I7** refer to it).
@@ -609,7 +614,7 @@ past `yes` RSVPs shows 2; `grep` finds no reference to the missing documents.
 **Findings:** I16, S15 (report-only CSP).
 **Owns:** new tests only, `.github/workflows/ci.yml`,
 `config/initializers/content_security_policy.rb`.
-**Do:** Add what the other tasks did not: request tests for every download action per
+**Do:** Make the `bundle-audit` step run even when Brakeman fails (`if: always()` or its own job) — it has been silently skipped (see `DEPENDENCY_AUDIT.md`). Add what the other tasks did not: request tests for every download action per
 access state, policy tests for `PresentationPolicy`, `EventPolicy`, `EventRsvpPolicy`, the
 same signed webhook posted twice through the controller, `customer.subscription.deleted`
 expiring credits. CI: Postgres 15 to match production; run system tests. Ship a
