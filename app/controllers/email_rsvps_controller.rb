@@ -16,6 +16,13 @@ class EmailRsvpsController < ApplicationController
       return redirect_to society_event_path(event.society, event), alert: "That RSVP link is not valid."
     end
 
+    # The link outlives membership: someone removed from a private society
+    # keeps the email, but no longer gets to answer its events.
+    unless event.rsvp_eligible?(user)
+      Rails.logger.warn "Email RSVP rejected for event #{event.id}, user #{user.id}: no longer eligible (society #{event.society_id})"
+      return redirect_to root_path, alert: "That RSVP link is no longer valid."
+    end
+
     rsvp = event.event_rsvps.find_or_initialize_by(user: user)
     rsvp.status = status
 

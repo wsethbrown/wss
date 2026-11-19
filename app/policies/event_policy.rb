@@ -23,7 +23,7 @@ class EventPolicy < ApplicationPolicy
   end
 
   def create?
-    return false unless user.present?
+    return false unless user.present? && record.society.present?
     user.admin? || record.society.has_admin?(user)
   end
 
@@ -39,6 +39,8 @@ class EventPolicy < ApplicationPolicy
     user.can_delete? || record.organizer == user || record.society.has_admin?(user)
   end
 
+  # Window + eligibility live on the model (Event#can_rsvp? / #rsvp_eligible?);
+  # the public-society rule is Event::PUBLIC_EVENTS_OPEN_TO_NON_MEMBERS.
   def rsvp?
     return false unless user.present?
     record.can_rsvp?(user)

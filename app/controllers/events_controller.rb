@@ -1,6 +1,12 @@
 class EventsController < ApplicationController
+  # Reading is open (show? applies the society's privacy); every write and the
+  # autocomplete reads need a signed-in user, so signed-out requests go to
+  # sign in instead of falling through to a policy with a nil user.
+  before_action :authenticate_user!, except: [ :index, :show ]
   before_action :set_event, only: [ :show, :edit, :update, :destroy, :assign_host, :assign_deck,
                                    :deck_options, :host_options, :mention_options ]
+  after_action :verify_authorized, except: :index
+  after_action :verify_policy_scoped, only: :index
 
   def index
     @events = policy_scope(Event).includes(:society, :organizer, :event_rsvps)

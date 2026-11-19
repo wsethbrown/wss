@@ -23,8 +23,9 @@ class EventRsvpPolicy < ApplicationPolicy
     return false unless user.present?
     return false unless record.event.present?
 
-    # User can only update their own RSVP, and only within the change window
-    record.user == user && record.can_change_response?
+    # User can only update their own RSVP, only within the change window, and
+    # only while still eligible (a removed member of a private society can't).
+    record.user == user && record.can_change_response? && record.event.rsvp_eligible?(user)
   end
 
   def destroy?

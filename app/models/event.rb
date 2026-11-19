@@ -112,9 +112,27 @@ class Event < ApplicationRecord
     start_time <= 24.hours.from_now
   end
 
+  # OWNER DECISION POINT (B1, Nov 2026): may signed-in NON-members RSVP to
+  # events of PUBLIC societies? Default `true` keeps today's behaviour; flip to
+  # `false` to require society membership for every event. Private societies
+  # always require membership, whatever this says.
+  PUBLIC_EVENTS_OPEN_TO_NON_MEMBERS = true
+
+  # Whether this person may answer this event at all (window aside): the
+  # society's active members, its creator and the organizer; for a public
+  # society, anyone signed in while the switch above is on. Shared by the
+  # on-site RSVP (via can_rsvp? / EventRsvpPolicy) and the emailed RSVP link.
+  def rsvp_eligible?(user)
+    return false unless user && society
+    return true if organizer_id == user.id || society.creator_id == user.id || society.has_member?(user)
+
+    society.public? && PUBLIC_EVENTS_OPEN_TO_NON_MEMBERS
+  end
+
   def can_rsvp?(user)
     return false unless user
     return false if past? || rsvp_closed?
+    return false unless rsvp_eligible?(user)
     !event_rsvps.exists?(user: user)
   end
 

@@ -1,8 +1,10 @@
 class EventRsvpsController < ApplicationController
   include ActivityLogger
 
+  before_action :authenticate_user!
   before_action :set_event
   before_action :set_rsvp, only: [ :update, :destroy ]
+  after_action :verify_authorized
 
   # Answering is idempotent: the segmented control posts here every time,
   # whether or not an RSVP already exists. It has to, because the control is
@@ -66,8 +68,12 @@ class EventRsvpsController < ApplicationController
 
   private
 
+  # An RSVP is only reachable through an event the user may see: without this
+  # an outsider could answer a private society's event and read its attendee
+  # list from the turbo-stream response.
   def set_event
     @event = Event.find(params[:event_id])
+    authorize @event, :show?
   end
 
   # Double-clicking the control can put two creates in flight at once; the
@@ -81,8 +87,14 @@ class EventRsvpsController < ApplicationController
     @rsvp.present? && @rsvp.update(status: params[:status] || "yes")
   end
 
+  # Only ever the signed-in user's own RSVP; there is nothing to change or
+  # cancel if they never answered, so that is a 404 rather than a nil policy.
   def set_rsvp
     @rsvp = @event.event_rsvps.find_by(user: current_user)
+    return if @rsvp
+
+    Rails.logger.warn "Event #{@event.id}: RSVP #{action_name} by user #{current_user.id} refused: no RSVP to #{action_name}"
+    raise ActiveRecord::RecordNotFound
   end
 
   def rsvp_params

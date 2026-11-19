@@ -1,16 +1,19 @@
 # app/controllers/admin/bottles/reviews_controller.rb
 # Admin-only moderation, no ownership check (distinct from ReviewsController).
 class Admin::Bottles::ReviewsController < Admin::BaseController
-  before_action :require_delete_rights!, only: :destroy
+  # Purging photos is as permanent as deleting the review: full admins only.
+  before_action :require_delete_rights!, only: [ :destroy, :destroy_image ]
   before_action :set_review
 
   def destroy
     @review.destroy!
+    Rails.logger.info "Admin user #{current_user.id} deleted review #{@review.id} (bottle #{@bottle.id})"
     redirect_to admin_bottle_path(@bottle), notice: "Review deleted."
   end
 
   def destroy_image
     @review.images.purge_later
+    Rails.logger.info "Admin user #{current_user.id} purged photos of review #{@review.id} (bottle #{@bottle.id})"
     redirect_to admin_bottle_path(@bottle), notice: "Review photos removed."
   end
 

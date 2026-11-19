@@ -3,6 +3,7 @@
 class Events::EventBottlesController < ApplicationController
   before_action :authenticate_user!
   before_action :set_event
+  after_action :verify_authorized
 
   def create
     authorize @event, :manage_pours?
