@@ -1,6 +1,8 @@
 require "application_system_test_case"
 
 class MagicLinksTest < ApplicationSystemTestCase
+  include ActiveJob::TestHelper
+
   def setup
     @user = User.create!(
       email: "test@example.com",
