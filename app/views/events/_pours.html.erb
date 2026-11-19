@@ -28,8 +28,7 @@
               <div class="flex shrink-0 items-center gap-3">
                 <% if night_reviews.any? %>
                   <% mean = (night_reviews.sum(&:rating) / night_reviews.size).to_f.round(2) %>
-                  <span class="font-semibold tabular-nums text-ink"><%= number_with_precision(mean, precision: 2, strip_insignificant_zeros: true) %></span>
-                  <%= render "bottles/rating", value: mean %>
+                  <%= render "shared/score", value: mean %>
                 <% end %>
                 <% if @can_review_pours %>
                   <% if (mine = @my_event_reviews[pour.bottle_id]) %>
@@ -76,7 +75,7 @@
                     <div class="rounded-[18px] bg-paper p-4">
                       <div class="flex flex-wrap items-baseline justify-between gap-2">
                         <span class="text-sm font-semibold text-ink"><%= review.user.first_name %> <%= review.user.last_name %> <%= render "shared/century_badge", record: review.user %></span>
-                        <%= render "bottles/rating", value: review.rating.to_f %>
+                        <%= render "shared/score", value: review.rating.to_f %>
                       </div>
                       <% if review.notes.present? %><p class="mt-1 text-sm text-gray-900"><%= review.notes %></p><% end %>
                     </div>

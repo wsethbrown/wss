@@ -1,7 +1,7 @@
 <%= link_to review_path(review), class: "block min-w-0 rounded-2xl border border-hairline p-3 transition hover:bg-paper" do %>
   <div class="flex items-baseline justify-between gap-2">
     <span class="truncate font-semibold text-ink"><%= review.bottle.display_name %></span>
-    <%= render "bottles/rating", value: review.rating.to_f %>
+    <%= render "shared/score", value: review.rating.to_f %>
   </div>
   <p class="mt-1 text-sm text-mute"><%= review.user.first_name %> <%= render "shared/century_badge", record: review.user %> · <%= time_ago_in_words(review.created_at) %> ago</p>
   <%= render "reviews/event_line", review: review %>

@@ -16,8 +16,7 @@
       </div>
     </div>
     <div class="mt-5 flex items-center gap-3 text-xl">
-      <%= render "bottles/rating", value: @review.rating.to_f %>
-      <span class="font-semibold tabular-nums text-ink"><%= number_with_precision(@review.rating, precision: 2, strip_insignificant_zeros: true) %></span>
+      <%= render "shared/score", value: @review.rating.to_f %>
     </div>
     <p class="mt-2 text-mute">
       <%= link_to "#{@review.user.first_name} #{@review.user.last_name}", profile_path(@review.user), class: "font-medium text-ink underline decoration-hairline underline-offset-4 hover:decoration-ink" %> <%= render "shared/century_badge", record: @review.user %> ·

@@ -439,7 +439,7 @@
                   </div>
                   <% if pour.average.present? %>
                     <div class="shrink-0 text-right">
-                      <span class="text-mark-deep"><%= render "bottles/rating", value: pour.average %></span>
+                      <%= render "shared/score", value: pour.average %>
                       <p class="mt-0.5 text-xs text-mute tabular-nums"><%= pluralize(pour.reviews_count, "score") %> on these nights</p>
                     </div>
                   <% end %>
@@ -460,7 +460,7 @@
         <h2 class="<%= heading_class %>">Reviews</h2>
         <% if deck_reviews.any? %>
           <div class="mt-3 flex flex-wrap items-center gap-2">
-            <span class="text-mark-deep"><%= render "bottles/rating", value: @presentation.average_review_rating %></span>
+            <%= render "shared/score", value: @presentation.average_review_rating %>
             <span class="text-sm text-mute"><%= pluralize(deck_reviews.size, "review") %>, from people who bought this deck or tasted along at a night that ran it</span>
           </div>
         <% else %>
@@ -506,7 +506,7 @@
                       <span class="text-xs text-mute"><%= review.created_at.strftime("%B %-d, %Y") %></span>
                     </div>
                   </div>
-                  <span class="shrink-0 text-mark-deep"><%= render "bottles/rating", value: review.rating.to_f %></span>
+                  <span class="shrink-0"><%= render "shared/score", value: review.rating.to_f %></span>
                 </div>
                 <% if review.body.present? %>
                   <p class="mt-3 text-sm leading-relaxed text-gray-900"><%= review.body %></p>

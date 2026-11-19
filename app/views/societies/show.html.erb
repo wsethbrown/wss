@@ -148,7 +148,7 @@
                         <div class="py-3">
                           <div class="flex flex-wrap items-baseline justify-between gap-2">
                             <span class="text-sm font-semibold text-ink"><%= review.user.first_name %> <%= review.user.last_name %> <%= render "shared/century_badge", record: review.user %></span>
-                            <span class="text-mark-deep"><%= render "bottles/rating", value: review.rating.to_f %></span>
+                            <%= render "shared/score", value: review.rating.to_f %>
                           </div>
                           <% if review.notes.present? %><p class="mt-1 text-sm text-mute"><%= review.notes %></p><% end %>
                         </div>

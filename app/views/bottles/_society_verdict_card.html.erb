@@ -10,8 +10,7 @@
   <div class="flex flex-wrap items-baseline justify-between gap-2">
     <span><%= link_to society.name, society_path(society), class: "font-semibold text-ink hover:underline" %> <%= render "shared/century_badge", record: society %></span>
     <span class="flex items-center gap-2 whitespace-nowrap">
-      <span class="font-semibold tabular-nums text-ink"><%= number_with_precision(society.verdict_avg, precision: 2, strip_insignificant_zeros: true) %></span>
-      <%= render "bottles/rating", value: society.verdict_avg.to_f %>
+      <%= render "shared/score", value: society.verdict_avg.to_f %>
     </span>
   </div>
 

@@ -3,7 +3,7 @@
 <article class="card min-w-0 p-6">
   <div class="flex flex-wrap items-baseline justify-between gap-2">
     <span><%= link_to "#{review.user.first_name} #{review.user.last_name}", profile_path(review.user), class: "font-semibold text-ink hover:underline" %> <%= render "shared/century_badge", record: review.user %></span>
-    <%= render "bottles/rating", value: review.rating.to_f %>
+    <%= render "shared/score", value: review.rating.to_f %>
   </div>
   <%= render "reviews/event_card", review: review %>
 

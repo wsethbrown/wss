@@ -18,8 +18,7 @@
       <div class="flex flex-wrap items-baseline justify-between gap-x-3 gap-y-1 py-2.5">
         <%= link_to bottle.display_name, bottle_path(bottle), class: "min-w-0 truncate font-semibold text-ink hover:underline" %>
         <span class="flex shrink-0 items-center gap-2 text-sm text-mute">
-          <span class="font-semibold tabular-nums text-ink"><%= number_with_precision(mean, precision: 2, strip_insignificant_zeros: true) %></span>
-          <%= render "bottles/rating", value: mean %>
+          <%= render "shared/score", value: mean %>
           <%= pluralize(reviews.map(&:user_id).uniq.size, "taster") %>
         </span>
       </div>

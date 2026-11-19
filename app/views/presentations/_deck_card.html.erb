@@ -22,7 +22,7 @@
         <% if deck.reviewed? %>
           <span class="flex shrink-0 items-baseline gap-1 whitespace-nowrap"
                 title="<%= "#{number_with_precision(deck.average_review_rating, precision: 1)} out of 5 from #{pluralize(deck.reviews_count, 'review')}" %>">
-            <span class="text-mark-deep"><%= render "bottles/rating", value: deck.average_review_rating %></span>
+            <%= render "shared/score", value: deck.average_review_rating, precision: 1 %>
             <span class="text-xs font-medium text-mute tabular-nums"><%= deck.reviews_count %></span>
           </span>
         <% end %>

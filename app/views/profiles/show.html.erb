@@ -43,7 +43,7 @@
                     <%= link_to review.bottle.display_name, bottle_path(review.bottle), class: "font-semibold text-ink hover:underline" %>
                     <span class="flex items-center gap-2 text-sm text-mute">
                       <%= link_to "view", review_path(review), class: "font-semibold text-ink hover:underline" %>
-                      <%= render "bottles/rating", value: review.rating.to_f %>
+                      <%= render "shared/score", value: review.rating.to_f %>
                       <%= review.created_at.strftime("%b %Y") %>
                     </span>
                   </div>
@@ -118,7 +118,7 @@
                     <% score = @shelf_scores[item.bottle_id] %>
                     <% if score&.avg_rating %>
                       <span class="shrink-0 whitespace-nowrap text-sm text-mute">
-                        <%= score.avg_rating.to_f.round(1) %> <span class="text-mark-deep">&#9733;</span>
+                        <%= render "shared/score", value: score.avg_rating.to_f, precision: 1 %>
                         &middot; <%= pluralize(score.reviewers, "tasting") %>
                       </span>
                     <% end %>

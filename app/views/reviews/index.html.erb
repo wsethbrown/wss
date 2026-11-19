@@ -56,13 +56,10 @@
           </div>
           <div class="shrink-0 whitespace-nowrap text-right">
             <% if bottle.avg_rating %>
-              <div>
-                <span class="font-semibold tabular-nums text-ink"><%= number_with_precision(bottle.avg_rating, precision: 2, strip_insignificant_zeros: true) %></span>
-                <span class="hidden sm:inline"><%= render "bottles/rating", value: bottle.avg_rating&.to_f %></span>
-              </div>
+              <%= render "shared/score", value: bottle.avg_rating.to_f %>
               <p class="text-sm text-mute"><%= pluralize(bottle.reviewers, "reviewer") %></p>
             <% else %>
-              <%= render "bottles/rating", value: nil %>
+              <%= render "shared/score", value: nil %>
             <% end %>
           </div>
         <% end %>

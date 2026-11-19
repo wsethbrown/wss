@@ -81,6 +81,13 @@ Rules:
 
 ## Components
 
+- **Glass**: the logo's tasting glass, flat and line-drawn, with an orange level. One shared
+  partial, `shared/_glass` (a score is shown through `shared/_score`, which wraps it); it is never
+  redrawn anywhere else. For a score, `level` is score / 5; for the table (RSVPs) going is 1, maybe
+  0.5, unanswered 0; in a verdict the numeral is the serve order. Tones: `:ink` on paper and white,
+  `:cream` on green. Minimum size 28px. It always sits beside its number or count (or carries
+  sr-only text), is aria-hidden, and has no shading or animation. Replaces star rows for display;
+  the half-step star control in review forms is an input and stays.
 - **Primary button**: `btn btn-primary` (green, white text, 16px radius). One per view.
 - **Secondary button**: `btn btn-secondary` (white, hairline).
 - **Text link with arrow**: bold ink text followed by `→`.

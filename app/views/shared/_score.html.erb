@@ -1,0 +1,18 @@
+<%# A score out of 5, shown as one glass (level = score / 5) beside the number.
+    The only display of a score: the glass never appears without its number.
+    The star INPUT (shared/_star_input, reviews/_form) is a control, not a display.
+
+    locals:
+      value:     the score, 0..5 (Numeric), or nil for "no tastings yet".
+      precision: decimals shown (default 2, trailing zeros stripped).
+      tone:      :ink (default) or :cream, passed to the glass. %>
+<% if value.present? %>
+  <% shown = number_with_precision(value, precision: local_assigns.fetch(:precision, 2), strip_insignificant_zeros: true) %>
+  <span class="inline-flex items-center gap-1.5 whitespace-nowrap" data-score="<%= shown %>">
+    <%= render "shared/glass", level: value.to_f / 5, size: 28, tone: local_assigns.fetch(:tone, :ink) %>
+    <span class="font-semibold tabular-nums text-ink"><%= shown %></span>
+    <span class="sr-only"> out of 5</span>
+  </span>
+<% else %>
+  <span class="text-sm text-mute">No tastings yet</span>
+<% end %>
