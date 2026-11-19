@@ -6,7 +6,7 @@
     dark); the verdict, the morning after, sits on paper as a tasting sheet.
     Public societies only (HomeController). Pour names show only when
     Event#pours_revealed?; no host/manager bypass on a public page.
-    Styles are scoped to .n4; the glass is home/next4/_glass. %>
+    Styles are scoped to .n4; the glass is shared/_glass. %>
 <%
   story_deck = @night_story_deck || @showcase_deck
   slides = story_deck ? story_deck.slide_images.order(:id).first(story_deck.effective_preview_slide_count) : []
@@ -24,8 +24,8 @@
     maybe = @night.maybe_count
     seats = [ @night_members.to_i, yes + maybe ].max
     shown_seats = [ seats, 12 ].min
-    seat_levels = Array.new([ yes, shown_seats ].min, 0.62) +
-                  Array.new([ maybe, shown_seats - [ yes, shown_seats ].min ].min, 0.3)
+    seat_levels = Array.new([ yes, shown_seats ].min, 1.0) +
+                  Array.new([ maybe, shown_seats - [ yes, shown_seats ].min ].min, 0.5)
     seat_levels += Array.new(shown_seats - seat_levels.size, 0)
     reply_line = @night.total_rsvp_count.zero? ? "No replies yet" :
       [ "#{yes} going", (maybe.positive? ? "#{maybe} maybe" : nil) ].compact.join(", ")
@@ -261,7 +261,7 @@
               <ol class="flight">
                 <% @night_pours.each_with_index do |pour, i| %>
                   <li>
-                    <%= render "home/next4/glass", level: 0.45, numeral: i + 1, size: 64, tone: :cream,
+                    <%= render "shared/glass", css: "n4-glass", level: 0.45, numeral: i + 1, size: 64, tone: :cream,
                                label: revealed ? "Pour #{i + 1}, #{pour.bottle.name}" : "Pour #{i + 1}, poured blind" %>
                     <% if revealed %><span><%= pour.bottle.name %></span><% end %>
                   </li>
@@ -277,7 +277,7 @@
             <p class="num"><%= reply_line %> · <%= pluralize(@night_members, "member") %></p>
             <div class="seats" role="img" aria-label="<%= reply_line %>, <%= pluralize(@night_members, 'member') %>">
               <% seat_levels.each do |lvl| %>
-                <%= render "home/next4/glass", level: lvl, size: 60, tone: :cream %>
+                <%= render "shared/glass", css: "n4-glass", level: lvl, size: 60, tone: :cream %>
               <% end %>
               <% if seats > shown_seats %><span class="num" style="align-self:center;color:rgba(246,244,238,.74)">+<%= seats - shown_seats %></span><% end %>
             </div>
@@ -338,7 +338,7 @@
             <%= @verdict_night.society.name %> · <%= @verdict_night.start_time.strftime("%B %-d") %> · <%= pluralize(tasters, "taster") %>
           </p>
           <div class="took">
-            <%= render "home/next4/glass", level: top[:mean] / 5.0, numeral: top[:number], size: 88, label: "Pour #{top[:number]}" %>
+            <%= render "shared/glass", css: "n4-glass", level: top[:mean] / 5.0, numeral: top[:number], size: 88, label: "Pour #{top[:number]}" %>
             <p>Pour <%= top[:number] %> took the night: <b><%= top[:pour].bottle.name %></b>.</p>
           </div>
           <% if top[:note] %>
@@ -353,7 +353,7 @@
             <% @verdict_rows.each_with_index do |row, rank| %>
               <% bottle = row[:pour].bottle %>
               <li class="row <%= 'row--top' if rank.zero? %>">
-                <%= render "home/next4/glass", level: row[:mean] / 5.0, numeral: row[:number], size: rank.zero? ? 64 : 52,
+                <%= render "shared/glass", css: "n4-glass", level: row[:mean] / 5.0, numeral: row[:number], size: rank.zero? ? 64 : 52,
                            label: "Pour #{row[:number]}" %>
                 <div style="min-width:0">
                   <%= link_to bottle.name, bottle_path(bottle), class: "name" %>

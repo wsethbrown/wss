@@ -100,6 +100,45 @@ class QueryCountsTest < ActionDispatch::IntegrationTest
     assert_select "[data-role=board-row]", 15
   end
 
+  # G1a: the table (one glass per RSVP) and the verdict (one row per scored pour).
+  def add_night_rows(event, count, offset)
+    count.times do |i|
+      member = new_user(offset + i)
+      SocietyMembership.create!(society: event.society, user: member, role: "member", status: "active")
+      EventRsvp.new(event: event, user: member, status: i.even? ? "yes" : "maybe").save!(validate: false)
+      bottle = Bottle.create!(name: "QC Night Pour #{offset + i}", distillery: "QC Distillery")
+      EventBottle.create!(event: event, bottle: bottle, position: 10 + offset + i)
+      Review.new(user: member, bottle: bottle, event: event, rating: 3.5, notes: "n").save!(validate: false)
+    end
+  end
+
+  test "event page query count does not grow with RSVPs, pours or the verdict" do
+    event = events(:spring_blind)
+    sign_in users(:john)
+    add_night_rows(event, 2, 0)
+    few = measure(society_event_path(event.society, event))
+    assert_select "[data-role=verdict-row]", 5
+
+    add_night_rows(event, 8, 10)
+    many = measure(society_event_path(event.society, event))
+    assert_select "[data-role=verdict-row]", 13
+
+    assert_operator many.size, :<=, few.size, "event page queries grew with rows:\n#{growth(few, many)}"
+  end
+
+  test "society page query count does not grow with the next night's RSVPs" do
+    event = events(:mystery_flight)
+    sign_in users(:john)
+    2.times { |i| EventRsvp.create!(event: event, user: new_user(i), status: "yes") }
+    few = measure(society_path(event.society))
+
+    8.times { |i| EventRsvp.create!(event: event, user: new_user(10 + i), status: "maybe") }
+    many = measure(society_path(event.society))
+    assert_select ".panel-ink [data-role=the-table]", text: /\+/ # more seats than glasses shown
+
+    assert_operator many.size, :<=, few.size, "society queries grew with RSVPs:\n#{growth(few, many)}"
+  end
+
   def add_tastings(count, offset)
     count.times do |i|
       reviewer = new_user(offset + i)

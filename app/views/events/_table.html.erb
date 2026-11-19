@@ -1,0 +1,31 @@
+<%# The table: one glass per seat at a night. Going is a full glass, maybe
+    half, unanswered empty; "no" is not a seat. A summary of the RSVP counts
+    the page already shows, with those counts as text beside it.
+    locals:
+      event: the Event
+      tone:  :ink (white card, default) or :cream (the green panel)
+    Unanswered seats count only for society members, the same people the
+    event page shows the "unanswered" count to (events/_stats). %>
+<%
+  tone = local_assigns.fetch(:tone, :ink)
+  tally = rsvp_tally(event)
+  yes = tally.fetch("yes", 0)
+  maybe = tally.fetch("maybe", 0)
+  unanswered = (event.unanswered_count if user_signed_in? && event.society.has_member?(current_user))
+  levels, more = table_seat_levels(yes: yes, maybe: maybe, unanswered: unanswered)
+  line = [ ("#{yes} going" if yes.positive?), ("#{maybe} maybe" if maybe.positive?),
+           ("#{unanswered} unanswered" if unanswered.to_i.positive?) ].compact.join(" · ")
+%>
+<% if levels.any? %>
+  <div class="mt-4" data-role="the-table">
+    <div class="flex flex-wrap items-end gap-1">
+      <% levels.each do |level| %>
+        <%= render "shared/glass", level: level, size: 32, tone: tone %>
+      <% end %>
+      <% if more.positive? %>
+        <span class="self-center pl-1 text-sm tabular-nums <%= tone == :cream ? 'text-cream/75' : 'text-mute' %>">+<%= more %></span>
+      <% end %>
+    </div>
+    <p class="mt-2 text-sm tabular-nums <%= tone == :cream ? 'text-cream/75' : 'text-mute' %>"><%= line %></p>
+  </div>
+<% end %>

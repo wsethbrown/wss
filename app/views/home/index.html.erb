@@ -124,6 +124,10 @@
     .hx .sl .track { height: 1.1cqw; border-radius: 1cqw; background: rgba(246, 244, 238, .18); overflow: hidden; }
     .hx .sl .track i { display: block; height: 100%; border-radius: 1cqw; background: var(--mark); }
     .hx .sl .score span { text-align: right; font-variant-numeric: tabular-nums; }
+    .hx .sl .pour { display: grid; grid-template-columns: auto 1fr auto; align-items: center; padding: .9cqw 0; }
+    .hx .sl .pour svg { display: block; width: auto; height: max(28px, 7.4cqw); }
+    .hx .sl .pour a { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hx .sl .pour span { font-variant-numeric: tabular-nums; }
 
     @media (min-width: 900px) {
       .hx .story { grid-template-columns: .86fr 1.14fr; column-gap: 72px; row-gap: 0; padding: 0; }
@@ -324,6 +328,22 @@
         <div class="player">
           <div class="screen">
             <div class="sl sl--ink">
+              <% if @verdict_rows.present? %>
+                <%# The verdict of a real revealed night at a public society:
+                    its top three pours, ranked by the room. The glass level is
+                    the mean out of 5, its numeral the order it was served. %>
+                <h4>The verdict</h4>
+                <div class="where"><%= link_to @verdict_night.title, society_event_path(@verdict_night.society, @verdict_night) %> · <%= @verdict_night.society.name %></div>
+                <ul>
+                  <% @verdict_rows.first(3).each do |row| %>
+                    <li class="pour">
+                      <%= render "shared/glass", level: row[:mean] / 5.0, numeral: row[:number], tone: :cream, size: 28, label: "Pour #{row[:number]}," %>
+                      <%= link_to row[:pour].bottle.name, bottle_path(row[:pour].bottle) %>
+                      <span><%= number_with_precision(row[:mean], precision: 2, strip_insignificant_zeros: true) %></span>
+                    </li>
+                  <% end %>
+                </ul>
+              <% else %>
               <h4>The tasting record</h4>
               <% if @top_bottles.present? %>
                 <%# Real scores from the public tasting record. %>
@@ -336,6 +356,7 @@
                     </li>
                   <% end %>
                 </ul>
+              <% end %>
               <% end %>
             </div>
           </div>

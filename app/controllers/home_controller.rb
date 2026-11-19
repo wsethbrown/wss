@@ -14,6 +14,11 @@ class HomeController < ApplicationController
     # public society and the top-rated bottles, the same rows /reviews shows.
     @next_event = Event.upcoming.joins(:society).where(societies: { is_private: false }).includes(:society).first
     @top_bottles = Bottle.with_score.where("agg.reviewers > 0").order(Arel.sql(Bottle::SORTS.fetch("top"))).limit(3)
+    # The verdict: the latest revealed night at a public society with event
+    # reviews, its pours ranked by the room (slide four shows its top three in
+    # place of the tasting record when there is one). Public societies only and
+    # Event#pours_revealed? with no bypass, so a secret pour stays secret.
+    load_verdict
     @deck_categories = Presentation.published.where.not(category: [ nil, "" ]).distinct.order(:category).limit(6).pluck(:category)
 
     # Earlier design studies, kept for reference: ?design=next and ?design=next2.
@@ -33,22 +38,8 @@ class HomeController < ApplicationController
           @night_pours = @night.event_bottles.ordered.includes(:bottle).to_a
           @night_members = @night.society.member_count
         end
-        # The verdict: the latest revealed public night with event reviews.
-        @verdict_night = public_events.past.includes(:society)
-                                      .where(id: Review.where.not(event_id: nil).select(:event_id))
-                                      .limit(10).detect(&:pours_revealed?)
-        if @verdict_night
-          by_bottle = @verdict_night.reviews.includes(:user).recent_first.group_by(&:bottle_id)
-          @verdict_rows = @verdict_night.event_bottles.ordered.includes(:bottle).each_with_index.filter_map do |pour, i|
-            reviews = by_bottle[pour.bottle_id]
-            next if reviews.blank?
-            { pour: pour, number: i + 1, mean: (reviews.sum(&:rating) / reviews.size).to_f.round(2),
-              count: reviews.size, note: reviews.detect { |r| r.notes.present? } }
-          end.sort_by { |row| [ -row[:mean], row[:number] ] }
-          Rails.logger.info "Home next4: night #{@night&.id || 'none'}, verdict night #{@verdict_night.id} (#{@verdict_rows.size} scored pours)"
-        else
-          Rails.logger.info "Home next4: night #{@night&.id || 'none'}, no revealed public night with reviews"
-        end
+        # The verdict (@verdict_night, @verdict_rows) is loaded above for slide four.
+        Rails.logger.info "Home next4: night #{@night&.id || 'none'}, verdict night #{@verdict_night&.id || 'none'}"
         @night_story_deck = @night_deck if @night_deck&.slide_images&.attached?
       end
       render preview
@@ -65,6 +56,24 @@ class HomeController < ApplicationController
   end
 
   private
+
+  # The latest revealed night at a public society whose pours have event
+  # reviews, ranked by GlassHelper#verdict_rows. Sets @verdict_night and
+  # @verdict_rows (empty when there is no such night).
+  def load_verdict
+    @verdict_night = Event.joins(:society).where(societies: { is_private: false }).past.includes(:society)
+                          .where(id: Review.where.not(event_id: nil).select(:event_id))
+                          .limit(10).detect(&:pours_revealed?)
+    @verdict_rows = []
+    unless @verdict_night
+      Rails.logger.debug "Home: no revealed public night with reviews, slide four shows the tasting record"
+      return
+    end
+
+    by_bottle = @verdict_night.reviews.includes(:user).recent_first.group_by(&:bottle_id)
+    @verdict_rows = helpers.verdict_rows(@verdict_night.event_bottles.ordered.includes(:bottle).to_a, by_bottle)
+    Rails.logger.debug "Home: verdict from event #{@verdict_night.id} (#{@verdict_rows.size} scored pours)"
+  end
 
   # Membership products/prices live in SubscriptionProducts (shared with admin
   # revenue) so pricing is never hardcoded in two places.

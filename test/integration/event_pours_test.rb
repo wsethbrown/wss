@@ -6,7 +6,8 @@ class EventPoursTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_match "The pours", response.body
     assert_match "Pour #1 — the blind", response.body
-    body = response.body
+    # The pour list itself, in serve order (the verdict above it ranks by score).
+    body = response.body[response.body.index(">The pours<")..]
     assert_operator body.index("Ardbeg 10"), :<, body.index("GlenDronach 12")
     assert_operator body.index("GlenDronach 12"), :<, body.index("Four Roses Small Batch")
     assert_select "a[href=?]", bottle_path(bottles(:ardbeg_10))

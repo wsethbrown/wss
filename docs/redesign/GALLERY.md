@@ -2,7 +2,7 @@
 
 Every HTML route walked in D11 (November 2026), at 1440px and 390px, as the viewer it matters for. Each image is the first screen of the page (viewport capture, JPEG). `scrollWidth` is `document.documentElement.scrollWidth` at that width: it equals the viewport width on every page, so nothing scrolls sideways. Full-page captures were kept outside the repo.
 
-Records used: deck 4 (The Honest Bottle, rendered slides), deck 1 (no cover), society 1 (public, member), society 2 (member is admin), society 3 (private, non-member), event 1 and 3, bottle ardbeg-10-ardbeg, review 2 (someone else's) and 4 (the member's own).
+Records used: deck 4 (The Honest Bottle, rendered slides), deck 1 (no cover), society 1 (public, member), society 2 (member is admin), society 3 (private, non-member), event 1, 3 and 5 (G1a: the past revealed night with scores), bottle ardbeg-10-ardbeg, review 2 (someone else's) and 4 (the member's own).
 
 Not included: download, present-mode, health, sitemap and other non-HTML routes; token routes (magic link, invitations, email RSVP, mute) except an invalid invite link; `/events/:id/reviews/new`, which needs a bottle from the event's pours to render.
 
@@ -11,6 +11,7 @@ Not included: download, present-mode, health, sitemap and other non-HTML routes;
 | Route | 1440px | 390px | scrollWidth |
 |---|---|---|---|
 | `/` | [1440](gallery/out-home-1440.jpg) | [390](gallery/out-home-390.jpg) | 1440 / 390 |
+| `/` (slide four, the verdict; scrolled) | [1440](gallery/out-home_verdict-1440.jpg) | [390](gallery/out-home_verdict-390.jpg) | 1440 / 390 |
 | `/presentations` | [1440](gallery/out-presentations-1440.jpg) | [390](gallery/out-presentations-390.jpg) | 1440 / 390 |
 | `/presentations/4` | [1440](gallery/out-presentations_4-1440.jpg) | [390](gallery/out-presentations_4-390.jpg) | 1440 / 390 |
 | `/presentations/1` | [1440](gallery/out-presentations_1-1440.jpg) | [390](gallery/out-presentations_1-390.jpg) | 1440 / 390 |
@@ -45,6 +46,8 @@ Not included: download, present-mode, health, sitemap and other non-HTML routes;
 | `/societies/2/edit` | [1440](gallery/member-societies_2_edit-1440.jpg) | [390](gallery/member-societies_2_edit-390.jpg) | 1440 / 390 |
 | `/societies/new` | [1440](gallery/member-societies_new-1440.jpg) | [390](gallery/member-societies_new-390.jpg) | 1440 / 390 |
 | `/societies/1/events/1` | [1440](gallery/member-societies_1_events_1-1440.jpg) | [390](gallery/member-societies_1_events_1-390.jpg) | 1440 / 390 |
+| `/societies/1/events/5` (past night, revealed) | [1440](gallery/member-societies_1_events_5-1440.jpg) | [390](gallery/member-societies_1_events_5-390.jpg) | 1440 / 390 |
+| `/societies/1/events/5` (the verdict; scrolled) | [1440](gallery/member-societies_1_events_5_verdict-1440.jpg) | [390](gallery/member-societies_1_events_5_verdict-390.jpg) | 1440 / 390 |
 | `/societies/2/events/3` | [1440](gallery/member-societies_2_events_3-1440.jpg) | [390](gallery/member-societies_2_events_3-390.jpg) | 1440 / 390 |
 | `/societies/2/events/new` | [1440](gallery/member-societies_2_events_new-1440.jpg) | [390](gallery/member-societies_2_events_new-390.jpg) | 1440 / 390 |
 | `/societies/2/events/3/edit` | [1440](gallery/member-societies_2_events_3_edit-1440.jpg) | [390](gallery/member-societies_2_events_3_edit-390.jpg) | 1440 / 390 |

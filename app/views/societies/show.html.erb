@@ -134,8 +134,8 @@
                 <div class="flex flex-wrap items-baseline justify-between gap-2">
                   <%= link_to bottle.display_name, bottle_path(bottle), class: "font-semibold text-ink hover:underline" %>
                   <span class="flex items-center gap-2 whitespace-nowrap text-sm text-mute">
-                    <span class="font-semibold tabular-nums text-ink"><%= number_with_precision(bottle.board_avg, precision: 2, strip_insignificant_zeros: true) %></span>
-                    <span class="text-mark-deep"><%= render "bottles/rating", value: bottle.board_avg.to_f %></span>
+                    <%= render "shared/glass", level: bottle.board_avg.to_f / 5, size: 28 %>
+                    <span class="font-semibold tabular-nums text-ink"><%= number_with_precision(bottle.board_avg, precision: 2, strip_insignificant_zeros: true) %><span class="sr-only"> out of 5</span></span>
                     <%= pluralize(bottle.board_reviewers, "reviewer") %>
                   </span>
                 </div>
@@ -196,6 +196,8 @@
               <span class="mt-0.5 block"><%= next_event.location %></span>
             <% end %>
           </p>
+          <%# The table for the next night, in cream on the green panel. %>
+          <%= render "events/table", event: next_event, tone: :cream %>
           <%= link_to 'View & RSVP', society_event_path(@society, next_event),
               class: 'btn mt-5 w-full bg-white text-ink hover:bg-whiskey-100' %>
         <% else %>

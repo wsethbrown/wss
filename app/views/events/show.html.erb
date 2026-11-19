@@ -121,6 +121,10 @@
         <% end %>
       </section>
 
+      <% if @event.pours_revealed? && (verdict = verdict_rows(@pours, @pour_reviews)).any? %>
+        <%= render "verdict", rows: verdict %>
+      <% end %>
+
       <%= render "pours" %>
 
       <%= render "comments", event: @event %>

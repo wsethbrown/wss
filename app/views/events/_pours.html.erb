@@ -2,6 +2,7 @@
     management: EventPolicy#manage_pours? (organizer / society admins / the host).
     Group means use ONLY event-tagged reviews (@pour_reviews), a solo
     review of the same bottle never counts toward the night. %>
+<% manage_pours = user_signed_in? && policy(@event).manage_pours? %><%# once, not per pour row %>
 <section class="card p-6 sm:p-7">
   <div class="flex flex-wrap items-center justify-between gap-3">
     <h2 class="text-xl font-semibold text-ink">The pours</h2>
@@ -38,7 +39,7 @@
                         class: "btn-secondary px-4 py-2" %>
                   <% end %>
                 <% end %>
-                <% if user_signed_in? && policy(@event).manage_pours? %>
+                <% if manage_pours %>
                   <%= button_to "Remove", event_event_bottle_path(@event, pour), method: :delete,
                       form: { data: { turbo_confirm: "Remove #{pour.bottle.name} from the pour list?" } },
                       class: "cursor-pointer text-sm font-semibold text-red-700 hover:text-red-800" %>
@@ -51,7 +52,7 @@
             <% if pour.notes.present? %>
               <p class="mt-3 text-sm leading-relaxed text-gray-900"><%= pour.notes %></p>
             <% end %>
-            <% if user_signed_in? && policy(@event).manage_pours? %>
+            <% if manage_pours %>
               <details class="mt-2">
                 <summary class="cursor-pointer text-sm font-semibold text-ink hover:text-whiskey-500">
                   <%= pour.notes.present? ? "Edit these notes" : "Add notes for tonight" %>
@@ -88,7 +89,7 @@
       </ol>
     <% end %>
 
-    <% if user_signed_in? && policy(@event).manage_pours? %>
+    <% if manage_pours %>
       <div class="mt-6 border-t border-hairline pt-6">
         <%# bottle-search wraps the WHOLE form so picking a bottle can prefill
             the notes box ([data-bottle-fill]) with what tasters have said about
