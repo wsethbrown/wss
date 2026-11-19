@@ -1,78 +1,48 @@
-<% content_for :title, "#{@user.full_name} - Profile" %>
-
-<div class="min-h-screen bg-gray-50">
-  <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+<div>
+  <div>
     <!-- Header -->
-    <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-8 mb-6">
-      <div class="flex items-center space-x-6">
-        <!-- Profile Photo -->
-        <div class="flex-shrink-0">
-          <% if @user.profile_image.attached? %>
-            <div class="w-32 h-32 rounded-full overflow-hidden bg-gray-100">
-              <%= image_tag @user.profile_image, class: "w-full h-full object-cover" %>
-            </div>
-          <% else %>
-            <div class="w-32 h-32 rounded-full flex items-center justify-center" style="background-color: <%= @user.avatar_color %>;">
-              <span class="text-4xl text-white font-semibold"><%= @user.initials %></span>
-            </div>
-          <% end %>
-        </div>
-        
-        <!-- Profile Info -->
-        <div class="flex-1">
-          <h1 class="text-3xl font-bold text-gray-900 mb-2"><%= @user.full_name %> <%= render "shared/century_badge", record: @user %></h1>
-          <p class="text-gray-600 mb-4">Member since <%= @user.created_at.strftime('%B %Y') %></p>
-          
-          <!-- Social Stats -->
-          <div class="flex space-x-6 text-sm text-gray-500">
-            <div class="flex items-center">
-              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-3-3.87M9 20H4v-2a3 3 0 013-3.87m6 0A4 4 0 005 16m6-4a4 4 0 100-8 4 4 0 000 8zm6 4a3 3 0 00-3-3.87"></path>
-              </svg>
-              <span><%= pluralize(@visible_societies.count, "society") %></span>
-            </div>
-            <div class="flex items-center">
-              <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
-              </svg>
-              <span><%= @user.event_rsvps.where(status: 'confirmed').count %> events attended</span>
-            </div>
-            <div class="flex items-center">
-              <svg class="w-4 h-4 mr-1" fill="currentColor" viewBox="0 0 20 20" aria-hidden="true">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.286 3.957a1 1 0 00.95.69h4.162c.969 0 1.371 1.24.588 1.81l-3.367 2.446a1 1 0 00-.364 1.118l1.287 3.957c.3.921-.755 1.688-1.54 1.118l-3.366-2.446a1 1 0 00-1.175 0l-3.367 2.446c-.784.57-1.838-.197-1.539-1.118l1.287-3.957a1 1 0 00-.364-1.118L2.98 9.384c-.783-.57-.38-1.81.588-1.81h4.162a1 1 0 00.95-.69l1.286-3.957z"></path>
-              </svg>
-              <span><%= pluralize(@user.followers_count, "follower") %></span>
+    <header class="pb-8 pt-2 sm:pb-10">
+      <div class="flex flex-col gap-5 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex min-w-0 items-center gap-5">
+          <%= avatar(@user, size: 96) %>
+          <div class="min-w-0">
+            <h1 class="font-display text-3xl font-semibold text-ink sm:text-5xl"><%= @user.full_name %> <%= render "shared/century_badge", record: @user %></h1>
+            <p class="mt-2 text-[17px] text-mute">Member since <%= @user.created_at.strftime('%B %Y') %></p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <span class="chip"><%= pluralize(@visible_societies.count, "society") %></span>
+              <span class="chip"><%= @user.event_rsvps.where(status: 'confirmed').count %> events attended</span>
+              <span class="chip"><%= pluralize(@user.followers_count, "follower") %></span>
             </div>
           </div>
         </div>
+        <% unless @user == current_user %>
+          <div class="shrink-0"><%= render "favorites/button", favoritable: @user %></div>
+        <% end %>
       </div>
-      <% unless @user == current_user %>
-        <div class="mt-4"><%= render "favorites/button", favoritable: @user %></div>
-      <% end %>
-    </div>
+    </header>
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 gap-6 pb-16 lg:grid-cols-3">
       <!-- Main Content -->
-      <div class="lg:col-span-2 space-y-6">
+      <div class="min-w-0 space-y-6 lg:col-span-2">
         <!-- About Me Section -->
         <% if @user.bio.present? %>
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">About Me</h2>
-            <p class="text-gray-700 leading-relaxed whitespace-pre-wrap"><%= @user.bio %></p>
+          <div class="card p-6">
+            <h2 class="mb-4 text-xl font-semibold text-ink">About Me</h2>
+            <p class="whitespace-pre-wrap leading-relaxed text-gray-900"><%= @user.bio %></p>
           </div>
         <% end %>
 
         <!-- Tastings Section -->
         <% if @tastings.any? %>
-          <div class="bg-white rounded-2xl shadow-sm border border-gray-200 p-6 mb-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">Tastings</h2>
-            <div class="space-y-3">
+          <div class="card p-6">
+            <h2 class="mb-4 text-xl font-semibold text-ink">Tastings</h2>
+            <div class="divide-y divide-hairline">
               <% @tastings.each do |review| %>
-                <div class="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
+                <div class="py-3 first:pt-0 last:pb-0">
                   <div class="flex flex-wrap items-baseline justify-between gap-2">
-                    <%= link_to review.bottle.display_name, bottle_path(review.bottle), class: "font-medium text-gray-900 hover:text-whiskey-700" %>
-                    <span class="flex items-center gap-2 text-sm text-gray-500">
-                      <%= link_to "view", review_path(review), class: "font-semibold text-whiskey-700 hover:text-whiskey-600" %>
+                    <%= link_to review.bottle.display_name, bottle_path(review.bottle), class: "font-semibold text-ink hover:underline" %>
+                    <span class="flex items-center gap-2 text-sm text-mute">
+                      <%= link_to "view", review_path(review), class: "font-semibold text-ink hover:underline" %>
                       <%= render "bottles/rating", value: review.rating.to_f %>
                       <%= review.created_at.strftime("%b %Y") %>
                     </span>
@@ -85,62 +55,47 @@
         <% end %>
 
         <!-- Societies Section -->
-        <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-          <h2 class="text-xl font-semibold text-gray-900 mb-4">Societies</h2>
+        <div class="card p-6">
+          <h2 class="mb-4 text-xl font-semibold text-ink">Societies</h2>
           <% user_societies = @visible_societies %>
           <% if user_societies.any? %>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div class="inset divide-y divide-hairline">
               <% user_societies.each do |society| %>
-                <div class="bg-gray-50 rounded-lg p-4 hover:bg-gray-100 transition-colors">
-                  <div class="flex items-center space-x-3">
-                    <!-- Society Icon -->
-                    <div class="w-10 h-10 bg-gradient-to-br from-whiskey-500 to-whiskey-500 rounded-lg flex items-center justify-center flex-shrink-0">
-                      <% if society.is_private %>
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path>
-                        </svg>
-                      <% else %>
-                        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-                        </svg>
-                      <% end %>
-                    </div>
-                    
-                    <div class="flex-1 min-w-0">
-                      <h3 class="font-medium text-gray-900 truncate"><%= society.name %></h3>
-                      <p class="text-sm text-gray-500 truncate"><%= truncate(society.description, length: 50) %></p>
-                      <% membership = @user.society_memberships.find_by(society: society) %>
-                      <% if membership&.admin? %>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-whiskey-100 text-whiskey-800 mt-1">Creator</span>
-                      <% elsif membership&.officer? %>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-blue-100 text-blue-800 mt-1">Officer</span>
-                      <% else %>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-800 mt-1">Member</span>
-                      <% end %>
-                    </div>
+                <% membership = @user.society_memberships.find_by(society: society) %>
+                <div class="flex items-center justify-between gap-3 py-3">
+                  <div class="min-w-0">
+                    <h3 class="truncate font-semibold text-ink"><%= society.name %></h3>
+                    <p class="truncate text-sm text-mute"><%= truncate(society.description, length: 50) %></p>
                   </div>
+                  <% if membership&.admin? %>
+                    <span class="chip shrink-0">Creator</span>
+                  <% elsif membership&.officer? %>
+                    <span class="chip shrink-0">Officer</span>
+                  <% else %>
+                    <span class="chip shrink-0">Member</span>
+                  <% end %>
                 </div>
               <% end %>
             </div>
           <% else %>
-            <p class="text-gray-500 text-center py-8">Not a member of any societies yet.</p>
+            <p class="text-mute">Not a member of any societies yet.</p>
           <% end %>
         </div>
 
         <% if @user == current_user && @favorites.any? %>
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">Favorites</h2>
-            <div class="divide-y divide-gray-100">
+          <div class="card p-6">
+            <h2 class="mb-4 text-xl font-semibold text-ink">Favorites</h2>
+            <div class="divide-y divide-hairline">
               <% @favorites.each do |favorite| %>
                 <% record = favorite.favoritable %>
                 <div class="flex items-center justify-between py-3 first:pt-0 last:pb-0">
                   <% if record.is_a?(User) %>
-                    <%= link_to record.full_name, profile_path(record), class: "font-medium text-gray-900 hover:text-whiskey-700" %>
+                    <%= link_to record.full_name, profile_path(record), class: "font-semibold text-ink hover:underline" %>
                   <% else %>
-                    <%= link_to record.name, society_path(record), class: "font-medium text-gray-900 hover:text-whiskey-700" %>
+                    <%= link_to record.name, society_path(record), class: "font-semibold text-ink hover:underline" %>
                   <% end %>
                   <%= button_to "Remove", favorite_path(favorite), method: :delete,
-                      class: "cursor-pointer text-sm font-semibold text-gray-400 hover:text-red-600" %>
+                      class: "min-h-11 cursor-pointer text-sm font-semibold text-mute hover:text-red-700" %>
                 </div>
               <% end %>
             </div>
@@ -149,26 +104,26 @@
       </div>
 
       <!-- Sidebar -->
-      <div class="space-y-6">
+      <div class="min-w-0 space-y-6">
         <!-- Whiskey Shelf -->
         <% if @shelf_items.any? %>
-          <div id="whiskey-shelf" class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-2">Whiskey shelf</h2>
-            <div class="divide-y divide-gray-100">
+          <div id="whiskey-shelf" class="card p-6">
+            <h2 class="mb-2 text-xl font-semibold text-ink">Whiskey shelf</h2>
+            <div class="divide-y divide-hairline">
               <% @shelf_items.each do |item| %>
                 <div class="flex items-baseline justify-between gap-3 py-2.5">
                   <% if item.bottle %>
                     <%= link_to item.bottle.name, bottle_path(item.bottle),
-                        class: "text-sm font-medium text-gray-900 underline decoration-whiskey-400 underline-offset-4 hover:text-whiskey-700" %>
+                        class: "text-sm font-semibold text-ink underline decoration-hairline underline-offset-4 hover:decoration-ink" %>
                     <% score = @shelf_scores[item.bottle_id] %>
                     <% if score&.avg_rating %>
-                      <span class="shrink-0 whitespace-nowrap text-xs text-gray-400">
-                        <%= score.avg_rating.to_f.round(1) %> <span class="text-whiskey-600">&#9733;</span>
+                      <span class="shrink-0 whitespace-nowrap text-sm text-mute">
+                        <%= score.avg_rating.to_f.round(1) %> <span class="text-mark">&#9733;</span>
                         &middot; <%= pluralize(score.reviewers, "tasting") %>
                       </span>
                     <% end %>
                   <% else %>
-                    <span class="text-sm text-gray-600"><%= item.custom_name %></span>
+                    <span class="text-sm text-gray-900"><%= item.custom_name %></span>
                   <% end %>
                 </div>
               <% end %>
@@ -178,15 +133,15 @@
 
         <!-- Tags Section -->
         <% if @user.tags.any? %>
-          <div class="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-4">Interests & Expertise</h2>
+          <div class="card p-6">
+            <h2 class="mb-4 text-xl font-semibold text-ink">Interests & Expertise</h2>
             <div class="space-y-4">
               <% @user.tags.group_by(&:category).each do |category, tags| %>
                 <div>
-                  <h3 class="text-sm font-medium text-gray-700 mb-2 capitalize"><%= category.humanize %></h3>
+                  <h3 class="mb-2 text-sm font-medium capitalize text-mute"><%= category.humanize %></h3>
                   <div class="flex flex-wrap gap-2">
                     <% tags.each do |tag| %>
-                      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-whiskey-100 text-whiskey-800">
+                      <span class="chip min-h-0 py-1 text-xs">
                         <%= tag.name %>
                       </span>
                     <% end %>

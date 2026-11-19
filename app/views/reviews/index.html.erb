@@ -1,85 +1,66 @@
 <% content_for :title, "Reviews - Whiskey Share Society" %>
 
-<section class="w-full bg-char px-4 pb-12 pt-28 text-center">
-  <p class="eyebrow mb-4 text-whiskey-300/90">The pours, on the record</p>
-  <h1 class="font-display text-4xl font-semibold text-cream sm:text-5xl">The tasting record</h1>
-  <p class="mx-auto mt-4 max-w-2xl text-cream/80">
-    Every bottle we've tasted and rated, and the societies doing the tasting,
-    search either, and say what you found in the glass.
-  </p>
-</section>
+<div class="mx-auto w-full max-w-6xl px-4">
+  <%= render "shared/page_header", clear_nav: true,
+      title: "The tasting record",
+      lede: "Every bottle we've tasted and rated, and the societies doing the tasting, search either, and say what you found in the glass.",
+      actions: link_to("Add a review", start_reviews_path, class: "btn btn-primary") %>
 
-<section class="w-full bg-white px-4 py-14">
-  <div class="mx-auto max-w-6xl <%= 'grid gap-8 lg:grid-cols-3' if user_signed_in? %>">
-    <div class="<%= 'lg:col-span-2' if user_signed_in? %>">
-    <div class="mb-10 flex flex-wrap items-center justify-between gap-4"
+  <div class="pb-16 <%= 'grid gap-8 lg:grid-cols-3' if user_signed_in? %>">
+    <div class="min-w-0 <%= 'lg:col-span-2' if user_signed_in? %>">
+    <div class="mb-6"
          data-controller="bottle-search" data-bottle-search-url-value="<%= search_reviews_path %>" data-bottle-search-grouped-value="true">
-      <%= form_with url: reviews_path, method: :get, class: "flex flex-1 items-start gap-3" do %>
-        <div class="relative w-full max-w-xl">
+      <%= form_with url: reviews_path, method: :get, class: "flex flex-col gap-3 sm:flex-row sm:items-start" do %>
+        <div class="relative min-w-0 flex-1">
         <input type="search" name="q" value="<%= params[:q] %>" placeholder="Search bottles, distilleries, or societies…"
                autocomplete="off"
                data-bottle-search-target="input" data-action="input->bottle-search#query"
-               class="w-full rounded-xl border border-gray-300 px-4 py-3 focus:outline-none focus:ring-2 focus:ring-whiskey-500">
+               class="w-full rounded-2xl border border-hairline bg-white px-4 py-3 focus:outline-none focus:ring-2 focus:ring-ink/30">
         <div data-bottle-search-target="results"
-             class="absolute inset-x-0 top-full z-20 mt-1 hidden overflow-hidden rounded-xl border border-gray-200 bg-white shadow-lg"></div>
+             class="absolute inset-x-0 top-full z-20 mt-1 hidden overflow-hidden rounded-2xl border border-hairline bg-white shadow-lg"></div>
         </div>
         <%= select_tag :sort,
             options_for_select([["Top rated", "top"], ["Most reviewed", "reviewed"], ["A–Z", "az"], ["Recently added", "newest"]], @sort),
             onchange: "this.form.requestSubmit()", "aria-label": "Sort bottles",
-            class: "rounded-xl border border-gray-300 bg-white px-3 py-3 text-sm font-medium text-gray-700 focus:outline-none focus:ring-2 focus:ring-whiskey-500" %>
+            class: "rounded-2xl border border-hairline bg-white px-4 py-3 text-sm font-medium text-ink focus:outline-none focus:ring-2 focus:ring-ink/30" %>
       <% end %>
-      <%= link_to "Add a review", start_reviews_path, class: "whitespace-nowrap rounded-xl bg-whiskey-600 px-5 py-3 font-semibold text-white transition hover:bg-whiskey-700" %>
     </div>
 
-    <div class="mb-8 flex flex-wrap items-center gap-2 text-gray-600">
+    <div class="mb-4 flex flex-wrap items-center gap-2 text-sm text-mute">
       <span><%= pluralize(@bottles.count(:all), "bottle") %><%= " matching \"#{params[:q]}\"" if params[:q].present? %></span>
+      <% x_icon = '<svg class="ml-1.5 h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>'.html_safe %>
       <% @tags.each do |tag| %>
-        <span class="inline-flex items-center gap-1.5 rounded-full bg-whiskey-600 py-1 pl-3 pr-1.5 text-sm font-medium text-white">
-          tasting of <%= tag %>
-          <%= link_to reviews_path(request.query_parameters.merge("tags" => (@tags - [tag]).join(",")).compact_blank),
-              class: "rounded-full p-0.5 transition hover:bg-whiskey-500", "aria-label": "Remove #{tag}" do %>
-            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-          <% end %>
-        </span>
+        <%= link_to reviews_path(request.query_parameters.merge("tags" => (@tags - [tag]).join(",")).compact_blank),
+            class: "chip", "aria-label": "Remove #{tag}" do %>tasting of <%= tag %><%= x_icon %><% end %>
       <% end %>
       <% if @distillery %>
-        <span class="inline-flex items-center gap-1.5 rounded-full bg-whiskey-600 py-1 pl-3 pr-1.5 text-sm font-medium text-white">
-          from <%= @distillery %>
-          <%= link_to reviews_path(request.query_parameters.except("distillery")),
-              class: "rounded-full p-0.5 transition hover:bg-whiskey-500", "aria-label": "Remove distillery filter" do %>
-            <svg class="h-3.5 w-3.5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
-          <% end %>
-        </span>
+        <%= link_to reviews_path(request.query_parameters.except("distillery")),
+            class: "chip", "aria-label": "Remove distillery filter" do %>from <%= @distillery %><%= x_icon %><% end %>
       <% end %>
       <% if @tags.any? %>
-        <%= link_to "Clear tags", reviews_path(request.query_parameters.except("tags")), class: "text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>
+        <%= link_to "Clear tags", reviews_path(request.query_parameters.except("tags")), class: "text-sm font-semibold text-ink hover:underline" %>
       <% end %>
     </div>
 
-    <div class="divide-y divide-gray-100 rounded-2xl border border-gray-200 bg-white shadow-sm">
+    <div class="card divide-y divide-hairline overflow-hidden">
       <% @bottles.each do |bottle| %>
-        <%= link_to bottle_path(bottle), class: "flex items-center justify-between gap-4 px-4 py-2 transition hover:bg-whiskey-50" do %>
-          <div class="flex items-center gap-3">
+        <%= link_to bottle_path(bottle), class: "flex items-center justify-between gap-4 px-4 py-3 transition hover:bg-paper" do %>
+          <div class="flex min-w-0 items-center gap-3">
             <%= render "bottles/identity_tile", bottle: bottle, tone: :light, size: :sm %>
             <div class="min-w-0">
-              <h2 class="truncate font-display text-lg font-semibold text-gray-900"><%= bottle.name %></h2>
-              <p class="mt-1 truncate text-sm">
-                <% meta = [] %>
-                <% if [bottle.style, bottle.region].compact_blank.any? %>
-                  <% meta << content_tag(:span, [bottle.style, bottle.region].compact_blank.join(" · "), class: "text-whiskey-700 font-medium") %>
-                <% end %>
-                <% meta << content_tag(:span, bottle.distillery, class: "text-gray-500") if bottle.distillery.present? %>
-                <%= safe_join(meta, " · ") %>
+              <h2 class="truncate text-base font-semibold text-ink"><%= bottle.name %></h2>
+              <p class="mt-0.5 truncate text-sm text-mute">
+                <%= [[bottle.style, bottle.region].compact_blank.join(" · ").presence, bottle.distillery.presence].compact.join(" · ") %>
               </p>
             </div>
           </div>
           <div class="shrink-0 whitespace-nowrap text-right">
             <% if bottle.average_rating %>
               <div>
-                <span class="font-semibold text-gray-900"><%= number_with_precision(bottle.avg_rating, precision: 2, strip_insignificant_zeros: true) %></span>
-                <%= render "bottles/rating", value: bottle.avg_rating&.to_f %>
+                <span class="font-semibold tabular-nums text-ink"><%= number_with_precision(bottle.avg_rating, precision: 2, strip_insignificant_zeros: true) %></span>
+                <span class="hidden sm:inline"><%= render "bottles/rating", value: bottle.avg_rating&.to_f %></span>
               </div>
-              <p class="text-sm text-gray-400"><%= pluralize(bottle.reviewers, "reviewer") %></p>
+              <p class="text-sm text-mute"><%= pluralize(bottle.reviewers, "reviewer") %></p>
             <% else %>
               <%= render "bottles/rating", value: nil %>
             <% end %>
@@ -91,19 +72,18 @@
 
     <% if @societies.any? %>
       <div class="mt-12">
-        <p class="eyebrow text-whiskey-600">The company</p>
-        <h2 class="mb-6 mt-1 font-display text-2xl font-semibold text-gray-900">Societies</h2>
-        <div class="divide-y divide-gray-100 rounded-2xl border border-gray-200 bg-white shadow-sm">
+        <h2 class="mb-4 font-display text-2xl font-semibold text-ink sm:text-3xl">Societies</h2>
+        <div class="card divide-y divide-hairline overflow-hidden">
           <% @societies.each do |society| %>
-            <%= link_to society_path(society), class: "flex items-center justify-between px-5 py-4 transition hover:bg-whiskey-50" do %>
-              <span>
-                <span class="block font-display text-lg font-semibold text-gray-900"><%= society.name %></span>
-                <span class="block text-sm text-gray-500">
+            <%= link_to society_path(society), class: "flex items-center justify-between gap-4 px-5 py-4 transition hover:bg-paper" do %>
+              <span class="min-w-0">
+                <span class="block truncate font-semibold text-ink"><%= society.name %></span>
+                <span class="block truncate text-sm text-mute">
                   <%= [society.location.presence, pluralize(society.members.count, "member")].compact.join(" · ") %>
                 </span>
               </span>
               <% if society.is_private? %>
-                <span class="rounded-full bg-gray-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-gray-500">Private</span>
+                <span class="chip shrink-0">Private</span>
               <% end %>
             <% end %>
           <% end %>
@@ -114,28 +94,27 @@
     <%# id + anchor on the tab links: switching feeds reloads the page, so
         without the anchor the browser dumps you back at the top of the
         bottle grid instead of the feed you just picked. %>
-    <div class="mt-16 scroll-mt-20" id="tastings">
-      <div class="mb-4 flex items-center gap-2">
+    <div class="mt-14 scroll-mt-24" id="tastings">
+      <div class="mb-6 flex flex-wrap items-center gap-2">
         <% { "Latest" => nil, "Circle" => "circle", "Hot" => "hot", "Tasting nights" => "nights" }.each do |label, key| %>
           <% next if key == "circle" && !user_signed_in? %>
           <%# Switching feeds drops the society filter, it only means something
               inside Tasting nights. %>
           <%= link_to label, reviews_path(request.query_parameters.except("society").merge(feed: key).compact_blank) + "#tastings",
-              class: "rounded-full px-4 py-1.5 text-sm font-semibold transition #{@feed == key ? 'bg-whiskey-600 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}" %>
+              class: "chip", "aria-pressed": (@feed == key).to_s %>
         <% end %>
       </div>
 
       <% if @feed == "nights" %>
-        <p class="eyebrow text-whiskey-600">Poured together</p>
-        <h2 class="mb-2 mt-1 font-display text-2xl font-semibold text-gray-900"><%= @night_society ? "Tasting nights · #{@night_society.name}" : "From society tasting nights" %></h2>
+        <h2 class="mb-2 font-display text-2xl font-semibold text-ink sm:text-3xl"><%= @night_society ? "Tasting nights · #{@night_society.name}" : "From society tasting nights" %></h2>
         <% if @night_societies.any? %>
           <div class="mb-6 flex flex-wrap items-center gap-2">
             <% if @night_society %>
-              <%= link_to "All societies", reviews_path(feed: "nights", anchor: "tastings"), class: "rounded-full border border-gray-300 px-3 py-1 text-xs font-semibold text-gray-600 transition hover:bg-gray-100" %>
+              <%= link_to "All societies", reviews_path(feed: "nights", anchor: "tastings"), class: "chip" %>
             <% end %>
             <% @night_societies.each do |society| %>
               <% next if society == @night_society %>
-              <%= link_to society.name, reviews_path(feed: "nights", society: society.id, anchor: "tastings"), class: "rounded-full border border-whiskey-200 bg-whiskey-50 px-3 py-1 text-xs font-semibold text-whiskey-700 transition hover:bg-whiskey-100" %>
+              <%= link_to society.name, reviews_path(feed: "nights", society: society.id, anchor: "tastings"), class: "chip" %>
             <% end %>
           </div>
         <% end %>
@@ -148,33 +127,30 @@
             <% end %>
           </div>
         <% else %>
-          <p class="text-gray-500">No tastings from society nights yet.</p>
+          <p class="text-mute">No tastings from society nights yet.</p>
         <% end %>
       <% elsif @feed == "hot" %>
-        <p class="eyebrow text-whiskey-600">Getting thumbs</p>
-        <h2 class="mb-6 mt-1 font-display text-2xl font-semibold text-gray-900">Hot tastings</h2>
+        <h2 class="mb-6 font-display text-2xl font-semibold text-ink sm:text-3xl">Hot tastings</h2>
         <div class="grid gap-4 sm:grid-cols-2"><%= render partial: "reviews/review_card", collection: @hot_reviews, as: :review %></div>
       <% elsif @recent_reviews.any? && (params[:q].blank? || @tags.any? || @distillery) %>
-        <p class="eyebrow text-whiskey-600">Fresh pours</p>
-        <h2 class="mb-6 mt-1 font-display text-2xl font-semibold text-gray-900"><%= if @tags.any? then "Tastings of #{@tags.join(" + ")}" elsif @distillery then "Tastings from #{@distillery}" else "Latest tastings" end %></h2>
+        <h2 class="mb-6 font-display text-2xl font-semibold text-ink sm:text-3xl"><%= if @tags.any? then "Tastings of #{@tags.join(" + ")}" elsif @distillery then "Tastings from #{@distillery}" else "Latest tastings" end %></h2>
         <div class="grid gap-4 sm:grid-cols-2"><%= render partial: "reviews/review_card", collection: @recent_reviews, as: :review %></div>
       <% end %>
     </div>
     </div>
     <% if user_signed_in? %>
-      <div class="mt-10 lg:mt-0">
+      <div class="min-w-0">
         <% if @feed == "circle" %>
-          <div class="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm">
-            <p class="eyebrow text-whiskey-600">From your circle</p>
-            <h2 class="mb-4 mt-1 font-display text-lg font-semibold text-gray-900">Your full circle feed</h2>
+          <div class="card p-6">
+            <h2 class="mb-4 text-xl font-semibold text-ink">Your full circle feed</h2>
             <% if @circle_feed_reviews.any? %>
-              <div class="space-y-4"><%= render partial: "reviews/circle_row", collection: @circle_feed_reviews, as: :review %></div>
+              <div class="space-y-3"><%= render partial: "reviews/circle_row", collection: @circle_feed_reviews, as: :review %></div>
             <% elsif @in_circle %>
-              <p class="text-sm text-gray-500">No pours from your circle yet, their next tastings will land here.</p>
+              <p class="text-sm text-mute">No pours from your circle yet, their next tastings will land here.</p>
             <% else %>
-              <p class="text-sm text-gray-500">Favorite a society or a fellow taster to see their pours here.</p>
+              <p class="text-sm text-mute">Favorite a society or a fellow taster to see their pours here.</p>
             <% end %>
-            <%= link_to "← Back to all tastings", reviews_path, class: "mt-4 block text-sm font-semibold text-whiskey-700 hover:text-whiskey-600" %>
+            <%= link_to "← Back to all tastings", reviews_path, class: "mt-4 block text-sm font-semibold text-ink hover:underline" %>
           </div>
         <% else %>
           <%= render "reviews/circle_sidebar", circle_reviews: @circle_reviews, in_circle: @in_circle %>
@@ -182,4 +158,4 @@
       </div>
     <% end %>
   </div>
-</section>
+</div>

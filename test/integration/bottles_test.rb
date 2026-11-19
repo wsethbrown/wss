@@ -64,7 +64,7 @@ class BottlesTest < ActionDispatch::IntegrationTest
     get bottle_path(bottles(:eagle_rare))
     assert_response :success
     assert_match "Eagle Rare 10", response.body
-    assert_select "section span.font-semibold.text-cream", text: "4" # strip_insignificant_zeros: 4.0 -> "4"
+    assert_select "header span.font-semibold.tabular-nums", text: "4" # strip_insignificant_zeros: 4.0 -> "4"
     assert_match "Cherry and oak", response.body # the review feed
   end
 
