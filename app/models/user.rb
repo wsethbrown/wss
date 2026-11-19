@@ -191,6 +191,28 @@ class User < ApplicationRecord
     !founding_member? && founding_revoked_at.nil?
   end
 
+  # Stripe price id -> plan name, the single mapping shared by the webhook and
+  # the checkout return path. Unknown or blank ids map to "unknown"; an unset
+  # ENV var never matches a blank id.
+  PLAN_PRICE_ENV = {
+    "monthly" => "STRIPE_MONTHLY_PRICE_ID",
+    "quarterly" => "STRIPE_QUARTERLY_PRICE_ID",
+    "yearly" => "STRIPE_YEARLY_PRICE_ID",
+    "founding_society" => "STRIPE_FOUNDING_SOCIETY_PRICE_ID",
+    "founding_monthly" => "STRIPE_FOUNDING_MONTHLY_PRICE_ID"
+  }.freeze
+
+  def self.plan_for_price_id(price_id)
+    return "unknown" if price_id.blank?
+
+    PLAN_PRICE_ENV.each do |plan, env_key|
+      configured = ENV[env_key]
+      return plan if configured.present? && configured == price_id
+    end
+    Rails.logger.warn "Unknown price ID: #{price_id}"
+    "unknown"
+  end
+
   # The $5 society-only plan runs societies but earns NO deck credits.
   def society_only_plan?
     subscription_plan == "founding_society"

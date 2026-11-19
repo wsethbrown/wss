@@ -321,11 +321,32 @@ class AccountController < ApplicationController
     subscription = Stripe::Subscription.list(customer: current_user.stripe_customer_id, status: "active", limit: 1).data.first
     return unless subscription && Time.at(subscription.created) > 1.hour.ago
 
+    record_plan_from_checkout_subscription(subscription)
+
     if CreditTransaction.grant_welcome_credit(current_user)
       log_activity(:credits_added, current_user, { amount: 1, reason: "new_subscription" })
     end
   rescue Stripe::StripeError => e
     Rails.logger.error "Welcome-credit sync check failed for user #{current_user.id}: #{e.message}"
+  end
+
+  # The redirect can beat both webhooks, so the local subscription_plan may
+  # still be unset. Read the plan from the subscription's price id (same
+  # mapping as the webhook) so a society-only plan is never given a deck credit.
+  def record_plan_from_checkout_subscription(subscription)
+    items = subscription.respond_to?(:items) ? subscription.items : nil
+    price_id = items&.data&.first&.price&.id
+    plan = User.plan_for_price_id(price_id)
+
+    if plan == "unknown"
+      Rails.logger.info "Checkout return for user #{current_user.id}: plan not determinable from subscription price; leaving plan #{current_user.subscription_plan.inspect}"
+      return
+    end
+
+    if current_user.subscription_plan != plan
+      current_user.update!(subscription_plan: plan)
+    end
+    Rails.logger.info "Checkout return for user #{current_user.id}: plan #{plan.inspect} from price id#{plan == 'founding_society' ? ' (society-only, no deck credit)' : ''}"
   end
 
   def profile_params

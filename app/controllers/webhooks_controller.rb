@@ -432,21 +432,7 @@ class WebhooksController < ApplicationController
       return "unknown"
     end
 
-    case price_id
-    when ENV["STRIPE_MONTHLY_PRICE_ID"]
-      "monthly"
-    when ENV["STRIPE_QUARTERLY_PRICE_ID"]
-      "quarterly"
-    when ENV["STRIPE_YEARLY_PRICE_ID"]
-      "yearly"
-    when ENV["STRIPE_FOUNDING_SOCIETY_PRICE_ID"]
-      "founding_society"
-    when ENV["STRIPE_FOUNDING_MONTHLY_PRICE_ID"]
-      "founding_monthly"
-    else
-      Rails.logger.warn "Unknown price ID: #{price_id}"
-      "unknown"
-    end
+    User.plan_for_price_id(price_id)
   end
 
   # Taking a founding plan grants founding status, unless it was ever revoked
