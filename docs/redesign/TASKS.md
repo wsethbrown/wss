@@ -518,6 +518,12 @@ in `app/` references the removed code (`grep`); suite green.
 Result: `mark-deep` (#e65c00) for orange graphics on light surfaces, orange text on light → ink; deck page variants; library filter → Stimulus; Active Storage transforms on `renders`; known pre-existing issues in SECTION_NOTES §15.
 **Do:** add token `mark-deep` (#e65c00) for orange graphics on light surfaces (stars, score bars) and keep `mark` for marks on green and the logo; DESIGN_SYSTEM colour table and rule. Deck page: slide images and og_image use variants, then drop the test exemption. Library filter auto-submit inline script → Stimulus. Active Storage transform jobs off the mail worker. SECTION_NOTES "known pre-existing issues" list.
 
+### [~] G1 · The glass: table and verdict where their data lives — `opus` (G1a) then `sonnet` (G1b)
+**Owner decision (via the advisor, 2026-11-19):** keep the current homepage; spread the glass and verdict ideas to where their data lives; `/?design=next4` stays a study. The glass is the advisor's redraw from the logo's glasses (spec in the G1 brief); use it exactly.
+**G1a owns:** `app/views/shared/_glass.html.erb` (new; replaces `home/next4/_glass`), event page attending/RSVP area and a verdict block, society page next-tasting panel and review-board rows, the homepage pinned presentation's fourth slide, matching tests and query-count additions, gallery screenshots for those pages.
+**G1b owns (after G1a):** tasting-record display stars → one glass + score (reviews index, bottle page, review cards, review show); star input controls unchanged.
+**Acceptance:** one glass partial used everywhere, no second drawing in `app/`; score glasses beside the number and RSVP glasses beside counts; axe clean, no overflow at 390; non-members and signed-out visitors see no more than before (private and unrevealed cases tested); query counts flat; gallery updated; copy listed ("The table", "The verdict").
+
 ## Blocked on the owner
 
 ### [!] B11 · Two-factor sign-in (S7)
