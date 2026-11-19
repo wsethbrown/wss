@@ -40,3 +40,11 @@ CLOUDFLARE_IP_RANGES = %w[
 # Applies in every environment; harmless locally (no Cloudflare hop there).
 Rails.application.config.action_dispatch.trusted_proxies =
   ActionDispatch::RemoteIp::TRUSTED_PROXIES + CLOUDFLARE_IP_RANGES
+
+# Make a missing or truncated list visible in production logs at boot.
+if Rails.env.production?
+  Rails.application.config.after_initialize do
+    Rails.logger.info "Trusted proxies: #{CLOUDFLARE_IP_RANGES.size} Cloudflare ranges loaded " \
+                      "(#{Rails.application.config.action_dispatch.trusted_proxies.size} total)"
+  end
+end

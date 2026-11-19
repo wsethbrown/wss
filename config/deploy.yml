@@ -18,6 +18,11 @@ servers:
 
 proxy:
   ssl: true
+  # Cloudflare sits in front of the app. Forward X-Forwarded-For so Rails can
+  # resolve the visitor's address; Rails trusts only the Cloudflare ranges
+  # listed in config/initializers/trusted_proxies.rb, so a forged header from
+  # a direct visitor resolves to that visitor. Needed by the per-IP rate limits.
+  forward_headers: true
   hosts:
     - whiskeysharesociety.com
     - www.whiskeysharesociety.com

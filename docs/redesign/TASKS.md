@@ -179,6 +179,12 @@ panel is reachable by its existing URL/param; billing and subscription actions a
 unchanged.
 **Tests:** `test/controllers/account_controller_test.rb`, `test/system/account_navigation_test.rb`.
 
+### [ ] D4b · Event edit page and events index — `sonnet` (step 3, with D8)
+**Found by:** D4 (events/edit.html.erb and events/index.html.erb are scaffold stubs; "Edit this event" lands on one).
+**Owns:** `app/views/events/edit.html.erb`, `app/views/events/new.html.erb` and a new shared `events/_form` partial, `app/views/events/index.html.erb`, `app/controllers/events_controller.rb` (`edit`/`index` only), matching tests.
+**Do:** a real edit form sharing a partial with `new` (same fields, same browser-timezone conversion on update, same authorisation as today). For `events#index`: do not design a page; find whether anything links to it, and if nothing does, redirect it to the society page (routes say events live under societies) and test the redirect.
+**Acceptance:** A–E; update tests for organiser, society admin, member and outsider; list every "Edit this event" link location in the hand-back.
+
 ## Wave D2 — admin (D8 alone, then D9a and D9b in parallel)
 
 ### [ ] D8 · Admin shell and patterns — `opus`
@@ -603,6 +609,7 @@ load with the report-only header and no console CSP errors on the ten main pages
 - **M15** confirm which payment methods are enabled in the Stripe dashboard.
 - **S7** check whether any production user has `otp_enabled = true`.
 - **S3/B3b** confirm in production that `request.remote_ip` shows real visitor addresses (not Cloudflare edges) before relying on the per-IP rate limits; refresh the Cloudflare range list in `config/initializers/trusted_proxies.rb` from cloudflare.com/ips; consider a Cloudflare rate-limiting rule on `/magic_links` as the outer layer.
+- **Deploy config changed (B3b):** `config/deploy.yml` now sets `proxy: forward_headers: true`. After the next deploy, check a production log line shows a real visitor address for `remote_ip` (and the boot line "Trusted proxies: N Cloudflare ranges loaded"), and verify the Cloudflare range list in `config/initializers/trusted_proxies.rb` against cloudflare.com/ips-v4 and /ips-v6 (it was written from memory).
 
 ---
 
