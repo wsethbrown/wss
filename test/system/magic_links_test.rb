@@ -15,6 +15,30 @@ class MagicLinksTest < ApplicationSystemTestCase
     Dir.glob("#{mail_dir}/*").each { |file| File.delete(file) } if Dir.exist?(mail_dir)
   end
 
+  # Magic-link mail is sent with deliver_later and the test environment uses the
+  # ActiveJob test adapter, so jobs enqueued by the app server must be performed
+  # explicitly before the :file delivery writes the message to tmp/mail.
+  def mail_file_for(email)
+    Rails.root.join("tmp/mail", email)
+  end
+
+  def deliver_enqueued_mail
+    assert_enqueued_jobs 1, only: ActionMailer::MailDeliveryJob
+    perform_enqueued_jobs
+  end
+
+  def magic_link_token_sent_to(email)
+    path = mail_file_for(email)
+    assert File.exist?(path), "Email to #{email} should have been delivered"
+    content = Mail.read(path.to_s).then do |mail|
+      parts = mail.multipart? ? mail.parts.map { |part| part.decoded } : [ mail.decoded ]
+      parts.join("\n")
+    end
+    match = content.match(%r{magic_links/([A-Za-z0-9_-]+)})
+    assert match, "Magic link should be found in email"
+    [ content, match[1] ]
+  end
+
   def teardown
     # Clean up emails after test
     mail_dir = Rails.root.join("tmp/mail")
@@ -24,92 +48,64 @@ class MagicLinksTest < ApplicationSystemTestCase
   test "magic link form submission for existing user" do
     visit auth_path
 
-    # Verify the initial state
     assert_text "Join the Society"
 
-    # The email form is visible immediately (no toggle since the horizontal
-    # auth layout, July 2026, the whole point is zero clicks to type an email)
+    # The email form is visible immediately (no toggle)
     assert_selector "#magic-link-form", visible: true
-    assert_field "Email address"
+    assert_field "magic-link-email"
 
-    # Fill and submit the form
-    fill_in "Email address", with: @user.email
-
-    # Check email count before submission
-    initial_count = Dir.glob(Rails.root.join("tmp/mail/*")).count
-
+    fill_in "magic-link-email", with: @user.email
     click_button "Send magic link"
 
-    # Check if we were redirected
     assert_current_path auth_path
-    assert_text "Check your email for a magic link to sign in!"
+    assert_text "Check your email for a magic link to sign in."
 
-    # Check if email was generated
-    final_count = Dir.glob(Rails.root.join("tmp/mail/*")).count
-    assert_equal initial_count + 1, final_count, "Email should have been generated"
+    deliver_enqueued_mail
 
-    # Verify email content
-    if final_count > initial_count
-      latest_email_file = Dir.glob(Rails.root.join("tmp/mail/*")).max_by { |f| File.mtime(f) }
-      email_content = File.read(latest_email_file)
-      assert_includes email_content, "magic_links/"
-      assert_includes email_content, @user.email
-    end
+    content, _token = magic_link_token_sent_to(@user.email)
+    assert_includes content, "Sign in to Whiskey Share Society"
   end
 
   test "magic link form submission for new user" do
     new_email = "newuser@example.com"
 
     visit auth_path
-
-    # Fill and submit the always-visible form
-    fill_in "Email address", with: new_email
-
-    # Check email count before submission
-    initial_count = Dir.glob(Rails.root.join("tmp/mail/*")).count
-
+    fill_in "magic-link-email", with: new_email
     click_button "Send magic link"
 
-    # Check if we were redirected
+    # New and existing addresses get the same message (no account disclosure)
     assert_current_path auth_path
-    assert_text "Check your email for a magic link to create your account!"
+    assert_text "Check your email for a magic link to sign in."
 
-    # Check if email was generated
-    final_count = Dir.glob(Rails.root.join("tmp/mail/*")).count
-    assert_equal initial_count + 1, final_count, "Email should have been generated"
+    deliver_enqueued_mail
+
+    # The registration email carries the link that creates the account
+    content, _token = magic_link_token_sent_to(new_email)
+    assert_includes content, "Create my account"
+    assert_nil User.find_by(email: new_email), "No account is created until the link is used"
   end
 
   test "magic link form is visible without any toggling" do
     visit auth_path
 
     assert_selector "#magic-link-form", visible: true
-    assert_field "Email address"
+    assert_field "magic-link-email"
   end
 
   test "magic link actually works for signing in" do
-    # First, create a magic link
     visit auth_path
-    fill_in "Email address", with: @user.email
+    fill_in "magic-link-email", with: @user.email
     click_button "Send magic link"
+    assert_text "Check your email for a magic link to sign in."
 
-    # Extract the magic link from the email
-    email_files = Dir.glob(Rails.root.join("tmp/mail/*"))
-    assert email_files.any?, "Email should have been generated"
+    deliver_enqueued_mail
+    _content, token = magic_link_token_sent_to(@user.email)
 
-    latest_email = File.read(email_files.max_by { |f| File.mtime(f) })
-    magic_link_match = latest_email.match(/magic_links\/([A-Za-z0-9_-]+)/)
-    assert magic_link_match, "Magic link should be found in email"
-
-    token = magic_link_match[1]
-
-    # Visit the magic link
     visit magic_link_path(token: token)
 
-    # Should be redirected to account page and signed in
+    # Redirected to the account page and signed in
     assert_current_path account_path
-    assert_text "Successfully signed in with magic link!"
-
-    # Verify user is actually signed in by checking for sign out link
+    assert_text "You're signed in. Welcome back!"
     assert_link "Sign out"
   end
 end
