@@ -23,7 +23,7 @@ class Presentations::DownloadsController < ApplicationController
       @presentation.increment_download_count!
       track_download("full_presentation")
 
-      redirect_to rails_blob_url(@presentation.pdf_file)
+      redirect_to_private_file(@presentation.pdf_file)
     else
       redirect_to @presentation, alert: "Presentation file not available"
     end
@@ -33,7 +33,7 @@ class Presentations::DownloadsController < ApplicationController
     if @presentation.speaker_notes.attached?
       track_download("speaker_notes")
 
-      redirect_to rails_blob_url(@presentation.speaker_notes)
+      redirect_to_private_file(@presentation.speaker_notes)
     else
       redirect_to @presentation, alert: "Speaker notes not available"
     end
@@ -43,7 +43,7 @@ class Presentations::DownloadsController < ApplicationController
     if @presentation.outline_file.attached?
       track_download("outline")
 
-      redirect_to rails_blob_url(@presentation.outline_file)
+      redirect_to_private_file(@presentation.outline_file)
     else
       redirect_to @presentation, alert: "Outline not available"
     end
@@ -53,7 +53,7 @@ class Presentations::DownloadsController < ApplicationController
     if @presentation.recommendations_sheet.attached?
       track_download("recommendations")
 
-      redirect_to rails_blob_url(@presentation.recommendations_sheet)
+      redirect_to_private_file(@presentation.recommendations_sheet)
     else
       redirect_to @presentation, alert: "Recommendations sheet not available"
     end
@@ -65,7 +65,7 @@ class Presentations::DownloadsController < ApplicationController
     if @presentation.scorecard.attached?
       track_download("scorecard")
 
-      redirect_to rails_blob_url(@presentation.scorecard)
+      redirect_to_private_file(@presentation.scorecard)
     else
       redirect_to blank_scorecard_presentation_downloads_path(@presentation)
     end
@@ -85,6 +85,23 @@ class Presentations::DownloadsController < ApplicationController
   private
 
   BLANK_SCORECARD_PATH = Rails.root.join("app/assets/documents/wss_scorecard_blank.pdf").freeze
+
+  # How long a paid file's download URL stays valid. Short on purpose: it is
+  # minted per request, after the access check, and never stored or shared.
+  PRIVATE_URL_TTL = 5.minutes
+
+  # Paid files are never handed out by the permanent signed-id blob URL (that
+  # link works forever for anyone who has it). Instead mint a service URL that
+  # expires and forces a download. On R2 this is a presigned URL; on the Disk
+  # service it is a signed, expiring /rails/active_storage/disk URL, which needs
+  # the request's host in ActiveStorage::Current.
+  def redirect_to_private_file(attachment)
+    ActiveStorage::Current.url_options = { protocol: request.protocol, host: request.host, port: request.optional_port }
+    url = attachment.blob.url(expires_in: PRIVATE_URL_TTL, disposition: :attachment)
+    Rails.logger.info "Download: user #{current_user.id} presentation #{@presentation.id} " \
+                      "file #{action_name} (blob #{attachment.blob.id}) short-lived URL issued"
+    redirect_to url, allow_other_host: true
+  end
 
   def set_presentation
     @presentation = Presentation.find(params[:presentation_id])
