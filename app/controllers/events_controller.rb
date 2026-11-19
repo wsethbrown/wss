@@ -97,9 +97,10 @@ class EventsController < ApplicationController
     updated_params = event_params
     if browser_timezone.present? && (params[:event][:start_time].present? || params[:event][:end_time].present?)
       Time.use_zone(browser_timezone) do
-        # Times are read in the editor's zone, so the event adopts it (B15).
+        # Times are read in the editor's zone to get the right instant, but the
+        # event's own time_zone is set once at creation and never overwritten
+        # here (B15b): an event happens in one place.
         updated_params = updated_params.merge(
-          time_zone: browser_timezone,
           start_time: submitted_time(params[:event][:start_time], @event.start_time),
           end_time: submitted_time(params[:event][:end_time], @event.end_time)
         )

@@ -106,6 +106,9 @@
       <%= form.datetime_local_field :start_time, value: event.start_time&.strftime("%Y-%m-%dT%H:%M"), data: { event_times_target: "start" },
           class: "w-full rounded-2xl border border-hairline bg-white px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-ink/30" %>
       <p class="mt-1 text-sm text-mute">When does the event begin?</p>
+      <% if event.persisted? && event.start_time %>
+        <p class="mt-1 text-sm text-mute" data-event-zone-note>Times in <%= event.start_time.zone %><% if (event_zone_time = event.event_zone_label_for(Time.zone)) %> · <%= event_zone_time %> at the event<% end %></p>
+      <% end %>
     </div>
 
     <div>

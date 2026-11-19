@@ -201,4 +201,66 @@ class EventsControllerTest < ActionDispatch::IntegrationTest
                                                             start_time: 3.days.from_now, end_time: 3.days.from_now + 1.hour } }
     assert_equal Event::FALLBACK_TIME_ZONE, Event.find_by!(title: "Fallback Night").time_zone
   end
+  # --- B15b: an event keeps its zone --------------------------------------
+
+  def eastern_event
+    start = Time.utc(2027, 1, 15, 0, 30) # 7:30 PM EST on Jan 14
+    Event.create!(society: societies(:single_malt), organizer: users(:seth), title: "Eastern Night", description: "d",
+                  location: "Somewhere", start_time: start, end_time: start + 2.hours, time_zone: "America/New_York")
+  end
+
+  test "editing from a Pacific browser keeps the event's zone and mails the right Eastern time" do
+    event = eastern_event
+    sign_in users(:seth)
+    cookies[:browser_timezone] = "America/Los_Angeles"
+    # 5:00 PM Pacific = 8:00 PM Eastern = 01:00 UTC on the 15th
+    patch event_path_for(event), params: { event: { start_time: "2027-01-14T17:00", end_time: "2027-01-14T19:00" } }
+    event.reload
+    assert_equal "America/New_York", event.time_zone
+    assert_equal Time.utc(2027, 1, 15, 1, 0), event.start_time.utc
+    mail = EventMailer.event_updated(users(:jane), event, [ "time" ])
+    [ mail.html_part.body.decoded, mail.text_part.body.decoded ].each do |body|
+      assert_includes body, "8:00 PM EST"
+    end
+  end
+
+  test "editing only the title from a Pacific browser leaves the zone alone" do
+    event = eastern_event
+    sign_in users(:seth)
+    cookies[:browser_timezone] = "America/Los_Angeles"
+    patch event_path_for(event), params: { event: { title: "Renamed" } }
+    assert_equal "America/New_York", event.reload.time_zone
+  end
+
+  test "a posted time_zone param cannot change the zone" do
+    event = eastern_event
+    sign_in users(:seth)
+    cookies[:browser_timezone] = "America/Los_Angeles"
+    patch event_path_for(event), params: { event: { title: "X", time_zone: "Asia/Tokyo" } }
+    assert_equal "America/New_York", event.reload.time_zone
+  end
+
+  test "the event page shows the zone, and the event-zone time only when the viewer's zone differs" do
+    event = eastern_event
+    sign_in users(:seth)
+    cookies[:browser_timezone] = "America/Los_Angeles"
+    get event_path_for(event)
+    assert_response :success
+    assert_select "[data-event-zone-note]", text: /4:30 PM – 6:30 PM PST/
+    assert_select "[data-event-zone-note]", text: /7:30 PM EST at the event/
+
+    cookies[:browser_timezone] = "America/New_York"
+    get event_path_for(event)
+    assert_select "[data-event-zone-note]", text: /EST/
+    assert_select "[data-event-zone-note]", text: /at the event/, count: 0
+  end
+
+  test "the edit form names the zone the times are typed in" do
+    event = eastern_event
+    sign_in users(:seth)
+    cookies[:browser_timezone] = "America/Los_Angeles"
+    get edit_society_event_path(event.society, event)
+    assert_select "[data-event-zone-note]", text: /PST/
+    assert_select "[data-event-zone-note]", text: /7:30 PM EST at the event/
+  end
 end

@@ -29,6 +29,21 @@ class Event < ApplicationRecord
     local_start.strftime("%A, %B %-d at %-l:%M %p %Z")
   end
 
+  # B15b: a viewer's-zone label ("4:30 PM PST") and, only when the viewer's zone
+  # has a different offset at the start time, the event-zone label
+  # ("7:30 PM EST"). Zones are compared by offset, so Chicago/Mexico City do not
+  # produce a redundant note.
+  def start_clock_label(zone = effective_time_zone)
+    start_time.in_time_zone(zone).strftime("%-l:%M %p %Z")
+  end
+
+  def event_zone_label_for(viewer_zone)
+    viewer = viewer_zone.is_a?(ActiveSupport::TimeZone) ? viewer_zone : ActiveSupport::TimeZone[viewer_zone.to_s]
+    return nil if viewer.nil?
+    return nil if viewer.at(start_time).utc_offset == effective_time_zone.at(start_time).utc_offset
+    start_clock_label
+  end
+
   def start_date_label
     local_start.strftime("%A, %B %-d")
   end
