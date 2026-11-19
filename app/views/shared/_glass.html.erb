@@ -8,6 +8,8 @@
       size:    rendered height in px (default 32, never below 28); width is 3/4.
       tone:    :ink on paper and white cards (default), :cream on green.
       numeral: optional text set in the bowl (the order a pour was served).
+               Only drawn at size 64 or larger; below that it is ignored, so
+               callers pass it only for large glasses and keep the order in text.
       label:   optional sr-only text equivalent. Leave it out only when the
                same information sits beside the glass as visible text.
       css:     optional extra classes on the svg.
@@ -18,7 +20,7 @@
   level   = local_assigns.fetch(:level, 0).to_f.clamp(0.0, 1.0)
   size    = [ local_assigns.fetch(:size, 32).to_i, 28 ].max
   cream   = local_assigns.fetch(:tone, :ink).to_sym == :cream
-  numeral = local_assigns[:numeral]
+  numeral = size >= 64 ? local_assigns[:numeral] : nil
   label   = local_assigns[:label]
   line    = cream ? "#f6f4ee" : "#16332a"
   @_glass_prefix ||= "gl#{SecureRandom.hex(3)}"

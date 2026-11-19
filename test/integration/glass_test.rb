@@ -31,15 +31,21 @@ class GlassPartialTest < ActiveSupport::TestCase
   end
 
   test "cream tone on green, numeral in white over a full glass, label as sr-only text" do
-    html = glass(level: 0.9, tone: :cream, numeral: 2, label: "Pour 2,")
+    html = glass(level: 0.9, tone: :cream, numeral: 2, size: 64, label: "Pour 2,")
     svg = html.at_css("svg")
     assert_equal %w[#ff6d00 #ff8a33], svg.css("g path").map { |p| p["fill"] }
     assert_equal "#f6f4ee", svg.at_css("> path")["stroke"]
     assert_equal "#fff", svg.at_css("text")["fill"]
     assert_equal "Pour 2,", html.at_css(".sr-only").text
 
-    low = glass(level: 0.3, numeral: 1).at_css("text")
+    low = glass(level: 0.3, numeral: 1, size: 64).at_css("text")
     assert_equal "#16332a", low["fill"]
+  end
+
+  test "the numeral is ignored below 64px" do
+    assert_nil glass(level: 0.5, numeral: 1, size: 63).at_css("text")
+    assert_nil glass(level: 0.5, numeral: 1).at_css("text")
+    assert_equal "1", glass(level: 0.5, numeral: 1, size: 64).at_css("text").text
   end
 
   test "every glass on a page gets its own clipPath id, and pages do not share them" do
@@ -102,7 +108,7 @@ class GlassPagesTest < ActionDispatch::IntegrationTest
 
   # --- The verdict ----------------------------------------------------------
 
-  test "a revealed night ranks its pours by the room, glass level = mean / 5, numeral = serve order" do
+  test "a revealed night ranks its pours by the room, glass level = mean / 5, top glass numeral = serve order" do
     event = events(:spring_blind)
     get society_event_path(event.society, event)
     assert_select "[data-role=verdict] h2", text: "The verdict"
@@ -113,7 +119,10 @@ class GlassPagesTest < ActionDispatch::IntegrationTest
     assert_match "Four Roses", rows[1].text
     assert_match "GlenDronach 12", rows[2].text
     assert_equal %w[0.85 0.8 0.65], rows.map { |r| r.at_css("svg")["data-glass"] }
-    assert_equal %w[1 3 2], rows.map { |r| r.at_css("svg text").text }
+    # Numeral only on the top (64px) glass; serve order stays in the sr-only label.
+    assert_equal [ "1", nil, nil ], rows.map { |r| r.at_css("svg text")&.text }
+    assert_equal [ "64", "40", "40" ], rows.map { |r| r.at_css("svg")["height"] }
+    assert_equal [ "Pour 1,", "Pour 3,", "Pour 2," ], rows.map { |r| r.at_css(".sr-only").text }
     assert_match "4.25", rows[0].text
     assert_match "2 reviewers", rows[0].text
     assert_match "1 reviewer", rows[1].text

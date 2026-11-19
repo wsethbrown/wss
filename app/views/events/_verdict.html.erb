@@ -8,10 +8,13 @@
   <h2 id="event-verdict-heading" class="text-xl font-semibold text-ink">The verdict</h2>
   <p class="mt-1 text-sm text-mute">Ranked by the room.</p>
   <ol class="mt-4 divide-y divide-hairline">
-    <% rows.each do |row| %>
+    <% rows.each_with_index do |row, rank| %>
       <% bottle = row[:pour].bottle %>
       <li class="flex items-center gap-4 py-3 first:pt-0 last:pb-0" data-role="verdict-row">
-        <%= render "shared/glass", level: row[:mean] / 5.0, numeral: row[:number], size: 52, label: "Pour #{row[:number]}," %>
+        <%# Numeral only on the top, 64px glass; the serve order of the rest stays in the sr-only label. %>
+        <span class="flex w-12 flex-none justify-center">
+          <%= render "shared/glass", level: row[:mean] / 5.0, numeral: (row[:number] if rank.zero?), size: rank.zero? ? 64 : 40, label: "Pour #{row[:number]}," %>
+        </span>
         <div class="min-w-0 flex-1">
           <%= link_to bottle.display_name, bottle_path(bottle), class: "font-semibold text-ink [overflow-wrap:anywhere] hover:text-whiskey-500" %>
           <% if row[:pour].label.present? %><p class="mt-0.5 text-sm text-mute [overflow-wrap:anywhere]"><%= row[:pour].label %></p><% end %>

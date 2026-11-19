@@ -337,7 +337,7 @@
                 <ul>
                   <% @verdict_rows.first(3).each do |row| %>
                     <li class="pour">
-                      <%= render "shared/glass", level: row[:mean] / 5.0, numeral: row[:number], tone: :cream, size: 28, label: "Pour #{row[:number]}," %>
+                      <%= render "shared/glass", level: row[:mean] / 5.0, tone: :cream, size: 28, label: "Pour #{row[:number]}," %>
                       <%= link_to row[:pour].bottle.name, bottle_path(row[:pour].bottle) %>
                       <span><%= number_with_precision(row[:mean], precision: 2, strip_insignificant_zeros: true) %></span>
                     </li>
