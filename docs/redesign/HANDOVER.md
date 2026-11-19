@@ -38,26 +38,28 @@ scroll (`GALLERY.md`).
 7. After deploy, email-RSVP and invite links open a confirm page. Email-change
    links issued before the B8 migration stop working.
 
-## 2. Open owner decisions
+## 2. Owner decisions
 
-| # | Question | Default applied |
+| # | Question | Status |
 |---|---|---|
 | 1 | ~~Homepage direction~~ **Answered:** keep the homepage; the glass (advisor's redraw from the logo) and the verdict go where their data lives, plus the homepage's fourth slide (G1) | Done in G1; `/?design=next4` kept as a study |
-| 2 | May signed-in non-members RSVP to **public** society events? | Yes (unchanged); one constant flips it: `Event::PUBLIC_EVENTS_OPEN_TO_NON_MEMBERS` |
-| 3 | Back-pay quarterly/yearly members the monthly credits `rake credits:owed` reports? | No back-pay |
-| 4 | When a direct purchase replaces a credit unlock, return the credit? | Not returned; logged |
-| 5 | Two-factor sign-in (B11): remove or build properly? An admin "reset 2FA" control belongs to this decision | Blocked |
-| 6 | Account deletion (B12): the decisions in `ACCOUNT_DELETION.md` | Self-service deletion disabled |
-| 7 | Keep `SocietyApplication` (self-serve join requests) or remove it? | Kept |
-| 8 | Terms of Service / Privacy Policy links on sign-up go to `#`. Write the documents or remove the implied agreement? | Untouched |
-| 9 | CLAUDE.md "Admin Panel Development" tells people to update `admin_panel_todo.md`, which does not exist: reword or drop | Untouched |
-| 10 | Magic-link sign-in click-to-confirm (protects against mail scanners)? | Not done |
-| 11 | Per-society event-email muting (today the mute is the global preference) | Possible feature, not built |
-| 12 | A full review-board page for societies (the board is capped at 15 with a count) | Not built |
-| 13 | Devise `:lockable` hard lockout | Not enabled (per-email rate limit instead) |
-| 14 | Magic-link per-email limit of 3 per 15 minutes: too tight? | Kept |
-| 15 | Confirm the yearly and quarterly Stripe price intervals (M1), and which payment methods are enabled (M15) | — |
-| 16 | Any production user with `otp_enabled = true`? (S7) | — |
+| 2 | May signed-in non-members RSVP to **public** society events? | **Answered (default, 2026-11-19):** yes; one constant flips it: `Event::PUBLIC_EVENTS_OPEN_TO_NON_MEMBERS` |
+| 3 | Back-pay quarterly/yearly members the monthly credits `rake credits:owed` reports? | **Answered (default):** no back-pay |
+| 4 | When a direct purchase replaces a credit unlock, return the credit? | **Answered (default):** not returned; logged |
+| 5 | Two-factor sign-in (B11): remove or build properly? | **Answered:** removed (B11). The otp columns stay, ignored, until a later migration drops them; see §3 |
+| 6 | Account deletion (B12): the decisions in `ACCOUNT_DELETION.md` | **Open.** Self-service deletion stays disabled |
+| 7 | Keep `SocietyApplication` (self-serve join requests) or remove it? | **Answered (default):** kept |
+| 8 | Terms of Service / Privacy Policy links on sign-up go to `#`. Write the documents or remove the implied agreement? | **Open.** The documents do not exist; no legal text is written here |
+| 9 | ~~CLAUDE.md "Admin Panel Development" points at a missing `admin_panel_todo.md`~~ | **Done:** the stale section was dropped |
+| 10 | Magic-link sign-in click-to-confirm (protects against mail scanners)? | **Answered (default):** not done |
+| 11 | Per-society event-email muting (today the mute is the global preference) | **Answered (default):** not built |
+| 12 | A full review-board page for societies (the board is capped at 15 with a count) | **Answered (default):** not built |
+| 13 | Devise `:lockable` hard lockout | **Answered (default):** not enabled (per-email rate limit instead) |
+| 14 | Magic-link per-email limit of 3 per 15 minutes: too tight? | **Answered (default):** kept |
+| 15 | Confirm the yearly and quarterly Stripe price intervals (M1), and which payment methods are enabled (M15) | **Open:** only the owner can check Stripe |
+| 16 | Any production user with `otp_enabled = true`? (S7) | **Open:** only the owner can check production; gates the column-drop migration (§3) |
+
+The defaults above were accepted by the owner's go-ahead on 2026-11-19, relayed by the advisor.
 
 ## 3. Ops items (also in `TASKS.md`)
 
@@ -65,10 +67,15 @@ I7 memory caps for web and jobs containers · I10 separate R2 bucket and a
 write-only token for backups · I11 dead-man's switch on the nightly backup ·
 M1/M15/S7 checks above · CSP enforcement needs the template and JS fixes listed
 in `CSP_REPORT_ONLY.md` (report-only today) · a Cloudflare rate-limiting rule
-on `/magic_links` as the outer layer.
+on `/magic_links` as the outer layer · once Q16 confirms no production user has
+`otp_enabled = true`, a migration can drop the ignored otp columns on `users` (B11 left
+them in place, unread).
 
-## 4. New user-facing copy for approval
+## 4. New user-facing copy
 
+**Approved** by the owner's go-ahead on 2026-11-19 (relayed by the advisor). The one
+exception is the account-deletion sentence, which belongs to the still-open deletion policy (Q6)
+and waits for that answer.
 Collected from every task; case-only changes are listed in the D11 commit.
 
 - **Error pages:**
@@ -79,7 +86,7 @@ Collected from every task; case-only changes are listed in the D11 commit.
   - 406: "Your browser is not supported" / "Please upgrade your browser to continue."
   - All five: "Back to the home page".
 - **Rate limit:** "Too many attempts. Please wait a few minutes and try again."
-- **Account deletion:** "To delete your account, please contact us." (notice, and the sentence on the edit page).
+- **Account deletion (not yet approved; waits for Q6):** "To delete your account, please contact us." (notice, and the sentence on the edit page).
 - **Admin email:**
   - Hint: "Changing the email signs the member out of remembered sessions and cancels any pending sign-in or invitation link."
   - Refusals: "Only full administrators can change email addresses." and "You can't change another administrator's email."
