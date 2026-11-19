@@ -251,7 +251,7 @@ the "Set credit balance" field; if B2 has landed, do not bring it back.
 
 ## Wave D3 — finish
 
-### [ ] D10 · Emails — `haiku`
+### [~] D10 · Emails — `haiku`
 **Owns:** `app/views/layouts/mailer.html.erb`, `app/views/mailers/*`,
 `app/views/*_mailer/*.html.erb`.
 **Do:** Swap the old palette for the new one in inline styles using this exact map:
@@ -565,7 +565,8 @@ a magic-link mail job is picked up while a render is running (queue config asser
 **Tests:** `test/services/deck_import_test.rb`, `test/jobs/deck_slide_render_job_test.rb`,
 `test/controllers/admin/presentations_controller_test.rb`.
 
-### [~] B15 · Event emails: right time, easy opt-out — `sonnet`
+### [x] B15 · Event emails: right time, easy opt-out — `sonnet`
+Result: `events.time_zone` (browser zone, fallback America/New_York; backfilled by raw SQL, nothing sent); mail times rendered in the event's zone with abbreviation; List-Unsubscribe headers and a signed, single-purpose mute (global event-email preference). No per-user zone exists, so the society-creator fallback step was skipped.
 **Findings:** I3, I23.
 **Owns:** a migration adding `events.time_zone`, `app/models/event.rb` (time-zone
 methods), `app/controllers/events_controller.rb` (set it on create/update — after B1 has
