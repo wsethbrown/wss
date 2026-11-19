@@ -66,7 +66,8 @@ with no external requests.
 
 ## Wave D1 — public pages (parallel; disjoint files)
 
-### [~] D1 · Library and deck page — `opus`
+### [x] D1 · Library and deck page — `opus`
+Result: page header and chip filters on the library, covers preloaded and owned ids in one query (M21 done); deck page in two acts with one action bar; purchase page one card; `show_next` deleted. Five purchase states browser-checked.
 **Owns:** `app/views/presentations/index.html.erb`, `show.html.erb`, `_pour_card.html.erb`,
 `purchases/*`, `app/javascript/controllers/` files used only by these views.
 Delete `presentations/show_next.html.erb` and its `maybe_render_next` call if the new
@@ -86,7 +87,8 @@ for non-owners; the downloads box still renders only when files exist.
 **Tests:** `test/controllers/presentations_controller_test.rb`,
 `test/controllers/presentations/*`, `test/integration/*deck*`, `test/integration/*purchase*`.
 
-### [~] D2 · Societies index — `opus`
+### [x] D2 · Societies index — `opus`
+Result: undelivered claims removed site-wide; signed-out page is a header, one panel in existing homepage copy and a ruled list of real public societies with database counts.
 **Owns:** `app/views/societies/index.html.erb`, society card partials it uses.
 **Do:** Replace the signed-out landing page. It is the old design and makes claims the
 product does not deliver ("VIP distillery visits", "Guest speakers & experts", "Smart
@@ -99,7 +101,8 @@ Signed-in page: "your societies" and "discover" in the same language, search kep
 glyph is replaced by a sentence.
 **Tests:** `test/controllers/societies_controller_test.rb`, `test/integration/*societ*`.
 
-### [~] D3 · Society pages — `sonnet`
+### [x] D3 · Society pages — `sonnet`
+Result: show/new/edit/activity/invite/welcome on paper; next tasting is the one green panel; officers no longer see controls on admin rows (B1 follow-up).
 **Owns:** `app/views/societies/show.html.erb`, `activity.html.erb`, `new.html.erb`,
 `edit.html.erb`, `invite.html.erb`, `app/views/invitations/*`, `society_memberships` and
 `society_invitations` views if any.
@@ -113,7 +116,8 @@ officer vs admin).
 **Tests:** `test/controllers/societies_controller_test.rb`, `test/policies/society_policy_test.rb`,
 `test/integration/*invit*`.
 
-### [~] D4 · Events — `opus`
+### [x] D4 · Events — `opus`
+Result: event page on paper; RSVP control re-coloured for white (all ratios ≥ 4.5:1), slide and in-place updates verified; Event Stats internals removed. Found events edit/index are scaffold stubs → D4b.
 **Owns:** `app/views/events/*`, `app/views/event_rsvps/*`, the RSVP control rules at the
 bottom of `application.css` (`.rsvp-*`).
 **Do:** Event page on paper: header (date, title, place, host), the RSVP control, then
@@ -130,7 +134,8 @@ host-only and admin-only controls are unchanged.
 **Tests:** `test/controllers/events_controller_test.rb`, `test/controllers/event_rsvps_controller_test.rb`,
 `test/system/*` if they touch events, `test/integration/*rsvp*`, `test/integration/*event*`.
 
-### [~] D5 · Reviews, bottles, profiles — `sonnet`
+### [x] D5 · Reviews, bottles, profiles — `sonnet`
+Result: reviews, bottles, profiles on paper; reviews index and profile 390px overflow fixed (511/564 → 390); vote/favourite verified in place.
 **Owns:** `app/views/reviews/*`, `app/views/bottles/*`, `app/views/profiles/*`,
 `app/views/favorites/*`, `app/views/review_votes/*`.
 **Do:** Tasting record index: `_page_header`, search and sort on paper, bottles as a ruled
@@ -145,7 +150,8 @@ favourite buttons still update in place.
 **Tests:** `test/controllers/reviews_controller_test.rb`, `test/controllers/bottles_controller_test.rb`,
 `test/controllers/review_votes_controller_test.rb`, `test/controllers/favorites_controller_test.rb`.
 
-### [~] D6 · Membership, auth, contact — `sonnet`
+### [x] D6 · Membership, auth, contact — `sonnet`
+Result: membership, contact, auth, Devise pages on paper; Yearly is the one green panel; Google dev hint hidden; pricing tests assert content.
 **Owns:** `app/views/home/membership.html.erb`, `home/contact.html.erb`,
 `app/views/shared/_membership_pricing.html.erb` (take it over from D0's "don't"),
 `app/views/subscriptions/*`, `app/views/auth/*`, `app/views/devise/**`,
@@ -168,7 +174,8 @@ class names; `#magic-link-email`, `#password-toggle`, `#signin-email`,
 `test/controllers/subscriptions_controller_test.rb`, `test/system/magic_links_test.rb`,
 `test/integration/*auth*`.
 
-### [~] D7 · Account and notifications — `sonnet`
+### [x] D7 · Account and notifications — `sonnet`
+Result: account chips on phones / column on desktop, panels as cards; 1152px → 390px at phone width; notifications ruled list with orange unread dot.
 **Owns:** `app/views/account/*`, `app/views/notifications/*`,
 `test/system/account_navigation_test.rb`.
 **Do:** Account: section navigation as a row of chips on phones and a left column on
@@ -333,6 +340,9 @@ email, and that requests after the window succeed; `Jon@X.com` signs in; a reque
 **Tests:** `test/controllers/auth_controller_test.rb`, `magic_links_controller_test.rb`,
 `test/system/magic_links_test.rb`.
 
+### [x] B3b · Trusted proxies for the rate limits — `opus` (added by the advisor)
+Result: Cloudflare ranges trusted (list from memory, verify), per-IP ceilings raised to backstop levels, `forward_headers: true` in deploy.yml (ops item above).
+
 ### [x] B4 · Stop account deletion from doing damage — `sonnet`
 Result: DELETE /users deletes nothing, redirects to /contact; button replaced by a sentence; `ACCOUNT_DELETION.md` written (29 FKs, 7 hard blockers).
 **Findings:** M6, S9.
@@ -351,7 +361,8 @@ changes; the design note lists every FK to `users` found in `db/schema.rb`.
 
 ## Wave B2 — money (strictly in this order, one at a time)
 
-### [~] B5 · A credit every month on every plan — `opus`
+### [x] B5 · A credit every month on every plan — `opus`
+Result: unique `grant_key` per member per billing month under `with_lock`; daily `MonthlyCreditJob`; webhook (after refreshing status) and admin button share the key; welcome counts as month one; `rake credits:owed` reports only. Follow-up tests for 29th–31st anchors and late subscribers found and fixed a 58-day gap.
 **Findings:** M1, M4, M17.
 **Owns:** `app/jobs/monthly_credit_job.rb` (new), `config/recurring.yml`,
 `app/models/credit_transaction.rb` (grant methods), the `subscription_cycle` branch of
