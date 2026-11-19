@@ -32,7 +32,8 @@ And this test plan, in addition to its own:
 
 ## Wave D0 — shared pieces (run alone, before everything else)
 
-### [~] D0 · Shared partials and helpers — `sonnet`
+### [x] D0 · Shared partials and helpers — `sonnet`
+Result: page header partial, `deck_cover`/`avatar` helpers with tests, new deck card, flash and five error pages restyled. Homepage `<style>` left inline (ERB-computed keyframes). Error-page copy awaiting owner approval.
 **Goal:** the building blocks other tasks reuse, so pages do not each invent them.
 **Owns:** `app/views/shared/*`, `app/views/presentations/_deck_card.html.erb`,
 `app/helpers/application_helper.rb`, `app/helpers/design_helper.rb` (new),
@@ -264,7 +265,8 @@ advisor, who will put it to the owner; do the rest of the task meanwhile.
 
 ## Wave B1 — close the holes (parallel; disjoint files)
 
-### [~] B1 · Event and society authorisation — `opus`
+### [x] B1 · Event and society authorisation — `opus`
+Result: event authorised wherever loaded, `verify_authorized` on owned controllers, private RSVPs need membership (`Event::PUBLIC_EVENTS_OPEN_TO_NON_MEMBERS` flips the public rule), officers cannot touch admins, limited admins cannot purge photos, 500s gone. Follow-up for D3: hide officers' Remove button on admin rows.
 **Findings:** S2, S8, S11, S17, S19.
 **Owns:** `app/controllers/event_rsvps_controller.rb`, `events_controller.rb`,
 `events/*_controller.rb`, `email_rsvps_controller.rb` (membership re-check only),
@@ -288,7 +290,8 @@ purge a review photo. Existing member flows still pass.
 `test/controllers/events/*`, `society_memberships_controller_test.rb`,
 `test/policies/*event*`, `test/controllers/admin/bottles/*`.
 
-### [~] B2 · Admin powers — `opus`
+### [x] B2 · Admin powers — `opus`
+Result: admin email edits full-admin only and never on another admin; change clears magic-link/invitation/reset/remember tokens; `:credits` field removed; admin-created subs get the welcome credit via the ledger; admin changes and Pundit denials logged.
 **Findings:** S1, M7/S10, M16, S16 (admin parts).
 **Owns:** `app/controllers/admin/users_controller.rb`, `admin/subscriptions_controller.rb`,
 `app/views/admin/users/edit.html.erb`, `admin/subscriptions/edit.html.erb` (field removal
@@ -307,7 +310,8 @@ leaves `users.credits` and the ledger untouched; the ledger invariant test still
 **Tests:** `test/controllers/admin/users_controller_test.rb`,
 `admin/subscriptions_controller_test.rb`, `test/models/credit_transaction_test.rb`.
 
-### [~] B3 · Rate limits and sign-in hardening — `sonnet`
+### [x] B3 · Rate limits and sign-in hardening — `sonnet`
+Result: `rate_limit` on sign-in (IP+email), email_check, magic link (IP+email), email change, invitations; browser gets redirect + flash, JSON 429; case-insensitive sign-in; missing param 400; email not logged. Lockable proposed, not built.
 **Findings:** S3, S18, S16 (sign-in log).
 **Owns:** `app/controllers/auth_controller.rb`, `magic_links_controller.rb`,
 `society_invitations_controller.rb`, `account_controller.rb` (`request_email_change`
@@ -323,7 +327,8 @@ email, and that requests after the window succeed; `Jon@X.com` signs in; a reque
 **Tests:** `test/controllers/auth_controller_test.rb`, `magic_links_controller_test.rb`,
 `test/system/magic_links_test.rb`.
 
-### [~] B4 · Stop account deletion from doing damage — `sonnet`
+### [x] B4 · Stop account deletion from doing damage — `sonnet`
+Result: DELETE /users deletes nothing, redirects to /contact; button replaced by a sentence; `ACCOUNT_DELETION.md` written (29 FKs, 7 hard blockers).
 **Findings:** M6, S9.
 **Owns:** the Devise `registrations` route options in `config/routes.rb`,
 `app/controllers/users/registrations_controller.rb`,
