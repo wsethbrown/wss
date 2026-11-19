@@ -266,12 +266,13 @@ Do not change any wording, link or the `.text.erb` files.
 test still renders; button text contrast at least 4.5:1.
 **Tests:** `bin/rails test test/mailers`.
 
-### [ ] B15b · Keep an event's zone on edit; zone check before deploy — `sonnet` (advisor ruling, after D11)
+### [~] B15b · Keep an event's zone on edit; zone check before deploy — `sonnet` (advisor ruling, after D11)
 **Owns:** `EventsController#update` (stop overwriting `time_zone`), `app/views/events/show.html.erb` and `events/_form.html.erb` (zone abbreviation next to times), `lib/tasks/events.rake` (new), matching tests.
 **Do:** `events.time_zone` is set once at creation and never overwritten on update (the typed time is still converted from the editor's browser zone to the correct instant). Show the event zone's abbreviation beside the time on the event page and the edit form. Add `rake events:zones`: prints upcoming events with society, society location and current zone (read-only). Do not infer zones from location text.
 **Acceptance:** an edit from a Pacific browser leaves an Eastern event Eastern and the mailed time correct; the rake task changes nothing.
 
-### [~] D11 · Consistency, accessibility and docs sweep — `opus` (last)
+### [x] D11 · Consistency, accessibility and docs sweep — `opus` (last)
+Result: 14 routed leftovers fixed except the full-bleed layout list (documented in SECTION_NOTES §1); axe serious/critical 36/36 clean; 71 routes × 2 widths walked with no overflow; GALLERY.md with 142 committed screenshots (5.8MB); gate greps clean.
 **Owns:** any view, for small fixes only; `SECTION_NOTES.md`; `docs/redesign/*`.
 **Do:** Walk every route in `config/routes.rb` that renders HTML, at both widths, signed
 out, as a member and as an admin. Fix leftovers: old mastheads, eyebrows, emoji, stray
@@ -593,7 +594,7 @@ that member's event emails, and is single-purpose; headers present. New copy lis
 
 ## Wave B4 — after the design track (D11 done)
 
-### [ ] B16 · Images and query counts — `sonnet`
+### [~] B16 · Images and query counts — `sonnet`
 **Findings:** I13, I15, I22, I28, M21 if B7 left it.
 **Owns:** attachment variant definitions in `app/models/*`, `DesignHelper` cover/avatar
 internals, `app/controllers/societies_controller.rb` (`show` loading),
@@ -609,7 +610,7 @@ the layout each stay under a stated bound that does not grow with the number of 
 no `url_for(…image)` of an original remains in views (`grep`) outside downloads.
 **Tests:** `test/integration/query_counts_test.rb` (new), existing controller tests.
 
-### [ ] B17 · Scripts, semantics and dead code — `sonnet`
+### [~] B17 · Scripts, semantics and dead code — `sonnet`
 **Findings:** I17, I18, I19, I24, I26.
 **Owns:** new Stimulus controllers replacing the inline scripts in `account/index` and
 `presentations/show`, `app/views/profiles/show.html.erb` (the count only),
