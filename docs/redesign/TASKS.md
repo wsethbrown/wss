@@ -66,7 +66,7 @@ with no external requests.
 
 ## Wave D1 — public pages (parallel; disjoint files)
 
-### [ ] D1 · Library and deck page — `opus`
+### [~] D1 · Library and deck page — `opus`
 **Owns:** `app/views/presentations/index.html.erb`, `show.html.erb`, `_pour_card.html.erb`,
 `purchases/*`, `app/javascript/controllers/` files used only by these views.
 Delete `presentations/show_next.html.erb` and its `maybe_render_next` call if the new
@@ -86,7 +86,7 @@ for non-owners; the downloads box still renders only when files exist.
 **Tests:** `test/controllers/presentations_controller_test.rb`,
 `test/controllers/presentations/*`, `test/integration/*deck*`, `test/integration/*purchase*`.
 
-### [ ] D2 · Societies index — `opus`
+### [~] D2 · Societies index — `opus`
 **Owns:** `app/views/societies/index.html.erb`, society card partials it uses.
 **Do:** Replace the signed-out landing page. It is the old design and makes claims the
 product does not deliver ("VIP distillery visits", "Guest speakers & experts", "Smart
@@ -99,7 +99,7 @@ Signed-in page: "your societies" and "discover" in the same language, search kep
 glyph is replaced by a sentence.
 **Tests:** `test/controllers/societies_controller_test.rb`, `test/integration/*societ*`.
 
-### [ ] D3 · Society pages — `sonnet`
+### [~] D3 · Society pages — `sonnet`
 **Owns:** `app/views/societies/show.html.erb`, `activity.html.erb`, `new.html.erb`,
 `edit.html.erb`, `invite.html.erb`, `app/views/invitations/*`, `society_memberships` and
 `society_invitations` views if any.
@@ -113,7 +113,7 @@ officer vs admin).
 **Tests:** `test/controllers/societies_controller_test.rb`, `test/policies/society_policy_test.rb`,
 `test/integration/*invit*`.
 
-### [ ] D4 · Events — `opus`
+### [~] D4 · Events — `opus`
 **Owns:** `app/views/events/*`, `app/views/event_rsvps/*`, the RSVP control rules at the
 bottom of `application.css` (`.rsvp-*`).
 **Do:** Event page on paper: header (date, title, place, host), the RSVP control, then
@@ -130,7 +130,7 @@ host-only and admin-only controls are unchanged.
 **Tests:** `test/controllers/events_controller_test.rb`, `test/controllers/event_rsvps_controller_test.rb`,
 `test/system/*` if they touch events, `test/integration/*rsvp*`, `test/integration/*event*`.
 
-### [ ] D5 · Reviews, bottles, profiles — `sonnet`
+### [~] D5 · Reviews, bottles, profiles — `sonnet`
 **Owns:** `app/views/reviews/*`, `app/views/bottles/*`, `app/views/profiles/*`,
 `app/views/favorites/*`, `app/views/review_votes/*`.
 **Do:** Tasting record index: `_page_header`, search and sort on paper, bottles as a ruled
@@ -145,7 +145,7 @@ favourite buttons still update in place.
 **Tests:** `test/controllers/reviews_controller_test.rb`, `test/controllers/bottles_controller_test.rb`,
 `test/controllers/review_votes_controller_test.rb`, `test/controllers/favorites_controller_test.rb`.
 
-### [ ] D6 · Membership, auth, contact — `sonnet`
+### [~] D6 · Membership, auth, contact — `sonnet`
 **Owns:** `app/views/home/membership.html.erb`, `home/contact.html.erb`,
 `app/views/shared/_membership_pricing.html.erb` (take it over from D0's "don't"),
 `app/views/subscriptions/*`, `app/views/auth/*`, `app/views/devise/**`,
@@ -168,7 +168,7 @@ class names; `#magic-link-email`, `#password-toggle`, `#signin-email`,
 `test/controllers/subscriptions_controller_test.rb`, `test/system/magic_links_test.rb`,
 `test/integration/*auth*`.
 
-### [ ] D7 · Account and notifications — `sonnet`
+### [~] D7 · Account and notifications — `sonnet`
 **Owns:** `app/views/account/*`, `app/views/notifications/*`,
 `test/system/account_navigation_test.rb`.
 **Do:** Account: section navigation as a row of chips on phones and a left column on
@@ -345,7 +345,7 @@ changes; the design note lists every FK to `users` found in `db/schema.rb`.
 
 ## Wave B2 — money (strictly in this order, one at a time)
 
-### [ ] B5 · A credit every month on every plan — `opus`
+### [~] B5 · A credit every month on every plan — `opus`
 **Findings:** M1, M4, M17.
 **Owns:** `app/jobs/monthly_credit_job.rb` (new), `config/recurring.yml`,
 `app/models/credit_transaction.rb` (grant methods), the `subscription_cycle` branch of
