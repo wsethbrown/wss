@@ -410,12 +410,14 @@ grants no deck credit whichever event arrives first; both spellings are gone fro
 **Tests:** `test/controllers/webhooks_controller_test.rb`, `test/models/stripe_event_test.rb`,
 `test/services/presentations/checkout_fulfillment_test.rb`.
 
-### [~] B6b · Society-only plan on the checkout return path — `sonnet` (from B6)
+### [x] B6b · Society-only plan on the checkout return path — `sonnet` (from B6)
+Result: `User.plan_for_price_id` shared by webhook and checkout return; founding-society return before webhooks grants no deck credit (red/green verified).
 **Owns:** `app/controllers/account_controller.rb` (`ensure_welcome_credit_after_checkout` only), `app/models/user.rb` (a shared price-id → plan mapping), the webhook's plan extraction switched to that mapping, matching tests.
 **Do:** decide society-only from the retrieved subscription's price id before `grant_welcome_credit` on the return path, using one mapping shared with the webhook.
 **Acceptance:** a founding-society checkout whose return redirect lands before both webhooks grants no deck credit; a regular plan still gets the welcome credit once.
 
-### [~] B7 · Purchase integrity — `sonnet` (after B6)
+### [x] B7 · Purchase integrity — `sonnet` (after B6)
+Result: duplicate ownership rows merged and a unique (user_id, presentation_id) index; `use_credit` re-checks ownership in the lock; paid checkout upgrades credit → direct; lapsed credit owner can buy outright (credit not returned, logged); decks with owners/ledger/download history refuse deletion; ledger rows read-only, no cascade from User; M21 verified (one ownership query).
 **Findings:** M2, M12, M13, M20, M21.
 **Owns:** a migration for `user_presentations`, `app/models/user_presentation.rb`,
 `presentation.rb` (associations only), `credit_transaction.rb` (`use_credit`, `readonly?`),
@@ -627,6 +629,7 @@ load with the report-only header and no console CSP errors on the ten main pages
 - **M1** confirm the yearly and quarterly Stripe prices' billing intervals.
 - **M15** confirm which payment methods are enabled in the Stripe dashboard.
 - **S7** check whether any production user has `otp_enabled = true`.
+- **B7 migration** deletes duplicate `user_presentations` rows irreversibly (keeps direct over credit). Take a backup before the deploy that runs it.
 - **S3/B3b** confirm in production that `request.remote_ip` shows real visitor addresses (not Cloudflare edges) before relying on the per-IP rate limits; refresh the Cloudflare range list in `config/initializers/trusted_proxies.rb` from cloudflare.com/ips; consider a Cloudflare rate-limiting rule on `/magic_links` as the outer layer.
 - **Deploy config changed (B3b):** `config/deploy.yml` now sets `proxy: forward_headers: true`. After the next deploy, check a production log line shows a real visitor address for `remote_ip` (and the boot line "Trusted proxies: N Cloudflare ranges loaded"), and verify the Cloudflare range list in `config/initializers/trusted_proxies.rb` against cloudflare.com/ips-v4 and /ips-v6 (it was written from memory).
 
