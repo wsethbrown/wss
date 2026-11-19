@@ -274,11 +274,15 @@
    Because of that, every visual state hangs off aria-pressed rather than
    server-rendered classes, so the Stimulus controller flips one attribute and
    CSS does the rest. No markup is duplicated in JavaScript. */
-.rsvp-option { color: color-mix(in srgb, var(--color-cream) 70%, transparent); }
-.rsvp-option:hover { color: var(--color-cream); }
+/* On a white card (2026 redesign): the track is paper, unchosen labels are
+   the secondary text colour, and the chosen answer is white on its RSVP fill.
+   Contrast on the paper track: mute 5.06:1, ink 12.4:1; white on the fills is
+   checked in the token comment above. */
+.rsvp-option { color: var(--color-mute); }
+.rsvp-option:hover { color: var(--color-ink); }
 /* Resting on Maybe before anyone has answered: visible, but never mistakable
-   for a confirmed answer. */
-.rsvp-option[data-resting="true"] { color: var(--color-whiskey-200); }
+   for a confirmed answer. No colour, no tick: a white seat on the paper track. */
+.rsvp-option[data-resting="true"] { color: var(--color-ink); }
 .rsvp-option[aria-pressed="true"] { color: #fff; }
 .rsvp-option .rsvp-tick { display: none; }
 .rsvp-option[aria-pressed="true"] .rsvp-tick { display: inline-flex; }
@@ -297,7 +301,8 @@
 .rsvp-indicator[data-fill="maybe"] { background-color: var(--color-rsvp-maybe); }
 .rsvp-indicator[data-fill="no"]    { background-color: var(--color-rsvp-no); }
 .rsvp-indicator[data-fill-resting="true"] {
-  background-color: color-mix(in srgb, var(--color-rsvp-maybe) 22%, transparent);
+  background-color: #fff;
+  box-shadow: inset 0 0 0 1px var(--color-hairline);
 }
 
 /* First paint and resize place it without animating in from wherever it was. */

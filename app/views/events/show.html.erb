@@ -1,276 +1,235 @@
 <% content_for :title, "#{@event.title} - Whiskey Share Society" %>
 
-<div class="min-h-screen bg-whiskey-50">
-  <%# Masthead. Deliberately the same shape as the society show page (char
-      surface, eyebrow → rule-double → display heading, one inline metadata
-      row) so a night reads as part of its society rather than a different app.
+<%# Full-bleed in the layout (events#show), so this page sets its own width
+    and clears the floating nav itself. Paper ground, header on paper, then
+    cards (docs/redesign/DESIGN_SYSTEM.md). %>
+<div class="mx-auto max-w-6xl px-4 pb-16 pt-28 sm:px-6">
+  <%# Header. The society is named once up here, in the breadcrumb, so a night
+      reads as part of its society without repeating it beside the title. %>
+  <header class="pb-8 sm:pb-10">
+    <nav class="mb-4 flex min-w-0 items-center gap-2 text-sm" aria-label="Breadcrumb">
+      <%= link_to @event.society.name, society_path(@event.society),
+          class: "truncate font-medium text-mute transition hover:text-ink" %>
+      <svg class="h-4 w-4 shrink-0 text-whiskey-300" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"></path>
+      </svg>
+      <span class="truncate text-mute" aria-current="page"><%= @event.title %></span>
+    </nav>
 
-      Replaces a white card that named the society twice — once in the
-      breadcrumb, again in a tan chip beside the title — and laid the details
-      out as three icon-in-a-box tiles, which wrapped a date onto three lines
-      in its narrow column. %>
-  <div class="relative w-full overflow-hidden bg-char pt-16">
-    <div class="pointer-events-none absolute inset-0" aria-hidden="true"
-         style="background: radial-gradient(ellipse 70% 50% at 50% 110%, rgba(201, 136, 74, 0.22), transparent 70%);"></div>
-
-    <div class="relative z-10 mx-auto max-w-6xl px-6 py-12 md:py-16">
-      <%# The only place the society is named up here. %>
-      <nav class="mb-8 flex items-center gap-2 text-sm" aria-label="Breadcrumb">
-        <%= link_to @event.society.name, society_path(@event.society),
-            class: "text-cream/50 transition hover:text-cream/90" %>
-        <svg class="h-4 w-4 shrink-0 text-cream/25" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"></path>
-        </svg>
-        <span class="text-cream/70" aria-current="page"><%= @event.title %></span>
-      </nav>
-
-      <div class="flex flex-col gap-10 lg:flex-row lg:items-end lg:justify-between">
-        <div class="max-w-2xl">
-          <p class="eyebrow mb-3 flex items-center gap-2 text-whiskey-300/90">
-            <% if @event.ongoing? %>
-              <span class="inline-block h-2 w-2 animate-pulse rounded-full bg-whiskey-400" aria-hidden="true"></span>
-              Happening now
-            <% elsif @event.upcoming? %>
-              Upcoming · in <%= distance_of_time_in_words(Time.current, @event.start_time) %>
-            <% else %>
-              Completed · <%= time_ago_in_words(@event.start_time) %> ago
-            <% end %>
-          </p>
-          <div class="rule-double mb-6 w-20 text-whiskey-300"></div>
-          <h1 class="font-display text-4xl font-semibold leading-tight text-cream md:text-5xl">
-            <%= @event.title %>
-          </h1>
-
-          <%# One wrapping row instead of three tiles: the same facts, and a
-              date that stays on one line. %>
-          <div class="mt-6 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-cream/60">
-            <span class="inline-flex items-center gap-2">
-              <svg class="h-4 w-4 shrink-0 text-whiskey-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"></path>
-              </svg>
-              <%= @event.start_time.strftime("%a, %B %-d, %Y") %>
-              <span class="text-cream/35">·</span>
-              <%= @event.start_time.strftime("%-I:%M %p") %> – <%= @event.end_time.strftime("%-I:%M %p") %>
-            </span>
-
-            <% if @event.location.present? %>
-              <span class="inline-flex items-center gap-2">
-                <svg class="h-4 w-4 shrink-0 text-whiskey-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                <%= @event.location %>
-              </span>
-            <% end %>
-
-            <%= render "header_rsvp_count", event: @event %>
-
-            <span class="inline-flex items-center gap-2">
-              <svg class="h-4 w-4 shrink-0 text-whiskey-300" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"></path>
-              </svg>
-              Organised by <%= link_to @event.organizer.full_name, profile_path(@event.organizer),
-                  class: "font-semibold text-whiskey-300 transition hover:text-whiskey-200" %>
-            </span>
-          </div>
-        </div>
-
-        <%# Actions. RSVP is the reason a member opens this page, so it leads;
-            Edit is an organiser's tool and sits quietly under it rather than
-            competing at the same weight. %>
-        <div class="flex flex-col gap-4 lg:items-end">
-          <% if user_signed_in? %>
-            <% if @event.upcoming? && !@event.rsvp_closed? %>
-              <% user_rsvp = @event.event_rsvps.find_by(user: current_user) %>
-              <%= render "rsvp_buttons", event: @event, user_rsvp: user_rsvp %>
-            <% elsif @event.upcoming? %>
-              <% user_rsvp = @event.event_rsvps.find_by(user: current_user) %>
-              <div class="rounded-xl border border-cream/15 bg-cream/5 px-4 py-3 text-sm text-cream/60 lg:text-right">
-                <% if user_rsvp %>
-                  You said <span class="font-semibold text-cream"><%= user_rsvp.status %></span>.
-                <% end %>
-                RSVPs closed 24 hours before the night.
-              </div>
-            <% else %>
-              <div class="rounded-xl border border-cream/15 bg-cream/5 px-4 py-3 text-sm text-cream/60 lg:text-right">
-                This night has passed.
-              </div>
-            <% end %>
-
-            <% if policy(@event).update? %>
-              <%= link_to edit_society_event_path(@event.society, @event),
-                  class: "inline-flex items-center gap-2 self-start text-sm font-semibold text-cream/60 transition hover:text-cream lg:self-end" do %>
-                <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"></path>
-                </svg>
-                Edit this event
-              <% end %>
-            <% end %>
+    <div class="flex flex-col gap-8 lg:flex-row lg:items-end lg:justify-between">
+      <div class="min-w-0 max-w-2xl">
+        <p class="mb-3 flex items-center gap-2 text-sm font-medium text-mute">
+          <% if @event.ongoing? %>
+            <span class="inline-block h-2 w-2 rounded-full bg-mark motion-safe:animate-pulse" aria-hidden="true"></span>
+            Happening now
+          <% elsif @event.upcoming? %>
+            Upcoming · in <%= distance_of_time_in_words(Time.current, @event.start_time) %>
           <% else %>
-            <%= link_to "Sign in to RSVP", new_user_session_path,
-                class: "inline-flex items-center justify-center rounded-xl bg-whiskey-500 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-whiskey-950/40 transition hover:bg-whiskey-400" %>
+            Completed · <%= time_ago_in_words(@event.start_time) %> ago
           <% end %>
+        </p>
+        <h1 class="font-display text-4xl font-semibold text-ink sm:text-5xl [overflow-wrap:anywhere]">
+          <%= @event.title %>
+        </h1>
+
+        <%# One wrapping row: the date stays on one line. %>
+        <div class="mt-5 flex flex-wrap items-center gap-x-6 gap-y-2 text-sm text-mute">
+          <span class="inline-flex items-center gap-2">
+            <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5"></path>
+            </svg>
+            <span>
+              <%= @event.start_time.strftime("%a, %B %-d, %Y") %>
+              <span aria-hidden="true">·</span>
+              <span class="tabular-nums"><%= @event.start_time.strftime("%-I:%M %p") %> – <%= @event.end_time.strftime("%-I:%M %p") %></span>
+            </span>
+          </span>
+
+          <% if @event.location.present? %>
+            <span class="inline-flex min-w-0 items-center gap-2">
+              <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"></path>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"></path>
+              </svg>
+              <span class="[overflow-wrap:anywhere]"><%= @event.location %></span>
+            </span>
+          <% end %>
+
+          <span class="inline-flex items-center gap-2">
+            <svg class="h-4 w-4 shrink-0" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"></path>
+            </svg>
+            <span>
+              Organised by <%= link_to @event.organizer.full_name, profile_path(@event.organizer),
+                  class: "font-semibold text-ink transition hover:text-whiskey-500" %>
+            </span>
+          </span>
         </div>
       </div>
-    </div>
-  </div>
 
-  <!-- Main Content -->
-  <div class="mx-auto max-w-6xl px-6 py-10">
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-      <!-- Event Description -->
-      <div class="lg:col-span-2">
-        <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900">Event Details</h2>
-          </div>
-          <div class="p-6">
-            <% if @event.description.present? %>
-              <div class="prose prose-indigo max-w-none">
-                <%= simple_format(@event.description, class: "text-gray-700 leading-relaxed") %>
-              </div>
-            <% else %>
-              <p class="text-gray-500 italic">No description provided for this event.</p>
-            <% end %>
-          </div>
-        </div>
-
-        <%= render "pours" %>
-
-        <%= render "comments", event: @event %>
-      </div>
-
-      <!-- Sidebar -->
-      <div class="space-y-6">
-        <%= render "attendees", event: @event %>
-
-        <!-- The deck (optional): shown to everyone; set by managers + host. -->
-        <% if @event.presentation || (user_signed_in? && policy(@event).manage_deck?) %>
-          <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
-              <h2 class="text-lg font-semibold text-gray-900">The deck</h2>
-            </div>
-            <div class="p-6 space-y-4">
-              <% if @event.presentation %>
-                <%= link_to presentation_path(@event.presentation), class: "block" do %>
-                  <p class="font-display text-lg font-semibold leading-snug text-gray-900"><%= @event.presentation.title %></p>
-                  <p class="mt-0.5 text-sm font-medium text-whiskey-700">See the deck</p>
-                <% end %>
-              <% else %>
-                <p class="text-sm text-gray-500">No deck attached. Plenty of nights run without one.</p>
+      <%# RSVP. The reason a member opens this page, so it gets the card beside
+          the title, with the going/maybe/no counts right under the control.
+          Edit is an organiser's tool and sits quietly at the bottom. %>
+      <div class="card w-full p-5 sm:p-6 lg:w-[380px] lg:shrink-0">
+        <% if user_signed_in? %>
+          <% if @event.upcoming? && !@event.rsvp_closed? %>
+            <% user_rsvp = @event.event_rsvps.find_by(user: current_user) %>
+            <%= render "rsvp_buttons", event: @event, user_rsvp: user_rsvp %>
+          <% elsif @event.upcoming? %>
+            <% user_rsvp = @event.event_rsvps.find_by(user: current_user) %>
+            <p class="text-sm text-mute">
+              <% if user_rsvp %>
+                You said <span class="font-semibold text-ink"><%= user_rsvp.status %></span>.
               <% end %>
-              <% if user_signed_in? && policy(@event).manage_deck? %>
-                <% if deck_options_for(@event).any? %>
-                  <%= form_with url: assign_deck_society_event_path(@event.society, @event), method: :patch, local: true, class: "space-y-2" do %>
-                    <%= render "events/autocomplete_field",
-                        name: "presentation_id",
-                        url: deck_options_society_event_path(@event.society, @event),
-                        placeholder: "Search deck titles…",
-                        current_label: @event.presentation&.title,
-                        hint: "Leave empty to run this night without a deck." %>
-                    <button type="submit"
-                            class="w-full px-4 py-2 bg-whiskey-600 text-white text-sm font-medium rounded-lg hover:bg-whiskey-700 transition cursor-pointer">
-                      Set deck
-                    </button>
-                  <% end %>
-                <% end %>
-              <% end %>
-            </div>
-          </div>
+              RSVPs closed 24 hours before the night.
+            </p>
+          <% else %>
+            <p class="text-sm text-mute">This night has passed.</p>
+          <% end %>
+        <% else %>
+          <%= link_to "Sign in to RSVP", new_user_session_path, class: "btn-primary w-full" %>
         <% end %>
 
-        <!-- Host: shown to everyone once assigned; managed by update? holders. -->
-        <% if @event.host || @event.host_name.present? || policy(@event).update? %>
-          <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
-              <h2 class="text-lg font-semibold text-gray-900">Host</h2>
-            </div>
-            <div class="p-6 space-y-4">
-              <% if @event.host %>
-                <%# -mx-2 -mt-2, not -m-2: the hover highlight still bleeds to
-                    the card's top and sides, but stops at the row's bottom so it
-                    can't sit on the search field below it. %>
-                <%= link_to profile_path(@event.host), class: "flex items-center space-x-3 hover:bg-gray-50 rounded-lg p-2 -mx-2 -mt-2 transition-colors" do %>
-                  <% if @event.host.has_profile_image? %>
-                    <img src="<%= @event.host.profile_image_url %>" alt="<%= @event.host.full_name %>" class="w-8 h-8 rounded-full">
-                  <% else %>
-                    <div class="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-medium" style="background-color: <%= @event.host.avatar_color %>;">
-                      <%= @event.host.initials %>
-                    </div>
-                  <% end %>
-                  <p class="text-sm font-medium text-gray-900 truncate"><%= @event.host.full_name %></p>
-                <% end %>
-              <% elsif @event.host_name.present? %>
-                <p class="text-sm font-medium text-gray-900"><%= @event.host_name %>
-                  <span class="ml-1 text-xs font-normal text-gray-500">guest presenter</span></p>
-              <% else %>
-                <p class="text-sm text-gray-500">No host assigned yet.</p>
+        <p class="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-hairline pt-4 text-sm text-mute">
+          <%= render "header_rsvp_count", event: @event %>
+          <%= render "stats", event: @event %>
+        </p>
+
+        <% if user_signed_in? && policy(@event).update? %>
+          <%= link_to edit_society_event_path(@event.society, @event),
+              class: "mt-3 inline-flex min-h-11 items-center gap-2 text-sm font-semibold text-ink transition hover:text-whiskey-500" do %>
+            <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931z"></path>
+            </svg>
+            Edit this event
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </header>
+
+  <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">
+    <div class="min-w-0 space-y-6 lg:col-span-2">
+      <section class="card p-6 sm:p-7" aria-labelledby="event-details-heading">
+        <h2 id="event-details-heading" class="text-xl font-semibold text-ink">Event details</h2>
+        <% if @event.description.present? %>
+          <div class="mt-3 text-[17px] leading-relaxed text-gray-900 [overflow-wrap:anywhere] [&_p+p]:mt-4">
+            <%= simple_format(@event.description) %>
+          </div>
+        <% else %>
+          <p class="mt-3 text-sm text-mute">No description provided for this event.</p>
+        <% end %>
+      </section>
+
+      <%= render "pours" %>
+
+      <%= render "comments", event: @event %>
+    </div>
+
+    <aside class="min-w-0 space-y-6" aria-label="About this night">
+      <%= render "attendees", event: @event %>
+
+      <%# The deck (optional): shown to everyone; set by managers + host. %>
+      <% if @event.presentation || (user_signed_in? && policy(@event).manage_deck?) %>
+        <section class="card p-6">
+          <h2 class="text-xl font-semibold text-ink">The deck</h2>
+          <div class="mt-3 space-y-4">
+            <% if @event.presentation %>
+              <%= link_to presentation_path(@event.presentation), class: "group block" do %>
+                <p class="text-lg font-semibold leading-snug text-ink group-hover:text-whiskey-500"><%= @event.presentation.title %></p>
+                <p class="mt-1 text-sm font-semibold text-ink">See the deck <span aria-hidden="true">→</span></p>
               <% end %>
-              <% if policy(@event).update? %>
-                <%= form_with url: assign_host_society_event_path(@event.society, @event), method: :patch, local: true, class: "space-y-2" do %>
+            <% else %>
+              <p class="text-sm text-mute">No deck attached. Plenty of nights run without one.</p>
+            <% end %>
+            <% if user_signed_in? && policy(@event).manage_deck? %>
+              <% if deck_options_for(@event).any? %>
+                <%= form_with url: assign_deck_society_event_path(@event.society, @event), method: :patch, local: true, class: "space-y-2" do %>
                   <%= render "events/autocomplete_field",
-                      name: "host_id",
-                      url: host_options_society_event_path(@event.society, @event),
-                      placeholder: "Search member names…",
-                      current_label: @event.host_display_name,
-                      free_text_name: "host_name",
-                      hint: "Pick a member, or type any name for a guest presenter. Leave empty to remove the host." %>
-                  <button type="submit"
-                          class="w-full px-4 py-2 bg-whiskey-600 text-white text-sm font-medium rounded-lg hover:bg-whiskey-700 transition cursor-pointer">
-                    Set host
+                      name: "presentation_id",
+                      url: deck_options_society_event_path(@event.society, @event),
+                      placeholder: "Search deck titles…",
+                      current_label: @event.presentation&.title,
+                      hint: "Leave empty to run this night without a deck." %>
+                  <button type="submit" class="btn-secondary w-full cursor-pointer">
+                    Set deck
                   </button>
                 <% end %>
-                <p class="text-xs text-gray-500">The host sees this event's RSVP replies.</p>
               <% end %>
-            </div>
-          </div>
-        <% end %>
-
-        <!-- RSVP replies: the host and event managers only. -->
-        <% if policy(@event).view_rsvps? && @event.event_rsvps.any? %>
-          <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-            <div class="px-6 py-4 border-b border-gray-200">
-              <h2 class="text-lg font-semibold text-gray-900">RSVP replies</h2>
-              <p class="text-xs text-gray-500 mt-1">Only the host and event managers see this.</p>
-            </div>
-            <div class="p-6 space-y-4">
-              <% @event.event_rsvps.includes(:user).order(updated_at: :desc).each do |rsvp| %>
-                <div class="flex items-start justify-between gap-3">
-                  <div class="min-w-0">
-                    <p class="text-sm font-medium text-gray-900 truncate"><%= rsvp.user.full_name %></p>
-                    <% if rsvp.note.present? %>
-                      <p class="mt-0.5 text-sm italic text-gray-600">&ldquo;<%= rsvp.note %>&rdquo;</p>
-                    <% end %>
-                  </div>
-                  <% chip = { "yes" => "bg-green-100 text-green-800", "maybe" => "bg-amber-100 text-amber-800", "no" => "bg-gray-100 text-gray-600" }[rsvp.status] %>
-                  <span class="shrink-0 inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium <%= chip %>"><%= rsvp.status.capitalize %></span>
-                </div>
-              <% end %>
-            </div>
-          </div>
-        <% end %>
-
-        <!-- Event Stats -->
-        <%= render "stats", event: @event %>
-
-        <!-- Society Info -->
-        <div class="bg-white shadow-sm rounded-lg overflow-hidden">
-          <div class="px-6 py-4 border-b border-gray-200">
-            <h2 class="text-lg font-semibold text-gray-900">Society</h2>
-          </div>
-          <div class="p-6">
-            <%= link_to @event.society, class: "flex items-center space-x-4 hover:bg-gray-50 rounded-lg p-2 -m-2 transition-colors" do %>
-              <div class="w-12 h-12 bg-gradient-to-br from-whiskey-500 to-whiskey-500 rounded-xl flex items-center justify-center">
-                <%= render 'shared/society_icon', society: @event.society, size: 'default' %>
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="text-sm font-medium text-gray-900 truncate"><%= @event.society.name %></p>
-                <p class="text-xs text-gray-500"><%= @event.society.member_count %> members</p>
-              </div>
             <% end %>
           </div>
-        </div>
-      </div>
-    </div>
+        </section>
+      <% end %>
+
+      <%# Host: shown to everyone once assigned; managed by update? holders. %>
+      <% if @event.host || @event.host_name.present? || policy(@event).update? %>
+        <section class="card p-6">
+          <h2 class="text-xl font-semibold text-ink">Host</h2>
+          <div class="mt-3 space-y-4">
+            <% if @event.host %>
+              <%= link_to profile_path(@event.host), class: "flex min-h-11 items-center gap-3 text-sm font-medium text-ink transition hover:text-whiskey-500" do %>
+                <%= avatar(@event.host, size: 32) %>
+                <span class="min-w-0 truncate"><%= @event.host.full_name %></span>
+              <% end %>
+            <% elsif @event.host_name.present? %>
+              <p class="text-sm font-medium text-ink"><%= @event.host_name %>
+                <span class="ml-1 text-xs font-normal text-mute">guest presenter</span></p>
+            <% else %>
+              <p class="text-sm text-mute">No host assigned yet.</p>
+            <% end %>
+            <% if policy(@event).update? %>
+              <%= form_with url: assign_host_society_event_path(@event.society, @event), method: :patch, local: true, class: "space-y-2" do %>
+                <%= render "events/autocomplete_field",
+                    name: "host_id",
+                    url: host_options_society_event_path(@event.society, @event),
+                    placeholder: "Search member names…",
+                    current_label: @event.host_display_name,
+                    free_text_name: "host_name",
+                    hint: "Pick a member, or type any name for a guest presenter. Leave empty to remove the host." %>
+                <button type="submit" class="btn-secondary w-full cursor-pointer">
+                  Set host
+                </button>
+              <% end %>
+              <p class="text-xs text-mute">The host sees this event's RSVP replies.</p>
+            <% end %>
+          </div>
+        </section>
+      <% end %>
+
+      <%# RSVP replies: the host and event managers only. %>
+      <% if policy(@event).view_rsvps? && @event.event_rsvps.any? %>
+        <section class="card p-6">
+          <h2 class="text-xl font-semibold text-ink">RSVP replies</h2>
+          <p class="mt-1 text-xs text-mute">Only the host and event managers see this.</p>
+          <ul class="mt-3 divide-y divide-hairline">
+            <% @event.event_rsvps.includes(:user).order(updated_at: :desc).each do |rsvp| %>
+              <li class="flex items-start justify-between gap-3 py-3">
+                <div class="min-w-0">
+                  <p class="truncate text-sm font-semibold text-ink"><%= rsvp.user.full_name %></p>
+                  <% if rsvp.note.present? %>
+                    <p class="mt-0.5 text-sm italic text-mute [overflow-wrap:anywhere]">&ldquo;<%= rsvp.note %>&rdquo;</p>
+                  <% end %>
+                </div>
+                <% tone = { "yes" => "text-rsvp-yes", "maybe" => "text-rsvp-maybe", "no" => "text-rsvp-no" }[rsvp.status] %>
+                <span class="inline-flex shrink-0 items-center rounded-xl border border-hairline bg-white px-2.5 py-0.5 text-xs font-semibold <%= tone %>"><%= rsvp.status.capitalize %></span>
+              </li>
+            <% end %>
+          </ul>
+        </section>
+      <% end %>
+
+      <section class="card p-6">
+        <h2 class="text-xl font-semibold text-ink">Society</h2>
+        <%= link_to @event.society, class: "mt-3 flex items-center gap-4 text-ink transition hover:text-whiskey-500" do %>
+          <span class="flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-[14px] bg-char">
+            <%= render 'shared/society_icon', society: @event.society, size: 'default' %>
+          </span>
+          <span class="min-w-0 flex-1">
+            <span class="block truncate text-sm font-semibold"><%= @event.society.name %></span>
+            <span class="block text-xs tabular-nums text-mute"><%= @event.society.member_count %> members</span>
+          </span>
+        <% end %>
+      </section>
+    </aside>
   </div>
 </div>
