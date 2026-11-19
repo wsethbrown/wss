@@ -1,4 +1,9 @@
 class User < ApplicationRecord
+  # The half-built two-factor sign-in was removed (B11). Its three columns stay in
+  # the table, still holding encrypted data on some rows, until a later migration
+  # drops them; ignoring them here means nothing can read or write them by accident.
+  self.ignored_columns += %w[otp_enabled otp_secret_key backup_codes]
+
   # Include default devise modules. Others available are:
   # :confirmable, :lockable, :timeoutable, :trackable and :omniauthable
   devise :database_authenticatable, :registerable,
@@ -389,20 +394,6 @@ class User < ApplicationRecord
     end
   end
 
-  # TOTP secret and backup codes are encrypted at rest (ActiveRecord encryption;
-  # keys in env, see config/initializers/active_record_encryption.rb).
-  encrypts :otp_secret_key
-  encrypts :backup_codes
-
-  # 2FA helper methods
-  def two_factor_enabled?
-    otp_enabled? && otp_secret_key.present?
-  end
-
-  def otp_required_for_login?
-    two_factor_enabled?
-  end
-
   # Authentication method helpers
   def has_password?
     password_set_manually? && encrypted_password.present?
@@ -535,57 +526,6 @@ class User < ApplicationRecord
     # Credits are added on the 1st of each month
     return nil unless has_active_subscription?
     Date.today.next_month.beginning_of_month
-  end
-
-  def generate_otp_secret
-    self.otp_secret_key = ROTP::Base32.random
-  end
-
-  def generate_backup_codes
-    codes = 8.times.map { SecureRandom.hex(4).upcase }
-    self.backup_codes = codes.to_json
-    codes
-  end
-
-  def backup_codes_array
-    backup_codes.present? ? JSON.parse(backup_codes) : []
-  end
-
-  def verify_otp(code)
-    return false unless two_factor_enabled?
-
-    # Check if it's a backup code
-    if backup_codes_array.include?(code.upcase)
-      # Remove used backup code
-      codes = backup_codes_array
-      codes.delete(code.upcase)
-      update!(backup_codes: codes.to_json)
-      return true
-    end
-
-    # Check TOTP code
-    totp = ROTP::TOTP.new(otp_secret_key)
-    totp.verify(code, drift_ahead: 30, drift_behind: 30)
-  end
-
-  def otp_qr_code
-    return nil unless otp_secret_key.present?
-
-    totp = ROTP::TOTP.new(otp_secret_key)
-    issuer = "Whiskey Share Society"
-    uri = totp.provisioning_uri(email, issuer_name: issuer)
-
-    qr = RQRCode::QRCode.new(uri)
-    qr.as_svg(
-      module_size: 4,
-      standalone: true,
-      use_path: true,
-      viewbox: true,
-      svg_attributes: {
-        class: "qr-code",
-        style: "width: 200px; height: 200px;"
-      }
-    )
   end
 
   def initials

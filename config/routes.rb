@@ -12,7 +12,7 @@ Rails.application.routes.draw do
     # but we keep the conventional Devise helper names so links/tests using
     # new_user_session_path / user_session_path still resolve.
     get    "/users/sign_in", to: "auth#unified", as: "new_user_session"
-    # Custom password sign-in (adds 2FA + remember-me handling on top of Devise)
+    # Custom password sign-in (adds remember-me handling on top of Devise)
     post   "/users/sign_in", to: "auth#sign_in", as: "user_session"
     delete "/users/sign_out", to: "auth#logout", as: "destroy_user_session"
     # OmniAuth redirects here when a provider errors (declined consent, bad
@@ -54,10 +54,6 @@ Rails.application.routes.draw do
   patch "account/change_email", to: "account#request_email_change"
   get "account/verify_email/:token", to: "account#verify_email_change", as: "verify_email_change"
   patch "account/change_password", to: "account#change_password"
-  post "account/setup_2fa", to: "account#setup_2fa"
-  post "account/enable_2fa", to: "account#enable_2fa"
-  post "account/disable_2fa", to: "account#disable_2fa"
-  post "account/regenerate_backup_codes", to: "account#regenerate_backup_codes"
   post "account/shelf_items", to: "account/shelf_items#create", as: :account_shelf_items
   delete "account/shelf_items/:id", to: "account/shelf_items#destroy", as: :account_shelf_item
 

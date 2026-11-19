@@ -1,6 +1,6 @@
 ---
 name: wss-auth
-description: WSS authentication — magic links, Google/Apple OAuth setup and gating, 2FA encryption keys, session handling. Use for sign-in bugs, OAuth config, or anything touching credentials.
+description: WSS authentication — magic links, Google/Apple OAuth setup and gating, session handling, the removed 2FA and its leftover encrypted columns. Use for sign-in bugs, OAuth config, or anything touching credentials.
 ---
 
 # WSS Auth
@@ -9,7 +9,7 @@ description: WSS authentication — magic links, Google/Apple OAuth setup and ga
 One page for everything: Google button, Apple button (only when configured),
 magic link (primary method), and optional password sign-in/up toggle.
 Devise :sessions module is SKIPPED — sessions are hand-rolled in
-AuthController (sign_in adds 2FA + remember-me handling). Helper routes
+AuthController (sign_in adds remember-me handling). Helper routes
 new_user_session_path / user_session_path still resolve (aliased in routes).
 
 ## Magic links (primary auth)
@@ -67,14 +67,19 @@ the apple phases only, else the state check fails csrf_detected. Hide My Email
 creates @privaterelay.appleid.com users (expected; matching real email links
 to the existing account instead).
 
-## 2FA (TOTP + backup codes)
-- Columns otp_secret_key + backup_codes are ENCRYPTED at rest (ActiveRecord
-  encryption, `encrypts` in User). Keys = AR_ENCRYPTION_PRIMARY_KEY /
-  _DETERMINISTIC_KEY / _KEY_DERIVATION_SALT in .env.
-- **LOSING THESE KEYS = LOSING ALL 2FA SECRETS.** They must be backed up
-  (owner's password manager) and provided to production as deploy secrets.
-- support_unencrypted_data is on (pre-encryption rows readable). Never
+## 2FA — REMOVED (B11, November 2026)
+- It was half-built: no challenge step, so enabling it broke password sign-in
+  while magic link, OAuth and invitations ignored it, and there was no UI to
+  enable it. The owner approved removal. There is no 2FA on any sign-in path.
+- The endpoints (account/setup_2fa, enable_2fa, disable_2fa,
+  regenerate_backup_codes), the AuthController branch and the User helpers are
+  gone. The rotp and rqrcode gems are now unused (Gemfile left alone).
+- The columns otp_enabled, otp_secret_key, backup_codes are KEPT in the table
+  and listed in User.ignored_columns until a later migration drops them. Some
+  rows still hold data encrypted with the AR_ENCRYPTION_* keys, so keep those
+  keys configured and backed up until the columns are dropped. Do not
   regenerate keys against a DB with encrypted data.
+- If 2FA comes back, build it across all four sign-in paths, not just password.
 
 ## Login activity
 All three methods log ActivityLog :login with method metadata (password /

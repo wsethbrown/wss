@@ -40,17 +40,11 @@ class AuthController < ApplicationController
     user = User.find_for_authentication(email: creds[:email].to_s)
 
     if user && user.valid_password?(creds[:password])
-      if user.otp_required_for_login?
-        # Store user_id in session for 2FA verification
-        session[:user_id_for_2fa] = user.id
-        Rails.logger.info "Password sign-in for user #{user.id}: 2FA verification required"
-        redirect_to auth_path, alert: "2FA verification required"
-      else
-        warden.set_user(user, scope: :user)
-        user.remember_me! if creds[:remember_me] == "1"
-        log_activity(:login, nil, { method: "password" })
-        redirect_to dashboard_path, notice: "Signed in successfully"
-      end
+      warden.set_user(user, scope: :user)
+      user.remember_me! if creds[:remember_me] == "1"
+      log_activity(:login, nil, { method: "password" })
+      Rails.logger.info "Password sign-in for user #{user.id}"
+      redirect_to dashboard_path, notice: "Signed in successfully"
     else
       # Security guideline: authentication failures are logged for monitoring.
       # The attempted address is not logged: it is often a typo of someone else's.

@@ -92,7 +92,7 @@ security find-generic-password -s wss-secrets-backup -w
 ```
 The Keychain copy dies with the machine — **also store the passphrase in your
 password manager** (the DR copy). The `AR_ENCRYPTION_*` trio + `master.key` are
-**UNRECOVERABLE if lost**: every user's 2FA enrollment goes with them (the
+**UNRECOVERABLE if lost**: the leftover encrypted 2FA columns (2FA itself was removed in B11) become unreadable (the
 master.key was lost once — credentials had to be regenerated). Keep offline
 copies.
 
@@ -139,7 +139,7 @@ Aug 9 first-renewal watch.
   local Unix socket that doesn't exist and the app won't boot.
 - **`.kamal/secrets` never holds values** — only `$VAR` refs; forgetting to
   `source ~/.wss-production.env` first deploys with empty secrets.
-- **Losing `AR_ENCRYPTION_*` / `master.key` = losing all 2FA data.** Run
+- **Losing `AR_ENCRYPTION_*` / `master.key` = the leftover encrypted 2FA columns become unreadable** (2FA was removed; keep the keys until a migration drops the columns). Run
   `bin/backup-secrets` and keep the passphrase in a password manager.
 - **Never re-add `ALLOW_MISSING_STRIPE`** once live keys are in — it silently
   lets payments break.

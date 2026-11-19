@@ -52,7 +52,7 @@ wss-production-launch.
   purchase states
 - wss-membership-model — free-vs-paid split, society-creation paywall,
   benefit copy source of truth, live pricing
-- wss-auth — magic links, Google/Apple OAuth, 2FA encryption keys
+- wss-auth — magic links, Google/Apple OAuth, the removed 2FA and its leftover encrypted columns
 - wss-deck-pipeline — import, slide rendering, teaser gate, Present mode
 - wss-societies — privacy model, invites, member management, creation paywall
 - wss-reviews — bottle catalog, solo + event reviews, society verdicts,

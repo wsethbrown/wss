@@ -13,6 +13,8 @@ source of truth for what's done and what's next. Key invariants established ther
   admin creates the account and emails a 14-day, single-use claim link (HMAC-digested token on dedicated
   invitation columns); accepting it signs the invitee in once, after which they use the other paths.
   There are NO hand-rolled OAuth callbacks; never add one, and never disable OAuth/JWT signature verification.
+  There is no two-factor sign-in: the half-built 2FA was removed (B11). Its columns (`otp_enabled`,
+  `otp_secret_key`, `backup_codes`) stay in the table, ignored by `User`, until a later migration drops them.
 - **Admin:** Roles are the `users.admin_role` enum (none/limited/full). `User#admin?` is true for any
   admin tier; `User#can_delete?` is true only for full (limited admins keep every admin power except
   hard-deleting records). `admin_role` is the source of truth; the old `is_admin` boolean is vestigial.
@@ -192,17 +194,6 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 - **@docs/redesign/DESIGN_SYSTEM.md** - The 2026 design system: surfaces, colour, type, components, rejected directions
 - **@docs/redesign/ARCHITECTURE_REVIEW.md** - November 2026 architecture and backend review, findings by severity
 - **@docs/redesign/TASKS.md** - The redesign and backend task list with acceptance criteria and test plans
-
-### Admin Panel Development
-**IMPORTANT**: When working on admin panel features:
-1. **Always update admin_panel_todo.md** with progress
-2. Mark completed items with [x]
-3. Add new requirements as discovered
-4. Update the "Last Updated" date
-5. Move completed phases to a "Completed" section
-6. Document any architectural decisions or changes
-
-This ensures continuity across sessions and maintains a clear development roadmap.
 
 ### Logging (STANDING RULE — applies to every change, not just debugging)
 
