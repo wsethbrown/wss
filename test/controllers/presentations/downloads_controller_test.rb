@@ -89,10 +89,6 @@ class Presentations::DownloadsControllerTest < ActionDispatch::IntegrationTest
       assert_short_lived_service_url
     end
 
-    # scorecard is not in DownloadLog's file_type list (pre-existing; reported
-    # in the B9 hand-back, the model is outside this task), so it is not asserted.
-    next if action == :scorecard
-
     test "#{action}: logs the download for the owner" do
       own("direct")
       sign_in @user
@@ -100,6 +96,23 @@ class Presentations::DownloadsControllerTest < ActionDispatch::IntegrationTest
         get download_path(action)
       end
     end
+  end
+
+  test "blank_scorecard downloads are logged" do
+    own("direct")
+    sign_in @user
+    assert_difference -> { DownloadLog.where(user: @user, file_type: "blank_scorecard").count }, 1 do
+      get download_path(:blank_scorecard)
+    end
+  end
+
+  test "a failing audit write is logged at error with ids and does not block the download" do
+    own("direct")
+    sign_in @user
+    DownloadLog.stubs(:create!).raises(ActiveRecord::RecordInvalid.new(DownloadLog.new))
+    Rails.logger.expects(:error).with(regexp_matches(/user #{@user.id} presentation #{@deck.id} file outline/))
+    get download_path(:outline)
+    assert_response :redirect
   end
 
   test "full_presentation increments the download count" do

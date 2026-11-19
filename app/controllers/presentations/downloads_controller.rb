@@ -137,6 +137,7 @@ class Presentations::DownloadsController < ApplicationController
       downloaded_at: Time.current
     )
   rescue => e
-    Rails.logger.error "Failed to track download: #{e.message}"
+    Rails.logger.error "Failed to track download: user #{current_user&.id} presentation #{@presentation&.id} " \
+                       "file #{file_type}: #{e.class}: #{e.message}"
   end
 end
