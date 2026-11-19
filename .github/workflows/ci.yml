@@ -22,6 +22,21 @@ jobs:
       - name: Scan for common Rails security vulnerabilities using static analysis
         run: bin/brakeman --no-pager
 
+  # Its own job, not a step after Brakeman: a failing Brakeman step used to skip
+  # the audit entirely, so known-CVE gems went unreported.
+  audit_gems:
+    runs-on: ubuntu-24.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
       - name: Audit gem dependencies for known CVEs
         run: |
           gem install bundler-audit
@@ -58,12 +73,13 @@ jobs:
       - name: Lint code for consistent style
         run: bin/rubocop -f github
 
+  # Production runs Postgres 15; keep CI on the same major version.
   test:
     runs-on: ubuntu-24.04
 
     services:
       postgres:
-        image: postgres:16
+        image: postgres:15
         env:
           POSTGRES_USER: postgres
           POSTGRES_PASSWORD: postgres
@@ -101,3 +117,59 @@ jobs:
       - name: Run tests
         run: bin/rails test
 
+  # System tests drive a real headless Chrome (test/application_system_test_case.rb).
+  # ubuntu-24.04 runners ship Google Chrome; Selenium Manager (bundled with
+  # selenium-webdriver) downloads the matching chromedriver on first use.
+  system_test:
+    runs-on: ubuntu-24.04
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      RAILS_ENV: test
+      DATABASE_HOST: localhost
+      DATABASE_USERNAME: postgres
+      DATABASE_PASSWORD: postgres
+      DATABASE_PORT: 5432
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install libvips for Active Storage image processing
+        run: sudo apt-get update && sudo apt-get install --no-install-recommends -y libvips
+
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: .ruby-version
+          bundler-cache: true
+
+      - name: Prepare database
+        run: bin/rails db:test:prepare
+
+      - name: Build Tailwind CSS
+        run: bin/rails tailwindcss:build
+
+      - name: Run system tests
+        run: bin/rails test:system
+
+      - name: Keep screenshots from failed system tests
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: system-test-screenshots
+          path: tmp/screenshots
+          if-no-files-found: ignore
