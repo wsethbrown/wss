@@ -42,7 +42,7 @@ scroll (`GALLERY.md`).
 
 | # | Question | Default applied |
 |---|---|---|
-| 1 | Homepage direction after the `/?design=next4` study: (a) keep the homepage and spread the glass/verdict to event and society pages, (b) the same plus a verdict section on the homepage, (c) other | Nothing built; study kept as preview |
+| 1 | ~~Homepage direction~~ **Answered:** keep the homepage; the glass (advisor's redraw from the logo) and the verdict go where their data lives, plus the homepage's fourth slide (G1) | Done in G1; `/?design=next4` kept as a study |
 | 2 | May signed-in non-members RSVP to **public** society events? | Yes (unchanged); one constant flips it: `Event::PUBLIC_EVENTS_OPEN_TO_NON_MEMBERS` |
 | 3 | Back-pay quarterly/yearly members the monthly credits `rake credits:owed` reports? | No back-pay |
 | 4 | When a direct purchase replaces a credit unlock, return the credit? | Not returned; logged |
@@ -120,6 +120,7 @@ Collected from every task; case-only changes are listed in the D11 commit.
   - "Account settings"
   - The fallback zone is America/New_York.
 - **Notifications:** screen-reader "Unread".
+- **G1 (glass):** "The table" (event attendees heading, replaces "Attending"; "Attending · N" stays below), "The verdict", "Ranked by the room.", count line "N going · N maybe · N unanswered", "+N" for seats beyond 12, sr-only "Pour N," and " out of 5".
 - **`/?design=next4` study (preview only):**
   - "RSVP for the night", "Meet the society", "On deck", "<host> presents".
   - "The pours", "The table", "The verdict", "Pour <n> took the night: <bottle>."
