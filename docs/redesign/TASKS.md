@@ -32,7 +32,7 @@ And this test plan, in addition to its own:
 
 ## Wave D0 — shared pieces (run alone, before everything else)
 
-### [ ] D0 · Shared partials and helpers — `sonnet`
+### [~] D0 · Shared partials and helpers — `sonnet`
 **Goal:** the building blocks other tasks reuse, so pages do not each invent them.
 **Owns:** `app/views/shared/*`, `app/views/presentations/_deck_card.html.erb`,
 `app/helpers/application_helper.rb`, `app/helpers/design_helper.rb` (new),
@@ -264,7 +264,7 @@ advisor, who will put it to the owner; do the rest of the task meanwhile.
 
 ## Wave B1 — close the holes (parallel; disjoint files)
 
-### [ ] B1 · Event and society authorisation — `opus`
+### [~] B1 · Event and society authorisation — `opus`
 **Findings:** S2, S8, S11, S17, S19.
 **Owns:** `app/controllers/event_rsvps_controller.rb`, `events_controller.rb`,
 `events/*_controller.rb`, `email_rsvps_controller.rb` (membership re-check only),
@@ -288,7 +288,7 @@ purge a review photo. Existing member flows still pass.
 `test/controllers/events/*`, `society_memberships_controller_test.rb`,
 `test/policies/*event*`, `test/controllers/admin/bottles/*`.
 
-### [ ] B2 · Admin powers — `opus`
+### [~] B2 · Admin powers — `opus`
 **Findings:** S1, M7/S10, M16, S16 (admin parts).
 **Owns:** `app/controllers/admin/users_controller.rb`, `admin/subscriptions_controller.rb`,
 `app/views/admin/users/edit.html.erb`, `admin/subscriptions/edit.html.erb` (field removal
@@ -307,7 +307,7 @@ leaves `users.credits` and the ledger untouched; the ledger invariant test still
 **Tests:** `test/controllers/admin/users_controller_test.rb`,
 `admin/subscriptions_controller_test.rb`, `test/models/credit_transaction_test.rb`.
 
-### [ ] B3 · Rate limits and sign-in hardening — `sonnet`
+### [~] B3 · Rate limits and sign-in hardening — `sonnet`
 **Findings:** S3, S18, S16 (sign-in log).
 **Owns:** `app/controllers/auth_controller.rb`, `magic_links_controller.rb`,
 `society_invitations_controller.rb`, `account_controller.rb` (`request_email_change`
@@ -323,7 +323,7 @@ email, and that requests after the window succeed; `Jon@X.com` signs in; a reque
 **Tests:** `test/controllers/auth_controller_test.rb`, `magic_links_controller_test.rb`,
 `test/system/magic_links_test.rb`.
 
-### [ ] B4 · Stop account deletion from doing damage — `sonnet`
+### [~] B4 · Stop account deletion from doing damage — `sonnet`
 **Findings:** M6, S9.
 **Owns:** the Devise `registrations` route options in `config/routes.rb`,
 `app/controllers/users/registrations_controller.rb`,
