@@ -527,7 +527,8 @@ Result: one `shared/_glass` (advisor's paths) and `shared/_score` (glass + numbe
 
 ## Blocked on the owner
 
-### [!] B11 · Two-factor sign-in (S7)
+### [x] B11 · Two-factor sign-in (S7) — `opus`
+Result: removed (owner go-ahead 2026-11-19): endpoints, routes and the AuthController 2FA branch gone; otp columns kept as `ignored_columns` (no migration) until production is checked; sign-in by password, magic link and OAuth tested for a user with `otp_enabled` true.
 Half-built: enabling it breaks password sign-in and every other path bypasses it.
 **[owner]** Remove it (small) or build it properly across all four sign-in paths (large)?
 Advisor's recommendation: remove now, revisit after launch. An admin "reset a member's 2FA" control is part of whatever the owner decides here (the dead admin checkbox is removed in D9c).

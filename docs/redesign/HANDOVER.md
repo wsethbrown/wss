@@ -1,9 +1,10 @@
 # Programme hand-over — 2026-11-19
 
 Branch `claude/redesign-programme`, draft PR wsethbrown/wss#37 against
-`claude/sleepy-thompson-wfneis`. Every task in `TASKS.md` is done except the
-two blocked on the owner (B11, B12). Final gates: `1172 runs, 4143 assertions,
-0 failures, 0 errors, 10 skips` (the skips are the Apple OAuth tests);
+`claude/sleepy-thompson-wfneis`. Every task in `TASKS.md` is done except B12
+(account deletion), blocked on the owner. B11 removed two-factor on 2026-11-19.
+Final gates: `1199 runs, 4346 assertions, 0 failures, 0 errors, 10 skips` (the skips
+are the Apple OAuth tests);
 `bin/rubocop` clean; Brakeman 0 errors with one warning, the Rails 8.0 end-of-life
 notice (fixed by #36). axe found no serious or critical issues on the main pages:
 36 of 36 page-and-width runs passed. 71 routes × 2 widths have no horizontal
@@ -135,7 +136,8 @@ Collected from every task; case-only changes are listed in the D11 commit.
 
 ## 5. TASKS.md items not done, and why
 
-- **B11 two-factor and B12 account deletion:** blocked on the owner (§2).
+- **B12 account deletion:** blocked on the owner (§2, Q6).
+- **Unused gems after B11:** `rotp` and `rqrcode` (no lockfile changes in this PR; remove after #36).
 - **B5 back-pay:** not done by design; `rake credits:owed` only reports.
 - **D11 full-bleed layout list:** left as a documented simplification (SECTION_NOTES §1). About a dozen views would change together.
 - **B19 dependency bump:** not done here, by the advisor's ruling; #36 does it.
