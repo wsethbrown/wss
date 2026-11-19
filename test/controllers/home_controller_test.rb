@@ -22,6 +22,20 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     assert_select "div.hm .tile", 3
   end
 
+  test "design=next2 preview renders for admins and is hidden from visitors" do
+    get root_path(design: "next2")
+    assert_response :success
+    assert_select "div.hx", 0
+
+    admin = User.create!(email: "preview-admin2@example.com", password: "password123",
+                         first_name: "Pre", last_name: "View", admin_role: :full)
+    sign_in admin
+    get root_path(design: "next2")
+    assert_response :success
+    assert_select "div.hx h1", /Every pour/
+    assert_select "div.hx .tile", 4
+  end
+
   test "should load stripe products for pricing display" do
     get root_path
     assert_response :success

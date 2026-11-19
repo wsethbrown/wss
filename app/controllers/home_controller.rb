@@ -8,15 +8,19 @@ class HomeController < ApplicationController
     # The one deck to spotlight right now: the most recently featured published deck.
     @spotlight_deck = Presentation.published.featured.recent.first
 
-    if render_next_design?
-      # Preview homepage shows real rendered slides from the newest deck that has them.
+    # Two saved previews: ?design=next (the approved direction) and
+    # ?design=next2 (the same system pushed further).
+    preview = { "next" => "index_next", "next2" => "index_next2" }[params[:design]]
+    if preview && design_preview_allowed?
+      # Real rendered slides from the newest deck that has them.
       @showcase_deck = Presentation.published.recent.joins(:slide_images_attachments).distinct.first
       # Real public data for the step tiles: the next tasting night at a public
       # society and the top-rated bottles, the same rows /reviews shows everyone.
       @next_event = Event.upcoming.joins(:society).where(societies: { is_private: false }).includes(:society).first
       @top_bottles = Bottle.with_score.where("agg.reviewers > 0").order(Arel.sql(Bottle::SORTS.fetch("top"))).limit(3)
-      Rails.logger.info "Home: rendering next-design preview (showcase deck #{@showcase_deck&.id || 'none'})"
-      render "index_next"
+      @deck_categories = Presentation.published.where.not(category: [ nil, "" ]).distinct.order(:category).limit(6).pluck(:category)
+      Rails.logger.info "Home: rendering #{preview} preview (showcase deck #{@showcase_deck&.id || 'none'})"
+      render preview
     end
   end
 
