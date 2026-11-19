@@ -186,7 +186,8 @@ panel is reachable by its existing URL/param; billing and subscription actions a
 unchanged.
 **Tests:** `test/controllers/account_controller_test.rb`, `test/system/account_navigation_test.rb`.
 
-### [~] D4b · Event edit page and events index — `sonnet` (step 3, with D8)
+### [x] D4b · Event edit page and events index — `sonnet` (step 3, with D8)
+Result: real edit form sharing `_form` with new, zone-correct prefill and unchanged round-trip (no spurious update email); events#index redirects; event delete no longer crashes.
 **Found by:** D4 (events/edit.html.erb and events/index.html.erb are scaffold stubs; "Edit this event" lands on one).
 **Owns:** `app/views/events/edit.html.erb`, `app/views/events/new.html.erb` and a new shared `events/_form` partial, `app/views/events/index.html.erb`, `app/controllers/events_controller.rb` (`edit`/`index` only), matching tests.
 **Do:** a real edit form sharing a partial with `new` (same fields, same browser-timezone conversion on update, same authorisation as today). For `events#index`: do not design a page; find whether anything links to it, and if nothing does, redirect it to the society page (routes say events live under societies) and test the redirect.
@@ -194,7 +195,8 @@ unchanged.
 
 ## Wave D2 — admin (D8 alone, then D9a and D9b in parallel)
 
-### [~] D8 · Admin shell and patterns — `opus`
+### [x] D8 · Admin shell and patterns — `opus`
+Result: green sidebar + phone top bar with native menu; `admin/shared` partials (page_header, filter_bar, table, detail_panel, form_card, status_chip, empty_state, confirm_button, stats) and AdminHelper class helpers for D9; dashboard figures identical; limited admin sees no delete controls.
 **Owns:** `app/views/layouts/admin.html.erb`, `app/views/admin/dashboard/*`,
 `app/views/admin/shared/*` (new), `app/helpers/admin_helper.rb`.
 **Do:** Keep the fixed 240px sidebar (`main.ml-60.min-w-0`), restyled: green, the sans
@@ -386,7 +388,8 @@ equals the ledger sum for every user after each scenario. The migration is rever
 **Tests:** `test/jobs/monthly_credit_job_test.rb`, `test/models/credit_transaction_test.rb`,
 `test/controllers/webhooks_controller_test.rb`, `test/controllers/admin/credits_controller_test.rb`.
 
-### [~] B6 · Webhook correctness — `opus` (after B5)
+### [x] B6 · Webhook correctness — `opus` (after B5)
+Result: current-subscription guard and fresh `Subscription.retrieve`; `processed_at` with 409 for in-flight and re-claim after 10 min; fulfilment errors 5xx; society-only from price id on the webhook path; async payments fulfilled; unique partial index on `stripe_customer_id`; status enum, `cancelled` backfilled. Remaining M10 on the checkout-return path → B6b.
 **Findings:** M3, M5, M8, M10, M15, M18, M19.
 **Owns:** `app/controllers/webhooks_controller.rb`, `app/models/stripe_event.rb`,
 `app/services/presentations/checkout_fulfillment.rb` (error propagation only),
@@ -407,7 +410,12 @@ grants no deck credit whichever event arrives first; both spellings are gone fro
 **Tests:** `test/controllers/webhooks_controller_test.rb`, `test/models/stripe_event_test.rb`,
 `test/services/presentations/checkout_fulfillment_test.rb`.
 
-### [ ] B7 · Purchase integrity — `sonnet` (after B6)
+### [~] B6b · Society-only plan on the checkout return path — `sonnet` (from B6)
+**Owns:** `app/controllers/account_controller.rb` (`ensure_welcome_credit_after_checkout` only), `app/models/user.rb` (a shared price-id → plan mapping), the webhook's plan extraction switched to that mapping, matching tests.
+**Do:** decide society-only from the retrieved subscription's price id before `grant_welcome_credit` on the return path, using one mapping shared with the webhook.
+**Acceptance:** a founding-society checkout whose return redirect lands before both webhooks grants no deck credit; a regular plan still gets the welcome credit once.
+
+### [~] B7 · Purchase integrity — `sonnet` (after B6)
 **Findings:** M2, M12, M13, M20, M21.
 **Owns:** a migration for `user_presentations`, `app/models/user_presentation.rb`,
 `presentation.rb` (associations only), `credit_transaction.rb` (`use_credit`, `readonly?`),
