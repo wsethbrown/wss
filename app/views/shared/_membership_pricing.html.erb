@@ -1,7 +1,7 @@
 <%# Plan cards, founding offer and free-vs-member comparison, used by /membership.
     Needs @stripe_products. The popular plan is the page's one .panel-ink.
     DOM contract pinned by test/integration/home_subscription_cards_test.rb:
-    #plan-cards, one h3 per plan, a "/mo" span, a "Get Started" action per plan. %>
+    #plan-cards, one h3 per plan, a "/mo" span, a "Get started" action per plan. %>
 <section id="pricing" class="scroll-mt-28">
   <h2 class="font-display text-2xl font-semibold text-ink sm:text-3xl">Choose your pour.</h2>
   <p class="mt-3 max-w-2xl text-[17px] text-mute">
@@ -17,7 +17,7 @@
         <div class="flex items-start justify-between gap-3">
           <h3 class="font-display text-xl font-semibold <%= popular ? 'text-cream' : 'text-ink' %>"><%= product[:name].gsub(' Membership', '') %></h3>
           <% if popular %>
-            <span class="inline-flex min-h-8 items-center rounded-xl border border-oak-edge bg-oak px-3 text-sm font-medium text-cream">Best Value</span>
+            <span class="inline-flex min-h-8 items-center rounded-xl border border-oak-edge bg-oak px-3 text-sm font-medium text-cream">Best value</span>
           <% end %>
         </div>
         <p class="mt-1 text-sm <%= popular ? 'text-cream/70' : 'text-mute' %>"><%=
@@ -59,10 +59,10 @@
           <% elsif user_signed_in? %>
             <%= form_with url: subscriptions_checkout_path, method: :post, local: true, data: { turbo: false } do |f| %>
               <%= f.hidden_field :price_id, value: product[:id] %>
-              <%= f.submit "Get Started", class: "btn w-full cursor-pointer #{popular ? 'bg-cream text-ink hover:bg-white' : 'btn-primary'}" %>
+              <%= f.submit "Get started", class: "btn w-full cursor-pointer #{popular ? 'bg-cream text-ink hover:bg-white' : 'btn-primary'}" %>
             <% end %>
           <% else %>
-            <%= link_to 'Get Started', auth_path,
+            <%= link_to 'Get started', auth_path,
                 class: "btn w-full #{popular ? 'bg-cream text-ink hover:bg-white' : 'btn-primary'}" %>
           <% end %>
         </div>

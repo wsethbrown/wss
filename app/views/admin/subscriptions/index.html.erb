@@ -10,7 +10,7 @@
   { label: "Avg credits/user", value: User.where(subscription_status: "active").average(:credits).to_f.round(1) }
 ] %>
 
-<%= render "admin/shared/filter_bar", url: admin_subscriptions_path, clear: admin_subscriptions_path, submit: "Apply Filters" do |form| %>
+<%= render "admin/shared/filter_bar", url: admin_subscriptions_path, clear: admin_subscriptions_path, submit: "Apply filters" do |form| %>
   <div class="sm:col-span-2">
     <%= form.label :search, "Search users", class: admin_label_class %>
     <%= form.text_field :search, value: params[:search], placeholder: "Search by name or email...", class: admin_field_class %>

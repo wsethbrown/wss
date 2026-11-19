@@ -27,7 +27,7 @@
         <!-- About Me Section -->
         <% if @user.bio.present? %>
           <div class="card p-6">
-            <h2 class="mb-4 text-xl font-semibold text-ink">About Me</h2>
+            <h2 class="mb-4 text-xl font-semibold text-ink">About me</h2>
             <p class="whitespace-pre-wrap leading-relaxed text-gray-900"><%= @user.bio %></p>
           </div>
         <% end %>
@@ -134,7 +134,7 @@
         <!-- Tags Section -->
         <% if @user.tags.any? %>
           <div class="card p-6">
-            <h2 class="mb-4 text-xl font-semibold text-ink">Interests & Expertise</h2>
+            <h2 class="mb-4 text-xl font-semibold text-ink">Interests & expertise</h2>
             <div class="space-y-4">
               <% @user.tags.group_by(&:category).each do |category, tags| %>
                 <div>

@@ -34,7 +34,7 @@ class AccountNavigationTest < ApplicationSystemTestCase
 
     assert_text "Account"
     assert_text "Profile"
-    assert_text "Account Details"
+    assert_text "Account details"
 
     # Profile tab should be active by default
     profile_tab = find('[data-tab="profile"]')
@@ -51,18 +51,18 @@ class AccountNavigationTest < ApplicationSystemTestCase
   test "clicking account details tab shows account details content" do
     sign_in_user
 
-    # Click on Account Details tab
-    click_link "Account Details"
+    # Click on Account details tab
+    click_link "Account details"
 
-    # Account Details tab should now be active
+    # Account details tab should now be active
     account_tab = find('[data-tab="account-details"]')
     assert account_tab.has_css?(".bg-ink")
     assert account_tab.has_css?(".text-white")
 
-    # Account Details content should be visible
+    # Account details content should be visible
     assert find("#account-details-content", visible: true)
-    assert_text "Email Address"
-    assert_text "Password & Security"
+    assert_text "Email address"
+    assert_text "Password & security"
 
     # Profile content should be hidden
     assert find("#profile-content", visible: false)
@@ -74,13 +74,13 @@ class AccountNavigationTest < ApplicationSystemTestCase
     # Start on Profile (default)
     assert find("#profile-content", visible: true)
 
-    # Click Account Details
-    click_link "Account Details"
+    # Click Account details
+    click_link "Account details"
     assert find("#account-details-content", visible: true)
     assert find("#profile-content", visible: false)
 
-    # Click My Presentations
-    click_link "My Presentations"
+    # Click My presentations
+    click_link "My presentations"
     assert find("#presentations-content", visible: true)
     assert find("#account-details-content", visible: false)
 
@@ -95,19 +95,19 @@ class AccountNavigationTest < ApplicationSystemTestCase
 
     # Check all tabs exist
     assert_link "Profile"
-    assert_link "Account Details"
-    assert_link "My Presentations"
+    assert_link "Account details"
+    assert_link "My presentations"
     assert_link "Subscription"
     assert_link "Billing"
-    assert_link "My Societies"
+    assert_link "My societies"
 
     # Test that each tab is clickable and changes content
     tabs = [
-      { name: "Account Details", content_id: "account-details-content" },
-      { name: "My Presentations", content_id: "presentations-content" },
+      { name: "Account details", content_id: "account-details-content" },
+      { name: "My presentations", content_id: "presentations-content" },
       { name: "Subscription", content_id: "subscription-content" },
       { name: "Billing", content_id: "billing-content" },
-      { name: "My Societies", content_id: "societies-content" }
+      { name: "My societies", content_id: "societies-content" }
     ]
 
     tabs.each do |tab|

@@ -79,7 +79,7 @@
   </div>
 
   <div class="flex flex-wrap items-center gap-3 pt-2">
-    <%= form.submit class: "btn btn-primary cursor-pointer" %>
+    <%= form.submit (form.object.new_record? ? "Create review" : "Update review"), class: "btn btn-primary cursor-pointer" %>
     <%= link_to "Cancel", bottle_path(review.bottle), class: "btn btn-secondary" %>
   </div>
 <% end %>

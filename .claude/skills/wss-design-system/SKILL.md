@@ -8,7 +8,15 @@ description: WSS visual identity, tokens, layout rules, CSS traps (sticky/overfl
 **The 2026 redesign replaced the char/amber/Fraunces system.** Source of truth:
 `docs/redesign/DESIGN_SYSTEM.md` (rules, tokens, components, rejected directions) and
 `app/assets/tailwind/application.css` (tokens). Reference implementation: the homepage,
-`app/views/home/index.html.erb`. Read the design-system doc before any UI change.
+`app/views/home/index.html.erb`. Read the design-system doc before any UI change; when this skill and the doc
+disagree, the doc wins (and the homepage beats both).
+
+## Shared pieces
+`shared/_page_header` (page title with one optional `<em>`, lede, actions, back link),
+`DesignHelper#deck_cover` (first slide → featured image → plain `bg-char`; a deck page
+with no cover drops the cover column instead) and `DesignHelper#avatar` (profile image →
+initials on `bg-whiskey-100`; never `avatar_color`). Both layouts have `lang="en"` and a
+skip link (`#main-content`, `#admin-main`).
 
 ## In one paragraph
 Warm paper ground; white rounded cards with a hairline edge and no shadow; bottle green
@@ -25,11 +33,15 @@ heading. Every visual is real product data. Sentence case, no small-caps eyebrow
    pinned presentation depends on this.
 3. **The nav floats** 12px from the top, so pages start at `pt-24`. Full-bleed pages
    (see the `full_bleed` list in `layouts/application.html.erb`) clear it themselves.
-4. **Admin layout**: fixed sidebar + `main.ml-60.min-w-0`. Never `flex-1` on main.
+4. **Admin layout**: fixed sidebar from `lg` + `main` with `lg:ml-60 min-w-0` (a top
+   bar with a menu below `lg`). Never `flex-1` on main. Admin pages use the pattern
+   partials in `app/views/admin/shared/` (see the `wss-admin` skill).
 5. **Attachments have no filename column**: order `slide_images` by `:id`.
 6. **Tailwind can't see dynamic classes** (`bg-<%= color %>-50`). Never interpolate.
 7. **A global `.btn` exists.** Don't reuse that class name for a page-scoped style.
-8. **Rebuild CSS** after touching `application.css`: `bin/rails tailwindcss:build`
+8. **Turbo ignores `data-confirm`.** Use `data: { turbo_confirm: ... }` (on the form for
+   `button_to`: `form: { data: { turbo_confirm: ... } }`).
+9. **Rebuild CSS** after touching `application.css`: `bin/rails tailwindcss:build`
    (the dev Procfile watcher does it; a bare `rails server` does not).
 
 ## Copy
@@ -43,5 +55,5 @@ gradient text, blur blobs; skeuomorphism (shelves, spines, plaques); hard offset
 shadows; title-on-a-box deck covers.
 
 ## Design studies kept for reference
-`/?design=next` and `/?design=next2` render two earlier homepage studies (admin-only in
-production). The owner asked to keep them; do not delete without asking.
+`/?design=next`, `/?design=next2` and `/?design=next4` render earlier homepage studies
+(admin-only in production). The owner asked to keep them; do not delete without asking.

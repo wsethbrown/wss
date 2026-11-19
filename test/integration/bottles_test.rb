@@ -79,7 +79,10 @@ class BottlesTest < ActionDispatch::IntegrationTest
     get bottle_path(bottles(:eagle_rare))
     assert_response :success
     assert_match "4.25", response.body # true average of 4.0 and 4.5
-    assert_select "span[aria-label=\"4.25 out of 5\"]", text: "★★★★½"
+    label = css_select("span.sr-only").find { |el| el.text == "4.25 out of 5" }
+    assert label, "the rating carries its value as text"
+    stars = label.parent.css("svg[data-star]").map { |svg| svg["data-star"] }
+    assert_equal %w[full full full full half], stars
   end
 
   test "a review has its own page, publicly readable and linked from the feed" do

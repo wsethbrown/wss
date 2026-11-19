@@ -105,10 +105,10 @@ export default class extends Controller {
       if (lines > TEASER_LINES) {
         const marker = document.createElement("p")
         marker.dataset.storyChaptersTarget = "marker"
-        marker.className = "flex items-center gap-3 text-xs font-semibold uppercase tracking-wide text-whiskey-700"
+        marker.className = "flex items-center gap-3 text-sm font-medium text-mute"
         const rule = () => {
           const span = document.createElement("span")
-          span.className = "h-px flex-1 bg-whiskey-300"
+          span.className = "h-px flex-1 bg-hairline"
           return span
         }
         marker.append(rule(), "The free teaser fades out here, everything below is buyers-only", rule())

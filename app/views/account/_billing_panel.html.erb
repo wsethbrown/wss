@@ -19,7 +19,7 @@
         <p class="text-sm text-mute">
           You don't have any billing history yet. Start a subscription to manage
           billing here.
-          <%= link_to "View plans", "#subscription", class: "font-medium text-ink underline", data: { tab_link: "subscription" } %>
+          <%= link_to "View plans", account_path(anchor: "subscription"), class: "font-medium text-ink underline", data: { tab_link: "subscription" } %>
         </p>
       <% end %>
     </div>

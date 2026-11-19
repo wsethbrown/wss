@@ -3,14 +3,14 @@
     by style.
 
     tone: :dark switches to a lighter palette for use on the char surface — the
-    default mid-tone browns are drawn for a paper ground and go muddy on dark. %>
+    default greens are drawn for a paper ground and disappear on dark. %>
 <% dark = local_assigns[:tone] == :dark %>
 <% tint = case bottle.style.to_s.downcase
-   when /bourbon|rye/ then dark ? "#d9ab74" : "#a05c28"
-   when /scotch|malt|peat/ then dark ? "#c9b79f" : "#6b5744"
+   when /bourbon|rye/ then dark ? "#f6f4ee" : "#16332a"
+   when /scotch|malt|peat/ then dark ? "#dedccf" : "#2f5546"
    when /irish/ then dark ? "#c2cf9b" : "#7a8a4f"
-   when /cocktail/ then dark ? "#e0947c" : "#b0563a"
-   else dark ? "#cbb79c" : "#8a6b4f"
+   when /cocktail/ then dark ? "#ecebe3" : "#1d4034"
+   else dark ? "#dedccf" : "#5f6b64"
    end %>
 <svg viewBox="0 0 60 120" class="<%= local_assigns.fetch(:size, 'h-24') %> w-auto" role="img" aria-label="<%= bottle.name %>">
   <g fill="none" stroke="<%= tint %>" stroke-width="2.5" stroke-linejoin="round">

@@ -4,9 +4,11 @@
   <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put, class: "space-y-5" }) do |f| %>
     <%= render "devise/shared/error_messages", resource: resource %>
 
+    <%# The email changes only through the account page (B8), so it is shown, not edited. %>
     <div>
-      <%= f.label :email, class: "mb-1.5 block text-sm font-medium text-gray-900" %>
-      <%= f.email_field :email, autofocus: true, autocomplete: "email", class: "block w-full rounded-2xl border border-hairline bg-white px-4 py-3 text-base text-gray-900 focus:border-ink focus:outline-none focus:ring-2 focus:ring-ink/30" %>
+      <p class="mb-1.5 block text-sm font-medium text-gray-900">Email</p>
+      <p class="rounded-2xl border border-hairline bg-paper px-4 py-3 text-base text-gray-900"><%= resource.email %></p>
+      <p class="mt-1.5 text-sm text-mute">To change your email address, use the Email address section of your <%= link_to "account page", account_path(anchor: "account-details"), class: "font-medium text-ink underline" %>.</p>
     </div>
 
     <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>

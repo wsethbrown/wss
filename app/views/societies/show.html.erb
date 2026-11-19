@@ -66,9 +66,9 @@
       <!-- Upcoming events -->
       <section class="card overflow-hidden">
         <div class="<%= card_head %> flex items-center justify-between gap-3">
-          <h2 class="text-xl font-semibold text-ink">Upcoming Events</h2>
+          <h2 class="text-xl font-semibold text-ink">Upcoming events</h2>
           <% if my_membership&.admin? || my_membership&.officer? %>
-            <%= link_to "Create New Event", new_society_event_path(@society), class: "btn btn-primary" %>
+            <%= link_to "Create new event", new_society_event_path(@society), class: "btn btn-primary" %>
           <% end %>
         </div>
         <% if @upcoming_events.any? %>
@@ -100,7 +100,7 @@
       <!-- Past events -->
       <% if @past_events.any? %>
         <section class="card overflow-hidden">
-          <div class="<%= card_head %>"><h2 class="text-xl font-semibold text-ink">Past Events</h2></div>
+          <div class="<%= card_head %>"><h2 class="text-xl font-semibold text-ink">Past events</h2></div>
           <div class="divide-y divide-hairline">
             <% @past_events.each do |event| %>
               <%= link_to society_event_path(@society, event), class: row_link do %>
@@ -164,7 +164,7 @@
 
       <!-- About -->
       <section class="card overflow-hidden">
-        <div class="<%= card_head %>"><h2 class="text-xl font-semibold text-ink">About This Society</h2></div>
+        <div class="<%= card_head %>"><h2 class="text-xl font-semibold text-ink">About this society</h2></div>
         <div class="p-6">
           <%# The long-form story; older societies without one fall back to
               the short blurb so the section never goes blank. %>
@@ -301,9 +301,9 @@
       <!-- Leave society (members only; admins cannot leave) -->
       <% if my_membership && !my_membership.admin? %>
         <section class="card p-6">
-          <%= button_to "Leave Society", leave_society_path(@society),
+          <%= button_to "Leave society", leave_society_path(@society),
               method: :delete,
-              data: { confirm: "Are you sure you want to leave this society? This action cannot be undone." },
+              form: { data: { turbo_confirm: "Are you sure you want to leave this society? This action cannot be undone." } },
               class: "btn w-full cursor-pointer border border-red-200 bg-red-50 text-red-700 hover:bg-red-100" %>
         </section>
       <% end %>

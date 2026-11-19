@@ -6,7 +6,13 @@ description: WSS admin panel — structure, layout traps, credit-adjustment rule
 # WSS Admin
 
 ## Structure
-Char sidebar shell (layouts/admin.html.erb): Dashboard · Decks · Bottles ·
+Green (`bg-char`) sidebar shell (layouts/admin.html.erb, links in
+`admin/shared/_nav`; the current section gets `bg-oak` plus a thin `bg-mark` bar
+and `aria-current`). Below `lg` the sidebar becomes a sticky top bar with a
+`<details>` menu. Pages are built from the pattern partials in `admin/shared/`
+(page header, filter bar, table, detail panel, form card, stats, status chip,
+empty state, confirm button), each documented at its top. Status chips use three
+tones only: ok / attention / problem. Sections: Dashboard · Decks · Bottles ·
 Reviews (analytics) · Moderation · Users · Subscriptions · Credits
 (+ /transactions ledger view) · Activity · Analytics.
 
@@ -36,11 +42,14 @@ admin minus HARD-DELETE rights: the deck + review admin destroy actions call
 organizers keep deleting their OWN records). Delete buttons hide for limited admins.
 
 ## Layout traps
-- Fixed sidebar + `main.ml-60.min-w-0`. NEVER flex-1 on main (overflows the
-  viewport by the 240px sidebar width — clipped buttons/columns).
+- Fixed sidebar + `main` with `lg:ml-60 min-w-0` (no margin below `lg`, where the
+  sidebar is a top bar). NEVER flex-1 on main (overflows the viewport by the
+  240px sidebar width — clipped buttons/columns).
+- The layout has `lang="en"` and a skip link to `#admin-main`. There are no
+  breadcrumbs any more (the old `shared/_admin_breadcrumbs` render was removed;
+  each page's header carries its back link).
 - Stylesheets: "tailwind" + "application" (a `:app` typo once shipped the
   whole panel unstyled).
-- EasyMDE CSS is CDN-linked in the admin layout head.
 
 ## Rules with teeth
 - **Credits are never edited on the user form.** The edit page shows balance
@@ -72,9 +81,9 @@ ActivityLog is CURATED, not a firehose:
 The form mirrors the buyer page top to bottom — seven numbered sections in the
 exact order buyers scroll them, each annotated "Appears on:". The sticky right
 rail ("The buyer page / What renders now") recomputes per render: green = will
-render, gray = section hidden because empty (takeaways/tasting/pours hide when
-blank), red = blocks the sale (missing pitch line or deck file), amber = slides
-(automatic). Keep that rail honest — if you add a buyer-page section, add its
+render (`bg-ink`), pale = section hidden because empty (takeaways/tasting/pours
+hide when blank), red (`bg-rsvp-no`) = blocks the sale (missing pitch line or
+deck file), mid green (`bg-whiskey-400`) = slides (automatic). No amber. Keep that rail honest — if you add a buyer-page section, add its
 rail row and its form section in page order.
 
 Design rules learned the hard way:
@@ -98,6 +107,7 @@ serializes back into the hidden content field — the server format never
 changed, and EasyMDE was removed with it (controller, importmap pin, CDN CSS,
 and the server preview route all deleted; "Preview as buyer" is the preview).
 
-The amber marker between cards shows where the free teaser cuts off. It
+The marker between cards (a sentence-case `text-mute` line between two
+hairlines, no small caps) shows where the free teaser cuts off. It
 mirrors `PresentationsHelper#preview_markdown` (first 24 SOURCE lines) — if
 that number changes, change `TEASER_LINES` in the Stimulus controller too.

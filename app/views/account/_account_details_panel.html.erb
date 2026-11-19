@@ -2,13 +2,13 @@
         <div id="account-details-content" class="tab-content hidden">
           <div class="space-y-6">
             <div>
-              <h2 class="font-display text-2xl font-semibold text-ink">Account Details</h2>
+              <h2 class="font-display text-2xl font-semibold text-ink">Account details</h2>
               <p class="mt-1 text-mute">Manage your account settings and security</p>
             </div>
             
             <!-- Email Section -->
             <div class="card p-6">
-              <h3 class="mb-4 text-xl font-semibold text-ink">Email Address</h3>
+              <h3 class="mb-4 text-xl font-semibold text-ink">Email address</h3>
               <div class="space-y-4">
                 <div>
                   <p class="text-sm text-mute">Current email address</p>
@@ -30,14 +30,14 @@
                     <%= f.label :new_email, "New email address", class: "mb-1.5 block text-sm font-medium text-ink" %>
                     <%= f.email_field :new_email, class: "block w-full rounded-2xl border border-hairline bg-white px-4 py-3 text-base text-gray-900 focus:outline-none focus:ring-2 focus:ring-ink/30", placeholder: "new.email@example.com" %>
                   </div>
-                  <%= f.submit "Change Email", class: "btn btn-primary min-h-11 cursor-pointer" %>
+                  <%= f.submit "Change email", class: "btn btn-primary min-h-11 cursor-pointer" %>
                 <% end %>
               </div>
             </div>
             
             <!-- Password Section -->
             <div class="card p-6">
-              <h3 class="mb-4 text-xl font-semibold text-ink">Password &amp; Security</h3>
+              <h3 class="mb-4 text-xl font-semibold text-ink">Password &amp; security</h3>
               
               <% if current_user.passwordless_only? %>
                 <div class="bg-paper border border-hairline rounded-2xl p-4 mb-4">
@@ -74,7 +74,7 @@
             
             <!-- Sign In Methods -->
             <div class="card p-6">
-              <h3 class="mb-4 text-xl font-semibold text-ink">Sign In Methods</h3>
+              <h3 class="mb-4 text-xl font-semibold text-ink">Sign in methods</h3>
               <div class="space-y-3">
                 <% if current_user.provider == 'google_oauth2' %>
                   <div class="flex items-center justify-between gap-3 rounded-2xl bg-paper px-4 py-3">

@@ -38,6 +38,14 @@ class Users::RegistrationsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, contact_path
   end
 
+  test "edit page shows the email read-only and points to the account page" do
+    get edit_user_registration_path
+    assert_response :success
+    assert_select "input[name='user[email]']", count: 0
+    assert_includes response.body, @user.email
+    assert_select "a[href=?]", account_path(anchor: "account-details")
+  end
+
   # B8 (S6): the email is the sign-in credential; it changes only through the
   # account page's confirm-from-the-new-mailbox flow, never here.
   test "the Devise account update cannot change the email" do

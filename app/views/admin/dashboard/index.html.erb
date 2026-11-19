@@ -59,7 +59,7 @@
     <% end %>
     <%= admin_td(align: :right) do %>
       <% if purchase.purchase_type == "direct" %>
-        <span class="font-semibold">$<%= purchase.purchase_price.to_i %></span>
+        <span class="font-semibold tabular-nums"><%= number_to_currency(purchase.purchase_price) %></span>
       <% else %>
         <%= render "admin/shared/status_chip", label: "Credit", tone: :attention %>
       <% end %>
@@ -74,7 +74,7 @@
         <span class="step-marker"><%= @popular_presentations.to_a.index(presentation) + 1 %></span>
         <span class="min-w-0">
           <%= link_to presentation.title, admin_presentation_path(presentation), class: "block truncate font-medium text-ink hover:underline underline-offset-4" %>
-          <span class="block text-xs text-mute tabular-nums">$<%= presentation.user_presentations.where(purchase_type: "direct").sum(:purchase_price).to_i %></span>
+          <span class="block text-xs text-mute tabular-nums"><%= number_to_currency(presentation.user_presentations.where(purchase_type: "direct").sum(:purchase_price)) %></span>
         </span>
       </span>
     <% end %>

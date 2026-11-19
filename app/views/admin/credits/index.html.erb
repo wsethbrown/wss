@@ -2,7 +2,7 @@
 
 <%= render "admin/shared/page_header", title: "Credits", lede: "Manage user credits and view transaction history" do %>
   <%= link_to "Credit ledger", transactions_admin_credits_path, class: "btn btn-secondary" %>
-  <%= button_to "Grant Monthly Credits", grant_monthly_admin_credits_path, method: :post,
+  <%= button_to "Grant monthly credits", grant_monthly_admin_credits_path, method: :post,
       data: { turbo_confirm: "Grant 1 credit to all active subscribers?" }, class: "btn btn-primary cursor-pointer" %>
 <% end %>
 
@@ -14,7 +14,7 @@
 
 <%# Filters are a GET form and must not sit inside the bulk-add POST form below
     (nested forms are invalid HTML), so they come first. %>
-<%= render "admin/shared/filter_bar", url: admin_credits_path, clear: admin_credits_path, submit: "Apply Filters" do |filter_form| %>
+<%= render "admin/shared/filter_bar", url: admin_credits_path, clear: admin_credits_path, submit: "Apply filters" do |filter_form| %>
   <div class="sm:col-span-2">
     <%= filter_form.label :search, "Search users", class: admin_label_class %>
     <%= filter_form.text_field :search, value: params[:search], placeholder: "Search by name or email...", class: admin_field_class %>
@@ -43,7 +43,7 @@
       <% [ 1, 5, 10 ].each do |n| %>
         <button type="button" onclick="document.getElementById('credits_to_add').value = <%= n %>" class="btn btn-secondary min-h-11 py-2.5">+<%= n %></button>
       <% end %>
-      <%= form.submit "Add Credits to Selected Users", class: "btn btn-primary min-h-11 cursor-pointer py-2.5" %>
+      <%= form.submit "Add credits to selected users", class: "btn btn-primary min-h-11 cursor-pointer py-2.5" %>
     </div>
   <% end %>
 

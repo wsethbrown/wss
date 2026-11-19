@@ -29,11 +29,11 @@ class AccountNavigationTest < ActionDispatch::IntegrationTest
 
     # Check all navigation tabs are present
     assert_select '[data-tab="profile"]', text: /Profile/
-    assert_select '[data-tab="account-details"]', text: /Account Details/
-    assert_select '[data-tab="presentations"]', text: /My Presentations/
+    assert_select '[data-tab="account-details"]', text: /Account details/
+    assert_select '[data-tab="presentations"]', text: /My presentations/
     assert_select '[data-tab="subscription"]', text: /Subscription/
     assert_select '[data-tab="billing"]', text: /Billing/
-    assert_select '[data-tab="societies"]', text: /My Societies/
+    assert_select '[data-tab="societies"]', text: /My societies/
   end
 
   test "account page contains all tab content sections" do
@@ -71,9 +71,9 @@ class AccountNavigationTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     # Check account details content
-    assert_select "#account-details-content", text: /Account Details/
-    assert_select "#account-details-content", text: /Email Address/
-    assert_select "#account-details-content", text: /Password & Security/
+    assert_select "#account-details-content", text: /Account details/
+    assert_select "#account-details-content", text: /Email address/
+    assert_select "#account-details-content", text: /Password & security/
     # Substring match: the container holds much more text than just the email.
     assert_select "#account-details-content", text: /#{Regexp.escape(@user.email)}/
   end

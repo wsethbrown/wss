@@ -7,6 +7,20 @@
     Preloading the slide attachments lets deck_cover pick the first slide without
     a query per deck; owned ids replace a purchased_by? query per card. %>
 <% ActiveRecord::Associations::Preloader.new(records: decks, associations: [ { slide_images_attachments: :blob }, { featured_image_attachment: :blob } ]).call if decks.any? %>
+<%# Default order pins featured decks first. A featured deck with no cover (no
+    slides, no featured image) is never pinned above a deck that has one: it moves
+    to just after the last deck with a cover on this page. %>
+<% if params[:sort].blank? && decks.any?(&:featured?) %>
+  <% has_cover = decks.index_with { |d| deck_cover_attachment(d).present? } %>
+  <% last_covered = decks.rindex { |d| has_cover[d] } %>
+  <% if last_covered %>
+    <% pulled = decks.first(last_covered).select { |d| d.featured? && !has_cover[d] } %>
+    <% if pulled.any? %>
+      <% rest = decks - pulled %>
+      <% decks = rest.insert(rest.rindex { |d| has_cover[d] } + 1, *pulled) %>
+    <% end %>
+  <% end %>
+<% end %>
 <% owned_ids = user_signed_in? && decks.any? ? current_user.user_presentations.where(presentation_id: decks.map(&:id)).pluck(:presentation_id).to_set : Set.new %>
 
 <div class="mx-auto w-full max-w-6xl px-4 pb-20">

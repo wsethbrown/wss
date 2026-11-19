@@ -51,6 +51,16 @@ class FeaturedDecksTest < ActionDispatch::IntegrationTest
     assert_operator @response.body.index("Featured Deck"), :<, @response.body.index("Plain Deck")
   end
 
+  test "a featured deck with no cover is not pinned above a deck with one" do
+    covered = published_deck(title: "Covered Deck")
+    covered.featured_image.attach(io: StringIO.new(file_fixture_png), filename: "cover.png", content_type: "image/png")
+    published_deck(title: "Bare Featured Deck", featured: true)
+
+    get presentations_path
+    assert_response :success
+    assert_operator @response.body.index("Covered Deck"), :<, @response.body.index("Bare Featured Deck")
+  end
+
   test "an admin can toggle featured from the deck form" do
     deck = published_deck(title: "Toggle Me")
     sign_in users(:admin)
@@ -60,5 +70,12 @@ class FeaturedDecksTest < ActionDispatch::IntegrationTest
 
     patch admin_presentation_path(deck), params: { presentation: { featured: "0" } }
     assert_not deck.reload.featured?, "expected the deck to be un-featured"
+  end
+
+  private
+
+  # A 1x1 PNG, enough for an attachment to count as a cover.
+  def file_fixture_png
+    Base64.decode64("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==")
   end
 end

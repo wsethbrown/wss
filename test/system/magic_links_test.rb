@@ -110,6 +110,6 @@ class MagicLinksTest < ApplicationSystemTestCase
     assert_text "Successfully signed in with magic link!"
 
     # Verify user is actually signed in by checking for sign out link
-    assert_link "Sign Out"
+    assert_link "Sign out"
   end
 end

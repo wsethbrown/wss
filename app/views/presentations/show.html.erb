@@ -52,9 +52,11 @@
     </p>
   <% end %>
 
-  <!-- Header: title and meta beside the cover -->
+  <!-- Header: title and meta beside the cover. A deck with no slides and no
+       featured image has no cover, so the text takes the full width. -->
+  <% cover_image = slide_list.first || (@presentation.featured_image if @presentation.featured_image.attached?) %>
   <header class="grid gap-8 md:grid-cols-12 md:items-center">
-    <div class="min-w-0 md:col-span-5">
+    <div class="min-w-0 <%= cover_image ? 'md:col-span-5' : 'md:col-span-8' %>">
       <h1 class="font-display text-4xl font-semibold text-ink sm:text-5xl"><%= @presentation.title %></h1>
       <% meta = [@presentation.category.presence, @presentation.difficulty.presence, @presentation.duration_label.presence,
                  (slide_list.any? ? "#{slide_list.size} slides" : nil)].compact %>
@@ -65,9 +67,11 @@
         <p class="mt-5 whitespace-pre-line text-[17px] leading-relaxed text-gray-900"><%= @presentation.description %></p>
       <% end %>
     </div>
-    <div class="md:col-span-7">
-      <%= deck_cover @presentation, preloaded: slide_list.first, alt: "#{@presentation.title}, first slide" %>
-    </div>
+    <% if cover_image %>
+      <div class="md:col-span-7">
+        <%= deck_cover @presentation, preloaded: cover_image, alt: "#{@presentation.title}, first slide" %>
+      </div>
+    <% end %>
   </header>
 
   <!-- The action bar: price or ownership, and the page's main action -->

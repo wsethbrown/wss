@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
   <head>
     <title><%= content_for(:title) || "Whiskey Share Society" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -125,6 +125,7 @@
   </head>
 
   <body class="bg-paper text-gray-900 min-h-screen font-sans">
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:fixed focus:left-3 focus:top-3 focus:z-[60] focus:rounded-xl focus:bg-white focus:px-4 focus:py-2 focus:text-sm focus:font-semibold focus:text-ink">Skip to content</a>
     <!-- Top Navigation Bar -->
     <%# A floating rounded bar, inset from the viewport edges. Solid, not glass. %>
     <nav class="fixed left-1/2 top-3 z-50 w-[min(1240px,calc(100%-1.5rem))] -translate-x-1/2 rounded-[22px] bg-char shadow-[0_10px_30px_-12px_rgba(22,51,42,0.45)]">
@@ -162,17 +163,11 @@
                 <% end %>
               <% end %>
               <%= link_to account_path, class: "flex items-center gap-2 text-cream/90 hover:text-cream transition" do %>
-                <% if current_user.profile_image.attached? %>
-                  <%= image_tag current_user.profile_image, class: "h-8 w-8 rounded-full object-cover border border-oak-edge", alt: current_user.full_name %>
-                <% else %>
-                  <div class="h-8 w-8 rounded-full flex items-center justify-center text-white font-semibold text-sm border border-oak-edge" style="background-color: <%= current_user.avatar_color %>">
-                    <%= current_user.initials %>
-                  </div>
-                <% end %>
+                <%= avatar(current_user, size: 32, class: "border border-oak-edge") %>
                 <span class="hidden sm:inline font-medium">Account</span>
               <% end %>
               <div class="h-6 w-px bg-oak-edge"></div>
-              <%= link_to 'Sign Out', destroy_user_session_path, data: { 'turbo-method': :delete, 'turbo-confirm': 'Are you sure you want to sign out?' }, class: 'text-cream/50 hover:text-red-400 transition' %>
+              <%= link_to 'Sign out', destroy_user_session_path, data: { 'turbo-method': :delete, 'turbo-confirm': 'Are you sure you want to sign out?' }, class: 'text-cream/70 hover:text-cream transition' %>
             </div>
           <% else %>
             <%= nav_link_to 'Sign in', auth_path %>
@@ -201,7 +196,7 @@
                 <% end %>
               <% end %>
               <%= link_to 'Account', account_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
-              <%= link_to 'Sign Out', destroy_user_session_path, data: { 'turbo-method': :delete, 'turbo-confirm': 'Are you sure you want to sign out?' }, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/60 hover:bg-oak' %>
+              <%= link_to 'Sign out', destroy_user_session_path, data: { 'turbo-method': :delete, 'turbo-confirm': 'Are you sure you want to sign out?' }, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/70 hover:bg-oak' %>
             <% else %>
               <%= link_to 'Sign in', auth_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
               <%= link_to 'Join the Society', auth_path, class: 'mt-1 block rounded-xl bg-cream px-4 py-2.5 text-center font-semibold text-char hover:bg-white' %>
@@ -234,11 +229,11 @@
       <%# No top padding here: every full-bleed page opens with a char masthead
           that clears the fixed nav itself (pt-16/pt-28). Layout padding on top
           of that rendered as a white strip above the masthead. %>
-      <main class="min-h-[80vh] w-full">
+      <main id="main-content" class="min-h-[80vh] w-full">
         <%= yield %>
       </main>
     <% else %>
-      <main class="max-w-6xl mx-auto px-4 min-h-[80vh] pt-24 pb-16">
+      <main id="main-content" class="max-w-6xl mx-auto px-4 min-h-[80vh] pt-24 pb-16">
         <%= yield %>
       </main>
     <% end %>
@@ -260,7 +255,7 @@
             </p>
           </div>
           <div>
-            <h3 class="eyebrow text-cream/50 mb-5">Explore</h3>
+            <h3 class="eyebrow text-cream/70 mb-5">Explore</h3>
             <ul class="space-y-3">
               <li><%= link_to 'Societies', societies_path, class: 'text-cream/80 hover:text-cream transition-colors' %></li>
               <li><%= link_to 'Decks', presentations_path, class: 'text-cream/80 hover:text-cream transition-colors' %></li>
@@ -269,7 +264,7 @@
             </ul>
           </div>
           <div>
-            <h3 class="eyebrow text-cream/50 mb-5">Account</h3>
+            <h3 class="eyebrow text-cream/70 mb-5">Account</h3>
             <ul class="space-y-3">
               <% if user_signed_in? %>
                 <li><%= link_to 'My account', account_path, class: 'text-cream/80 hover:text-cream transition-colors' %></li>
@@ -283,10 +278,10 @@
         </div>
         <div class="rule-double text-cream/60 mb-6"></div>
         <div class="flex flex-col md:flex-row justify-between items-center gap-3">
-          <p class="text-cream/40 text-sm">
+          <p class="text-cream/70 text-sm">
             © <%= Date.current.year %> Whiskey Share Society. All rights reserved.
           </p>
-          <p class="eyebrow text-cream/30">Est. 2019</p>
+          <p class="eyebrow text-cream/70">Est. 2019</p>
         </div>
       </div>
     </footer>

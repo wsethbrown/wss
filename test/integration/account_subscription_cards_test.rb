@@ -67,16 +67,16 @@ class AccountSubscriptionCardsTest < ActionDispatch::IntegrationTest
     get account_path
     assert_response :success
 
-    assert_select "span", text: /Best Value/
+    assert_select "span", text: /Best value/
   end
 
-  test "account subscription cards have Get Started buttons" do
+  test "account subscription cards have Get started buttons" do
     @user.update!(stripe_subscription_id: nil)
 
     get account_path
     assert_response :success
 
-    assert_select "#plan-cards input[type='submit'][value='Get Started']", count: 3
+    assert_select "#plan-cards input[type='submit'][value='Get started']", count: 3
   end
 
   test "account chooser shows the shared membership benefits once, not per card" do

@@ -9,7 +9,7 @@
     value: (@most_common_activity ? (ActivityLog::ACTIVITY_TYPES[@most_common_activity[0].to_sym] || @most_common_activity[0].humanize) : "No activities yet") }
 ] %>
 
-<%= render "admin/shared/filter_bar", url: admin_activities_path, clear: admin_activities_path, submit: "Apply Filters" do |form| %>
+<%= render "admin/shared/filter_bar", url: admin_activities_path, clear: admin_activities_path, submit: "Apply filters" do |form| %>
   <div>
     <%= form.label :search, "Search", class: admin_label_class %>
     <%= form.text_field :search, value: params[:search], placeholder: "Search activities...", class: admin_field_class %>

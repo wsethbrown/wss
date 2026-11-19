@@ -28,10 +28,10 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     # The marker is content, not a CSS class: one chip, inside the yearly card.
-    assert_select "#plan-cards span", text: /Best Value/, count: 1
+    assert_select "#plan-cards span", text: /Best value/, count: 1
     yearly = css_select("#plan-cards > div").find { |card| card.at_css("h3")&.text&.strip == "Yearly" }
     assert yearly, "expected a yearly plan card"
-    assert_match(/Best Value/, yearly.text)
+    assert_match(/Best value/, yearly.text)
   end
 
   test "home page shows the free-vs-membership split, not per-plan feature ladders" do
@@ -65,13 +65,13 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
     assert_select "#plan-cards > div h3", count: 3
   end
 
-  test "subscription cards have Get Started buttons" do
+  test "subscription cards have Get started buttons" do
     get membership_path
     assert_response :success
 
-    # Check for CTA buttons (scoped to the pricing grid; "Get Started" also
+    # Check for CTA buttons (scoped to the pricing grid; "Get started" also
     # appears in hero/CTA copy elsewhere on the marketing page).
-    assert_select "#plan-cards a", text: /Get Started/, count: 3
+    assert_select "#plan-cards a", text: /Get started/, count: 3
 
     # Check that buttons link to auth page
     assert_select "#plan-cards a[href='#{auth_path}']", count: 3

@@ -92,6 +92,8 @@ Rules:
 - **Icons**: inline SVG, 1.8 stroke, `currentColor`. No emoji as icons.
 - **Deck covers**: the deck's first rendered slide (`slide_images.order(:id).first`), else
   its `featured_image`, else a plain `bg-char` block. Never the title typed on a box.
+  The deck page drops its cover column when there is no cover; the plain block is for
+  library cards only.
 - **Avatars**: profile image, else initials on `bg-whiskey-100 text-ink`. Not `avatar_color`.
 
 ## Layout
@@ -105,7 +107,7 @@ Rules:
 - Phone first: every page must be usable at 390px with **no horizontal scroll**
   (`document.documentElement.scrollWidth === 390`). Tap targets at least 44px.
 - CSS traps, still true: no `overflow-x: hidden` or `height: 100%` on `body`/`main`
-  (breaks `position: sticky`); the admin `main` is `ml-60 min-w-0`, never `flex-1`;
+  (breaks `position: sticky`); the admin `main` is `lg:ml-60 min-w-0`, never `flex-1`;
   order `slide_images` by `:id`.
 
 ## Motion

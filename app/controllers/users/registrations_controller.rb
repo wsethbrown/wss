@@ -31,7 +31,7 @@ class Users::RegistrationsController < Devise::RegistrationsController
     return if Auth::EmailChangeService.normalize(submitted) == Auth::EmailChangeService.normalize(current_user.email)
 
     Rails.logger.warn "[Account] Email change through registration update refused for user #{current_user.id}; use the account page"
-    redirect_to account_path, alert: "To change your email address, use the Email Address section of your account page."
+    redirect_to account_path, alert: "To change your email address, use the Email address section of your account page."
   end
 
   def configure_sign_up_params

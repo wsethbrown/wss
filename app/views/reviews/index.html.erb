@@ -101,7 +101,7 @@
           <%# Switching feeds drops the society filter, it only means something
               inside Tasting nights. %>
           <%= link_to label, reviews_path(request.query_parameters.except("society").merge(feed: key).compact_blank) + "#tastings",
-              class: "chip", "aria-pressed": (@feed == key).to_s %>
+              class: "chip", "aria-current": (@feed == key ? "true" : nil) %>
         <% end %>
       </div>
 

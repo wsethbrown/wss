@@ -8,7 +8,7 @@
 
     <!-- Profile Photo Section -->
     <div class="card p-6">
-      <h3 class="mb-4 text-xl font-semibold text-ink">Profile Photo</h3>
+      <h3 class="mb-4 text-xl font-semibold text-ink">Profile photo</h3>
       <div class="flex flex-col gap-5 sm:flex-row sm:items-center">
         <%= avatar current_user, size: 96 %>
 
@@ -16,7 +16,7 @@
           <%= form_with url: account_avatar_path, method: :patch, multipart: true, class: "inline-block" do |f| %>
             <%= f.file_field :profile_image, accept: "image/*", class: "hidden", id: "profile-image-upload", onchange: "this.form.submit();" %>
             <label for="profile-image-upload" class="btn btn-secondary min-h-11 cursor-pointer">
-              Upload Photo
+              Upload photo
             </label>
           <% end %>
 
@@ -29,7 +29,7 @@
 
     <!-- Basic Info Section -->
     <div class="card p-6">
-      <h3 class="mb-4 text-xl font-semibold text-ink">Basic Information</h3>
+      <h3 class="mb-4 text-xl font-semibold text-ink">Basic information</h3>
       <%= form_with model: current_user, url: account_profile_path, method: :patch, class: "space-y-4", id: "profile-form" do |f| %>
         <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
           <div>
@@ -43,7 +43,7 @@
         </div>
 
         <div>
-          <%= f.label :bio, "About Me", class: "mb-1.5 block text-sm font-medium text-ink" %>
+          <%= f.label :bio, "About me", class: "mb-1.5 block text-sm font-medium text-ink" %>
           <%= f.text_area :bio, rows: 4, class: "block w-full rounded-2xl border border-hairline bg-white px-4 py-3 text-base text-gray-900 focus:outline-none focus:ring-2 focus:ring-ink/30", placeholder: "Tell others about your whiskey journey..." %>
         </div>
 
@@ -53,8 +53,8 @@
         </div>
 
         <div class="flex flex-wrap gap-3 pt-2">
-          <%= f.submit "Save Profile", class: "btn btn-primary min-h-11 cursor-pointer" %>
-          <%= link_to "See my Profile", profile_path(current_user), class: "btn btn-secondary min-h-11", target: "_blank" %>
+          <%= f.submit "Save profile", class: "btn btn-primary min-h-11 cursor-pointer" %>
+          <%= link_to "See my profile", profile_path(current_user), class: "btn btn-secondary min-h-11", target: "_blank" %>
         </div>
       <% end %>
     </div>

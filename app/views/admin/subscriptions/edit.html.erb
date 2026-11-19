@@ -65,7 +65,7 @@
       <% end %>
 
       <div class="flex flex-wrap items-center gap-3">
-        <%= form.submit "Save Changes", class: "btn btn-primary cursor-pointer" %>
+        <%= form.submit "Save changes", class: "btn btn-primary cursor-pointer" %>
         <%= link_to "Cancel", admin_subscriptions_path, class: "btn btn-secondary" %>
       </div>
     </div>
@@ -79,13 +79,13 @@
       <h2 class="mb-4 text-xl font-semibold text-ink">Quick actions</h2>
       <div class="flex flex-wrap gap-3">
         <% if @user.subscription_status == "active" %>
-          <%= button_to "Pause Subscription", pause_admin_subscription_path(@user), method: :post,
+          <%= button_to "Pause subscription", pause_admin_subscription_path(@user), method: :post,
               data: { turbo_confirm: "Pause subscription for #{@user.full_name}?" }, class: "btn btn-secondary cursor-pointer" %>
           <%= render "admin/shared/confirm_button", label: "Cancel Subscription", url: cancel_admin_subscription_path(@user),
                      method: :post, variant: :button,
                      confirm: "Cancel subscription for #{@user.full_name}? This will cancel immediately." %>
         <% else %>
-          <%= button_to "Resume Subscription", resume_admin_subscription_path(@user), method: :post,
+          <%= button_to "Resume subscription", resume_admin_subscription_path(@user), method: :post,
               data: { turbo_confirm: "Resume subscription for #{@user.full_name}?" }, class: "btn btn-primary cursor-pointer" %>
         <% end %>
       </div>
