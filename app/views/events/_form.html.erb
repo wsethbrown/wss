@@ -1,0 +1,136 @@
+<%# Shared by events#new and events#edit.
+    Locals:
+      event        (Event)
+      society      (Society, optional)
+      submit_label (String)
+      creating     (Boolean) true on new/create: shows the society, deck and host fields, which
+                   only create accepts (update ignores them; the host is assigned from the event page).
+      cancel_path  (String)
+    Times are written in the request's time zone (the browser_timezone cookie, set by an
+    around_action), to the minute, exactly the shape EventsController#update parses back. %>
+<%= form_with(model: [society, event].compact, local: true, html: { class: "space-y-8" }) do |form| %>
+  <% if event.errors.any? %>
+    <div class="rounded-2xl bg-red-50 p-5">
+      <h3 class="mb-2 text-sm font-semibold text-red-700">Please fix the following:</h3>
+      <ul class="list-inside list-disc space-y-1 text-sm text-red-700">
+        <% event.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <!-- Society Selection (if not pre-selected; an existing event never moves society) -->
+  <% if creating && !event.society_id %>
+    <div>
+      <%= form.label :society_id, class: "mb-2 block text-sm font-medium text-gray-900" do %>
+        Society <span class="text-mute">*</span>
+      <% end %>
+      <%= form.collection_select :society_id,
+          current_user.administered_societies,
+          :id, :name,
+          { prompt: "Select a society..." },
+          { class: "w-full rounded-2xl border border-hairline bg-white px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-ink/30" } %>
+      <p class="mt-1 text-sm text-mute">Choose which society this event belongs to.</p>
+    </div>
+  <% elsif creating %>
+    <%= form.hidden_field :society_id %>
+  <% end %>
+
+  <!-- Event Title -->
+  <div>
+    <%= form.label :title, class: "mb-2 block text-sm font-medium text-gray-900" do %>
+      Event title <span class="text-mute">*</span>
+    <% end %>
+    <%= form.text_field :title,
+        class: "w-full rounded-2xl border border-hairline bg-white px-4 py-3 text-gray-900 placeholder:text-mute/80 focus:outline-none focus:ring-2 focus:ring-ink/30",
+        placeholder: "e.g., Highland Scotch Tasting, Bourbon & BBQ Night" %>
+    <p class="mt-1 text-sm text-mute">Give your event a compelling title that captures what makes it special.</p>
+  </div>
+
+  <!-- Event Description -->
+  <div>
+    <%= form.label :description, class: "mb-2 block text-sm font-medium text-gray-900" %>
+    <%= form.text_area :description, rows: 5,
+        class: "w-full resize-none rounded-2xl border border-hairline bg-white px-4 py-3 text-gray-900 placeholder:text-mute/80 focus:outline-none focus:ring-2 focus:ring-ink/30",
+        placeholder: "Describe what attendees can expect, what whiskies will be featured, any special guests, food pairings, etc..." %>
+    <p class="mt-1 text-sm text-mute">Help members understand what makes this event worth attending.</p>
+  </div>
+
+  <% if creating %>
+  <!-- The deck (optional by owner rule; nights without a WSS deck are first-class) -->
+  <% deck_choices = Presentation.published.where(author_id: [society&.creator_id, current_user.id].compact.uniq) %>
+  <% if deck_choices.any? %>
+    <div>
+      <%= form.label :presentation_id, "The deck (optional)", class: "mb-2 block text-sm font-medium text-gray-900" %>
+      <%= form.collection_select :presentation_id, deck_choices, :id, :title,
+          { include_blank: "No deck for this night" },
+          { class: "w-full rounded-2xl border border-hairline bg-white px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-ink/30" } %>
+      <p class="mt-1 text-sm text-mute">Attach the deck this night presents. Plenty of nights run without one.</p>
+    </div>
+  <% end %>
+
+  <!-- Host (member match = real host; anything else = guest presenter) -->
+  <div>
+    <%= form.label :host_query, "Host (optional)", class: "mb-2 block text-sm font-medium text-gray-900" %>
+    <input type="text" name="event[host_query]" id="event_host_query" list="member-names"
+           value="<%= params.dig(:event, :host_query) %>" placeholder="Who runs the night?"
+           class="w-full rounded-2xl border border-hairline bg-white px-4 py-3 text-gray-900 placeholder:text-mute/80 focus:outline-none focus:ring-2 focus:ring-ink/30">
+    <% if society %>
+      <datalist id="member-names">
+        <% society.society_memberships.where(status: "active").includes(:user).map(&:user).uniq.each do |member| %>
+          <option value="<%= member.full_name %>"></option>
+        <% end %>
+      </datalist>
+    <% end %>
+    <p class="mt-1 text-sm text-mute">A member's name makes them the host, with the host powers (RSVP replies, the pour list). Any other name is kept as a guest presenter.</p>
+  </div>
+
+  <% end %>
+
+  <!-- Location -->
+  <div>
+    <%= form.label :location, class: "mb-2 block text-sm font-medium text-gray-900" %>
+    <%= form.text_field :location, data: { controller: "location-autocomplete" },
+        class: "w-full rounded-2xl border border-hairline bg-white px-4 py-3 text-gray-900 placeholder:text-mute/80 focus:outline-none focus:ring-2 focus:ring-ink/30",
+        placeholder: "e.g., The Whiskey Bar, 123 Main St, or Virtual (Zoom)" %>
+    <p class="mt-1 text-sm text-mute">Where will your event take place? Include address or virtual meeting details.</p>
+  </div>
+
+  <!-- Date and Time (flatpickr; end auto-fills to start + 3 hours) -->
+  <div class="grid grid-cols-1 gap-6 md:grid-cols-2" data-controller="event-times">
+    <div>
+      <%= form.label :start_time, class: "mb-2 block text-sm font-medium text-gray-900" do %>
+        Start date &amp; time <span class="text-mute">*</span>
+      <% end %>
+      <%= form.datetime_local_field :start_time, value: event.start_time&.strftime("%Y-%m-%dT%H:%M"), data: { event_times_target: "start" },
+          class: "w-full rounded-2xl border border-hairline bg-white px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-ink/30" %>
+      <p class="mt-1 text-sm text-mute">When does the event begin?</p>
+    </div>
+
+    <div>
+      <%= form.label :end_time, class: "mb-2 block text-sm font-medium text-gray-900" do %>
+        End date &amp; time <span class="text-mute">*</span>
+      <% end %>
+      <%= form.datetime_local_field :end_time, value: event.end_time&.strftime("%Y-%m-%dT%H:%M"), data: { event_times_target: "end" },
+          class: "w-full rounded-2xl border border-hairline bg-white px-4 py-3 text-gray-900 focus:outline-none focus:ring-2 focus:ring-ink/30" %>
+      <p class="mt-1 text-sm text-mute">Fills in three hours after the start; adjust if the night runs long.</p>
+    </div>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="flex flex-col gap-4 pt-2 sm:flex-row">
+    <%= form.submit submit_label,
+        class: "btn-primary flex-1 cursor-pointer text-base" %>
+    <%= link_to "Cancel", cancel_path,
+        class: "btn-secondary flex-1 text-base" %>
+  </div>
+
+  <% if creating %>
+  <!-- Organizer Note -->
+  <div class="rounded-[18px] bg-paper p-5">
+    <h3 class="mb-1 text-sm font-semibold text-ink">Event organizer</h3>
+    <p class="text-sm text-mute">You'll be set as the organizer of this event and can manage RSVPs and edit details.</p>
+  </div>
+  <% end %>
+<% end %>

@@ -6,17 +6,18 @@ class EventsController < ApplicationController
   before_action :set_event, only: [ :show, :edit, :update, :destroy, :assign_host, :assign_deck,
                                    :deck_options, :host_options, :mention_options ]
   after_action :verify_authorized, except: :index
-  after_action :verify_policy_scoped, only: :index
 
+  # Nothing links to a standalone events list (the society page already lists
+  # its events), so the index just sends people back to the society, or to the
+  # societies list when no society is named.
   def index
-    @events = policy_scope(Event).includes(:society, :organizer, :event_rsvps)
-                   .search(params[:search])
-                   .by_society(params[:society_id])
-                   .order(:start_time)
-                   .page(params[:page])
-
-    @events = @events.upcoming if params[:filter] == "upcoming"
-    @events = @events.past if params[:filter] == "past"
+    if params[:society_id].present?
+      Rails.logger.info "Events index requested for society #{params[:society_id]} by #{current_user ? "user #{current_user.id}" : 'a signed-out visitor'}; redirecting to the society page"
+      redirect_to society_path(params[:society_id])
+    else
+      Rails.logger.info "Events index requested with no society by #{current_user ? "user #{current_user.id}" : 'a signed-out visitor'}; redirecting to societies"
+      redirect_to societies_path
+    end
   end
 
   def show
@@ -92,8 +93,8 @@ class EventsController < ApplicationController
     if browser_timezone.present? && (params[:event][:start_time].present? || params[:event][:end_time].present?)
       Time.use_zone(browser_timezone) do
         updated_params = updated_params.merge(
-          start_time: params[:event][:start_time].present? ? Time.zone.parse(params[:event][:start_time]) : @event.start_time,
-          end_time: params[:event][:end_time].present? ? Time.zone.parse(params[:event][:end_time]) : @event.end_time
+          start_time: submitted_time(params[:event][:start_time], @event.start_time),
+          end_time: submitted_time(params[:event][:end_time], @event.end_time)
         )
       end
     end
@@ -217,10 +218,13 @@ class EventsController < ApplicationController
 
   def destroy
     authorize @event
+    society = @event.society
 
     if @event.destroy
-      redirect_to events_url, notice: "Event was successfully deleted."
+      Rails.logger.info "Event #{@event.id} deleted by user #{current_user.id} (society #{society.id})"
+      redirect_to society_path(society), notice: "Event was successfully deleted."
     else
+      Rails.logger.warn "Event #{@event.id} delete by user #{current_user.id} failed: #{@event.errors.full_messages.to_sentence}"
       redirect_to society_event_path(@event.society, @event), alert: @event.errors.full_messages.to_sentence
     end
   end
@@ -229,6 +233,17 @@ class EventsController < ApplicationController
 
   def set_event
     @event = Event.find(params[:id])
+  end
+
+  # The edit form shows times to the minute, so a stored 7:30:42 comes back as
+  # 7:30. Keep the stored value when nothing else changed, otherwise an
+  # untouched save would count as a time change and email every yes-RSVP.
+  # Must run inside the browser-zone block.
+  def submitted_time(raw, current)
+    return current if raw.blank?
+    parsed = Time.zone.parse(raw)
+    return current if parsed && current && parsed == current.change(sec: 0)
+    parsed
   end
 
   # The creation form's host field is one input: an active-member name match
