@@ -196,6 +196,22 @@ class User < ApplicationRecord
     subscription_plan == "founding_society"
   end
 
+  # ---- Subscription status (B6 / M19) ---------------------------------------
+  # Stripe's subscription statuses, in Stripe's spelling (US "canceled"). The
+  # webhook once wrote "cancelled" while the admin screens counted "canceled",
+  # splitting cancelled members across two values. "paused" is also what the
+  # in-app pause writes locally. Prefixed so the generated helpers
+  # (subscription_status_active?, User.subscription_status_canceled) never
+  # collide with subscription_active? or the `active` scope.
+  SUBSCRIPTION_STATUSES = %w[incomplete incomplete_expired trialing active past_due canceled unpaid paused].freeze
+  enum :subscription_status, SUBSCRIPTION_STATUSES.index_with(&:itself),
+       prefix: true, validate: { allow_nil: true }
+
+  # Older code paths and rows used the British spelling; store Stripe's.
+  def subscription_status=(value)
+    super(value.to_s == "cancelled" ? "canceled" : value)
+  end
+
   # Admin role tiers, assigned via console. `full` can do everything including
   # hard-deleting records; `limited` is a full admin minus delete rights; `none`
   # is a normal user. admin_role is the single source of truth for admin access.
@@ -395,7 +411,7 @@ class User < ApplicationRecord
       subscription_paused? ? "Paused" : "Active"
     when "paused"
       "Paused"
-    when "cancelled"
+    when "canceled"
       "Cancelled"
     when "past_due"
       "Past Due"

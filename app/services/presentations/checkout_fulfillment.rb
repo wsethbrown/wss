@@ -13,7 +13,12 @@ module Presentations
   class CheckoutFulfillment
     # Returns the UserPresentation (new or pre-existing), or nil when the
     # session isn't a paid deck purchase.
-    def self.fulfill!(session, expected_user: nil)
+    #
+    # raise_errors: the webhook passes true so an unexpected error (a database
+    # blip mid-grant) propagates, the webhook answers 5xx, releases its claim
+    # and Stripe retries. The return path leaves it false: the buyer's page
+    # must not error, and the webhook remains the backstop.
+    def self.fulfill!(session, expected_user: nil, raise_errors: false)
       metadata = session.respond_to?(:metadata) ? session.metadata : session["metadata"]
       user_id = metadata && (metadata["user_id"] || metadata[:user_id])
       presentation_id = metadata && (metadata["presentation_id"] || metadata[:presentation_id])
@@ -68,7 +73,8 @@ module Presentations
       Rails.logger.info "Checkout #{session_id}: concurrent fulfillment won the race; deck already granted"
       UserPresentation.find_by(user_id: user_id, presentation_id: presentation_id)
     rescue => e
-      Rails.logger.error "Checkout #{session_id} fulfillment failed for user #{user_id}, presentation #{presentation_id}: #{e.class}: #{e.message}"
+      Rails.logger.error "Checkout #{session_id} fulfillment failed for user #{user_id}, presentation #{presentation_id}: #{e.class}: #{e.message}#{' (re-raising for a Stripe retry)' if raise_errors}"
+      raise if raise_errors
       nil
     end
 

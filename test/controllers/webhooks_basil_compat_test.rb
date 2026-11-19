@@ -31,7 +31,7 @@ class WebhooksBasilCompatTest < ActionDispatch::IntegrationTest
       }
     }.to_json
 
-    post webhooks_stripe_path, params: payload, headers: signed_headers(payload)
+    post_subscription_event(payload)
 
     assert_response :success
     @user.reload
@@ -56,7 +56,7 @@ class WebhooksBasilCompatTest < ActionDispatch::IntegrationTest
       }
     }.to_json
 
-    post webhooks_stripe_path, params: payload, headers: signed_headers(payload)
+    post_subscription_event(payload)
 
     assert_response :success
     @user.reload
@@ -78,7 +78,7 @@ class WebhooksBasilCompatTest < ActionDispatch::IntegrationTest
         items: { data: [ { id: "si_1", current_period_end: @period_end, price: { id: ENV["STRIPE_MONTHLY_PRICE_ID"] } } ] }
       } }
     }.to_json
-    post webhooks_stripe_path, params: created, headers: signed_headers(created)
+    post_subscription_event(created)
     assert_response :success
     assert_equal 0, @user.reload.credits.to_i, "no credit while incomplete"
 
@@ -132,6 +132,16 @@ class WebhooksBasilCompatTest < ActionDispatch::IntegrationTest
   end
 
   private
+
+  # B6: subscription handlers write state from a fresh retrieve, not the
+  # payload. Hand back the payload's own object so the shape under test (basil
+  # or legacy) is still what the handler reads.
+  def post_subscription_event(payload)
+    object = JSON.parse(payload)["data"]["object"]
+    Stripe::Subscription.stub(:retrieve, Stripe::Subscription.construct_from(object)) do
+      post webhooks_stripe_path, params: payload, headers: signed_headers(payload)
+    end
+  end
 
   # handle_payment_succeeded re-fetches the subscription via the API; hand it
   # a hash (the handler's try/[] reads cover both object shapes).
