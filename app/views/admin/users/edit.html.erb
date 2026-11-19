@@ -55,19 +55,6 @@
         <%= link_to "Adjust via the credit ledger →", adjust_admin_credit_path(@user), class: "mt-3 inline-flex min-h-11 items-center #{admin_link_class}" %>
       </section>
 
-      <%# NOTE (D9b): these two checkboxes are not permitted params and do nothing.
-          Kept as they were; reported to the owner as dead controls. %>
-      <%= render "admin/shared/form_card", title: "Admin actions" do %>
-        <label class="flex min-h-11 items-center gap-3">
-          <%= check_box_tag :reset_password, "1", false, class: "h-4 w-4 rounded border-hairline text-ink focus:ring-ink/30" %>
-          <span class="text-sm text-gray-900">Send password reset email</span>
-        </label>
-        <label class="flex min-h-11 items-center gap-3">
-          <%= check_box_tag :disable_2fa, "1", false, class: "h-4 w-4 rounded border-hairline text-ink focus:ring-ink/30" %>
-          <span class="text-sm text-gray-900">Disable two-factor authentication</span>
-        </label>
-      <% end %>
-
       <div class="flex flex-wrap items-center gap-3">
         <%= form.submit "Save Changes", class: "btn btn-primary cursor-pointer" %>
         <%= link_to "Cancel", admin_user_path(@user), class: "btn btn-secondary" %>
@@ -138,13 +125,17 @@
 
             <p class="mb-3 text-sm font-medium text-ink">Create New Subscription:</p>
             <div class="grid grid-cols-1 gap-4 md:grid-cols-3">
-              <% [ [ "Monthly", "$19.99", "/mo", "monthly" ], [ "Quarterly", "$38.97", "/3mo", "quarterly" ], [ "Yearly", "$131.88", "/yr", "yearly" ] ].each do |name, price, per, plan| %>
+              <%# Labels come from SubscriptionProducts (same source as /membership); the create action charges by Stripe price id. %>
+              <% billed = { "monthly" => "monthly", "quarterly" => "quarterly", "yearly" => "annually" } %>
+              <% SubscriptionProducts.all.select { |p| billed.key?(p[:id].to_s) }.each do |product| %>
+                <% plan = product[:id].to_s; name = plan.capitalize; price = number_to_currency(product[:price] / 100.0) %>
                 <div class="rounded-[18px] border border-hairline p-4">
                   <div class="mb-2 flex items-center justify-between gap-2">
                     <h3 class="font-medium text-ink"><%= name %></h3>
                     <% if plan == "quarterly" %><%= render "admin/shared/status_chip", label: "Popular", tone: :attention %><% end %>
                   </div>
-                  <p class="mb-3 font-display text-2xl font-semibold tabular-nums text-ink"><%= price %><span class="text-sm font-normal text-mute"><%= per %></span></p>
+                  <p class="mb-3 font-display text-2xl font-semibold tabular-nums text-ink"><%= price %><span class="text-sm font-normal text-mute">/mo</span></p>
+                  <p class="mb-3 -mt-2 text-sm text-mute">billed <%= billed[plan] %></p>
                   <%= button_to "Create #{name}", admin_create_subscription_path, method: :post,
                       params: { user_id: @user.id, plan: plan },
                       data: { turbo_confirm: "Create a #{plan} subscription for #{@user.full_name}?" },

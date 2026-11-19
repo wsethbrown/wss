@@ -108,4 +108,25 @@ class Admin::UsersControllerTest < ActionDispatch::IntegrationTest
     get edit_admin_user_path(users(:john))
     assert_select "input[name='user[email]']", 0
   end
+
+  # D9c: plan cards must show live prices (same source as /membership), and the
+  # dead "admin actions" checkboxes must be gone.
+  test "edit page shows the same plan prices as /membership and no dead checkboxes" do
+    user = users(:john)
+    user.update_columns(stripe_customer_id: "cus_test_d9c")
+    empty = Struct.new(:data).new([])
+    Stripe::Subscription.stubs(:list).returns(empty)
+
+    sign_in users(:limited_admin)
+    get edit_admin_user_path(user)
+    assert_response :success
+    SubscriptionProducts.all.each do |product|
+      label = ActionController::Base.helpers.number_to_currency(product[:price] / 100.0)
+      assert_includes response.body, label
+    end
+    assert_no_match(/19\.99|38\.97|131\.88/, response.body)
+    assert_select "input[name='reset_password']", 0
+    assert_select "input[name='disable_2fa']", 0
+    assert_select "form[action=?]", admin_create_subscription_path, 3
+  end
 end
