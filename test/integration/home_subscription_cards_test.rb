@@ -23,12 +23,15 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
     assert_select "span", text: "$10.99"  # Yearly
   end
 
-  test "home page highlights a best-value plan" do
+  test "exactly one plan is marked best value, and it is the yearly plan" do
     get membership_path
     assert_response :success
 
-    # One highlighted plan (yearly — the lowest per-month cost).
-    assert_select "span", text: /Best Value/
+    # The marker is content, not a CSS class: one chip, inside the yearly card.
+    assert_select "#plan-cards span", text: /Best Value/, count: 1
+    yearly = css_select("#plan-cards > div").find { |card| card.at_css("h3")&.text&.strip == "Yearly" }
+    assert yearly, "expected a yearly plan card"
+    assert_match(/Best Value/, yearly.text)
   end
 
   test "home page shows the free-vs-membership split, not per-plan feature ladders" do
@@ -39,6 +42,7 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
     assert_select "#plan-cards ul", count: 0
     assert_select "p", text: "Free with any account"
     assert_select "p", text: "Membership adds"
+    assert_select "li", text: /Join any public society/, count: 1
     assert_select "li", text: /Join any public society/
     assert_select "li", text: /One deck credit every month/
   end
@@ -48,19 +52,17 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     # Check for savings badges
-    assert_select "div", text: /Save 19%/
-    assert_select "div", text: /Save 31%/
+    assert_select "#plan-cards", text: /Save 19%/
+    assert_select "#plan-cards", text: /Save 31%/
   end
 
-  test "subscription cards have brand card styling" do
+  test "there are three plan cards, one per plan, in a single plan grid" do
     get membership_path
     assert_response :success
 
-    # Plan cards are white label-style cards; the popular plan is set off with a
-    # whiskey border (see app/views/home/index.html.erb pricing section).
-    assert_select "div.rounded-3xl", minimum: 3
-    assert_select "div.shadow-xl", minimum: 3
-    assert_select "#plan-cards div.border-whiskey-400", count: 1
+    assert_select "#plan-cards", count: 1
+    assert_select "#plan-cards > div", count: 3
+    assert_select "#plan-cards > div h3", count: 3
   end
 
   test "subscription cards have Get Started buttons" do
@@ -84,12 +86,14 @@ class HomeSubscriptionCardsTest < ActionDispatch::IntegrationTest
     assert_select "#plan-cards span", text: "/mo", count: 3
   end
 
-  test "subscription cards are responsive with 3-column grid" do
+  test "signed-in non-members get a checkout form per plan, not a sign-in link" do
+    sign_in users(:john)
     get membership_path
     assert_response :success
 
-    # Check for responsive grid classes
-    assert_select "div.grid.grid-cols-1.md\\:grid-cols-3", count: 1
+    assert_select "#plan-cards form[action='#{subscriptions_checkout_path}']", count: 3
+    assert_select "#plan-cards input[name='price_id']", count: 3
+    assert_select "#plan-cards a[href='#{auth_path}']", count: 0
   end
 
   test "subscription cards show proper plan descriptions" do

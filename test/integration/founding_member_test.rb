@@ -85,7 +85,7 @@ class FoundingMemberTest < ActionDispatch::IntegrationTest
   test "the membership page shows the founding offers while slots remain" do
     get membership_path
     assert_response :success
-    assert_match(/The first fifty/, @response.body)
+    assert_match(/the first fifty/i, @response.body)
     assert_match(/Founding Society/, @response.body)
     assert_match(/Founding Monthly/, @response.body)
     assert_match(/50 of 50 founding spots left/, @response.body)
