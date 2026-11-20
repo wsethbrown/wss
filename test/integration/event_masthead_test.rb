@@ -187,6 +187,9 @@ class EventMastheadTest < ActionDispatch::IntegrationTest
   test "a signed-out visitor is pointed at a sign-in that exists" do
     get society_event_path(@society, @event)
     assert_response :success
-    assert_select "a[href=?]", new_user_session_path
+    # The sign-in link carries the event page so sign-in returns here.
+    assert_select "a[href=?]", auth_path(return_to: society_event_path(@society, @event))
+    get auth_path(return_to: society_event_path(@society, @event))
+    assert_response :success
   end
 end

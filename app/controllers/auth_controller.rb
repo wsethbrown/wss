@@ -20,7 +20,11 @@ class AuthController < ApplicationController
              with: -> { rate_limit_response("ip") }
 
   def unified
-    redirect_to root_path if user_signed_in?
+    if user_signed_in?
+      redirect_to(ReturnPath.sanitize(params[:return_to]) || root_path)
+      return
+    end
+    remember_return_to(params[:return_to])
   end
 
   # The password path asks for the email first (it reuses the magic-link
@@ -44,7 +48,7 @@ class AuthController < ApplicationController
       user.remember_me! if creds[:remember_me] == "1"
       log_activity(:login, nil, { method: "password" })
       Rails.logger.info "Password sign-in for user #{user.id}"
-      redirect_to dashboard_path, notice: "Signed in successfully"
+      redirect_to after_sign_in_path_for(user), notice: "Signed in successfully"
     else
       # Security guideline: authentication failures are logged for monitoring.
       # The attempted address is not logged: it is often a typo of someone else's.

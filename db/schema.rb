@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_19_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_20_235242) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -624,6 +624,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_160000) do
     t.datetime "invitation_sent_at"
     t.datetime "invitation_accepted_at"
     t.bigint "invited_by_id"
+    t.string "magic_link_return_to"
     t.index ["admin_role"], name: "index_users_on_admin_role"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["email_change_token"], name: "index_users_on_email_change_token", unique: true

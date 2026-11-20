@@ -54,6 +54,11 @@
       <div id="magic-link-form">
         <%= form_with url: magic_links_path, local: true, class: "space-y-3",
                       data: { turbo: "false" } do |f| %>
+          <%# A magic link is often opened in another browser, so the page to
+              return to travels with the request and is stored with the token. %>
+          <% if pending_return_path %>
+            <%= hidden_field_tag :return_to, pending_return_path, id: nil %>
+          <% end %>
           <div>
             <label for="magic-link-email" class="sr-only">Email address</label>
             <%# text-center matches the centered button label below it. %>

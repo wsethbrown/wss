@@ -40,7 +40,7 @@
                else
                  'Purchase'
                end %>
-<% get_path = user_signed_in? ? new_presentation_purchase_path(@presentation) : auth_path %>
+<% get_path = user_signed_in? ? new_presentation_purchase_path(@presentation) : sign_in_path_returning %>
 
 <%# Purchase outcomes are real flashes (overlay toasts from the layout), set by
     PresentationsController#handle_checkout_return. %>

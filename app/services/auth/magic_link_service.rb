@@ -16,14 +16,22 @@ module Auth
       end
     end
 
+    # A consumed link: the user to sign in and the same-site path the link was
+    # requested from (nil when there was none). Magic links are often opened
+    # later, in another browser, so the path travels with the token on the
+    # server (users.magic_link_return_to, or the new-user cache entry), never
+    # in the link itself.
+    Redemption = Struct.new(:user, :return_to, keyword_init: true)
+
     # --- Delivery -----------------------------------------------------------
 
-    def self.deliver(email)
-      new(email).deliver
+    def self.deliver(email, return_to: nil)
+      new(email, return_to: return_to).deliver
     end
 
-    def initialize(email)
+    def initialize(email, return_to: nil)
       @email = email.to_s.strip.downcase
+      @return_to = ReturnPath.sanitize(return_to)
     end
 
     def deliver
@@ -35,10 +43,12 @@ module Auth
       user = User.find_by(email: @email)
 
       if user
-        user.update!(magic_link_token: self.class.digest(raw), magic_link_sent_at: Time.current)
+        user.update!(magic_link_token: self.class.digest(raw), magic_link_sent_at: Time.current,
+                     magic_link_return_to: @return_to)
         UserMailer.magic_link_email(user, raw).deliver_later
+        Rails.logger.info "Magic link sent to user #{user.id}#{' with a return path' if @return_to}"
       else
-        Rails.cache.write(self.class.cache_key(self.class.digest(raw)), { email: @email }, expires_in: EXPIRY)
+        Rails.cache.write(self.class.cache_key(self.class.digest(raw)), { email: @email, return_to: @return_to }, expires_in: EXPIRY)
         UserMailer.magic_link_registration_email(@email, raw).deliver_later
       end
 
@@ -49,6 +59,12 @@ module Auth
 
     # Returns a persisted User to sign in, or nil if the token is invalid/expired.
     def self.consume(raw_token)
+      redeem(raw_token)&.user
+    end
+
+    # Returns a Redemption (user + return path), or nil if the token is
+    # invalid/expired. The return path is re-checked on the way out.
+    def self.redeem(raw_token)
       return nil if raw_token.blank?
 
       token_digest = digest(raw_token)
@@ -56,18 +72,20 @@ module Auth
       # Existing-user path.
       user = User.find_by(magic_link_token: token_digest)
       if user&.magic_link_sent_at && user.magic_link_sent_at > EXPIRY.ago
-        user.update!(magic_link_token: nil, magic_link_sent_at: nil)
-        return user
+        return_to = user.magic_link_return_to
+        user.update!(magic_link_token: nil, magic_link_sent_at: nil, magic_link_return_to: nil)
+        return Redemption.new(user: user, return_to: ReturnPath.sanitize(return_to))
       end
 
       # New-user registration path (token held in cache).
       data = Rails.cache.read(cache_key(token_digest))
       if data && data[:email].present?
         Rails.cache.delete(cache_key(token_digest))
-        return User.find_or_create_by!(email: data[:email]) do |u|
+        user = User.find_or_create_by!(email: data[:email]) do |u|
           u.password = SecureRandom.alphanumeric(24)
           u.password_set_manually = false
         end
+        return Redemption.new(user: user, return_to: ReturnPath.sanitize(data[:return_to]))
       end
 
       nil
