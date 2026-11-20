@@ -189,8 +189,33 @@ class Event < ApplicationRecord
     (end_time - start_time) / 1.hour
   end
 
+  # The RSVP window (owner decision, November 2026). Answers can be given,
+  # changed or withdrawn until the event starts. A NEW yes (from someone not
+  # currently at yes) closes YES_CUTOFF before the start to protect the
+  # headcount, except for events created less than YES_CUTOFF before their
+  # start ("drinks tonight"), which take yeses until they start.
+  YES_CUTOFF = 24.hours
+
+  # Every answer is closed: the night has started.
   def rsvp_closed?
-    start_time <= 24.hours.from_now
+    start_time <= Time.current
+  end
+
+  # Whether the last-day cutoff applies to this event at all.
+  def yes_cutoff_applies?
+    created_at.nil? || start_time - created_at >= YES_CUTOFF
+  end
+
+  # A new yes can no longer be given (maybe and no still can, until the start).
+  def new_yes_closed?
+    rsvp_closed? || (yes_cutoff_applies? && start_time <= YES_CUTOFF.from_now)
+  end
+
+  # Whether moving from current_status to status is allowed right now.
+  def answer_allowed?(status, current_status = nil)
+    return false if rsvp_closed?
+    return true unless status.to_s == "yes"
+    current_status.to_s == "yes" || !new_yes_closed?
   end
 
   # OWNER DECISION POINT (B1, Nov 2026): may signed-in NON-members RSVP to

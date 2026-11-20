@@ -2,7 +2,7 @@
 #   event_created  -> society members when a new event is posted
 #   rsvp_received  -> the organizer when someone responds (note included)
 #   event_updated  -> yes-RSVPs when time or location changes
-#   event_reminder -> yes-RSVPs 24 hours before start
+#   event_reminder -> yes and maybe RSVPs 48 hours before start
 # Every recipient is filtered on User#event_emails (the account-page mute)
 # by the enqueuing jobs; templates keep to the magic-link email's plain style.
 class EventMailer < ApplicationMailer
@@ -35,7 +35,7 @@ class EventMailer < ApplicationMailer
     @user = user
     @event = event
     @rsvp_urls = rsvp_urls(user, event)
-    mail_with_unsubscribe(user, event, subject: "Tomorrow: #{event.title}")
+    mail_with_unsubscribe(user, event, subject: "#{event.start_date_label}: #{event.title}")
   end
 
   private

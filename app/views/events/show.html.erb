@@ -72,17 +72,11 @@
           Edit is an organiser's tool and sits quietly at the bottom. %>
       <div class="card w-full p-5 sm:p-6 lg:w-[380px] lg:shrink-0">
         <% if user_signed_in? %>
+          <%# Answers stay open until the start; a new yes closes 24 hours out
+              (Event#answer_allowed?), which the control shows by disabling Yes. %>
           <% if @event.upcoming? && !@event.rsvp_closed? %>
             <% user_rsvp = @event.event_rsvps.find_by(user: current_user) %>
             <%= render "rsvp_buttons", event: @event, user_rsvp: user_rsvp %>
-          <% elsif @event.upcoming? %>
-            <% user_rsvp = @event.event_rsvps.find_by(user: current_user) %>
-            <p class="text-sm text-mute">
-              <% if user_rsvp %>
-                You said <span class="font-semibold text-ink"><%= user_rsvp.status %></span>.
-              <% end %>
-              RSVPs closed 24 hours before the night.
-            </p>
           <% else %>
             <p class="text-sm text-mute">This night has passed.</p>
           <% end %>

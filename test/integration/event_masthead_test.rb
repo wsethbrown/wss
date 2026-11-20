@@ -174,10 +174,14 @@ class EventMastheadTest < ActionDispatch::IntegrationTest
     get society_event_path(@society, @event)
     assert_select "#event-rsvp-buttons", count: 1
 
-    @event.update_columns(start_time: 6.hours.from_now, end_time: 8.hours.from_now)
+    # Inside the last day of a night announced earlier: the control stays (maybe
+    # and can't make it are open until the start) but a new yes is closed.
+    @event.update_columns(start_time: 6.hours.from_now, end_time: 8.hours.from_now, created_at: 5.days.ago)
     get society_event_path(@society, @event)
-    assert_select "#event-rsvp-buttons", count: 0
-    assert_match "RSVPs closed", response.body
+    assert_select "#event-rsvp-buttons", count: 1
+    assert_select "#event-rsvp-buttons button[data-answer='yes'][disabled]", count: 1
+    assert_select "#event-rsvp-buttons button[data-answer='maybe']:not([disabled])", count: 1
+    assert_match "New yes answers closed 24 hours before the night", response.body
 
     @event.update_columns(start_time: 3.days.ago, end_time: 3.days.ago + 2.hours)
     get society_event_path(@society, @event)

@@ -14,7 +14,7 @@ class EmailRsvpsController < ApplicationController
   def show
     @event, @user, @status = load_link
     return if performed?
-    return unless allowed?(@event, @user)
+    return unless allowed?(@event, @user, @status)
 
     @token = params[:token]
     @button_label = BUTTON_LABELS.fetch(@status)
@@ -24,7 +24,7 @@ class EmailRsvpsController < ApplicationController
   def create
     event, user, status = load_link
     return if performed?
-    return unless allowed?(event, user)
+    return unless allowed?(event, user, status)
 
     rsvp = event.event_rsvps.find_or_initialize_by(user: user)
     rsvp.status = status
@@ -87,7 +87,7 @@ class EmailRsvpsController < ApplicationController
   # EventPolicy#rsvp? (eligible, window open); changing an answer needs
   # EventRsvpPolicy#update? (still eligible, window open). The link outlives
   # membership, so a removed member of a private society is refused here.
-  def allowed?(event, user)
+  def allowed?(event, user, status)
     unless event.rsvp_eligible?(user)
       Rails.logger.warn "Email RSVP rejected for event #{event.id}, user #{user.id}: no longer eligible (society #{event.society_id})"
       redirect_to root_path, alert: "That RSVP link is no longer valid."
@@ -96,10 +96,19 @@ class EmailRsvpsController < ApplicationController
 
     existing = event.event_rsvps.find_by(user: user)
     permitted = existing ? EventRsvpPolicy.new(user, existing).update? : EventPolicy.new(user, event).rsvp?
-    return true if permitted
+    unless permitted
+      Rails.logger.warn "Email RSVP rejected for event #{event.id}, user #{user.id}: RSVP window closed (#{existing ? 'change' : 'new answer'})"
+      redirect_to society_event_path(event.society, event), alert: "RSVPs closed when the night started"
+      return false
+    end
 
-    Rails.logger.warn "Email RSVP rejected for event #{event.id}, user #{user.id}: RSVP window closed (#{existing ? 'change' : 'new answer'})"
-    redirect_to society_event_path(event.society, event), alert: "RSVPs close 24 hours before the event"
-    false
+    # A new yes closes 24 hours out (Event#answer_allowed?); say so before the
+    # confirm page offers a button that cannot work.
+    unless event.answer_allowed?(status, existing&.status)
+      Rails.logger.warn "Email RSVP rejected for event #{event.id}, user #{user.id}: new yes inside the last 24 hours"
+      redirect_to society_event_path(event.society, event), alert: "New yes answers close 24 hours before the event"
+      return false
+    end
+    true
   end
 end
