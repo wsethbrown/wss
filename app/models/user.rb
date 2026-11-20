@@ -324,6 +324,28 @@ class User < ApplicationRecord
     member_societies.joins(:society_memberships).where(society_memberships: { user: self, role: [ :admin, :officer ], status: :active })
   end
 
+  # Every society the user belongs to: the ones they created plus their active
+  # memberships, each once. "Your societies" on /societies and the dashboard.
+  def belonging_societies
+    Society.where(creator_id: id)
+           .or(Society.where(id: society_memberships.active.select(:society_id)))
+  end
+
+  # The viewer's role label per society id ("Creator", "Society admin",
+  # "Officer", "Member"), from one query, for lists of societies.
+  def society_role_labels(societies)
+    roles = society_memberships.active.where(society_id: societies.map(&:id)).pluck(:society_id, :role).to_h
+    societies.to_h do |society|
+      label =
+        if society.creator_id == id then "Creator"
+        elsif roles[society.id] == "admin" then "Society admin"
+        elsif roles[society.id] == "officer" then "Officer"
+        else "Member"
+        end
+      [ society.id, label ]
+    end
+  end
+
   def administered_societies
     # Returns societies where the user can create events (created societies + admin/officer roles)
     Society.left_joins(:society_memberships)

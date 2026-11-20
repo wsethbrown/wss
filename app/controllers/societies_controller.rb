@@ -13,17 +13,20 @@ class SocietiesController < ApplicationController
 
   def index
     if user_signed_in?
-      # Get user's societies (separate from searchable societies)
-      @user_societies = current_user.societies.includes(:creator, :society_memberships, :members, :events)
-                                             .with_attached_profile_picture
-                                             .with_attached_banner_image
-                                             .order(created_at: :desc)
+      # Every society the viewer belongs to (created + active memberships),
+      # kept apart from the searchable list below.
+      @user_societies = current_user.belonging_societies
+                                    .includes(:creator, :society_memberships, :members, :events)
+                                    .with_attached_profile_picture
+                                    .with_attached_banner_image
+                                    .order(created_at: :desc).to_a
+      @user_society_roles = current_user.society_role_labels(@user_societies)
 
       # For search results, show all societies the user has access to (excluding their own)
       scope = policy_scope(Society).includes(:creator, :society_memberships, :members, :events)
                                    .with_attached_profile_picture
                                    .with_attached_banner_image
-                                   .where.not(id: @user_societies.pluck(:id))
+                                   .where.not(id: @user_societies.map(&:id))
 
       # Apply search filters
       scope = apply_search_filters(scope)
