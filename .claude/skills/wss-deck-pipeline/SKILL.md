@@ -26,6 +26,20 @@ auto-publish** — the narrative voice is the product.
    slide_images). Import returns immediately; slides appear when the job
    lands. Inline rendering once crashed the whole dev container.
 
+## Deck packages (finished decks, loaded in one step)
+A deck built outside the app arrives as a folder: `deck.json` (title, category,
+difficulty, duration, description, tags, pours, optional price),
+`speaker-notes.md`, `<slug>.pptx`, `<slug>-speaker-notes.pdf`,
+`<slug>-research-outline.pdf` and `slides/slide-NN.png`.
+`rake decks:load DIR=<folder of packages> [PUBLISH=1] [AUTHOR=email]` runs
+`DeckPackageImport` on each: story from the script, the pptx as the buyer
+download, the two PDFs as owner downloads, slide 1 as the cover, the slides
+as `slide_images` (already rendered, so no LibreOffice and no render job),
+the pour list as free-text rows, and tags. New decks are drafts unless
+PUBLISH=1. Re-running updates the same deck by title and leaves its price
+and published state alone. Not to be confused with `decks:import`, which
+loads a production catalog snapshot into development.
+
 ## Story rendering & the teaser gate
 - render_markdown (PresentationsHelper): redcarpet, filter_html + sanitize
   allowlist, **NO hard_wrap** (hard_wrap turned authors' wrapped lines into

@@ -126,7 +126,7 @@ class Presentations::DownloadsController < ApplicationController
     elsif @presentation.purchased_by?(current_user)
       # Owns the deck via a credit but the membership has lapsed, downloads
       # come back when the membership does.
-      redirect_to root_path(anchor: "pricing"),
+      redirect_to membership_path(anchor: "pricing"),
                   alert: "This deck was unlocked with a credit. Reactivate your membership to download it"
     else
       redirect_to new_presentation_purchase_path(@presentation),

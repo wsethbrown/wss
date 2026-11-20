@@ -64,7 +64,7 @@ class Presentations::DownloadsControllerTest < ActionDispatch::IntegrationTest
       own("credit")
       sign_in @user
       get download_path(action)
-      assert_redirected_to root_path(anchor: "pricing")
+      assert_redirected_to membership_path(anchor: "pricing")
     end
 
     test "#{action}: active credit owner gets a short-lived service URL" do
@@ -211,7 +211,7 @@ class Presentations::DownloadsControllerTest < ActionDispatch::IntegrationTest
     own("credit")
     sign_in @user
     get supplemental_path(attach_extra)
-    assert_redirected_to root_path(anchor: "pricing")
+    assert_redirected_to membership_path(anchor: "pricing")
   end
 
   test "supplemental: active credit owner, direct owner and admin get a short-lived URL" do

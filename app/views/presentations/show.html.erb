@@ -98,7 +98,7 @@
       <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:justify-end">
         <% if viewer_owns %>
           <% if lapsed_credit_owner %>
-            <%= link_to "Reactivate membership", root_path(anchor: 'pricing'), class: "btn btn-primary min-h-12" %>
+            <%= link_to "Reactivate membership", membership_path(anchor: 'pricing'), class: "btn btn-primary min-h-12" %>
             <a href="#deck-story" data-turbo="false" class="btn btn-secondary min-h-12">Read the story</a>
           <% elsif @presentation.pdf_file.attached? && @full_story %>
             <%# Owners: open the real deck when the file exists. %>
