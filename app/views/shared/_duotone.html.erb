@@ -1,0 +1,10 @@
+<%# A photograph printed in the site's two inks: shadows in bottle green, light in
+    cream. The only way a photograph appears on the site, and at most one per
+    view. Sources and licences: docs/redesign/IMAGE_CREDITS.md.
+    Locals:
+      src  (String) asset path of a greyscale image under app/assets/images
+      alt  (String) what the photograph shows
+      css  (String, optional) sizing classes, e.g. an aspect ratio %>
+<figure class="duotone <%= local_assigns[:css] %>">
+  <%= image_tag src, alt: alt, loading: "lazy", decoding: "async" %>
+</figure>

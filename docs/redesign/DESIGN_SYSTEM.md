@@ -10,8 +10,8 @@ Tokens live in `app/assets/tailwind/application.css`. Rebuild CSS after editing 
 ## The idea
 
 A product-led site. Every visual is the real product showing real data: rendered slides,
-real decks, real events, real scores. No stock photography, no illustration, no invented
-numbers. When the data is missing, the element does not render.
+real decks, real events, real scores. No colour stock photography, no illustration, no invented
+numbers. The one exception is a photograph printed in the site's two inks (see Components). When the data is missing, the element does not render.
 
 ## Surfaces
 
@@ -88,6 +88,9 @@ Rules:
   `:cream` on green. Minimum size 28px. It always sits beside its number or count (or carries
   sr-only text), is aria-hidden, and has no shading or animation. Replaces star rows for display;
   the half-step star control in review forms is an input and stays.
+- **Photograph**: only through `shared/_duotone`, which prints a greyscale image in bottle green
+  and cream. Public-domain or owner-supplied images only, at most one per view, never behind
+  text. Sources and licences are listed in `IMAGE_CREDITS.md`.
 - **Primary button**: `btn btn-primary` (green, white text, 16px radius). One per view.
 - **Secondary button**: `btn btn-secondary` (white, hairline).
 - **Text link with arrow**: bold ink text followed by `→`.
@@ -123,7 +126,8 @@ Rules:
 ## Motion
 
 Quiet and functional: 150ms hover lifts of 1–3px, the hero player's slide change, and
-scroll-in reveals. Everything is disabled under `prefers-reduced-motion: reduce`.
+scroll-in reveals. Pages cross-fade (view transitions), a deck's cover travels from
+its card to the deck page, and the level in a glass rises once when it appears. Everything is disabled under `prefers-reduced-motion: reduce`.
 
 ## Copy
 

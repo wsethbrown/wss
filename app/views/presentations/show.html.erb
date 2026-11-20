@@ -68,7 +68,7 @@
       <% end %>
     </div>
     <% if cover_image %>
-      <div class="md:col-span-7">
+      <div class="md:col-span-7" style="view-transition-name: deck-cover-<%= @presentation.id %>">
         <%= deck_cover @presentation, preloaded: cover_image, alt: "#{@presentation.title}, first slide" %>
       </div>
     <% end %>
