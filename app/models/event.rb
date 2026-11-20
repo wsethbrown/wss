@@ -10,6 +10,42 @@ class Event < ApplicationRecord
   # the host isn't a member (host_id wins whenever both are set).
   belongs_to :presentation, optional: true
 
+  # Decks this night can run (owner decision, November 2026): published decks
+  # that the organiser, the host or an admin of the society (its creator and
+  # active members with the admin role) can access right now. Access is the
+  # existing rule, never a fork of it: the organiser goes through
+  # Presentation#can_download_full_presentation? (so a site admin organising
+  # the night keeps every deck), everyone else through
+  # User#can_access_presentation? (bought outright is forever; a credit unlock
+  # counts only while that person's membership is active). Authorship grants
+  # nothing. The deck already attached stays selectable unless
+  # include_current is false (create, where it is the value being checked).
+  #
+  # The one rule behind the creation form, the deck_options autocomplete and
+  # the server-side checks on create and assign_deck.
+  def offerable_decks(organizer: self.organizer, include_current: true)
+    decks =
+      if organizer&.admin?
+        Presentation.published.order(:title).to_a
+      else
+        offerers = deck_offerers(organizer)
+        candidates = Presentation.published
+                                 .where(id: UserPresentation.where(user_id: offerers.map(&:id)).select(:presentation_id))
+                                 .order(:title).to_a
+        candidates.select do |deck|
+          (organizer && deck.can_download_full_presentation?(organizer)) ||
+            offerers.any? { |person| person != organizer && person.can_access_presentation?(deck.id) }
+        end
+      end
+    decks |= [ presentation ] if include_current && presentation
+    decks
+  end
+
+  def deck_offerable?(presentation_id, organizer: self.organizer, include_current: true)
+    return false if presentation_id.blank?
+    offerable_decks(organizer: organizer, include_current: include_current).any? { |deck| deck.id == presentation_id.to_i }
+  end
+
   # The display name for whoever runs the night, member or guest.
   def host_display_name
     host&.full_name.presence || host_name.presence
@@ -42,6 +78,17 @@ class Event < ApplicationRecord
     return nil if viewer.nil?
     return nil if viewer.at(start_time).utc_offset == effective_time_zone.at(start_time).utc_offset
     start_clock_label
+  end
+
+  # The people whose decks the night may run: the organiser, the host and the
+  # society's admins (creator plus active admin-role members).
+  def deck_offerers(organizer = self.organizer)
+    ids = [ organizer&.id, host_id ]
+    if society
+      ids << society.creator_id
+      ids.concat(society.society_memberships.where(role: "admin", status: "active").pluck(:user_id))
+    end
+    User.where(id: ids.compact.uniq).to_a
   end
 
   def start_date_label

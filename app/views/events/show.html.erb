@@ -147,7 +147,7 @@
               <p class="text-sm text-mute">No deck attached. Plenty of nights run without one.</p>
             <% end %>
             <% if user_signed_in? && policy(@event).manage_deck? %>
-              <% if deck_options_for(@event).any? %>
+              <% if @event.offerable_decks.any? %>
                 <%= form_with url: assign_deck_society_event_path(@event.society, @event), method: :patch, local: true, class: "space-y-2" do %>
                   <%= render "events/autocomplete_field",
                       name: "presentation_id",

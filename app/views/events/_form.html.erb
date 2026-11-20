@@ -59,7 +59,9 @@
 
   <% if creating %>
   <!-- The deck (optional by owner rule; nights without a WSS deck are first-class) -->
-  <% deck_choices = Presentation.published.where(author_id: [society&.creator_id, current_user.id].compact.uniq) %>
+  <%# Event#offerable_decks is the one rule (also behind deck_options and the
+      checks on create). A new event has no organiser yet: it is the person filling this in. %>
+  <% deck_choices = event.offerable_decks(organizer: current_user) %>
   <% if deck_choices.any? %>
     <div>
       <%= form.label :presentation_id, "The deck (optional)", class: "mb-2 block text-sm font-medium text-gray-900" %>

@@ -16,6 +16,8 @@ class EventAutocompleteTest < ActionDispatch::IntegrationTest
     @deck = Presentation.create!(author: @organizer, title: "Peat and Provenance",
                                  content: "x", price: 5)
     @deck.update_column(:published, true)
+    # A night runs decks its people can access, not decks they wrote (Event#offerable_decks).
+    UserPresentation.create!(user: @organizer, presentation: @deck, purchase_type: "direct", purchased_at: Time.current)
   end
 
   def json = JSON.parse(response.body)
