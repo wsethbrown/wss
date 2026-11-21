@@ -37,9 +37,14 @@ export default class extends Controller {
     } else {
       this.activate(this.tabs.find((t) => t.getAttribute("aria-selected") === "true")?.dataset.tab || this.tabs[0]?.dataset.tab, { scroll: false })
     }
+
+    // Readiness signal for system tests: set last, once listeners are bound and
+    // the initial tab is active, so a click after this point cannot be lost.
+    this.element.setAttribute("data-account-tabs-ready", "true")
   }
 
   disconnect() {
+    this.element.removeAttribute("data-account-tabs-ready")
     this.element.removeEventListener("click", this.onClick)
     this.element.removeEventListener("keydown", this.onKeydown)
   }

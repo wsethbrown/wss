@@ -31,10 +31,15 @@ class AccountNavigationTest < ApplicationSystemTestCase
 
     visit account_path
     assert_current_path account_path
-    # The tab roles are set by the account-tabs Stimulus controller when it
-    # connects. Wait for that before any test clicks a tab: on a cold first
-    # page load a click can land before the controller is listening.
-    assert_selector "[data-tab='profile'][role='tab']"
+    wait_for_account_tabs
+  end
+
+  # The account-tabs Stimulus controller sets data-account-tabs-ready as the
+  # last step of connect(), after its click listener is bound and the initial
+  # tab is active. Wait for it before any click: on a cold first page load the
+  # controller is imported asynchronously and an early click would be lost.
+  def wait_for_account_tabs
+    assert_selector "[data-controller~='account-tabs'][data-account-tabs-ready='true']"
   end
 
   def assert_tab_selected(name)
