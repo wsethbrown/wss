@@ -12,6 +12,10 @@
         <p class="text-mute" data-auth-toggle-target="authSubtitle">Create your account</p>
       </div>
 
+      <%# The provider buttons and the "or" divider only make sense when at
+          least one provider is configured. Without that the divider would
+          sit under nothing. %>
+      <% if google_sign_in_available? || apple_sign_in_available? %>
       <!-- Providers -->
       <div class="space-y-3">
         <% if google_sign_in_available? %>
@@ -49,6 +53,7 @@
           <span class="px-2 bg-white text-mute">or</span>
         </div>
       </div>
+      <% end %>
 
       <!-- Email (magic link: creates or finds the account) -->
       <div id="magic-link-form">
