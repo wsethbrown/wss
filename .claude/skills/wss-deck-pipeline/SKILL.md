@@ -40,6 +40,12 @@ PUBLISH=1. Re-running updates the same deck by title and leaves its price
 and published state alone. Not to be confused with `decks:import`, which
 loads a production catalog snapshot into development.
 
+Making a package (the story, research, script, slides, and the build tools in
+`tools/decks/`, which produce exactly this folder layout) is covered by the
+wss-deck-creation skill and its two companions, wss-deck-outline and
+wss-deck-speaker-notes. The script's one `---` rule matters here: `story`
+keeps only what follows it.
+
 ## Story rendering & the teaser gate
 - render_markdown (PresentationsHelper): redcarpet, filter_html + sanitize
   allowlist, **NO hard_wrap** (hard_wrap turned authors' wrapped lines into

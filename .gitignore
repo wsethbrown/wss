@@ -52,3 +52,9 @@ claude-swarm.log
 stripe-webhooks.log
 .stripe_pid
 .DS_Store
+
+# Deck build output: built decks are never committed, only their sources (tools/decks/README.md).
+/tools/decks/**/*.pptx
+/tools/decks/**/*.pdf
+/tools/decks/**/slides/
+/tools/decks/**/__pycache__/

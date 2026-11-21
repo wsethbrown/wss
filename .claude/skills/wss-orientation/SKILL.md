@@ -53,7 +53,14 @@ wss-production-launch.
 - wss-membership-model — free-vs-paid split, society-creation paywall,
   benefit copy source of truth, live pricing
 - wss-auth — magic links, Google/Apple OAuth, the removed 2FA and its leftover encrypted columns
-- wss-deck-pipeline — import, slide rendering, teaser gate, Present mode
+- wss-deck-pipeline — import, slide rendering, teaser gate, Present mode,
+  loading finished deck packages (`decks:load`)
+- wss-deck-creation — making a tasting-night deck package: story, bottles,
+  slides, build with `tools/decks/`, QA, load as a draft (start here for any
+  new deck; it hands off to the next two)
+- wss-deck-outline — researching a deck and writing its research outline
+- wss-deck-speaker-notes — the host's kit and read-aloud script, and the
+  markdown the build tools and the site import rely on
 - wss-societies — privacy model, invites, member management, creation paywall
 - wss-reviews — bottle catalog, solo + event reviews, society verdicts,
   veiling, search modes (NO longer holds the social layer — see wss-community)

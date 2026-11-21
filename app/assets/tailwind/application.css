@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 /* Tailwind v4 scans project files for class names; binary fonts in
-   docker/fonts crash the scanner (RangeError: out of range code points). */
+   docker/fonts and tools/decks/fonts crash the scanner (RangeError: out of
+   range code points). */
 @source not "../../../docker";
+@source not "../../../tools";
 /* Same reason: shipped PDF assets (e.g. the blank scorecard) are binary. */
 @source not "../documents";
 
