@@ -1,0 +1,26 @@
+{
+  "slug": "Mint-Julep",
+  "title": "Mint Julep",
+  "subtitle": "Cocktails, Chapter One",
+  "category": "Cocktails",
+  "difficulty": "Intermediate",
+  "duration": "45 min",
+  "description": "The mint julep from a Persian rose cordial to a silver cup at Churchill Downs, told from the newspapers, books and court reports that record it: the Virginia paper trail, the arrival of ice, the enslaved and free Black bartenders who made it the finest drink in America (Cato Alexander, Jasper Crouch, Carter, John Dabney, Jim Cook and Tom Bullock), and how a tax revolt, a war and a French aphid turned a brandy drink into a bourbon one. Two juleps for the room: the Virginia julep first, the Kentucky julep later.",
+  "tags": "cocktails, mint julep, bourbon, brandy, cognac, history, virginia, kentucky, black history, bartenders",
+  "pours": [
+    {
+      "name": "Glass A: the Virginia julep",
+      "origin": "Virginia, as drunk around 1820; made for the room",
+      "style": "Julep: 1½ oz cognac, ½ oz peach brandy, ¼ oz simple syrup, 8 mint leaves, berries, crushed ice",
+      "strength": "Built on spirits of about 40–45% ABV, diluted by crushed ice",
+      "notes": "Handed out at slide 2, without saying what is in it. The drink as it existed before Kentucky got hold of it."
+    },
+    {
+      "name": "Glass B: the Kentucky julep",
+      "origin": "Kentucky, as the julep came to be made by about 1900; made for the room",
+      "style": "Julep: 2 oz bourbon, ¼ oz simple syrup, 8 mint leaves, crushed ice",
+      "strength": "Built on a bourbon of 40–50% ABV, diluted by crushed ice",
+      "notes": "Made after a short break and poured at slide 13, next to Glass A. The one you know."
+    }
+  ]
+}
