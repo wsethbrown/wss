@@ -4,19 +4,19 @@ Speaker's notes
 
 The Whiskey Share Society
 
-_READ THIS FIRST. Pour the first glass on slide 2 and keep talking; nobody should sit through a history lesson with an empty glass. The other three come at their own slides. All four ryes trace back to one distillery in Lawrenceburg, Indiana, so read each back label before the night: brands change where their whiskey comes from, and the bottle is the only up-to-date source._
+_READ THIS FIRST. Pour the first glass at slide 2 so nobody sits through the history with an empty glass. The other three are poured at their own slides. Check the back label of each bottle before the night: brands change where they buy their whiskey, and the label is the only current source._
 
 ## Part One: before the night
 
-### The one-sentence version
+### The short version
 
-In a small Indiana river town there is a distillery that spent most of the twentieth century making a very high-rye whiskey for other people's blends, and when it nearly closed, that same rye went out under one new label after another and a great deal of the rye sold in America since has started there. Tonight we pour four of them.
+A distillery in Lawrenceburg, Indiana spent most of the twentieth century making a 95% rye for Seagram's blends. It nearly closed in 2006. Its later owners sold that rye to other brands, and a lot of the American rye sold since 2011 was distilled there. Tonight we pour four of those ryes.
 
 ### What the night is
 
-A story, with the bottles as its chapters. The building's history comes first, while the first glass goes round. Then each bottle arrives at the point in the story where it belongs: the easiest one to find, the one a Tennessee house changed, the one from an Iowa town with its own legend, and finally the distillery’s own bottle.
+The distillery's history comes first, while people drink the first glass. Then one bottle at a time: Bulleit, George Dickel, Templeton, and the distillery's own Rossville Union.
 
-Be warm about the brands. Each of them chose barrels, an age, a proof, a filter or a blend, and several have since built distilleries of their own. The story is about one plant's rye and the many people who made something of it.
+Be fair to the brands. Each of them chose the barrels, the age, the proof, and in some cases a filter or a blend. Several now have distilleries of their own.
 
 ### How many bottles
 
@@ -25,9 +25,9 @@ Four. Five if you add the optional High West Double Rye at the end (see below). 
 ### Cast the roles, then find the bottles
 
 - **The Opener (glass 1).** The Lawrenceburg rye that is easiest to find. Tonight: Bulleit 95 Rye.
-- **The Changed One (glass 2).** The same recipe with something done to it afterwards. Tonight: George Dickel Rye, filtered through sugar-maple charcoal.
-- **The Hometown Story (glass 3).** A brand built on a town's legend, whose label and whose distillery have both changed since. Tonight: Templeton Straight Rye.
-- **The House Bottle (glass 4).** The distillery under its own name. Tonight: Rossville Union Straight Rye.
+- **The Filtered One (glass 2).** The same rye with a step added by the brand. Tonight: George Dickel Rye, filtered through sugar-maple charcoal.
+- **The Iowa One (glass 3).** A brand named for a town, which has since built a distillery there. Tonight: Templeton Straight Rye.
+- **The Distillery's Own (glass 4).** Sold by the distillery itself. Tonight: Rossville Union Straight Rye.
 
 ### Bottle ideas by role
 
@@ -38,189 +38,185 @@ Suggestions, not instructions. Prices are rough US shelf prices checked in Novem
 - **Bulleit 95 Rye.** About $25–33. 90 proof. The recipe is in the name: 95% rye, 5% malted barley.
 - **Redemption Rye.** About $25–30. 92 proof. A brand that has always said plainly that its rye comes from Indiana.
 
-**The Changed One**
+**The Filtered One**
 
 - **George Dickel Rye.** About $22–30. 90 proof. Charcoal-filtered.
 - **Angel's Envy Rye.** Listed among the Lawrenceburg ryes, and finished by the brand. Pricier; check the price and the back label.
-- **High West Double Rye.** 92 proof; check the price locally. Indiana 95% rye blended with High West's own Utah rye: "changed" by blending rather than filtering.
+- **High West Double Rye.** 92 proof; check the price locally. Indiana 95% rye blended with High West's own Utah rye. A blend, not a filter, but it fits this slot.
 
-**The Hometown Story**
+**The Iowa One**
 
 - **Templeton Straight Rye.** About $30. 90 proof. The standard bottle is still selected from sourced rye; Templeton's own Iowa rye has so far come out only as a limited single barrel (October 2025).
 - **Smooth Ambler Old Scout Rye.** A West Virginia company that uses "Old Scout" for the whiskey it buys. Availability varies.
 
-**The House Bottle**
+**The Distillery's Own**
 
 - **Rossville Union Straight Rye.** About $40. 94 proof. A blend of the distillery's 95% and 51% rye recipes.
 - **Rossville Union Bottled-in-Bond or Barrel Proof.** If you can find them, either makes a fine closer.
 
 > **THE OPTIONAL GAME**
-> If your group likes a challenge, pour glasses 2 and 3 side by side, unlabelled, before you reach slide 9. Ask one question: "Which of these went through charcoal?" No scores, no verdict; just a reason to taste them against each other. Reveal it on slide 9.
+> If your group likes a game, pour glasses 2 and 3 side by side, unlabelled, before you reach slide 9. Ask one question: "Which of these went through charcoal?" Tell them the answer at slide 9.
 
 ### How to order them
 
-Ascend in proof, which tonight is also the order of the story: 90, 90, 90, then 94. The three 90-proof ryes are close enough that the differences you notice are the ones each brand made, not the alcohol.
+Lowest proof first: 90, 90, 90, then 94. The first three are the same proof, so any difference between them comes from what each brand did.
 
 ### Match the deck to your lineup
 
 There is one slide per glass: 8, 9, 10 and 12. If you swap a bottle, change its slide and its mention on slide 7. Nothing else depends on the exact four.
 
 > **RUNNING ORDER: ABOUT 45 MINUTES**
-> 0–15 min: pour glass 1 at slide 2, then the building's history while they drink, slides 1–7.
+> 0–15 min: pour glass 1 at slide 2, then the history while they drink, slides 1–7.
 > 15–30 min: glasses 2 and 3, the brands, and the back label, slides 8–11.
-> 30–45 min: glass 4, the house bottle, and the close, slides 12–14.
+> 30–45 min: glass 4 and the close, slides 12–14.
 
 ---
 
 ## Part Two: the script
 
-_SET UP: four glasses per person, marked 1 to 4. Pour glass 1 before slide 2 if you can, or while you speak it. Bottles can stay on the table tonight: nothing is hidden._
+_SET UP: four glasses per person, marked 1 to 4. Pour glass 1 before slide 2 if you can. The bottles can stay on the table; nothing tonight is blind._
 
 ## [SLIDE 1] The Rye From Lawrenceburg
 
 Good evening.
 
-Tonight is about one distillery, in Lawrenceburg, Indiana. For most of its life it made whiskey for other people's blends. Then, about fifteen years ago, its rye went out into the world under one name after another, and a great deal of the American rye you have drunk since started there.
+Tonight is about one distillery, in Lawrenceburg, Indiana.
 
-We will pour four of them tonight.
+For most of its life it made whiskey for Seagram's blends. Since 2011 it has sold its rye to other companies, who bottle it under their own names. A lot of the rye on American shelves was distilled there.
 
-## [SLIDE 2] Start with the Bulleit
+We have four of those ryes tonight.
 
-_Pour glass 1, the Bulleit 95 Rye, now. Keep talking while you pour._
+## [SLIDE 2] Glass 1: Bulleit 95 Rye
 
-This is Bulleit 95 Rye. Sip it whenever you like; we will come back to it properly in a bit.
+_Pour glass 1, the Bulleit 95 Rye. Keep talking while you pour._
 
-While you do, one small thing to look out for in it. This is a very high-rye whiskey: ninety-five parts rye to five of malted barley. Plenty of American ryes are made with just over half rye, and corn making up much of the rest. Whatever spicy, grassy, herbal thing you get from this glass, that comes mostly from the grain.
+This is Bulleit 95 Rye. Drink it whenever you like. We will come back to it at slide 8.
 
-Remember how it tastes. The other three glasses start from the same rye.
+The 95 is the recipe: 95% rye and 5% malted barley. Many American ryes are only a little over half rye, with corn making up much of the rest. So the spice and the grassy, herbal notes in this glass come mostly from the rye.
 
-## [SLIDE 3] 1847: Rossville Union
+Keep a little in the glass. The next two pours are the same recipe, and it helps to taste them together.
 
-The story starts in 1847, when a man named George Ross started a rye distillery in Lawrenceburg, Indiana. It came to be known as the Rossville Union Distillery.
+## [SLIDE 3] 1847: George Ross
 
-I wish I could tell you more about George Ross. The sources I could find give us his name, his town and his trade, and not much else. Somebody with time and a county archive could do better. What matters for tonight is the name, because it comes back at the end.
+In 1847 a man named George Ross started a rye distillery in Lawrenceburg, Indiana. It became known as the Rossville Union Distillery.
+
+That is nearly all I can tell you about him. The sources give his name, the town and the date, and not much more.
+
+The distillery started using the Rossville Union name again in 2018. That bottle is glass 4.
 
 ## [SLIDE 4] 1933: Seagram
 
-Prohibition ends in 1933, and the distillery is bought by Seagram, the Canadian drinks company.
+Prohibition ended in 1933, and Seagram, the Canadian drinks company, bought the distillery.
 
-That photograph is the Seagram's building in Lawrenceburg, on Ridge Avenue, with the name still on the brickwork.
+The photograph is the Seagram's building on Ridge Avenue in Lawrenceburg. The name is still on the brickwork.
 
-For most of the next seventy years, this is what the plant was: a Seagram workhorse. It made whiskey in volume, and much of it was never meant to be drunk on its own.
+For about the next seventy years the plant made whiskey in bulk for Seagram. Much of it went into blends.
 
 ## [SLIDE 5] A rye made for blending
 
-The rye this plant is known for was not made to be bottled on its own.
+Seagram's business was blended whiskey: 7 Crown and 5 Crown, among others. A blend gets much of its flavour from a small share of something strong-tasting. A very high-rye whiskey does that job well.
 
-Seagram sold blends: Seagram's 7 Crown and 5 Crown among them. A blend needs a small amount of something with a lot of flavour to give it character. A very high-rye whiskey does that job. A little goes a long way.
+Larry Ebersold started distilling at Lawrenceburg in 1972, and he is the person usually credited with the recipe: 95% rye, 5% malted barley. Accounts differ on when it was settled. Some say the 1980s, some the early 1990s.
 
-Larry Ebersold, who started distilling at Lawrenceburg in 1972, is the man usually credited with the recipe. He settled on ninety-five percent rye and five percent malted barley. Accounts differ on when; some say the 1980s, some the early 1990s.
+Mashes that high in rye are hard to work with. They foam and they stick. One writer says the equipment at Lawrenceburg handled them better than most.
 
-Very high-rye mashes are awkward to make. They foam and gum up the equipment, and one writer credits the Lawrenceburg set-up with handling them better than most.
+So the rye in your glass was made as an ingredient. It was not sold on its own for a long time.
 
-So the rye in your glass was made to go into blends, a little at a time.
+## [SLIDE 6] Three owners in eleven years
 
-## [SLIDE 6] Nearly the end
+_Ask what people are getting from glass 1 before you start this slide._
 
-_They should be well into glass 1 now. Ask what they are getting before you move on._
+Seagram's drinks business was broken up around 2000, and the Lawrenceburg plant went to Pernod Ricard.
 
-Then the big companies changed hands. Seagram's drinks business was broken up around 2000, and the Lawrenceburg plant went to Pernod Ricard.
+On the 19th of April 2006, Pernod announced it would close the distillery.
 
-On the 19th of April 2006, Pernod announced it would close it.
+It stayed open. In 2007 Pernod sold it to CL Financial, a holding company from Trinidad and Tobago, which named it Lawrenceburg Distillers Indiana. Older reviews call its whiskey "LDI". CL Financial collapsed in the 2008 financial crisis.
 
-It did not close. In 2007 Pernod sold it to CL Financial, a holding company from Trinidad and Tobago, which named it Lawrenceburg Distillers Indiana. You will still see its whiskey called "LDI" in older reviews. Then came the financial crisis of 2008, and CL Financial collapsed.
+In 2011 MGP Ingredients, a Kansas company, bought the distillery. MGP's business was to make whiskey and sell it to other companies to bottle.
 
-In 2011 a Kansas company, MGP Ingredients, agreed to buy the distillery. MGP's plan was simple: make whiskey, and sell it to anyone who wanted to put a name on it.
+## [SLIDE 7] The brands that bottled it
 
-The timing was good.
+Rye was becoming popular again around then, and new brands wanted to sell it. Rye needs years in a barrel, so a new brand could not make its own in time. MGP had aged rye in its warehouses and was willing to sell it.
 
-## [SLIDE 7] One rye, many labels
+Bulleit Rye came out in 2011. Templeton, in Iowa, was already bottling it. George Dickel, the Tennessee distillery, put out a rye. So did Redemption, Smooth Ambler in West Virginia, High West in Utah, and Angel's Envy. The slide is not a complete list.
 
-Around the same time, American drinkers were rediscovering rye, and a wave of new whiskey brands wanted to sell it. The trouble is that rye worth selling needs years in a barrel. A brand that wanted to sell rye next year could not make its own in time.
+Each brand started with the same rye and chose its own age and proof. Some filtered it or blended it. The next three glasses are three of them.
 
-But in Lawrenceburg there was a distillery with a very good, very distinctive rye, already aged, and a new owner who wanted to sell it.
+## [SLIDE 8] Glass 1 again: Bulleit 95 Rye
 
-So the names arrived. Bulleit Rye in 2011. Templeton, from Iowa. George Dickel's rye, from a Tennessee house. Redemption. Smooth Ambler's Old Scout, from West Virginia. High West, from Utah, blending it with its own. Angel's Envy. That list is far from complete.
+Back to the glass you have had since the start.
 
-Each brand took the same starting point and did something different with it: an age, a proof, a blend, a filter. Let's taste what three of them did.
+Bulleit Rye launched in 2011. It is distilled in Lawrenceburg to Bulleit's specification and bottled in Kentucky at 90 proof. It has no age statement.
 
-## [SLIDE 8] Glass 1: Bulleit 95 Rye
+Bulleit has its own distilleries in Kentucky, and they make its bourbon. Whisky Advocate reported this year that all of Bulleit's rye has come from Indiana and that the company plans to keep it that way.
 
-The one you have been drinking.
-
-Bulleit Rye came out in 2011. It is distilled in Lawrenceburg to Bulleit's specification and bottled in Kentucky, at 90 proof, with no age statement. The recipe is printed on the front: 95.
-
-Bulleit does have its own distilleries in Kentucky, and they make bourbon. Whisky Advocate reported this year that every Bulleit rye has been made on this Indiana recipe, and will be. It is a deliberate choice: this is the rye they want.
-
-_Ask: "Now that you know what it is, what do you taste that you'd call 'rye'?"_
+_Ask: "What in this glass would you call 'rye'?"_
 
 ## [SLIDE 9] Glass 2: George Dickel Rye
 
 _Pour glass 2._
 
-George Dickel is one of the two great Tennessee whisky names. Its rye starts in Lawrenceburg, on the same 95% rye recipe as glass 1.
+George Dickel is a Tennessee distillery. Its rye is distilled in Lawrenceburg, on the same 95% recipe as glass 1.
 
-What Dickel adds is a step from its own tradition. Dickel says the rye is chilled and then filtered through charcoal made from sugar maple, the way its Tennessee whisky is. The idea is that the charcoal softens and rounds the spirit.
+The difference is charcoal. Dickel says the rye is chilled and then filtered through charcoal made from sugar maple, which is how it makes its Tennessee whisky. The filtering is meant to soften the spirit.
 
-Where that filtering happens is a small puzzle. Some accounts put it in Tennessee. Wikipedia says the whiskey goes to Diageo's plant in Plainfield, Illinois, to be filtered and bottled. I could not settle it, so I won't pretend to.
+I could not find out for certain where the filtering is done. Some sources say Tennessee. Wikipedia says the rye goes to a Diageo plant in Plainfield, Illinois, and is filtered and bottled there.
 
-It is the cheapest bottle on the table, usually in the twenties.
+It is usually the cheapest of tonight's four, in the twenties.
 
-_If you played the optional game, reveal it now. Then ask: "Put glass 1 and glass 2 side by side. Is the charcoal doing anything you can taste?"_
+_If you played the optional game, give the answer now. Then ask: "Taste glasses 1 and 2 together. Can you taste the charcoal filtering?"_
 
 ## [SLIDE 10] Glass 3: Templeton
 
 _Pour glass 3._
 
-Templeton is a town in Iowa, and the brand named after it was founded in 2006 on a town legend. The story goes that during Prohibition, Templeton made bootleg rye good enough to find drinkers as far away as Chicago. I could not find a primary source for that, so it stays "the story goes".
+Templeton is a town in Iowa. The brand was founded in 2006. Its story is that during Prohibition the town made bootleg rye that sold as far away as Chicago. I could not find a primary source for that, so treat it as the brand's story.
 
-The whiskey in the early bottles came from Lawrenceburg and was bottled in Iowa. For a while the label said a good deal about the legend and very little about Indiana, and in 2015, after class actions over its marketing, the company agreed to add "Distilled in Indiana" to the label and to offer refunds of up to $36 a household.
+The early bottles were Lawrenceburg rye, bottled in Iowa. The label talked about the town and said little about Indiana. Customers sued over the marketing, and in 2015 the company settled. It agreed to put "Distilled in Indiana" on the label and to offer refunds of up to $36 per household.
 
-Then Templeton built its own distillery in Templeton, a reported $35 million, opened in 2018. Its own whiskey had to age, so the bottles kept coming from Indiana in the meantime. The one in your glass, the Straight Rye launched in late 2024, is at least four years old, 90 proof, on the 95% recipe, and by the company's own account selected from sourced stock. In October 2025, Templeton released its first rye distilled, aged and bottled in Iowa, as a limited single barrel.
+In 2018 Templeton opened its own distillery in the town. It reportedly cost $35 million. That whiskey needed time to age, so the bottles kept coming from Indiana. The Straight Rye in your glass launched in late 2024. It is at least four years old, 90 proof, on the 95% recipe, and the company says it is selected from whiskey it bought.
 
-So the standard bottle is still Indiana rye for now, and the Iowa rye has started to arrive.
+In October 2025 Templeton released its first rye distilled, aged and bottled in Iowa. It was a limited single barrel.
 
-_The photograph on the slide is a Templeton 6 Year bottle; say so if anyone asks why the label looks different._
+_The photograph on the slide is the Templeton 6 Year, not the Straight Rye. Say so if anyone asks._
+
+_Ask: "Of the three so far, which would you buy again?"_
 
 ## [SLIDE 11] Reading the back label
 
 _Pick up any bottle on the table and turn it round._
 
-Since we are holding bottles: here is a useful thing to know, for any American whiskey you will ever buy.
+Federal labelling rules say most American whiskey has to show the state where it was distilled. If the company's address on the label is in a different state, the state of distillation has to appear as well. That is the "Distilled in Indiana" line. It is usually on the back, in small type.
 
-Federal labelling rules say that most American whiskies have to show the state where they were first distilled. If the company's address on the label is in one state and the whiskey was distilled in another, the state of distillation has to be on the label too. That is the "Distilled in Indiana" line, and it is usually on the back, in small type.
+Every approved label is also in a public database, the TTB's COLA registry. You can look up any bottle.
 
-And if you want to go further, every approved label, front and back, is in a public federal database: the TTB's COLA registry. You can look up any bottle you own.
-
-It is all on the bottle, in small print.
-
-_Let people find the line on the bottles in front of them. Someone will read one out._
+_Give people a minute to find the line on tonight's bottles._
 
 ## [SLIDE 12] Glass 4: Rossville Union
 
 _Pour glass 4._
 
-In May 2018, MGP launched its first rye under its own label, and it reached back for the old name: Rossville Union, after George Ross's distillery of 1847. In 2021 the plant itself took back an old name too, Ross & Squibb Distillery.
+In May 2018 MGP released its first rye under its own label. It called it Rossville Union, after George Ross's distillery. In 2021 the plant itself was renamed Ross & Squibb Distillery.
 
-This bottle is a blend of the distillery's two rye recipes, the 95% you have been drinking all night and a 51% rye made the more traditional way, aged at least four years, at 94 proof. It is about $40.
+This is a blend of two of the distillery's rye recipes: the 95% rye from the first three glasses, and a 51% rye. It is at least four years old, 94 proof, and about $40.
 
-This is the only bottle tonight sold by the distillery that made it.
+It is the only bottle tonight that is sold by the distillery that made it.
 
-_Ask: "After three glasses of the 95%, what does the 51% do to it?"_
+_Ask: "What does the 51% rye change?"_
 
 ## [SLIDE 13] Where the brands are now
 
-Several of the brands that started with Lawrenceburg rye now make their own. Templeton has its Iowa distillery. High West blends its own Utah rye in with Indiana's. Bulleit makes its bourbon in Kentucky and keeps its rye in Indiana by choice.
+Some of the brands that bought Lawrenceburg rye now make their own as well.
 
-And the company that owns the distillery changed its own name this month. On the 2nd of November 2026, MGP Ingredients became Sempreon.
+Templeton has its distillery in Iowa. High West blends its own Utah rye with rye from Indiana. Bulleit makes bourbon in Kentucky and still buys its rye from Indiana.
 
-The rye made for Seagram’s blends is now sold under its own name and many others.
+The owner has changed its name too. On the 2nd of November 2026, MGP Ingredients became Sempreon.
 
 ## [SLIDE 14] Sláinte
 
-Four glasses tonight, from one distillery.
+That is four ryes from one distillery.
 
-To George Ross, to Larry Ebersold, to whoever is running the stills in Lawrenceburg tonight, and to everybody who took their rye and made something of it.
+To George Ross, to Larry Ebersold, and to the people making rye in Lawrenceburg now.
 
 Sláinte.
 
