@@ -103,7 +103,7 @@ footer(s, 6)
 s = new_slide()
 heading(s, 0.8, 'The brands that bottled it.', size=38, h=0.8, w=7)
 text(s, 0.85, 1.62, 11.6, 0.6,
-     'New brands wanted aged rye sooner than they could make it. MGP had it in the warehouse and sold it to them.',
+     'New brands wanted aged rye sooner than they could make it, so they bought MGP’s.',
      size=18, italic=True, color=MUTE)
 cx, cy = SLIDE_W / 2, 4.2
 pw, ph = 3.3, 1.25
