@@ -31,6 +31,10 @@ class AccountNavigationTest < ApplicationSystemTestCase
 
     visit account_path
     assert_current_path account_path
+    # The tab roles are set by the account-tabs Stimulus controller when it
+    # connects. Wait for that before any test clicks a tab: on a cold first
+    # page load a click can land before the controller is listening.
+    assert_selector "[data-tab='profile'][role='tab']"
   end
 
   def assert_tab_selected(name)
