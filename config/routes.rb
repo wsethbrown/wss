@@ -41,9 +41,9 @@ Rails.application.routes.draw do
   # Contact addresses (hello@ / support@ / partners@)
   get "contact", to: "home#contact"
 
-  # The signed-in landing page. /dashboard and /account render the same account
-  # surface; /dashboard is the canonical post-authentication destination.
-  get "dashboard", to: "account#index", as: :dashboard
+  # The signed-in landing page (DashboardController): next tastings, what is
+  # waiting on you, your societies. /account is the account page.
+  get "dashboard", to: "dashboard#index", as: :dashboard
 
   # Account
   get "account", to: "account#index"
