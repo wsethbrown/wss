@@ -132,6 +132,33 @@ Aug 9 first-renewal watch.
 6. PENDING — SMTP provider (above); watch Sentry day 1; confirm nightly backup;
    uptime monitor on `/up`.
 
+## Restoring a production backup locally — `bin/restore-production-snapshot`
+Use when production data is needed on the Mac (the server is gone, or real
+decks/users are needed to debug). Input is the R2 bucket downloaded as a
+folder: `db-backups/wss_*.sql.gz` plus every Active Storage object at its key.
+```sh
+bin/restore-production-snapshot tmp/r2-backup                      # newest dump
+bin/restore-production-snapshot tmp/r2-backup --dump wss_20261020_090000.sql.gz
+bin/restore-production-snapshot tmp/r2-backup --admin-email you@example.com --set-password
+```
+Needs the Docker stack up (`./wss up`); never reads `~/.wss-production.env`.
+It refuses to run if development mail is not `:file` or the local
+`STRIPE_SECRET_KEY` is a live key. Then: backs up the current
+`wss_development` to `tmp/dev-db-before-restore-<stamp>.sql.gz` → stops web
+and jobs → drops/recreates the database and loads the dump (ownership lines
+stripped, every other psql error fatal, one transaction) → sets
+`ar_internal_metadata.environment` to development, creates the Solid Queue
+tables if the dump lacks them, runs `db:migrate` (schema dump goes to `tmp/`,
+`db/schema.rb` is not rewritten) → copies blobs into `storage/` (Disk layout,
+nothing deleted) and moves blobs from `cloudflare_r2` to `local`, reporting
+missing files and checksum mismatches → truncates Solid Queue tables →
+restarts, waits for `/up`, prints a summary and the exact commands to reload
+the pre-restore backup. Re-runnable. A data-transforming migration that fails
+on real data (e.g. two users sharing a `stripe_customer_id`) stops the run
+with the error; fix the rows and re-run. Local sign-in afterwards: the
+password set by `--set-password`, or a magic link from `tmp/mail`
+(`bin/magic-links`); Google is not configured locally.
+
 ## Gotchas / traps
 - **Piped test runs hide failures** — gate on file + summary text, not pipe
   exit code (above).

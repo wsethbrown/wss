@@ -43,8 +43,8 @@ class AppleOAuthTest < ActionDispatch::IntegrationTest
     # Simulate the OAuth callback (this would normally come from Apple)
     post user_apple_omniauth_callback_path
 
-    # Should redirect to account page after successful sign in
-    assert_redirected_to account_path
+    # Should redirect to the dashboard after successful sign in
+    assert_redirected_to dashboard_path # sign-in lands on the dashboard when no page is waiting
 
     # User should be created in database
     user = User.find_by(email: "test@appleid.com")
@@ -81,8 +81,8 @@ class AppleOAuthTest < ActionDispatch::IntegrationTest
     # Simulate the OAuth callback
     post user_apple_omniauth_callback_path
 
-    # Should redirect to account page
-    assert_redirected_to account_path
+    # Should redirect to the dashboard
+    assert_redirected_to dashboard_path # sign-in lands on the dashboard when no page is waiting
 
     # Should not create a new user
     assert_equal 1, User.count
@@ -160,7 +160,7 @@ class AppleOAuthTest < ActionDispatch::IntegrationTest
     post user_apple_omniauth_callback_path, headers: { "X-CSRF-Token" => "invalid" }
 
     # Should still work because OAuth callbacks should skip CSRF
-    assert_redirected_to account_path
+    assert_redirected_to dashboard_path # sign-in lands on the dashboard when no page is waiting
 
     # User should be created
     user = User.find_by(email: "test@appleid.com")
@@ -181,7 +181,7 @@ class AppleOAuthTest < ActionDispatch::IntegrationTest
 
     # Complete OAuth callback
     post user_apple_omniauth_callback_path
-    assert_redirected_to account_path
+    assert_redirected_to dashboard_path # sign-in lands on the dashboard when no page is waiting
 
     # User should be created and signed in
     user = User.find_by(email: "test@appleid.com")
@@ -212,7 +212,7 @@ class AppleOAuthTest < ActionDispatch::IntegrationTest
     post user_apple_omniauth_callback_path
 
     # Should successfully sign in and link to existing user
-    assert_redirected_to account_path
+    assert_redirected_to dashboard_path # sign-in lands on the dashboard when no page is waiting
 
     # Should still have only 1 user (account linking)
     assert_equal 1, User.count

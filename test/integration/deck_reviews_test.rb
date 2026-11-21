@@ -87,6 +87,8 @@ class EventDeckHostTest < ActionDispatch::IntegrationTest
     SocietyMembership.create!(user: @member, society: @society, role: "member", status: "active")
     @deck = Presentation.create!(author: @organizer, title: "Offerable Deck", content: "A story.", price: 9.99)
     @deck.update_column(:published, true)
+    # A night runs decks its people can access, not decks they wrote (Event#offerable_decks).
+    UserPresentation.create!(user: @organizer, presentation: @deck, purchase_type: "direct", purchased_at: Time.current)
   end
 
   def create_event(extra = {})

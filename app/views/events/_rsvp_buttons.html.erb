@@ -17,6 +17,9 @@
     when no RSVP exists, and their host would still see them as unanswered.
     Nothing is written until they actually pick. %>
 <% answered = user_rsvp.present? %>
+<%# A new yes closes 24 hours before the night (Event#answer_allowed?); someone
+    already at yes keeps it. Maybe and No stay open until the start. %>
+<% yes_closed = !event.answer_allowed?("yes", user_rsvp&.status) %>
 <div id="event-rsvp-buttons" class="flex flex-col gap-3">
   <div class="flex flex-wrap items-center justify-between gap-3">
     <span class="text-sm font-medium text-ink"><%= answered ? "Going?" : "Coming along?" %></span>
@@ -36,6 +39,7 @@
             after the first answer. The endpoint is idempotent for that reason
             (see EventRsvpsController#create). %>
         <%= button_to event_event_rsvps_path(event), method: :post, params: { status: answer },
+            disabled: (answer == "yes" && yes_closed),
             aria: { pressed: (answered && user_rsvp.status == answer) },
             data: { answer: answer,
                     resting: (!answered && answer == "maybe" ? "true" : nil),
@@ -53,6 +57,10 @@
       <% end %>
     </div>
   </div>
+
+  <% if yes_closed %>
+    <p class="text-sm text-mute">New yes answers closed 24 hours before the night. You can still answer maybe or no until it starts.</p>
+  <% end %>
 
   <%= render "events/rsvp_note", event: event, user_rsvp: user_rsvp %>
 </div>

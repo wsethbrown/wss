@@ -1,0 +1,640 @@
+#!/usr/bin/env bash
+#
+# Restore a production backup (a downloaded copy of the R2 bucket) into the
+# LOCAL Docker development stack, so real decks, users and societies can be
+# seen and worked on locally.
+#
+#   bin/restore-production-snapshot tmp/r2-backup                 # newest dump
+#   bin/restore-production-snapshot tmp/r2-backup --dump wss_20261020_090000.sql.gz
+#   bin/restore-production-snapshot tmp/r2-backup --yes           # no confirmation
+#   bin/restore-production-snapshot tmp/r2-backup --admin-email you@example.com --set-password
+#
+# The folder is the bucket as downloaded: db-backups/wss_*.sql.gz (nightly
+# pg_dump of the primary database, see DatabaseBackupJob) plus every Active
+# Storage object at its key (flat, no extension).
+#
+# What it does, in order (stops at the first failure):
+#   1. checks Docker, the db and web services, the folder, the dump, the blob
+#      files, and that development cannot send real mail or use a live Stripe key
+#   2. backs up the current local database to tmp/dev-db-before-restore-*.sql.gz
+#   3. stops web and jobs, drops and recreates wss_development, loads the dump
+#   4. marks it as a development database and runs pending migrations
+#   5. copies blob files into storage/ (Disk service layout) and points the
+#      blobs at the `local` service
+#   6. clears queued Solid Queue jobs so nothing fires when the stack starts
+#   7. starts web and jobs, waits for /up, prints a summary and how to go back
+#
+# Re-runnable: every run makes a fresh pre-restore backup and copying is
+# idempotent (files already in storage/ are left alone).
+#
+# Written for macOS's bash 3.2 and BSD tools as well as Linux.
+#
+# Testing hooks (not for everyday use): WSS_RESTORE_MODE=direct runs psql,
+# pg_dump and bin/rails directly against a local Postgres (PGHOST, default
+# 127.0.0.1, user DATABASE_USERNAME/DATABASE_PASSWORD) and a database named by
+# WSS_RESTORE_DB instead of going through Docker. WSS_RESTORE_STOP_CMD and
+# WSS_RESTORE_START_CMD replace stopping/starting the stack; WSS_RESTORE_URL
+# replaces http://localhost:3000.
+
+set -eo pipefail
+
+cd "$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+
+# ---------------------------------------------------------------- output
+
+say()  { printf '%s\n' "[restore] $*"; }
+warn() { printf '%s\n' "[restore] WARNING: $*" >&2; }
+die()  {
+  printf '%s\n' "[restore] STOPPED: $*" >&2
+  if [ "$STACK_STOPPED" = 1 ]; then
+    print_go_back >&2
+    printf '%s\n' "web and jobs are stopped. Start them with: ./wss up" >&2
+  fi
+  exit 1
+}
+STACK_STOPPED=0
+PRE_BACKUP=""
+step() { printf '\n%s\n' "== $*"; }
+
+usage() {
+  sed -n '3,12p' "$0" | sed 's/^# \{0,1\}//'
+  cat <<'EOF'
+Options:
+  --dump NAME           use this dump (a file name in db-backups/ or a path)
+  --yes                 do not ask for confirmation
+  --admin-email EMAIL   make that existing user a full admin
+  --set-password        with --admin-email: prompt for a new local password
+  -h, --help            this help
+EOF
+}
+
+# ---------------------------------------------------------------- arguments
+
+BACKUP_DIR=""
+DUMP_ARG=""
+ASSUME_YES=0
+ADMIN_EMAIL=""
+SET_PASSWORD=0
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --dump)          [ $# -ge 2 ] || die "--dump needs a file name"; DUMP_ARG="$2"; shift 2 ;;
+    --dump=*)        DUMP_ARG="${1#--dump=}"; shift ;;
+    --yes|-y)        ASSUME_YES=1; shift ;;
+    --admin-email)   [ $# -ge 2 ] || die "--admin-email needs an address"; ADMIN_EMAIL="$2"; shift 2 ;;
+    --admin-email=*) ADMIN_EMAIL="${1#--admin-email=}"; shift ;;
+    --set-password)  SET_PASSWORD=1; shift ;;
+    -h|--help)       usage; exit 0 ;;
+    -*)              die "unknown option $1 (see --help)" ;;
+    *)               [ -z "$BACKUP_DIR" ] || die "only one backup folder, got '$BACKUP_DIR' and '$1'"
+                     BACKUP_DIR="$1"; shift ;;
+  esac
+done
+
+[ -n "$BACKUP_DIR" ] || { usage; die "give the downloaded bucket folder, e.g. tmp/r2-backup"; }
+if [ "$SET_PASSWORD" = 1 ] && [ -z "$ADMIN_EMAIL" ]; then
+  die "--set-password needs --admin-email (whose password to set)"
+fi
+
+# ---------------------------------------------------------------- mode
+
+MODE="${WSS_RESTORE_MODE:-docker}"
+STORAGE_DIR="storage"
+APP_URL="${WSS_RESTORE_URL:-http://localhost:3000}"
+STAMP="$(date +%Y%m%d-%H%M%S)"
+
+case "$MODE" in
+  docker)
+    TARGET_DB="wss_development"
+    [ -z "$WSS_RESTORE_DB" ] || die "WSS_RESTORE_DB only applies with WSS_RESTORE_MODE=direct"
+    ;;
+  direct)
+    TARGET_DB="${WSS_RESTORE_DB:-}"
+    [ -n "$TARGET_DB" ] || die "direct mode needs WSS_RESTORE_DB (a throwaway database name)"
+    case "$TARGET_DB" in
+      wss_development|wss_test|wss_test*) die "direct mode refuses to touch $TARGET_DB" ;;
+    esac
+    export PGHOST="${PGHOST:-127.0.0.1}" PGPORT="${PGPORT:-5432}"
+    export PGUSER="${DATABASE_USERNAME:-wss}" PGPASSWORD="${DATABASE_PASSWORD:-password}"
+    ;;
+  *) die "WSS_RESTORE_MODE must be docker or direct, not '$MODE'" ;;
+esac
+
+case "$TARGET_DB" in
+  *[!a-z0-9_]*) die "database name '$TARGET_DB' must be lowercase letters, digits and underscores" ;;
+esac
+
+# ---------------------------------------------------------------- backends
+# Everything that talks to Docker goes through these few functions, so the
+# test mode can swap them for direct local commands.
+
+compose() { docker compose "$@"; }
+
+# db_psql DATABASE [psql args...]: psql as the wss role, errors fatal.
+db_psql() {
+  local db="$1"; shift
+  if [ "$MODE" = docker ]; then
+    compose exec -T db psql -X -U wss -v ON_ERROR_STOP=1 -d "$db" "$@"
+  else
+    psql -X -v ON_ERROR_STOP=1 -d "$db" "$@"
+  fi
+}
+
+# db_query DATABASE SQL: one value per line, fields separated by a tab.
+db_query() { db_psql "$1" -At -F "$(printf '\t')" -c "$2"; }
+
+db_dump() {
+  if [ "$MODE" = docker ]; then
+    compose exec -T db pg_dump -U wss "$1"
+  else
+    pg_dump "$1"
+  fi
+}
+
+# rails_env_args: NAME=value pairs given before "--" become container env.
+# web_run: a one-off Rails command while web is stopped.
+# web_exec: a Rails command inside the running web container.
+web_cmd() {
+  local how="$1"; shift
+  local envs=""
+  while [ $# -gt 0 ] && [ "$1" != "--" ]; do envs="$envs $1"; shift; done
+  [ "$1" = "--" ] && shift
+  if [ "$MODE" = docker ]; then
+    local flags="" e
+    for e in $envs; do flags="$flags -e $e"; done
+    if [ "$how" = run ]; then
+      # shellcheck disable=SC2086
+      compose run --rm --no-deps -T $flags web "$@"
+    else
+      # shellcheck disable=SC2086
+      compose exec -T $flags web "$@"
+    fi
+  else
+    # shellcheck disable=SC2086
+    env RAILS_ENV=development \
+        DATABASE_URL="postgresql://${PGUSER}:${PGPASSWORD}@${PGHOST}:${PGPORT}/${TARGET_DB}" \
+        $envs "$@"
+  fi
+}
+web_run()  { web_cmd run "$@"; }
+web_exec() { web_cmd exec "$@"; }
+
+stack_stop() {
+  if [ "$MODE" = docker ]; then
+    compose stop web jobs
+  else
+    eval "${WSS_RESTORE_STOP_CMD:-:}"
+  fi
+}
+
+stack_start() {
+  if [ "$MODE" = docker ]; then
+    compose up -d web jobs
+  else
+    eval "${WSS_RESTORE_START_CMD:-:}"
+  fi
+}
+
+human_size() {
+  awk -v b="$1" 'BEGIN {
+    if (b >= 1073741824) printf "%.1f GB", b / 1073741824
+    else if (b >= 1048576) printf "%.1f MB", b / 1048576
+    else if (b >= 1024) printf "%.1f KB", b / 1024
+    else printf "%d bytes", b }'
+}
+
+file_size() { wc -c < "$1" | tr -d ' '; }
+
+# How to put the pre-restore database back (also printed on failure).
+print_go_back() {
+  [ -n "$PRE_BACKUP" ] || return 0
+  if [ -n "$PRE_BACKUP" ]; then
+    if [ "$MODE" = docker ]; then
+      cat <<EOF
+
+To go back to the database you had before this run:
+  docker compose stop web jobs
+  docker compose exec -T db psql -U wss -d postgres -c 'DROP DATABASE IF EXISTS "$TARGET_DB" WITH (FORCE)' -c 'CREATE DATABASE "$TARGET_DB"'
+  gunzip -c $PRE_BACKUP | docker compose exec -T db psql -U wss -d $TARGET_DB -q -v ON_ERROR_STOP=1
+  docker compose up -d web jobs
+(The files copied into storage/ can stay; the old database simply does not use them.)
+EOF
+    else
+      cat <<EOF
+
+To go back to the database you had before this run:
+  psql -d postgres -c 'DROP DATABASE IF EXISTS "$TARGET_DB" WITH (FORCE)' -c 'CREATE DATABASE "$TARGET_DB"'
+  gunzip -c $PRE_BACKUP | psql -d $TARGET_DB -q -v ON_ERROR_STOP=1
+EOF
+    fi
+  fi
+  # A re-run backs up whatever is there at that moment; the oldest file is the
+  # database from before the first run.
+  if [ "$(find tmp -maxdepth 1 -name 'dev-db-before-restore-*.sql.gz' | wc -l | tr -d ' ')" -gt 1 ]; then
+    echo "Earlier backups (the oldest is from before your first restore):"
+    find tmp -maxdepth 1 -name 'dev-db-before-restore-*.sql.gz' | sort | sed 's/^/  /'
+  fi
+}
+
+# ================================================================ 1. checks
+step "1. Checking"
+
+if [ "$MODE" = docker ]; then
+  command -v docker >/dev/null 2>&1 || die "docker is not installed or not on PATH"
+  docker info >/dev/null 2>&1 || die "Docker is not running. Start Docker Desktop and try again."
+  docker compose version >/dev/null 2>&1 || die "'docker compose' (Compose v2) is not available"
+  running="$(compose ps --status running --services 2>/dev/null || true)"
+  grep -qx db <<<"$running"  || die "the db service is not running. Start the stack with ./wss up"
+  grep -qx web <<<"$running" || die "the web service is not running. Start the stack with ./wss up"
+  grep -qx jobs <<<"$running" || warn "the jobs service is not running (it will be started at the end)"
+  say "Docker is running; db and web are up"
+else
+  command -v psql >/dev/null 2>&1 || die "psql not found"
+  say "direct mode (testing): database $TARGET_DB on $PGHOST:$PGPORT"
+fi
+
+[ -d "$BACKUP_DIR" ] || die "folder not found: $BACKUP_DIR"
+BACKUP_DIR="$(cd "$BACKUP_DIR" && pwd)"
+[ -d "$BACKUP_DIR/db-backups" ] || die "no db-backups/ folder in $BACKUP_DIR (is this the downloaded bucket?)"
+
+if [ -n "$DUMP_ARG" ]; then
+  if [ -f "$DUMP_ARG" ]; then
+    DUMP="$DUMP_ARG"
+  elif [ -f "$BACKUP_DIR/db-backups/$DUMP_ARG" ]; then
+    DUMP="$BACKUP_DIR/db-backups/$DUMP_ARG"
+  else
+    die "dump not found: $DUMP_ARG (looked in $BACKUP_DIR/db-backups/)"
+  fi
+else
+  # Timestamped names sort chronologically, newest last.
+  DUMP="$(find "$BACKUP_DIR/db-backups" -maxdepth 1 -type f -name 'wss_*.sql.gz' | sort | tail -n 1)"
+  [ -n "$DUMP" ] || die "no wss_*.sql.gz dump in $BACKUP_DIR/db-backups"
+fi
+dump_count="$(find "$BACKUP_DIR/db-backups" -maxdepth 1 -type f -name '*.sql.gz' | wc -l | tr -d ' ')"
+gzip -t "$DUMP" 2>/dev/null || die "the dump $(basename "$DUMP") is not a valid gzip file (truncated download?)"
+dump_size="$(file_size "$DUMP")"
+[ "$dump_size" -gt 1000 ] || die "the dump $(basename "$DUMP") is only $dump_size bytes"
+# head closes the pipe early, so the pipeline's status is ignored here.
+dump_head="$(gunzip -c "$DUMP" 2>/dev/null | head -n 40 || true)"
+grep -q 'PostgreSQL database dump' <<<"$dump_head" \
+  || die "$(basename "$DUMP") does not look like a pg_dump file"
+
+# Blob files: everything except db-backups/ and hidden files (.DS_Store).
+blob_count=0
+blob_bytes=0
+odd_names=0
+while IFS= read -r -d '' f; do
+  blob_count=$((blob_count + 1))
+  blob_bytes=$((blob_bytes + $(file_size "$f")))
+  key="${f#"$BACKUP_DIR"/}"
+  case "$key" in *[!A-Za-z0-9/_.-]*) odd_names=$((odd_names + 1)) ;; esac
+done < <(find "$BACKUP_DIR" -type f ! -path "$BACKUP_DIR/db-backups/*" ! -name '.*' -print0)
+[ "$blob_count" -gt 0 ] || die "no blob files found next to db-backups/ in $BACKUP_DIR"
+[ "$odd_names" = 0 ] || warn "$odd_names file name(s) contain unusual characters; they are copied as-is"
+
+# Safety: the restored data is real customers. Ask the running app (all
+# initializers and .env applied) how it would send mail and which Stripe key
+# it holds. Prints only labels, never the key.
+safety_rb='m = ActionMailer::Base.delivery_method; k = Stripe.api_key.to_s
+stripe = if k.empty? || k.end_with?("_placeholder") then "placeholder" elsif k.start_with?("sk_live_", "rk_live_") then "live" elsif k.start_with?("sk_test_", "rk_test_") then "test" else "unknown" end
+puts "wss-safety env=#{Rails.env} mail=#{m} stripe=#{stripe} sentry=#{ENV["SENTRY_DSN"].present? ? "set" : "unset"}"'
+safety="$(web_exec -- bin/rails runner "$safety_rb" 2>/dev/null | grep '^wss-safety ' | tail -n 1 || true)"
+[ -n "$safety" ] || die "could not ask the app for its mail and Stripe settings (bin/rails runner failed in web)"
+s_env="$(printf '%s' "$safety" | sed -n 's/.* env=\([^ ]*\).*/\1/p')"
+s_mail="$(printf '%s' "$safety" | sed -n 's/.* mail=\([^ ]*\).*/\1/p')"
+s_stripe="$(printf '%s' "$safety" | sed -n 's/.* stripe=\([^ ]*\).*/\1/p')"
+s_sentry="$(printf '%s' "$safety" | sed -n 's/.* sentry=\([^ ]*\).*/\1/p')"
+[ "$s_env" = development ] || die "the web app runs as '$s_env', not development; refusing to load customer data into it"
+case "$s_mail" in
+  file|test) say "mail: development delivers to files in tmp/mail (method $s_mail), nothing is sent" ;;
+  *) die "development mail delivery is '$s_mail', which could email real customers. It must be :file (config/environments/development.rb). Fix that before restoring." ;;
+esac
+case "$s_stripe" in
+  live) die "STRIPE_SECRET_KEY in the local environment is a LIVE key. With real customers loaded, admin actions could charge or cancel real subscriptions. Put a test-mode key (sk_test_...) in .env, run 'docker compose up -d --force-recreate web jobs', then retry." ;;
+  test) say "stripe: test-mode key (production customer ids do not exist in test mode, so Stripe calls fail instead of charging)" ;;
+  placeholder) say "stripe: no key configured (placeholder), Stripe calls will fail" ;;
+  *)    die "STRIPE_SECRET_KEY is set but is neither a test (sk_test_) nor a live key; refusing until it is a test-mode key" ;;
+esac
+[ "$s_sentry" != set ] || warn "SENTRY_DSN is set locally: errors while browsing real data would be reported to Sentry"
+
+if [ "$MODE" = docker ]; then
+  pgver="$(compose exec -T db psql -X -U wss -At -c 'show server_version' 2>/dev/null | tr -d '\r' || true)"
+  say "local Postgres server: ${pgver:-unknown}"
+fi
+
+say "dump:   $(basename "$DUMP") ($(human_size "$dump_size"), newest of $dump_count in db-backups/)"
+say "files:  $blob_count blob file(s), $(human_size "$blob_bytes") in total"
+say "target: database $TARGET_DB, files into $STORAGE_DIR/"
+cat <<EOF
+
+About to:
+  - back up the current $TARGET_DB to tmp/dev-db-before-restore-$STAMP.sql.gz
+  - stop web and jobs
+  - DROP $TARGET_DB and load $(basename "$DUMP") into a fresh one
+  - mark it as development and run pending migrations
+  - copy the $blob_count files into $STORAGE_DIR/ (nothing there is deleted)
+  - point the blobs at the local Disk service, clear queued jobs
+  - start web and jobs again
+EOF
+[ -z "$ADMIN_EMAIL" ] || echo "  - make $ADMIN_EMAIL a full admin$( [ "$SET_PASSWORD" = 1 ] && echo ' and set a local password' )"
+echo
+
+if [ "$ASSUME_YES" != 1 ]; then
+  printf 'Continue? [y/N] '
+  read -r answer || answer=""
+  case "$answer" in y|Y|yes|YES) ;; *) die "cancelled, nothing was changed" ;; esac
+fi
+
+# Read the password now, before anything slow happens, so the person is not
+# asked half way through. Never echoed, never on a command line.
+NEW_PASSWORD=""
+if [ "$SET_PASSWORD" = 1 ]; then
+  printf 'New local password for %s (min 6 characters): ' "$ADMIN_EMAIL"
+  read -r -s NEW_PASSWORD || true; echo
+  printf 'Again: '
+  read -r -s again || true; echo
+  [ "$NEW_PASSWORD" = "$again" ] || die "the passwords did not match, nothing was changed"
+  [ "${#NEW_PASSWORD}" -ge 6 ] || die "the password must be at least 6 characters, nothing was changed"
+  unset again
+fi
+
+mkdir -p tmp
+
+# ================================================================ 2. backup
+step "2. Backing up the current local database"
+
+exists="$(db_query postgres "SELECT 1 FROM pg_database WHERE datname = '$TARGET_DB'" | tr -d '\r')"
+if [ "$exists" = 1 ]; then
+  PRE_BACKUP="tmp/dev-db-before-restore-$STAMP.sql.gz"
+  if ! db_dump "$TARGET_DB" | gzip > "$PRE_BACKUP"; then
+    rm -f "$PRE_BACKUP"
+    die "pg_dump of $TARGET_DB failed; nothing was changed"
+  fi
+  gzip -t "$PRE_BACKUP" || die "the backup $PRE_BACKUP is not readable; nothing was changed"
+  say "saved $PRE_BACKUP ($(human_size "$(file_size "$PRE_BACKUP")"))"
+else
+  say "$TARGET_DB does not exist yet, nothing to back up"
+fi
+
+# ================================================================ 3. load
+step "3. Loading $(basename "$DUMP") into $TARGET_DB"
+
+say "stopping web and jobs"
+STACK_STOPPED=1
+stack_stop || die "could not stop web and jobs"
+# A puma pid file left behind would stop the server starting again.
+[ "$MODE" != docker ] || rm -f tmp/pids/server.pid
+
+say "dropping and recreating $TARGET_DB"
+db_psql postgres -q -c "DROP DATABASE IF EXISTS \"$TARGET_DB\" WITH (FORCE)" \
+                    -c "CREATE DATABASE \"$TARGET_DB\"" \
+  || die "could not drop and recreate $TARGET_DB (the backup is $PRE_BACKUP)"
+
+# The dump is plain SQL from a database owned by the role wss. Two kinds of
+# line are removed before loading, outside COPY data blocks only:
+#   - "ALTER ... OWNER TO ...": everything is created by the local wss role
+#     anyway, so ownership comes out right and a role mismatch cannot fail the
+#     load (the same as pg_restore --no-owner).
+#   - "\restrict" / "\unrestrict": psql meta-commands newer pg_dump versions
+#     add; an older local psql rejects them as unknown commands. They guard
+#     against a hostile server, and this dump comes from our own.
+# Everything else must load without a single error: ON_ERROR_STOP plus one
+# transaction, so a failure leaves an empty database, never a half-loaded one.
+LOAD_LOG="tmp/restore-load-$STAMP.log"
+filter_dump() {
+  awk '
+    in_copy { print; if ($0 == "\\.") in_copy = 0; next }
+    /^COPY .* FROM stdin;$/ { in_copy = 1; print; next }
+    /^ALTER .* OWNER TO / { owners++; next }
+    /^\\(un)?restrict / { next }
+    { print }
+    END { print owners + 0 > "/dev/stderr" }
+  '
+}
+if ! gunzip -c "$DUMP" | filter_dump 2>"$LOAD_LOG.owners" | db_psql "$TARGET_DB" -q -1 >"$LOAD_LOG" 2>&1; then
+  echo "--- psql output (last 30 lines of $LOAD_LOG) ---" >&2
+  tail -n 30 "$LOAD_LOG" >&2
+  die "loading the dump failed; $TARGET_DB is empty. Go back with the commands below once fixed, or re-run. Backup: ${PRE_BACKUP:-none}"
+fi
+if grep -q 'ERROR' "$LOAD_LOG"; then
+  tail -n 30 "$LOAD_LOG" >&2
+  die "psql reported errors while loading (see $LOAD_LOG)"
+fi
+say "loaded; skipped $(cat "$LOAD_LOG.owners" 2>/dev/null || echo 0) ownership statement(s)"
+rm -f "$LOAD_LOG.owners"
+
+tables="$(db_query "$TARGET_DB" "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'")"
+[ "${tables:-0}" -ge 20 ] || die "only ${tables:-0} tables after loading; the dump looks incomplete"
+say "$tables tables restored"
+
+# ================================================================ 4. migrate
+step "4. Bringing the schema up to this code"
+
+db_psql "$TARGET_DB" -q -c "UPDATE ar_internal_metadata SET value = 'development', updated_at = now() WHERE key = 'environment'" \
+  || die "could not mark the database as development"
+say "ar_internal_metadata.environment = development"
+
+# Development runs Solid Queue in the primary database
+# (config/initializers/solid_queue_dev.rb); production keeps it in a separate
+# queue database, so the dump may not have the tables. Create them from
+# db/queue_schema.rb if missing. Its define(version: 1) wrapper is skipped on
+# purpose: it would write a bogus version into schema_migrations.
+has_queue="$(db_query "$TARGET_DB" "SELECT to_regclass('public.solid_queue_jobs') IS NOT NULL")"
+if [ "$has_queue" != t ]; then
+  say "Solid Queue tables missing (production keeps them elsewhere); creating them from db/queue_schema.rb"
+  queue_rb='body = File.read(Rails.root.join("db/queue_schema.rb"))[/\.define\(version: [\d_]+\) do\n(.*)\nend\s*\z/m, 1]
+abort "could not read db/queue_schema.rb" unless body
+ActiveRecord::Migration.suppress_messages { ActiveRecord::Schema[8.0].new.instance_eval(body) }'
+  if ! out="$(web_run -- bin/rails runner "$queue_rb" 2>&1)"; then
+    printf '%s\n' "$out" | tail -n 15 >&2
+    die "creating the Solid Queue tables failed"
+  fi
+  say "Solid Queue tables created"
+fi
+
+# SCHEMA= sends the post-migration schema dump to tmp/ instead of rewriting
+# db/schema.rb in the working tree.
+MIGRATE_LOG="tmp/restore-migrate-$STAMP.log"
+SCHEMA_OUT="tmp/restore-schema-$STAMP.rb"
+say "running bin/rails db:migrate (log: $MIGRATE_LOG)"
+if ! web_run "SCHEMA=$SCHEMA_OUT" -- bin/rails db:migrate >"$MIGRATE_LOG" 2>&1; then
+  echo "--- migration output (last 40 lines of $MIGRATE_LOG) ---" >&2
+  tail -n 40 "$MIGRATE_LOG" >&2
+  die "a migration failed. The database holds the restored data up to the failed migration. Fix the cause and re-run this script, or go back with the commands below. Backup: ${PRE_BACKUP:-none}"
+fi
+migrated="$(grep -E '^== [0-9]+ .*: migrated' "$MIGRATE_LOG" | sed 's/^== //; s/: migrated.*//' || true)"
+if [ -n "$migrated" ]; then
+  say "migrations run:"
+  printf '%s\n' "$migrated" | sed 's/^/           /'
+  grep -E '^   -> |^-- ' "$MIGRATE_LOG" | grep -iE 'merged|cleared' | sed 's/^ *-> /           note: /' || true
+else
+  say "no pending migrations"
+fi
+
+status="$(web_run -- bin/rails db:migrate:status 2>/dev/null || true)"
+down="$(printf '%s\n' "$status" | grep -cE '^ +down ' || true)"
+nofile="$(printf '%s\n' "$status" | grep -E 'NO FILE' || true)"
+[ "${down:-0}" = 0 ] || die "$down migration(s) still down after db:migrate (see bin/rails db:migrate:status)"
+if [ -n "$nofile" ]; then
+  warn "the backup has migrations this code does not know (production ran newer code):"
+  printf '%s\n' "$nofile" | sed 's/^/           /' >&2
+fi
+if [ -f "$SCHEMA_OUT" ]; then
+  # Compare without the version line (it names the newest migration either way).
+  grep -v '^ActiveRecord::Schema' db/schema.rb > "$SCHEMA_OUT.a" || true
+  grep -v '^ActiveRecord::Schema' "$SCHEMA_OUT" > "$SCHEMA_OUT.b" || true
+  same=0; cmp -s "$SCHEMA_OUT.a" "$SCHEMA_OUT.b" && same=1
+  rm -f "$SCHEMA_OUT.a" "$SCHEMA_OUT.b"
+  if [ "$same" = 1 ]; then
+    say "resulting schema matches db/schema.rb"
+    rm -f "$SCHEMA_OUT"
+  else
+    warn "the restored schema differs from db/schema.rb; compare with: diff db/schema.rb $SCHEMA_OUT"
+  fi
+fi
+
+# ================================================================ 5. files
+step "5. Copying files into $STORAGE_DIR/"
+
+copied=0; present=0; replaced=0
+while IFS= read -r -d '' f; do
+  key="${f#"$BACKUP_DIR"/}"
+  # The Disk service's layout: storage/<key[0,2]>/<key[2,2]>/<key>
+  dest="$STORAGE_DIR/${key:0:2}/${key:2:2}/$key"
+  if [ -f "$dest" ]; then
+    if cmp -s "$f" "$dest"; then present=$((present + 1)); continue; fi
+    replaced=$((replaced + 1))
+  else
+    copied=$((copied + 1))
+  fi
+  mkdir -p "$(dirname "$dest")"
+  cp "$f" "$dest" || die "could not copy $key into $STORAGE_DIR/"
+done < <(find "$BACKUP_DIR" -type f ! -path "$BACKUP_DIR/db-backups/*" ! -name '.*' -print0)
+say "copied $copied new file(s), $present already in place, $replaced replaced with the backup's copy"
+
+moved="$(db_query "$TARGET_DB" "WITH u AS (UPDATE active_storage_blobs SET service_name = 'local' WHERE service_name = 'cloudflare_r2' RETURNING 1) SELECT count(*) FROM u")"
+say "pointed $moved blob(s) from cloudflare_r2 to local"
+others="$(db_query "$TARGET_DB" "SELECT service_name || ' (' || count(*) || ')' FROM active_storage_blobs WHERE service_name <> 'local' GROUP BY service_name")"
+[ -z "$others" ] || warn "blobs on other services, left alone: $(printf '%s' "$others" | tr '\n' ' ')"
+
+referenced=0; on_disk=0; bad_sum=0; missing_list=""; missing=0
+have_md5=0; command -v openssl >/dev/null 2>&1 && command -v base64 >/dev/null 2>&1 && have_md5=1
+tab="$(printf '\t')"
+while IFS="$tab" read -r key checksum filename owner; do
+  [ -n "$key" ] || continue
+  referenced=$((referenced + 1))
+  path="$STORAGE_DIR/${key:0:2}/${key:2:2}/$key"
+  if [ -f "$path" ]; then
+    on_disk=$((on_disk + 1))
+    if [ "$have_md5" = 1 ] && [ -n "$checksum" ]; then
+      sum="$(openssl dgst -md5 -binary < "$path" | base64)"
+      [ "$checksum" = - ] || [ "$sum" = "$checksum" ] || { bad_sum=$((bad_sum + 1)); warn "checksum mismatch: $key ($filename)"; }
+    fi
+  else
+    missing=$((missing + 1))
+    [ "$missing" -gt 20 ] || missing_list="$missing_list
+           $key  $filename  ($owner)"
+  fi
+done <<EOF
+$(db_query "$TARGET_DB" "SELECT b.key, coalesce(nullif(b.checksum, ''), '-'), coalesce(nullif(b.filename, ''), '-'),
+    coalesce((SELECT a.record_type || ' ' || a.record_id || ' ' || a.name FROM active_storage_attachments a WHERE a.blob_id = b.id LIMIT 1), 'not attached')
+  FROM active_storage_blobs b ORDER BY b.id")
+EOF
+say "the database references $referenced blob(s); $on_disk have a file on disk"
+if [ "$have_md5" = 1 ]; then say "checksums checked: $bad_sum mismatch(es)"; fi
+if [ "$missing" -gt 0 ]; then
+  warn "$missing blob(s) have no file (pages show them as broken images; variants regenerate on demand). First $( [ "$missing" -gt 20 ] && echo 20 || echo "$missing" ):$missing_list"
+fi
+
+# ================================================================ 6. safety
+step "6. Making local use safe"
+
+jobs_before="$(db_query "$TARGET_DB" "SELECT count(*) FROM solid_queue_jobs")"
+db_psql "$TARGET_DB" -q -c "SET client_min_messages = warning" -c "DO \$\$
+DECLARE t text;
+BEGIN
+  FOR t IN SELECT tablename FROM pg_tables WHERE schemaname = 'public' AND tablename LIKE 'solid\\_queue\\_%' LOOP
+    EXECUTE format('TRUNCATE TABLE public.%I CASCADE', t);
+  END LOOP;
+END \$\$;" || die "could not clear the Solid Queue tables"
+say "cleared $jobs_before queued or finished job(s), so no email or reminder fires when jobs starts"
+say "mail goes to tmp/mail only; Stripe key is ${s_stripe}"
+
+# ================================================================ 7. start
+step "7. Starting web and jobs"
+
+stack_start || die "could not start web and jobs (try ./wss up)"
+STACK_STOPPED=0
+say "waiting for $APP_URL/up"
+code=""; waited=0
+while [ "$waited" -lt 180 ]; do
+  code="$(curl -s -o /dev/null -w '%{http_code}' "$APP_URL/up" 2>/dev/null || true)"
+  [ "$code" = 200 ] && break
+  sleep 3; waited=$((waited + 3))
+done
+[ "$code" = 200 ] || die "$APP_URL/up did not return 200 within 180s (last: ${code:-no answer}). Check ./wss logs web"
+say "$APP_URL/up returned 200"
+
+if [ -n "$ADMIN_EMAIL" ]; then
+  admin_rb='email = ENV.fetch("WSS_ADMIN_EMAIL").strip.downcase
+user = User.find_by("lower(email) = ?", email)
+abort "No user with that email in the restored database. Nothing changed." unless user
+user.update_columns(admin_role: "full", updated_at: Time.current)
+Rails.logger.info("[restore] user #{user.id} admin_role set to full by bin/restore-production-snapshot")
+puts "wss-admin user #{user.id} is now a full admin"'
+  out="$(web_exec "WSS_ADMIN_EMAIL=$ADMIN_EMAIL" -- bin/rails runner "$admin_rb" 2>&1)" \
+    || { printf '%s\n' "$out" | tail -n 5 >&2; die "could not make $ADMIN_EMAIL an admin"; }
+  say "$(printf '%s\n' "$out" | grep '^wss-admin ' | sed 's/^wss-admin //')"
+
+  if [ "$SET_PASSWORD" = 1 ]; then
+    password_rb='pw = ENV["WSS_NEW_PASSWORD"].to_s
+abort "The password did not reach the container (empty). Nothing changed." if pw.empty?
+user = User.find_by("lower(email) = ?", ENV.fetch("WSS_ADMIN_EMAIL").strip.downcase)
+abort "No user with that email. Nothing changed." unless user
+abort "Password length must be in #{Devise.password_length}. Nothing changed." unless Devise.password_length.cover?(pw.length)
+user.password = pw
+user.password_confirmation = pw
+user.save!(validate: false)
+Rails.logger.info("[restore] user #{user.id} local password set by bin/restore-production-snapshot")
+puts "wss-password set for user #{user.id}"'
+    # The password travels only in this one command'\''s environment: it is
+    # named (not valued) on the docker command line, so ps never shows it.
+    if [ "$MODE" = docker ]; then
+      out="$(WSS_NEW_PASSWORD="$NEW_PASSWORD" compose exec -T -e WSS_NEW_PASSWORD -e "WSS_ADMIN_EMAIL=$ADMIN_EMAIL" web bin/rails runner "$password_rb" 2>&1)" || {
+        printf '%s\n' "$out" | tail -n 5 >&2; NEW_PASSWORD=""; die "could not set the password"; }
+    else
+      out="$(WSS_NEW_PASSWORD="$NEW_PASSWORD" web_exec "WSS_ADMIN_EMAIL=$ADMIN_EMAIL" -- bin/rails runner "$password_rb" 2>&1)" || {
+        printf '%s\n' "$out" | tail -n 5 >&2; NEW_PASSWORD=""; die "could not set the password"; }
+    fi
+    NEW_PASSWORD=""
+    say "password $(printf '%s\n' "$out" | grep '^wss-password ' | sed 's/^wss-password //')"
+  fi
+fi
+
+# ---------------------------------------------------------------- summary
+step "Summary"
+
+db_query "$TARGET_DB" "SELECT 'decks: ' || count(*) FILTER (WHERE published) || ' published, ' || count(*) FILTER (WHERE NOT published OR published IS NULL) || ' draft' FROM presentations" | sed 's/^/  /'
+db_query "$TARGET_DB" "SELECT p.title, CASE WHEN p.published THEN 'published' ELSE 'draft' END,
+         (SELECT count(*) FROM active_storage_attachments a WHERE a.record_type = 'Presentation' AND a.record_id = p.id AND a.name = 'slide_images')
+  FROM presentations p ORDER BY p.published DESC, p.title" |
+  while IFS="$tab" read -r title state slides; do
+    printf '    %-9s %3s slides  %s\n' "$state" "$slides" "$title"
+  done
+db_query "$TARGET_DB" "SELECT 'users: ' || count(*) || ' (' || count(*) FILTER (WHERE admin_role = 'full') || ' full admin, ' || count(*) FILTER (WHERE admin_role = 'limited') || ' limited)' FROM users" | sed 's/^/  /'
+db_query "$TARGET_DB" "SELECT 'societies: ' || count(*) FROM societies" | sed 's/^/  /'
+db_query "$TARGET_DB" "SELECT 'events: ' || count(*) || ' (' || count(*) FILTER (WHERE start_time > now()) || ' upcoming)' FROM events" | sed 's/^/  /'
+
+cat <<EOF
+
+Signing in ($APP_URL/auth):
+  - Google sign-in is not configured locally.
+  - Password: run again with --admin-email you@example.com --set-password,
+    or use a password you already had in production.
+  - Magic link: ask for one on the sign-in page; it is written to tmp/mail,
+    and bin/magic-links prints the link.
+  Real customers' data is loaded. Mail goes to tmp/mail only.
+EOF
+
+print_go_back
+say "done"

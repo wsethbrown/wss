@@ -176,4 +176,30 @@ class QueryCountsTest < ActionDispatch::IntegrationTest
     end
     assert_empty offenders, "image_tag of an original attachment (use a named variant): #{offenders.join(', ')}"
   end
+
+  test "dashboard query count does not grow with the number of events, pours and societies" do
+    member = users(:seth)
+    society = societies(:single_malt)
+    make_night = lambda do |i, start|
+      e = Event.new(society: society, organizer: users(:admin), title: "QC night #{i}", description: "x",
+                    location: "den", start_time: start, end_time: start + 2.hours)
+      e.save!(validate: false)
+      e
+    end
+    sign_in member
+    few = measure(dashboard_path)
+
+    6.times do |i|
+      upcoming = make_night.(i, (i + 2).days.from_now)
+      EventRsvp.create!(event: upcoming, user: member, status: i.even? ? "yes" : "maybe") if i < 3
+      past = make_night.(i + 100, (i + 2).days.ago)
+      EventRsvp.new(event: past, user: member, status: "yes").save!(validate: false)
+      EventBottle.create!(event: past, bottle: bottles(:lagavulin), position: 1)
+      other = Society.create!(name: "QC Society #{i}", description: "x", creator: users(:admin), is_private: i.even?)
+      SocietyMembership.create!(user: member, society: other, role: "member", status: "active")
+    end
+    many = measure(dashboard_path)
+
+    assert_operator many.size, :<=, few.size, "dashboard grew:\n#{growth(few, many)}"
+  end
 end

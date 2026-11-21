@@ -67,6 +67,10 @@ services:
       - .env
     environment:
       RAILS_ENV: development
+      DATABASE_HOST: db
+      DATABASE_USERNAME: wss
+      DATABASE_PASSWORD: password
+      DATABASE_PORT: 5432
       REDIS_URL: redis://redis:6379/0
     volumes:
       - .:/rails

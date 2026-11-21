@@ -44,4 +44,18 @@ class EventMailerTest < ActionMailer::TestCase
       bodies(mail).each { |b| assert_includes b, url }
     end
   end
+
+  # The reminder goes out 48 hours ahead (finding 5), so it must not say
+  # "Tomorrow", and what it says about changing an answer must be the rule.
+  test "the reminder says when it is and states the real RSVP rule" do
+    mail = EventMailer.event_reminder(@member, @event)
+    assert_not_includes mail.subject, "Tomorrow"
+    assert_includes mail.subject, "Thursday, January 14"
+    bodies(mail).each do |body|
+      assert_not_includes body, "Tomorrow"
+      assert_not_includes body, "at any time"
+      assert_includes body, "You can change your answer until the night starts. A new yes closes 24 hours before."
+    end
+    assert_not_includes EventMailer.event_created(@member, @event).html_part.body.decoded, "at any time"
+  end
 end

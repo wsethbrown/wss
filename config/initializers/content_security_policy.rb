@@ -23,7 +23,10 @@ Rails.application.configure do
     policy.form_action :self, :https
     policy.frame_ancestors :self
     # The Maps script is injected at runtime by location_autocomplete_controller.js.
-    policy.script_src  :self, "https://maps.googleapis.com"
+    # Cloudflare Turnstile (sign-up bot check, only when TURNSTILE_* keys are set):
+    # turnstile_controller.js injects its script, which renders the widget in an iframe.
+    policy.script_src  :self, "https://maps.googleapis.com", "https://challenges.cloudflare.com"
+    policy.frame_src   :self, "https://challenges.cloudflare.com"
     policy.style_src   :self, :https
     policy.connect_src :self, "https://maps.googleapis.com"
   end

@@ -57,8 +57,9 @@ class EventRsvpPolicyTest < ActiveSupport::TestCase
     assert_not policy(users(:jane)).update?
   end
 
+  # The window closes when the night starts (owner decision, November 2026).
   test "nobody changes an RSVP once the response window has closed" do
-    @private_event.update_columns(start_time: 2.hours.from_now, end_time: 4.hours.from_now)
+    @private_event.update_columns(start_time: 1.minute.ago, end_time: 2.hours.from_now)
     assert_not policy(users(:jane)).update?
     assert_not policy(users(:jane)).destroy?
   end

@@ -91,12 +91,56 @@ class EventNotificationsTest < ActionDispatch::IntegrationTest
   end
 
   # ---- reminder -------------------------------------------------------------
-  test "the reminder mails yes-RSVPs with the matching stamp" do
+  test "the reminder mails yes and maybe RSVPs with the matching stamp" do
     event = build_event
     EventRsvp.create!(user: @member, event: event, status: "yes")
+    EventRsvp.create!(user: users(:one), event: event, status: "maybe")
     EventRsvp.create!(user: users(:seth), event: event, status: "no")
     EventReminderJob.perform_now(event.id, event.start_time.to_i)
-    assert_equal [ @member.email ], enqueued_mail_recipients("event_reminder")
+    assert_equal [ @member.email, users(:one).email ].sort, enqueued_mail_recipients("event_reminder").sort
+  end
+
+  test "the reminder is scheduled 48 hours before the start" do
+    event = build_event(start_time: 5.days.from_now)
+    assert_enqueued_with(job: EventReminderJob, args: [ event.id, event.start_time.to_i ], at: event.start_time - 48.hours) do
+      EventReminderJob.schedule(event)
+    end
+  end
+
+  test "a reminder whose send time has passed is skipped and logged" do
+    event = build_event(start_time: 30.hours.from_now)
+    io = StringIO.new
+    original = Rails.logger
+    Rails.logger = ActiveSupport::Logger.new(io)
+    assert_no_enqueued_jobs(only: EventReminderJob) do
+      EventReminderJob.schedule(event)
+    end
+    assert_match(/event #{event.id}.*no reminder scheduled/, io.string)
+  ensure
+    Rails.logger = original
+  end
+
+  test "the reminder's answer buttons work when it arrives" do
+    event = build_event(start_time: 5.days.from_now)
+    EventRsvp.create!(user: @member, event: event, status: "maybe")
+    travel_to(event.start_time - 48.hours + 1.minute) do
+      token = EmailRsvpsController.token_for(@member, event)
+      post email_rsvp_path(status: "yes", token: token)
+      assert_equal "yes", event.event_rsvps.find_by(user: @member).status
+    end
+  end
+
+  test "an emailed yes from a maybe inside the last day is refused with the reason" do
+    event = build_event(start_time: 5.days.from_now)
+    EventRsvp.create!(user: @member, event: event, status: "maybe")
+    travel_to(event.start_time - 12.hours) do
+      token = EmailRsvpsController.token_for(@member, event)
+      post email_rsvp_path(status: "yes", token: token)
+      assert_equal "maybe", event.event_rsvps.find_by(user: @member).status
+      assert_equal "New yes answers close 24 hours before the event", flash[:alert]
+      post email_rsvp_path(status: "no", token: token)
+      assert_equal "no", event.event_rsvps.find_by(user: @member).status
+    end
   end
 
   test "a stale reminder stamp is a no-op" do
@@ -106,10 +150,23 @@ class EventNotificationsTest < ActionDispatch::IntegrationTest
     assert_empty enqueued_mail_recipients("event_reminder")
   end
 
-  test "no reminder is scheduled for events under 24 hours away" do
-    event = build_event(start_time: 10.hours.from_now)
+  test "no reminder is scheduled for events under 48 hours away" do
+    event = build_event(start_time: 40.hours.from_now)
     assert_no_enqueued_jobs(only: EventReminderJob) do
       EventReminderJob.schedule(event)
+    end
+  end
+
+  test "an on-site yes refused inside the last day says why and fails the request" do
+    event = build_event(start_time: 5.days.from_now)
+    travel_to(event.start_time - 12.hours) do
+      sign_in @member
+      post event_event_rsvps_path(event), params: { status: "yes" }, as: :turbo_stream
+      assert_response :unprocessable_entity
+      assert_match "New yes answers close 24 hours before the event", response.body
+      assert_nil event.event_rsvps.find_by(user: @member)
+      post event_event_rsvps_path(event), params: { status: "maybe" }, as: :turbo_stream
+      assert_equal "maybe", event.event_rsvps.find_by(user: @member).status
     end
   end
 

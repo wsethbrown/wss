@@ -31,6 +31,13 @@
 <% viewer_can_credit = user_signed_in? && !viewer_owns && !@presentation.free? && current_user.subscription_active? && current_user.credits.to_i > 0 %>
 <% owned_purchase = user_signed_in? ? current_user.user_presentations.find_by(presentation_id: @presentation.id) : nil %>
 <% lapsed_credit_owner = owned_purchase && owned_purchase.purchase_type == 'credit' && !current_user.subscription_active? %>
+<%# Site admins open every deck without buying it. admin_access is that case (an
+    admin with no usable purchase); owner_tools is the ONE flag the action bar
+    and the Downloads box both read, derived from the controller's @full_story
+    so the page can never promise more than the downloads controller allows.
+    A lapsed credit owner who is not an admin keeps owner_tools false. %>
+<% admin_access = user_signed_in? && current_user.admin? && @full_story && (owned_purchase.nil? || lapsed_credit_owner) %>
+<% owner_tools = user_signed_in? && @full_story && (admin_access || (owned_purchase.present? && !lapsed_credit_owner)) %>
 <%# Rendered slides, loaded once: the cover, the slide count and the teaser all use them. %>
 <% slide_list = @presentation.slide_images.attached? ? @presentation.slide_images_attachments.includes(:blob).order(:id).to_a : [] %>
 <% get_label = if !user_signed_in?
@@ -40,7 +47,7 @@
                else
                  'Purchase'
                end %>
-<% get_path = user_signed_in? ? new_presentation_purchase_path(@presentation) : auth_path %>
+<% get_path = user_signed_in? ? new_presentation_purchase_path(@presentation) : sign_in_path_returning %>
 
 <%# Purchase outcomes are real flashes (overlay toasts from the layout), set by
     PresentationsController#handle_checkout_return. %>
@@ -78,7 +85,10 @@
   <section id="deck-actions" class="card mt-8 p-5 sm:p-6" aria-label="Get this deck">
     <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
       <div class="min-w-0">
-        <% if owned_purchase %>
+        <% if admin_access %>
+          <p class="font-display text-2xl font-semibold text-ink">Admin access</p>
+          <p class="mt-1 text-mute">You can open every deck as a site admin. Customers see the price and purchase options here.</p>
+        <% elsif owned_purchase %>
           <% if lapsed_credit_owner %>
             <p class="font-display text-2xl font-semibold text-ink">Membership paused</p>
             <p class="mt-1 text-mute">You unlocked this deck with a credit, reactivate to read it again.</p>
@@ -96,11 +106,11 @@
       </div>
 
       <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:justify-end">
-        <% if viewer_owns %>
-          <% if lapsed_credit_owner %>
-            <%= link_to "Reactivate membership", root_path(anchor: 'pricing'), class: "btn btn-primary min-h-12" %>
+        <% if owner_tools || viewer_owns %>
+          <% if !owner_tools %>
+            <%= link_to "Reactivate membership", membership_path(anchor: 'pricing'), class: "btn btn-primary min-h-12" %>
             <a href="#deck-story" data-turbo="false" class="btn btn-secondary min-h-12">Read the story</a>
-          <% elsif @presentation.pdf_file.attached? && @full_story %>
+          <% elsif @presentation.pdf_file.attached? %>
             <%# Owners: open the real deck when the file exists. %>
             <% if slide_list.any? %>
               <%= link_to "Present", present_presentation_path(@presentation), class: "btn btn-primary min-h-12" %>
@@ -121,7 +131,7 @@
       </div>
     </div>
 
-    <% unless owned_purchase %>
+    <% unless owned_purchase || admin_access %>
       <%# What you get, an honest manifest built ONLY from what exists. %>
       <% manifest = [
         (slide_list.any? ? "The full deck, #{slide_list.size} slides" : (@presentation.pdf_file.attached? ? "The full presentation file" : nil)),
@@ -152,7 +162,7 @@
   <%# Downloads: owners with access only, one list built from whatever files exist.
       The box only renders when there is something to download; an empty labeled
       box reads as broken. %>
-  <% if owned_purchase && !lapsed_credit_owner %>
+  <% if owner_tools %>
     <% downloads = [
       ['Full presentation', (full_presentation_presentation_downloads_path(@presentation) if @presentation.pdf_file.attached?)],
       ['Speaker notes',     (speaker_notes_presentation_downloads_path(@presentation) if @presentation.speaker_notes.attached?)],

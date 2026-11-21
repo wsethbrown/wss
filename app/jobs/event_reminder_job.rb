@@ -1,16 +1,20 @@
-# The 24-hours-before reminder, scheduled at event creation (and re-scheduled
+# The 48-hours-before reminder (to yes and maybe answers), scheduled at event creation (and re-scheduled
 # on time changes). The scheduled_start stamp makes stale jobs no-ops: when an
 # event is rescheduled, the old job wakes, sees the stamp mismatch, and does
 # nothing; the newly scheduled job carries the new stamp.
 class EventReminderJob < ApplicationJob
   queue_as :default
 
+  # 48 hours leaves a day of open yeses after it lands (Event::YES_CUTOFF), so
+  # every button in it works when it arrives.
+  LEAD_TIME = 48.hours
+
   def self.schedule(event)
     return if event.start_time.blank?
 
-    run_at = event.start_time - 24.hours
-    if run_at <= Time.current # under 24h away: no reminder, they just heard about it
-      Rails.logger.info "EventReminderJob: event #{event.id} starts within 24h; no reminder scheduled"
+    run_at = event.start_time - LEAD_TIME
+    if run_at <= Time.current # the send time has passed: they just heard about it
+      Rails.logger.info "EventReminderJob: event #{event.id} starts within 48h; no reminder scheduled"
       return
     end
 
@@ -33,9 +37,9 @@ class EventReminderJob < ApplicationJob
       return
     end
 
-    attendees = event.event_rsvps.where(status: "yes").includes(:user).map(&:user).uniq
+    attendees = event.event_rsvps.where(status: %w[yes maybe]).includes(:user).map(&:user).uniq
     recipients = attendees.select(&:event_emails?)
-    Rails.logger.info "EventReminderJob: event #{event.id}: emailing #{recipients.size} of #{attendees.size} yes-RSVPs (rest muted)"
+    Rails.logger.info "EventReminderJob: event #{event.id}: emailing #{recipients.size} of #{attendees.size} yes/maybe RSVPs (rest muted)"
     recipients.each do |user|
       sent = once("event_reminder:#{event.id}:#{scheduled_start}:#{user.id}") do
         EventMailer.event_reminder(user, event).deliver_later

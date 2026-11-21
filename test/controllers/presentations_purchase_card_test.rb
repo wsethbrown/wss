@@ -61,7 +61,7 @@ class PresentationsPurchaseCardTest < ActionDispatch::IntegrationTest
     get presentation_path(deck)
     assert_response :success
     # The sidebar card and story gate prompt sign-in for signed-out visitors.
-    assert_select "a[href=?]", auth_path, text: /Sign in to get this deck/
+    assert_select "a[href=?]", auth_path(return_to: presentation_path(deck)), text: /Sign in to get this deck/
   end
 
   test "the checkout screen offers a credit choice to a member who has one" do

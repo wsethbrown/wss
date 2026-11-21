@@ -27,7 +27,7 @@
             <% @user_societies.each do |society| %>
               <li>
                 <%= render "societies/index_row", society: society,
-                      label: (society.creator == current_user ? "Creator" : "Member") %>
+                      label: @user_society_roles[society.id] %>
               </li>
             <% end %>
           </ul>

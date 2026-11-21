@@ -13,7 +13,7 @@
         <a class="btn" style="background:#a15825;" href="<%= @rsvp_urls["maybe"] %>">Maybe</a>
         <a class="btn" style="background:#a8503a;" href="<%= @rsvp_urls["no"] %>">Can't make it</a>
       </div>
-      <p class="hint">You can change your answer at any time on the event page.</p>
+      <p class="hint">You can change your answer until the night starts. A new yes closes 24 hours before.</p>
       <p class="see"><a href="<%= society_event_url(@society, @event) %>">See the full event page</a></p>
 <p class="hint"><a href="<%= @mute_url %>">Turn off event emails</a></p>
 <%= render "mailers/layout_close", footer_note: "You can turn off event emails any time in your account settings at whiskeysharesociety.com." %>

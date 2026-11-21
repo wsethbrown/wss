@@ -18,6 +18,10 @@
   </div>
 
   <div class="mt-8">
-    <%= link_to "Go to your dashboard", dashboard_path, class: "btn btn-primary px-8 py-3" %>
+    <% if @continue_path %>
+      <%= link_to "Continue", @continue_path, class: "btn btn-primary px-8 py-3" %>
+    <% else %>
+      <%= link_to "Go to your dashboard", dashboard_path, class: "btn btn-primary px-8 py-3" %>
+    <% end %>
   </div>
 </div>

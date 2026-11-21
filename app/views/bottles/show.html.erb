@@ -33,7 +33,7 @@
       </div>
       <div class="flex shrink-0 flex-wrap items-center gap-3">
         <% if !user_signed_in? %>
-          <%= link_to "Sign in to review", new_user_session_path, class: "btn btn-primary" %>
+          <%= link_to "Sign in to review", sign_in_path_returning, class: "btn btn-primary" %>
         <% elsif @my_review %>
           <%= link_to "Update your review", edit_review_path(@my_review), class: "btn btn-primary" %>
         <% else %>

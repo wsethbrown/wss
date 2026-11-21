@@ -88,6 +88,31 @@ class MagicLinksTest < ApplicationSystemTestCase
     assert_nil User.find_by(email: new_email), "No account is created until the link is used"
   end
 
+  test "a new address's link asks before creating the account, then signs in" do
+    original_cache = Rails.cache
+    Rails.cache = ActiveSupport::Cache::MemoryStore.new # pending sign-ups live in the cache
+    new_email = "confirm.me@example.com"
+
+    visit auth_path
+    assert_selector "#magic-link-form", visible: true
+    fill_in "magic-link-email", with: new_email
+    click_button "Send magic link"
+    assert_text "Check your email for a magic link to sign in."
+    deliver_enqueued_mail
+    _content, token = magic_link_token_sent_to(new_email)
+
+    visit magic_link_path(token: token)
+    assert_text "Welcome to the Society"
+    assert_nil User.find_by(email: new_email), "opening the link creates nothing"
+
+    click_button "Create my account"
+    assert_current_path dashboard_path
+    assert_text "You're signed in. Welcome back!"
+    assert User.find_by(email: new_email)
+  ensure
+    Rails.cache = original_cache
+  end
+
   test "magic link form is visible without any toggling" do
     visit auth_path
 
@@ -109,8 +134,9 @@ class MagicLinksTest < ApplicationSystemTestCase
 
     visit magic_link_path(token: token)
 
-    # Redirected to the account page and signed in
-    assert_current_path account_path
+    # Signed in and on the dashboard: no page was waiting for this sign-in,
+    # so it lands where every sign-in does by default (finding 4).
+    assert_current_path dashboard_path
     assert_text "You're signed in. Welcome back!"
     assert_link "Sign out"
   end

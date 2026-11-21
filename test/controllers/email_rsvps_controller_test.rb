@@ -54,9 +54,23 @@ class EmailRsvpsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "the POST is refused once the RSVP window has closed" do
-    @event.update_columns(start_time: 2.hours.from_now, end_time: 4.hours.from_now)
+    @event.update_columns(start_time: 1.minute.ago, end_time: 2.hours.from_now)
+    %w[yes maybe no].each do |status|
+      assert_no_difference -> { EventRsvp.count } do
+        post email_rsvp_path(status), params: { token: @token }
+      end
+    end
+  end
+
+  test "a new yes is refused inside the last 24 hours of a night announced earlier; maybe is not" do
+    @event.update_columns(start_time: 2.hours.from_now, end_time: 4.hours.from_now, created_at: 5.days.ago)
+    get email_rsvp_path("yes", token: @token)
+    assert_redirected_to society_event_path(@society, @event)
     assert_no_difference -> { EventRsvp.count } do
       post email_rsvp_path("yes"), params: { token: @token }
+    end
+    assert_difference -> { EventRsvp.count }, 1 do
+      post email_rsvp_path("maybe"), params: { token: @token }
     end
   end
 

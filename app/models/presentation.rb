@@ -176,7 +176,8 @@ class Presentation < ApplicationRecord
 
   def formatted_price
     return "Free" if free?
-    "$#{price}"
+    # Always two decimals: a price stored as 19.0 reads "$19.00", not "$19.0".
+    format("$%.2f", price)
   end
 
   def excerpt(length = 150)

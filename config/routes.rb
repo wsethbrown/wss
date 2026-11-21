@@ -4,7 +4,8 @@ Rails.application.routes.draw do
   # the OmniAuth strategies (signature-checked); we no longer hand-roll any callback.
   devise_for :users, controllers: {
     omniauth_callbacks: "users/omniauth_callbacks",
-    registrations: "users/registrations"
+    registrations: "users/registrations",
+    passwords: "users/passwords"
   }, skip: [ :sessions ]
 
   devise_scope :user do
@@ -28,6 +29,9 @@ Rails.application.routes.draw do
   # Magic Links
   post "magic_links", to: "magic_links#create"
   get "magic_links/:token", to: "magic_links#show", as: "magic_link"
+  # A new account's link opens a confirmation page; its button posts here
+  # (token in the body, never the path) and only then is the account created.
+  post "magic_links/confirm", to: "magic_links#confirm", as: "confirm_magic_link"
 
   # Admin invitations: the claim link from the invite email.
   get "invitations/:token", to: "invitations#show", as: :invitation
@@ -41,9 +45,9 @@ Rails.application.routes.draw do
   # Contact addresses (hello@ / support@ / partners@)
   get "contact", to: "home#contact"
 
-  # The signed-in landing page. /dashboard and /account render the same account
-  # surface; /dashboard is the canonical post-authentication destination.
-  get "dashboard", to: "account#index", as: :dashboard
+  # The signed-in landing page (DashboardController): next tastings, what is
+  # waiting on you, your societies. /account is the account page.
+  get "dashboard", to: "dashboard#index", as: :dashboard
 
   # Account
   get "account", to: "account#index"

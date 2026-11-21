@@ -62,6 +62,9 @@ env:
     - STRIPE_FOUNDING_MONTHLY_PRICE_ID
     # Error alerting (inert if blank)
     - SENTRY_DSN
+    # Cloudflare Turnstile bot check on sign-up (inert unless BOTH are set)
+    - TURNSTILE_SITE_KEY
+    - TURNSTILE_SECRET_KEY
     # Cloudflare R2: uploads (Active Storage) + nightly DB backups
     - R2_ENDPOINT
     - R2_ACCESS_KEY_ID

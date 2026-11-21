@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 /* Tailwind v4 scans project files for class names; binary fonts in
-   docker/fonts crash the scanner (RangeError: out of range code points). */
+   docker/fonts and tools/decks/fonts crash the scanner (RangeError: out of
+   range code points). */
 @source not "../../../docker";
+@source not "../../../tools";
 /* Same reason: shipped PDF assets (e.g. the blank scorecard) are binary. */
 @source not "../documents";
 
@@ -284,6 +286,8 @@
 /* Resting on Maybe before anyone has answered: visible, but never mistakable
    for a confirmed answer. No colour, no tick: a white seat on the paper track. */
 .rsvp-option[data-resting="true"] { color: var(--color-ink); }
+/* A new yes closes 24 hours before the night (Event#answer_allowed?). */
+.rsvp-option:disabled { cursor: not-allowed; color: var(--color-mute); text-decoration: line-through; }
 .rsvp-option[aria-pressed="true"] { color: #fff; }
 .rsvp-option .rsvp-tick { display: none; }
 .rsvp-option[aria-pressed="true"] .rsvp-tick { display: inline-flex; }

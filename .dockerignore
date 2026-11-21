@@ -50,3 +50,6 @@ docker-compose*.yml
 # Active Storage blobs (dev uploads — never belong in the image; extensionless
 # binaries also crash the Tailwind v4 source scanner during precompile)
 storage/*
+
+# Deck build tools (run outside the app; fonts and images are not needed in the image)
+tools/

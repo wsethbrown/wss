@@ -45,7 +45,7 @@ class TwoFactorRemovedTest < ActionDispatch::IntegrationTest
 
     get magic_link_path(token: raw)
 
-    assert_redirected_to account_path
+    assert_redirected_to dashboard_path # sign-in lands on the dashboard when no page is waiting
     get account_path
     assert_response :success
   end
@@ -64,7 +64,7 @@ class TwoFactorRemovedTest < ActionDispatch::IntegrationTest
       post user_google_oauth2_omniauth_callback_path
     end
 
-    assert_redirected_to account_path
+    assert_redirected_to dashboard_path # sign-in lands on the dashboard when no page is waiting
     get account_path
     assert_response :success
   end

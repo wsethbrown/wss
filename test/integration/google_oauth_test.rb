@@ -39,8 +39,8 @@ class GoogleOAuthTest < ActionDispatch::IntegrationTest
     # Simulate the OAuth callback (this would normally come from Google)
     post user_google_oauth2_omniauth_callback_path
 
-    # Should redirect to account page after successful sign in
-    assert_redirected_to account_path
+    # Should redirect to the dashboard after successful sign in
+    assert_redirected_to dashboard_path # sign-in lands on the dashboard when no page is waiting
 
     # User should be created in database
     user = User.find_by(email: "test@gmail.com")
@@ -76,8 +76,8 @@ class GoogleOAuthTest < ActionDispatch::IntegrationTest
       post user_google_oauth2_omniauth_callback_path
     end
 
-    # Should redirect to account page
-    assert_redirected_to account_path
+    # Should redirect to the dashboard
+    assert_redirected_to dashboard_path # sign-in lands on the dashboard when no page is waiting
 
     # Should sign in the existing user
     follow_redirect!
@@ -98,7 +98,7 @@ class GoogleOAuthTest < ActionDispatch::IntegrationTest
 
     # Complete OAuth callback
     post user_google_oauth2_omniauth_callback_path
-    assert_redirected_to account_path
+    assert_redirected_to dashboard_path # sign-in lands on the dashboard when no page is waiting
 
     # User should be created and signed in
     user = User.find_by(email: "test@gmail.com")

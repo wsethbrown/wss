@@ -39,7 +39,7 @@ class MagicLinksControllerTest < ActionDispatch::IntegrationTest
 
     get magic_link_path(token: raw)
 
-    assert_redirected_to account_path
+    assert_redirected_to dashboard_path # sign-in lands on the dashboard when no page is waiting
     assert_match(/signed in/i, flash[:notice])
     assert_nil @user.reload.magic_link_token, "token is consumed on use"
   end

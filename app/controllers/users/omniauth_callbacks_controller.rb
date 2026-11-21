@@ -46,8 +46,4 @@ class Users::OmniauthCallbacksController < Devise::OmniauthCallbacksController
     Rails.logger.error "OAuth error (#{provider}): #{e.class} - #{e.message}"
     redirect_to auth_path, alert: "Authentication error. Please try again."
   end
-
-  def after_sign_in_path_for(resource)
-    stored_location_for(resource) || account_path
-  end
 end
