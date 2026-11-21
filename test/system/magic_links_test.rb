@@ -109,8 +109,9 @@ class MagicLinksTest < ApplicationSystemTestCase
 
     visit magic_link_path(token: token)
 
-    # Redirected to the account page and signed in
-    assert_current_path account_path
+    # Signed in and on the dashboard: no page was waiting for this sign-in,
+    # so it lands where every sign-in does by default (finding 4).
+    assert_current_path dashboard_path
     assert_text "You're signed in. Welcome back!"
     assert_link "Sign out"
   end
