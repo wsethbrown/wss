@@ -113,6 +113,10 @@ class Event < ApplicationRecord
   validates :end_time, presence: true
   validate :end_time_after_start_time
 
+  # The .ics SEQUENCE (EventIcs): calendars replace their copy of the event
+  # when it rises, so it rises exactly when the time or the place changes.
+  before_update :bump_calendar_sequence, if: -> { will_save_change_to_start_time? || will_save_change_to_end_time? || will_save_change_to_location? }
+
   # Scopes
   scope :upcoming, -> { where("start_time > ?", Time.current).order(:start_time) }
   scope :past, -> { where("start_time < ?", Time.current).order(start_time: :desc) }
@@ -283,6 +287,10 @@ class Event < ApplicationRecord
   def time_zone_is_known
     return if time_zone.blank? || ActiveSupport::TimeZone[time_zone]
     errors.add(:time_zone, "is not a known time zone")
+  end
+
+  def bump_calendar_sequence
+    self.calendar_sequence = calendar_sequence.to_i + 1
   end
 
   def end_time_after_start_time

@@ -23,4 +23,18 @@ module EventsHelper
               class: "mention-pill")
     }.html_safe
   end
+
+  # Google Calendar's "add event" template link for an event (no API, no
+  # account link): the same instants as the .ics, in UTC.
+  def google_calendar_url(event)
+    finish = event.end_time || event.start_time + 2.hours
+    params = {
+      action: "TEMPLATE",
+      text: event.title,
+      dates: "#{EventIcs.utc(event.start_time)}/#{EventIcs.utc(finish)}",
+      details: "#{event.society.name}\n#{society_event_url(event.society, event)}",
+      location: event.location.to_s
+    }
+    "https://calendar.google.com/calendar/render?#{params.to_query}"
+  end
 end

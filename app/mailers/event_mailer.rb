@@ -13,6 +13,7 @@ class EventMailer < ApplicationMailer
     @event = event
     @society = event.society
     @rsvp_urls = rsvp_urls(user, event)
+    attach_calendar(event)
     mail_with_unsubscribe(user, event, subject: "New tasting night: #{event.title} at #{@society.name}")
   end
 
@@ -28,6 +29,7 @@ class EventMailer < ApplicationMailer
     @user = user
     @event = event
     @changed_fields = changed_fields
+    attach_calendar(event) # same UID, higher SEQUENCE: the calendar entry updates in place
     mail_with_unsubscribe(user, event, subject: "Update to #{event.title}")
   end
 
@@ -39,6 +41,12 @@ class EventMailer < ApplicationMailer
   end
 
   private
+
+  # The event's .ics (EventIcs), so a calendar can add it, and later update it.
+  def attach_calendar(event)
+    ics = EventIcs.new(event, url: society_event_url(event.society, event))
+    attachments[ics.filename] = { mime_type: "text/calendar", content: ics.to_s }
+  end
 
   # Every event email is mutable, so each carries a signed one-click mute:
   # the List-Unsubscribe headers (RFC 8058) for mail clients, and @mute_url

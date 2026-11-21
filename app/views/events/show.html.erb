@@ -65,6 +65,18 @@
             </span>
           </span>
         </div>
+
+        <%# Add to calendar: the .ics (Apple Calendar, Outlook, anything) and a
+            Google Calendar link. Same permission as this page. Upcoming only. %>
+        <% if @event.upcoming? %>
+          <div class="mt-4 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm" aria-label="Add to calendar" role="group">
+            <span class="font-medium text-ink">Add to calendar</span>
+            <%= link_to "Apple or Outlook (.ics)", society_event_path(@event.society, @event, format: :ics),
+                  class: "chip min-h-11", data: { turbo: false } %>
+            <%= link_to "Google Calendar", google_calendar_url(@event),
+                  class: "chip min-h-11", target: "_blank", rel: "noopener" %>
+          </div>
+        <% end %>
       </div>
 
       <%# RSVP. The reason a member opens this page, so it gets the card beside

@@ -22,6 +22,14 @@ class EventsController < ApplicationController
 
   def show
     authorize @event
+
+    # Add to calendar: the same permission as the page (EventPolicy#show?).
+    if request.format.ics?
+      ics = EventIcs.new(@event, url: society_event_url(@event.society, @event))
+      Rails.logger.info "Event #{@event.id}: .ics downloaded by #{current_user ? "user #{current_user.id}" : 'a signed-out visitor'}"
+      send_data ics.to_s, type: "text/calendar; charset=utf-8", disposition: "attachment", filename: ics.filename
+      return
+    end
     @pours = @event.event_bottles.ordered.includes(:bottle)
     @pours_visible = @event.pours_visible_to?(current_user)
     @rsvps = @event.event_rsvps.includes(:user)
