@@ -136,6 +136,33 @@ version is usually the one the powerful recorded.
 
 Never: notes to the author, session history, "fix this", lyrics, a fact not in the outline.
 
+### Say the thing, skip the flourish
+
+The owner called this slide line "total AI slop writing": "A recipe built to be the seasoning,
+never the dish." It was a fact (the rye was made to go into blends) dressed up as a quotable
+line. Write the fact. The patterns to cut, on slides and in the script:
+
+- **The aphorism that closes a section.** "It was never supposed to be the dish." "The name on
+  the front and the name on the still are the same." End on the last fact instead.
+- **The metaphor standing in for a plain statement.** "The grain talking", "the distillery
+  speaks for itself", "never knew its address". Say "comes from the grain", "the distillery's
+  own bottle", "did not know where it was made".
+- **The set-up before the point.** "Here is the strange part." "What happened next is the
+  better part of the story." Delete it and start with the point.
+- **Balanced pairs and triplets written for rhythm.** "A building you have never heard of, in
+  a town you have never been to, that has been in your glass."
+- **Claims about the people in the room.** The owner on "Most of you have had this rye. Very
+  few of you have been to the place it was made": "what a stupid statement. You don't know if
+  people have had the rye or if they've been to the distillery." The writer has never met the
+  room. Do not say what the audience has drunk, knows, expects or has heard of ("the one you
+  know", "you have almost certainly", "everyone remembers"). State what the bottle is, or ask.
+- **A motif repeated for effect.** The pilot said "four different hands" five times.
+
+The owner's own good lines are plain statements a host would actually say to friends ("Heat is
+not flavour."). If a line sounds like a caption on a poster, rewrite it as what you would say
+across the table. Read every slide's text on its own before building: a slide shows one
+sentence at a time, so a flourish has nowhere to hide.
+
 ## Into the pptx
 
 You do not paste anything. `tools/decks/build.py` reads `speaker-notes.md`, finds each
