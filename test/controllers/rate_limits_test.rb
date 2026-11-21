@@ -102,6 +102,33 @@ class RateLimitsTest < ActionDispatch::IntegrationTest
     assert_nil User.find_by(email: unknown)
   end
 
+  test "password sign-up is limited per IP and creates no further users" do
+    Users::RegistrationsController::SIGN_UP_IP_LIMIT.times do |i|
+      post user_registration_path, params: { user: { email: "signup#{i}@example.com", password: "short" } }
+    end
+    assert_no_difference -> { User.count } do
+      post user_registration_path, params: { user: { email: "fresh.signup@example.com", first_name: "F", last_name: "S",
+                                                     password: "password123", password_confirmation: "password123" } }
+    end
+    assert_rate_limited_redirect
+  end
+
+  test "password reset requests are limited per email and send no further email" do
+    Users::PasswordsController::EMAIL_LIMIT.times do |i|
+      post user_password_path, params: { user: { email: @user.email } }, headers: { "REMOTE_ADDR" => "10.2.0.#{i + 1}" }
+    end
+    # Devise sends the reset mail inline from this class method; it must not run.
+    User.expects(:send_reset_password_instructions).never
+    post user_password_path, params: { user: { email: @user.email } }, headers: { "REMOTE_ADDR" => "10.2.0.99" }
+    assert_rate_limited_redirect
+  end
+
+  test "password reset requests are limited per IP" do
+    Users::PasswordsController::IP_LIMIT.times { |i| post user_password_path, params: { user: { email: "r#{i}@example.com" } } }
+    post user_password_path, params: { user: { email: @user.email } }
+    assert_rate_limited_redirect
+  end
+
   test "magic link requests are limited per IP" do
     MagicLinksController::IP_LIMIT.times { |i| post magic_links_path, params: { email: "u#{i}@example.com" } }
     assert_no_enqueued_jobs do

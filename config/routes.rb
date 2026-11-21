@@ -4,7 +4,8 @@ Rails.application.routes.draw do
   # the OmniAuth strategies (signature-checked); we no longer hand-roll any callback.
   devise_for :users, controllers: {
     omniauth_callbacks: "users/omniauth_callbacks",
-    registrations: "users/registrations"
+    registrations: "users/registrations",
+    passwords: "users/passwords"
   }, skip: [ :sessions ]
 
   devise_scope :user do

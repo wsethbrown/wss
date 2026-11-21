@@ -1,5 +1,13 @@
 class Users::RegistrationsController < Devise::RegistrationsController
   include TurnstileProtection
+  include RateLimitedResponses
+
+  # Password sign-up creates a users row for whoever asks; per-IP backstop.
+  SIGN_UP_IP_LIMIT = 20 # sign-up attempts per IP per window
+  SIGN_UP_WINDOW = 15.minutes
+
+  rate_limit to: SIGN_UP_IP_LIMIT, within: SIGN_UP_WINDOW, only: :create, store: RateLimitStore,
+             name: "sign-up-ip", with: -> { rate_limit_response("ip") }
 
   # Bot check (Cloudflare Turnstile) on password sign-up, inert until its keys
   # are set. Password sign-in for existing accounts is not gated (rate limits).
