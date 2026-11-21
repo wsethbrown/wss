@@ -1,0 +1,33 @@
+{
+  "slug": "Whisky-From-Japan",
+  "title": "Whisky From Japan",
+  "subtitle": "But not Japanese whisky: Hakata, from the Hikari Distillery in Fukuoka",
+  "category": "World Whisky",
+  "difficulty": "Intermediate",
+  "duration": "45 min",
+  "description": "How whisky came to Japan, from Perry's ships to Torii, Taketsuru and Rita, the 2021 standard that defined Japanese whisky, and the boom that made it necessary. Then the turn: the glass the room has been drinking since slide 2 is Hakata, made in Fukuoka from Kyushu barley with koji instead of malt, aged in sherry casks, and sold in America as whisky from Japan because it cannot be called Japanese whisky. Three pours from one distillery: the 10, 12 and 16 Year.",
+  "tags": "japanese whisky, koji, shochu, sherry cask, labelling, history, world whisky",
+  "pours": [
+    {
+      "name": "Hakata 10 Year Sherry Cask",
+      "origin": "Hikari Distillery (Hikari Shuzo), Hakata-ku, Fukuoka, Japan",
+      "style": "Barley whisky made with koji: one third koji barley, two thirds unmalted barley; single distilled; aged in ex-oloroso sherry casks",
+      "strength": "42% ABV (84 proof)",
+      "notes": "Poured on slide 2 and drunk through the history before the room learns what it is. The koji is loudest here."
+    },
+    {
+      "name": "Hakata 12 Year Sherry Cask",
+      "origin": "Hikari Distillery (Hikari Shuzo), Hakata-ku, Fukuoka, Japan",
+      "style": "Barley whisky made with koji; aged in ex-sherry casks",
+      "strength": "42% ABV (84 proof)",
+      "notes": "Two more years in the cask. Taste it beside the 10."
+    },
+    {
+      "name": "Hakata 16 Year Sherry Cask",
+      "origin": "Hikari Distillery (Hikari Shuzo), Hakata-ku, Fukuoka, Japan",
+      "style": "Barley whisky made with koji; aged in ex-sherry casks",
+      "strength": "42% ABV (84 proof)",
+      "notes": "The most polished of the three, for the question of the night: does more time make it better, or more like everything else?"
+    }
+  ]
+}
