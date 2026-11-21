@@ -52,4 +52,54 @@ class Admin::PresentationsControllerTest < ActionDispatch::IntegrationTest
       delete admin_presentation_path(@deck)
     end
   end
+
+  # Re-render slide previews: the manual recovery for a failed or missing render.
+  test "re-render enqueues the render job for a deck with a file" do
+    @deck.pdf_file.attach(io: StringIO.new("%PDF-1.4 fake"), filename: "deck.pdf", content_type: "application/pdf")
+    assert_enqueued_with(job: DeckSlideRenderJob, args: [ @deck.id ]) do
+      post render_slides_admin_presentation_path(@deck)
+    end
+    assert_redirected_to admin_presentation_path(@deck)
+    assert_match(/render queued/i, flash[:notice])
+  end
+
+  test "re-render on a deck with no file gives an alert and enqueues nothing" do
+    assert_no_enqueued_jobs only: DeckSlideRenderJob do
+      post render_slides_admin_presentation_path(@deck)
+    end
+    assert_redirected_to admin_presentation_path(@deck)
+    assert_match(/no deck file/i, flash[:alert])
+  end
+
+  test "re-render for an unknown deck is a 404, not a 500" do
+    post render_slides_admin_presentation_path(id: 0)
+    assert_response :not_found
+  end
+
+  test "a limited admin can re-render like the neighbouring actions" do
+    @deck.pdf_file.attach(io: StringIO.new("%PDF-1.4 fake"), filename: "deck.pdf", content_type: "application/pdf")
+    delete destroy_user_session_path
+    sign_in users(:limited_admin)
+    assert_enqueued_with(job: DeckSlideRenderJob, args: [ @deck.id ]) do
+      post render_slides_admin_presentation_path(@deck)
+    end
+  end
+
+  test "a non-admin cannot re-render" do
+    @deck.pdf_file.attach(io: StringIO.new("%PDF-1.4 fake"), filename: "deck.pdf", content_type: "application/pdf")
+    delete destroy_user_session_path
+    sign_in @buyer
+    assert_no_enqueued_jobs only: DeckSlideRenderJob do
+      post render_slides_admin_presentation_path(@deck)
+    end
+    assert_response :redirect
+  end
+
+  test "a failure enqueueing the render is reported, not a 500" do
+    @deck.pdf_file.attach(io: StringIO.new("%PDF-1.4 fake"), filename: "deck.pdf", content_type: "application/pdf")
+    DeckSlideRenderJob.stubs(:perform_later).raises(StandardError, "queue down")
+    post render_slides_admin_presentation_path(@deck)
+    assert_redirected_to admin_presentation_path(@deck)
+    assert_match(/could not queue/i, flash[:alert])
+  end
 end

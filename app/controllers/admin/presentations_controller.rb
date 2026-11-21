@@ -1,6 +1,6 @@
 class Admin::PresentationsController < Admin::BaseController
   before_action :require_delete_rights!, only: :destroy
-  before_action :set_presentation, only: [ :show, :edit, :update, :destroy, :publish, :unpublish ]
+  before_action :set_presentation, only: [ :show, :edit, :update, :destroy, :publish, :unpublish, :render_slides ]
 
   def index
     @presentations = Presentation.includes(:author, :user_presentations)
@@ -136,9 +136,21 @@ class Admin::PresentationsController < Admin::BaseController
   # Slide previews normally render automatically on import/upload; this is
   # the manual retry for renders that failed or never ran.
   def render_slides
+    unless @presentation.pdf_file.attached?
+      Rails.logger.warn "Admin #{current_user.id} refused slide re-render for presentation #{@presentation.id}: no deck file attached"
+      redirect_to admin_presentation_path(@presentation),
+                  alert: "This deck has no deck file to render. Upload one first."
+      return
+    end
+
     DeckSlideRenderJob.perform_later(@presentation.id)
+    Rails.logger.info "Admin #{current_user.id} queued slide re-render for presentation #{@presentation.id}"
     redirect_to admin_presentation_path(@presentation),
                 notice: "Slide render queued. Previews refresh in about a minute."
+  rescue StandardError => e
+    Rails.logger.error "Slide re-render enqueue failed for presentation #{@presentation&.id} (admin #{current_user&.id}): #{e.class}: #{e.message}"
+    redirect_to admin_presentation_path(@presentation),
+                alert: "Could not queue the slide render. Try again in a moment."
   end
 
   def destroy
