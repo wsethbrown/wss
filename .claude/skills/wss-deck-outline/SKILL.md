@@ -20,6 +20,37 @@ way round.
 feel. Memory is where to start looking, never the source. Everything in "What's established"
 was found in a source during this deck's research, and the source is listed.
 
+### The bar: read the sources
+
+The owner, setting the standard:
+
+> "These presentations take a lot of research, pulling from books, journals, and articles
+> written by historians and enthusiasts alike. For instance, the mint julep deck pulls a lot
+> from historical newspapers and official sources and tells the story of how black enslaved
+> men really created the mint julep."
+
+So the default is plain: **read the sources; do not cite from search snippets.** A claim's
+source is something you opened and read. A search result is a pointer to a source, not the
+source. The reason is practical as well as principled: snippets drop the date, the hedge and
+the next sentence, and in drinks history the next sentence is often "the story goes".
+
+- In the outline, every source line says how far it was read: **read in full**, **read in
+  part** (say which part: "pp. 284–288", "the 1919–1933 timeline"), or **not read** (seen
+  cited elsewhere; give where). A claim that rests only on a "not read" source goes in
+  **Not confirmed**.
+- The best story is usually in the primary layer: old newspapers, county histories, trade
+  journals, court papers, filings. The brochure history is what is left when those are
+  summarised by people selling something. Go to the documents first and read the brochure
+  to see what it leaves out.
+- People are not props. When the history involves labour, ownership, enslaved or excluded
+  people, or a community the brochure version skips, record what the sources say about them,
+  with the same care as the dates.
+- The search budget below still applies. Fetching and reading documents is not a search;
+  that is where the time should go.
+
+Working recipes for each archive (exact URL patterns, what refuses automated clients, and
+the fallbacks) are in **`reference/research-recipes.md`**. Read it before you start.
+
 ### Plan the searches before you start
 
 1. Write the story's spine as a chain of claims with dates (A in 1847 → B in 1933 → ...).
@@ -31,21 +62,39 @@ was found in a source during this deck's research, and the source is listed.
 4. Set a budget: roughly 40 to 80 searches for a full deck. Spend most of it on the load-bearing
    claims and the bottles; stop chasing colour that the story does not need.
 
-Use the WebSearch tool (load it with ToolSearch, `select:WebSearch`); WebFetch for a page when
-it is allowed. Search with specific words: names, years, exact product names, statute numbers.
+Use the WebSearch tool (load it with ToolSearch, `select:WebSearch`) to find things, then
+open and read them with `curl` (browser User-Agent, `python3 -I` to strip the HTML) or
+WebFetch. Search with specific words: names, years, exact product names, statute numbers.
+Archives with their own search (newspapers, Internet Archive, SEC, eCFR) are searched
+directly; see the recipes file.
 
 ### Sources, best first
 
-1. **Primary documents and official bodies**: statutes and regulations (eCFR, law.cornell.edu),
-   the TTB and its public COLA label registry, SEC filings, court records and settlements,
-   contemporary newspapers (Chronicling America, state digital newspaper archives), government
-   archives, the Scotch Whisky Association, Japan's spirits makers' standard.
-2. **Named historians and established whisky writers**, books and long-form articles.
-3. **The maker's own statements**: good for what a bottle is (proof, recipe, age), weak for the
-   maker's own history and legends.
-4. Reference works (Wikipedia is a map to its citations: follow them, cite what you reach).
+1. **Primary documents and official bodies**: contemporary newspapers (the Library of
+   Congress's Chronicling America collection, newspapers on the Internet Archive, state
+   archives such as Hoosier State Chronicles); county and local histories (the
+   nineteenth-century "History of X County" books are on the Internet Archive in full text);
+   old trade journals (also on the Internet Archive); statutes and regulations (eCFR, the
+   Federal Register); the TTB, its rulings and its public COLA label registry; SEC filings
+   (EDGAR full-text search) for anything a public company did; court records and settlements;
+   state and county historical societies; the Scotch Whisky Association, Japan's spirits
+   makers' standard.
+2. **Named historians and established whisky writers**: books, journal articles and long-form
+   pieces (Chuck Cowdery's blog and books, Whisky Advocate, Punch, VinePair, Bourbon & Banter,
+   Fred Minnick, Breaking Bourbon, enthusiast researchers who cite their documents). Good for
+   interviews with distillers, which are often the only record of how a recipe came about.
+3. **The maker's own statements**: good for what a bottle is (proof, recipe, age) and for what
+   the company says about itself, weak for its history and legends. Cite them as the maker's
+   claim ("the company's timeline says").
+4. Reference works. Wikipedia is a map to its citations: open its raw wikitext to see them,
+   follow them, cite what you reach. A Wikipedia sentence with no citation is a lead, not a fact.
 5. A blog or a retailer page alone is not enough for anything that matters. Retailer listings
    are fine for current shelf prices, dated.
+
+**Paywalled or unreachable material** (JSTOR, Newspapers.com, Ancestry, most books from the
+last ninety years, library-lending-only scans): do not cite what you cannot read. Name it in
+the outline as **not read**, say why it matters, and list it under **Worth getting** so the
+owner can supply scans or a library copy.
 
 The owner's own outline on why: "Chase the primary sources. Cocktail history is unusually
 infested with blog posts citing blog posts, and the underlying documents are almost all
@@ -53,11 +102,16 @@ digitized and sitting there for free."
 
 ### When a page cannot be fetched
 
-Fetching is often blocked or rate-limited. Then: work from the search results' titles and
-snippets, search again with different words to get the fact stated in another result, and
-look for the same fact from a second publisher. Cite what you actually saw (title, publisher,
-date, URL). If a claim rests on one snippet you could not open, it goes in **Not confirmed**,
-or is said aloud as "one account says". Never cite a document you have not seen any of.
+Some sites refuse automated clients or rate-limit them. Try, in order: a browser
+User-Agent; a pause and one retry; the Wayback Machine
+(`https://web.archive.org/web/2026/<url>`); the same document from another host (a press
+release on PR Newswire as well as the company site; a filing on sec.gov as well as the
+company's investor pages); the same fact from a second publisher. The recipes file lists
+which sites refused in practice.
+
+If, after that, a claim rests only on a search snippet, it is **not read**: it goes in **Not
+confirmed**, or is said aloud as "one account says". Never cite a document you have not
+seen, and never write "read" for a source you saw only in a search result.
 
 ### Dated facts
 
@@ -104,8 +158,12 @@ is a full example):
 8. **The short shelf**: the five things to read first.
 9. **Not confirmed**: every claim that could not be confirmed, what was found, and how the
    script handles it ("said as 'the story goes'", "kept off the slides").
-10. **Sources**: everything cited, title, publisher, date, URL.
-11. **Image credits**, last: per slide, the title, author or institution, licence, where it was
+10. **Worth getting**: sources that would settle an open question or deepen the story but
+    could not be read (paywalled, lending-only, not digitised), each with what it would
+    answer, so the owner can supply a scan.
+11. **Sources**: everything cited, title, author or publisher, date, URL, and how far it was
+    read (read in full / read in part, which part / not read).
+12. **Image credits**, last: per slide, the title, author or institution, licence, where it was
     found (e.g. the Commons file name), and what was changed ("Cropped and printed in two
     inks"). Then any slide left with a placeholder because no free image exists.
 
@@ -133,7 +191,8 @@ for modules, `### ` subheadings, `- › _source_` lines, `> **LABEL**` callouts,
 
 ## Before handing back
 
-- Every fact in the script and on the slides is in "What's established" or explicitly hedged.
+- Every fact in the script and on the slides is in "What's established" or explicitly hedged,
+  and each established fact rests on a source marked read in full or read in part.
 - "Not confirmed" is honest and complete; nothing in it appears on a slide as fact.
 - No Jameson bottle anywhere; no song lyrics; every image credited with its licence.
 - Prices and availability carry a date.
