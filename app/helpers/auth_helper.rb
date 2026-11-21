@@ -15,4 +15,16 @@ module AuthHelper
     ENV["GOOGLE_CLIENT_ID"].present? && ENV["GOOGLE_CLIENT_SECRET"].present? &&
       Devise.omniauth_configs.key?(:google_oauth2)
   end
+
+  # Cloudflare Turnstile widget for a public sign-up form. Renders nothing
+  # unless both TURNSTILE_* keys are set (see Turnstile). Place it inside the
+  # <form>: the widget adds the hidden `cf-turnstile-response` field there.
+  # turnstile_controller.js loads Cloudflare's script once and renders the
+  # widget explicitly, so Turbo visits do not load it twice.
+  def turnstile_widget
+    return unless Turnstile.enabled?
+
+    tag.div(class: "cf-turnstile min-h-[65px] flex justify-center",
+            data: { sitekey: Turnstile.site_key, controller: "turnstile", turnstile_sitekey_value: Turnstile.site_key })
+  end
 end

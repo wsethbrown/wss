@@ -1,6 +1,7 @@
 class MagicLinksController < ApplicationController
   include ActivityLogger
   include RateLimitedResponses
+  include TurnstileProtection
 
   # Per-IP is a backstop only (shared NATs, one wifi); per-email is the real guard.
   IP_LIMIT = 50      # link requests per IP per window
@@ -13,6 +14,10 @@ class MagicLinksController < ApplicationController
   rate_limit to: EMAIL_LIMIT, within: WINDOW, only: :create, store: RateLimitStore,
              name: "magic-link-email", by: -> { rate_limit_email_key(params[:email]) },
              with: -> { rate_limit_response("email") }
+
+  # Bot check (Cloudflare Turnstile), inert until its keys are set. After the
+  # rate limits, before any lookup, so the answer never depends on the address.
+  before_action :require_turnstile, only: :create
 
   # Sending and consuming links are public; consuming is bounded by the token expiry, requesting by the limits below.
   skip_before_action :verify_authenticity_token, only: [ :create ]

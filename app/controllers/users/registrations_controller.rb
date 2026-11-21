@@ -1,4 +1,9 @@
 class Users::RegistrationsController < Devise::RegistrationsController
+  include TurnstileProtection
+
+  # Bot check (Cloudflare Turnstile) on password sign-up, inert until its keys
+  # are set. Password sign-in for existing accounts is not gated (rate limits).
+  before_action :require_turnstile, only: [ :create ]
   before_action :configure_sign_up_params, only: [ :create ]
   before_action :configure_account_update_params, only: [ :update ]
   before_action :refuse_email_change, only: [ :update ]

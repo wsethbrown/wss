@@ -6,7 +6,10 @@ console (and fire a `securitypolicyviolation` event). Do **not** flip
 `content_security_policy_report_only` to `false` until the list below is empty.
 
 Policy: `default-src 'self'`; scripts `'self'` + `https://maps.googleapis.com` (injected at
-runtime by `location_autocomplete_controller.js`) + a per-request nonce; styles `'self'` +
+runtime by `location_autocomplete_controller.js`) + `https://challenges.cloudflare.com`
+(Cloudflare Turnstile, injected by `turnstile_controller.js` with the page nonce, only when the
+`TURNSTILE_*` keys are set) + a per-request nonce; frames `'self'` + `https://challenges.cloudflare.com`
+(the Turnstile widget is an iframe); styles `'self'` +
 `https:` (Google Fonts) + nonce; images `'self' https: data: blob:`; fonts `'self' https: data:`;
 `object-src 'none'`; `base-uri 'self'`; `form-action 'self' https:` (Stripe Checkout redirects);
 `frame-ancestors 'self'`; `connect-src 'self'` + Maps. The nonce is `SecureRandom.base64(16)`
@@ -36,7 +39,9 @@ Ten pages, headless Chromium against a second dev server, signed out and as the 
 | 9 | `style-src-attr` | ~21 `style="..."` attributes on `/`, 12 on `/admin`, 2 each on deck page, society page, `/account` | Those inline styles (mostly computed widths, delays and image positions) are dropped | Nonces do not cover attributes. Use classes, CSS custom properties set from a nonced `<style>`, or add `'unsafe-hashes'` |
 | 10 | `script-src-elem` (type `application/ld+json`) | JSON-LD in the layout and `presentations/show.html.erb:8` | Not executed, so not blocked in practice: data blocks are exempt from `script-src`. Listed so nobody "fixes" it | None needed |
 
-Also check before enforcing: Google Maps (`maps.googleapis.com` scripts, plus `maps.gstatic.com`
+Also check before enforcing: Turnstile on `/auth` and `/users/sign_up` with the keys set (not
+exercised in the browser run: it needs real keys; Cloudflare documents `script-src` and
+`frame-src` on `challenges.cloudflare.com` as sufficient). Google Maps (`maps.googleapis.com` scripts, plus `maps.gstatic.com`
 images under `img-src https:`) was not exercised in the browser run (needs a Maps key); mail
 templates are unaffected (not served by Rails responses).
 
