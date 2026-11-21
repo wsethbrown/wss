@@ -22,6 +22,21 @@ send.whiskeysharesociety.com, every sender is
 stay on the verified subdomain or Resend rejects). First prod magic link
 verified delivered end-to-end.
 
+New addresses (November 2026, after the junk-account incident): requesting a
+link for an email with no account creates NO users row. The pending sign-up
+(email + return path) sits in Rails.cache under the hashed token for 15
+minutes. Opening the link (GET /magic_links/:token) only renders
+magic_links/confirm; the account is created by the POST from its button
+(POST /magic_links/confirm, token in the body) via
+MagicLinkService.complete_sign_up, which claims the entry with the cache
+delete (single use). Why: between August and October a script typed ~89
+harvested business addresses into /auth, and corporate mail scanners that
+follow every link created an account for each one when the GET did it.
+Existing accounts are unchanged: their link signs in on the GET. The visitor
+sees the same redirect and flash for known and unknown addresses. Junk
+accounts from before the fix: `rake users:purge_unused` (dry run unless
+CONFIRM=1).
+
 ## Admin invitations (fourth sign-in path)
 Auth::InvitationService (admin/invitations_controller, admin/users#resend_invitation,
 InvitationsController#show at /invitations/:token). An admin creates the User and

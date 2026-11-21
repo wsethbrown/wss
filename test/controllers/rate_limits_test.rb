@@ -89,6 +89,19 @@ class RateLimitsTest < ActionDispatch::IntegrationTest
     assert_redirected_to auth_path
   end
 
+  test "the per-email magic link limit also covers addresses with no account, across IPs" do
+    unknown = "nobody.here@business.example"
+    MagicLinksController::EMAIL_LIMIT.times do |i|
+      post magic_links_path, params: { email: unknown }, headers: { "REMOTE_ADDR" => "10.1.0.#{i + 1}" }
+      assert_redirected_to auth_path
+    end
+    assert_no_enqueued_jobs do
+      post magic_links_path, params: { email: " #{unknown.upcase} " }, headers: { "REMOTE_ADDR" => "10.1.0.99" }
+    end
+    assert_rate_limited_redirect
+    assert_nil User.find_by(email: unknown)
+  end
+
   test "magic link requests are limited per IP" do
     MagicLinksController::IP_LIMIT.times { |i| post magic_links_path, params: { email: "u#{i}@example.com" } }
     assert_no_enqueued_jobs do

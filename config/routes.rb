@@ -28,6 +28,9 @@ Rails.application.routes.draw do
   # Magic Links
   post "magic_links", to: "magic_links#create"
   get "magic_links/:token", to: "magic_links#show", as: "magic_link"
+  # A new account's link opens a confirmation page; its button posts here
+  # (token in the body, never the path) and only then is the account created.
+  post "magic_links/confirm", to: "magic_links#confirm", as: "confirm_magic_link"
 
   # Admin invitations: the claim link from the invite email.
   get "invitations/:token", to: "invitations#show", as: :invitation

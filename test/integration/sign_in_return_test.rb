@@ -69,6 +69,8 @@ class SignInReturnTest < ActionDispatch::IntegrationTest
     raw = enqueued_magic_token
     reset!
     get magic_link_path(token: raw)
+    assert_response :success # a new account confirms first; the GET creates nothing
+    post confirm_magic_link_path, params: { token: raw }
     assert_redirected_to @target
   ensure
     Rails.cache = original_cache
