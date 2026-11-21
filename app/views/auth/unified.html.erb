@@ -89,7 +89,16 @@
       </div>
 
       <div id="password-forms" class="hidden space-y-5">
-        <p id="password-context" class="text-center text-sm text-mute"></p>
+        <p id="password-context" class="text-center text-sm text-mute" aria-live="polite"></p>
+
+        <%# Shown only when the email lookup finds no account, so a visitor who
+            expects to be signing in understands why a sign-up form appeared.
+            Always in the DOM so screen readers announce it when it fills. %>
+        <div id="password-notice" role="status" aria-live="polite"
+             class="hidden inset p-4 text-sm text-ink break-words">
+          <p class="font-semibold" id="password-notice-title"></p>
+          <p class="mt-1" id="password-notice-body"></p>
+        </div>
 
         <!-- Existing account: just the password -->
         <div id="password-signin" class="hidden">
@@ -178,6 +187,7 @@ async function togglePasswordForms() {
 
   if (!forms.classList.contains('hidden')) {
     forms.classList.add('hidden');
+    clearPasswordNotice();
     if (toggle) toggle.textContent = 'Use a password instead';
     return;
   }
@@ -191,6 +201,23 @@ async function togglePasswordForms() {
 
   await revealPasswordForm(email);
   if (toggle) toggle.textContent = 'Hide password sign-in';
+}
+
+function clearPasswordNotice() {
+  const notice = document.getElementById('password-notice');
+  if (!notice) return;
+  notice.classList.add('hidden');
+  document.getElementById('password-notice-title').textContent = '';
+  document.getElementById('password-notice-body').textContent = '';
+}
+
+function showPasswordNotice(email) {
+  const notice = document.getElementById('password-notice');
+  if (!notice) return;
+  document.getElementById('password-notice-title').textContent = 'No account uses ' + email + ' yet.';
+  document.getElementById('password-notice-body').textContent =
+    'Fill in the form below to create one. If you already have an account, check the address above for a typo.';
+  notice.classList.remove('hidden');
 }
 
 async function revealPasswordForm(email) {
@@ -210,6 +237,7 @@ async function revealPasswordForm(email) {
     });
     exists = (await response.json()).exists;
   } catch (e) {
+    clearPasswordNotice();
     if (context) context.textContent = 'Something went wrong checking that email. Try the magic link instead.';
     forms.classList.remove('hidden');
     signin.classList.add('hidden');
@@ -219,9 +247,8 @@ async function revealPasswordForm(email) {
 
   document.getElementById('signin-email').value = email;
   document.getElementById('signup-email').value = email;
-  if (context) {
-    context.textContent = exists ? ('Signing in as ' + email) : ('Creating an account for ' + email);
-  }
+  if (context) context.textContent = exists ? ('Signing in as ' + email) : '';
+  if (exists) clearPasswordNotice(); else showPasswordNotice(email);
   signin.classList.toggle('hidden', !exists);
   signup.classList.toggle('hidden', exists);
   forms.classList.remove('hidden');
