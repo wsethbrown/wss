@@ -37,9 +37,9 @@ s = new_slide()
 text(s, 0.75, 0.9, 6.2, 2.2, '1847', size=150, font=SANS, bold=True, color=INK, ls=0.9)
 rect(s, 0.88, 3.25, 1.2, 0.045, fill=MARK_DEEP)
 text(s, 0.85, 3.55, 5.6, 1.0, 'Lawrenceburg, Indiana', size=26, font=SANS, bold=True, color=INK)
-text(s, 0.85, 4.1, 5.6, 0.6, 'Rossville Union Distillery', size=18, italic=True, color=MUTE)
-heading(s, 1.15, 'George Ross starts a rye distillery.', size=34, x=7.1, w=5.4, h=1.4)
-text(s, 7.1, 2.75, 5.35, 3.6, [
+text(s, 0.85, 4.1, 5.6, 0.6, 'The Rossville distillery', size=18, italic=True, color=MUTE)
+heading(s, 1.15, 'George Ross and two partners build a distillery.', size=34, x=7.1, w=5.4, h=1.4)
+text(s, 7.1, 3.1, 5.35, 3.4, [
         'Little else about Ross is on record.',
     [('The distillery started using his name again in 2018. That is glass 4.', {'bold': True})],
 ], size=19, ls=1.25, space_after=12)
@@ -83,8 +83,8 @@ heading(s, 0.85, 'Three owners in eleven years.', size=40, h=0.9)
 text(s, 0.85, 1.8, 11.6, 0.5, 'What happened to the plant after Seagram.',
      size=19, italic=True, color=MUTE)
 stops = [
-    ('c. 2000', 'Pernod Ricard', 'Seagram is broken up. The Lawrenceburg plant goes to Pernod Ricard.'),
-    ('19 April 2006', 'Closure announced', 'Pernod Ricard says it will close the distillery.'),
+    ('2001', 'Pernod Ricard', 'Seagram is broken up. The Lawrenceburg plant goes to Pernod Ricard.'),
+    ('Early 2006', 'Closure announced', 'Pernod Ricard says it will close the distillery.'),
     ('2007', 'Lawrenceburg Distillers Indiana', 'Sold instead to CL Financial of Trinidad and Tobago, which collapses in the 2008 crisis.'),
     ('2011', 'MGP Ingredients', 'A Kansas company buys it, and sells its whiskey to other brands.'),
 ]
@@ -195,8 +195,8 @@ footer(s, 11)
 # ---------------------------------------------------------------- 12 Rossville Union
 glass_slide(12, 'Glass 4, pour now', 'Rossville Union Straight Rye',
             'Distilled in Lawrenceburg  ·  sold by the distillery  ·  94 proof  ·  about $40',
-            ['In 2018 the distillery released its first rye under its own label. Rossville Union was the name of George Ross’s distillery.',
-             'It is a blend of the 95% rye and a 51% rye. The plant has been called Ross & Squibb since 2021.'],
+            ['In 2018 the distillery released its first rye under its own label. Rossville was the name of George Ross’s distillery.',
+             'It is a blend of the 95% rye and a 51% rye. The plant was Ross & Squibb from 2021, and MGP Distillery since 2026.'],
             [('Distilled', 'Lawrenceburg, Indiana'), ('The brand', 'The house blend: 95% and 51% rye'),
              ('The name', 'From the 1847 distillery')],
             'What does the 51% rye change?')

@@ -98,7 +98,7 @@ Keep a little in the glass. The next two pours are the same recipe, and it helps
 
 ## [SLIDE 3] 1847: George Ross
 
-In 1847 a man named George Ross started a rye distillery in Lawrenceburg, Indiana. It became known as the Rossville Union Distillery.
+In 1847 a man named George Ross and two partners built a distillery in Lawrenceburg, Indiana. It was called the Rossville distillery.
 
 That is nearly all I can tell you about him. The sources give his name, the town and the date, and not much more.
 
@@ -126,9 +126,9 @@ So the rye in your glass was made as an ingredient. It was not sold on its own f
 
 _Ask what people are getting from glass 1 before you start this slide._
 
-Seagram's drinks business was broken up around 2000, and the Lawrenceburg plant went to Pernod Ricard.
+Seagram's drinks business was broken up in 2001, and the Lawrenceburg plant went to Pernod Ricard.
 
-On the 19th of April 2006, Pernod announced it would close the distillery.
+In early 2006, Pernod announced it would close the distillery.
 
 It stayed open. In 2007 Pernod sold it to CL Financial, a holding company from Trinidad and Tobago, which named it Lawrenceburg Distillers Indiana. Older reviews call its whiskey "LDI". CL Financial collapsed in the 2008 financial crisis.
 
@@ -196,7 +196,7 @@ _Give people a minute to find the line on tonight's bottles._
 
 _Pour glass 4._
 
-In May 2018 MGP released its first rye under its own label. It called it Rossville Union, after George Ross's distillery. In 2021 the plant itself was renamed Ross & Squibb Distillery.
+In May 2018 MGP released its first rye under its own label. It called it Rossville Union, after George Ross's distillery. In 2021 the plant itself was renamed Ross & Squibb Distillery. In 2026 it went back to the name MGP Distillery.
 
 This is a blend of two of the distillery's rye recipes: the 95% rye from the first three glasses, and a 51% rye. It is at least four years old, 94 proof, and about $40.
 

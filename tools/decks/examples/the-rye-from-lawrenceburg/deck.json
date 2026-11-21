@@ -5,7 +5,7 @@
   "category": "American Whiskey",
   "difficulty": "Intermediate",
   "duration": "45 min",
-  "description": "The story of the Lawrenceburg, Indiana distillery: George Ross's Rossville Union of 1847, the Seagram years and the 95% rye made to flavour blends, a near-closure, and the rye revival that took its whiskey out under one label after another. Four pours, each from the same distillery in different hands.",
+  "description": "The story of the Lawrenceburg, Indiana distillery: George Ross's Rossville distillery of 1847, the Seagram years and the 95% rye made to flavour blends, a near-closure, and the rye revival that took its whiskey out under one label after another. Four pours, each from the same distillery in different hands.",
   "tags": "rye, american whiskey, history, distilleries, sourcing, blending",
   "pours": [
     {
@@ -31,10 +31,10 @@
     },
     {
       "name": "Rossville Union Straight Rye",
-      "origin": "Ross & Squibb Distillery, Lawrenceburg, Indiana",
+      "origin": "MGP Distillery (called Ross & Squibb 2021–2026), Lawrenceburg, Indiana",
       "style": "Straight rye whiskey, a blend of the distillery's 95% and 51% rye recipes, at least 4 years",
       "strength": "47% ABV (94 proof)",
-      "notes": "The distillery under its own name, launched in 2018 and named after George Ross's Rossville Union of 1847."
+      "notes": "The distillery under its own name, launched in 2018 and named after George Ross's Rossville distillery of 1847."
     }
   ]
 }
