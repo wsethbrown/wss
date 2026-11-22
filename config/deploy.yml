@@ -1,4 +1,4 @@
-# Kamal production config. Deploys to the Hetzner CPX box; Postgres runs as a
+# Kamal production config. Deploys to one VPS (the IP under servers:); Postgres runs as a
 # Kamal accessory on the same host; Cloudflare fronts DNS/CDN (SSL mode: Full).
 # Secrets come from .kamal/secrets, which pulls from your shell env — see
 # docs/launch-checklist.md for the full first-deploy runbook.
@@ -8,12 +8,12 @@ image: wsethbrown/wss
 
 servers:
   web:
-    - 178.156.251.37
+    - 135.148.239.177
   # LibreOffice deck-rendering is memory-heavy and must NEVER run inside the
   # web container (it would stall page serving) — jobs get their own container.
   job:
     hosts:
-      - 178.156.251.37
+      - 135.148.239.177
     cmd: bin/jobs
 
 proxy:
@@ -106,12 +106,12 @@ builder:
   arch: amd64
   # Building amd64 images from an Apple Silicon Mac uses emulation (slow but
   # fine). If deploys feel long, enable a remote builder on the server:
-  # remote: ssh://root@178.156.251.37
+  # remote: ssh://root@135.148.239.177
 
 accessories:
   db:
     image: postgres:15
-    host: 178.156.251.37
+    host: 135.148.239.177
     # Bound to localhost only — reachable from containers, never the internet.
     port: "127.0.0.1:5432:5432"
     env:
