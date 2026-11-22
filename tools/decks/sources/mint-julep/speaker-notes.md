@@ -75,13 +75,13 @@ Almost all of that is a modern invention. The bourbon is recent. The Derby is re
 
 So here's my promise for the next half hour: by the end of it, you will not be able to call this a Kentucky drink with a straight face.
 
-## [SLIDE 2] The drink in your hand
+## [SLIDE 2] Start with glass A
 
 _Pour Glass A now: the Virginia julep. Don't say what's in it yet._
 
 Taste that first. Sit with it a second. I'll tell you what it is in about twenty minutes, and I want you to have an opinion before I do.
 
-What I'll say now is that it's built the same way a julep has always been built: something sweet, something green, something strong, and as much ice as the cup will take.
+What I'll say now is what goes into every julep: sugar, mint, spirit and crushed ice.
 
 ## [SLIDE 3] The road to the julep
 
@@ -96,11 +96,11 @@ And somewhere along that road, as the drink moves west through the Mediterranean
 
 ## [SLIDE 4] It's good for you
 
-For its first thousand years, a julep is not a pleasure. It's a delivery mechanism.
+For most of its history a julep was a medicine.
 
 A julep, in the medical sense, is a sweet liquid you put medicine into: the spoonful of sugar, essentially. Eighteenth-century British medical books are full of them, and they are, by and large, disgusting: camphor juleps, juleps with balsam in them, juleps cut with salt.
 
-In 1784 you can find a physician in Medical Communications prescribing a mint julep to a woman with a sick stomach and trouble swallowing, right alongside an emetic and some powders. That is the register we're in. This is a drink on a prescription pad.
+In 1784 you can find a physician in Medical Communications prescribing a mint julep to a woman with a sick stomach and trouble swallowing, right alongside an emetic and some powders.
 
 And in America it keeps that flavor for a long time. Virginians drank it at six in the morning, before breakfast, as a restorative: what the period called an antifogmatic, a morning dram to burn off the damp and keep the fever away. A julep was a health measure. So was, conveniently, being drunk by seven.
 
@@ -138,19 +138,17 @@ Apart from that London prescription, every single one of those takes place in Vi
 
 ## [SLIDE 6] In 1789, all of this was Virginia
 
-> **THE SENTENCE**
-> The julep did not travel west. Virginia did, and then it split in half.
-> Kentucky's claim on this drink is inherited. It is not earned.
+Kentucky was part of Virginia until 1792. The early julep references all come from the south-east corner of the state.
 
 _Point to the circle: Williamsburg and Mecklenburg County in 1770, Norfolk in 1793 and 1807._
 
 ## [SLIDE 7] The Virginia julep
 
-So picture the drink at its peak, around 1820, in Virginia. It is not what you may think.
+This is what was in a julep around 1820, in Virginia.
 
-Rum has fallen out of fashion after the Revolution: too British, too colonial. So the good julep is built on fine French brandy, sometimes domestic peach brandy, sometimes cut with Spanish or Portuguese wine. There are berries in it, whatever's in season. There's a whole thicket of mint on top, not Toulmin's sad little slip. And underneath all of it is a mountain of shaved ice.
+Rum has fallen out of fashion after the Revolution. So the good julep is built on fine French brandy, sometimes domestic peach brandy, sometimes cut with Spanish or Portuguese wine. There are berries in it, whatever's in season. There's a large bunch of mint on top. And underneath all of it is a mountain of shaved ice.
 
-This is a luxury good. It is showing off. It's the most expensive thing a man can hand you on a hot morning, and that is entirely the point.
+It was an expensive drink, and serving one was a way to show wealth and hospitality.
 
 ## [SLIDE 8] Ice, ice, baby
 
@@ -162,11 +160,9 @@ Ice. Before ice, a julep is a warm sweet dram. With ice, it becomes the most ref
 
 The first known advertisement for an iced julep runs on the fourth of May, 1807, in a Norfolk newspaper, for a pleasure garden called the Wig-Wam. Ten years later, in 1817, a bartender named Orsamus Willard at New York's City Hotel is taught to make an iced julep by a visiting Virginian, and the thing goes national.
 
-And I want to be clear about the scale of this. The iced julep is the drink that teaches America to drink cold. Everything downstream, every cocktail you have ever ordered on the rocks, runs through this cup. In 1830s New York they were smashing ice with a mallet and calling the result a hailstorm julep. That's not a garnish. That's an industry being born.
+By the 1830s New York bartenders were crushing ice with a mallet and calling the result a hailstorm julep.
 
 ## [SLIDE 9] Wholly American
-
-Which brings us to the part of the story that got left out of the brochure.
 
 The julep, in its great period, was overwhelmingly made by Black Americans, enslaved and free. Between roughly 1820 and the Civil War, the most celebrated bartenders in this country were Black men, and the julep was their signature.
 
@@ -189,7 +185,7 @@ Samuel Mordecai, writing about old Richmond in 1856, remembered the Quoit Club's
 
 There was a man known only as Carter who kept a bar called the Hole in the Wall inside the United States Capitol until it was demolished in the building's renovations. One does wonder whether Congress would be quite so partisan if it still had one.
 
-And Tom Bullock. Born in Louisville in 1872; his father was a formerly enslaved man who fought for the Union. Bell boy at Louisville's Pendennis Club, then the bar, then the St. Louis Country Club. In 1917 he published The Ideal Bartender, the first cocktail book by a Black author in America. Hold that name. We'll come back to him, because in 1913 a former President of the United States went to court over one of his juleps.
+And Tom Bullock. Born in Louisville in 1872; his father was a formerly enslaved man who fought for the Union. Bell boy at Louisville's Pendennis Club, then the bar, then the St. Louis Country Club. In 1917 he published The Ideal Bartender, the first cocktail book by a Black author in America. We'll come back to him, because in 1913 a former President of the United States went to court over one of his juleps.
 
 > **THE LINE TO LAND ON**
 > David Wondrich puts it best, and I'll borrow it: the African-American influence on the American bar ran the same way it ran through Southern cooking and through American music, so high you can't get over it, so deep you can't get under it, so wide you can't go around it.
@@ -252,7 +248,7 @@ It is the only time in American history a man's sobriety defence was rejected on
 
 Roosevelt won. The editor folded, admitting he could not produce a single witness. Roosevelt asked the court for the smallest sum the law allowed: six cents. He noted that six cents was about the price of a good newspaper. The Iron Ore sold for three.
 
-And Bullock reprinted that article in the front of his own book. He knew exactly what he had.
+Bullock reprinted that article in the front of his own book.
 
 > **THE PART THAT ISN'T FUNNY**
 > Nobody was defending Tom Bullock here. The Post-Dispatch was mocking Roosevelt, and Bullock was the stick they hit him with: the paper's whole joke depends on the reader agreeing, instantly and without argument, that no man alive leaves one of Tom's juleps unfinished.
@@ -281,11 +277,9 @@ Three: the bug. In the 1870s and 80s, phylloxera eats the French vineyards. Cogn
 
 ## [SLIDE 14] The julep goes out of style
 
-And then, having conquered, it dies.
-
 By the late nineteenth century the julep is in trouble. It takes too long to make: you're hand-crushing ice and building a bouquet while the bar is three deep. It's too strong; it's essentially neat spirit and ice. And the new drinks are faster and lighter: fizzes, Collinses, coolers. Things you can make in fifteen seconds.
 
-The julep becomes a period piece. A costume. The drink your grandfather talks about.
+It became an old-fashioned drink, made for occasions.
 
 ## [SLIDE 15] The woman who drank it all
 
@@ -328,7 +322,7 @@ The two rules that actually matter: the ice must be crushed, not cubed, because 
 
 A thousand years ago this was a Persian rose syrup handed to people who were ill.
 
-It lost the rose in the Mediterranean, lost the medicine in Virginia, was perfected in ice by men who were not free, lost its brandy to a tax revolt and a plant louse, and washed up in a silver cup at a horse race.
+It became a brandy drink in Virginia, made famous by men who were not free. It became a bourbon drink in Kentucky.
 
 One last thing. The most quoted line ever written about this drink comes from a 1937 letter by Lieutenant General Simon Bolivar Buckner Jr., who was asked for the recipe and refused to give one. A julep, he wrote, is not a formula. It is a ceremony, a rite not to be entrusted to "a novice, a statistician, nor a Yankee."
 

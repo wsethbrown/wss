@@ -76,20 +76,19 @@ def ruled(s, y, items, size=14.5, cpl=62, x=4.45, tx=6.1, tw=6.38):
 
 # ---------------------------------------------------------------- 1 title
 title_slide('Mint Julep',
-            'A thousand-year-old Persian medicine that lost its roses, crossed the Atlantic, '
-            'and washed up in a silver cup at a horse race.',
+            'The history of the mint julep, with two versions to taste: the brandy original and the bourbon one.',
             series='Cocktails, Chapter One  ·  The Whiskey Share Society')
 
 # ---------------------------------------------------------------- 2 the drink in your hand
 s = new_slide()
 glass_line(s, 0.85, 0.85, 'Glass A. Pour it now.')
-heading(s, 1.35, 'The drink in your hand.', size=40, w=6.6, h=0.8)
-text(s, 0.85, 2.2, 6.2, 0.9, 'Glass A. Taste it before I tell you what it is.', size=19, italic=True, color=MUTE)
-text(s, 0.85, 3.0, 6.2, 0.5, 'Built the way a julep has always been built.', size=18, italic=True, color=MUTE)
+heading(s, 1.35, 'Start with glass A.', size=40, w=6.6, h=0.8)
+text(s, 0.85, 2.2, 6.2, 0.9, 'Taste it now. What is in it comes at slide 16.', size=19, italic=True, color=MUTE)
+text(s, 0.85, 3.0, 6.2, 0.5, '', size=18, italic=True, color=MUTE)
 rrect(s, 7.45, 0.85, 5.03, 5.65, r=0.36, fill=WHITE, line=HAIR)
 yy = 1.35
-for i, t in enumerate(['Something sweet.', 'Something green.', 'Something strong.',
-                       'And as much ice as the cup will take.']):
+for i, t in enumerate(['Sugar', 'Mint', 'Spirit',
+                       'Crushed ice']):
     if i:
         line(s, 7.85, yy - 0.22, 12.08, yy - 0.22, HAIR, 1.0)
     dot(s, 8.0, yy + 0.27, 0.13, MARK_DEEP if i == 3 else INK)
@@ -99,7 +98,7 @@ jfooter(s, 2)
 
 # ---------------------------------------------------------------- 3 the road to the julep (map)
 s = new_slide()
-head(s, 'The road to the julep.', 'A Persian rose cordial, and how it became a cup of Kentucky bourbon.',
+head(s, 'The road to the julep.', 'Where the drink and its name came from.',
      y=0.7, size=36, h=0.65)
 mx, my, mw = 0.85, 1.95, 11.63
 mp = json.loads((A / 'road_map.json').read_text())
@@ -118,7 +117,7 @@ labels = [
     ('virginia', 'Virginia', 'brandy, sugar, garden mint, drunk at daybreak, 1700s', 3.05, 4.7, 3.0),
     ('england', 'England', 'an apothecary’s syrup, used to hide a bitter dose, 1400s', 8.6, 2.1, 3.3),
     ('andalus', 'Al-Andalus', 'the julep enters Europe', 6.15, 4.85, 2.3),
-    ('levant', 'The Levant', 'mint takes the rose’s place', 9.95, 3.2, 2.4),
+    ('levant', 'The Levant', 'mint replaces the rose', 9.95, 3.2, 2.4),
     ('persia', 'Persia', 'gulāb: rose petals, sugar, water, prescribed as medicine, c. 900', 9.2, 5.12, 3.12),
 ]
 for k, name, body, lx, ly, lw in labels:
@@ -139,27 +138,27 @@ text(s, 0.85, 6.6, 11.6, 0.3, 'Redrawn from the original deck’s map. Coastline
 
 # ---------------------------------------------------------------- 4 it's good for you
 s = new_slide()
-head(s, 'It’s good for you.', 'For its first thousand years, a julep is not a pleasure. It’s a delivery mechanism.')
+head(s, 'It’s good for you.', 'For most of its history a julep was a medicine.')
 rows(s, 0.85, 2.3, 11.63, [
-    ('The vehicle', 'A sweet liquid you put medicine into: the spoonful of sugar. 18th-century British medical '
-                    'books are full of them: camphor juleps, balsam juleps, juleps cut with salt.'),
-    ('1784', 'A physician in Medical Communications prescribes a mint julep to a woman with a sick stomach, '
-             'alongside an emetic and some powders. This is a drink on a prescription pad.'),
-    ('Antifogmatic', 'A morning dram, taken before breakfast, to burn off the damp and keep the fever away. A julep '
-                     'was a health measure. So was, conveniently, being drunk by seven.'),
+    ('A julep', 'A sweet liquid that medicine was mixed into. British medical books of the 1700s list camphor juleps, '
+                'balsam juleps and juleps with salt.'),
+    ('1784', 'A London doctor, writing in Medical Communications, prescribes a mint julep to a woman with a sick '
+             'stomach, with an emetic and some powders.'),
+    ('Antifogmatic', 'A dram taken before breakfast, meant to keep off damp and fever. The julep was drunk this '
+                     'way.'),
 ], label_w=2.4, row_h=1.3, size=17)
 jfooter(s, 4)
 
 # ---------------------------------------------------------------- 5 the paper trail (timeline)
 s = new_slide()
-head(s, 'The paper trail.', 'Every early julep is a Virginia julep. Kentucky is not in the record.', size=38)
+head(s, 'The paper trail.', 'The early American references are all from Virginia. None is from Kentucky.', size=38)
 stops = [
-    ('1770', 'Virginia', 'Munford’s play The Candidates stars a drunk named Mr. Julip. Same year: a hunting poem in the Virginia Gazette.'),
-    ('1784', 'Prescription', 'Medical Communications: a mint julep prescribed to a patient, alongside an emetic.'),
+    ('1770', 'Virginia', 'Munford’s play The Candidates has a drunk character named Mr. Julip. The same year, a hunting poem in the Virginia Gazette.'),
+    ('1784', 'Prescription', 'Medical Communications, London: a mint julep prescribed to a patient, with an emetic.'),
     ('1787', 'Rum. No mint.', 'American Museum: the Virginian rises at six and drinks a julep of rum, water and sugar.'),
     ('1793', 'First recipe', 'Rev. Harry Toulmin, in Norfolk: rum and water, well sweetened, with a slip of mint in it.'),
     ('1803', 'Of a morning', 'John Davis, Travels: a dram of spirituous liquor that has mint steeped in it, taken by Virginians of a morning.'),
-    ('1807', 'Ice', 'Wig-Wam Gardens, Norfolk, advertises an iced julep. The moment the drink becomes the drink.'),
+    ('1807', 'Ice', 'Wig-Wam Gardens, Norfolk, advertises an iced julep.'),
 ]
 x0, ty, cw = 0.85, 3.72, 11.63 / 6
 line(s, x0 + 0.12, ty, x0 + 11.63 - 0.05, ty, INK, 1.5)
@@ -171,7 +170,7 @@ for i, (yr, tag, body) in enumerate(stops):
     text(s, cx, 4.0, cw - 0.22, 1.9, body, size=13, ls=1.15)
 rrect(s, 0.85, 5.92, 11.63, 0.78, r=0.18, fill=W100)
 text(s, 1.15, 5.92, 11.0, 0.78, [[('Kentucky was part of Virginia until 1792.  ', {'font': SANS, 'bold': True, 'italic': False, 'size': 16}),
-                                   ('The julep didn’t travel west. Virginia did.', {})]],
+                                   ('The julep was a Virginia drink before Kentucky was a state.', {})]],
      size=16, italic=True, color=INK, anchor=MSO_ANCHOR.MIDDLE)
 jfooter(s, 5)
 
@@ -190,17 +189,17 @@ def vat(k):
 
 
 heading(s, 0.85, 'In 1789, all of this was Virginia.', size=32, w=3.05, h=1.7)
-text(s, 0.85, 2.62, 3.05, 0.85, 'And every julep in the record comes from one corner of it.', size=16, italic=True,
+text(s, 0.85, 2.62, 3.05, 0.85, 'The early julep references come from its south-east corner.', size=16, italic=True,
      color=MUTE, ls=1.12)
 rrect(s, 0.85, 3.6, 3.05, 2.88, r=0.22, fill=WHITE, line=HAIR)
-text(s, 1.1, 3.8, 2.6, 0.62, 'Every Virginian julep citation sits inside that circle.', size=14, font=SANS, bold=True,
+text(s, 1.1, 3.8, 2.6, 0.62, 'The Virginia references are all inside the circle.', size=14, font=SANS, bold=True,
      color=INK, ls=1.05)
 yy = 4.5
 for t in ['Williamsburg 1770', 'Mecklenburg County 1770', 'Norfolk 1793 and 1807']:
     dot(s, 1.17, yy + 0.13, 0.11, MARK_DEEP)
     text(s, 1.35, yy, 2.4, 0.3, t, size=13, color=INK)
     yy += 0.32
-text(s, 1.1, 5.55, 2.65, 0.85, 'Kentucky’s claim on this drink is inherited. It was part of Virginia until 1792.',
+text(s, 1.1, 5.55, 2.65, 0.85, 'Kentucky was part of Virginia until 1792.',
      size=12.5, italic=True, color=INK, ls=1.1)
 for k, t in [('ohio', 'Ohio'), ('pennsylvania', 'Pennsylvania'), ('maryland', 'Maryland'), ('tennessee', 'Tennessee'),
              ('northcarolina', 'North Carolina'), ('indiana', 'Indiana'), ('illinois', 'Illinois')]:
@@ -209,9 +208,9 @@ for k, t in [('ohio', 'Ohio'), ('pennsylvania', 'Pennsylvania'), ('maryland', 'M
 px, py = vat('wv')
 text(s, px - 0.8, py - 0.13, 1.6, 0.26, 'W. Virginia', size=11, font=SANS, color=CREAM_MUTE, align=PP_ALIGN.CENTER)
 px, py = 6.95, 4.05
-text(s, px - 1.3, py - 0.38, 2.6, 0.32, 'Not one from here', size=16, font=SANS, bold=True, color=CREAM,
+text(s, px - 1.3, py - 0.38, 2.6, 0.32, 'None from here', size=16, font=SANS, bold=True, color=CREAM,
      align=PP_ALIGN.CENTER)
-text(s, px - 1.3, py - 0.04, 2.6, 0.5, 'Kentucky was Virginia for three more years, and left no julep behind.',
+text(s, px - 1.3, py - 0.04, 2.6, 0.5, 'No julep reference from Kentucky in these years.',
      size=11, italic=True, color=CREAM_MUTE, align=PP_ALIGN.CENTER, ls=1.05)
 text(s, 4.15, 6.02, 8.33, 0.3,
      'State outlines from Natural Earth; 1789 Virginia shown as its modern successor states.',
@@ -220,45 +219,43 @@ jfooter(s, 6)
 
 # ---------------------------------------------------------------- 7 the virginia julep
 s = new_slide()
-head(s, 'The Virginia julep.', 'Picture the drink at its peak, around 1820. It is not what you think.')
+head(s, 'The Virginia julep.', 'What was in a julep around 1820.')
 rows(s, 0.85, 2.25, 11.63, [
-    ('Not rum', 'Rum has fallen out of fashion after the Revolution: too British, too colonial.'),
-    ('Brandy', 'The good julep is built on fine French brandy, sometimes domestic peach brandy, sometimes cut '
-               'with Spanish or Portuguese wine.'),
-    ('And more', 'Berries, whatever’s in season. A whole thicket of mint on top, not Toulmin’s sad little slip.'),
-    ('The point', 'This is a luxury good. It is showing off. It is the most expensive thing a man can hand you on '
-                  'a hot morning, and that is entirely the point.'),
+    ('Rum', 'Rum had gone out of fashion after the Revolution.'),
+    ('Brandy', 'The usual spirit was French brandy, sometimes American peach brandy, sometimes with Spanish or '
+               'Portuguese wine added.'),
+    ('Fruit and mint', 'Berries in season, and a large bunch of mint on top.'),
+    ('Cost', 'It was an expensive drink. Serving one was a way to show wealth and hospitality.'),
 ], label_w=2.2, row_h=0.98, size=16.5)
 jfooter(s, 7)
 
 # ---------------------------------------------------------------- 8 ice, ice, baby
 s = new_slide()
-head(s, 'Ice, ice, baby.', 'Ask the room to guess the year. They will guess too late.')
+head(s, 'Ice, ice, baby.', 'When ice went into the julep.')
 rows(s, 0.85, 2.25, 11.63, [
-    ('4 May 1807', 'The first known advertisement for an iced julep: the Wig-Wam Gardens, in a Norfolk newspaper.'),
-    ('1817', 'Orsamus Willard, at New York’s City Hotel, is taught the iced julep by a visiting Virginian. '
-             'It goes national.'),
-    ('1830s', 'New York smashes ice with a mallet and calls the result a hailstorm julep. That is not a garnish. '
-              'That is an industry being born.'),
+    ('4 May 1807', 'The first known advertisement for an iced julep, placed by the Wig-Wam Gardens in a Norfolk newspaper.'),
+    ('1817', 'Orsamus Willard of the City Hotel, New York, learns the iced julep from a visiting Virginian. '
+             'It spreads from there.'),
+    ('1830s', 'New York bartenders crush ice with a mallet. The result is called a hailstorm julep.'),
 ], label_w=2.2, row_h=0.98, size=16.5)
-text(s, 0.85, 5.88, 11.6, 0.9, ['The iced julep is the drink that taught America to drink cold.',
-                              'Every cocktail you have ever ordered on the rocks runs through this cup.'],
+text(s, 0.85, 5.88, 11.6, 0.9, ['By the 1830s the julep was an iced drink in New York as well as Virginia.'],
+                              
      size=19, italic=True, color=INK, ls=1.15)
 jfooter(s, 8)
 
 # ---------------------------------------------------------------- 9 wholly american
 s = new_slide()
-head(s, 'Wholly American.', 'The part of the story that got left out of the brochure.')
+head(s, 'Wholly American.', 'The best-known julep makers of the 1800s were Black men, free and enslaved.')
 people = [
     ('Cato Alexander', 'New York',
-     [[('Freed 1799. Built his tavern four miles up the Harlem Road, a ten-minute gallop out of town. Thirty years the '
-        'most fashionable room in America. He poured ', {}), ('brandy', {'bold': True}), (' juleps.', {})]]),
+     [[('Freed in 1799. Kept a tavern four miles up the Harlem Road for about thirty years, among the most '
+        'fashionable in the country. He served ', {}), ('brandy', {'bold': True}), (' juleps.', {})]]),
     ('Jasper Crouch', 'Richmond',
-     'Free man of color. The first acknowledged master of the julep. John Marshall drank them.'),
+     'A free man of color. Called the first master of the julep. Chief Justice John Marshall drank his.'),
     ('Carter', 'Washington',
      'Kept the “Hole in the Wall” bar inside the United States Capitol.'),
     ('Tom Bullock', 'St. Louis',
-     'The Ideal Bartender (1917), the first cocktail book by a Black author in America. Hold that name.'),
+     'Wrote The Ideal Bartender (1917), the first cocktail book by a Black author in America. He is on slide 12.'),
 ]
 cw, ch = 5.7, 2.15
 for i, (name, place, body) in enumerate(people):
@@ -278,14 +275,13 @@ heading(s, 1.3, 'The Prince’s julep.', size=42, color=CREAM, w=7.0, h=0.85)
 text(s, 0.85, 2.35, 6.75, 3.3, [
     'The Prince of Wales, nineteen, the future Edward VII, is told Richmond holds the best compounder of cooling '
     'drinks in the world.',
-    'What Jim Cook builds takes more than three hundred words to describe in the published record of the royal tour. '
-    'It is not a drink. It is an installation: basins and obelisks of ice drilled through for straws, a tumbler '
-    'holding a pint and a half, a bouquet of flowers on top.',
-    'He takes one sip and demands the recipe. He finishes it, his party drains a second, and a third is booked '
+    'What Jim Cook makes takes more than three hundred words to describe in the published record of the royal tour: '
+    'basins and obelisks of ice drilled through for straws, a tumbler holding a pint and a half, and flowers on top.',
+    'He takes one sip and asks for the recipe. He finishes it, his party drains a second, and a third is booked '
     'for the following morning.',
 ], size=16, color=CREAM, ls=1.2, space_after=10)
-text(s, 0.85, 5.75, 6.75, 0.85, 'Years later, the only thing the future King of England could remember about '
-     'Richmond was that julep.', size=17, italic=True, color=CREAM, ls=1.15)
+text(s, 0.85, 5.75, 6.75, 0.85, 'The story goes that, years later, it was the one thing he remembered about '
+     'Richmond.', size=17, italic=True, color=CREAM, ls=1.15)
 rrect(s, 8.1, 0.85, 4.38, 5.65, r=0.4, fill=OAK, line=OAK_EDGE)
 rect(s, 8.6, 1.5, 0.9, 0.045, fill=MARK)
 text(s, 8.6, 1.75, 3.5, 1.7, '13', size=110, font=SANS, bold=True, color=CREAM, ls=0.9)
@@ -298,22 +294,22 @@ jfooter(s, 10, dark=True)
 # ---------------------------------------------------------------- 11 john dabney
 s = new_slide()
 portrait(s, 'dabney.jpg', 0.85, 0.85, 3.2, 4.0)
-text(s, 0.85, 4.98, 3.2, 0.62, ['He never saw this written down.', 'He could not read.'], size=13, italic=True,
+text(s, 0.85, 4.98, 3.2, 0.62, ['He could not read.', ''], size=13, italic=True,
      color=MUTE, ls=1.1)
 text(s, 0.85, 5.6, 3.2, 0.42, 'The only known photograph of John Dabney. The Valentine, Richmond.', size=9.5,
      font=SANS, color=MUTE, ls=1.1)
 heading(s, 0.8, 'John Dabney', size=38, x=4.45, w=8.0, h=0.7)
 text(s, 4.45, 1.5, 8.0, 0.4, 'c. 1824–1900  ·  Richmond, Virginia', size=17, italic=True, color=MUTE)
 ruled(s, 2.02, [
-    ('Born enslaved', 'Hanover County, c.1824. Small, so they made him a jockey. When he outgrew the horses they put '
-                      'him in a kitchen, and he could cook.'),
-    ('The ice', 'He shaved it himself with a carpenter’s plane turned blade-up, wooden sides fitted to catch the fall.'),
+    ('Born enslaved', 'Hanover County, about 1824. He was small, so he was made a jockey. When he grew too big he '
+                      'was put to work in a kitchen.'),
+    ('The ice', 'He shaved it with a carpenter’s plane turned blade-up, with wooden sides to catch the shavings.'),
     ('Elizabeth', 'He bought his wife’s freedom with tips, because her owners were preparing to sell her away from him.'),
-    ('The debt', 'He was still paying instalments on his own freedom when Emancipation cancelled it. He paid the '
-                 'balance anyway.'),
-    ('The recipe', 'Crushed ice, sugar, mint bruised in with the ice, then your good brandy. Not bourbon.'),
+    ('The debt', 'He was still paying for his own freedom when Emancipation ended the debt. He paid the rest '
+                 'anyway.'),
+    ('The recipe', 'Crushed ice, sugar, mint bruised with the ice, then brandy. Not bourbon.'),
 ], size=14.5, cpl=62)
-strip(s, 6.12, [[('The greatest julep maker who ever lived was not making a bourbon drink.', {'bold': True})]], h=0.6)
+strip(s, 6.12, [[('The most celebrated julep maker of his time made it with brandy.', {'bold': True})]], h=0.6)
 jfooter(s, 11)
 
 # ---------------------------------------------------------------- 12 the six-cent julep
@@ -326,21 +322,21 @@ heading(s, 0.8, 'The six-cent julep.', size=38, x=4.45, w=8.0, h=0.7)
 text(s, 4.45, 1.5, 8.0, 0.4, 'Roosevelt v. Newett  ·  Marquette, Michigan  ·  May 1913', size=17, italic=True,
      color=MUTE)
 ruled(s, 2.02, [
-    ('1912', 'The Iron Ore prints that Roosevelt gets drunk, and not infrequently, and all his intimates know it. '
-             'Roosevelt has waited years for someone to put that in print. He sues.'),
-    ('May 1913', 'On the stand he swears he has never been intoxicated in his life. He concedes a mint bed at the White '
-                 'House. And he testifies that since leaving office he drank a julep at the St. Louis Country Club, '
-                 'but only part of it.'),
-    ('The rebuttal', 'The St. Louis Post-Dispatch will not have it. Who, it asks, was ever known to drink just part of '
-                     'one of Tom’s? It calls him the greatest mixologist “of any race, color or condition of servitude.”'),
-    ('The verdict', 'Newett folds: he cannot produce one witness. Roosevelt wins, and asks for the smallest sum the law allows.'),
+    ('1912', 'The Iron Ore, a Michigan newspaper, prints that Roosevelt gets drunk, and not infrequently, and that '
+             'all his intimates know it. Roosevelt sues for libel.'),
+    ('May 1913', 'On the stand he swears he has never been intoxicated. He admits there was a mint bed at the White '
+                 'House. He says that since leaving office he drank part of one julep, at the St. Louis Country '
+                 'Club.'),
+    ('The rebuttal', 'The St. Louis Post-Dispatch asks who was ever known to drink just part of one of Tom’s. '
+                     'It calls Bullock the greatest mixologist “of any race, color or condition of servitude.”'),
+    ('The verdict', 'Newett cannot produce a witness and withdraws. Roosevelt wins and asks for the smallest damages the law allows.'),
 ], size=13.5, cpl=68)
 rrect(s, 0.85, 6.08, 11.63, 0.74, r=0.18, fill=W100)
 dot(s, 1.38, 6.45, 0.56, WHITE)
 text(s, 1.09, 6.25, 0.58, 0.4, '6¢', size=19, font=SANS, bold=True, color=INK, align=PP_ALIGN.CENTER,
      anchor=MSO_ANCHOR.MIDDLE)
-text(s, 1.9, 6.08, 10.4, 0.74, [[('Damages awarded. Roosevelt noted it was about the price of a good newspaper.', {'bold': True})],
-                               [('Bullock reprinted the article in the front of his own book. He knew what he had.', {'italic': True})]],
+text(s, 1.9, 6.08, 10.4, 0.74, [[('Roosevelt was awarded six cents.', {'bold': True})],
+                               [('Bullock printed the editorial at the front of his book.', {'italic': True})]],
      size=14, color=INK, anchor=MSO_ANCHOR.MIDDLE, ls=1.1)
 jfooter(s, 12)
 
@@ -348,14 +344,13 @@ jfooter(s, 12)
 s = new_slide()
 glass_line(s, 0.85, 0.85, 'Glass B. Pour it now.')
 heading(s, 1.3, 'Damn the excise.', size=38, w=5.4, h=0.75)
-text(s, 0.85, 2.05, 5.4, 0.75, '1791. The first federal tax ever laid on something Americans made themselves.',
+text(s, 0.85, 2.05, 5.4, 0.75, 'In 1791 Congress put a tax on American-made spirits.',
      size=16, italic=True, color=MUTE, ls=1.12)
 yy = 2.8
-for k, v in [('Pennsylvania', 'Takes up arms. Washington rides out with 13,000 militia, more men than he commanded '
-                              'at most Revolutionary battles.'),
-             ('Kentucky', 'Simply declines. Grand juries won’t indict for four years. No informant will take half the '
-                          'penalties. No lawyer will prosecute.'),
-             ('1802', 'Jefferson repeals it. Kentucky defied the law for eight years and never fired a shot.')]:
+for k, v in [('Pennsylvania', 'Farmers take up arms. Washington leads about 13,000 militia against them.'),
+             ('Kentucky', 'Does not pay. For four years grand juries will not indict, informers will not come '
+                          'forward and lawyers will not prosecute.'),
+             ('1802', 'Jefferson repeals the tax.')]:
     text(s, 0.85, yy, 5.4, 0.35, k, size=14, font=SANS, bold=True, color=INK)
     text(s, 0.85, yy + 0.32, 5.4, 0.75, v, size=14, ls=1.12)
     yy += 1.32 if k == 'Kentucky' else 0.97
@@ -363,19 +358,19 @@ picture(s, A / 'whiskey_rebellion.jpg', 6.73, 0.85, 5.75, 3.66, radius_in=0.22)
 text(s, 6.73, 4.6, 5.75, 0.6, 'Washington reviews the army raised to put down the Whiskey Rebellion, 1794. '
      'Attributed to Frederick Kemmelmeyer. The Metropolitan Museum of Art, public domain.',
      size=10.5, font=SANS, color=MUTE, ls=1.12)
-strip(s, 6.1, [[('Distillers did not flee to Kentucky to escape the tax. The tax was federal. Kentucky just didn’t pay it.',
+strip(s, 6.1, [[('Distillers did not move to Kentucky to escape the tax. It was a federal tax, and Kentucky did not pay it.',
                   {'bold': True})]], h=0.66, size=15)
 jfooter(s, 13)
 
 # ---------------------------------------------------------------- 14 the julep goes out of style
 s = new_slide()
-head(s, 'The julep goes out of style.', 'Having conquered, it dies.')
+head(s, 'The julep goes out of style.', 'Why bars stopped making it.')
 rows(s, 0.85, 2.25, 11.63, [
-    ('Too slow', 'You are hand-crushing ice and building a bouquet while the bar is three deep.'),
-    ('Too strong', 'It is essentially neat spirit and ice.'),
-    ('Too old', 'The new drinks are faster and lighter: fizzes, Collinses, coolers. Things you can make in fifteen seconds.'),
+    ('Too slow', 'The ice is crushed by hand and the garnish is built for each drink.'),
+    ('Too strong', 'It is nearly all spirit and ice.'),
+    ('Too old', 'Newer drinks were lighter and quicker to make: fizzes, Collinses, coolers.'),
 ], label_w=2.2, row_h=0.9, size=17)
-text(s, 0.85, 5.55, 11.6, 0.8, 'The julep becomes a period piece. A costume. The drink your grandfather talks about.',
+text(s, 0.85, 5.55, 11.6, 0.8, 'It became an old-fashioned drink, made for occasions.',
      size=21, italic=True, color=INK, ls=1.15)
 jfooter(s, 14)
 
@@ -383,33 +378,33 @@ jfooter(s, 14)
 s = new_slide()
 portrait(s, 'modjeska.jpg', 0.85, 0.85, 3.2, 4.0)
 text(s, 0.85, 4.98, 3.2, 0.35, 'Helena Modjeska', size=16, font=SANS, bold=True, color=INK)
-text(s, 0.85, 5.3, 3.2, 0.62, ['Polish tragedienne, lately of Kraków', 'Godmother to Ethel Barrymore'], size=13,
+text(s, 0.85, 5.3, 3.2, 0.62, ['Polish actress', ''], size=13,
      italic=True, color=MUTE, ls=1.1)
 heading(s, 0.8, 'The woman who drank it all.', size=38, x=4.45, w=8.0, h=0.7)
-text(s, 4.45, 1.5, 8.0, 0.4, 'Louisville, 1877  ·  “the story goes…”', size=17, italic=True, color=MUTE)
-text(s, 4.45, 2.1, 8.0, 1.3, 'Meriwether Lewis Clark Jr., grandson of that Clark, has built Churchill Downs and planted '
-     'mint behind the clubhouse. He hands the visiting Polish actress an enormous julep, meant to be passed around '
-     'the table and shared.', size=16, ls=1.2)
+text(s, 4.45, 1.5, 8.0, 0.4, 'Louisville, 1877. A story, not a documented event.', size=17, italic=True, color=MUTE)
+text(s, 4.45, 2.1, 8.0, 1.3, 'Meriwether Lewis Clark Jr., grandson of William Clark, has built Churchill Downs and '
+     'planted mint behind the clubhouse. He hands the visiting actress a very large julep, meant to be passed around '
+     'the table.', size=16, ls=1.2)
 text(s, 4.45, 3.45, 8.0, 0.45, 'She drinks the whole thing herself.', size=22, font=SANS, bold=True, color=INK)
 text(s, 4.45, 3.92, 8.0, 0.45, [[('●  ', {'color': MARK_DEEP, 'size': 14}), ('Then she asks for more.', {})]], size=22,
      font=SANS, bold=True, color=INK)
-text(s, 4.45, 4.6, 8.0, 1.2, 'That is the founding anecdote of the most famous drink in American sport. She learned '
-     'English at thirty-six, never lost the accent, and became the finest Shakespearean actress in the country anyway. '
-     'Grant, Sherman and Mark Twain were friends.', size=14.5, color=MUTE, ls=1.18)
+text(s, 4.45, 4.6, 8.0, 1.2, 'The Kentucky Derby’s julep tradition is traced to this story. Modjeska learned '
+     'English at thirty-six and became one of the leading Shakespearean actresses in America.',
+     size=14.5, color=MUTE, ls=1.18)
 rrect(s, 0.85, 6.02, 11.63, 0.76, r=0.18, fill=W100)
-text(s, 1.15, 6.02, 11.0, 0.76, [[('Louisville adored her. In 1883 she premiered the first Ibsen play ever staged in America, in this city.', {'bold': True})],
-                                 [('In 1889 a Louisville candymaker named a sweet after her. You can still buy a Modjeska today.', {'italic': True})]],
+text(s, 1.15, 6.02, 11.0, 0.76, [[('In 1883 she gave the first American performance of an Ibsen play, in Louisville.', {'bold': True})],
+                                 [('In 1889 a Louisville candymaker named a sweet after her. Modjeskas are still sold.', {'italic': True})]],
      size=14, color=INK, anchor=MSO_ANCHOR.MIDDLE, ls=1.1)
 jfooter(s, 15)
 
 # ---------------------------------------------------------------- 16 two juleps
 s = new_slide()
-head(s, 'Two juleps.', 'Same drink, eighty years apart. Only one of them has bourbon in it.')
+head(s, 'Two juleps.', 'The two glasses from tonight.')
 cards = [
-    (0.85, WHITE, INK, MUTE, 'Glass A  ·  c. 1820  ·  Virginia', 'The original', 'what the record actually describes',
+    (0.85, WHITE, INK, MUTE, 'Glass A  ·  c. 1820  ·  Virginia', 'The Virginia julep', 'as described around 1820',
      'Cognac + peach brandy', ['1½ oz cognac  ·  ½ oz peach brandy', '¼ oz simple syrup  ·  8 mint leaves',
                                'berries in season, buried in the ice', 'crushed ice, mounded high']),
-    (6.78, INK, CREAM, CREAM_MUTE, 'Glass B  ·  c. 1900  ·  Kentucky', 'The one you know', 'a substitution, not an improvement',
+    (6.78, INK, CREAM, CREAM_MUTE, 'Glass B  ·  c. 1900  ·  Kentucky', 'The Kentucky julep', 'as made around 1900',
      'Bourbon', ['2 oz bourbon', '¼ oz simple syrup  ·  8 mint leaves', '', 'crushed ice, mounded high']),
 ]
 for x, fill, fg, mu, meta, name, tag, spirit, lines in cards:
@@ -420,26 +415,25 @@ for x, fill, fg, mu, meta, name, tag, spirit, lines in cards:
     rect(s, x + 0.42, 3.85, 0.7, 0.04, fill=MARK if fill == INK else MARK_DEEP)
     text(s, x + 0.4, 4.0, 5.0, 0.45, spirit, size=20, font=SANS, bold=True, color=fg)
     text(s, x + 0.4, 4.5, 5.0, 1.3, [l for l in lines if l], size=14.5, color=fg, ls=1.15)
-strip(s, 5.98, [[('What changed: a tax revolt, a civil war, and a French aphid.', {'bold': True})],
-                [('Bourbon won the julep on economics, not on flavour.', {'italic': True})]], h=0.8, size=14.5)
+strip(s, 5.98, [[('Brandy became scarce and expensive after the Civil War and the vine blight in France.', {'bold': True})],
+                [('Bourbon was cheaper and made nearby.', {'italic': True})]], h=0.8, size=14.5)
 jfooter(s, 16)
 
 # ---------------------------------------------------------------- 17 building it at home
 s = new_slide()
-head(s, 'Building it at home.', 'Two rules actually matter.')
+head(s, 'Building it at home.', 'Two recipes and two rules.')
 for x, name, body in [
     (0.85, 'Kentucky julep', '8 mint leaves  ·  ¼ oz simple syrup  ·  2 oz bourbon. Wipe the mint round a chilled cup, '
                              'add syrup and bourbon, pack with crushed ice and stir until the cup frosts. Mound more '
-                             'ice on top, crown with a fat sprig, short straw.'),
+                             'ice on top. Finish with a large sprig of mint and a short straw.'),
     (6.78, 'Virginia julep', 'Same build, but 1½ oz cognac and ½ oz peach brandy instead of the bourbon, and a berry '
                              'or two buried in the ice.'),
 ]:
     rrect(s, x, 2.2, 5.7, 2.35, r=0.26, fill=WHITE, line=HAIR)
     text(s, x + 0.35, 2.42, 5.0, 0.4, name, size=18, font=SANS, bold=True, color=INK)
     text(s, x + 0.35, 2.88, 5.0, 1.6, body, size=15, ls=1.18)
-for i, (k, v) in enumerate([('Rule one', 'The ice must be crushed, not cubed. The drink is supposed to dilute as you go.'),
-                            ('Rule two', 'Bruise the mint, don’t pulverise it, or you get chlorophyll and bitterness '
-                                         'instead of oil and perfume.')]):
+for i, (k, v) in enumerate([('Rule one', 'Use crushed ice, not cubes. The drink is meant to dilute as you drink it.'),
+                            ('Rule two', 'Bruise the mint. Do not grind it: ground mint tastes bitter.')]):
     y = 4.85 + i * 0.85
     rrect(s, 0.85, y, 0.5, 0.5, r=0.13, fill=W100)
     text(s, 0.85, y, 0.5, 0.5, str(i + 1), size=16, font=SANS, bold=True, color=INK, align=PP_ALIGN.CENTER,
@@ -453,10 +447,9 @@ picture(s, LOGO_CREAM, SLIDE_W / 2 - 0.9, 0.35, 1.8, 1.8 * LOGO_RATIO)
 text(s, 0.8, 1.98, 11.733, 0.95, 'Sláinte', size=54, font=SANS, bold=True, color=CREAM, align=PP_ALIGN.CENTER,
      anchor=MSO_ANCHOR.MIDDLE)
 rect(s, SLIDE_W / 2 - 0.45, 3.0, 0.9, 0.045, fill=MARK)
-text(s, 1.8, 3.25, 9.733, 1.95, ['It lost the rose in the Mediterranean.', 'It lost the medicine in Virginia.',
-                                 'It was perfected in ice by men who were not free.',
-                                 'It lost its brandy to a tax revolt and a plant louse.',
-                                 'And it washed up in a silver cup at a horse race.'],
+text(s, 1.8, 3.25, 9.733, 1.95, ['It began as a rose-water medicine in Persia.',
+                                 'It became a brandy drink in Virginia, made famous by men who were not free.',
+                                 'It became a bourbon drink in Kentucky.'],
      size=18, color=CREAM_MUTE, align=PP_ALIGN.CENTER, ls=1.2)
 text(s, 1.8, 5.35, 9.733, 0.85, ['Every drink you like has a story like this.',
                                  'Most of them just haven’t been written down.'],
