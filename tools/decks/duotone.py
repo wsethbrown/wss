@@ -21,7 +21,10 @@ CREAM = (0xF6, 0xF4, 0xEE)
 
 
 def main():
-    args = [a for a in sys.argv[1:] if not a.startswith('--')]
+    argv = sys.argv[1:]
+    if '--focus' in argv:  # the value after --focus is not a positional argument
+        i = argv.index('--focus'); argv = argv[:i] + argv[i + 2:]
+    args = [a for a in argv if not a.startswith('--')]
     if len(args) != 4:
         raise SystemExit(__doc__)
     src, dst, w_in, h_in = args[0], args[1], float(args[2]), float(args[3])

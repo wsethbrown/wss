@@ -54,6 +54,12 @@ def init(package_dir, title):
     prs = Presentation()
     prs.slide_width = Inches(SLIDE_W)
     prs.slide_height = Inches(SLIDE_H)
+    # python-pptx's template is 4:3 and labels its size type="screen4x3". Changing the width
+    # leaves that label behind, which contradicts the size; write the standard 16:9 values.
+    sz = prs.element.sldSz
+    sz.set('cx', '12192000'); sz.set('cy', '6858000')
+    if 'type' in sz.attrib:
+        del sz.attrib['type']
     BLANK = prs.slide_layouts[6]
     SLIDES.clear()
 
