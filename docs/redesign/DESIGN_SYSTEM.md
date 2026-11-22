@@ -89,8 +89,10 @@ Rules:
   sr-only text), is aria-hidden, and has no shading. Its one motion is the pour (see Motion). Replaces star rows for display;
   the half-step star control in review forms is an input and stays.
 - **Photograph**: only through `shared/_duotone`, which prints a greyscale image in bottle green
-  and cream. Public-domain or owner-supplied images only, at most one per view, never behind
-  text. Sources and licences are listed in `IMAGE_CREDITS.md`.
+  and cream. Public-domain or owner-supplied images, or free-licence stock (Unsplash, Pexels)
+  credited in `IMAGE_CREDITS.md` with the owner's approval of each photo; at most one per view,
+  never behind text. Photographs of people use the heavy variant (`duotone--heavy`: light in
+  orange, shadows in ink, softened by a 1.5px blur), which keeps faces unrecognisable. Sources and licences are listed in `IMAGE_CREDITS.md`.
 - **Primary button**: `btn btn-primary` (green, white text, 16px radius). One per view.
 - **Secondary button**: `btn btn-secondary` (white, hairline).
 - **Text link with arrow**: bold ink text followed by `→`. Write it as `link_to with_arrow("Words"), path` so the
@@ -147,13 +149,17 @@ glass and the view transitions. No animation library.
 - **Reveal on first view**: one system, the `appear` Stimulus controller on the public layout's
   `<main>`. Mark a card, list row, short panel or section heading with
   `data-appear-target="item"`. Out of view at load, it waits hidden and, the first time it
-  scrolls in, eases up 16px (12px on phones) and fades in over 500ms. Items that arrive in the
+  comes properly into view (its top above the bottom 18% of the screen, where the eye is,
+  not at the bottom edge), eases up 24px (16px on phones) and fades in over 700ms. Items that arrive in the
   same moment stagger by 0, then 60, then 110ms and so on (the gaps shrink, capped at 200ms); in
   practice that is cards side by side in a grid on a wide screen, so most reveals, and nearly
   all on a phone's single column, start at once. Rules: the hidden state is a class the
   controller adds (no JS means visible); anything on screen at load is left alone; it is
-  time-based, runs once and then removes its classes; nothing on screen stays hidden even if the
-  observer never fires (a sweep when the scroll or a resize settles, and a one-off 1.5s limit);
+  time-based, runs once and then removes its classes; because the triggers sit inside the
+  screen, something can be on screen and still waiting, but only while the page is scrolling:
+  when the scroll or a resize settles (150ms) everything waiting on screen starts its motion
+  (started, not snapped; only what a jump carried past is shown at once), and a one-off 1.5s
+  limit does the same even if the observer never fires;
   focusing anything inside a waiting item shows it at once; print shows everything; Turbo
   snapshots and back/forward visits are never hidden.
   **Never mark anything taller than about one screen**: mark its heading (a deck section's
@@ -163,19 +169,55 @@ glass and the view transitions. No animation library.
   words that read together (a homepage beat's numeral, heading, text and link) as one item.
   Never mark the header, the footer, a form someone types in, the page heading, the homepage's
   closing beat, or anything in admin (its layout has no controller). Never scroll-scrub a
-  reveal (`animation-timeline`): it stops part-faded wherever the scroll stops.
-- **The glass pours** (900ms) the first time it is seen, through the same controller
-  (`data-appear-target="glass"`, set by `shared/_glass`). A glass inside a revealing card pours
-  120ms after its card starts, once the card is visible. At rest, without JS and in admin the
-  level is simply drawn.
+  reveal (`animation-timeline`): it stops part-faded wherever the scroll stops. Print shows
+  every start state at its final picture.
+- **Secondary motion**, the same controller: things inside a card that play once when seen.
+  Each kind has a start-state class the controller adds (`*-wait`) and a class that plays it
+  (`*-run`), both removed when it is done, so the server's markup is always the final picture.
+  It starts later than a reveal, once it is well on screen (it reaches the middle 60% of the
+  viewport), and lasts long enough to be watched. One inside a card starts at least 120ms after
+  its card starts to show (starting the card first if it is still waiting) and is shown at once
+  whenever its card is; one outside a card plays on its own trigger. On screen at load: a
+  draw-in plays 300ms after a Turbo visit (a click within the site; never back or forward), so
+  a review's wheel above the fold is seen to draw. Not on a full page load, where the browser
+  may already have painted the finished drawing and replaying it would flash (drawn, collapsed,
+  redrawn). A glass pours on load only before the first paint, as before; a face or a photo on
+  screen at load is left alone. These durations are the standard, set by the owner in
+  November 2026 ("too soon for us to see"): reveal 700ms, pour 1.2s, draw-ins about 1.2s,
+  faces about 900ms, photo settle 1.2s.
+  - **The glass pours** (1.2s; `glass`, set by `shared/_glass`). At rest, without JS and in
+    admin the level is simply drawn. `appear: false` leaves a glass out (a gauge another
+    controller drives).
+  - **Draw-ins** (`draw`, about 1.2s: the wheel's wedges 600ms each with delays up to 440ms,
+    labels at 850ms; the wave's stems 500ms, its line 1s, labels at 900ms), only on drawings that carry a value: the palate wheel's
+    lit wedges grow out from under the hub one after another (from the scale that puts their
+    edge at the hub, never from 0; scaled about the wheel's centre with `transform-box:
+    view-box`, checked in Chrome and WebKit), the flavor wave's stems grow from the base to their
+    value and its line draws left to right (`pathLength="1"` and `stroke-dashoffset`); labels
+    fade in last. Gaps shrink. The wheel's wedges stay inside their links, clickable throughout.
+  - **The homepage step faces perform** (`perform` on each face's screen, about 900ms; rows
+    500ms each with gaps 90, 80, 70, 60, 50ms): the
+    library's rows tick in one by one, the invite's guests pop in from `.7` (never from 0), the
+    record's words settle while its wheel draws. CSS in `home/index`.
+  - **Photographs settle** (`photo` on `shared/_duotone`): from `scale: 1.04` to 1 over 1.2s
+    inside the frame, which clips it, so nothing moves around it.
+- **Images fade in as they load** (`image` on deck covers, the deck page's slides, bottle photos
+  and duotone photos): only an image not yet loaded when the page starts, 200ms on the strong
+  ease-out. A cached image is never touched (no flash); one that fails, or sits on screen for 2s
+  without loading, or is on a page Turbo caches, is shown at once.
 - **The hero player** cross-fades its real preview slides, one tick per slide lit in step (a
-  one-slide reel does not cycle); hovering with a pointer or focusing it pauses the reel. The
-  story faces' ticks do not animate: each lights its own position.
+  one-slide reel does not cycle); hovering with a pointer or focusing it pauses the reel. Only the
+  hero has ticks: the step faces' bars carry just their title (ticks there read as a sideways
+  carousel, when the faces change with the vertical scroll).
+- **Trial, off by default**: `/?glass=1`, `2` or `3` (three placements to compare; any other
+  value means none) adds a glass that fills with the scroll through the homepage story (`home/_story_glass`, `story_glass_controller.js`; the partial says how to remove
+  it). Not part of the system until the owner decides.
 - **Pages** cross-fade (view transitions), and a deck's cover travels from its card to the deck
   page. Turbo's progress bar is a 2px `mark-deep` line.
 - **Reduced motion** (`prefers-reduced-motion: reduce`), the same everywhere: the appear
-  controller does nothing, so nothing is hidden and no glass pours; the reel and ticks stand
-  still on the first slide; view transitions are off; nothing travels on hover (no card lift,
+  controller does nothing, so nothing is hidden, no glass pours, nothing draws in, no face
+  performs, no photo settles and no image fades; the reel and ticks stand still on the first
+  slide; view transitions are off; nothing travels on hover (no card lift,
   cover lean or arrow nudge). The press (fill step and `.98`) and colour changes stay: they are
   feedback, not travel.
 

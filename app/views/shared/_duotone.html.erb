@@ -6,7 +6,10 @@
       alt    (String) what the photograph shows
       css    (String, optional) sizing classes, e.g. an aspect ratio
       width, height (Integer, optional) the file's pixel size, so the
-             browser reserves the space before the lazy image arrives %>
-<figure class="duotone <%= local_assigns[:css] %>">
-  <%= image_tag src, alt: alt, loading: "lazy", decoding: "async", width: local_assigns[:width], height: local_assigns[:height] %>
+             browser reserves the space before the lazy image arrives
+    Motion (the appear controller): the photograph settles from a slight
+    scale to its place the first time it is seen (photo), clipped by the
+    frame so nothing shifts, and fades in if it is still loading (image). %>
+<figure class="duotone <%= local_assigns[:css] %>" data-appear-target="photo">
+  <%= image_tag src, alt: alt, loading: "lazy", decoding: "async", width: local_assigns[:width], height: local_assigns[:height], data: { appear_target: "image" } %>
 </figure>

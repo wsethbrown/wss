@@ -137,6 +137,12 @@
     </div>
     <% if user_signed_in? %>
       <div class="min-w-0">
+        <%# The page's one photograph, at the top of the rail (interim stock, see
+            docs/redesign/IMAGE_CREDITS.md), in the heavy two-ink duotone. Wide
+            screens only: on a phone the rail falls below the whole list. %>
+        <%= render "shared/duotone", src: "photos/reviews-glass-book.jpg", width: 1280, height: 960,
+              css: "duotone--heavy mb-6 hidden aspect-[4/3] lg:block",
+              alt: "A hand holds a tumbler of whiskey over an open book by a fire." %>
         <% if @feed == "circle" %>
           <div class="card p-6">
             <h2 class="mb-4 text-xl font-semibold text-ink">Your full circle feed</h2>

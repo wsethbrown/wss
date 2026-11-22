@@ -2,14 +2,23 @@
     length = intensity. Lit segments click through to the family's tag view.
     Renders nothing without descriptors or dial values.
     locals: review (one tasting) OR profile (a pre-blended family=>0..1
-    hash, e.g. Review.blended_wheel for a society verdict). %>
+    hash, e.g. Review.blended_wheel for a society verdict).
+    Draw-in (the appear controller, data-appear-target="draw"): the first
+    time the wheel is seen, its lit wedges grow out from under the hub one
+    after another (--from is the scale that puts a wedge's edge at the hub,
+    --d its delay, gaps shrinking), then the labels fade in. The markup is
+    the final picture: without JS, in admin, in print and under reduced
+    motion the wheel is simply drawn. Each wedge stays inside its link, so
+    it is clickable throughout. %>
 <% profile = local_assigns[:profile] || review.wheel_display_profile %>
 <% if profile.any? %>
   <% families = Review::DESCRIPTOR_LEXICON.keys %>
   <% step = 360.0 / families.size %>
   <% hub, rmax = 22, 96 %>
+  <% lit_delays = [ 0, 90, 170, 240, 300, 350, 390, 420, 440 ] %>
+  <% lit = 0 %>
   <figure class="mx-auto max-w-xs">
-    <svg viewBox="-110 -110 220 220" role="img" aria-label="Palate wheel for this tasting">
+    <svg viewBox="-110 -110 220 220" role="img" aria-label="Palate wheel for this tasting" data-appear-target="draw">
       <% families.each_with_index do |family, i| %>
         <% a0 = (-90 + i * step) * Math::PI / 180 %>
         <% a1 = (-90 + (i + 1) * step) * Math::PI / 180 %>
@@ -27,15 +36,17 @@
                       "L#{(hub * Math.cos(a1)).round(2)},#{(hub * Math.sin(a1)).round(2)} " \
                       "A#{hub},#{hub} 0 0 0 #{(hub * Math.cos(a0)).round(2)},#{(hub * Math.sin(a0)).round(2)} Z" %>
           <a href="<%= reviews_path(tags: family) %>">
-            <path d="<%= sector %>" fill="#b8c9bf" stroke="#fff" stroke-width="1">
+            <path d="<%= sector %>" fill="#b8c9bf" stroke="#fff" stroke-width="1" class="wheel-wedge"
+                  style="--from: <%= (hub / r).round(3) %>; --d: <%= lit_delays[[ lit, lit_delays.size - 1 ].min] %>ms">
               <title><%= family %>. See tastings like this.</title>
             </path>
             <text x="<%= lx %>" y="<%= ly %>" text-anchor="middle" dominant-baseline="middle"
-                  font-size="9" font-weight="700" fill="#16332a"><%= family %></text>
+                  font-size="9" font-weight="700" fill="#16332a" class="wheel-label"><%= family %></text>
           </a>
+          <% lit += 1 %>
         <% else %>
           <text x="<%= lx %>" y="<%= ly %>" text-anchor="middle" dominant-baseline="middle"
-                font-size="9" fill="#5f6b64"><%= family %></text>
+                font-size="9" fill="#5f6b64" class="wheel-label"><%= family %></text>
         <% end %>
       <% end %>
       <circle r="<%= hub %>" fill="#fff"></circle>

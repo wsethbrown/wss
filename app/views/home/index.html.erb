@@ -77,8 +77,10 @@
 
     /* The hero player's reel: its real preview slides cross-fade in turn, and
        one tick per slide lights in step with it (same cycle, same delay).
-       Hovering or focusing the player pauses both. The four story faces'
-       ticks do not animate: each lights the one tick for its own position. */
+       Hovering or focusing the player pauses both. Only the hero has ticks
+       (without slides it lights the first of four, still): the step faces'
+       bars carry just their title, since ticks there read as a sideways
+       carousel when the faces really change with the vertical scroll. */
     <% if reel > 1 %>
     @keyframes hx-reel { 0% { opacity: 0; } 3% { opacity: 1; } <%= step %>% { opacity: 1; } <%= step + 3 %>% { opacity: 0; } 100% { opacity: 0; } }
     @keyframes hx-tick { 0% { opacity: .22; } 3% { opacity: 1; } <%= step %>% { opacity: 1; } <%= step + 3 %>% { opacity: .22; } 100% { opacity: .22; } }
@@ -313,6 +315,38 @@
       .hx .split { grid-template-columns: 5fr 7fr; gap: 64px; }
     }
 
+    /* The step faces perform once as they arrive (data-appear-target=
+       "perform" on each screen; the appear controller plays it 120ms after
+       its player starts to show, once, and never on a back or forward
+       visit), once the face is well on screen. Each is done inside 950ms. The library's rows tick in one by
+       one; the invite's guests pop in in turn, from .7 and never from
+       nothing; the record's words settle while its wheel draws (the wheel's
+       own draw-in) and a verdict's rows tick in like the library's. The
+       stagger gaps shrink. Without JS, on the server's HTML and under
+       reduced motion, the faces are simply there. */
+    @media (prefers-reduced-motion: no-preference) {
+      .hx .perform-wait .sl li,
+      .hx .perform-wait .rv-txt > *,
+      .hx .perform-wait .rv-card--notes { opacity: 0; translate: 0 8px; }
+      .hx .perform-wait .faces > * { opacity: 0; scale: .7; }
+      .hx .perform-run .sl li,
+      .hx .perform-run .rv-txt > *,
+      .hx .perform-run .rv-card--notes { animation: hx-settle 500ms var(--motion-ease-out) calc(var(--appear-delay, 0ms) + var(--d, 0ms)) both; }
+      .hx .perform-run .faces > * { animation: hx-pop 400ms var(--motion-ease-out) calc(var(--appear-delay, 0ms) + 150ms + var(--d, 0ms)) both; }
+      .hx .sl li:nth-child(2), .hx .faces > :nth-child(2), .hx .rv-txt > :nth-child(2), .hx .rv-card--notes { --d: 90ms; }
+      .hx .sl li:nth-child(3), .hx .faces > :nth-child(3) { --d: 170ms; }
+      .hx .sl li:nth-child(4), .hx .faces > :nth-child(4) { --d: 240ms; }
+      .hx .sl li:nth-child(5), .hx .faces > :nth-child(5) { --d: 300ms; }
+      .hx .sl li:nth-child(n+6), .hx .faces > :nth-child(n+6) { --d: 350ms; }
+    }
+    @keyframes hx-settle { from { opacity: 0; translate: 0 8px; } to { opacity: 1; translate: none; } }
+    @keyframes hx-pop { from { opacity: 0; scale: .7; } to { opacity: 1; scale: 1; } }
+    @media print {
+      .hx :is(.perform-wait, .perform-run) :is(.sl li, .rv-txt > *, .rv-card--notes, .faces > *) {
+        opacity: 1 !important; translate: none !important; scale: none !important; animation: none !important;
+      }
+    }
+
     /* Cards, rows, panels and headings reveal once, the first time they
        scroll in, through the site's appear controller (data-appear-target on
        the markup below; application.css; appear_controller.js). It is
@@ -377,7 +411,7 @@
       </div>
       <div class="face f2">
         <div class="player" data-appear-target="item">
-          <div class="screen">
+          <div class="screen" data-appear-target="perform">
             <div class="sl sl--paper">
               <h4>Latest decks</h4>
               <ul>
@@ -390,7 +424,7 @@
               </ul>
             </div>
           </div>
-          <div class="bar"><b>The library</b><div class="ticks" aria-hidden="true"><i></i><i class="on"></i><i></i><i></i></div><span>2 / 4</span></div>
+          <div class="bar"><b>The library</b></div>
         </div>
       </div>
 
@@ -409,7 +443,7 @@
         <% gathering_photo = capture do %><%= render "shared/duotone", src: "photos/tasting-night-living-room.jpg", css: "invite-photo", width: 1280, height: 512,
               alt: "Five friends at a whiskey tasting in a lamp-lit living room. One stands by the TV with a glass raised, presenting, and four listen from the sofas, laughing, with glasses in hand." %><% end %>
         <div class="player" data-appear-target="item">
-          <div class="screen screen--invite">
+          <div class="screen screen--invite" data-appear-target="perform">
             <% if @next_event %>
               <%# The next real tasting night at a public society, drawn as its
                   invite: when, what, where, and who has said yes (the names
@@ -461,7 +495,7 @@
               </div>
             <% end %>
           </div>
-          <div class="bar"><b><%= @next_event ? "The next tasting night" : "Gather your society" %></b><div class="ticks" aria-hidden="true"><i></i><i></i><i class="on"></i><i></i></div><span>3 / 4</span></div>
+          <div class="bar"><b><%= @next_event ? "The next tasting night" : "Gather your society" %></b></div>
         </div>
       </div>
 
@@ -476,7 +510,7 @@
       </div>
       <div class="face f4">
         <div class="player" data-appear-target="item">
-          <div class="screen<%= ' screen--tall' if @verdict_rows.blank? && @featured_review %>">
+          <div class="screen<%= ' screen--tall' if @verdict_rows.blank? && @featured_review %>" data-appear-target="perform">
             <div class="sl sl--ink">
               <% if @verdict_rows.present? %>
                 <%# The verdict of a real revealed night at a public society:
@@ -538,9 +572,15 @@
               <% end %>
             </div>
           </div>
-          <div class="bar"><b>The tasting record</b><div class="ticks" aria-hidden="true"><i></i><i></i><i></i><i class="on"></i></div><span>4 / 4</span></div>
+          <div class="bar"><b>The tasting record</b></div>
         </div>
       </div>
+
+      <%# TRIAL, off by default: a glass that fills with the story's scroll,
+          in one of three placements. Only "1", "2" or "3" selects one; the
+          param itself never reaches the page. %>
+      <% story_glass = { "1" => 1, "2" => 2, "3" => 3 }[params[:glass]] %>
+      <%= render "home/story_glass", variant: story_glass if story_glass %>
 
       <!-- The close: the end of the three steps, in the same column -->
       <div class="beat beat--close">

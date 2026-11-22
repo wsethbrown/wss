@@ -97,7 +97,7 @@ class AppearMotionTest < ActionDispatch::IntegrationTest
   test "the glass pours only once the controller says it is in view" do
     css = css_source
     refute_match(/svg\[data-glass\] g > path\s*\{[^}]*animation/, css, "no glass pours on load regardless of position")
-    assert_match(/svg\[data-glass\]\.glass-pouring g > path\s*\{[^}]*animation:\s*glass-pour 900ms/, css)
+    assert_match(/svg\[data-glass\]\.glass-pouring g > path\s*\{[^}]*animation:\s*glass-pour 1200ms/, css)
 
     html = Nokogiri::HTML5.fragment(ApplicationController.render(partial: "shared/glass", locals: { level: 0.5 }))
     assert_equal "glass", html.at_css("svg")["data-appear-target"]
@@ -115,7 +115,7 @@ class AppearMotionTest < ActionDispatch::IntegrationTest
     assert_includes js, "unobserve"
     assert_includes js, "prefers-reduced-motion: reduce"
     assert_includes js, "turbo:before-cache"
-    assert_match(/static targets = \[\s*"item",\s*"glass"\s*\]/, js)
+    assert_match(/static targets = \[\s*"item",\s*"glass"/, js)
   end
 
   test "the Turbo progress bar is a thin orange line" do
@@ -176,7 +176,11 @@ class AppearMotionTest < ActionDispatch::IntegrationTest
     assert_includes js, 'addEventListener("focusin"', "focusing inside a waiting item shows it"
     assert_match(/LIMIT = \d+/, js, "a one-off time limit")
     assert_match(/rect\.top < height/, js, "the settle sweep reveals anything above the bottom of the screen")
-    refute_match(/rootMargin:\s*"[^"]*-\d/, js, "no inset band where an on-screen item can wait")
+    # The triggers sit inside the viewport (motion happens where the eye is),
+    # so the settle sweep must start everything waiting on screen.
+    assert_match(/ITEM_MARGIN = "0px 0px -1[5-9]% 0px"/, js, "an item starts once its top is 15-20% up the screen")
+    assert_match(/DEEP_MARGIN = "-20% 0px -20% 0px"/, js, "secondary motion starts in the middle 60%")
+    assert_match(/SETTLE = 150/, js)
     assert_includes js, "itemTargetDisconnected"
   end
 

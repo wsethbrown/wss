@@ -1,20 +1,44 @@
 import { Controller } from "@hotwired/stimulus"
 
 // The site's one reveal system (docs/redesign/DESIGN_SYSTEM.md, "Motion").
-// Lives on the public layout's <main>. Two kinds of target:
+// Lives on the public layout's <main>. Kinds of target:
 //
-//   item   A card, list row, panel or section heading. Out of view at load,
-//          it waits hidden (.appear-pending) and, the first time it scrolls
-//          in, eases up and fades in (.is-in, a 500ms CSS transition), with
-//          a short shrinking stagger across the items that arrive together.
-//   glass  A shared/_glass svg. Its level rises (a 900ms CSS animation) the
-//          first time it is seen.
+//   item    A card, list row, panel or section heading. Out of view at load,
+//           it waits hidden (.appear-pending) and, the first time it scrolls
+//           in properly (its top about a fifth of the way up the screen),
+//           eases up and fades in (.is-in, a 700ms CSS transition), with a
+//           short shrinking stagger across the items that arrive together.
+//   glass   A shared/_glass svg. Its level rises (a 1.2s CSS animation) the
+//           first time it is seen.
+//   draw    A palate wheel or flavor wave svg. Its wedges, stems and line
+//           draw in (CSS animations under .draw-run, 1.25s at most).
+//   perform A homepage step face's screen. Its rows, avatars or record play
+//           once (.perform-run, 950ms at most; the CSS is in home/index).
+//   photo   A shared/_duotone figure. Its photograph settles from a slight
+//           scale inside the frame (.photo-run).
+//   image   An img that may still be loading. If it has not loaded when it
+//           connects, it fades in when it does (.img-wait, .img-in).
+//
+// glass, draw, perform and photo are secondary motion: each waits in its
+// start state until it is well on screen (it reaches the middle 60% of the
+// viewport) and then plays once, so it plays where the eye is. One inside a
+// revealing item starts at least 120ms after its item starts to show (never
+// while the item is still hidden), and is shown at once whenever its item
+// is. A wheel or wave already on screen when a Turbo visit lands plays
+// 300ms later (not on a back or forward visit, and not on a full page load,
+// which may already have painted it finished), so an above-the-fold drawing
+// reached by a click is seen to draw.
+//
+// The triggers sit inside the viewport, so while the page scrolls an item
+// can be on screen and still waiting. When the scroll settles (150ms) that
+// band is emptied: everything waiting on screen starts its motion.
 //
 // Safety rules, each one a bug this replaced or could have caused:
 // - The hidden start state is a class this controller adds, never server
 //   HTML, so no JS (or a JS error) means everything is simply visible.
-// - Anything already on screen when the controller connects is left alone:
-//   it was painted visible, and hiding it to fade it back would flicker.
+// - Anything already on screen when the controller connects is left alone
+//   (except the draw-ins above): it was painted visible, and hiding it to
+//   fade it back would flicker.
 // - Time-based and once: an item that starts revealing always finishes, and
 //   then its classes are removed so its own hover styles are untouched.
 //   (The old homepage reveal was scrubbed by scroll position and stayed
@@ -32,15 +56,35 @@ import { Controller } from "@hotwired/stimulus"
 //   page of reading text is worse than no reveal, and on a phone it builds a
 //   huge layer. Mark such a section's heading instead.
 // - Under prefers-reduced-motion: reduce the controller does nothing at all.
+// - An image is only hidden if it has not loaded yet; it is shown at once if
+//   it fails, if it has sat on screen for IMAGE_LIMIT without loading, and
+//   before Turbo caches the page.
 
-const DURATION = 500 // ms, matches .appear-pending.is-in in application.css
-const POUR = 900 // ms, matches svg[data-glass].glass-pouring
+const DURATION = 700 // ms, matches .appear-pending.is-in in application.css
+const POUR = 1200 // ms, matches svg[data-glass].glass-pouring
+// Where things start: an item once its top is above the bottom 18% of the
+// screen; secondary motion once it reaches the middle 60%.
+const ITEM_MARGIN = "0px 0px -18% 0px"
+const DEEP_MARGIN = "-20% 0px -20% 0px"
+const ON_LOAD = 300 // ms: an on-screen draw-in or pour at load starts after this
 const STAGGER = [ 0, 60, 110, 150, 180, 200 ] // ms; gaps shrink, then cap
 const ITEM = "[data-appear-target~='item']"
 const SETTLE = 150 // ms after the last scroll or resize event
 const LIMIT = 1500 // ms after targets are sorted: the one-off safety net
 const TALL = 1.2 // x the viewport height: an item this tall is never hidden
-const POUR_LAG = 120 // ms: a glass in a revealing card pours once the card shows
+const POUR_LAG = 120 // ms: secondary motion in a revealing card starts once the card shows
+// The secondary kinds: the class holding the start state, the class that
+// plays it, and how long it plays (the longest delay plus duration in CSS).
+const KINDS = {
+  glass: { wait: "glass-wait", run: "glass-pouring", ms: POUR },
+  draw: { wait: "draw-wait", run: "draw-run", ms: 1250 },
+  perform: { wait: "perform-wait", run: "perform-run", ms: 950 },
+  photo: { wait: "photo-wait", run: "photo-run", ms: 1200 }
+}
+const ALL_CLASSES = [ "appear-pending", "is-in", ...Object.values(KINDS).flatMap((k) => [ k.wait, k.run ]) ]
+const IMAGE_FADE = 200 // ms, matches img.img-in
+const IMAGE_LIMIT = 2000 // ms on screen without loading: show it anyway
+const IMAGE_CHECK = 500 // ms between those checks
 
 // A Turbo render inserts the new page before it is painted, so a glass on
 // screen can pour without first flashing full. On a first, full page load
@@ -65,7 +109,7 @@ function painted() {
 }
 
 export default class extends Controller {
-  static targets = [ "item", "glass" ]
+  static targets = [ "item", "glass", "draw", "perform", "photo", "image" ]
 
   // Stimulus calls the target callbacks before connect(), so both go
   // through setup().
@@ -75,6 +119,7 @@ export default class extends Controller {
     if (!this.active) return
     this.finishAll()
     this.observer.disconnect()
+    this.deep.disconnect()
     document.removeEventListener("turbo:before-cache", this.finishAll)
     window.removeEventListener("scroll", this.onScroll)
     window.removeEventListener("resize", this.onScroll)
@@ -84,15 +129,25 @@ export default class extends Controller {
     this.limitTimer = null
     if (this.frame) cancelAnimationFrame(this.frame)
     this.frame = null
+    clearInterval(this.imageTimer)
+    this.imageTimer = null
     this.active = false
     this.ready = false
   }
 
-  itemTargetConnected(el) { this.enqueue(el) }
-  glassTargetConnected(el) { this.enqueue(el) }
+  itemTargetConnected(el) { this.enqueue(el, "item") }
+  glassTargetConnected(el) { this.enqueue(el, "glass") }
+  drawTargetConnected(el) { this.enqueue(el, "draw") }
+  performTargetConnected(el) { this.enqueue(el, "perform") }
+  photoTargetConnected(el) { this.enqueue(el, "photo") }
+  imageTargetConnected(el) { this.watchImage(el) }
   // Removed by a Turbo stream or a re-render: stop watching it.
   itemTargetDisconnected(el) { this.forget(el) }
   glassTargetDisconnected(el) { this.forget(el) }
+  drawTargetDisconnected(el) { this.forget(el) }
+  performTargetDisconnected(el) { this.forget(el) }
+  photoTargetDisconnected(el) { this.forget(el) }
+  imageTargetDisconnected(el) { if (this.active) this.showImage(el) }
 
   forget(el) {
     if (!this.active) return
@@ -108,18 +163,26 @@ export default class extends Controller {
     if (!this.active) return false
 
     this.fresh = turboRendering || !painted()
+    // Only a Turbo render is certain not to have been painted yet. A full
+    // load can paint a finished drawing before this runs (measured in Chrome
+    // and WebKit), so a draw-in there would flash: drawn, collapsed, redrawn.
+    this.turbo = turboRendering
     this.restoring = restoring
     this.queue = new Set()
     this.waiting = new Set()       // hidden, observed
     this.running = new Map()       // element -> timer
     this.delays = new WeakMap()    // item -> its stagger delay
+    this.shows = new WeakMap()     // item -> when it starts to show (ms, performance.now)
+    this.kinds = new WeakMap()     // element -> "item", "glass", "draw", ...
+    this.images = new Map()        // loading img -> ms it has spent on screen
     this.finishAll = this.finishAll.bind(this)
     this.onIntersect = this.onIntersect.bind(this)
     this.onScroll = this.onScroll.bind(this)
     this.onFocus = this.onFocus.bind(this)
-    // No inset margin: an item reveals as soon as any of it is on screen, so
-    // nothing can sit hidden in a band at the bottom of the viewport.
-    this.observer = new IntersectionObserver(this.onIntersect)
+    // Inset triggers, so motion happens where the eye is. The band they
+    // leave (on screen, still waiting) is emptied when the scroll settles.
+    this.observer = new IntersectionObserver(this.onIntersect, { rootMargin: ITEM_MARGIN })
+    this.deep = new IntersectionObserver(this.onIntersect, { rootMargin: DEEP_MARGIN })
     document.addEventListener("turbo:before-cache", this.finishAll)
     window.addEventListener("scroll", this.onScroll, { passive: true })
     window.addEventListener("resize", this.onScroll, { passive: true })
@@ -127,8 +190,9 @@ export default class extends Controller {
     return true
   }
 
-  enqueue(el) {
+  enqueue(el, kind) {
     if (!this.setup()) return
+    this.kinds.set(el, kind)
     this.queue.add(el)
     if (!this.frame) this.frame = requestAnimationFrame(() => this.classify())
   }
@@ -144,30 +208,44 @@ export default class extends Controller {
     const sorted = []
     for (const el of this.queue) {
       if (!el.isConnected || this.waiting.has(el) || this.running.has(el)) continue
-      const glass = el.matches("svg[data-glass]")
+      const secondary = this.kinds.get(el) !== "item"
       // One entrance per container: an item inside another item rides along.
-      if (!glass && el.parentElement && el.parentElement.closest(ITEM)) continue
+      if (!secondary && el.parentElement && el.parentElement.closest(ITEM)) continue
       if (this.restoring) continue
-      sorted.push({ el, glass, rect: el.getBoundingClientRect() })
+      sorted.push({ el, secondary, rect: el.getBoundingClientRect() })
     }
     this.queue.clear()
     const fresh = this.fresh
+    const turbo = this.turbo
     this.fresh = false
+    this.turbo = false
     this.restoring = false
 
-    const nowPour = []
-    for (const { el, glass, rect } of sorted) {
+    // On screen at load: a draw-in or a pour plays (after ON_LOAD) on a
+    // Turbo visit, which is not painted until this has run, so a finished
+    // drawing is never shown and then collapsed. On a full page load it may
+    // already have been painted final, so it stays final (as it did in
+    // batch 1, where a glass poured on load only before the first paint).
+    const nowPlay = []
+    for (const { el, secondary, rect } of sorted) {
       const below = rect.top >= height || (rect.width === 0 && rect.height === 0)
-      if (!glass && rect.height > height * TALL) continue
+      if (!secondary && rect.height > height * TALL) continue
       if (!below) {
-        if (glass && fresh && rect.bottom > 0) nowPour.push(el)
+        const kind = this.kinds.get(el)
+        // A glass keeps batch 1's rule (pours if not yet painted).
+        const playable = kind === "draw" ? turbo : fresh
+        if (secondary && rect.bottom > 0 && playable) nowPlay.push(el)
         continue
       }
-      this.prepare(el, glass)
+      this.prepare(el)
       this.waiting.add(el)
-      this.observer.observe(el)
+      this.watcher(el).observe(el)
     }
-    nowPour.forEach((el) => { this.prepare(el, true); this.start(el, true, 0) })
+    nowPlay.forEach((el) => {
+      const kind = this.kinds.get(el)
+      this.prepare(el)
+      this.start(el, kind === "draw" || kind === "glass" ? ON_LOAD : 0)
+    })
 
     // The one-off safety net: whatever is still waiting on screen by now is
     // revealed, observer or not.
@@ -176,17 +254,19 @@ export default class extends Controller {
     }
   }
 
-  prepare(el, glass) {
-    if (glass) {
+  watcher(el) { return this.kinds.get(el) === "item" ? this.observer : this.deep }
+
+  prepare(el) {
+    const kind = this.kinds.get(el)
+    if (kind === "item") return el.classList.add("appear-pending")
+    if (kind === "glass") {
       const level = parseFloat(el.dataset.glass) || 0
       if (level < 0.02) return
       // Start just under the bowl's foot whatever the level, so a low pour
       // starts rising at once instead of waiting below the glass.
       el.style.setProperty("--glass-rise", `${(level * 34 + 4).toFixed(1)}px`)
-      el.classList.add("glass-wait")
-    } else {
-      el.classList.add("appear-pending")
     }
+    el.classList.add(KINDS[kind].wait)
   }
 
   onIntersect(entries) {
@@ -202,50 +282,125 @@ export default class extends Controller {
 
     let step = 0
     for (const { target } of arriving) {
-      if (target.matches("svg[data-glass]")) continue
+      if (this.kinds.get(target) !== "item" || !this.waiting.has(target)) continue
       const delay = STAGGER[Math.min(step++, STAGGER.length - 1)]
       this.delays.set(target, delay)
-      this.start(target, false, delay)
+      this.start(target, delay)
     }
     for (const { target } of arriving) {
-      if (!target.matches("svg[data-glass]")) continue
-      // A glass inside a revealing card pours just after its card starts to
-      // show, so the rise is not spent while the card is still faint.
-      const card = target.closest(ITEM)
-      const delay = card && this.running.has(card) ? (this.delays.get(card) || 0) + POUR_LAG : 0
-      this.start(target, true, delay)
+      if (this.kinds.get(target) === "item" || !this.waiting.has(target)) continue
+      // Inside a card still waiting: the card goes first (it is further
+      // into view than its own trigger needs).
+      const card = target.parentElement && target.parentElement.closest(ITEM)
+      if (card && this.waiting.has(card)) this.start(card, 0)
+      // Never before the card has been showing for POUR_LAG, so the motion
+      // is not spent while the card is still faint.
+      const shows = card && this.running.has(card) ? this.shows.get(card) : null
+      const delay = shows == null ? 0 : Math.max(0, Math.round(shows + POUR_LAG - performance.now()))
+      this.start(target, delay)
     }
   }
 
-  start(el, glass, delay) {
+  start(el, delay) {
+    const kind = this.kinds.get(el)
     this.waiting.delete(el)
-    this.observer.unobserve(el)
-    if (glass && !el.classList.contains("glass-wait")) return
-    el.style.setProperty("--appear-delay", `${delay}ms`)
-    if (glass) {
-      el.classList.remove("glass-wait")
-      el.classList.add("glass-pouring")
-    } else {
+    this.watcher(el).unobserve(el)
+    if (kind === "item") {
+      el.style.setProperty("--appear-delay", `${delay}ms`)
       el.classList.add("is-in")
+      this.shows.set(el, performance.now() + delay)
+      this.running.set(el, setTimeout(() => this.finish(el), DURATION + delay + 60))
+      // Its secondary motion waits for its own, deeper trigger.
+      return
     }
-    const timer = setTimeout(() => this.finish(el), (glass ? POUR : DURATION) + delay + 60)
-    this.running.set(el, timer)
+    const { wait, run, ms } = KINDS[kind]
+    if (!el.classList.contains(wait)) return // nothing to play (an empty glass)
+    el.style.setProperty("--appear-delay", `${delay}ms`)
+    el.classList.remove(wait)
+    el.classList.add(run)
+    this.running.set(el, setTimeout(() => this.finish(el), ms + delay + 60))
+  }
+
+  waitingInside(item) {
+    return [ ...this.waiting ].filter((el) => el !== item && this.kinds.get(el) !== "item" && item.contains(el))
   }
 
   // Back to the element's own styles: no classes, no variables left behind.
+  // An item shown without its reveal takes its waiting secondary motion
+  // with it, so nothing inside is left in a start state.
   finish(el) {
+    const skipped = this.waiting.has(el) && this.kinds.get(el) === "item"
     clearTimeout(this.running.get(el))
     this.running.delete(el)
     this.waiting.delete(el)
-    if (this.observer) this.observer.unobserve(el)
-    el.classList.remove("appear-pending", "is-in", "glass-wait", "glass-pouring")
+    if (this.observer) this.watcher(el).unobserve(el)
+    el.classList.remove(...ALL_CLASSES)
     el.style.removeProperty("--appear-delay")
     el.style.removeProperty("--glass-rise")
+    if (skipped) this.waitingInside(el).forEach((inner) => this.finish(inner))
   }
 
   finishAll() {
     if (!this.active) return
     for (const el of [ ...this.waiting, ...this.running.keys() ]) this.finish(el)
+    for (const img of [ ...this.images.keys() ]) this.showImage(img)
+  }
+
+  // An image still loading when it connects waits invisible and fades in
+  // once it has loaded. Already loaded (a cached image, a back visit): left
+  // alone, so there is no flash. Fails, or sits on screen for IMAGE_LIMIT
+  // without loading (or the page is cached by Turbo): shown at once.
+  watchImage(img) {
+    if (!this.setup() || restoring || img.complete || this.images.has(img)) return
+    // Not rendered (display: none, e.g. a photo for wide screens only on a
+    // phone): nothing to fade, and it would wait forever. Left alone.
+    const rects = img.getClientRects()
+    if (!rects.length) return
+    // On screen after the first paint, it may already be partly drawn:
+    // hiding it to fade it back would flash. Left alone.
+    if (painted() && !turboRendering && rects[0].top < window.innerHeight && rects[0].bottom > 0) return
+    this.images.set(img, 0)
+    img.classList.add("img-wait")
+    img.addEventListener("load", () => this.fadeImage(img), { once: true })
+    img.addEventListener("error", () => this.showImage(img), { once: true })
+    if (!this.imageTimer) this.imageTimer = setInterval(() => this.checkImages(), IMAGE_CHECK)
+  }
+
+  fadeImage(img) {
+    if (!this.images.has(img)) return
+    this.images.delete(img)
+    img.classList.add("img-in")
+    img.classList.remove("img-wait")
+    setTimeout(() => img.classList.remove("img-in"), IMAGE_FADE + 60)
+    this.stopImageTimer()
+  }
+
+  showImage(img) {
+    this.images.delete(img)
+    img.classList.remove("img-wait", "img-in")
+    this.stopImageTimer()
+  }
+
+  stopImageTimer() {
+    if (this.images.size || !this.imageTimer) return
+    clearInterval(this.imageTimer)
+    this.imageTimer = null
+  }
+
+  // While a waiting image is on screen, check twice a second; once none
+  // is, stop, and let the next scroll settle start the checks again.
+  checkImages() {
+    const height = window.innerHeight
+    let anyOnScreen = false
+    for (const [ img, shown ] of [ ...this.images ]) {
+      if (!img.isConnected) { this.showImage(img); continue }
+      const rect = img.getBoundingClientRect()
+      const onScreen = rect.bottom > 0 && rect.top < height && rect.width > 0
+      const time = onScreen ? shown + IMAGE_CHECK : 0
+      if (time >= IMAGE_LIMIT) this.showImage(img)
+      else { this.images.set(img, time); if (onScreen) anyOnScreen = true }
+    }
+    if (!anyOnScreen && this.imageTimer) { clearInterval(this.imageTimer); this.imageTimer = null }
   }
 
   // When the scroll or a resize settles, nothing waiting above the bottom
@@ -259,7 +414,12 @@ export default class extends Controller {
   }
 
   sweep() {
-    if (!this.active || !this.waiting.size) return
+    if (!this.active) return
+    if (this.images.size && !this.imageTimer) {
+      this.imageTimer = setInterval(() => this.checkImages(), IMAGE_CHECK)
+      this.checkImages()
+    }
+    if (!this.waiting.size) return
     const height = window.innerHeight
     const measured = [ ...this.waiting ].map((el) => ({ target: el, rect: el.isConnected ? el.getBoundingClientRect() : null }))
     const onScreen = []
@@ -277,6 +437,10 @@ export default class extends Controller {
     while (item) {
       if (this.waiting.has(item) || this.running.has(item)) this.finish(item)
       item = item.parentElement && item.parentElement.closest(ITEM)
+    }
+    // And any draw-in, face, pour or photo around it, waiting or playing.
+    for (const el of [ ...this.waiting, ...this.running.keys() ]) {
+      if (this.kinds.get(el) !== "item" && el.contains(event.target)) this.finish(el)
     }
   }
 }

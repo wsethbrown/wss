@@ -1,6 +1,11 @@
 <%# locals: bottle, the community's aggregated palate as a smooth wave over
     the nine flavor families. Not per-review (that's the wheel): this sums
-    every tasting's words. Labels click through to the family tag view. %>
+    every tasting's words. Labels click through to the family tag view.
+    Draw-in (the appear controller, data-appear-target="draw"): the first
+    time it is seen, each stem grows up from the base to its value (--len is
+    its length, --d its delay, gaps shrinking), the line draws left to right
+    over them, and the labels fade in last. The markup is the final picture:
+    without JS, in print and under reduced motion it is simply drawn. %>
 <% profile = bottle.flavor_profile %>
 <% if profile.any? %>
   <% families = Review::DESCRIPTOR_LEXICON.keys %>
@@ -24,18 +29,21 @@
           path += " C#{c1x.round(1)},#{c1y.round(1)} #{c2x.round(1)},#{c2y.round(1)} #{b[0].round(1)},#{b[1].round(1)}"
         end
       %>
-      <svg viewBox="0 0 <%= w %> 172" class="mt-4 w-full" role="img" aria-label="Flavor profile: strongest in <%= top.join(' and ') %>">
+      <% stem_delays = [ 0, 70, 130, 180, 220, 255, 285, 310, 330 ] %>
+      <svg viewBox="0 0 <%= w %> 172" class="mt-4 w-full" role="img" aria-label="Flavor profile: strongest in <%= top.join(' and ') %>" data-appear-target="draw">
         <% pts.each_with_index do |(x, y), i| %>
-          <line x1="<%= x %>" y1="<%= y %>" x2="<%= x %>" y2="<%= base %>" stroke="#2f5546" stroke-width="1.5"></line>
+          <%# Drawn from the base up, so the draw-in grows it to its value. %>
+          <line x1="<%= x %>" y1="<%= base %>" x2="<%= x %>" y2="<%= y %>" stroke="#2f5546" stroke-width="1.5" class="wave-stem"
+                style="--len: <%= (base - y).round(1) %>; --d: <%= stem_delays[[ i, stem_delays.size - 1 ].min] %>ms"></line>
         <% end %>
-        <path d="<%= path %>" fill="none" stroke="#f6f4ee" stroke-width="4.5" stroke-linecap="round"></path>
+        <path d="<%= path %>" fill="none" stroke="#f6f4ee" stroke-width="4.5" stroke-linecap="round" pathLength="1" class="wave-line"></path>
         <% families.each_with_index do |family, i| %>
           <% strong = top.include?(family) %>
           <a href="<%= reviews_path(tags: family) %>">
             <text x="<%= xs[i] %>" y="<%= base + (i.even? ? 22 : 42) %>" text-anchor="middle"
                   font-size="12"
                   fill="#f6f4ee"
-                  fill-opacity="<%= strong ? 1 : 0.8 %>" font-weight="<%= strong ? 700 : 500 %>"><%= family.capitalize %></text>
+                  fill-opacity="<%= strong ? 1 : 0.8 %>" font-weight="<%= strong ? 700 : 500 %>" class="wave-label"><%= family.capitalize %></text>
           </a>
         <% end %>
       </svg>

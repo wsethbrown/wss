@@ -21,7 +21,10 @@ module DesignHelper
 
     content_tag(:div, class: wrapper) do
       if image
-        image_tag image_variant(image, :card), alt: alt || deck.title, loading: "lazy", class: "absolute inset-0 h-full w-full object-cover"
+        # Fades in if it is still loading when the page starts (the appear
+        # controller's image target; cached covers are left alone).
+        image_tag image_variant(image, :card), alt: alt || deck.title, loading: "lazy", class: "absolute inset-0 h-full w-full object-cover",
+                  data: { appear_target: "image" }
       else
         "".html_safe
       end

@@ -222,6 +222,15 @@
     <%= render "presentations/story_section", presentation: @presentation, full_story: @full_story,
                get_label: get_label, get_path: get_path %>
 
+    <%# The page's one photograph, a wide band after the story (interim stock,
+        see docs/redesign/IMAGE_CREDITS.md), in the heavy two-ink duotone.
+        Never behind text. %>
+    <div class="border-t border-hairline py-12">
+      <%= render "shared/duotone", src: "photos/deck-pour-decanter.jpg", width: 1280, height: 427,
+            css: "duotone--heavy aspect-[2/1] sm:aspect-[3/1]",
+            alt: "A hand pours whiskey from a cut-glass decanter into a tumbler in a lamp-lit sitting room." %>
+    </div>
+
     <!-- The slides, a teaser for non-owners ONLY. We never show the whole deck
          here: the preview caps below the slide count and the last one fades
          into the buy prompt. Owners skip this section entirely, they open the
@@ -241,7 +250,7 @@
                 <% fade = teasing && i == visible.size - 1 %>
                 <figure class="<%= 'relative' if fade %>">
                   <%= image_tag image_variant(slide, :hero), alt: "Slide #{i + 1}", loading: 'lazy',
-                      class: 'aspect-video w-full rounded-[18px] border border-hairline object-cover' %>
+                      class: 'aspect-video w-full rounded-[18px] border border-hairline object-cover', data: { appear_target: 'image' } %>
                   <% if fade %>
                     <%# The last free slide dissolves from about halfway down into
                         the purchase prompt, the paywall, made of the deck itself. %>

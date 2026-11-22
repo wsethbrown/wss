@@ -4,6 +4,13 @@
     a secondary path behind a quiet toggle. %>
 <%# Full-bleed page: clears the fixed nav itself (pt-24), beige spans the viewport. %>
 <div class="min-h-screen bg-paper flex items-center justify-center pt-24 pb-12 px-4 sm:px-6 lg:px-8">
+  <%# One photograph beside the form on wide screens (interim stock, see
+      docs/redesign/IMAGE_CREDITS.md), printed in the heavy two-ink duotone. Phones
+      drop it: the form is the whole job there. %>
+  <div class="grid w-full max-w-md items-center gap-10 lg:max-w-5xl lg:grid-cols-[minmax(0,1fr)_28rem]">
+    <%= render "shared/duotone", src: "photos/signin-sofa-lamp.jpg", width: 640, height: 800,
+          css: "duotone--heavy hidden aspect-[4/5] lg:block",
+          alt: "Four friends relax on a sofa and rug under an arc lamp, each holding a glass of whiskey." %>
   <div class="w-full max-w-md">
     <div class="card p-7 sm:p-8 space-y-6">
       <!-- Header -->
@@ -174,6 +181,7 @@
         </div>
       </div>
     </div>
+  </div>
   </div>
 </div>
 

@@ -1,11 +1,13 @@
 require "test_helper"
 
-# The homepage players. Each of the four story faces shows one lit tick for
-# its own position, matching its "n / 4" counter. The hero player with real
-# slides has one tick per slide, each lit in step with its slide in the reel
-# (same duration, same delay), and hovering or focusing the player pauses
-# both. The ticks were once all driven by a leftover hx-tick animation, so all
-# four lit together on every face and then went dark.
+# The homepage players. Only the hero has ticks: with real slides it has one
+# tick per slide, each lit in step with its slide in the reel (same duration,
+# same delay), and hovering or focusing the player pauses both; without slides
+# it lights the first of four. The three step faces below it show only their
+# bar's title: their old ticks and "n / 4" counter read as a sideways image
+# carousel, when the faces actually change with the vertical scroll. (Before
+# that the ticks were all driven by a leftover hx-tick animation, so all four
+# lit together on every face and then went dark.)
 class HomePlayerTicksTest < ActionDispatch::IntegrationTest
   def page_css
     Nokogiri::HTML(response.body).css("style").map(&:text).join("\n")
@@ -24,13 +26,16 @@ class HomePlayerTicksTest < ActionDispatch::IntegrationTest
     lit.first
   end
 
-  test "faces two to four light the tick their counter names" do
+  test "the step faces keep their bar's title but draw no ticks and no counter" do
     get root_path
     assert_response :success
 
-    { ".f2" => 2, ".f3" => 3, ".f4" => 4 }.each do |face, n|
-      assert_select "#{face} .bar span", text: "#{n} / 4"
-      assert_equal n - 1, lit_index(face), "#{face} reads #{n} / 4"
+    { ".f2" => "The library", ".f3" => "The next tasting night", ".f4" => "The tasting record" }.each do |face, title|
+      assert_select "#{face} .bar", 1
+      assert_select "#{face} .bar b", text: title
+      assert_select "#{face} .ticks, #{face} .ticks i", 0, "#{face} must not suggest a sideways carousel"
+      assert_select "#{face} .bar span", 0, "#{face} has no n / 4 counter"
+      refute_match %r{\d / 4}, css_select("#{face} .bar").text
     end
   end
 
@@ -68,9 +73,13 @@ class HomePlayerTicksTest < ActionDispatch::IntegrationTest
   end
 
   test "only the reel's ticks animate; a face's lit tick is never overridden" do
+    deck = Presentation.create!(author: users(:admin), title: "Tick Deck", content: "Smoke.", price: 10, featured: true, preview_slide_count: 3)
+    5.times { |n| deck.slide_images.attach(io: File.open(file_fixture("sample_review.jpg")), filename: "t#{n}.png", content_type: "image/png") }
+    deck.update_column(:published, true)
     get root_path
-    rules.each do |sel, block|
-      next unless block.include?("hx-tick") && block.include?("animation")
+    animated = rules.select { |_, block| block.include?("hx-tick") && block.include?("animation") }
+    assert animated.any?, "a reel of three slides animates its ticks"
+    animated.each do |sel, _block|
       sel.split(",").each do |s|
         assert_includes s, ".ticks--reel", "#{s.strip} would animate every face's ticks"
       end
