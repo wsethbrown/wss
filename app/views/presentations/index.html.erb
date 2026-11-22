@@ -41,8 +41,10 @@
           class: "w-full rounded-2xl border border-hairline bg-white py-3 pl-12 pr-4 text-gray-900 placeholder-gray-500 focus:border-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/30" %>
     </div>
 
-    <% select_class = "min-h-12 rounded-2xl border border-hairline bg-white px-4 py-3 text-gray-900 focus:border-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/30" %>
-    <div class="grid grid-cols-2 gap-3 md:flex md:flex-none">
+    <% select_class = "min-h-11 shrink-0 rounded-2xl border border-hairline bg-white px-3.5 py-2.5 text-[15px] text-gray-900 focus:border-ink/40 focus:outline-none focus:ring-2 focus:ring-ink/30 md:min-h-12 md:px-4 md:py-3 md:text-base" %>
+    <%# On a phone the selects sit on one line that scrolls sideways (bleeding to
+        the screen edges), so the decks are not pushed below the fold. %>
+    <div class="-mx-4 flex gap-2 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:flex-none md:gap-3 md:overflow-visible md:px-0">
       <%# Filter options come from the catalog itself (see controller). %>
       <%= form.label :category, "Category", class: "sr-only" %>
       <%= form.select :category,
@@ -66,19 +68,21 @@
           ], params[:sort]),
           {}, class: select_class, data: { filter_form_target: "select", action: "change->filter-form#submit" } %>
 
-      <%= form.submit "Filter", class: "btn btn-primary min-h-12 cursor-pointer" %>
+      <%# The selects and the search field submit on their own; this button is for
+          browsers without JavaScript and is hidden once the controller connects. %>
+      <%= form.submit "Filter", class: "btn btn-primary min-h-11 shrink-0 cursor-pointer md:min-h-12", data: { filter_form_target: "submit" } %>
     </div>
   <% end %>
 
   <%# Popular tags as one quiet clickable row. %>
   <% if @popular_tags.any? %>
-    <div class="mt-5 flex flex-wrap items-center gap-2">
-      <span class="mr-1 text-sm font-medium text-mute">Tags</span>
+    <div class="-mx-4 mt-3 flex items-center gap-2 overflow-x-auto px-4 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden md:mx-0 md:mt-5 md:flex-wrap md:overflow-visible md:px-0">
+      <span class="mr-1 shrink-0 text-sm font-medium text-mute">Tags</span>
       <% @popular_tags.each do |tag| %>
         <% active = params[:tag] == tag.name %>
         <%= link_to tag.name,
             presentations_path(request.query_parameters.except('tag', 'page').merge(active ? {} : { tag: tag.name })),
-            class: "chip", "aria-current": (active ? "true" : nil) %>
+            class: "chip shrink-0", "aria-current": (active ? "true" : nil) %>
       <% end %>
     </div>
   <% end %>
@@ -87,7 +91,7 @@
   <%# Landing here from a deck's "Filed under" link must not feel like being
       teleported to a random shelf: the header names the active filter, and
       each filter chip carries its own ×. %>
-  <div class="mb-6 mt-8 flex flex-wrap items-center justify-between gap-3 border-t border-hairline pt-6">
+  <div class="mb-5 mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-hairline pt-4 md:mb-6 md:mt-8 md:pt-6">
     <div class="flex flex-wrap items-center gap-2 text-mute">
       <span class="tabular-nums"><%= pluralize(@presentations.total_count, 'deck') %></span>
       <% {
