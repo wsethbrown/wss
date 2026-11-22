@@ -91,7 +91,9 @@ it's current behavior, not a bug in scope.
 - OG + Twitter Card tags (commit be59e41): `og:site_name/type/title/description/
   image/url` (layout:23-28) + `twitter:card = summary_large_image` (:29). Per-page
   overrides via `content_for(:og_title/:og_description/:og_image)`; defaults fall
-  back to the brand tagline and `{base_url}/og-image.png`. `base_url` = the runtime
+  back to the brand tagline and `{base_url}/og-card-2026.png` (source and render
+  script in `tools/og-card/`; a changed card gets a NEW filename because Cloudflare
+  caches the old one, and the old `/og-image.png` was removed). `base_url` = the runtime
   `request.base_url` (layout:21) — there is NO base_url constant. The canonical prod
   host is `whiskeysharesociety.com` (production.rb `default_url_options` + allowed
   hosts); anything needing absolute URLs off-request (sitemap, mailers) uses that.

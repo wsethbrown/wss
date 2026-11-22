@@ -24,7 +24,9 @@
     <% og_description = content_for(:og_description).presence ||
          "Narrative tasting decks for whiskey nights that hold together, the research done, the script written, the bottles picked." %>
     <% og_image_override = content_for(:og_image).present? %>
-    <% og_image = og_image_override ? content_for(:og_image) : "#{request.base_url}/og-image.png" %>
+    <%# The default card's source is tools/og-card/ (README there). A new card
+        ships under a new filename: Cloudflare caches the old one. %>
+    <% og_image = og_image_override ? content_for(:og_image) : "#{request.base_url}/og-card-2026.png" %>
     <%# Dimensions only when we actually know them: the default card and the
         invite card are both 1200x630, but a deck's featured image or a
         society banner is arbitrary, so those pages set no size. Giving iMessage
