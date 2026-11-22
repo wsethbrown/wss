@@ -1,0 +1,40 @@
+{
+  "slug": "Rye-Country",
+  "title": "Rye Country",
+  "subtitle": "American rye, 1790s to now",
+  "category": "Rye",
+  "difficulty": "Intermediate",
+  "duration": "45 min",
+  "description": "How rye became the whiskey of Pennsylvania and Maryland, nearly disappeared after Prohibition, and came back with whiskey made in Kentucky and Indiana. Four pours.",
+  "pours": [
+    {
+      "name": "Old Overholt",
+      "origin": "Beam, Kentucky",
+      "style": "Straight rye, 4 years old",
+      "strength": "86 proof",
+      "notes": "A Pennsylvania name, made in Kentucky. Beam does not publish the recipe."
+    },
+    {
+      "name": "Pikesville Straight Rye",
+      "origin": "Heaven Hill, Kentucky",
+      "style": "Straight rye, 6 years old",
+      "strength": "110 proof",
+      "notes": "Reported to be 51% rye, the legal minimum. Six years old and 110 proof. Try it neat, then with water."
+    },
+    {
+      "name": "Old Forester Rye",
+      "origin": "Brown-Forman, Kentucky",
+      "style": "Kentucky straight rye whisky",
+      "strength": "100 proof",
+      "notes": "65% rye, 20% malted barley, 15% corn, as Brown-Forman publishes it. Compare it with the Pikesville."
+    },
+    {
+      "name": "Bulleit 95 Rye",
+      "origin": "Bulleit (Diageo), distilled by MGP",
+      "style": "Straight rye whiskey",
+      "strength": "90 proof",
+      "notes": "95% rye, distilled in Indiana. Find that on the back label, then taste it against the Pikesville."
+    }
+  ],
+  "tags": "rye, american whiskey, history"
+}

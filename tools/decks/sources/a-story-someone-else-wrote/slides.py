@@ -274,7 +274,7 @@ footer(s, 11)
 s = new_slide()
 label_line(s, 0.85, 0.85, 6.5, 'The point')
 heading(s, 1.3, 'You scored these without knowing what they cost.',
-        size=36, w=11.2, h=1.8)
+        size=36, w=7.0, h=1.8)
 rrect(s, 0.85, 3.25, 11.63, 2.95, r=0.3, fill=WHITE, line=HAIR)
 text(s, 1.35, 3.6, 10.6, 2.3,
      'Sometimes a higher price buys more age, more proof or better barrels. Sometimes it buys scarcity and a '

@@ -1,0 +1,40 @@
+{
+  "slug": "The-Honest-Bottle",
+  "title": "The Honest Bottle",
+  "subtitle": "Bottled-in-Bond, 1897",
+  "category": "Bourbon",
+  "difficulty": "Beginner",
+  "duration": "45 min",
+  "description": "What bottled in bond means on a whiskey label, and the 1897 law it comes from. Four pours.",
+  "pours": [
+    {
+      "name": "Evan Williams Bottled-in-Bond",
+      "origin": "Heaven Hill, Kentucky",
+      "style": "Kentucky straight bourbon",
+      "strength": "100 proof",
+      "notes": "Try it neat first, then with a few drops of water."
+    },
+    {
+      "name": "Old Grand-Dad Bonded",
+      "origin": "Jim Beam, Kentucky",
+      "style": "Kentucky straight bourbon, high rye",
+      "notes": "Jim Beam, Kentucky. A high-rye bourbon at 100 proof.",
+      "strength": "100 proof"
+    },
+    {
+      "name": "Rittenhouse Rye Bottled-in-Bond",
+      "origin": "Heaven Hill, Kentucky",
+      "style": "Straight rye whisky",
+      "strength": "100 proof",
+      "notes": "The Act covers distilled spirits of any kind, not only bourbon."
+    },
+    {
+      "name": "Old Forester 1897",
+      "origin": "Brown-Forman, Kentucky",
+      "style": "Kentucky straight bourbon",
+      "strength": "100 proof",
+      "notes": "George Garvin Brown’s brand, in a bottling named after the year of the Act."
+    }
+  ],
+  "tags": "bourbon, bottled in bond, history, labels"
+}
