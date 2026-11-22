@@ -1,69 +1,43 @@
-<%# TRIAL, off by default (only /?glass=1, 2 or 3 renders it; the owner is
-    comparing placements). A glass that fills as the reader scrolls through
-    the story: empty at the first step, full at the closing beat ("That's
-    the whole ritual."). Everything for it is here and in
-    story_glass_controller.js; to drop the trial, delete both files, the two
-    lines in home/index.html.erb and test/integration/home_story_glass_test.rb.
+<%# The story glass (owner's choice, November 2026): a glass that fills as the
+    reader scrolls through the homepage story, empty at the first step and
+    full at the closing beat ("That's the whole ritual."). Driven by
+    story_glass_controller.js.
 
-    locals: variant (1, 2 or 3; home/index validates the param, so nothing
-    from the request reaches this partial).
-      1  Desktop: 64px, in the gutter beside the face's bottom bar.
-         Phones: 28px on the right edge, mid-screen.
-      2  Desktop: a 96px gauge in the gutter between the step words and the
-         face, held at the middle of the screen. Phones: 40px in the
-         bottom-right corner.
-      3  Desktop: 80px, standing centred under the pinned face, like the
-         glass in front of the screen. Phones: 40px on the right edge, just
-         under the nav.
-    The drawing is shared/_glass at full, its level lowered by the
-    controller (the liquid is translated down, as in the pour). It is a
-    gauge, so it stays out of the appear controller's pour. Out of the flow
-    everywhere (fixed on phones; sticky with no height on desktop), so it
-    moves nothing. aria-hidden, no words, absent without JS. On phones it
-    sits in the page's 20px gutter (only the glass's empty margin reaches
-    past it), never over text, the nav or a tap target, and it lets taps
-    through. Under reduced motion the level does not follow the scroll: it
-    steps a third at a time as each step is reached, with no motion. %>
+    The drawing is shared/_glass at full, its level lowered by the controller
+    (the liquid is translated down, as in the pour). It is a gauge, so it
+    stays out of the appear controller's pour.
+    - Desktop (900px and up): a 96px gauge in the gutter between the step
+      words and the face, held at the middle of the screen while the steps
+      pass. Sticky with no height, so it takes no space. The step words keep
+      a clear margin from it (.beat padding in home/index), and the faces sit
+      in their own column, so it never meets either.
+    - Phones and tablets: 40px in the bottom-right corner, in the page's
+      20px gutter (only the glass's transparent margin reaches past it), so
+      it never covers text, the nav or a tap target. Shown only while the
+      steps are on screen.
+    - aria-hidden, no words, lets every tap through. Hidden until its
+      controller connects (no JS, no glass), hidden in print. Under reduced
+      motion the level does not follow the scroll: it steps a third at a
+      time as each step is reached, with no motion. %>
 <% content_for :head do %>
   <style>
-    .hx .story-glass { position: fixed; z-index: 30; right: -5px; pointer-events: none; opacity: 0; transition: opacity 200ms var(--motion-ease-out); }
+    .hx .story-glass { position: fixed; z-index: 30; right: -5px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); pointer-events: none;
+                       opacity: 0; transition: opacity 200ms var(--motion-ease-out); }
     .hx .story-glass.is-shown { opacity: 1; }
     .hx .story-glass svg { display: block; width: 30px; height: 40px; }
     .hx .story-glass svg g > path { transform: translateY(var(--story-glass-drop, 38px)); }
-    .hx .story-glass--1 { right: 0; top: 50%; margin-top: -14px; }
-    .hx .story-glass--1 svg { width: 21px; height: 28px; }
-    .hx .story-glass--2 { bottom: calc(16px + env(safe-area-inset-bottom, 0px)); }
-    .hx .story-glass--3 { top: 92px; }
     @media (min-width: 900px) {
-      /* Shares the faces' column and sticky top, from the first step to the
-         end of the story. The frame matches the face's box, so the glass can
-         be placed against the face. */
-      .hx .story-glass { position: sticky; grid-column: 2; grid-row: 2 / 6; align-self: start; height: 0; right: auto; bottom: auto; margin: 0;
-                         top: max(112px, calc(50svh - 17.5vw)); opacity: 1; transition: none; }
-      .hx .story-glass-frame { position: relative; padding: 10px; }
-      .hx .story-glass-frame::before { content: ""; display: block; aspect-ratio: 16 / 9; }
-      .hx .story-glass-frame::after { content: ""; display: block; height: 40px; }
-      .hx .story-glass-frame svg { position: absolute; }
-      .hx .story-glass--1 .story-glass-frame svg { bottom: 4px; left: -60px; width: 48px; height: 64px; }
-      /* 2: held at the middle of the screen in the 72px gutter. */
-      .hx .story-glass--2 { top: calc(50svh - 48px); }
-      .hx .story-glass--2 .story-glass-frame { padding: 0; }
-      .hx .story-glass--2 .story-glass-frame::before, .hx .story-glass--2 .story-glass-frame::after { display: none; }
-      .hx .story-glass--2 .story-glass-frame svg { top: 0; left: -72px; width: 72px; height: 96px; }
-      /* 3: centred under the face, 28px below its bottom edge. */
-      .hx .story-glass--3 .story-glass-frame svg { top: calc(100% + 28px); left: calc(50% - 30px); width: 60px; height: 80px; }
-      /* The next face slides up over it, like a screen passing in front of
-         the glass on the table, rather than the glass floating on top. */
-      .hx .story:has(> .story-glass--3) > .face { z-index: 31; }
+      /* Shares the faces' column from the first step to the end of the
+         story, hangs into the 72px gutter to its left, and is held at the
+         middle of the screen. */
+      .hx .story-glass { position: sticky; grid-column: 2; grid-row: 2 / 6; align-self: start; height: 0; right: auto; bottom: auto;
+                         top: calc(50svh - 48px); opacity: 1; transition: none; }
+      .hx .story-glass svg { position: absolute; top: 0; left: -72px; width: 72px; height: 96px; }
     }
-    @media (min-width: 1400px) { .hx .story-glass:not(.story-glass--2) { top: max(112px, calc(50svh - 230px)); } }
     @media (prefers-reduced-motion: reduce) { .hx .story-glass { transition: none; } }
     @media print { .hx .story-glass { display: none; } }
   </style>
 <% end %>
-<% variant_class = { 1 => "story-glass--1", 2 => "story-glass--2", 3 => "story-glass--3" }.fetch(variant) %>
-<div class="story-glass <%= variant_class %>" data-controller="story-glass" hidden aria-hidden="true">
-  <div class="story-glass-frame">
-    <%= render "shared/glass", level: 1, size: 96, appear: false %>
-  </div>
+<div class="story-glass" data-controller="story-glass" hidden aria-hidden="true">
+  <%= render "shared/glass", level: 1, size: 96, appear: false %>
 </div>

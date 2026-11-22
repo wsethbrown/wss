@@ -1,18 +1,19 @@
 import { Controller } from "@hotwired/stimulus"
 
-// TRIAL, off by default (home/_story_glass.html.erb, rendered only for
-// /?glass=1). A glass that fills as the reader scrolls through the homepage
-// story: empty when the first step's words sit in the middle of the screen,
-// full when the closing beat's heading does. To drop the trial, delete this
-// file and the partial (the partial says what else goes).
+// The story glass (home/_story_glass.html.erb, on the homepage only): a
+// glass that fills as the reader scrolls through the homepage story, empty
+// when the first step's words sit in the middle of the screen, full when the
+// closing beat's heading does. Loaded like every controller (eager, from the
+// import map); it is small, and inert on any page without its element.
 //
 // The drawing is shared/_glass at full; this lowers its liquid by
 // --story-glass-drop (user units, as the pour does). The level follows the
 // scroll position directly, with no easing of its own, so it is always
 // exactly where the reader is. Under reduced motion it does not follow the
 // scroll: it steps a third at a time as each step is reached.
-// On phones (fixed in the gutter) it is shown only while the steps are on
-// screen; on desktop it rides with the pinned faces and the CSS shows it.
+// On phones (fixed in the bottom-right corner) it is shown only while the
+// steps are on screen; on desktop it is sticky beside the steps and the CSS
+// shows it.
 
 const DROP = 38 // the full level lowered this far is below the bowl: empty
 

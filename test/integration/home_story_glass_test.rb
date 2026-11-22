@@ -1,70 +1,64 @@
 require "test_helper"
 
-# TRIAL (owner to decide from a recording): a glass that fills with the
-# scroll through the homepage story, from empty at the first step to full at
-# the closing beat. Off by default: only /?glass=1, 2 or 3 renders it, each a
-# different placement for the owner to compare. All of it lives in
-# home/_story_glass.html.erb and story_glass_controller.js, so a "no" is two
-# deleted files, two lines in home/index and this test.
+# The story glass (owner's choice of placement, November 2026): a glass that
+# fills with the scroll through the homepage story, empty at the first step
+# and full at the closing beat. On the homepage by default, nowhere else.
+# Desktop: a 96px gauge in the gutter between the step words and the face,
+# held mid-screen. Phones: 40px in the bottom-right corner.
 class HomeStoryGlassTest < ActionDispatch::IntegrationTest
-  test "the default homepage renders no trial glass: no markup, no styles" do
+  def page_css = css_select("style").map(&:text).join("\n")
+
+  test "the homepage shows one hidden, aria-hidden glass in the story, drawn by shared/_glass" do
     get root_path
     assert_response :success
-    assert_select "[data-controller~=story-glass], .story-glass", 0
-    refute_match(/\.story-glass|story-glass--/, css_select("style").map(&:text).join, "no trial styles")
-    # The one trace is the module itself: importmap's pin_all_from and eager
-    # loading put every controller in the import map and preload it on every
-    # page. Inert without its element. Deleting the controller file removes it.
-    mentions = response.body.scan(/[^\s"']*story[-_]glass[^\s"']*/).uniq
-    assert mentions.all? { |m| m.include?("controllers/story_glass_controller") }, "only the module pin: #{mentions}"
-  end
-
-  test "?glass=1 adds one hidden, aria-hidden glass to the story, drawn by shared/_glass" do
-    get root_path(glass: 1)
-    assert_response :success
-    assert_select ".story [data-controller=story-glass]", 1 do |els|
+    assert_select ".story > .story-glass[data-controller=story-glass]", 1 do |els|
       el = els.first
       assert el.key?("hidden"), "absent until its controller shows it: no JS, no glass"
       assert_equal "true", el["aria-hidden"]
     end
-    assert_select "[data-controller=story-glass] svg[data-glass][aria-hidden=true]", 1
-    # It is a gauge, not a reveal: the appear controller must not pour it.
-    assert_select "[data-controller=story-glass] [data-appear-target]", 0
-    # No words of its own.
-    assert_equal "", css_select("[data-controller=story-glass]").text.strip
+    assert_select ".story-glass svg[data-glass][aria-hidden=true]", 1
+    assert_equal "96", css_select(".story-glass svg").first["height"], "drawn at the desktop gauge's size"
+    # A gauge, not a reveal: the appear controller must not pour it.
+    assert_select ".story-glass [data-appear-target]", 0
+    assert_equal "", css_select(".story-glass").text.strip, "no words of its own"
   end
 
-  test "each of 1, 2 and 3 selects its own placement" do
-    { "1" => "story-glass--1", "2" => "story-glass--2", "3" => "story-glass--3" }.each do |param, klass|
-      get root_path(glass: param)
-      assert_select ".story-glass", 1
-      assert_select ".story-glass.#{klass}", 1, "?glass=#{param}"
+  test "it needs no parameter, and no parameter changes it" do
+    [ {}, { glass: "1" }, { glass: "3" }, { glass: "0" } ].each do |params|
+      get root_path, params: params
+      assert_select ".story-glass", 1, params.inspect
+      refute_match(/story-glass--|variant|trial/i, css_select(".story-glass").to_s, params.inspect)
     end
+    refute_match(/params\[:glass\]/, File.read(Rails.root.join("app/views/home/index.html.erb")))
   end
 
-  test "anything else means no glass, and the param is never written into the page" do
-    [ "0", "4", "12", "1x", " 1", "true", "<b>1</b>", "%22onload%3Dalert(1)" ].each do |value|
-      get root_path, params: { glass: value }
+  test "it is on no other page" do
+    [ presentations_path, societies_path, reviews_path, membership_path, auth_path ].each do |path|
+      get path
       assert_response :success
-      assert_select "[data-controller~=story-glass]", 0, "?glass=#{value.inspect} must not select a variant"
-      refute_includes response.body, "story-glass", value
+      assert_select "[data-controller~=story-glass], .story-glass", 0, path
+      refute_match(/\.story-glass/, page_css, "#{path}: no story-glass styles")
     end
-    get "/?glass[]=1"
-    assert_response :success
-    assert_select "[data-controller~=story-glass]", 0, "an array param selects nothing"
-
-    get root_path(glass: "2")
-    refute_match(/glass=2/, css_select(".story-glass").to_s, "the request's value is not echoed")
   end
 
-  test "the trial glass is out of the flow, so showing it shifts nothing" do
-    get root_path(glass: 1)
-    css = css_select("style").map(&:text).join("\n")
-    block = css[/\.hx \.story-glass\s*\{([^}]*)\}/, 1]
-    assert block, "expected the trial's base rule"
-    assert_match(/position:\s*fixed/, block, "on phones it is fixed beside the text")
-    assert_match(/position:\s*sticky/, css, "on desktop it rides with the pinned faces")
-    assert_match(/height:\s*0/, css[/@media \(min-width: 900px\)\s*\{[^@]*\.story-glass[^@]*/m].to_s, "on desktop it takes no height")
+  test "it is out of the flow, so showing it shifts nothing, and taps pass through" do
+    get root_path
+    css = page_css
+    base = css[/\.hx \.story-glass\s*\{([^}]*)\}/, 1]
+    assert base, "expected the glass's base rule"
+    assert_match(/position:\s*fixed/, base, "on phones it is fixed in the corner")
+    assert_match(/right:\s*-5px/, base)
+    assert_match(/bottom:\s*calc\(16px/, base)
+    assert_match(/pointer-events:\s*none/, base)
+    assert_match(/\.hx \.story-glass svg\s*\{[^}]*width:\s*30px;\s*height:\s*40px/, css, "40px on phones")
+    desktop = css[/@media \(min-width: 900px\)\s*\{[^@]*\.story-glass[^@]*/m].to_s
+    assert_match(/position:\s*sticky/, desktop)
+    assert_match(/height:\s*0/, desktop, "on desktop it takes no height")
+    assert_match(/top:\s*calc\(50svh - 48px\)/, desktop, "held at the middle of the screen")
+    assert_match(/left:\s*-72px;\s*width:\s*72px;\s*height:\s*96px/, desktop, "a 96px gauge filling the 72px gutter")
+    assert_match(/@media print\s*\{\s*\.hx \.story-glass\s*\{\s*display:\s*none/, css)
+    # The step words keep clear of it.
+    assert_match(/\.hx \.beat\s*\{[^}]*padding:\s*40px 28px 40px 0/, css)
   end
 
   test "the shared glass can be drawn without joining the reveal" do

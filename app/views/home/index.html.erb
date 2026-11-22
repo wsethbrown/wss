@@ -216,12 +216,14 @@
 
     @media (min-width: 900px) {
       .hx .story { grid-template-columns: .86fr 1.14fr; column-gap: 72px; row-gap: 0; padding: 0; }
-      .hx .beat { grid-column: 1; min-height: 86svh; padding: 40px 0; }
+      /* The right padding keeps the step words clear of the story glass,
+         which hangs in the gutter beside them (home/_story_glass). */
+      .hx .beat { grid-column: 1; min-height: 86svh; padding: 40px 28px 40px 0; }
       .hx .beat:first-child { min-height: 100svh; padding-top: 104px; }
       .hx .face { grid-column: 2; align-self: start; position: sticky; top: max(112px, calc(50svh - 17.5vw)); margin: 0; }
       .hx .f1 { grid-row: 1 / 5; } .hx .f2 { grid-row: 2 / 5; } .hx .f3 { grid-row: 3 / 5; } .hx .f4 { grid-row: 4 / 5; }
       .hx .b1 { grid-row: 1; } .hx .b2 { grid-row: 2; } .hx .b3 { grid-row: 3; } .hx .b4 { grid-row: 4; }
-      .hx .beat--close { grid-row: 5; min-height: 0; padding: 24px 0 8px; }
+      .hx .beat--close { grid-row: 5; min-height: 0; padding: 24px 28px 8px 0; }
     }
     @media (min-width: 1400px) { .hx .face { top: max(112px, calc(50svh - 230px)); } }
 
@@ -576,11 +578,8 @@
         </div>
       </div>
 
-      <%# TRIAL, off by default: a glass that fills with the story's scroll,
-          in one of three placements. Only "1", "2" or "3" selects one; the
-          param itself never reaches the page. %>
-      <% story_glass = { "1" => 1, "2" => 2, "3" => 3 }[params[:glass]] %>
-      <%= render "home/story_glass", variant: story_glass if story_glass %>
+      <%# The story glass: fills with the scroll through the steps. %>
+      <%= render "home/story_glass" %>
 
       <!-- The close: the end of the three steps, in the same column -->
       <div class="beat beat--close">

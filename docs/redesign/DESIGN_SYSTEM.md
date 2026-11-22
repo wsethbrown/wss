@@ -209,13 +209,20 @@ glass and the view transitions. No animation library.
   one-slide reel does not cycle); hovering with a pointer or focusing it pauses the reel. Only the
   hero has ticks: the step faces' bars carry just their title (ticks there read as a sideways
   carousel, when the faces change with the vertical scroll).
-- **Trial, off by default**: `/?glass=1`, `2` or `3` (three placements to compare; any other
-  value means none) adds a glass that fills with the scroll through the homepage story (`home/_story_glass`, `story_glass_controller.js`; the partial says how to remove
-  it). Not part of the system until the owner decides.
+- **The story glass** (homepage only, `home/_story_glass`, `story_glass_controller.js`): one
+  glass that fills as the reader scrolls through the story, empty when the first step's words
+  are mid-screen and full when the closing beat's heading is. It follows the scroll directly
+  (it is a gauge, not a reveal, so `appear: false` keeps it out of the pour). Desktop: a 96px
+  gauge in the gutter between the step words and the face, sticky at the middle of the screen;
+  the beats keep 28px of right padding so the words never meet it. Phones: 40px in the
+  bottom-right corner, inside the 20px page gutter, shown only while the steps are on screen.
+  aria-hidden, no words, `pointer-events: none`, out of the flow (no layout shift), hidden
+  until its controller runs and in print. Under reduced motion it steps a third at a time as
+  each step is reached instead of following the scroll.
 - **Pages** cross-fade (view transitions), and a deck's cover travels from its card to the deck
   page. Turbo's progress bar is a 2px `mark-deep` line.
 - **Reduced motion** (`prefers-reduced-motion: reduce`), the same everywhere: the appear
-  controller does nothing, so nothing is hidden, no glass pours, nothing draws in, no face
+  controller does nothing, so nothing is hidden, no glass pours (the story glass steps), nothing draws in, no face
   performs, no photo settles and no image fades; the reel and ticks stand still on the first
   slide; view transitions are off; nothing travels on hover (no card lift,
   cover lean or arrow nudge). The press (fill step and `.98`) and colour changes stay: they are

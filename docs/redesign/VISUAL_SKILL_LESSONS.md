@@ -119,8 +119,6 @@ Authoritative values are in DESIGN_SYSTEM.md "Motion". These are the reasons beh
 
 ## Open
 
-- The story glass trial (`/?glass=1`, `2`, `3`) awaits the owner's choice of placement or
-  removal.
 - The re-pour for RSVP glasses exists only as a demo outside the repo.
 - Real Safari and iPhone checks are still outstanding.
 - impeccable is untried.
