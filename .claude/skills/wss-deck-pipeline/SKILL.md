@@ -131,3 +131,24 @@ deck file, and on update that replaces the deck file; admins can also force one
 via the "Re-render slide previews" button (POST render_slides). The admin show
 page's Actions panel walks the states: no file → rendering → ready to publish →
 published.
+
+## Loading a package from the admin (November 2026)
+
+A finished package can be uploaded as a zip, without the command line:
+`Admin::DeckPackagesController`, zip handling in `app/services/deck_package_zip.rb`.
+
+- **Deck list → "Upload a package"** creates a new draft. It refuses if another deck already
+  has the package's title and links to that deck's replace page.
+- **A deck's admin page → "Replace with a package"** loads the zip into that deck whatever its
+  title. Title, description, category, difficulty, running time, story, files, slides, pours
+  and tags come from the package. Price, published state, featured flag, author, owners and
+  counters are kept. Everything is validated first and saved in one transaction; old files are
+  removed only after the save succeeds.
+- `bin/rails decks:load` takes `DECK_ID=` for the same explicit target, and `FREE=1` with
+  `PUBLISH=1` for a deck that is meant to be free.
+- The import runs inside the request. A very large package would need a background job.
+
+Unpublished decks stay open to the people who own them (`Presentation#visible_to?`): the deck
+page, Present mode and downloads work for admins, direct owners and credit owners with an
+active membership; the library, search, featured lists and the purchase page do not show
+them. Publishing at $0 needs "This deck is free" ticked.

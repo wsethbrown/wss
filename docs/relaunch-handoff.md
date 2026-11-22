@@ -105,10 +105,11 @@ OVH's default login is user `ubuntu` with sudo, not root; Kamal here deploys as 
   result in Keynote, then bisect. Do not put the decks in front of customers until this is
   solved.
 - **Admin deck pages.** A review is in `tmp/review/admin-decks/REVIEW.md` on the cloud side
-  (not in git). Built so far: the re-render crash fix. In progress in the cloud session:
-  uploading a deck package as a zip from the admin (including replacing an existing deck in
-  place), keeping unpublished decks open to their owners, and a guard against publishing at
-  $0. Once that lands, the three redone decks replace the live ones through the admin.
+  (not in git). Built and on the branch: the re-render crash fix; uploading a deck package as
+  a zip from the admin, including "Replace with a package" on an existing deck (keeps price,
+  published state and owners); unpublished decks staying open to their owners; and a guard
+  against publishing at $0. The three redone decks replace the live ones through that upload
+  once the Keynote problem is solved.
 - **Open owner decisions:** merging the pull request; the deck name (Value vs. Prestige / A
   Story Someone Else Wrote / Value vs Hype); whether the bottle photos in that deck are cleared
   for use; whether free decks should exist; what the public "story" text on a deck page should

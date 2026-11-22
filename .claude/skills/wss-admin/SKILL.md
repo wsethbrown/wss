@@ -111,3 +111,10 @@ The marker between cards (a sentence-case `text-mute` line between two
 hairlines, no small caps) shows where the free teaser cuts off. It
 mirrors `PresentationsHelper#preview_markdown` (first 24 SOURCE lines) — if
 that number changes, change `TEASER_LINES` in the Stimulus controller too.
+
+## Deck packages, unpublish and free decks (November 2026)
+
+Decks can be created or replaced in place from a package zip (deck list → "Upload a package";
+a deck's page → "Replace with a package"). The Unpublish button states how many people own the
+deck; owners keep access after it. Publishing at $0 is refused unless "This deck is free" is
+ticked. Details: wss-deck-pipeline.
