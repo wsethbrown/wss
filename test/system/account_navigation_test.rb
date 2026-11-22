@@ -29,6 +29,13 @@ class AccountNavigationTest < ApplicationSystemTestCase
     # Signed in once the nav offers "Sign out" (the sign-in redirect target may vary).
     assert_link "Sign out"
 
+    # Let the sign-in redirect finish before leaving the page. "Sign out" shows as
+    # soon as Turbo renders the dashboard, while its visit and page transition are
+    # still running. A CI failure's timeline showed this test navigating away at
+    # that moment, after which Chrome delivered none of the clicks sent to the
+    # account page (no pointerdown ever reached it).
+    wait_for_turbo_visit
+
     visit account_path
     assert_current_path account_path
     wait_for_account_tabs
