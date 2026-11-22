@@ -33,6 +33,13 @@ class AccountNavigationTest < ApplicationSystemTestCase
     # /account loading while the sign-in visit's transition was still running.
     assert_no_selector "html[aria-busy='true']", visible: :all
 
+    # Let the sign-in redirect finish before leaving the page. "Sign out" shows as
+    # soon as Turbo renders the dashboard, while its visit and page transition are
+    # still running. A CI failure's timeline showed this test navigating away at
+    # that moment, after which Chrome delivered none of the clicks sent to the
+    # account page (no pointerdown ever reached it).
+    wait_for_turbo_visit
+
     visit account_path
     assert_current_path account_path
     wait_for_account_tabs
