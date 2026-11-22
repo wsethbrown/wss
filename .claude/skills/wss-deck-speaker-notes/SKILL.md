@@ -156,7 +156,22 @@ line. Write the fact. The patterns to cut, on slides and in the script:
   people have had the rye or if they've been to the distillery." The writer has never met the
   room. Do not say what the audience has drunk, knows, expects or has heard of ("the one you
   know", "you have almost certainly", "everyone remembers"). State what the bottle is, or ask.
+- **Predictions about the room, and host directions on a slide.** A slide once read "Ask the
+  room to guess the year. They will guess too late." The owner: "#1 don't ever make
+  declarations like this #2 don't put this IN the slide where everyone can see it." Directions
+  to the host go in the script as stage directions, never in slide text, and never say how the
+  room will answer.
+- **A sentence that leaves a question open.** "He never saw this written down" (the owner:
+  "what is 'this'"); "Roosevelt has waited years for someone to put that in print" ("why?").
+  If a line makes the reader ask what or why, answer it in the line or cut it.
+- **Fragments stacked for drama.** "1791. The first federal tax ever laid on something
+  Americans made themselves." Write the sentence: "In 1791 Congress put a tax on American-made
+  spirits."
 - **A motif repeated for effect.** The pilot said "four different hands" five times.
+
+This applies to text carried over from an older deck as much as to new writing: "keep the
+owner's content" means keep the facts, the story and the bottles, not the phrasing. The owner
+flagged a whole deck of carried-over lines as slop.
 
 The owner's own good lines are plain statements a host would actually say to friends ("Heat is
 not flavour."). If a line sounds like a caption on a poster, rewrite it as what you would say
