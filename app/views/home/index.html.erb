@@ -133,18 +133,32 @@
     .hx .sl .pour span { font-variant-numeric: tabular-nums; }
 
     /* Slide three: the invite for a night (a real one, or a drawn sample).
-       Its words live in .invite-body, a layer above the slide ground, so a
-       photograph can later be added as a sibling layer beside it (the
-       owner wants one; source not decided) without touching the invite. */
+       A photograph of a tasting night is the top band, printed through
+       shared/_duotone in this slide's two inks (light in orange, shadows in
+       ink); the invite's words sit below it on solid orange, never on the
+       photo. The band shows the top of the picture so the bottles' labels
+       stay out of frame. */
     .hx .invite { padding: 0; }
-    .hx .invite-body { position: relative; z-index: 1; display: flex; flex-direction: column; height: 100%; padding: 6.5cqw 7cqw; }
-    .hx .invite .top { display: flex; justify-content: space-between; align-items: center; gap: 3cqw; margin-bottom: 2.4cqw; font-weight: 600; font-size: max(11px, 2.5cqw); letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
-    .hx .invite .tag { display: inline-flex; align-items: center; min-height: max(20px, 4.4cqw); padding: 0 max(8px, 1.6cqw); border-radius: max(7px, 1.4cqw); box-shadow: inset 0 0 0 max(1px, .28cqw) var(--ink); white-space: nowrap; }
-    .hx .invite .date { font-size: 15.5cqw; }
-    .hx .invite .foot { margin-top: auto; display: flex; justify-content: space-between; align-items: flex-end; gap: 4cqw; }
-    .hx .invite .foot > div:first-child { min-width: 0; }
-    .hx .invite .ev { margin-top: 0; }
-    .hx .invite .where { font-size: max(11px, 2.9cqw); }
+    .hx .invite-photo { flex: none; height: 47%; margin: 0; border-radius: 0; background: var(--mark); }
+    .hx .invite-photo::after { background: var(--ink); }
+    .hx .invite-photo img { object-position: 50% 4%; }
+    .hx .invite-body { flex: 1; min-height: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto 1fr; column-gap: 5cqw; align-items: end; padding: 3cqw 5cqw 3.6cqw; }
+    .hx .invite .top { grid-column: 1 / -1; align-self: start; display: flex; justify-content: space-between; align-items: center; gap: 3cqw; font-weight: 600; font-size: max(11px, 2.4cqw); letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+    .hx .invite .tag { display: inline-flex; align-items: center; min-height: max(20px, 4.2cqw); padding: 0 max(8px, 1.6cqw); border-radius: max(7px, 1.4cqw); box-shadow: inset 0 0 0 max(1px, .28cqw) var(--ink); white-space: nowrap; }
+    .hx .invite .date { font-size: 13cqw; }
+    .hx .invite .foot { min-width: 0; display: flex; flex-direction: column; gap: 2cqw; padding-bottom: .6cqw; }
+    .hx .invite .ev { margin-top: 0; font-size: 4.2cqw; }
+    .hx .invite .where { margin-top: 1cqw; font-size: max(11px, 2.6cqw); }
+    .hx .invite .guests { flex-direction: row; align-items: center; gap: 2cqw; }
+    @media (max-width: 599px) {
+      /* Phones: a square face, so the band stays tall enough to see faces. */
+      .hx .screen--invite { aspect-ratio: 1 / 1; }
+      .hx .invite-photo { height: 42%; }
+      .hx .invite-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr; row-gap: 2.5cqw; padding: 4cqw 5.5cqw 5cqw; }
+      .hx .invite .date { font-size: 15cqw; }
+      .hx .invite .ev { font-size: 5.4cqw; }
+      .hx .invite .where { font-size: max(12px, 3.4cqw); }
+    }
     .hx .guests { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 1.2cqw; font-weight: 600; font-size: max(11px, 2.5cqw); font-variant-numeric: tabular-nums; }
     .hx .faces { display: flex; padding-left: 1.4cqw; }
     .hx .faces > * { display: inline-flex !important; align-items: center; justify-content: center; width: max(26px, 6.6cqw) !important; height: max(26px, 6.6cqw) !important; margin-left: -1.4cqw;
@@ -376,8 +390,12 @@
         <%= link_to "Browse societies", societies_path, class: "more" %>
       </div>
       <div class="face f3">
+        <%# The one photograph on this page (owner-supplied, AI-generated; see
+            docs/redesign/IMAGE_CREDITS.md). Same band in both invite states. %>
+        <% gathering_photo = capture do %><%= render "shared/duotone", src: "photos/tasting-night-living-room.jpg", css: "invite-photo", width: 1280, height: 512,
+              alt: "Five friends at a whiskey tasting in a lamp-lit living room. One stands by the TV with a glass raised, presenting, and four listen from the sofas, laughing, with glasses in hand." %><% end %>
         <div class="player">
-          <div class="screen">
+          <div class="screen screen--invite">
             <% if @next_event %>
               <%# The next real tasting night at a public society, drawn as its
                   invite: when, what, where, and who has said yes (the names
@@ -387,6 +405,7 @@
                   otherwise show UTC, weekday included. %>
               <% local = @next_event.start_time.in_time_zone(@next_event.effective_time_zone) %>
               <%= link_to event_path(@next_event), class: "sl sl--mark invite" do %>
+                <%= gathering_photo %>
                 <div class="invite-body">
                 <div class="top"><span><%= local.strftime("%a · %-l:%M %P %Z") %></span></div>
                 <div class="date"><%= local.strftime("%b %-d") %></div>
@@ -410,6 +429,7 @@
                   one; it links nowhere and names nobody (initials only). %>
               <% sample_date = Date.current.next_occurring(:friday) %>
               <div class="sl sl--mark invite">
+                <%= gathering_photo %>
                 <div class="invite-body">
                 <div class="top"><span><%= sample_date.strftime("%a") %> · 7:30 pm</span><span class="tag">Sample invite</span></div>
                 <div class="date"><%= sample_date.strftime("%b %-d") %></div>

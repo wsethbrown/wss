@@ -8,6 +8,35 @@ class HomeFacesTest < ActionDispatch::IntegrationTest
     css_select(selector).map(&:text).join(" ")
   end
 
+  PHOTO_ALT = "Five friends at a whiskey tasting in a lamp-lit living room. One stands by the TV with a glass raised, presenting, and four listen from the sofas, laughing, with glasses in hand.".freeze
+
+  # The photograph shares the face with the invite: printed through
+  # shared/_duotone, lazy, sized, never behind the invite's words.
+  def assert_gathering_photo
+    assert_select ".f3 .sl figure.duotone img", count: 1 do |imgs|
+      img = imgs.first
+      assert_match %r{tasting-night-living-room.*\.jpg}, img["src"]
+      assert_equal PHOTO_ALT, img["alt"]
+      assert_equal "lazy", img["loading"]
+      assert_equal "1280", img["width"]
+      assert_equal "512", img["height"]
+    end
+    assert_select ".f3 .invite-body figure", count: 0
+    assert_select "figure.duotone", count: 1 # one photograph per view
+  end
+
+  test "the sample invite shares its face with the gathering photograph" do
+    Event.where("start_time > ?", Time.current).update_all(start_time: 1.day.ago)
+    get root_path
+    assert_gathering_photo
+  end
+
+  test "a real night's invite shares its face with the gathering photograph" do
+    get root_path
+    assert_select ".f3 a.sl", count: 1
+    assert_gathering_photo
+  end
+
   # --- Beat 3: the next tasting night ---------------------------------------
 
   test "an upcoming public night fills the invite with its date, place and guests" do
