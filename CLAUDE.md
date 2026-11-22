@@ -194,6 +194,7 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 - **@docs/redesign/DESIGN_SYSTEM.md** - The 2026 design system: surfaces, colour, type, components, rejected directions
 - **@docs/redesign/ARCHITECTURE_REVIEW.md** - November 2026 architecture and backend review, findings by severity
 - **@docs/redesign/TASKS.md** - The redesign and backend task list with acceptance criteria and test plans
+- **docs/relaunch.md** - Bringing production back on a new server with `bin/relaunch-production` (tests: `test/bin/relaunch_production_test.sh`)
 - **tools/decks/README.md** - Deck build tools (pptx, branded PDFs, slide PNGs from markdown); the pilot deck's sources in `tools/decks/examples/`
 - **.claude/skills/wss-deck-creation/** - How to make a tasting-night deck package (with `wss-deck-outline` for research and `wss-deck-speaker-notes` for the script)
 

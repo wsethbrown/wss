@@ -1,0 +1,1264 @@
+#!/usr/bin/env bash
+#
+# Bring whiskeysharesociety.com back up on a NEW server, from the backups.
+#
+#   bin/relaunch-production              # run every step, skipping finished ones
+#   bin/relaunch-production --from dns   # resume at a step (name or number)
+#   bin/relaunch-production --dry-run    # say what would happen, change nothing
+#   bin/relaunch-production --help       # list the steps
+#
+# Run it on the Mac, from the repo folder, with Docker Desktop running. It
+# reads secrets from ~/.wss-production.env (never prints them) and asks
+# before anything destructive or public. Every step checks the real state
+# first (the server, the database, the website) and skips itself when it is
+# already done, so running it again after a failure is always safe.
+#
+# The human version of this is docs/relaunch.md.
+#
+# Written for macOS's bash 3.2 and BSD tools as well as Linux: no associative
+# arrays, no GNU-only flags. Never add `set -x`: it would print secrets.
+#
+# Testing hooks (not for everyday use): WSS_RELAUNCH_MODE=test replaces ssh,
+# scp, kamal, docker, curl, gh and opening URLs with stubs that record each
+# call in WSS_RELAUNCH_CALL_LOG and answer from WSS_STUB_* variables (see
+# "Test stubs" below). test/bin/relaunch_production_test.sh drives it.
+
+# Shellcheck, file-wide: SC2015 (`a && ok || warn`) is safe because ok/warn
+# always succeed; SC2029 (client-side expansion in ssh commands) is intended;
+# SC2012 (ls for a mode string) is fine for one known path; SC2016 marks code
+# meant for another shell or Ruby; SC2086 the space-separated name lists.
+# shellcheck disable=SC2015,SC2029,SC2012,SC2016,SC2086
+
+set -o pipefail
+umask 077
+
+# ================================================================= settings
+
+DOMAIN="whiskeysharesociety.com"
+OLD_IP="178.156.251.37"          # the Hetzner box that is gone
+DB_CONTAINER="wss-db"            # Kamal names the accessory <service>-<name>
+DB_NAME="wss_production"
+REMOTE_DIR="/root/wss-relaunch"  # scratch folder on the server
+DEFAULT_BACKUP_DIRS="$HOME/Documents/wss/tmp/r2-backup:$HOME/Documents/WSS-R2-backup-2026-11-21"
+PURGE_EXPECTED=89                # junk accounts created 2026-08-03 .. 2026-10-14
+OVERWRITE_PHRASE="REPLACE PRODUCTION DATA"
+
+STEPS="preflight server config masterkey database deploy purge turnstile dns aftercare"
+
+# Production refuses to boot without these (config/initializers/
+# production_config_guard.rb and stripe.rb), and Kamal needs the first two to
+# log in to the registry and start Postgres. Every one must also be in the
+# list bin/kamal-deploy forwards; preflight checks that too.
+REQUIRED_VARS="KAMAL_REGISTRY_PASSWORD WSS_DATABASE_PASSWORD
+AR_ENCRYPTION_PRIMARY_KEY AR_ENCRYPTION_DETERMINISTIC_KEY AR_ENCRYPTION_KEY_DERIVATION_SALT
+STRIPE_SECRET_KEY STRIPE_PUBLISHABLE_KEY STRIPE_WEBHOOK_SECRET
+STRIPE_MONTHLY_PRICE_ID STRIPE_QUARTERLY_PRICE_ID STRIPE_YEARLY_PRICE_ID
+R2_ENDPOINT R2_ACCESS_KEY_ID R2_SECRET_ACCESS_KEY R2_BUCKET"
+# The site boots without these but something visible breaks.
+RECOMMENDED_VARS="SMTP_ADDRESS SMTP_USERNAME SMTP_PASSWORD GOOGLE_CLIENT_ID GOOGLE_CLIENT_SECRET SENTRY_DSN"
+# Values that must never appear in anything this script prints.
+SECRET_VARS="$REQUIRED_VARS $RECOMMENDED_VARS GOOGLE_MAPS_API_KEY APPLE_PRIVATE_KEY APPLE_KEY_ID
+TURNSTILE_SECRET_KEY STRIPE_FOUNDING_SOCIETY_PRICE_ID STRIPE_FOUNDING_MONTHLY_PRICE_ID"
+
+MODE="${WSS_RELAUNCH_MODE:-real}"
+case "$MODE" in real|test) ;; *) echo "WSS_RELAUNCH_MODE must be real or test" >&2; exit 2 ;; esac
+
+if [ "$MODE" = test ] && [ -n "$WSS_RELAUNCH_ROOT" ]; then
+  ROOT="$WSS_RELAUNCH_ROOT"
+else
+  ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+fi
+cd "$ROOT" || exit 1
+
+ENV_FILE="${WSS_RELAUNCH_ENV_FILE:-$HOME/.wss-production.env}"
+STATE_FILE="${WSS_RELAUNCH_STATE:-$HOME/.wss-relaunch-state}"
+WORK="$(mktemp -d "${TMPDIR:-/tmp}/wss-relaunch.XXXXXX")" || exit 1
+trap 'rm -rf "$WORK"' EXIT
+
+SSH_OPTS="-o BatchMode=yes -o ConnectTimeout=15 -o StrictHostKeyChecking=accept-new -o ServerAliveInterval=30"
+
+# ================================================================= output
+
+if [ -t 1 ]; then B=$'\033[1m'; G=$'\033[32m'; Y=$'\033[33m'; R=$'\033[31m'; N=$'\033[0m'; else B=""; G=""; Y=""; R=""; N=""; fi
+
+CURRENT_STEP=""
+say()  { printf '%s\n' "  $*"; }
+ok()   { printf '%s\n' "  ${G}OK${N}  $*"; }
+warn() { printf '%s\n' "  ${Y}WARNING${N}  $*"; }
+plan() { printf '%s\n' "  [dry run] would: $*"; }
+# fail "what went wrong" "how to fix it" — stops the whole run.
+fail() {
+  printf '\n%s\n' "  ${R}STOPPED${N} at step ${CURRENT_STEP:-?}: $1" >&2
+  [ -z "$2" ] || printf '%s\n' "  Fix: $2" >&2
+  [ -z "$CURRENT_STEP" ] || printf '%s\n' "  Then run again:  bin/relaunch-production --from $CURRENT_STEP" >&2
+  exit 1
+}
+
+step_header() {
+  local n="$1" name="$2" title="$3"
+  CURRENT_STEP="$name"
+  printf '\n%s\n' "${B}== Step $n of 10: $title${N}"
+}
+
+# ask VAR "question" [default] — plain answer (shown as typed).
+ask() {
+  local __var="$1" __q="$2" __def="$3" __a=""
+  if [ -n "$__def" ]; then printf '  %s [%s]: ' "$__q" "$__def"; else printf '  %s: ' "$__q"; fi
+  IFS= read -r __a || __a=""
+  [ -n "$__a" ] || __a="$__def"
+  printf -v "$__var" '%s' "$__a"
+}
+
+# ask_secret VAR "question" — hidden, never echoed or stored anywhere but VAR.
+ask_secret() {
+  local __var="$1" __q="$2" __a=""
+  printf '  %s (hidden): ' "$__q"
+  IFS= read -rs __a || __a=""
+  printf '\n'
+  printf -v "$__var" '%s' "$__a"
+}
+
+# confirm "question" — yes/no, default no.
+confirm() {
+  local a=""
+  printf '  %s [y/N] ' "$1"
+  IFS= read -r a || a=""
+  case "$a" in y|Y|yes|YES|Yes) return 0 ;; *) return 1 ;; esac
+}
+
+# confirm_phrase "PHRASE" — the person must type it exactly.
+confirm_phrase() {
+  local a=""
+  printf '  Type %s to go ahead (anything else cancels): ' "${B}$1${N}"
+  IFS= read -r a || a=""
+  [ "$a" = "$1" ]
+}
+
+pause() { local a=""; printf '  %s ' "${1:-Press Enter to continue.}"; IFS= read -r a || true; }
+
+nap() { if [ "$MODE" = test ]; then sleep "${WSS_RELAUNCH_SLEEP:-0}"; else sleep "$1"; fi; }
+
+open_url() {
+  say "Opening $1"
+  if [ "$MODE" = test ]; then log_call "open $1"; return 0; fi
+  if command -v open >/dev/null 2>&1; then open "$1" >/dev/null 2>&1 || true; fi
+}
+
+# ================================================================= state
+# Non-secret facts only (the server IP, a skipped step), outside the repo.
+
+state_get() { [ -f "$STATE_FILE" ] && sed -n "s/^$1=//p" "$STATE_FILE" | tail -n 1; }
+state_set() {
+  [ "$DRY_RUN" = 1 ] && return 0
+  local tmp="$STATE_FILE.tmp.$$"
+  { [ -f "$STATE_FILE" ] && grep -v "^$1=" "$STATE_FILE"; printf '%s=%s\n' "$1" "$2"; } > "$tmp" && mv "$tmp" "$STATE_FILE"
+}
+
+# ================================================================= secrets
+# The env file is only ever sourced inside a subshell, so secrets never sit in
+# this script's own variables (except the Turnstile keys while being saved).
+
+# Runs "$@" in a subshell with the env file loaded and exported.
+with_env() {
+  ( set -a
+    # shellcheck disable=SC1090
+    . "$ENV_FILE" >/dev/null 2>&1
+    set +a
+    "$@" )
+}
+
+# Prints the names (one per line) of the given variables that are empty.
+_missing_names() { local v; for v in "$@"; do [ -n "${!v}" ] || echo "$v"; done; }
+missing_vars() { with_env _missing_names "$@"; }
+
+# mask: copy stdin to stdout with every known secret value and anything that
+# looks like a key, token or password replaced by [MASKED].
+_mask() {
+  WSS_MASK_NAMES="$SECRET_VARS TURNSTILE_SITE_KEY" awk '
+    BEGIN { n = split(ENVIRON["WSS_MASK_NAMES"], names, /[ \n]+/)
+            for (i = 1; i <= n; i++) { v = ENVIRON[names[i]]; if (length(v) >= 8) vals[++m] = v } }
+    { line = $0
+      for (j = 1; j <= m; j++) {
+        out = ""
+        while ((p = index(line, vals[j])) > 0) { out = out substr(line, 1, p - 1) "[MASKED]"; line = substr(line, p + length(vals[j])) }
+        line = out line
+      }
+      print line }' |
+  sed -E \
+    -e 's/(sk|rk|pk)_(live|test)_[A-Za-z0-9]+/\1_\2_[MASKED]/g' \
+    -e 's/whsec_[A-Za-z0-9]+/whsec_[MASKED]/g' \
+    -e 's/gh[pousr]_[A-Za-z0-9]+/gh_[MASKED]/g' \
+    -e 's/github_pat_[A-Za-z0-9_]+/github_pat_[MASKED]/g' \
+    -e 's/re_[A-Za-z0-9_]{12,}/re_[MASKED]/g' \
+    -e 's#(postgres(ql)?://[^:/@ ]+:)[^@ ]+@#\1[MASKED]@#g' \
+    -e 's/([Pp][Aa][Ss][Ss][Ww][Oo][Rr][Dd]|[Ss][Ee][Cc][Rr][Ee][Tt]|[Tt][Oo][Kk][Ee][Nn])([" '"'"']*[=:][ "'"'"']*)[^ "'"'"',&]+/\1\2[MASKED]/g'
+}
+mask() { if [ -f "$ENV_FILE" ]; then with_env _mask; else _mask; fi; }
+
+# Writes NAME=value into the env file, replacing an existing line for NAME.
+# The value travels in the environment to awk, never on a command line.
+env_upsert() {
+  local name="$1" tmp="$ENV_FILE.tmp.$$"
+  WSS_UPSERT_NAME="$name" WSS_UPSERT_VALUE="$2" awk -v q="'" '
+    BEGIN { name = ENVIRON["WSS_UPSERT_NAME"]; line = "export " name "=" q ENVIRON["WSS_UPSERT_VALUE"] q }
+    $0 ~ "^[ \t]*(export[ \t]+)?" name "=" { if (!done) print line; done = 1; next }
+    { print }
+    END { if (!done) print line }' "$ENV_FILE" > "$tmp" && chmod 600 "$tmp" && mv "$tmp" "$ENV_FILE"
+}
+
+file_mode() { ls -l "$1" | awk '{ print $1 }'; }
+file_size() { wc -c < "$1" | tr -d ' '; }
+human_size() {
+  awk -v b="$1" 'BEGIN { if (b >= 1073741824) printf "%.1f GB", b / 1073741824
+    else if (b >= 1048576) printf "%.1f MB", b / 1048576; else if (b >= 1024) printf "%.1f KB", b / 1024
+    else printf "%d bytes", b }'
+}
+
+# ================================================================= backends
+# Everything that reaches outside this Mac goes through these few functions,
+# so the test mode can swap them for stubs. The first argument of each is a
+# TAG naming the call (the stubs answer per tag).
+
+log_call() { [ -z "$WSS_RELAUNCH_CALL_LOG" ] || printf '%s\n' "$*" >> "$WSS_RELAUNCH_CALL_LOG"; }
+
+# remote TAG USER — run the bash script on stdin on the server as USER.
+remote() {
+  local tag="$1" user="$2"
+  if [ "$MODE" = test ]; then stub_call "ssh:$tag" "ssh $user@$SERVER_IP bash -s"; return; fi
+  # shellcheck disable=SC2086
+  ssh $SSH_OPTS "$user@$SERVER_IP" 'bash -s'
+}
+
+# rsh TAG COMMAND — one command on the server as root.
+rsh() {
+  local tag="$1"; shift
+  if [ "$MODE" = test ]; then stub_call "ssh:$tag" "ssh root@$SERVER_IP $*" </dev/null; return; fi
+  # shellcheck disable=SC2086
+  ssh $SSH_OPTS "root@$SERVER_IP" "$@" </dev/null
+}
+
+# upload TAG LOCAL REMOTE_PATH
+upload() {
+  if [ "$MODE" = test ]; then
+    stub_call "scp:$1" "scp $(basename "$2") root@$SERVER_IP:$3" </dev/null || return
+    if [ -n "$WSS_STUB_SERVER_DIR" ]; then cp "$2" "$WSS_STUB_SERVER_DIR/$(basename "$3")"; fi
+    return 0
+  fi
+  # shellcheck disable=SC2086
+  scp -q $SSH_OPTS "$2" "root@$SERVER_IP:$3"
+}
+
+# kamal_run TAG ARGS... — bin/kamal-deploy with the env file loaded.
+kamal_run() {
+  local tag="$1"; shift
+  if [ "$MODE" = test ]; then
+    # Record which variables were loaded (names only) to prove the env file
+    # reached Kamal, without the values.
+    local loaded
+    loaded="$(with_env _set_names $REQUIRED_VARS TURNSTILE_SITE_KEY TURNSTILE_SECRET_KEY | tr '\n' ' ')"
+    stub_call "kamal:$tag" "kamal $* [env: $loaded]" </dev/null
+    return
+  fi
+  with_env "$ROOT/bin/kamal-deploy" "$@"
+}
+_set_names() { local v; for v in "$@"; do [ -z "${!v}" ] || echo "$v"; done; }
+
+# dk TAG ARGS... — local docker (Docker Desktop on the Mac).
+dk() {
+  local tag="$1"; shift
+  if [ "$MODE" = test ]; then
+    if [ "$WSS_STUB_RUBY" = local ] && [ "$tag" = ruby ]; then
+      # docker compose run ... web bundle exec ruby -e CODE  ->  ruby -e CODE here
+      log_call "docker:$tag docker $(printf '%s ' "$@" | cut -c1-60)"
+      while [ $# -gt 0 ] && [ "$1" != ruby ]; do shift; done; shift
+      ruby "$@"; return
+    fi
+    stub_call "docker:$tag" "docker $*" </dev/null; return
+  fi
+  docker "$@"
+}
+
+# web TAG ARGS... — curl from this Mac.
+web() {
+  local tag="$1"; shift
+  if [ "$MODE" = test ]; then stub_call "curl:$tag" "curl $*" </dev/null; return; fi
+  curl "$@"
+}
+
+ghc() {
+  if [ "$MODE" = test ]; then stub_call "gh:$1" "gh ${*:2}" </dev/null; return; fi
+  shift; gh "$@"
+}
+
+have_cmd() {
+  if [ "$MODE" = test ]; then
+    case " ${WSS_STUB_MISSING_CMDS:-} " in *" $1 "*) return 1 ;; esac
+    case "$1" in docker|gh|ssh|scp|curl|open|security) return 0 ;; esac
+  fi
+  command -v "$1" >/dev/null 2>&1
+}
+
+# db_sql LABEL DATABASE SQL — rows, fields separated by a tab. SQL goes on
+# stdin so no quoting survives two shells. psql errors are fatal.
+db_sql() {
+  local label="$1" db="$2" sql="$3"
+  if [ "$MODE" = test ] && [ "$WSS_STUB_PSQL" = local ]; then
+    log_call "psql:$label -d $db"
+    printf '%s\n' "$sql" | psql -X -q -At -F "$(printf '\t')" -v ON_ERROR_STOP=1 -d "$(test_db "$db")"
+    return
+  fi
+  if [ "$MODE" = test ]; then stub_call "psql:$label" "psql -d $db" </dev/null; return; fi
+  printf '%s\n' "$sql" | rsh_stdin "docker exec -i $DB_CONTAINER psql -X -q -At -F \"\$(printf '\\t')\" -v ON_ERROR_STOP=1 -U wss -d $db"
+}
+rsh_stdin() {
+  # shellcheck disable=SC2086
+  ssh $SSH_OPTS "root@$SERVER_IP" "$1"
+}
+
+# db_load REMOTE_FILE — load a gzipped SQL file already on the server into
+# the production database: one transaction, every error fatal.
+db_load() {
+  if [ "$MODE" = test ] && [ "$WSS_STUB_PSQL" = local ]; then
+    log_call "psql:load $(basename "$1")"
+    gunzip -c "$WSS_STUB_SERVER_DIR/$(basename "$1")" | psql -X -q -1 -v ON_ERROR_STOP=1 -d "$(test_db "$DB_NAME")"
+    return
+  fi
+  if [ "$MODE" = test ]; then stub_call "psql:load" "psql load $(basename "$1")" </dev/null; return; fi
+  rsh_stdin "set -o pipefail; gunzip -c '$1' | docker exec -i $DB_CONTAINER psql -X -q -1 -v ON_ERROR_STOP=1 -U wss -d $DB_NAME"
+}
+
+# The name a database really has where db_sql runs (differs only in local tests).
+real_db_name() { if [ "$MODE" = test ] && [ "$WSS_STUB_PSQL" = local ]; then test_db "$1"; else echo "$1"; fi; }
+
+# In test mode, production database names map to throwaway local ones.
+test_db() {
+  case "$1" in
+    postgres) echo postgres ;;
+    *) case "$WSS_TEST_DB" in relaunch_test_*) echo "$WSS_TEST_DB" ;; *) echo "WSS_TEST_DB must start with relaunch_test_" >&2; echo invalid_db ;; esac ;;
+  esac
+}
+
+# app_ruby TAG RUBY [NAME=VALUE] — run Ruby with `bin/rails runner` inside the
+# running web container (production env, production secrets on the server).
+# The code is piped in as a file so no quoting is involved. VALUE must be
+# plain (letters, digits, @ . _ + -); it is never a secret.
+app_ruby() {
+  local tag="$1" code="$2" envflag=""
+  [ -z "$3" ] || envflag="-e $3"
+  if [ "$MODE" = test ]; then stub_call "ruby:$tag" "app runner $tag" </dev/null; return; fi
+  printf '%s\n' "$code" | rsh_stdin "c=\$(docker ps -q --filter label=service=wss --filter label=role=web --filter status=running | head -n 1)
+[ -n \"\$c\" ] || { echo 'no running web container' >&2; exit 3; }
+docker exec -i \$c sh -c 'cat > /rails/tmp/wss-relaunch.rb' || exit 4
+docker exec $envflag \$c bin/rails runner /rails/tmp/wss-relaunch.rb; rc=\$?
+docker exec \$c rm -f /rails/tmp/wss-relaunch.rb
+exit \$rc"
+}
+
+# ================================================================= test stubs
+# Each stubbed call is logged as "<tag> <command line>" and answers with
+# $WSS_STUB_<TAG> on stdout and exit code $WSS_STUB_<TAG>_RC (default 0),
+# where <TAG> is the tag upper-cased with ':' and '-' turned into '_'. A few
+# defaults below make an all-green run possible without setting everything.
+
+stub_call() {
+  local tag="$1" line="$2" key out rc
+  if [ ! -t 0 ]; then
+    # Stdin carries remote scripts / SQL: record its first line (a comment
+    # naming the script), never the rest.
+    local first; first="$(head -n 1)"; cat >/dev/null
+    [ -z "$first" ] || line="$line <<< $first"
+  fi
+  log_call "$tag $line"
+  key="WSS_STUB_$(printf '%s' "$tag" | tr 'a-z:-' 'A-Z__')"
+  out="${!key}"
+  local rckey="${key}_RC"; rc="${!rckey:-}"
+  if [ -z "$out" ] && [ -z "$rc" ]; then
+    case "$tag" in
+      docker:info)          out="ok" ;;
+      gh:auth)              out="ok" ;;
+      ssh:root-check)       if [ "${WSS_STUB_ROOT:-1}" = 1 ] || [ -f "$WSS_RELAUNCH_STATE.rootok" ]; then out="wss-login-ok"; else rc=255; fi ;;
+      ssh:ubuntu-check)     if [ "${WSS_STUB_UBUNTU:-0}" = 1 ]; then out="wss-login-ok"; else rc=255; fi ;;
+      ssh:enable-root)      : > "$WSS_RELAUNCH_STATE.rootok"; out="wss-root-enabled" ;;
+      ssh:facts)            out="os=ubuntu 24.04
+mem_kb=8000000
+disk_kb=70000000
+swaps=1
+ufw=yes
+ufw_active=yes
+ufw_rules=22 80 443" ;;
+      ssh:swap)             out="wss-swap-ok" ;;
+      ssh:ufw)              out="wss-ufw-ok" ;;
+      ssh:docker-present)   out="yes" ;;
+      ssh:db-running)       out="running" ;;
+      ssh:db-ready)         out="ready" ;;
+      ssh:app-up)           out="200" ;;
+      ssh:jobs-running)     out="1" ;;
+      ssh:remote-size)      out="${WSS_STUB_LAST_UPLOAD_SIZE:-0}" ;;
+      psql:tables)          out="0" ;;
+      curl:*)               out="200" ;;
+      ruby:turnstile)       out="wss-turnstile off" ;;
+    esac
+  fi
+  [ -z "$out" ] || printf '%s\n' "$out"
+  return "${rc:-0}"
+}
+
+# ================================================================= arguments
+
+usage() {
+  sed -n '3,8p' "$0" | sed 's/^# \{0,1\}//'
+  cat <<'EOF'
+
+Steps (each one checks first and skips itself when already done):
+   1 preflight   Docker running, repo clean and pushed, ~/.wss-production.env
+                 complete (names of anything missing), SSH key, gh
+   2 server      SSH as root (or set it up from the "ubuntu" login), check
+                 the OS, memory and disk, add swap, open ports 22/80/443
+   3 config      put the new IP in config/deploy.yml, commit and push it
+   4 masterkey   regenerate config/master.key + credentials if lost
+   5 database    start Postgres alone and load a nightly dump into it
+   6 deploy      first `kamal setup`, wait until the app answers on the server
+   7 purge       delete the junk sign-ups (dry run first, typed confirmation)
+   8 turnstile   save the Cloudflare Turnstile keys and reboot the app
+   9 dns         point Cloudflare at the new server, wait for https
+  10 aftercare   smoke test, test email, jobs, a fresh backup, reminders
+
+Options:
+  --from STEP    start at this step (name or number); earlier steps are not
+                 run, preflight always is
+  --only STEP    run just this step (after preflight)
+  --dry-run      check and report, change nothing
+  -h, --help     this help
+EOF
+}
+
+FROM=""
+ONLY=""
+DRY_RUN=0
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --from)     [ $# -ge 2 ] || { echo "--from needs a step name or number" >&2; exit 2; }; FROM="$2"; shift 2 ;;
+    --from=*)   FROM="${1#--from=}"; shift ;;
+    --only)     [ $# -ge 2 ] || { echo "--only needs a step name or number" >&2; exit 2; }; ONLY="$2"; shift 2 ;;
+    --only=*)   ONLY="${1#--only=}"; shift ;;
+    --dry-run)  DRY_RUN=1; shift ;;
+    -h|--help)  usage; exit 0 ;;
+    *)          echo "unknown option $1 (see --help)" >&2; exit 2 ;;
+  esac
+done
+
+step_number() {
+  local i=1 s
+  for s in $STEPS; do
+    if [ "$1" = "$s" ] || [ "$1" = "$i" ]; then echo "$i"; return 0; fi
+    i=$((i + 1))
+  done
+  return 1
+}
+FROM_N=1
+if [ -n "$FROM" ]; then
+  FROM_N="$(step_number "$FROM")" || { echo "no step called '$FROM' (see --help)" >&2; exit 2; }
+fi
+ONLY_N=""
+if [ -n "$ONLY" ]; then
+  ONLY_N="$(step_number "$ONLY")" || { echo "no step called '$ONLY' (see --help)" >&2; exit 2; }
+fi
+
+SERVER_IP=""
+
+# ================================================================= 1 preflight
+
+step_preflight() {
+  step_header 1 preflight "Checking this Mac"
+  say "Making sure everything the later steps need is here. Nothing is changed."
+
+  have_cmd docker || fail "Docker is not installed." "Install Docker Desktop from docker.com, start it, wait for the whale icon to settle."
+  dk info info >/dev/null 2>&1 || fail "Docker Desktop is not running." "Open Docker Desktop and wait until it says it is running."
+  ok "Docker Desktop is running"
+
+  local t; for t in git ssh scp curl gzip gunzip awk sed openssl; do have_cmd "$t" || fail "'$t' is missing on this Mac." "Install the Xcode command line tools: xcode-select --install"; done
+
+  # --- the repo
+  git rev-parse --git-dir >/dev/null 2>&1 || fail "$ROOT is not a git repository." "Run this from the wss repo folder."
+  local dirty; dirty="$(git status --porcelain)"
+  if [ -n "$dirty" ]; then
+    say "Files with uncommitted changes:"; printf '%s\n' "$dirty" | sed 's/^/      /'
+    fail "the repo has uncommitted changes. A deploy builds from the last commit, so these would not ship (and must not ship by accident)." \
+         "commit or stash them (git stash), then re-run."
+  fi
+  local branch; branch="$(git rev-parse --abbrev-ref HEAD)"
+  git rev-parse --abbrev-ref '@{u}' >/dev/null 2>&1 || fail "branch $branch has no copy on GitHub yet." "git push -u origin $branch"
+  git fetch --quiet 2>/dev/null || warn "could not reach GitHub to compare (git fetch failed); using what this Mac last saw"
+  local ahead behind
+  ahead="$(git rev-list --count '@{u}..HEAD')"; behind="$(git rev-list --count 'HEAD..@{u}')"
+  [ "$behind" = 0 ] || fail "GitHub has $behind newer commit(s) on $branch that this Mac does not." "git pull, then re-run."
+  if [ "$ahead" != 0 ]; then
+    say "$ahead commit(s) on $branch are not on GitHub yet."
+    if [ "$DRY_RUN" = 1 ]; then plan "git push"; elif confirm "Push them now?"; then
+      git push --quiet || fail "git push failed." "Check your GitHub login (gh auth status), then re-run."
+    else fail "the commit to deploy is not on GitHub." "git push, then re-run."; fi
+  fi
+  case "$branch" in main|master) ;; *) warn "you are on branch '$branch', not main: production will run this branch's code." ;; esac
+  ok "repo is clean and $(git rev-parse --short HEAD) is on GitHub ($branch)"
+
+  # --- the secrets file
+  [ -f "$ENV_FILE" ] || fail "$ENV_FILE does not exist." "Restore it from your secrets backup (bin/backup-secrets made encrypted copies in ~/Documents/WSS-Backups)."
+  local m; m="$(file_mode "$ENV_FILE")"
+  case "$m" in
+    -rw-------*) ;;
+    *) fail "$ENV_FILE can be read by other users of this Mac (permissions $m)." "chmod 600 $ENV_FILE" ;;
+  esac
+  local errs
+  # shellcheck disable=SC1090
+  errs="$( ( set -a; . "$ENV_FILE" ) 2>&1 >/dev/null | sed -n 's/.*line \([0-9][0-9]*\).*/\1/p' | sort -un | tr '\n' ' ')"
+  [ -z "$errs" ] || fail "$ENV_FILE has a mistake on line(s) $errs(the line is not shown, it may hold a secret)." \
+                         "open it in a text editor; each line should look like: export NAME='value'"
+  # shellcheck disable=SC2086
+  local missing; missing="$(missing_vars $REQUIRED_VARS | tr '\n' ' ')"
+  [ -z "$missing" ] || fail "$ENV_FILE is missing values production cannot start without: $missing" \
+                            "add them (export NAME='value'), then re-run. docs/launch-checklist.md says where each comes from."
+  # Each required name must also be forwarded into the Kamal container.
+  local v notfwd=""
+  for v in $REQUIRED_VARS; do grep -qw "$v" bin/kamal-deploy || notfwd="$notfwd $v"; done
+  [ -z "$notfwd" ] || fail "bin/kamal-deploy does not forward:$notfwd" "add them to its 'for var in' list."
+  # shellcheck disable=SC2086
+  local rec; rec="$(missing_vars $RECOMMENDED_VARS | tr '\n' ' ')"
+  [ -z "$rec" ] || warn "not set (the site starts, but email, Google sign-in or error alerts will not work): $rec"
+  local kind; kind="$(with_env sh -c 'case "$STRIPE_SECRET_KEY" in sk_live_*|rk_live_*) echo live ;; sk_test_*|rk_test_*) echo test ;; *) echo unknown ;; esac')"
+  [ "$kind" = live ] || warn "STRIPE_SECRET_KEY is a $kind key, not a live one: real payments will not work."
+  ok "$ENV_FILE is private and has every required value (Stripe key: $kind)"
+
+  # --- SSH key
+  local key="" k
+  for k in id_ed25519 id_ecdsa id_rsa; do [ -f "$HOME/.ssh/$k" ] && { key="$k"; break; }; done
+  [ -n "$key" ] || fail "no SSH key in ~/.ssh (id_ed25519, id_ecdsa or id_rsa)." \
+                        "ssh-keygen -t ed25519   (press Enter at every question), then add ~/.ssh/id_ed25519.pub to the server (see docs/relaunch.md)"
+  ok "SSH key ~/.ssh/$key"
+
+  # --- gh (bin/kamal-deploy deploy checks CI with it; setup does not)
+  if have_cmd gh && ghc auth auth status >/dev/null 2>&1; then
+    ok "gh is installed and signed in"
+  else
+    warn "gh (the GitHub command line tool) is missing or not signed in. This relaunch does not need it, but every later 'bin/kamal-deploy deploy' does (it checks CI). Fix later: brew install gh && gh auth login"
+  fi
+}
+
+# ================================================================= 2 server
+
+valid_ip() {
+  local IFS=. a b c d
+  [[ "$1" =~ ^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$ ]] || return 1
+  # shellcheck disable=SC2086
+  set -- $1; a=$1; b=$2; c=$3; d=$4
+  [ "$a" -le 255 ] && [ "$b" -le 255 ] && [ "$c" -le 255 ] && [ "$d" -le 255 ]
+}
+
+# Server addresses in deploy.yml. Loopback is excluded: the db accessory's
+# "127.0.0.1:5432:5432" binding must never be rewritten (it keeps Postgres off
+# the internet).
+deploy_ips() { grep -oE '([0-9]{1,3}\.){3}[0-9]{1,3}' config/deploy.yml | grep -vE '^(127\.|0\.0\.0\.0$)' | sort -u; }
+
+# Finds the new server's IP: remembered, else the one already in deploy.yml
+# (if it is not the old server), else asks.
+resolve_ip() {
+  [ -z "$SERVER_IP" ] || return 0
+  local known; known="$(state_get ip)"
+  if [ -z "$known" ]; then
+    local in_yml; in_yml="$(deploy_ips | head -n 1)"
+    [ "$in_yml" = "$OLD_IP" ] || known="$in_yml"
+  fi
+  while :; do
+    ask SERVER_IP "The new server's IPv4 address (from the OVHcloud control panel or email)" "$known"
+    valid_ip "$SERVER_IP" && break
+    say "That is not an IPv4 address (four numbers with dots, like 51.81.12.34). Try again."
+  done
+  state_set ip "$SERVER_IP"
+}
+
+login_ok() { printf '%s\n' '# wss:login-check' 'echo wss-login-ok' | remote "$1-check" "$1" 2>/dev/null | grep -q wss-login-ok; }
+
+step_server() {
+  step_header 2 server "Getting into the new server"
+  say "Checking that this Mac can log in to the server and that it is big enough,"
+  say "then adding swap space and a firewall."
+  resolve_ip
+
+  if [ "$SERVER_IP" = "$OLD_IP" ]; then
+    warn "$SERVER_IP was the old server's address. Its saved fingerprint in ~/.ssh/known_hosts belongs to the dead machine and would block the login."
+    if [ "$DRY_RUN" = 1 ]; then plan "ssh-keygen -R $SERVER_IP"
+    elif confirm "Remove the old fingerprint for $SERVER_IP from ~/.ssh/known_hosts?"; then
+      if [ "$MODE" = test ]; then log_call "ssh-keygen -R $SERVER_IP"; else ssh-keygen -R "$SERVER_IP" >/dev/null 2>&1 || true; fi
+      ok "old fingerprint removed"
+    fi
+  fi
+
+  if login_ok root; then
+    ok "logged in as root"
+  elif login_ok ubuntu; then
+    say "The server lets you in as 'ubuntu' (OVHcloud's default) but not as 'root'."
+    say "Kamal logs in as root, so the next action copies your SSH key into root's"
+    say "account (/root/.ssh/authorized_keys). Password logins stay off."
+    if [ "$DRY_RUN" = 1 ]; then plan "copy ubuntu's authorized_keys to root and allow root key login"; return 0; fi
+    confirm "Enable root login with your SSH key?" || fail "root login is needed by Kamal." "re-run and answer y, or set it up by hand (docs/relaunch.md)."
+    remote enable-root ubuntu <<'EOF' | grep -q wss-root-enabled || fail "could not set up root login (does 'ubuntu' have sudo without a password?)." "ssh ubuntu@$SERVER_IP and run: sudo -n true   (it must print nothing)"
+# wss:enable-root
+set -e
+sudo -n true
+sudo install -d -m 700 -o root -g root /root/.ssh
+# Replace root's file outright: OVH's cloud-init puts a "please log in as
+# ubuntu" forced command there, which would swallow every root command.
+sudo install -m 600 -o root -g root "$HOME/.ssh/authorized_keys" /root/.ssh/authorized_keys
+if sudo sshd -T 2>/dev/null | grep -qi '^permitrootlogin no'; then
+  echo 'PermitRootLogin prohibit-password' | sudo tee /etc/ssh/sshd_config.d/60-wss-root.conf >/dev/null
+  sudo systemctl reload ssh 2>/dev/null || sudo systemctl reload sshd
+fi
+echo wss-root-enabled
+EOF
+    login_ok root || fail "root login still does not work after setting it up." "ssh -v root@$SERVER_IP shows why; docs/relaunch.md has the manual steps."
+    ok "root login works"
+  else
+    fail "this Mac cannot log in to $SERVER_IP as root or as ubuntu." \
+         "check the IP, then copy your key once with the password OVHcloud emailed you:  ssh-copy-id ubuntu@$SERVER_IP   then re-run."
+  fi
+
+  local facts
+  facts="$(remote facts root <<'EOF'
+# wss:facts
+. /etc/os-release; echo "os=$ID $VERSION_ID"
+awk '/^MemTotal/ { print "mem_kb=" $2 }' /proc/meminfo
+df -Pk / | awk 'NR == 2 { print "disk_kb=" $4 }'
+echo "swaps=$(swapon --noheadings --show=NAME 2>/dev/null | wc -l | tr -d ' ')"
+if command -v ufw >/dev/null 2>&1; then
+  echo ufw=yes
+  if ufw status | grep -q '^Status: active'; then echo ufw_active=yes; else echo ufw_active=no; fi
+  echo "ufw_rules=$(ufw status | awk '$2 == "ALLOW" { sub("/tcp", "", $1); print $1 }' | sort -un | tr '\n' ' ')"
+else
+  echo ufw=no
+fi
+EOF
+)" || fail "could not read the server's details over SSH." "ssh root@$SERVER_IP works by hand? Then re-run."
+  fact() { printf '%s\n' "$facts" | sed -n "s/^$1=//p" | head -n 1; }
+  local os mem disk swaps
+  os="$(fact os)"; mem="$(fact mem_kb)"; disk="$(fact disk_kb)"; swaps="$(fact swaps)"
+  [ "$os" = "ubuntu 24.04" ] && ok "Ubuntu 24.04" || warn "the server runs '$os', not Ubuntu 24.04; Kamal should still work."
+  [ "${mem:-0}" -ge 3500000 ] || fail "the server has only $(human_size $(( ${mem:-0} * 1024 ))) of memory; deck rendering needs at least 4 GB." "choose a bigger plan."
+  ok "memory $(human_size $(( mem * 1024 )))"
+  [ "${disk:-0}" -ge 15000000 ] || fail "only $(human_size $(( ${disk:-0} * 1024 ))) of disk is free; at least 15 GB is needed." "choose a plan with more disk."
+  ok "free disk $(human_size $(( disk * 1024 )))"
+
+  # Swap: a safety margin for LibreOffice deck renders. Nominal "8 GB" boxes
+  # report a little under 8,388,608 kB, so this adds swap to anything 8 GB or less.
+  if [ "${swaps:-0}" -gt 0 ]; then
+    ok "swap is on"
+  elif [ "${mem:-0}" -gt 8400000 ]; then
+    ok "no swap, not needed with this much memory"
+  elif [ "$DRY_RUN" = 1 ]; then
+    plan "create a 2 GB /swapfile and turn it on"
+  else
+    say "Adding 2 GB of swap (spare memory on disk, used only if deck rendering needs it)."
+    remote swap root <<'EOF' | grep -q wss-swap-ok || fail "could not add swap." "ssh root@$SERVER_IP 'swapon --show' to see why; then re-run (or skip: --from config)."
+# wss:swap
+set -e
+if [ ! -f /swapfile ]; then fallocate -l 2G /swapfile || dd if=/dev/zero of=/swapfile bs=1M count=2048; fi
+chmod 600 /swapfile
+swapon --show=NAME --noheadings | grep -q '^/swapfile$' || { mkswap /swapfile >/dev/null; swapon /swapfile; }
+grep -q '^/swapfile ' /etc/fstab || echo '/swapfile none swap sw 0 0' >> /etc/fstab
+echo wss-swap-ok
+EOF
+    ok "2 GB swap added"
+  fi
+
+  # Firewall: SSH, HTTP and HTTPS only. Postgres is bound to 127.0.0.1 by
+  # deploy.yml, so it is never reachable from outside either way.
+  if [ "$(fact ufw)" != yes ]; then
+    warn "ufw is not installed, so no firewall was set up. OVHcloud's network firewall (control panel) can do the same job."
+  else
+    local rules; rules=" $(fact ufw_rules) "
+    if [ "$(fact ufw_active)" = yes ] && [[ "$rules" == *" 22 "* ]] && [[ "$rules" == *" 80 "* ]] && [[ "$rules" == *" 443 "* ]]; then
+      ok "firewall on: ports 22, 80, 443 open"
+    elif [ "$DRY_RUN" = 1 ]; then
+      plan "ufw allow 22, 80, 443 and turn the firewall on"
+    else
+      say "Turning on the firewall with only ports 22 (SSH), 80 and 443 (the website) open."
+      remote ufw root <<'EOF' | grep -q wss-ufw-ok || fail "could not set up the firewall." "ssh root@$SERVER_IP 'ufw status' to see why."
+# wss:ufw
+set -e
+ufw allow 22/tcp >/dev/null
+ufw allow 80/tcp >/dev/null
+ufw allow 443/tcp >/dev/null
+ufw --force enable >/dev/null
+echo wss-ufw-ok
+EOF
+      login_ok root || fail "SSH stopped working after turning on the firewall." "use the OVHcloud web console (KVM) to run: ufw allow 22/tcp"
+      ok "firewall on: ports 22, 80, 443 open"
+    fi
+  fi
+}
+
+# ================================================================= 3 config
+
+step_config() {
+  step_header 3 config "Pointing the deploy config at the new server"
+  say "config/deploy.yml names the server three times (web, jobs, database)."
+  say "Kamal reads it from this folder, so it must hold the new address."
+  resolve_ip
+
+  local ips others
+  ips="$(deploy_ips | tr '\n' ' ')"
+  others="$(deploy_ips | grep -vx "$SERVER_IP" | tr '\n' ' ')"
+  local count; count="$(grep -cF "$SERVER_IP" config/deploy.yml || true)"
+  if [ -z "$others" ] && [ "${count:-0}" -ge 3 ] && git diff --quiet HEAD -- config/deploy.yml; then
+    ok "config/deploy.yml already uses $SERVER_IP and is committed"
+    return 0
+  fi
+  if [ "$DRY_RUN" = 1 ]; then plan "replace $ips with $SERVER_IP in config/deploy.yml, commit and push"; return 0; fi
+
+  local tmp="$WORK/deploy.yml" ip expr=""
+  for ip in $others; do expr="$expr -e s/$(printf '%s' "$ip" | sed 's/\./\\./g')/$SERVER_IP/g"; done
+  # shellcheck disable=SC2086
+  sed $expr -e 's/^# Kamal production config\. Deploys to the Hetzner CPX box;/# Kamal production config. Deploys to one VPS (the IP under servers:);/' \
+      config/deploy.yml > "$tmp" || fail "could not edit config/deploy.yml" ""
+  cat "$tmp" > config/deploy.yml
+  count="$(grep -cF "$SERVER_IP" config/deploy.yml || true)"
+  grep -qF '"127.0.0.1:5432:5432"' config/deploy.yml || { git checkout -- config/deploy.yml; fail "the database port binding in config/deploy.yml changed; refusing (Postgres must stay on 127.0.0.1)." "check config/deploy.yml by hand."; }
+  [ "${count:-0}" -ge 3 ] || { git checkout -- config/deploy.yml; fail "expected the IP in at least 3 places in config/deploy.yml, found ${count:-0}." "edit it by hand: servers.web, servers.job.hosts and accessories.db.host."; }
+
+  say "The change:"
+  git --no-pager diff --color=never -- config/deploy.yml | sed 's/^/      /'
+  if ! confirm "Commit this change?"; then
+    git checkout -- config/deploy.yml
+    fail "the change was not kept." "re-run when ready."
+  fi
+  git commit --quiet -m "Deploy to the new server $SERVER_IP" -- config/deploy.yml || fail "git commit failed." "see the message above."
+  ok "committed $(git rev-parse --short HEAD)"
+  if confirm "Push it to GitHub? (keeps GitHub matching what runs in production)"; then
+    git push --quiet || fail "git push failed." "git push by hand, then re-run with --from masterkey."
+    ok "pushed"
+  else
+    warn "not pushed. The relaunch still works (Kamal builds from this Mac), but push before any later 'bin/kamal-deploy deploy'."
+  fi
+}
+
+# ================================================================= 4 masterkey
+
+# ActiveSupport alone, no Rails boot: exactly what Rails.application.credentials
+# does with config/master.key. Prints one status word.
+CRED_CHECK_RB='require "active_support"; require "active_support/encrypted_configuration"
+c = ActiveSupport::EncryptedConfiguration.new(config_path: "config/credentials.yml.enc", key_path: "config/master.key",
+      env_key: "WSS_RELAUNCH_NO_SUCH_KEY", raise_if_missing_key: true)
+status = begin
+  c.config[:secret_key_base].to_s.empty? ? "no-secret-key-base" : "ok"
+rescue ActiveSupport::EncryptedFile::MissingKeyError then "no-key"
+rescue ActiveSupport::EncryptedFile::MissingContentError then "no-file"
+rescue StandardError then "wrong-key"
+end
+puts "wss-cred #{status}"'
+
+CRED_GEN_RB='require "active_support"; require "active_support/encrypted_configuration"; require "securerandom"; require "time"
+key = ActiveSupport::EncryptedFile.generate_key
+File.write("config/master.key", key)
+File.chmod(0600, "config/master.key")
+File.delete("config/credentials.yml.enc") if File.exist?("config/credentials.yml.enc")
+c = ActiveSupport::EncryptedConfiguration.new(config_path: "config/credentials.yml.enc", key_path: "config/master.key",
+      env_key: "WSS_RELAUNCH_NO_SUCH_KEY", raise_if_missing_key: true)
+c.write(<<~YAML)
+  # Regenerated by bin/relaunch-production on #{Time.now.utc.to_date.iso8601}: the previous
+  # master.key was lost. Only secret_key_base lives here; every other secret is an
+  # environment variable (config/deploy.yml env.secret).
+  secret_key_base: #{SecureRandom.hex(64)}
+YAML
+puts "wss-cred generated"'
+
+cred_status() {
+  dk ruby compose run --rm --no-deps -T web bundle exec ruby -e "$CRED_CHECK_RB" 2>/dev/null | sed -n 's/^wss-cred //p' | tail -n 1
+}
+
+step_masterkey() {
+  step_header 4 masterkey "Rails master key"
+  say "The app's credentials file holds one secret (secret_key_base, which signs"
+  say "sessions and links). Checking that config/master.key can open it."
+
+  git check-ignore -q config/master.key || fail "config/master.key is NOT git-ignored; it must never be committed." "add /config/master.key to .gitignore."
+  say "(This runs Ruby in the Docker dev stack; the first time it may build for a few minutes.)"
+  local s; s="$(cred_status)"
+  case "$s" in
+    ok) ok "config/master.key opens config/credentials.yml.enc"; return 0 ;;
+    "") fail "could not run Ruby in the Docker dev stack to check the key." "./wss up (or: docker compose build web), then re-run. The dev stack needs the .env file in this folder." ;;
+  esac
+  case "$s" in
+    no-key)  say "config/master.key is missing (it was lost with the old setup)." ;;
+    no-file) say "config/credentials.yml.enc is missing." ;;
+    *)       say "config/master.key does not open config/credentials.yml.enc ($s)." ;;
+  esac
+  cat <<EOF
+
+  Both files will be made new. What that resets, and nothing else:
+    - everyone is signed out once (sessions are signed with secret_key_base)
+    - links already sent by email (sign-in, RSVP, unsubscribe) stop working
+  Data, uploads, payments and the database password are not affected; those
+  secrets live in $ENV_FILE.
+
+EOF
+  if [ "$DRY_RUN" = 1 ]; then plan "back up the old file, generate a new master.key + credentials.yml.enc, commit the .enc"; return 0; fi
+  confirm "Generate a new master key and credentials file?" || fail "the app cannot start without a working master key." "re-run and answer y."
+
+  local keep; keep="$(mktemp -d "${TMPDIR:-/tmp}/wss-old-credentials.XXXXXX")"
+  [ ! -f config/credentials.yml.enc ] || cp config/credentials.yml.enc "$keep/"
+  [ ! -f config/master.key ] || cp config/master.key "$keep/"
+  say "old files kept in $keep"
+
+  local out; out="$(dk ruby compose run --rm --no-deps -T web bundle exec ruby -e "$CRED_GEN_RB" 2>&1)"
+  printf '%s\n' "$out" | grep -q 'wss-cred generated' || { printf '%s\n' "$out" | tail -n 10 | mask; fail "generating the credentials failed." "see the output above; the old files are in $keep."; }
+  [ "$(cred_status)" = ok ] || fail "the new credentials file does not open with the new key." "re-run; the old files are in $keep."
+  ok "new config/master.key opens the new credentials file and holds secret_key_base"
+  git check-ignore -q config/master.key || fail "config/master.key is not git-ignored." ""
+
+  git add config/credentials.yml.enc
+  git commit --quiet -m "Regenerate Rails credentials (the old master.key was lost)" -- config/credentials.yml.enc \
+    || fail "git commit failed." "see the message above."
+  ok "committed config/credentials.yml.enc (the key itself is never committed)"
+  if confirm "Push it to GitHub?"; then git push --quiet && ok "pushed" || warn "push failed; push by hand later."; fi
+
+  if [ -x bin/backup-secrets ] && have_cmd security && have_cmd openssl; then
+    say "bin/backup-secrets makes an encrypted copy of master.key and $ENV_FILE in ~/Documents/WSS-Backups."
+    if confirm "Run it now?"; then
+      if [ "$MODE" = test ]; then log_call "bin/backup-secrets"; else bin/backup-secrets || warn "bin/backup-secrets failed; run it by hand."; fi
+    fi
+  fi
+  warn "ALSO put config/master.key in your password manager now (open the file in TextEdit, copy the one line). Losing it again means doing this step again."
+}
+
+# ================================================================= 5 database
+
+wait_db_ready() {
+  local i=0 r
+  while [ "$i" -lt 30 ]; do
+    r="$(rsh db-ready "docker exec $DB_CONTAINER pg_isready -q -U wss -d $DB_NAME && echo ready" 2>/dev/null || true)"
+    [ "$r" = ready ] && return 0
+    nap 4; i=$((i + 1))
+  done
+  return 1
+}
+
+# Same filter as bin/restore-production-snapshot: outside COPY data, drop
+# "ALTER ... OWNER TO" (everything is created by the wss role anyway) and the
+# \restrict meta-commands newer pg_dump adds. Ownership count on stderr.
+filter_dump() {
+  awk '
+    in_copy { print; if ($0 == "\\.") in_copy = 0; next }
+    /^COPY .* FROM stdin;$/ { in_copy = 1; print; next }
+    /^ALTER .* OWNER TO / { owners++; next }
+    /^\\(un)?restrict / { next }
+    { print }
+    END { print owners + 0 > "/dev/stderr" }
+  '
+}
+
+pick_dump() {
+  local def="" d IFS=:
+  for d in $DEFAULT_BACKUP_DIRS; do [ -d "$d/db-backups" ] && { def="$d"; break; }; done
+  unset IFS
+  local dir
+  while :; do
+    ask dir "Folder with the downloaded R2 bucket (it contains db-backups/)" "$def"
+    dir="${dir/#\~/$HOME}"
+    [ -d "$dir/db-backups" ] && break
+    say "No db-backups/ folder in '$dir'. Drag the folder from Finder into this window to paste its path."
+  done
+  local dumps=() f
+  while IFS= read -r f; do dumps+=("$f"); done < <(find "$dir/db-backups" -maxdepth 1 -type f -name 'wss_*.sql.gz' | sort -r)
+  [ "${#dumps[@]}" -gt 0 ] || fail "no wss_*.sql.gz dumps in $dir/db-backups" "check the folder is the downloaded bucket."
+  say "Nightly dumps, newest first:"
+  local i=0
+  while [ "$i" -lt "${#dumps[@]}" ] && [ "$i" -lt 14 ]; do
+    printf '      %2d) %s  (%s)\n' $((i + 1)) "$(basename "${dumps[$i]}")" "$(human_size "$(file_size "${dumps[$i]}")")"
+    i=$((i + 1))
+  done
+  local n
+  while :; do
+    ask n "Which one? (1 is the newest, taken just before the server died)" 1
+    [[ "$n" =~ ^[0-9]+$ ]] && [ "$n" -ge 1 ] && [ "$n" -le "${#dumps[@]}" ] && break
+    say "Type a number from the list."
+  done
+  DUMP="${dumps[$((n - 1))]}"
+}
+
+count_rows() {
+  db_sql counts "$DB_NAME" "SELECT 'users', count(*) FROM users UNION ALL SELECT 'presentations', count(*) FROM presentations
+    UNION ALL SELECT 'user_presentations', count(*) FROM user_presentations UNION ALL SELECT 'credit_transactions', count(*) FROM credit_transactions"
+}
+
+step_database() {
+  step_header 5 database "Database first: start Postgres and load the backup"
+  say "Starting only the database on the new server, then loading the last nightly"
+  say "backup into it, before the app exists (so the app never starts on an empty one)."
+  resolve_ip
+
+  # Docker on the server (kamal setup would do this too; the database needs it first).
+  if [ "$(rsh docker-present 'command -v docker >/dev/null && echo yes' 2>/dev/null)" != yes ]; then
+    if [ "$DRY_RUN" = 1 ]; then plan "kamal server bootstrap (installs Docker on the server)"; plan "kamal accessory boot db"; plan "load a dump"; return 0; fi
+    say "Installing Docker on the server (kamal server bootstrap, a minute or two)."
+    kamal_run bootstrap server bootstrap || fail "installing Docker on the server failed." "read Kamal's message above; then re-run with --from database."
+  fi
+  ok "Docker is installed on the server"
+
+  if [ "$(rsh db-running "docker ps --filter name=^${DB_CONTAINER}\$ --filter status=running --format running" 2>/dev/null)" != running ]; then
+    if [ "$DRY_RUN" = 1 ]; then plan "kamal accessory boot db"; plan "load a dump"; return 0; fi
+    say "Starting Postgres (kamal accessory boot db)."
+    kamal_run accessory-boot accessory boot db || fail "starting Postgres failed." "read Kamal's message above; then re-run with --from database."
+  fi
+  wait_db_ready || fail "Postgres did not become ready within 2 minutes." "bin/kamal-deploy accessory logs db   shows why."
+  ok "Postgres is running ($DB_CONTAINER)"
+
+  local tables; tables="$(db_sql tables "$DB_NAME" "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'")" \
+    || fail "could not query $DB_NAME." "bin/kamal-deploy accessory logs db"
+  local replacing=0
+  if [ "${tables:-0}" -gt 0 ]; then
+    say "The production database already holds data:"
+    count_rows 2>/dev/null | while IFS="$(printf '\t')" read -r t n; do printf '      %-20s %s\n' "$t" "$n"; done
+    say "Keeping it is right unless an earlier load went wrong. Replacing it DELETES"
+    say "everything in it, including anything members did since it was loaded."
+    if [ "$DRY_RUN" = 1 ]; then plan "keep it (or replace it only after the typed phrase)"; return 0; fi
+    if ! confirm_phrase "$OVERWRITE_PHRASE"; then ok "kept the existing database"; return 0; fi
+    replacing=1
+  fi
+
+  [ "$DRY_RUN" = 0 ] || { plan "pick a dump, copy it to the server and load it into $DB_NAME"; return 0; }
+  pick_dump
+  gzip -t "$DUMP" 2>/dev/null || fail "$(basename "$DUMP") is damaged (not valid gzip)." "pick an older dump, or download it again."
+  gunzip -c "$DUMP" 2>/dev/null | head -n 40 | grep -q 'PostgreSQL database dump' || fail "$(basename "$DUMP") is not a pg_dump file." "pick another dump."
+  ok "$(basename "$DUMP") is a valid dump ($(human_size "$(file_size "$DUMP")"))"
+
+  local filtered; filtered="$WORK/relaunch-$(basename "$DUMP")"
+  gunzip -c "$DUMP" | filter_dump 2>"$WORK/owners" | gzip > "$filtered" || fail "preparing the dump failed." ""
+  say "prepared: skipped $(cat "$WORK/owners") ownership line(s) (the wss role owns everything)"
+
+  local remote_file; remote_file="$REMOTE_DIR/$(basename "$filtered")"
+  rsh mkdir "mkdir -p $REMOTE_DIR && chmod 700 $REMOTE_DIR" || fail "could not make $REMOTE_DIR on the server." ""
+  say "copying to the server..."
+  WSS_STUB_LAST_UPLOAD_SIZE="$(file_size "$filtered")"; export WSS_STUB_LAST_UPLOAD_SIZE
+  upload dump "$filtered" "$remote_file" || fail "copying the dump to the server failed." "check the connection, re-run with --from database."
+  [ "$(rsh remote-size "wc -c < '$remote_file'" | tr -d ' \r')" = "$(file_size "$filtered")" ] || fail "the copy on the server has the wrong size." "re-run with --from database."
+  ok "copied to the server"
+
+  if [ "$replacing" = 1 ]; then
+    say "stopping the app while the database is replaced"
+    kamal_run app-stop app stop >/dev/null 2>&1 || true
+    local target; target="$(real_db_name "$DB_NAME")"
+    db_sql recreate postgres "DROP DATABASE IF EXISTS $target WITH (FORCE); CREATE DATABASE $target" >/dev/null \
+      || fail "could not empty $DB_NAME." ""
+  fi
+
+  say "loading (one transaction: it either all goes in or nothing does)..."
+  local log="$WORK/load.log"
+  if ! db_load "$remote_file" > "$log" 2>&1 || grep -q 'ERROR' "$log"; then
+    tail -n 30 "$log" | mask | sed 's/^/      /'
+    fail "loading the dump failed; $DB_NAME was left empty." "the error is above. An older dump may load: re-run with --from database."
+  fi
+  rsh cleanup "rm -f '$remote_file'" >/dev/null 2>&1 || true
+
+  tables="$(db_sql tables "$DB_NAME" "SELECT count(*) FROM information_schema.tables WHERE table_schema = 'public'")"
+  [ "${tables:-0}" -ge 20 ] || fail "only ${tables:-0} tables after loading; the dump looks incomplete." "pick another dump: --from database (it will ask for the phrase)."
+  local counts; counts="$(count_rows)" || fail "could not count rows after loading." ""
+  say "loaded $tables tables:"
+  printf '%s\n' "$counts" | while IFS="$(printf '\t')" read -r t n; do printf '      %-20s %s\n' "$t" "$n"; done
+  local users; users="$(printf '%s\n' "$counts" | awk -F '\t' '$1 == "users" { print $2 }')"
+  [ "${users:-0}" -gt 0 ] || fail "the users table is empty after loading." "pick another dump."
+  local drift; drift="$(db_sql drift "$DB_NAME" "SELECT count(*) FROM users u WHERE u.credits <> COALESCE((SELECT sum(c.amount) FROM credit_transactions c WHERE c.user_id = u.id), 0)")"
+  [ "${drift:-0}" = 0 ] && ok "every credit balance matches the ledger" || warn "$drift user(s) have a credit balance that differs from the ledger."
+  ok "database restored from $(basename "$DUMP")"
+}
+
+# ================================================================= 6 deploy
+
+app_up() {
+  # Asks the app itself, inside its container on the server: works before DNS.
+  local c; c="$(rsh app-up "c=\$(docker ps -q --filter label=service=wss --filter label=role=web --filter status=running | head -n 1); [ -n \"\$c\" ] && docker exec \$c curl -s -o /dev/null -w '%{http_code}' --max-time 10 http://localhost:80/up" 2>/dev/null | tr -d '\r')"
+  [ "$c" = 200 ]
+}
+
+show_app_logs() {
+  say "Last 60 lines of the app's log (secrets masked):"
+  kamal_run logs app logs --lines 60 </dev/null 2>&1 | tr -d '\r' | mask | tail -n 80 | sed 's/^/      /'
+}
+
+step_deploy() {
+  step_header 6 deploy "First deploy (kamal setup)"
+  say "Building the app, sending it to the server and starting it with HTTPS."
+  say "Database migrations run by themselves on the first boot."
+  resolve_ip
+  if app_up; then ok "the app is already running on the server and answers /up"; return 0; fi
+  if [ "$DRY_RUN" = 1 ]; then plan "bin/kamal-deploy setup, then wait for /up"; return 0; fi
+
+  if [ -n "$(missing_vars TURNSTILE_SITE_KEY TURNSTILE_SECRET_KEY)" ]; then
+    say "(The Turnstile keys are not set yet; step 8 adds them.)"
+  fi
+  say "This takes 10 to 25 minutes the first time (it builds for Intel servers on a Mac)."
+  say "Kamal's own output follows."
+  echo
+  if ! kamal_run setup setup; then
+    echo
+    show_app_logs
+    fail "kamal setup failed." "the reason is usually in the first red lines above. Fix it and re-run with --from deploy (safe to repeat)."
+  fi
+
+  say "waiting for the app to answer /up on the server..."
+  local i=0
+  while [ "$i" -lt 30 ]; do app_up && break; nap 10; i=$((i + 1)); done
+  if ! app_up; then
+    show_app_logs
+    fail "the app did not answer /up within 5 minutes." "the log above says why (a missing variable or a failed migration, usually). Fix it and re-run with --from deploy."
+  fi
+  ok "the app answers /up on $SERVER_IP"
+  local code; code="$(web proxy -s -o /dev/null -w '%{http_code}' --max-time 15 -H "Host: $DOMAIN" "http://$SERVER_IP/up" 2>/dev/null || true)"
+  case "$code" in
+    200|301|308) ok "kamal-proxy routes $DOMAIN to it (http answered $code)" ;;
+    *) warn "http://$SERVER_IP/ with Host $DOMAIN answered '${code:-nothing}'. If step 9 fails, check ports 80/443 are open (step 2)." ;;
+  esac
+}
+
+# ================================================================= 7 purge
+
+purge_report() { kamal_run purge-dry app exec --roles=web --reuse "bin/rails users:purge_unused" </dev/null 2>&1 | tr -d '\r'; }
+
+step_purge() {
+  step_header 7 purge "Removing the junk sign-ups"
+  say "A script created accounts through the sign-up form in August to October."
+  say "users:purge_unused finds accounts nobody ever used. A dry run first."
+  resolve_ip
+  local out n
+  out="$(purge_report)"
+  n="$(printf '%s\n' "$out" | sed -n 's/^\([0-9][0-9]*\) unused accounts match.*/\1/p' | head -n 1)"
+  [ -n "$n" ] || { printf '%s\n' "$out" | tail -n 20 | mask | sed 's/^/      /'; fail "the dry run did not report a count." "see the output above."; }
+  if [ "$n" = 0 ]; then ok "no unused accounts left"; return 0; fi
+
+  say "$n unused account(s). Created per day:"
+  printf '%s\n' "$out" | grep -E '^  20[0-9]{2}-[0-9]{2}-[0-9]{2} +[0-9]+$' | sed 's/^/    /'
+  local first last
+  first="$(printf '%s\n' "$out" | grep -oE '^  20[0-9]{2}-[0-9]{2}-[0-9]{2}' | head -n 1 | tr -d ' ')"
+  last="$(printf '%s\n' "$out" | grep -oE '^  20[0-9]{2}-[0-9]{2}-[0-9]{2}' | tail -n 1 | tr -d ' ')"
+  local odd=0
+  [ "$n" -ge $((PURGE_EXPECTED / 2)) ] && [ "$n" -le $((PURGE_EXPECTED * 2)) ] || odd=1
+  [[ "$first" > "2026-07-31" ]] && [[ "$last" < "2026-11-01" ]] || odd=1
+  if [ "$odd" = 1 ]; then
+    warn "expected about $PURGE_EXPECTED accounts created 2026-08-03 to 2026-10-14; found $n created $first to $last."
+    warn "That is different enough that I recommend NOT deleting until someone has looked at why."
+  else
+    say "That matches what was expected (about $PURGE_EXPECTED, 2026-08-03 to 2026-10-14)."
+  fi
+  if [ "$DRY_RUN" = 1 ]; then plan "delete the $n accounts after the typed phrase"; return 0; fi
+  say "Deleting cannot be undone (the nightly backup still has them)."
+  if ! confirm_phrase "DELETE $n ACCOUNTS"; then
+    warn "nothing deleted. Run again with --from purge when ready."
+    return 0
+  fi
+  out="$(kamal_run purge app exec --roles=web --reuse "env CONFIRM=1 bin/rails users:purge_unused" </dev/null 2>&1 | tr -d '\r')"
+  printf '%s\n' "$out" | grep -E '^(Deleted|Skipped) ' | sed 's/^/      /'
+  printf '%s\n' "$out" | grep -qE '^Deleted [0-9]+ unused accounts' || fail "the purge did not report finishing." "bin/kamal-deploy logs | grep UnusedAccounts"
+  n="$(purge_report | sed -n 's/^\([0-9][0-9]*\) unused accounts match.*/\1/p' | head -n 1)"
+  ok "purge done; ${n:-?} unused account(s) remain"
+}
+
+# ================================================================= 8 turnstile
+
+turnstile_on() { app_ruby turnstile 'puts "wss-turnstile #{Turnstile.enabled? ? "on" : "off"}"' 2>/dev/null | grep -q 'wss-turnstile on'; }
+
+step_turnstile() {
+  step_header 8 turnstile "Bot check on sign-up (Cloudflare Turnstile)"
+  say "Turnstile is the 'are you human' check on the sign-up forms; it is what"
+  say "stops the junk sign-ups from coming back."
+  resolve_ip
+  local missing; missing="$(missing_vars TURNSTILE_SITE_KEY TURNSTILE_SECRET_KEY)"
+  if [ -z "$missing" ] && turnstile_on; then ok "Turnstile is on"; return 0; fi
+
+  if [ -n "$missing" ]; then
+    cat <<EOF
+
+  In Cloudflare (the page opens now):
+    1. Turnstile (left menu) -> Add widget
+    2. Widget name: WSS sign-up.  Hostname: $DOMAIN  (press Add)
+    3. Widget mode: Managed.  Leave the rest, press Create
+    4. The next page shows a Site Key and a Secret Key: copy them one by one below
+
+EOF
+    if [ "$DRY_RUN" = 1 ]; then plan "ask for the two keys, save them to $ENV_FILE, reboot the app"; return 0; fi
+    if ! confirm "Set it up now? (answer n to skip for now)"; then
+      warn "SKIPPED: sign-up has NO human check until this is done. Run later: bin/relaunch-production --from turnstile"
+      state_set turnstile skipped
+      return 0
+    fi
+    open_url "https://dash.cloudflare.com/?to=/:account/turnstile"
+    local site secret
+    while :; do
+      ask_secret site "Site Key"
+      [[ "$site" =~ ^[A-Za-z0-9_-]{10,}$ ]] && break
+      say "That does not look like a Site Key (letters, digits, - and _, usually starting 0x). Copy it again."
+    done
+    while :; do
+      ask_secret secret "Secret Key"
+      [[ "$secret" =~ ^[A-Za-z0-9_-]{10,}$ ]] && [ "$secret" != "$site" ] && break
+      say "That does not look like the Secret Key (it differs from the Site Key). Copy it again."
+    done
+    env_upsert TURNSTILE_SITE_KEY "$site" && env_upsert TURNSTILE_SECRET_KEY "$secret" || fail "could not write $ENV_FILE." ""
+    site=""; secret=""
+    [ -z "$(missing_vars TURNSTILE_SITE_KEY TURNSTILE_SECRET_KEY)" ] || fail "the keys did not land in $ENV_FILE." "add them by hand: export TURNSTILE_SITE_KEY='...' and TURNSTILE_SECRET_KEY='...'"
+    ok "both keys saved in $ENV_FILE (still private: $(file_mode "$ENV_FILE"))"
+  fi
+  [ "$DRY_RUN" = 0 ] || { plan "kamal app boot (the app reads the new keys)"; return 0; }
+
+  # Kamal 2 uploads the secrets every time it boots the app; `app boot`
+  # restarts the current image with them (no rebuild, no CI gate).
+  say "Restarting the app with the new keys (kamal app boot, about a minute)."
+  kamal_run app-boot app boot || fail "kamal app boot failed." "see Kamal's output above; re-run with --from turnstile."
+  local i=0; while [ "$i" -lt 12 ] && ! app_up; do nap 5; i=$((i + 1)); done
+  turnstile_on || fail "the app still reports Turnstile off." "check both names in $ENV_FILE are spelled exactly TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY, then --from turnstile."
+  state_set turnstile on
+  ok "Turnstile is on"
+}
+
+# ================================================================= 9 dns
+
+site_ok() {
+  [ "$(web dns-up -s -o /dev/null -w '%{http_code}' --max-time 15 "https://$DOMAIN/up" 2>/dev/null)" = 200 ] &&
+  [ "$(web dns-home -s -o /dev/null -w '%{http_code}' --max-time 20 "https://$DOMAIN/" 2>/dev/null)" = 200 ]
+}
+
+step_dns() {
+  step_header 9 dns "Pointing the domain at the new server"
+  say "Cloudflare still sends visitors to the old, dead server. Two records change."
+  resolve_ip
+  if site_ok; then ok "https://$DOMAIN answers 200 (the old server is gone, so this is the new one)"; check_cert; return 0; fi
+  cat <<EOF
+
+  In Cloudflare (the page opens now): choose $DOMAIN, then DNS -> Records.
+    1. The A record named $DOMAIN (or @): Edit -> IPv4 address $SERVER_IP,
+       Proxy status Proxied (orange cloud) -> Save
+    2. The A record named www: the same, $SERVER_IP, Proxied -> Save
+       (if www is a CNAME pointing at $DOMAIN, leave it as it is)
+    3. SSL/TLS -> Overview: the mode must say Full (not Flexible)
+
+  This makes the site public on the new server.
+
+EOF
+  if [ "$DRY_RUN" = 1 ]; then plan "wait for https://$DOMAIN/up to answer 200"; return 0; fi
+  open_url "https://dash.cloudflare.com/"
+  pause "Press Enter once both records are saved."
+
+  local waited=0
+  while :; do
+    if site_ok; then break; fi
+    if [ "$waited" -ge 600 ]; then
+      warn "still not answering after 10 minutes."
+      if confirm "Keep waiting another 10 minutes?"; then waited=0; continue; fi
+      fail "https://$DOMAIN does not answer yet." "check the two records say $SERVER_IP and Proxied, and SSL mode is Full. 'bin/kamal-deploy proxy logs' shows certificate errors. Then --from dns."
+    fi
+    printf '  ...waiting for https://%s (%ss)\r' "$DOMAIN" "$waited"
+    nap 15; waited=$((waited + 15))
+  done
+  echo
+  ok "https://$DOMAIN/up and the home page answer 200"
+  check_cert
+}
+
+check_cert() {
+  # curl without -k already refused an invalid certificate; this prints dates.
+  if [ "$MODE" = test ]; then log_call "openssl cert $DOMAIN"; return 0; fi
+  local info; info="$(echo | openssl s_client -servername "$DOMAIN" -connect "$DOMAIN:443" 2>/dev/null | openssl x509 -noout -enddate 2>/dev/null)"
+  [ -n "$info" ] && ok "certificate valid (${info#notAfter=} expiry; Cloudflare renews it)" || warn "could not read the certificate details (the site answered, so it is valid)."
+  local origin; origin="$(echo | openssl s_client -servername "$DOMAIN" -connect "$SERVER_IP:443" 2>/dev/null | openssl x509 -noout -issuer 2>/dev/null)"
+  [ -n "$origin" ] && ok "the server's own certificate: ${origin#issuer=}" || warn "the server's own certificate could not be read yet (kamal-proxy gets it from Let's Encrypt on the first visits; SSL mode Full tolerates that)."
+}
+
+# ================================================================= 10 aftercare
+
+step_aftercare() {
+  step_header 10 aftercare "Checking everything works, and what to do next"
+  resolve_ip
+  local failures=0
+
+  say "Smoke test (the main pages):"
+  if [ "$MODE" = test ]; then log_call "smoke https://$DOMAIN"; [ "${WSS_STUB_SMOKE_RC:-0}" = 0 ] || failures=$((failures + 1))
+  elif ! bin/smoke "https://$DOMAIN"; then failures=$((failures + 1)); warn "a page failed (above)."; fi
+
+  local n; n="$(rsh jobs-running "docker ps -q --filter label=service=wss --filter label=role=job --filter status=running | wc -l" 2>/dev/null | tr -d ' \r')"
+  if [ "${n:-0}" -ge 1 ]; then ok "the jobs container is running (emails, backups, monthly credits)"; else failures=$((failures + 1)); warn "the jobs container is NOT running: bin/kamal-deploy app details"; fi
+
+  local rec; rec="$(app_ruby recurring 't = SolidQueue::RecurringTask.find_by(key: "nightly_db_backup"); puts "wss-recurring #{t ? t.schedule : "missing"}"' 2>/dev/null | sed -n 's/^wss-recurring //p')"
+  case "$rec" in ""|missing) failures=$((failures + 1)); warn "the nightly backup is not scheduled (${rec:-no answer}). It registers when the jobs container starts." ;;
+                 *) ok "nightly backup scheduled: $rec (UTC)" ;; esac
+
+  if [ "$DRY_RUN" = 1 ]; then plan "send a test sign-in email, take a backup now"; aftercare_notes; return 0; fi
+
+  # A sign-in email to the owner only, never to a member.
+  local email
+  ask email "Your own email address, to receive a test sign-in link (Enter to skip)" ""
+  if [ -n "$email" ]; then
+    if [[ "$email" =~ ^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$ ]]; then
+      local r; r="$(app_ruby magic 'r = Auth::MagicLinkService.deliver(ENV.fetch("WSS_TEST_EMAIL")); puts "wss-magic #{r.success? ? "ok" : "refused"}"' "WSS_TEST_EMAIL=$email" 2>&1 | tr -d '\r')"
+      if printf '%s\n' "$r" | grep -q 'wss-magic ok'; then
+        ok "sign-in email queued; it is sent by the jobs container within a minute"
+        if confirm "Did it arrive? (check spam; wait a minute first)"; then ok "email works"; else
+          failures=$((failures + 1))
+          warn "it did not arrive. Recent mail errors from the jobs container:"
+          rsh mail-errors "docker logs --since 10m \$(docker ps -q --filter label=service=wss --filter label=role=job | head -n 1) 2>&1 | grep -iE 'smtp|mail|deliver' | tail -n 15" 2>/dev/null | mask | sed 's/^/      /'
+          say "Also check SMTP_* in $ENV_FILE and the Resend dashboard (resend.com -> Emails)."
+        fi
+      else
+        failures=$((failures + 1)); printf '%s\n' "$r" | tail -n 5 | mask | sed 's/^/      /'; warn "could not queue the email."
+      fi
+    else
+      warn "'$email' does not look like an email address; skipped."
+    fi
+  fi
+
+  # A backup now, checked by listing R2 from the app (this Mac never reads the R2 keys).
+  say "Taking a database backup now (kamal app exec, about a minute)."
+  local list_rb='require "aws-sdk-s3"; keys = DatabaseBackupJob.new.send(:s3).list_objects_v2(bucket: ENV["R2_BUCKET"], prefix: DatabaseBackupJob::PREFIX).contents.map(&:key).sort; puts "wss-newest #{keys.last}"'
+  local before after
+  before="$(app_ruby r2-before "$list_rb" 2>/dev/null | sed -n 's/^wss-newest //p')"
+  kamal_run backup app exec --roles=web --reuse "bin/rails runner DatabaseBackupJob.perform_now" </dev/null >/dev/null 2>&1 || warn "the backup command reported an error."
+  after="$(app_ruby r2-after "$list_rb" 2>/dev/null | sed -n 's/^wss-newest //p')"
+  if [ -n "$after" ] && [ "$after" != "$before" ]; then ok "new backup in R2: $after"; else failures=$((failures + 1)); warn "no new backup appeared in R2 (newest: ${after:-none}). bin/kamal-deploy logs | grep db-backup"; fi
+
+  aftercare_notes
+  if [ "$failures" -gt 0 ]; then
+    warn "$failures check(s) above need attention; the site itself is up."
+  else
+    ok "all checks passed. Welcome back."
+  fi
+}
+
+aftercare_notes() {
+  cat <<EOF
+
+  ${B}Still to do by hand${N}
+    - Stripe: the webhook URL is unchanged (https://$DOMAIN/webhooks/stripe), so
+      nothing to edit. Dashboard -> Developers -> Webhooks shows the deliveries
+      that failed while the site was down; Stripe stops retrying after 3 days, so
+      renewals and cancellations from late October may need a look.
+    - Resend (resend.com -> Emails): look for bounces and complaints since August.
+    - Sentry: watch the first day's errors.
+    - Run bin/backup-secrets, and keep config/master.key in your password manager.
+    - Uptime monitor (e.g. UptimeRobot, free) on https://$DOMAIN/up
+
+  ${B}Everyday commands${N} (first: source ~/.wss-production.env)
+    Logs:       bin/kamal-deploy logs
+    Console:    bin/kamal-deploy console
+    Roll back:  bin/kamal-deploy rollback        (the previous version)
+    Status:     bin/kamal-deploy app details
+EOF
+}
+
+# ================================================================= main
+
+[ "$DRY_RUN" = 0 ] || say "DRY RUN: checking only; nothing will be changed."
+[ "$MODE" = real ] || say "TEST MODE: ssh, scp, kamal, docker, curl and gh are stubs."
+
+step_preflight
+i=1
+for s in $STEPS; do
+  if [ "$i" -gt 1 ] && [ "$i" -ge "$FROM_N" ] && { [ -z "$ONLY_N" ] || [ "$i" = "$ONLY_N" ]; }; then "step_$s"; fi
+  i=$((i + 1))
+done
+CURRENT_STEP=""
+printf '\n%s\n' "${B}Done.${N} https://$DOMAIN"

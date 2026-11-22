@@ -1,12 +1,16 @@
 # WSS Launch Runbook
 
-Server: Hetzner `wss-prod` — `178.156.251.37` (resize to CPX21 if not done).
+> **Moving to a new server?** Use `bin/relaunch-production` (`docs/relaunch.md`),
+> not this list. This is the original July 2026 first-launch runbook, kept for
+> where each secret comes from. The old Hetzner server (178.156.251.37) is gone;
+> the current server's IP is the one under `servers:` in `config/deploy.yml`.
+
 Everything below the "Your accounts" section is one terminal session on your Mac.
 
 ## 1 · Your accounts (one-time clicking)
 
 - [ ] **Cloudflare DNS** — add `whiskeysharesociety.com` to Cloudflare (free plan).
-      Records: `A @ → 178.156.251.37` (proxied ☁️ on) and `A www → 178.156.251.37`
+      Records: `A @ → <server IP>` (proxied ☁️ on) and `A www → <server IP>`
       (proxied). SSL/TLS mode: **Full**.
 - [ ] **GitHub token** — github.com → Settings → Developer settings → Personal
       access tokens (classic) → scopes: `write:packages`, `read:packages`.
@@ -54,9 +58,10 @@ and `source ~/.wss-production.env` before deploying.
 
 ```sh
 cd ~/Documents/Coding/wss
-gem install kamal            # once, on your Mac (or: bundle exec kamal ...)
-kamal setup                  # installs Docker on the server, boots Postgres
-                             # accessory, builds + pushes image, deploys, SSL
+source ~/.wss-production.env
+bin/kamal-deploy setup       # Kamal in Docker, no local Ruby: installs Docker on
+                             # the server, boots the Postgres accessory, builds +
+                             # pushes the image, deploys, SSL
 ```
 
 First build cross-compiles amd64 from your Mac — expect 10–20 minutes.
@@ -66,10 +71,10 @@ Migrations run automatically via bin/docker-entrypoint (db:prepare).
 
 - [ ] https://whiskeysharesociety.com loads with a padlock
 - [ ] Sign up a fresh account (email + Google)
-- [ ] `bin/kamal console` → `User.count` works
+- [ ] `bin/kamal-deploy console` → `User.count` works
 - [ ] Upload an image on a review → appears (proves R2)
-- [ ] `bin/kamal backup` → then check R2 bucket for `db-backups/...`
-- [ ] `bin/kamal logs` shows lograge lines
+- [ ] `bin/kamal-deploy backup` → then check R2 bucket for `db-backups/...`
+- [ ] `bin/kamal-deploy logs` shows lograge lines
 
 ## 5 · Stripe live webhook (after the site is up)
 
@@ -77,9 +82,11 @@ Stripe dashboard (Live) → Developers → Webhooks → Add endpoint:
 `https://whiskeysharesociety.com/webhooks/stripe` — subscribe to the same
 events as the dev endpoint. Copy the signing secret, then:
 
+Put `export STRIPE_WEBHOOK_SECRET='whsec_...'` in `~/.wss-production.env`, then:
+
 ```sh
-export STRIPE_WEBHOOK_SECRET="whsec_..."
-kamal env push && kamal app boot     # refresh env with the new secret
+source ~/.wss-production.env
+bin/kamal-deploy app boot    # Kamal 2 uploads the env on boot (no `env push`)
 ```
 
 - [ ] Real end-to-end purchase with a live card (refund yourself after)
