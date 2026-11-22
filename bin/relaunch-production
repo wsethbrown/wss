@@ -275,7 +275,9 @@ dk() {
     fi
     stub_call "docker:$tag" "docker $*" </dev/null; return
   fi
-  docker "$@"
+  # No caller feeds docker on stdin. Without this, `compose run -T` swallows
+  # the answers waiting on stdin and the next question reads an empty line.
+  docker "$@" </dev/null
 }
 
 # web TAG ARGS... — curl from this Mac.
