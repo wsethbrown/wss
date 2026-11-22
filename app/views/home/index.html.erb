@@ -100,6 +100,12 @@
     .hx .beat h2 + p { margin-top: 18px; }
     .hx .beat .more { margin-top: 24px; align-self: flex-start; }
     .hx .face { margin-bottom: 36px; }
+    /* The closing beat: the end of the walkthrough, in the step column with
+       the beats' own type. On desktop the last face stays pinned beside it
+       until the story ends. It never animates in, so it is never left faded. */
+    .hx .beat--close { padding: 12px 0 8px; }
+    .hx .beat--close h2 { font-size: clamp(2rem, 3.6vw, 3.25rem); }
+    .hx .beat--close .acts { margin-top: 26px; }
     .hx .player { display: block; background: var(--ink); border-radius: 28px; padding: 10px; box-shadow: 0 1px 2px rgba(22, 51, 42, .25), 0 44px 80px -34px rgba(22, 51, 42, .6); }
     .hx .screen { position: relative; aspect-ratio: 16 / 9; border-radius: 19px; overflow: hidden; container-type: inline-size; }
     .hx .bar { display: flex; align-items: center; gap: 14px; padding: 14px 12px 6px; color: #f6f4ee; font-size: 14px; }
@@ -205,6 +211,7 @@
       .hx .face { grid-column: 2; align-self: start; position: sticky; top: max(112px, calc(50svh - 17.5vw)); margin: 0; }
       .hx .f1 { grid-row: 1 / 5; } .hx .f2 { grid-row: 2 / 5; } .hx .f3 { grid-row: 3 / 5; } .hx .f4 { grid-row: 4 / 5; }
       .hx .b1 { grid-row: 1; } .hx .b2 { grid-row: 2; } .hx .b3 { grid-row: 3; } .hx .b4 { grid-row: 4; }
+      .hx .beat--close { grid-row: 5; min-height: 0; padding: 24px 0 8px; }
     }
     @media (min-width: 1400px) { .hx .face { top: max(112px, calc(50svh - 230px)); } }
 
@@ -231,9 +238,6 @@
     .hx .when .d small { display: block; text-transform: uppercase; letter-spacing: .06em; font-size: 11px; font-weight: 600; color: var(--ink); }
     .hx .when .d b { display: block; font-size: 21px; line-height: 1; margin-top: 2px; color: var(--ink); }
     .hx .when span { display: block; }
-    .hx .tile--ink { background: var(--ink); box-shadow: none; justify-content: flex-end; min-height: 260px; }
-    .hx .tile--ink h3 { color: #f6f4ee; font-size: clamp(1.75rem, 3vw, 2.5rem); letter-spacing: -.04em; line-height: 1.02; }
-    .hx .tile--ink p { color: rgba(246, 244, 238, .78); font-size: 17px; }
 
     .hx .spot { display: grid; gap: 28px; align-items: center; }
     .hx .spot-img img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 18px; box-shadow: 0 0 0 1px var(--line); }
@@ -525,6 +529,13 @@
           <div class="bar"><b>The tasting record</b><div class="ticks" aria-hidden="true"><i></i><i></i><i></i><i class="on"></i></div><span>4 / 4</span></div>
         </div>
       </div>
+
+      <!-- The close: the end of the three steps, in the same column -->
+      <div class="beat beat--close">
+        <h2>That's <em>the whole ritual.</em></h2>
+        <p class="lede">Pick your first deck and set a date. The deck recommends some bottles to buy.</p>
+        <div class="acts"><%= link_to "Browse the decks", presentations_path, class: "btn2" %></div>
+      </div>
     </div>
   </div>
 
@@ -552,16 +563,6 @@
       </div>
     </section>
   <% end %>
-
-  <section>
-    <div class="wrap">
-      <div class="tile tile--ink" style="min-height:0;padding:40px 32px">
-        <h3>That's the whole ritual.</h3>
-        <p style="margin-top:12px">Pick your first deck and set a date. The deck recommends some bottles to buy.</p>
-        <div class="acts" style="margin-top:24px"><%= link_to "Browse the decks", presentations_path, class: "btn2 btn2--light" %></div>
-      </div>
-    </div>
-  </section>
 
   <section>
     <div class="wrap">
