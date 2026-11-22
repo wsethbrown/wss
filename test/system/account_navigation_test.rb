@@ -15,7 +15,7 @@ class AccountNavigationTest < ApplicationSystemTestCase
   # magic-link field, "Use a password instead" reveals the password form for an
   # existing account, which copies the email into #signin-email.
   def sign_in_user
-    visit auth_path
+    visit_sign_in_page
 
     fill_in "magic-link-email", with: @user.email
     find("#password-toggle").click
@@ -28,6 +28,10 @@ class AccountNavigationTest < ApplicationSystemTestCase
 
     # Signed in once the nav offers "Sign out" (the sign-in redirect target may vary).
     assert_link "Sign out"
+    # Let that Turbo visit finish (it renders inside a view transition) before
+    # the next navigation starts. The CI timeline for a lost tab click showed
+    # /account loading while the sign-in visit's transition was still running.
+    assert_no_selector "html[aria-busy='true']", visible: :all
 
     visit account_path
     assert_current_path account_path

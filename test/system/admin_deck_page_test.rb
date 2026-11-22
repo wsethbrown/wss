@@ -20,7 +20,7 @@ class AdminDeckPageTest < ApplicationSystemTestCase
   end
 
   def sign_in_admin
-    visit auth_path
+    visit_sign_in_page
     fill_in "magic-link-email", with: @admin.email
     find("#password-toggle").click
     fill_in "signin-password", with: "password"
@@ -231,7 +231,12 @@ class AdminDeckPageTest < ApplicationSystemTestCase
       find("button[aria-label='Remove section']").click
     end
     within_frame("customer-preview") { assert_selector "[data-deck-section]", count: 1 }
+    # The first save's message is still on the page, so it can't show that
+    # this save finished. Mark this page; the save's redirect renders a new
+    # body without the mark.
+    page.execute_script("document.body.dataset.beforeSecondSave = 'true'")
     first(:button, "Save deck").click
+    assert_no_selector "body[data-before-second-save]"
     assert_text "Presentation updated successfully."
     assert_equal [ "On the night" ], @deck.reload.sections.map { |section| section["heading"] }
   end

@@ -55,6 +55,9 @@ export default class extends Controller {
 
     this.request?.abort()
     const request = (this.request = new AbortController())
+    // The frame is being updated: aria-busy says so to assistive technology,
+    // as Turbo does for its own requests (the system tests wait on it too).
+    this.frameTarget.setAttribute("aria-busy", "true")
     try {
       const response = await fetch(this.urlValue, {
         method: "POST",
@@ -76,6 +79,8 @@ export default class extends Controller {
       if (error.name === "AbortError") return
       if (this.hasStatusTarget) this.statusTarget.hidden = false
       console.warn("Customer preview not updated:", error.message)
+    } finally {
+      if (request === this.request) this.frameTarget.removeAttribute("aria-busy")
     }
   }
 
