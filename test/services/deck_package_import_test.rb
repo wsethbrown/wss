@@ -194,6 +194,13 @@ class DeckPackageImportTest < ActiveSupport::TestCase
     assert_empty importer.warnings
   end
 
+  test "publish: a $0 package is not published free unless that is confirmed" do
+    write_meta(price: 0)
+    assert_raises(DeckPackageImport::Invalid) { DeckPackageImport.call(@dir, author: users(:admin), publish: true) }
+    assert_nil Presentation.find_by(title: "Test Deck")
+    assert DeckPackageImport.call(@dir, author: users(:admin), publish: true, free_confirmed: true).published?
+  end
+
   private
 
   def write_meta(overrides = {}) = write_deck_meta(@dir, overrides)

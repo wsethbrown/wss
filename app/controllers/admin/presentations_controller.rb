@@ -114,6 +114,7 @@ class Admin::PresentationsController < Admin::BaseController
       DeckSlideRenderJob.perform_later(@presentation.id) if presentation_params[:pdf_file].present?
       redirect_to admin_presentation_path(@presentation), notice: "Presentation updated successfully."
     else
+      Rails.logger.warn "Admin #{current_user.id} update of presentation #{@presentation.id} refused: #{@presentation.errors.full_messages.to_sentence}"
       render :edit, status: :unprocessable_entity
     end
   end
@@ -121,9 +122,13 @@ class Admin::PresentationsController < Admin::BaseController
   # Publishing is an explicit action, never a form side-effect. The model
   # blocks publishing without the buyer-download deck file.
   def publish
+    @presentation.free_confirmed = params[:free_confirmed] == "1"
     if @presentation.update(published: true)
+      Rails.logger.info "Admin #{current_user.id} published presentation #{@presentation.id} at price #{@presentation.price}" \
+                        "#{' (confirmed free)' if @presentation.free?}"
       redirect_to admin_presentation_path(@presentation), notice: "Published. The deck is live in the library."
     else
+      Rails.logger.warn "Admin #{current_user.id} publish of presentation #{@presentation.id} refused: #{@presentation.errors.full_messages.to_sentence}"
       redirect_to admin_presentation_path(@presentation), alert: @presentation.errors.full_messages.to_sentence
     end
   end
@@ -209,6 +214,7 @@ class Admin::PresentationsController < Admin::BaseController
       :recommendations_sheet,
       :scorecard,
       :featured,
+      :free_confirmed,
       supplemental_materials: [],
       # The deck's pour list rides along as nested rows, so it saves with the
       # deck like every other section (see PresentationBottle).

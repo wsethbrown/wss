@@ -128,4 +128,45 @@ class Admin::PresentationsControllerTest < ActionDispatch::IntegrationTest
     assert_not @deck.reload.published?
     assert_match(/1 person owns this deck and keeps it/, flash[:notice])
   end
+
+  # No accidental free decks (publish action and the edit form).
+  def ready_to_publish(price:)
+    @deck.update_columns(price: price)
+    @deck.pdf_file.attach(io: StringIO.new("%PDF-1.4 fake"), filename: "deck.pdf", content_type: "application/pdf")
+    @deck.slide_images.attach(io: File.open(Rails.root.join("test/fixtures/files/slides/slide-01.png"), "rb"),
+                              filename: "slide-01.png", content_type: "image/png")
+  end
+
+  test "publishing a $0 deck without ticking the box is refused" do
+    ready_to_publish(price: 0)
+    post publish_admin_presentation_path(@deck)
+    assert_not @deck.reload.published?
+    assert_match(/This deck is free/, flash[:alert])
+  end
+
+  test "publishing a $0 deck with the box ticked works" do
+    ready_to_publish(price: 0)
+    post publish_admin_presentation_path(@deck), params: { free_confirmed: "1" }
+    assert @deck.reload.published?
+  end
+
+  test "the publish panel shows the price, and the free box only for a $0 deck" do
+    ready_to_publish(price: 0)
+    get admin_presentation_path(@deck)
+    assert_select "form[action=?] input[type=checkbox][name=free_confirmed]", publish_admin_presentation_path(@deck)
+    ready_to_publish(price: 12)
+    get admin_presentation_path(@deck)
+    assert_select "input[name=free_confirmed]", count: 0
+    assert_select "p", text: /Publishes at \$12\.00/
+  end
+
+  test "saving the form that drops a live deck to $0 needs the box" do
+    ready_to_publish(price: 12)
+    @deck.update!(published: true)
+    patch admin_presentation_path(@deck), params: { presentation: { price: "0" } }
+    assert_response :unprocessable_entity
+    assert_equal BigDecimal("12"), @deck.reload.price
+    patch admin_presentation_path(@deck), params: { presentation: { price: "0", free_confirmed: "1" } }
+    assert_equal BigDecimal("0"), @deck.reload.price
+  end
 end

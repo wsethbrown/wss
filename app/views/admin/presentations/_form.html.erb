@@ -89,6 +89,10 @@
             <%= form.label :price, "Price (USD)", class: admin_label_class %>
             <%= form.number_field :price, step: 0.01, min: 0, class: admin_field_class, placeholder: "9.99" %>
             <p class="mt-1 text-xs text-mute">0 makes the deck free to claim.</p>
+            <label class="mt-2 flex min-h-11 items-center gap-3 text-sm text-ink">
+              <%= form.check_box :free_confirmed, class: "h-5 w-5 rounded border-hairline text-ink focus:ring-ink/30" %>
+              <span>This deck is free (needed to publish at $0)</span>
+            </label>
           </div>
 
           <div>

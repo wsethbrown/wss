@@ -181,8 +181,18 @@
             (the presentation buyers download) in the editor to enable publishing.
           </div>
         <% elsif @presentation.slides_rendered? %>
-          <%= button_to "Publish to the library", publish_admin_presentation_path(@presentation), method: :post,
-              class: "btn btn-primary w-full" %>
+          <%= form_with url: publish_admin_presentation_path(@presentation), method: :post, class: "space-y-3" do |f| %>
+            <% if @presentation.free? %>
+              <p class="text-sm text-ink">The price is <span class="font-semibold">$0</span>: published, anyone signed in can add it to their library for nothing.</p>
+              <label class="flex min-h-11 items-center gap-3 text-sm font-medium text-ink">
+                <%= f.check_box :free_confirmed, { class: "h-5 w-5 rounded border-hairline text-ink focus:ring-ink/30" }, "1", nil %>
+                <span>This deck is free</span>
+              </label>
+            <% else %>
+              <p class="text-sm text-ink">Publishes at <span class="font-semibold tabular-nums"><%= number_to_currency(@presentation.price) %></span>.</p>
+            <% end %>
+            <%= f.submit "Publish to the library", class: "btn btn-primary w-full" %>
+          <% end %>
         <% elsif @presentation.slide_render_pending? %>
           <div class="rounded-2xl border border-hairline bg-paper px-4 py-3 text-sm text-ink">
             <span class="font-semibold">Rendering slide previews&hellip;</span>

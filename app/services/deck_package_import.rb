@@ -56,12 +56,13 @@ class DeckPackageImport
     new(dir, **options).call
   end
 
-  def initialize(dir, author:, publish: false, into: nil, create_only: false)
+  def initialize(dir, author:, publish: false, into: nil, create_only: false, free_confirmed: false)
     @dir = Pathname(dir)
     @author = author
     @publish = publish
     @into = into
     @create_only = create_only
+    @free_confirmed = free_confirmed
     @warnings = []
   end
 
@@ -93,7 +94,10 @@ class DeckPackageImport
 
       replace_pours(deck, meta["pours"])
       deck.tag_names = meta["tags"] if meta["tags"].present?
-      deck.update!(published: true) if @publish && !deck.published?
+      if @publish && !deck.published?
+        deck.free_confirmed = @free_confirmed # a $0 package publishes only with FREE=1
+        deck.update!(published: true)
+      end
     end
 
     Rails.logger.info(

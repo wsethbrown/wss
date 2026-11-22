@@ -70,6 +70,14 @@ class Presentation < ApplicationRecord
   # records don't get stuck.
   validate :ready_to_publish, if: -> { published? && will_save_change_to_published? }
 
+  # No accidental free decks: a deck goes live at $0 (or a live deck drops to
+  # $0) only when the admin ticks "This deck is free". Not a column: it is
+  # asked for again on every such change. Free decks stay possible; they are
+  # claimable without Stripe.
+  attribute :free_confirmed, :boolean, default: false
+  validate :free_publish_confirmed,
+           if: -> { published? && price.present? && price.zero? && (will_save_change_to_published? || will_save_change_to_price?) }
+
   # File attachment validations
   validate :featured_image_validation
   validate :pdf_file_validation
@@ -404,6 +412,13 @@ class Presentation < ApplicationRecord
     else
       errors.add(:base, "No slide previews have been rendered for this deck, re-render them, then publish")
     end
+  end
+
+  def free_publish_confirmed
+    return if free_confirmed
+
+    errors.add(:base, "The price is $0, so publishing would make this deck free for everyone. " \
+                      "Set a price, or tick \"This deck is free\" to publish it free on purpose")
   end
 
   def featured_image_validation

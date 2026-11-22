@@ -1,5 +1,5 @@
 namespace :decks do
-  desc "Load deck packages: rake decks:load DIR=/path/to/packages [PUBLISH=1] [AUTHOR=email] [DECK_ID=id]"
+  desc "Load deck packages: rake decks:load DIR=/path/to/packages [PUBLISH=1] [AUTHOR=email] [DECK_ID=id] [FREE=1]"
   task load: :environment do
     root = ENV["DIR"].to_s
     abort "Give the folder that holds the deck packages: rake decks:load DIR=/path/to/packages" if root.blank?
@@ -22,10 +22,12 @@ namespace :decks do
       abort "DECK_ID loads one package; #{root} holds #{packages.size}." if packages.size > 1
     end
 
+    # PUBLISH=1 publishes; a package priced $0 also needs FREE=1 (no accidental free decks).
     publish = ENV["PUBLISH"] == "1"
     failed = []
     packages.each do |dir|
-      importer = DeckPackageImport.new(dir, author: author, publish: publish, into: target)
+      importer = DeckPackageImport.new(dir, author: author, publish: publish, into: target,
+                                       free_confirmed: ENV["FREE"] == "1")
       deck = importer.call
       state = deck.published? ? "published" : "draft"
       puts format("%-28s %s, %d slides, %d pours, $%.2f", deck.title, state, deck.slide_images.count,
