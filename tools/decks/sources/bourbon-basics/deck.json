@@ -1,0 +1,40 @@
+{
+  "slug": "Bourbon-Basics",
+  "title": "Bourbon Basics",
+  "subtitle": "What the words on the label mean",
+  "category": "American Whiskey",
+  "difficulty": "Beginner",
+  "duration": "45 min",
+  "description": "A first tasting night for people who are new to bourbon. Four bourbons, lowest proof first, and each one carries a word from its own label that has a federal rule behind it: bourbon, bonded, straight with an age, and barrel proof. Along the way: how to taste, why wheat and rye change the glass, what was sold as bourbon before the rules, the 1897 Bottled-in-Bond Act, President Taft's 1909 decision, what the barrel does, and which words on a label have no rule at all.",
+  "tags": "bourbon, beginner, american whiskey, labels, bottled in bond, straight bourbon, barrel proof, wheated bourbon, history",
+  "pours": [
+    {
+      "name": "Maker's Mark",
+      "origin": "Maker's Mark Distillery, Loretto, Kentucky",
+      "style": "Kentucky straight bourbon whisky; 70% corn, 16% soft red winter wheat, 14% malted barley (the maker's figures)",
+      "strength": "45% ABV (90 proof)",
+      "notes": "Poured on slide 2. The word it teaches is bourbon, and it is the wheat half of the wheat and rye comparison."
+    },
+    {
+      "name": "Old Grand-Dad Bonded",
+      "origin": "James B. Beam Distilling Co., Kentucky",
+      "style": "Kentucky straight bourbon whiskey, bottled in bond; the label says High Rye Mash Bill",
+      "strength": "50% ABV (100 proof)",
+      "notes": "The word it teaches is bonded. Taste it beside glass 1 for rye against wheat."
+    },
+    {
+      "name": "Knob Creek 9 Year",
+      "origin": "James B. Beam Distilling Co., Clermont, Kentucky",
+      "style": "Kentucky straight bourbon whiskey, aged nine years",
+      "strength": "50% ABV (100 proof)",
+      "notes": "The words it teaches are straight and the age statement. Same proof as glass 2, so the difference is the recipe and the years."
+    },
+    {
+      "name": "Wild Turkey Rare Breed",
+      "origin": "Wild Turkey Distillery, Lawrenceburg, Kentucky",
+      "style": "Kentucky straight bourbon whiskey, barrel proof; no age statement",
+      "strength": "58.4% ABV (116.8 proof)",
+      "notes": "The words it teaches are barrel proof. Taste it neat, then with a few drops of water."
+    }
+  ]
+}
