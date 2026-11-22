@@ -42,7 +42,12 @@ PUBLISH=1. Re-running updates the same deck by title and leaves its price
 and published state alone. Not to be confused with `decks:import`, which
 loads a production catalog snapshot into development.
 
-### Takeaways and extra sections from deck.json (November 2026)
+### Subtitle, takeaways and extra sections from deck.json (November 2026)
+- `"subtitle"` fills `presentations.subtitle` (string, up to 140 characters, blank stored as
+  nil), shown on the deck page under the title (`presentations/_deck_top`, so the admin preview
+  shows it too); not on the library card. Same present/absent rule as below: present sets it
+  (blank clears), absent keeps the admin's; not a string or over 140 refuses the package. The
+  package summary shows it; the import log notes set/cleared/kept, never the text.
 - `"takeaways": [{"title", "text"}]` fills "What you'll learn", stored in the existing
   `what_youll_learn` text format through `Presentation#takeaways=` (the one writer of that
   format; it agrees with the admin's takeaway editor and `parsed_what_youll_learn`).

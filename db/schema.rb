@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_22_120100) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_22_130000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -284,6 +284,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_22_120100) do
     t.decimal "reviews_average", precision: 3, scale: 2
     t.jsonb "slide_script", default: [], null: false
     t.jsonb "sections", default: [], null: false
+    t.string "subtitle"
     t.index ["author_id"], name: "index_presentations_on_author_id"
     t.index ["category"], name: "index_presentations_on_category"
     t.index ["download_count"], name: "index_presentations_on_download_count"

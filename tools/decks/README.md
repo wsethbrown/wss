@@ -36,6 +36,9 @@ writes `tmp/decks/The-Rye-From-Lawrenceburg/` with the pptx (script in every not
 both PDFs, `slides/slide-NN.png` and copies of the sources, then checks the counts match.
 Then load it as a draft: `bin/rails decks:load DIR=tmp/decks` (see `wss-deck-pipeline`).
 
+`subtitle` (required by `build.py`) is customer copy: the site shows it under the title on the
+deck page, so its wording is approved with the deck. Up to 140 characters (`check_meta`).
+
 `deck.json` may also carry `takeaways` (`[{"title", "text"}]`, the deck page's "What you'll
 learn") and `sections` (`[{"heading", "lines": [...]}]`, its extra sections; a line
 `"Label: text"` is a labelled row). Both are optional and copied into the package as they are;

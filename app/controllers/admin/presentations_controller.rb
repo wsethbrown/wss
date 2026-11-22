@@ -180,7 +180,7 @@ class Admin::PresentationsController < Admin::BaseController
   # script: the story shown is the teaser of the text that was sent. The
   # stored deck (member route) lends only its cover and slide count, which
   # the deck page shows everyone. Fires on typing, so it logs at debug.
-  PREVIEW_FIELDS = %w[title description category difficulty duration what_youll_learn content sections].freeze
+  PREVIEW_FIELDS = %w[title subtitle description category difficulty duration what_youll_learn content sections].freeze
 
   def preview
     saved = Presentation.find(params[:id]) if params[:id]
@@ -291,6 +291,7 @@ class Admin::PresentationsController < Admin::BaseController
   def presentation_params
     params.require(:presentation).permit(
       :title,
+      :subtitle,
       :description,
       :content,
       :category,

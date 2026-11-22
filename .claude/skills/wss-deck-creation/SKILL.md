@@ -71,6 +71,10 @@ build it to see the outputs). `deck.json` fields: `difficulty` is Beginner, Inte
 Advanced; `tags` is one comma-separated string; each pour is
 `{name, origin, style, strength, notes}`; no `price` (see Pricing).
 
+`subtitle` is customer copy too: it shows on the deck page as one line under the title (not on
+the library card). Up to 140 characters; write it for buyers ("Cocktails, Chapter One", "What the
+words on the label mean") and propose it to the owner with the rest of the deck's wording.
+
 Two more keys fill the rest of the customer's deck page, so nobody types them at upload:
 
 - `takeaways`: the "What you'll learn" list, `[{"title": "...", "text": "..."}]`. Up to 10;
@@ -85,7 +89,7 @@ Two more keys fill the rest of the customer's deck page, so nobody types them at
   for, the tasting profile of a single-bottle night, the running order of the glasses), not as
   a fixed set. None is fine.
 
-Draft both when the deck is made, in the same step as the description, from the outline and the
+Draft them (and the subtitle) when the deck is made, in the same step as the description, from the outline and the
 script (nothing in them that the outline does not establish). They are customer copy: propose
 their wording to the owner for approval with the rest of the deck's wording, never write them
 straight into a deck the owner has not seen. `build.py` checks their shape and limits and fails

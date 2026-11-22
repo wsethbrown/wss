@@ -2,7 +2,7 @@
 #
 # A package holds everything the deck page and its owner downloads need:
 #
-#   deck.json                      title, category, difficulty, duration, description,
+#   deck.json                      title, subtitle, category, difficulty, duration, description,
 #                                  price (optional), tags, pours, and optionally
 #                                  takeaways [{ "title", "text" }] and
 #                                  sections [{ "heading", "lines": [..] }]
@@ -30,7 +30,7 @@
 # price, the published state, the featured flag, the author, purchases and
 # counters stay as the admin left them.
 #
-# The takeaways ("What you'll learn") and the extra sections are replaced only
+# The subtitle, the takeaways ("What you'll learn") and the extra sections are replaced only
 # when deck.json has the key: an empty list clears them, and a package without
 # the key (an older one) keeps what the admin typed on the deck page.
 #
@@ -77,6 +77,7 @@ class DeckPackageImport
   def call
     meta = read_meta
     check_files!(meta)
+    subtitle = read_subtitle(meta)
     takeaways = read_takeaways(meta)
     sections = read_sections(meta)
     deck = target_for(meta.fetch("title"))
@@ -97,6 +98,7 @@ class DeckPackageImport
         content: story,
         slide_script: slide_script
       )
+      deck.subtitle = subtitle if meta.key?("subtitle")
       deck.takeaways = takeaways unless takeaways.nil?
       deck.sections = sections unless sections.nil?
       deck.price = BigDecimal((meta["price"] || DEFAULT_PRICE).to_s) if @created
@@ -116,6 +118,7 @@ class DeckPackageImport
       "[DeckPackageImport] #{@created ? 'created' : 'updated'} presentation #{deck.id}" \
       "#{' (explicit target)' if @into}: #{deck.slide_images.count} slides, " \
       "#{deck.presentation_bottles.count} pours, #{slide_script.size} slide script section(s), " \
+      "subtitle #{meta.key?('subtitle') ? (deck.subtitle ? 'set' : 'cleared') : 'kept'}, " \
       "#{deck.parsed_what_youll_learn.size} takeaway(s)#{' (kept)' if takeaways.nil?}, " \
       "#{Array(deck.sections).size} extra section(s)#{' (kept)' if sections.nil?}, " \
       "published=#{deck.published?}, #{@warnings.size} warning(s)"
@@ -239,6 +242,21 @@ class DeckPackageImport
   # before the deck is touched.
 
   TAKEAWAYS_MAX = 10
+
+  # The subtitle, stripped (blank clears it), or nil when the key is absent:
+  # callers check meta.key?("subtitle") to tell "clear" from "keep".
+  def read_subtitle(meta)
+    return nil unless meta.key?("subtitle")
+
+    value = meta["subtitle"]
+    refuse!("deck.json \"subtitle\" must be text") unless value.is_a?(String)
+    value = value.squish
+    if value.length > Presentation::SUBTITLE_MAX
+      refuse!("deck.json \"subtitle\" can be at most #{Presentation::SUBTITLE_MAX} characters (it has #{value.length})")
+    end
+    value.presence
+  end
+
   TAKEAWAY_TITLE_MAX = 120
   TAKEAWAY_TEXT_MAX = 400
 

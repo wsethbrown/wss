@@ -15,6 +15,7 @@
     <%= created ? "New draft from the package" : "This deck now matches the package" %>
   </h2>
   <dl class="mt-3 grid grid-cols-1 gap-x-8 divide-y divide-hairline text-sm sm:grid-cols-2 sm:divide-y-0">
+    <div class="flex flex-col gap-1 py-2 sm:col-span-2 sm:flex-row sm:justify-between sm:gap-4 sm:border-b sm:border-hairline"><dt class="shrink-0 text-mute">Subtitle</dt><dd class="min-w-0 break-words font-medium text-gray-900 sm:text-right"><%= presentation.subtitle.presence || "None" %></dd></div>
     <div class="flex justify-between gap-4 py-2 sm:border-b sm:border-hairline"><dt class="text-mute">Slides</dt><dd class="font-medium text-gray-900 tabular-nums"><%= pluralize(presentation.slide_images.count, "slide") %></dd></div>
     <div class="flex justify-between gap-4 py-2 sm:border-b sm:border-hairline"><dt class="text-mute">Pours</dt><dd class="font-medium text-gray-900 tabular-nums"><%= pluralize(presentation.presentation_bottles.count, "pour") %></dd></div>
     <div class="flex justify-between gap-4 py-2 sm:border-b sm:border-hairline"><dt class="text-mute">Takeaways</dt><dd class="font-medium text-gray-900 tabular-nums"><%= pluralize(presentation.parsed_what_youll_learn.size, "takeaway") %></dd></div>

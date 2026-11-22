@@ -63,7 +63,11 @@ export default class extends Controller {
         credentials: "same-origin",
         signal: request.signal
       })
-      if (!response.ok) throw new Error(`preview answered ${response.status}`)
+      // A redirect means the request was refused (signed out, or an expired
+      // session): its page is not a preview, so it is never shown as one.
+      if (!response.ok || response.redirected) {
+        throw new Error(`preview answered ${response.status}${response.redirected ? " after a redirect" : ""}`)
+      }
       const html = await response.text()
       if (request !== this.request) return
       this.show(html)

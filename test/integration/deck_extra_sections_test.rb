@@ -68,6 +68,21 @@ class DeckExtraSectionsTest < ActionDispatch::IntegrationTest
     assert_select "[data-deck-section] li span.text-mute", text: "<b>Nose</b>"
   end
 
+  # --- The subtitle, in the same hero partial ---
+
+  test "the subtitle is one escaped line between the title and the details line" do
+    deck = deck_with([], subtitle: "Cocktails, <b>Chapter</b> One", category: "Cocktails")
+    get presentation_path(deck)
+    assert_select "header h1 + p[data-deck-subtitle]", text: "Cocktails, <b>Chapter</b> One"
+    assert_select "header p[data-deck-subtitle] + p", text: /Cocktails/
+    assert_no_match "<b>Chapter</b>", response.body
+  end
+
+  test "nothing renders when there is no subtitle" do
+    get presentation_path(deck_with([]))
+    assert_select "[data-deck-subtitle]", 0
+  end
+
   test "nothing renders for a deck with no sections" do
     get presentation_path(deck_with([]))
     assert_response :success

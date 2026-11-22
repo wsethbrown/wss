@@ -58,6 +58,8 @@ class Presentation < ApplicationRecord
   # Validations
   validates :title, presence: true, length: { minimum: 2, maximum: 200 }
   validates :description, length: { maximum: 1000 }
+  SUBTITLE_MAX = 140
+  validates :subtitle, length: { maximum: SUBTITLE_MAX, message: "can be at most #{SUBTITLE_MAX} characters" }
   validates :content, presence: true
   validates :price, numericality: { greater_than_or_equal_to: 0 }
   validates :category, length: { maximum: 100 }
@@ -109,6 +111,12 @@ class Presentation < ApplicationRecord
   def tag_names=(value)
     names = value.to_s.split(",").map { |n| n.strip.downcase }.reject(&:blank?).uniq.first(10)
     self.tags = names.map { |n| Tag.find_or_create_by(name: n) { |t| t.category = "deck" } }
+  end
+
+  # The subtitle: one line under the title on the deck page. Optional;
+  # stripped, and blank is stored as nil (nothing renders).
+  def subtitle=(value)
+    super(value.is_a?(String) ? value.squish.presence : value)
   end
 
   # --- Extra sections ---------------------------------------------------------

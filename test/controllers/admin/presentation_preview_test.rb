@@ -37,6 +37,14 @@ class Admin::PresentationPreviewTest < ActionDispatch::IntegrationTest
     assert_no_match "Saved Title", response.body
   end
 
+  test "shows the typed subtitle under the title, and nothing when it is blank" do
+    post preview_admin_presentation_path(@deck), params: typed(subtitle: "A typed <i>subtitle</i>")
+    assert_select "header [data-deck-subtitle]", text: "A typed <i>subtitle</i>"
+    assert_no_match "<i>subtitle</i>", response.body
+    post preview_admin_presentation_path(@deck), params: typed(subtitle: " ")
+    assert_select "[data-deck-subtitle]", 0
+  end
+
   test "never saves, and never touches files or pours" do
     @deck.update!(sections: [ { "heading" => "Saved", "lines" => [ "x" ] } ])
     before = @deck.reload.attributes
@@ -44,7 +52,7 @@ class Admin::PresentationPreviewTest < ActionDispatch::IntegrationTest
                            -> { PresentationBottle.count }, -> { ActiveStorage::Attachment.count },
                            -> { ActiveStorage::Blob.count } ] do
       post preview_admin_presentation_path(@deck), params: typed(
-        price: "0", featured: "1", tag_names: "new, tags",
+        price: "0", featured: "1", tag_names: "new, tags", subtitle: "Unsaved subtitle",
         sections: [ { heading: "Unsaved", lines: "y" } ],
         pdf_file: fixture_file_upload("sample_scorecard.pdf", "application/pdf"),
         presentation_bottles_attributes: { "0" => { name: "Unsaved Pour", position: 1 } }

@@ -337,7 +337,7 @@ class Admin::PresentationPageTest < ActionDispatch::IntegrationTest
 
   PERMITTED = %w[title description content category tag_names price duration difficulty what_youll_learn
                  featured_image pdf_file preview_slide_count speaker_notes outline_file scorecard featured free_confirmed
-                 supplemental_materials presentation_bottles_attributes sections].freeze
+                 supplemental_materials presentation_bottles_attributes sections subtitle].freeze
   # Permitted but never on this form: legacy columns and a legacy upload slot.
   NOT_ON_THE_FORM = %w[tasting_notes image recommendations_sheet].freeze
   # The four tasting boxes the extra sections replaced: no longer on the form
@@ -373,7 +373,7 @@ class Admin::PresentationPageTest < ActionDispatch::IntegrationTest
   test "one save stores fields from every tab" do
     attach_slides(4)
     patch admin_presentation_path(@deck), params: { tab: "files", presentation: {
-      title: "Saved Everywhere", description: "A new pitch.", content: "## One\n\nThe new story.",
+      title: "Saved Everywhere", subtitle: " A typed subtitle ", description: "A new pitch.", content: "## One\n\nThe new story.",
       category: "Bourbon", tag_names: "smoky, islay", price: "21.50", duration: "60", difficulty: "Advanced",
       sections: [ { heading: "" }, { heading: "On the night", lines: "Glass A: first\r\n\r\nGlass B: later" } ],
       what_youll_learn: "- A point\nIts detail", preview_slide_count: "2", featured: "1",
@@ -387,6 +387,7 @@ class Admin::PresentationPageTest < ActionDispatch::IntegrationTest
     @deck.reload
     assert_equal "Saved Everywhere", @deck.title
     assert_equal "A new pitch.", @deck.description
+    assert_equal "A typed subtitle", @deck.subtitle
     assert_match "The new story.", @deck.content
     assert_equal "Bourbon", @deck.category
     assert_equal %w[islay smoky], @deck.tags.map(&:name).sort
@@ -427,6 +428,33 @@ class Admin::PresentationPageTest < ActionDispatch::IntegrationTest
     end
     assert_select "#f-tasting", 0
     RETIRED.each { |field| assert_select "[name='presentation[#{field}]']", 0 }
+  end
+
+  test "the cover card has the subtitle field directly under the title" do
+    @deck.update!(subtitle: "Cocktails, Chapter One")
+    get edit_admin_presentation_path(@deck)
+    names = css_select("#f-cover input, #f-cover textarea, #f-cover select").map { |field| field["name"] }
+    assert_equal [ "presentation[title]", "presentation[subtitle]", "presentation[description]" ], names.first(3)
+    assert_select "#f-cover label[for=presentation_subtitle]", text: "Subtitle"
+    assert_select "#f-cover input[name='presentation[subtitle]'][value=?]", "Cocktails, Chapter One"
+  end
+
+  test "a subtitle over the limit is refused and kept in the field" do
+    patch admin_presentation_path(@deck), params: { tab: "pours", presentation: { subtitle: "s" * 141 } }
+    assert_response :unprocessable_entity
+    assert_select "[role=alert]", text: /Subtitle can be at most 140 characters/
+    assert_select "#pane-listing .field_with_errors input[name='presentation[subtitle]']"
+    assert_nil @deck.reload.subtitle
+  end
+
+  test "the package summary shows the subtitle" do
+    work = Dir.mktmpdir("page-package-subtitle")
+    zip = zip_deck_package(build_deck_package(File.join(work, "package")), File.join(work, "p.zip"))
+    post admin_presentation_package_path(@deck), params: { package: Rack::Test::UploadedFile.new(zip, "application/zip", true) }
+    follow_redirect!
+    assert_select "#package-summary div", text: /Subtitle\s*A test/
+  ensure
+    FileUtils.remove_entry(work) if work
   end
 
   test "the description hint says where it shows" do

@@ -15,6 +15,12 @@
     </div>
 
     <div class="md:col-span-2">
+      <%= form.label :subtitle, "Subtitle", class: admin_label_class %>
+      <%= form.text_field :subtitle, class: admin_field_class %>
+      <p class="mt-1 text-xs text-mute">Optional. One line between the title and the details on the deck page.</p>
+    </div>
+
+    <div class="md:col-span-2">
       <%= form.label :description, "Description, the one-line pitch", class: admin_label_class %>
       <%= form.text_area :description, rows: [ (presentation.description.to_s.length / 90.0).ceil + 1, 3 ].max.clamp(3, 10),
             class: admin_field_class, placeholder: "One or two sentences under the title, why THIS deck, in the buyer's language." %>

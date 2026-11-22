@@ -325,6 +325,46 @@ class DeckPackageImportTest < ActiveSupport::TestCase
     assert_includes importer.warnings, "deck.json lists no takeaways, so the deck page has no \"What you'll learn\" section."
   end
 
+  # --- The subtitle from deck.json ---
+
+  test "the package's subtitle fills the deck's" do
+    assert_equal "A test", DeckPackageImport.call(@dir, author: users(:admin)).reload.subtitle
+  end
+
+  test "a re-upload sets the subtitle when deck.json has it, and a blank one clears it" do
+    deck = live_deck
+    deck.update!(subtitle: "Typed by hand")
+    write_meta(subtitle: "From the package")
+    DeckPackageImport.call(@dir, author: users(:admin), into: deck)
+    assert_equal "From the package", deck.reload.subtitle
+
+    write_meta(subtitle: "  ")
+    DeckPackageImport.call(@dir, author: users(:admin), into: deck)
+    assert_nil deck.reload.subtitle
+  end
+
+  test "a package without a subtitle keeps the admin's" do
+    deck = live_deck
+    deck.update!(subtitle: "Typed by hand")
+    write_meta_without(:subtitle)
+    DeckPackageImport.call(@dir, author: users(:admin), into: deck)
+    assert_equal "Typed by hand", deck.reload.subtitle
+  end
+
+  test "a subtitle that is not text, or too long, refuses the package before anything changes" do
+    deck = live_deck
+    deck.update!(subtitle: "Typed by hand")
+    { 42 => /"subtitle" must be text/, [ "A" ] => /"subtitle" must be text/, nil => /"subtitle" must be text/,
+      "s" * 141 => /"subtitle" can be at most 140 characters \(it has 141\)/ }.each do |value, message|
+      write_meta(subtitle: value)
+      error = assert_raises(DeckPackageImport::Invalid) { DeckPackageImport.call(@dir, author: users(:admin), into: deck) }
+      assert_match message, error.message
+      deck.reload
+      assert_equal "Typed by hand", deck.subtitle
+      assert_equal "The Old Title", deck.title
+    end
+  end
+
   MALFORMED = {
     "takeaways not a list" => [ { takeaways: "Learn things" }, /"takeaways" must be a list/ ],
     "a takeaway without a title" => [ { takeaways: [ { text: "No title." } ] }, /title and a text for takeaway 1/ ],

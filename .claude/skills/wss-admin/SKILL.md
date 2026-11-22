@@ -88,6 +88,9 @@ partials (`_cover_fields`, `_takeaways_fields`, `_story_fields`,
 `_sections_fields`, `_pour_list_fields`, `_files_fields`); `_form` is the
 one-column new-deck form built from the same partials.
 
+The cover card has "Subtitle" directly under Title (`presentations.subtitle`,
+shown under the title on the deck page; also filled by a package's deck.json).
+
 The Listing tab (and the new-deck form) has "What the customer sees" beside
 the fields from `lg` (below them on a phone): `_customer_preview`, a sandboxed
 iframe (srcdoc `_preview_document`, so the deck page's own breakpoints apply

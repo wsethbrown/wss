@@ -44,6 +44,8 @@ META_KEYS = ['slug', 'title', 'subtitle', 'category', 'difficulty', 'duration', 
 OPTIONAL_KEYS = ['takeaways', 'sections']
 TAKEAWAYS_MAX, TAKEAWAY_TITLE_MAX, TAKEAWAY_TEXT_MAX = 10, 120, 400
 SECTIONS_MAX, SECTION_HEADING_MAX, SECTION_LINES_MAX, SECTION_LINE_MAX = 8, 80, 12, 300
+# The subtitle shows under the title on the deck page (customer copy, approved with the deck).
+SUBTITLE_MAX = 140
 
 
 def fail(msg):
@@ -91,8 +93,13 @@ def main():
 
 
 def check_meta(meta):
-    """Problems with the optional takeaways and sections, as the site would refuse them."""
+    """Problems with the subtitle, takeaways and sections, as the site would refuse them."""
     problems = []
+    if 'subtitle' in meta:
+        if not isinstance(meta['subtitle'], str):
+            problems.append('"subtitle" must be text')
+        elif len(' '.join(meta['subtitle'].split())) > SUBTITLE_MAX:
+            problems.append('"subtitle" over %d characters' % SUBTITLE_MAX)
     if 'takeaways' in meta:
         takeaways = meta['takeaways']
         if not isinstance(takeaways, list):
