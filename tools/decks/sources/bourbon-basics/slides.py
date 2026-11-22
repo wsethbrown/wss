@@ -121,7 +121,9 @@ glass_slide(7, 'Glass 2. Pour it now.', 'Old Grand-Dad Bonded',
             ['Taste glass 1, then glass 2. Two things changed: wheat to rye, and 90 proof to 100.',
              [('The label says “Bonded”. The rule behind that word dates from 1897.', {'bold': True})]],
             [('The word', 'Bonded'), ('Second grain', 'Rye'), ('Age', 'At least four years')],
-            'What is different about the second one?')
+            'What is different about the second one?',
+            photo='old-grand-dad-crop.jpg',
+            credit='Pictured: an older 86 proof Old Grand-Dad, not the Bonded. Photograph: rick, CC BY 2.0, via Flickr. Cropped.')
 
 # ---------------------------------------------------------------- 8 before the rules
 s = new_slide()
