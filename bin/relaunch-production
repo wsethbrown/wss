@@ -259,7 +259,8 @@ kamal_run() {
     stub_call "kamal:$tag" "kamal $* [env: $loaded]" </dev/null
     return
   fi
-  with_env "$ROOT/bin/kamal-deploy" "$@"
+  # stdin closed for the same reason as dk: bin/kamal-deploy runs docker -i.
+  with_env "$ROOT/bin/kamal-deploy" "$@" </dev/null
 }
 _set_names() { local v; for v in "$@"; do [ -z "${!v}" ] || echo "$v"; done; }
 
