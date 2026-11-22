@@ -218,6 +218,15 @@ class Presentation < ApplicationRecord
     user.can_access_presentation?(id)
   end
 
+  # Who can open the deck page, present it and download its files. A published
+  # deck is open to everyone (downloads still check access). Unpublishing only
+  # takes a deck out of the library, search and new purchases: anyone whose
+  # ownership grants access today (can_download_full_presentation?: admins,
+  # direct owners, credit owners with an active membership) keeps it.
+  def visible_to?(user)
+    published? || can_download_full_presentation?(user)
+  end
+
   def can_download_speaker_notes?(user)
     can_download_full_presentation?(user)
   end

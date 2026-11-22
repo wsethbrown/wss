@@ -102,4 +102,30 @@ class Admin::PresentationsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to admin_presentation_path(@deck)
     assert_match(/could not queue/i, flash[:alert])
   end
+
+  # Unpublishing takes a deck out of the library, not away from its owners;
+  # the admin is told how many people own it before and after.
+  def published_with_owners(count)
+    @deck.pdf_file.attach(io: StringIO.new("%PDF-1.4 fake"), filename: "deck.pdf", content_type: "application/pdf")
+    @deck.slide_images.attach(io: File.open(Rails.root.join("test/fixtures/files/slides/slide-01.png"), "rb"),
+                              filename: "slide-01.png", content_type: "image/png")
+    @deck.update!(published: true)
+    [ users(:john), users(:jane), users(:seth) ].first(count).each do |user|
+      UserPresentation.create!(user: user, presentation: @deck, purchase_type: "direct", purchased_at: Time.current)
+    end
+  end
+
+  test "the unpublish button states how many people own the deck" do
+    published_with_owners(2)
+    get admin_presentation_path(@deck)
+    assert_select "form[action=?][data-turbo-confirm*='2 people own this deck']", unpublish_admin_presentation_path(@deck)
+    assert_match(/2 people own this deck/, response.body)
+  end
+
+  test "unpublishing says the owners keep the deck" do
+    published_with_owners(1)
+    post unpublish_admin_presentation_path(@deck)
+    assert_not @deck.reload.published?
+    assert_match(/1 person owns this deck and keeps it/, flash[:notice])
+  end
 end

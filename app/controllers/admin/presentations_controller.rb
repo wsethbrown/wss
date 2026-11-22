@@ -128,9 +128,16 @@ class Admin::PresentationsController < Admin::BaseController
     end
   end
 
+  # Unpublishing takes the deck out of the library, search and new purchases.
+  # Its owners keep it (see Presentation#visible_to?), and the admin is told
+  # how many there are.
   def unpublish
     @presentation.update_columns(published: false)
-    redirect_to admin_presentation_path(@presentation), notice: "Unpublished. The deck is back to draft."
+    owners = @presentation.user_presentations.count
+    Rails.logger.info "Admin #{current_user.id} unpublished presentation #{@presentation.id} (#{owners} owner(s) keep access)"
+    owners_note = owners.zero? ? "Nobody owns it yet." : "#{helpers.pluralize(owners, 'person')} #{owners == 1 ? 'owns' : 'own'} this deck and #{owners == 1 ? 'keeps' : 'keep'} it."
+    redirect_to admin_presentation_path(@presentation),
+                notice: "Unpublished. The deck is out of the library and can't be bought. #{owners_note}"
   end
 
   # Slide previews normally render automatically on import/upload; this is

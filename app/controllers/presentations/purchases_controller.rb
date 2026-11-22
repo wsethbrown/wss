@@ -34,7 +34,9 @@ class Presentations::PurchasesController < ApplicationController
 
   def set_presentation
     @presentation = Presentation.find(params[:presentation_id])
-    # Drafts are not for sale/download: 404 for non-admins (see PresentationsController).
+    # Unpublished decks (drafts, or decks taken out of the library) are never
+    # for sale: 404 for non-admins. Their owners keep them through the deck
+    # page and downloads, not through here (see Presentation#visible_to?).
     raise ActiveRecord::RecordNotFound unless @presentation.published? || current_user&.admin?
   end
 

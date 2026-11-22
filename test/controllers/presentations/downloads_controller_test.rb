@@ -177,9 +177,18 @@ class Presentations::DownloadsControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to presentation_path(@deck)
   end
 
-  test "drafts 404 for non-admins" do
+  # Unpublishing hides a deck from the library, not from its owners (see
+  # Presentations::UnpublishedAccessTest); everyone else gets the draft 404.
+  test "an unpublished deck still downloads for its direct owner" do
     @deck.update_column(:published, false)
     own("direct")
+    sign_in @user
+    get download_path(:outline)
+    assert_short_lived_service_url
+  end
+
+  test "an unpublished deck 404s for a member who does not own it" do
+    @deck.update_column(:published, false)
     sign_in @user
     get download_path(:outline)
     assert_response :not_found

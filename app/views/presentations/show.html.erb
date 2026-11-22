@@ -54,9 +54,15 @@
 
 <div class="mx-auto w-full max-w-6xl px-4 pb-20 pt-28">
   <% unless @presentation.published? %>
-    <p class="mb-6 rounded-2xl border border-hairline bg-whiskey-100 px-4 py-3 text-sm font-semibold text-ink">
-      Draft, visible to admins only. Customers get a 404 until this deck is published.
-    </p>
+    <% if current_user&.admin? %>
+      <p class="mb-6 rounded-2xl border border-hairline bg-whiskey-100 px-4 py-3 text-sm font-semibold text-ink">
+        Draft, visible to admins and to people who already own it. Everyone else gets a 404 until this deck is published.
+      </p>
+    <% else %>
+      <p class="mb-6 rounded-2xl border border-hairline bg-whiskey-100 px-4 py-3 text-sm font-semibold text-ink">
+        This deck is no longer in the library. It stays in yours.
+      </p>
+    <% end %>
   <% end %>
 
   <!-- Header: title and meta beside the cover. A deck with no slides and no

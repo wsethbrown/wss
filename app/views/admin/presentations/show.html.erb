@@ -167,7 +167,13 @@
       <div class="space-y-3">
         <%# Publishing is explicit and gated on the deck file + rendered slide previews. %>
         <% if @presentation.published? %>
+          <% owners = @presentation.user_presentations.count %>
+          <% owners_line = owners.zero? ? "Nobody owns this deck yet." : "#{pluralize(owners, 'person')} #{owners == 1 ? 'owns' : 'own'} this deck and #{owners == 1 ? 'keeps' : 'keep'} it." %>
+          <p class="text-sm text-mute">
+            Unpublishing takes the deck out of the library and stops new sales. <%= owners_line %>
+          </p>
           <%= button_to "Unpublish (back to draft)", unpublish_admin_presentation_path(@presentation), method: :post,
+              form: { data: { turbo_confirm: "Unpublish #{@presentation.title}? #{owners_line} It leaves the library and can't be bought." } },
               class: "btn btn-secondary w-full" %>
         <% elsif !@presentation.pdf_file.attached? %>
           <div class="rounded-2xl border border-hairline bg-paper px-4 py-3 text-sm text-ink">
