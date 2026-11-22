@@ -28,17 +28,38 @@ auto-publish** — the narrative voice is the product.
 
 ## Deck packages (finished decks, loaded in one step)
 A deck built outside the app arrives as a folder: `deck.json` (title, category,
-difficulty, duration, description, tags, pours, optional price),
+difficulty, duration, description, tags, pours, optional price, optional takeaways
+and sections),
 `speaker-notes.md`, `<slug>.pptx`, `<slug>-speaker-notes.pdf`,
 `<slug>-research-outline.pdf` and `slides/slide-NN.png`.
 `rake decks:load DIR=<folder of packages> [PUBLISH=1] [AUTHOR=email]` runs
 `DeckPackageImport` on each: story from the script, the pptx as the buyer
 download, the two PDFs as owner downloads, slide 1 as the cover, the slides
 as `slide_images` (already rendered, so no LibreOffice and no render job),
-the pour list as free-text rows, and tags. New decks are drafts unless
+the pour list as free-text rows, tags, and the takeaways and extra sections
+(below). New decks are drafts unless
 PUBLISH=1. Re-running updates the same deck by title and leaves its price
 and published state alone. Not to be confused with `decks:import`, which
 loads a production catalog snapshot into development.
+
+### Takeaways and extra sections from deck.json (November 2026)
+- `"takeaways": [{"title", "text"}]` fills "What you'll learn", stored in the existing
+  `what_youll_learn` text format through `Presentation#takeaways=` (the one writer of that
+  format; it agrees with the admin's takeaway editor and `parsed_what_youll_learn`).
+- `"sections": [{"heading", "lines": [..]}]` fills `presentations.sections` (jsonb), the
+  deck page's extra sections, which replaced the four fixed tasting boxes
+  (`nose/palate/finish/body_notes` stay in the table, unread; the migration
+  CarryTastingNotesIntoSections moved their text into a "What you'll taste" section).
+- A key PRESENT replaces what the deck had (an empty list clears it). A key ABSENT keeps what
+  the admin typed, so re-uploading an older package never wipes hand-typed copy.
+- Malformed values (not a list, wrong entry shape, over the limits: 10 takeaways, title 120,
+  text 400; 8 sections, heading 80, 12 lines, line 300) refuse the package before anything
+  changes. Limits live in `Presentation` (sections) and `DeckPackageImport` (takeaways), and
+  are mirrored in `tools/decks/build.py` `check_meta`.
+- No takeaways adds a "Worth a look" warning; the package summary counts both.
+- Rendering rule (one partial, `presentations/_extra_sections`, used by the deck page and the
+  admin preview): one plain line = a paragraph; otherwise rows; `Label: text` (label up to 24
+  characters, colon, space) = a labelled row. Plain text only, escaped.
 
 Making a package (the story, research, script, slides, and the build tools in
 `tools/decks/`, which produce exactly this folder layout) is covered by the

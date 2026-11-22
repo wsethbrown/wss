@@ -3,7 +3,9 @@
 # A package holds everything the deck page and its owner downloads need:
 #
 #   deck.json                      title, category, difficulty, duration, description,
-#                                  price (optional), tags, pours
+#                                  price (optional), tags, pours, and optionally
+#                                  takeaways [{ "title", "text" }] and
+#                                  sections [{ "heading", "lines": [..] }]
 #   speaker-notes.md               the script; one "## [SLIDE n] Title" section per slide
 #   <slug>.pptx                    the deck file buyers download
 #   <slug>-speaker-notes.pdf       owner download
@@ -27,6 +29,10 @@
 # difficulty, running time, story, slide script, files, slides, pours and tags, while the
 # price, the published state, the featured flag, the author, purchases and
 # counters stay as the admin left them.
+#
+# The takeaways ("What you'll learn") and the extra sections are replaced only
+# when deck.json has the key: an empty list clears them, and a package without
+# the key (an older one) keeps what the admin typed on the deck page.
 #
 # Everything is checked before anything changes, and the changes are saved in
 # one transaction: a package refused part-way leaves the deck as it was. New
@@ -71,11 +77,14 @@ class DeckPackageImport
   def call
     meta = read_meta
     check_files!(meta)
+    takeaways = read_takeaways(meta)
+    sections = read_sections(meta)
     deck = target_for(meta.fetch("title"))
     @created = deck.new_record?
     check_script_matches_slides
     note_missing_downloads(deck, meta)
     note_missing_pours(deck, meta["pours"])
+    note_missing_takeaways(deck, takeaways)
 
     Presentation.transaction do
       deck.assign_attributes(
@@ -88,6 +97,8 @@ class DeckPackageImport
         content: story,
         slide_script: slide_script
       )
+      deck.takeaways = takeaways unless takeaways.nil?
+      deck.sections = sections unless sections.nil?
       deck.price = BigDecimal((meta["price"] || DEFAULT_PRICE).to_s) if @created
       deck.published = false if @created
       assign_files(deck, meta)
@@ -105,6 +116,8 @@ class DeckPackageImport
       "[DeckPackageImport] #{@created ? 'created' : 'updated'} presentation #{deck.id}" \
       "#{' (explicit target)' if @into}: #{deck.slide_images.count} slides, " \
       "#{deck.presentation_bottles.count} pours, #{slide_script.size} slide script section(s), " \
+      "#{deck.parsed_what_youll_learn.size} takeaway(s)#{' (kept)' if takeaways.nil?}, " \
+      "#{Array(deck.sections).size} extra section(s)#{' (kept)' if sections.nil?}, " \
       "published=#{deck.published?}, #{@warnings.size} warning(s)"
     )
     deck
@@ -216,6 +229,75 @@ class DeckPackageImport
       else
         "The package has no #{label} (#{name}), so owners won't get one."
       end
+    end
+  end
+
+  # --- Takeaways and extra sections (optional keys) ---------------------------
+  #
+  # Each returns nil when deck.json has no such key (the deck keeps its own),
+  # else the list to store. Anything malformed refuses the whole package here,
+  # before the deck is touched.
+
+  TAKEAWAYS_MAX = 10
+  TAKEAWAY_TITLE_MAX = 120
+  TAKEAWAY_TEXT_MAX = 400
+
+  def read_takeaways(meta)
+    return nil unless meta.key?("takeaways")
+
+    list = meta["takeaways"]
+    refuse!("deck.json \"takeaways\" must be a list of takeaways") unless list.is_a?(Array)
+    if list.size > TAKEAWAYS_MAX
+      refuse!("deck.json \"takeaways\" can have at most #{TAKEAWAYS_MAX} takeaways (there are #{list.size})")
+    end
+
+    list.each.with_index(1) do |entry, n|
+      unless entry.is_a?(Hash) && entry["title"].is_a?(String) && (entry["text"].nil? || entry["text"].is_a?(String))
+        refuse!("deck.json \"takeaways\" needs a title and a text for takeaway #{n}")
+      end
+
+      title, text = entry["title"].squish, entry["text"].to_s.squish
+      refuse!("deck.json \"takeaways\" needs a title for takeaway #{n}") if title.empty?
+      if title.length > TAKEAWAY_TITLE_MAX
+        refuse!("deck.json \"takeaways\" allows titles of up to #{TAKEAWAY_TITLE_MAX} characters (takeaway #{n} has #{title.length})")
+      end
+      if text.length > TAKEAWAY_TEXT_MAX
+        refuse!("deck.json \"takeaways\" allows texts of up to #{TAKEAWAY_TEXT_MAX} characters (takeaway #{n} has #{text.length})")
+      end
+      # The stored format reads a line starting with one of these as the next
+      # takeaway's title, so the text would not come back as written.
+      if text.match?(/\A[-•*]/)
+        refuse!("deck.json \"takeaways\" text can't start with a dash, a bullet or an asterisk (takeaway #{n})")
+      end
+    end
+    list
+  end
+
+  def read_sections(meta)
+    return nil unless meta.key?("sections")
+
+    list = meta["sections"]
+    refuse!("deck.json \"sections\" must be a list of sections") unless list.is_a?(Array)
+    list.each.with_index(1) do |entry, n|
+      next if entry.is_a?(Hash) && entry["heading"].is_a?(String) &&
+              entry["lines"].is_a?(Array) && entry["lines"].all?(String)
+
+      refuse!("deck.json \"sections\" needs a heading and a list of lines (text) for section #{n}")
+    end
+
+    sections = Presentation.normalize_sections(list)
+    problems = Presentation.section_problems(sections)
+    refuse!("deck.json \"sections\" #{problems.first}") if problems.any?
+    sections
+  end
+
+  def note_missing_takeaways(deck, takeaways)
+    return if takeaways.present?
+
+    @warnings << if takeaways.nil? && !@created && deck.parsed_what_youll_learn.any?
+      "deck.json has no takeaways, so the deck keeps the takeaways it had."
+    else
+      "deck.json lists no takeaways, so the deck page has no \"What you'll learn\" section."
     end
   end
 

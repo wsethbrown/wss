@@ -48,12 +48,23 @@
       <%= render "admin/presentations/pour_list_fields", form: form, presentation: presentation %>
     </section>
 
+    <%# The Listing fields, with "What the customer sees" beside them from lg
+        (below them on a phone), refreshed as the admin types. %>
     <section id="pane-listing" data-deck-tabs-target="pane" data-pane="listing" aria-label="Listing"
-             class="scroll-mt-56 space-y-6 pt-6">
-      <%= render "admin/presentations/cover_fields", form: form, presentation: presentation, saved: saved, files_link: true %>
-      <%= render "admin/presentations/takeaways_fields", form: form, presentation: presentation %>
-      <%= render "admin/presentations/story_fields", form: form, presentation: presentation %>
-      <%= render "admin/presentations/tasting_fields", form: form, presentation: presentation %>
+             class="scroll-mt-56 pt-6">
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start"
+           data-controller="deck-preview" data-deck-preview-url-value="<%= preview_admin_presentation_path(presentation) %>"
+           data-action="input->deck-preview#schedule change->deck-preview#schedule click->deck-preview#schedule deck-tabs:shown@window->deck-preview#resize">
+        <div class="min-w-0 space-y-6">
+          <%= render "admin/presentations/cover_fields", form: form, presentation: presentation, saved: saved, files_link: true %>
+          <%= render "admin/presentations/takeaways_fields", form: form, presentation: presentation %>
+          <%= render "admin/presentations/story_fields", form: form, presentation: presentation %>
+          <%= render "admin/presentations/sections_fields", form: form, presentation: presentation %>
+        </div>
+        <%= render "admin/presentations/customer_preview", presentation: presentation,
+                   cover_image: slides.first || (saved.featured_image if saved.featured_image.attached?),
+                   slides_count: slides.size %>
+      </div>
     </section>
 
     <section id="pane-files" data-deck-tabs-target="pane" data-pane="files" aria-label="Files"

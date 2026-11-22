@@ -169,6 +169,35 @@ class Admin::PresentationsController < Admin::BaseController
                 alert: "Could not queue the slide render. Try again in a moment."
   end
 
+  # "What the customer sees" on the Listing tab, refreshed as the admin types:
+  # the parts of the deck page a visitor who has not bought the deck sees
+  # (the top, the takeaways, the story teaser and the extra sections),
+  # rendered by the deck page's own partials from the submitted fields.
+  #
+  # The deck it renders is a NEW, unsaved Presentation built from those
+  # fields only, so this never saves anything, never touches files or pours,
+  # never runs the publish checks, and never reads the stored story or slide
+  # script: the story shown is the teaser of the text that was sent. The
+  # stored deck (member route) lends only its cover and slide count, which
+  # the deck page shows everyone. Fires on typing, so it logs at debug.
+  PREVIEW_FIELDS = %w[title description category difficulty duration what_youll_learn content sections].freeze
+
+  def preview
+    saved = Presentation.find(params[:id]) if params[:id]
+    deck = Presentation.new(presentation_params.slice(*PREVIEW_FIELDS))
+    cover = saved && helpers.deck_cover_attachment(saved)
+    slides_count = saved ? saved.slide_images.count : 0
+    Rails.logger.debug { "Admin #{current_user.id} previewed #{saved ? "presentation #{saved.id}" : 'a new presentation'}" }
+    render partial: "admin/presentations/customer_view",
+           locals: { presentation: deck, cover_image: cover, slides_count: slides_count }
+  rescue ActiveRecord::RecordNotFound, ActionController::ParameterMissing => e
+    Rails.logger.warn "Admin #{current_user.id} preview of presentation #{params[:id] || 'new'} refused: #{e.class}"
+    head(e.is_a?(ActiveRecord::RecordNotFound) ? :not_found : :bad_request)
+  rescue StandardError => e
+    Rails.logger.warn "Admin #{current_user.id} preview of presentation #{params[:id] || 'new'} failed: #{e.class}"
+    head :unprocessable_entity
+  end
+
   def destroy
     if @presentation.destroy
       Rails.logger.info "Admin #{current_user.id} deleted presentation #{@presentation.id}"
@@ -270,10 +299,6 @@ class Admin::PresentationsController < Admin::BaseController
       :duration,
       :difficulty,
       :tasting_notes,
-      :nose_notes,
-      :palate_notes,
-      :finish_notes,
-      :body_notes,
       :what_youll_learn,
       :image,
       :featured_image,
@@ -286,6 +311,9 @@ class Admin::PresentationsController < Admin::BaseController
       :featured,
       :free_confirmed,
       supplemental_materials: [],
+      # The extra sections: one { heading, lines } per card on the Listing
+      # tab, lines as one textarea string (Presentation#sections= splits it).
+      sections: [ :heading, :lines ],
       # The deck's pour list rides along as nested rows, so it saves with the
       # deck like every other section (see PresentationBottle).
       presentation_bottles_attributes: [ :id, :bottle_id, :name, :origin, :style,

@@ -24,10 +24,11 @@ if Presentation.count == 0
       difficulty: 'Beginner',
       duration: '45 min',
       published: true,
-      nose_notes: 'Vanilla, honey, light oak, subtle fruit notes',
-      palate_notes: 'Smooth, balanced, with notes of caramel and spice',
-      finish_notes: 'Medium length with warming oak and gentle smoke',
-      body_notes: 'Medium-bodied with a smooth, approachable texture',
+      sections: [ { 'heading' => "What you'll taste",
+                    'lines' => [ 'Nose: Vanilla, honey, light oak, subtle fruit notes',
+                                 'Palate: Smooth, balanced, with notes of caramel and spice',
+                                 'Finish: Medium length with warming oak and gentle smoke',
+                                 'Body: Medium-bodied with a smooth, approachable texture' ] } ],
       whiskey_recommendations: "Glenfiddich 12 Year|Speyside|$|Light & Fruity\nLaphroaig 10 Year|Islay|$$|Peaty & Smoky\nHighland Park 12 Year|Highlands|$$|Balanced\nAuchentoshan 12 Year|Lowlands|$|Smooth & Light"
     },
     {
@@ -39,10 +40,11 @@ if Presentation.count == 0
       difficulty: 'Intermediate',
       duration: '60 min',
       published: true,
-      nose_notes: 'Caramel, vanilla, toasted oak, cinnamon',
-      palate_notes: 'Sweet corn, brown sugar, baking spices',
-      finish_notes: 'Long and warming with notes of leather and tobacco',
-      body_notes: 'Full-bodied with a rich, creamy texture',
+      sections: [ { 'heading' => "What you'll taste",
+                    'lines' => [ 'Nose: Caramel, vanilla, toasted oak, cinnamon',
+                                 'Palate: Sweet corn, brown sugar, baking spices',
+                                 'Finish: Long and warming with notes of leather and tobacco',
+                                 'Body: Full-bodied with a rich, creamy texture' ] } ],
       whiskey_recommendations: "Buffalo Trace|Kentucky|$|Classic Bourbon\nWoodford Reserve|Kentucky|$$|Premium Small Batch\nMaker's Mark|Kentucky|$$|Wheated Bourbon\nFour Roses Single Barrel|Kentucky|$$|High Rye"
     },
     {
@@ -54,10 +56,11 @@ if Presentation.count == 0
       difficulty: 'Advanced',
       duration: '75 min',
       published: true,
-      nose_notes: 'Delicate florals, green apple, subtle smoke',
-      palate_notes: 'Refined and elegant with notes of pear and honey',
-      finish_notes: 'Clean and crisp with a hint of white pepper',
-      body_notes: 'Light to medium-bodied with silky texture',
+      sections: [ { 'heading' => "What you'll taste",
+                    'lines' => [ 'Nose: Delicate florals, green apple, subtle smoke',
+                                 'Palate: Refined and elegant with notes of pear and honey',
+                                 'Finish: Clean and crisp with a hint of white pepper',
+                                 'Body: Light to medium-bodied with silky texture' ] } ],
       whiskey_recommendations: "Nikka From the Barrel|Japan|$$|Bold & Complex\nYamazaki 12|Japan|$$$|Fruity & Elegant\nHakushu 12|Japan|$$$|Fresh & Smoky\nHibiki Harmony|Japan|$$|Balanced Blend"
     }
   ]
@@ -73,10 +76,7 @@ if Presentation.count == 0
       duration: attrs[:duration],
       published: attrs[:published],
       author: admin,
-      nose_notes: attrs[:nose_notes],
-      palate_notes: attrs[:palate_notes],
-      finish_notes: attrs[:finish_notes],
-      body_notes: attrs[:body_notes],
+      sections: attrs[:sections],
       whiskey_recommendations: attrs[:whiskey_recommendations],
       rating: rand(4.5..5.0).round(1),
       review_count: rand(10..150)

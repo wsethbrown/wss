@@ -9,8 +9,7 @@
   pours           = presentation.pour_list.to_a
   linked_count    = pours.count(&:linked?)
   story_words     = presentation.content.to_s.split.size
-  tasting_notes_n = [ presentation.nose_notes, presentation.palate_notes,
-                      presentation.finish_notes, presentation.body_notes ].count(&:present?)
+  sections_count  = Array(presentation.sections).count { |section| section.is_a?(Hash) }
   slides_count    = slides.size
   extras_count    = [ presentation.sneak_peek_file, presentation.speaker_notes,
                       presentation.outline_file, presentation.recommendations_sheet ].count(&:attached?) +
@@ -24,8 +23,8 @@
       takeaways_count.positive? ? pluralize(takeaways_count, "point") : "hidden, none yet" ],
     [ "The story", "#pane-listing", story_words > 40 ? :on : :need,
       story_words > 40 ? "#{number_with_delimiter(story_words)} words · ~#{presentation.reading_time} min read" : "too short, the teaser is the pitch" ],
-    [ "What you'll taste", "#pane-listing", tasting_notes_n.positive? ? :on : :off,
-      tasting_notes_n.positive? ? "#{tasting_notes_n} of 4 notes" : "hidden, empty" ],
+    [ "Extra sections", "#f-sections", sections_count.positive? ? :on : :off,
+      sections_count.positive? ? pluralize(sections_count, "section") : "hidden, none yet" ],
     [ "The slides", "#pane-slides", slides_count.positive? ? :auto : :need,
       if slides_count.positive?
         "#{slides_count} rendered · first #{presentation.effective_preview_slide_count} free"

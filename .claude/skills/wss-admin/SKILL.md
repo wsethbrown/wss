@@ -85,8 +85,28 @@ buyer / Publish-Unpublish, then six tabs: Overview, Slides and script, Pour
 list, Listing, Files, Sales (`deck_tabs_controller.js`; tab in
 `location.hash`; without JS every pane shows). Field groups are shared
 partials (`_cover_fields`, `_takeaways_fields`, `_story_fields`,
-`_tasting_fields`, `_pour_list_fields`, `_files_fields`); `_form` is the
+`_sections_fields`, `_pour_list_fields`, `_files_fields`); `_form` is the
 one-column new-deck form built from the same partials.
+
+The Listing tab (and the new-deck form) has "What the customer sees" beside
+the fields from `lg` (below them on a phone): `_customer_preview`, a sandboxed
+iframe (srcdoc `_preview_document`, so the deck page's own breakpoints apply
+to its width) refreshed by `deck_preview_controller.js` ~400ms after typing.
+It POSTs the form's fields (no files, no `_method`) to `preview`
+(member, or collection for a new deck), which builds an UNSAVED
+`Presentation.new` from the preview fields only and renders `_customer_view`:
+the deck page's own partials (`presentations/_deck_top`, `_what_youll_learn`,
+`_story_section` with `full_story: false`, `_extra_sections`). It never saves,
+never reads the stored story or slide script (only the saved cover and slide
+count), and is a fetch, so the unsaved-changes guard never sees it. If you
+change those deck page parts, change the partials, never a copy.
+
+"Extra sections" (`_sections_fields` + `_section_card`, editor
+`deck_sections_controller.js`) replaced the four tasting boxes: plain fields
+`presentation[sections][][heading]`/`[lines]` (heading first, so Rack groups
+each card), one textarea per section split by `Presentation#sections=`, plus a
+hidden empty heading that keeps the key in the request when every card is
+removed (the model drops empty sections).
 
 Rules with teeth:
 - ONE form (`#deck-form`) holds every editable field, so one Save saves all

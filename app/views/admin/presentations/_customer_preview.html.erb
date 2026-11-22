@@ -1,0 +1,18 @@
+<%# "What the customer sees": the deck page as a visitor who has not bought
+    the deck sees it, beside the Listing fields (below them on a phone).
+    Rendered here from the form's values, then refreshed by
+    deck_preview_controller.js about 400ms after the admin stops typing (it
+    posts the form's fields to the preview action; nothing is saved). The
+    frame holds its own document, see _preview_document.
+    Locals: presentation (the form's deck), cover_image (or nil), slides_count %>
+<section id="f-preview" class="card min-w-0 scroll-mt-56 p-5 sm:p-6" aria-labelledby="customer-preview-title">
+  <h2 id="customer-preview-title" class="text-xl font-semibold text-ink">What the customer sees</h2>
+  <p data-deck-preview-target="status" class="mt-1 text-sm text-red-700" hidden>The preview couldn't be updated.</p>
+  <div class="mt-4 overflow-hidden rounded-[18px] border border-hairline bg-paper">
+    <%= tag.iframe id: "customer-preview", title: "What the customer sees", sandbox: "allow-same-origin",
+          srcdoc: String.new(render("admin/presentations/preview_document", presentation: presentation,
+                                    cover_image: cover_image, slides_count: slides_count)),
+          class: "block h-[40rem] w-full",
+          data: { deck_preview_target: "frame", action: "load->deck-preview#frameLoaded" } %>
+  </div>
+</section>

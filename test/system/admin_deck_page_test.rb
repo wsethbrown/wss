@@ -183,6 +183,59 @@ class AdminDeckPageTest < ApplicationSystemTestCase
     end
   end
 
+  # --- Listing: "What the customer sees" and the extra sections ---
+
+  test "typing in a Listing field updates what the customer sees, without saving" do
+    sign_in_admin
+    visit edit_admin_presentation_path(@deck, anchor: "listing")
+    within_frame("customer-preview") { assert_selector "h1", text: "System Deck" }
+
+    fill_in "presentation_description", with: "A pitch typed just now."
+    within_frame("customer-preview") do
+      assert_text "A pitch typed just now."
+      assert_selector "h1", text: "System Deck"
+    end
+    assert_selector "form#deck-form[data-unsaved-changes-dirty-value=true]", visible: :all
+    assert_nil @deck.reload.description, "the preview saves nothing"
+  end
+
+  test "sections are added, reordered and shown in the preview, then saved in that order" do
+    sign_in_admin
+    visit edit_admin_presentation_path(@deck, anchor: "listing")
+
+    click_on "Add a section"
+    within all("#f-sections .section-item").last do
+      find(".section-heading").fill_in(with: "On the night")
+      find(".section-lines").fill_in(with: "Glass A: first\nGlass B: later")
+    end
+    click_on "Add a section"
+    within all("#f-sections .section-item").last do
+      find(".section-heading").fill_in(with: "Who it's for")
+      find(".section-lines").fill_in(with: "New to rye.")
+      find("button[aria-label='Move up']").click
+    end
+
+    within_frame("customer-preview") do
+      assert_selector "[data-deck-section]", count: 2
+      assert_equal [ "Who it's for", "On the night" ], all("[data-deck-section] h2").map(&:text)
+      assert_selector "[data-deck-section] li", text: "Glass A"
+    end
+
+    first(:button, "Save deck").click
+    assert_text "Presentation updated successfully."
+    assert_equal [ { "heading" => "Who it's for", "lines" => [ "New to rye." ] },
+                   { "heading" => "On the night", "lines" => [ "Glass A: first", "Glass B: later" ] } ], @deck.reload.sections
+
+    click_on "Listing"
+    within all("#f-sections .section-item").first do
+      find("button[aria-label='Remove section']").click
+    end
+    within_frame("customer-preview") { assert_selector "[data-deck-section]", count: 1 }
+    first(:button, "Save deck").click
+    assert_text "Presentation updated successfully."
+    assert_equal [ "On the night" ], @deck.reload.sections.map { |section| section["heading"] }
+  end
+
   test "a field the browser refuses on a hidden tab opens that tab instead of blocking Save silently" do
     sign_in_admin
     visit edit_admin_presentation_path(@deck, anchor: "slides")

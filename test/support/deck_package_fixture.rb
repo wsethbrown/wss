@@ -38,7 +38,8 @@ module DeckPackageFixture
     MD
   end
 
-  def write_deck_meta(dir, overrides = {})
+  # `without:` leaves keys out altogether (an older package, say).
+  def write_deck_meta(dir, overrides = {}, without: [])
     meta = {
       slug: "Test-Deck", title: "Test Deck", subtitle: "A test", category: "Rye",
       difficulty: "Beginner", duration: "45 min", price: 19.99,
@@ -46,8 +47,12 @@ module DeckPackageFixture
       pours: [
         { name: "A Rye", origin: "Somewhere, Kentucky", style: "Straight rye", strength: "100 proof", notes: "Try it neat." },
         { name: "A Bourbon", origin: "Elsewhere, Kentucky", style: "Straight bourbon" }
+      ],
+      takeaways: [
+        { title: "Where the rye came from", text: "One distillery, two brands." },
+        { title: "How to taste it", text: "Neat, then with a drop of water." }
       ]
-    }.merge(overrides)
+    }.merge(overrides).except(*without)
     File.write(File.join(dir, "deck.json"), JSON.generate(meta))
   end
 

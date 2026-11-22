@@ -91,12 +91,14 @@ if Rails.env.development?
       p.save!(validate: false) if p.new_record?
       p.update_columns(published: presentation_data[:published])
 
-      # Add tasting notes for first presentation
+      # Add tasting notes for first presentation (an extra section; the four
+      # tasting columns are retired)
       if presentation_data[:title] == "Introduction to Scotch Whisky"
-        p.nose_notes = "Vanilla, honey, light oak, subtle fruit notes"
-        p.palate_notes = "Smooth, balanced, with notes of caramel and spice"
-        p.finish_notes = "Medium length with warming oak and gentle smoke"
-        p.body_notes = "Medium-bodied with a smooth, approachable texture"
+        p.sections = [ { "heading" => "What you'll taste",
+                         "lines" => [ "Nose: Vanilla, honey, light oak, subtle fruit notes",
+                                      "Palate: Smooth, balanced, with notes of caramel and spice",
+                                      "Finish: Medium length with warming oak and gentle smoke",
+                                      "Body: Medium-bodied with a smooth, approachable texture" ] } ]
         p.whiskey_recommendations = "Glenfiddich 12 Year|Speyside|$45|Light & Fruity|Pear, oak, subtle spice\nLaphroaig 10 Year|Islay|$65|Peaty & Smoky|Iodine, peat, sea salt\nHighland Park 12 Year|Highlands|$55|Balanced|Honey, heather, light smoke\nAuchentoshan 12 Year|Lowlands|$50|Smooth & Light|Vanilla, citrus, nuts"
       end
     end

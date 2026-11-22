@@ -36,6 +36,14 @@ writes `tmp/decks/The-Rye-From-Lawrenceburg/` with the pptx (script in every not
 both PDFs, `slides/slide-NN.png` and copies of the sources, then checks the counts match.
 Then load it as a draft: `bin/rails decks:load DIR=tmp/decks` (see `wss-deck-pipeline`).
 
+`deck.json` may also carry `takeaways` (`[{"title", "text"}]`, the deck page's "What you'll
+learn") and `sections` (`[{"heading", "lines": [...]}]`, its extra sections; a line
+`"Label: text"` is a labelled row). Both are optional and copied into the package as they are;
+`build.py` checks their shape and the site's limits first (`check_meta`) and fails before
+building. Leaving one out means a re-upload keeps what the admin typed; an empty list clears it.
+Their wording is customer copy, drafted with the description and approved by the owner (see
+`wss-deck-creation`).
+
 Build into the repo's `tmp/decks` (gitignored, and visible inside the Docker containers) or a
 folder outside the repo. Built files (pptx, PDFs, PNGs) are never committed.
 

@@ -18,7 +18,7 @@
       <%= form.label :description, "Description, the one-line pitch", class: admin_label_class %>
       <%= form.text_area :description, rows: [ (presentation.description.to_s.length / 90.0).ceil + 1, 3 ].max.clamp(3, 10),
             class: admin_field_class, placeholder: "One or two sentences under the title, why THIS deck, in the buyer's language." %>
-      <p class="mt-1 text-xs text-mute">Shows under the title on the hero and on every library card. This line does the most selling per word on the site.</p>
+      <p class="mt-1 text-xs text-mute">Shows under the title on the deck page.</p>
     </div>
 
     <div data-controller="category-picker">

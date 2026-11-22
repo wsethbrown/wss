@@ -133,6 +133,11 @@ Rails.application.routes.draw do
     resources :presentations do
       collection { post :import }
       member { post :publish; post :unpublish; post :render_slides }
+      # "What the customer sees" on the Listing tab: the deck page's top,
+      # takeaways, story teaser and extra sections, rendered from the typed
+      # (unsaved) fields. Collection for a deck not created yet.
+      post :preview, on: :collection
+      post :preview, on: :member
       resource :package, only: [ :new, :create ], controller: "deck_packages"
       # "Open" on the deck page: one of the deck's files by slot name (a
       # whitelist in the controller), for any admin, whoever owns the deck.

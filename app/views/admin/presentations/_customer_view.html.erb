@@ -1,0 +1,16 @@
+<%# What a visitor who has not bought the deck sees at the top of its page:
+    the cover, title, the line of details and description, "What you'll
+    learn", the story teaser and the extra sections. Built from the deck
+    page's own partials, so the preview cannot drift from the real page.
+    The story is always the teaser (full_story: false). The slide previews,
+    the price box, pours and reviews are left out.
+    Rendered inside the preview frame (_preview_document) on the Listing tab,
+    and on its own by Admin::PresentationsController#preview as the admin types.
+    Locals: presentation (possibly unsaved), cover_image (or nil), slides_count %>
+<%= render "presentations/deck_top", presentation: presentation, cover_image: cover_image, slides_count: slides_count %>
+<div class="mt-12">
+  <%= render "presentations/what_youll_learn", presentation: presentation %>
+  <%= render "presentations/story_section", presentation: presentation, full_story: false,
+             get_label: "Sign in to get this deck", get_path: "#" %>
+  <%= render "presentations/extra_sections", presentation: presentation %>
+</div>

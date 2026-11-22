@@ -6,10 +6,19 @@
   <%= render "admin/presentations/errors", presentation: presentation %>
 
   <div class="mt-6 min-w-0 space-y-6">
-    <%= render "admin/presentations/cover_fields", form: form, presentation: presentation %>
-    <%= render "admin/presentations/takeaways_fields", form: form, presentation: presentation %>
-    <%= render "admin/presentations/story_fields", form: form, presentation: presentation %>
-    <%= render "admin/presentations/tasting_fields", form: form, presentation: presentation %>
+    <%# The listing, with "What the customer sees" beside it from lg, as on
+        the deck page's Listing tab (a new deck has no cover yet). %>
+    <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start"
+         data-controller="deck-preview" data-deck-preview-url-value="<%= preview_admin_presentations_path %>"
+         data-action="input->deck-preview#schedule change->deck-preview#schedule click->deck-preview#schedule">
+      <div class="min-w-0 space-y-6">
+        <%= render "admin/presentations/cover_fields", form: form, presentation: presentation %>
+        <%= render "admin/presentations/takeaways_fields", form: form, presentation: presentation %>
+        <%= render "admin/presentations/story_fields", form: form, presentation: presentation %>
+        <%= render "admin/presentations/sections_fields", form: form, presentation: presentation %>
+      </div>
+      <%= render "admin/presentations/customer_preview", presentation: presentation, cover_image: nil, slides_count: 0 %>
+    </div>
     <%= render "admin/presentations/files_fields", form: form, presentation: presentation %>
 
     <section class="card p-5 sm:p-7">

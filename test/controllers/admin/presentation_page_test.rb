@@ -58,6 +58,8 @@ class Admin::PresentationPageTest < ActionDispatch::IntegrationTest
     assert_redirected_to edit_admin_presentation_path(@deck)
     follow_redirect!
     assert_select "#package-summary", 1
+    assert_select "#package-summary div", text: /Takeaways\s*2 takeaways/
+    assert_select "#package-summary div", text: /Extra sections\s*0 sections/
     get edit_admin_presentation_path(@deck)
     assert_select "#package-summary", 0
   ensure
@@ -333,14 +335,18 @@ class Admin::PresentationPageTest < ActionDispatch::IntegrationTest
 
   # --- One form, every field, saved together ---
 
-  PERMITTED = %w[title description content category tag_names price duration difficulty nose_notes palate_notes
-                 finish_notes body_notes what_youll_learn featured_image pdf_file preview_slide_count speaker_notes
-                 outline_file scorecard featured free_confirmed supplemental_materials presentation_bottles_attributes].freeze
+  PERMITTED = %w[title description content category tag_names price duration difficulty what_youll_learn
+                 featured_image pdf_file preview_slide_count speaker_notes outline_file scorecard featured free_confirmed
+                 supplemental_materials presentation_bottles_attributes sections].freeze
   # Permitted but never on this form: legacy columns and a legacy upload slot.
   NOT_ON_THE_FORM = %w[tasting_notes image recommendations_sheet].freeze
+  # The four tasting boxes the extra sections replaced: no longer on the form
+  # nor permitted (their columns stay in the table, unread).
+  RETIRED = %w[nose_notes palate_notes finish_notes body_notes].freeze
 
   test "the deck form carries every permitted field once, from whichever tab it sits on" do
     PresentationBottle.create!(presentation: @deck, name: "A Pour", position: 1)
+    @deck.update!(sections: [ { "heading" => "One", "lines" => [ "a" ] }, { "heading" => "Two", "lines" => [ "b" ] } ])
     get edit_admin_presentation_path(@deck)
 
     form = css_select("form#deck-form").sole
@@ -351,9 +357,12 @@ class Admin::PresentationPageTest < ActionDispatch::IntegrationTest
     assert_equal [], PERMITTED - keys, "every permitted field is on the form"
     assert_equal [], keys - PERMITTED - NOT_ON_THE_FORM, "nothing on the form that the controller drops"
     assert_equal [], NOT_ON_THE_FORM & keys
+    assert_equal [], RETIRED & keys
 
     repeats = names.tally.select { |_, count| count > 1 }.keys.reject do |name|
       next true if name.end_with?("[]")
+      # One heading and one lines field per extra section, as a list.
+      next true if name.start_with?("presentation[sections][][")
       same = fields.select { |node| node["name"] == name }
       # A check box and its hidden "0" partner.
       same.size == 2 && same.map { |node| node["type"] }.sort == %w[checkbox hidden]
@@ -366,7 +375,7 @@ class Admin::PresentationPageTest < ActionDispatch::IntegrationTest
     patch admin_presentation_path(@deck), params: { tab: "files", presentation: {
       title: "Saved Everywhere", description: "A new pitch.", content: "## One\n\nThe new story.",
       category: "Bourbon", tag_names: "smoky, islay", price: "21.50", duration: "60", difficulty: "Advanced",
-      nose_notes: "Pear", palate_notes: "Oak", finish_notes: "Long", body_notes: "Light",
+      sections: [ { heading: "" }, { heading: "On the night", lines: "Glass A: first\r\n\r\nGlass B: later" } ],
       what_youll_learn: "- A point\nIts detail", preview_slide_count: "2", featured: "1",
       speaker_notes: fixture_file_upload("sample_scorecard.pdf", "application/pdf"),
       scorecard: fixture_file_upload("sample_scorecard.pdf", "application/pdf"),
@@ -384,7 +393,7 @@ class Admin::PresentationPageTest < ActionDispatch::IntegrationTest
     assert_equal BigDecimal("21.5"), @deck.price
     assert_equal "60", @deck.duration
     assert_equal "Advanced", @deck.difficulty
-    assert_equal %w[Pear Oak Long Light], [ @deck.nose_notes, @deck.palate_notes, @deck.finish_notes, @deck.body_notes ]
+    assert_equal [ { "heading" => "On the night", "lines" => [ "Glass A: first", "Glass B: later" ] } ], @deck.sections
     assert_equal 1, @deck.parsed_what_youll_learn.size
     assert_equal 2, @deck.preview_slide_count
     assert @deck.featured?
@@ -392,6 +401,99 @@ class Admin::PresentationPageTest < ActionDispatch::IntegrationTest
     assert @deck.scorecard.attached?
     assert_equal 1, @deck.supplemental_materials.count
     assert_equal [ "Woodford Reserve" ], @deck.pour_list.map(&:title)
+  end
+
+  # --- Listing: the extra sections and "What the customer sees" ---
+
+  test "the Listing tab has the extra sections card and no tasting boxes" do
+    @deck.update!(sections: [ { "heading" => "What you'll taste", "lines" => [ "Nose: pear", "Palate: oak" ] },
+                              { "heading" => "Who it's for", "lines" => [ "New to rye." ] } ])
+    get edit_admin_presentation_path(@deck)
+    assert_select "#pane-listing #f-sections" do
+      assert_select "h2", text: "Extra sections"
+      assert_select "p", text: 'One line per item. Write "Nose: vanilla and oak" for a labelled row.'
+      assert_select "[data-deck-sections-target=container] .section-item", count: 2
+      headings = css_select("[data-deck-sections-target=container] input[name='presentation[sections][][heading]']")
+      assert_equal [ "What you'll taste", "Who it's for" ], headings.map { |input| input["value"] }
+      lines = css_select("[data-deck-sections-target=container] textarea[name='presentation[sections][][lines]']")
+      assert_equal "Nose: pear\nPalate: oak", lines.first.text.sub(/\A\n/, "")
+      assert_select "[data-deck-sections-target=container] label", text: "Heading", count: 2
+      assert_select "button", text: /Add a section/
+      assert_select "[data-deck-sections-target=container] button[aria-label='Move up']", count: 2
+      assert_select "[data-deck-sections-target=container] button[aria-label='Remove section']", count: 2
+      assert_select "template[data-deck-sections-target=template] .section-item", count: 1
+      # Sent with every save, so removing the last card clears the sections.
+      assert_select "input[type=hidden][name='presentation[sections][][heading]'][value='']", count: 1
+    end
+    assert_select "#f-tasting", 0
+    RETIRED.each { |field| assert_select "[name='presentation[#{field}]']", 0 }
+  end
+
+  test "the description hint says where it shows" do
+    get edit_admin_presentation_path(@deck)
+    assert_select "#f-cover p", text: "Shows under the title on the deck page."
+    assert_no_match "every library card", response.body
+  end
+
+  test "sections save in the order sent, and removing every card clears them" do
+    patch admin_presentation_path(@deck), params: { tab: "listing", presentation: {
+      sections: [ { heading: "" }, { heading: "B first", lines: "one" }, { heading: "A second", lines: "two\nthree" } ]
+    } }
+    assert_redirected_to edit_admin_presentation_path(@deck, anchor: "listing")
+    assert_equal [ "B first", "A second" ], @deck.reload.sections.map { |section| section["heading"] }
+
+    patch admin_presentation_path(@deck), params: { tab: "listing", presentation: { sections: [ { heading: "" } ] } }
+    assert_equal [], @deck.reload.sections
+  end
+
+  test "a save refused for the sections keeps the typed text and opens the Listing tab" do
+    patch admin_presentation_path(@deck), params: { tab: "pours", presentation: {
+      sections: [ { heading: "" }, { heading: "Fine heading", lines: "ok" }, { heading: "Kept heading", lines: "x" * 301 } ]
+    } }
+    assert_response :unprocessable_entity
+    assert_select "[role=alert]", text: /Extra sections allow lines of up to 300 characters/
+    assert_select "#pane-listing #f-sections li", text: /section 2, line 1 has 301/
+    assert_select "#pane-listing input[aria-invalid=true][value='Kept heading']"
+    assert_select "#pane-listing textarea[aria-invalid=true]", text: /x{301}/
+    # Only the section at fault is marked.
+    assert_select "#pane-listing input[value='Fine heading']:not([aria-invalid])"
+    assert_select "#pane-listing [aria-invalid=true]", count: 2
+    assert_equal [], @deck.reload.sections
+  end
+
+  test "a save refused for too many sections marks every section" do
+    patch admin_presentation_path(@deck), params: { tab: "listing", presentation: {
+      sections: [ { heading: "" } ] + Array.new(9) { |i| { heading: "S#{i}", lines: "x" } }
+    } }
+    assert_response :unprocessable_entity
+    assert_select "#pane-listing input.section-heading[aria-invalid=true]", count: 9
+  end
+
+  test "the overview checklist counts the extra sections and links to them" do
+    get edit_admin_presentation_path(@deck)
+    assert_select "#pane-overview li", text: /Extra sections\s+hidden, none yet/
+    assert_select "#pane-overview a[href='#f-sections']", text: "Extra sections"
+    assert_no_match "What you'll taste", css_select("#pane-overview").text
+
+    @deck.update!(sections: [ { "heading" => "A", "lines" => [ "x" ] }, { "heading" => "B", "lines" => [ "y" ] } ])
+    get edit_admin_presentation_path(@deck)
+    assert_select "#pane-overview li", text: /Extra sections\s+2 sections/
+  end
+
+  test "the Listing tab shows what the customer sees beside the fields" do
+    attach_slides(2)
+    @deck.update!(what_youll_learn: "- A takeaway\nIts line.", sections: [ { "heading" => "Who it's for", "lines" => [ "Rye fans." ] } ])
+    get edit_admin_presentation_path(@deck)
+    assert_select "#pane-listing [data-controller=deck-preview][data-deck-preview-url-value=?]", preview_admin_presentation_path(@deck)
+    assert_select "#pane-listing #f-preview h2", text: "What the customer sees"
+    frame = css_select("#pane-listing iframe#customer-preview").sole
+    assert_equal "allow-same-origin", frame["sandbox"], "no scripts run in the preview"
+    preview = Nokogiri::HTML(frame["srcdoc"])
+    assert_equal "Page Deck", preview.at_css("#customer-view h1").text
+    assert_match "Cocktails · Intermediate · 45 min · 2 slides", preview.at_css("#customer-view header p").text
+    assert_equal "A takeaway", preview.at_css("#customer-view ol h3").text
+    assert_equal "Who it's for", preview.at_css("#customer-view [data-deck-section] h2").text
+    assert preview.at_css("#customer-view[inert]"), "its links do nothing"
   end
 
   # --- "Anything else": saving never loses an extra, and Add files adds ---

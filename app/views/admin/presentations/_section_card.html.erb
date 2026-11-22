@@ -1,0 +1,32 @@
+<%# One extra section on the Listing tab: its heading and its lines (one
+    textarea, a line per item; Presentation#sections= splits it). Plain form
+    fields named presentation[sections][][heading] and [lines], heading
+    first, so the server reads each card as one section, in page order, with
+    or without JavaScript. deck_sections_controller.js adds, removes and
+    reorders cards. Locals: index (for the ids), heading, lines (a String),
+    invalid (true after a save refused for the sections) %>
+<% move_class = "inline-flex h-11 w-11 items-center justify-center rounded-xl text-mute transition hover:bg-whiskey-100 hover:text-ink" %>
+<div class="section-item rounded-2xl border border-hairline bg-paper p-4" data-deck-sections-target="item">
+  <div class="mb-2 flex items-center justify-between gap-3">
+    <label for="presentation_sections_<%= index %>_heading" class="text-sm font-medium text-ink">Heading</label>
+    <div class="flex items-center gap-1">
+      <button type="button" data-action="click->deck-sections#moveUp" class="<%= move_class %>" aria-label="Move up">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5"></path></svg>
+      </button>
+      <button type="button" data-action="click->deck-sections#moveDown" class="<%= move_class %>" aria-label="Move down">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path></svg>
+      </button>
+      <button type="button" data-action="click->deck-sections#remove"
+              class="inline-flex h-11 w-11 items-center justify-center rounded-xl text-red-700 transition hover:bg-red-50" aria-label="Remove section">
+        <svg class="h-4 w-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+      </button>
+    </div>
+  </div>
+  <input type="text" name="presentation[sections][][heading]" id="presentation_sections_<%= index %>_heading"
+         value="<%= heading %>" class="section-heading <%= admin_field_class %>"
+         <%= 'aria-invalid=true' if invalid %>>
+  <textarea name="presentation[sections][][lines]" id="presentation_sections_<%= index %>_lines"
+            rows="<%= (lines.to_s.count("\n") + 2).clamp(3, 12) %>" aria-label="Lines" aria-describedby="sections-hint"
+            class="section-lines mt-3 <%= admin_field_class %> leading-relaxed"
+            <%= 'aria-invalid=true' if invalid %>><%= "\n" %><%= lines %></textarea>
+</div>

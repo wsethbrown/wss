@@ -260,7 +260,106 @@ class DeckPackageImportTest < ActiveSupport::TestCase
     assert DeckPackageImport.call(@dir, author: users(:admin), publish: true, free_confirmed: true).published?
   end
 
+  # --- Takeaways and extra sections from deck.json ---
+
+  SECTIONS = [
+    { "heading" => "What you'll need", "lines" => [ "Crushed ice", "Fresh mint" ] },
+    { "heading" => "  Who it's for ", "lines" => [ " New to rye. ", "" ] }
+  ].freeze
+
+  test "fills the takeaways and the extra sections from deck.json" do
+    write_meta(sections: SECTIONS)
+    deck = DeckPackageImport.call(@dir, author: users(:admin)).reload
+
+    assert_equal [ { "title" => "Where the rye came from", "text" => "One distillery, two brands." },
+                   { "title" => "How to taste it", "text" => "Neat, then with a drop of water." } ], deck.takeaways
+    assert_equal "- Where the rye came from\nOne distillery, two brands.\n\n- How to taste it\nNeat, then with a drop of water.",
+                 deck.what_youll_learn, "stored in the format the takeaway editor writes"
+    assert_equal [ { "heading" => "What you'll need", "lines" => [ "Crushed ice", "Fresh mint" ] },
+                   { "heading" => "Who it's for", "lines" => [ "New to rye." ] } ], deck.sections
+  end
+
+  test "a re-upload replaces the takeaways and sections when deck.json has them" do
+    deck = live_deck
+    deck.update!(what_youll_learn: "- Typed by hand\nOld.", sections: [ { "heading" => "Typed", "lines" => [ "x" ] } ])
+    write_meta(takeaways: [ { title: "From the package", text: "New." } ], sections: SECTIONS.first(1))
+
+    DeckPackageImport.call(@dir, author: users(:admin), into: deck)
+    deck.reload
+    assert_equal [ "From the package" ], deck.takeaways.map { |t| t["title"] }
+    assert_equal [ "What you'll need" ], deck.sections.map { |s| s["heading"] }
+  end
+
+  test "an empty list clears them" do
+    deck = live_deck
+    deck.update!(what_youll_learn: "- Typed by hand\nOld.", sections: [ { "heading" => "Typed", "lines" => [ "x" ] } ])
+    write_meta(takeaways: [], sections: [])
+
+    importer = DeckPackageImport.new(@dir, author: users(:admin), into: deck)
+    importer.call
+    deck.reload
+    assert_nil deck.what_youll_learn
+    assert_equal [], deck.sections
+    assert importer.warnings.any? { |w| w.include?("lists no takeaways") }, importer.warnings.inspect
+  end
+
+  test "an older package without the keys keeps what the admin typed, and says so" do
+    deck = live_deck
+    deck.update!(what_youll_learn: "- Typed by hand\nOld.", sections: [ { "heading" => "Typed", "lines" => [ "x" ] } ])
+    write_meta_without(:takeaways, :sections)
+
+    importer = DeckPackageImport.new(@dir, author: users(:admin), into: deck)
+    importer.call
+    deck.reload
+    assert_equal "- Typed by hand\nOld.", deck.what_youll_learn
+    assert_equal [ { "heading" => "Typed", "lines" => [ "x" ] } ], deck.sections
+    assert_includes importer.warnings, "deck.json has no takeaways, so the deck keeps the takeaways it had."
+  end
+
+  test "a new deck from a package without takeaways is warned about" do
+    write_meta_without(:takeaways)
+    importer = DeckPackageImport.new(@dir, author: users(:admin))
+    deck = importer.call
+    assert_nil deck.what_youll_learn
+    assert_equal [], deck.sections
+    assert_includes importer.warnings, "deck.json lists no takeaways, so the deck page has no \"What you'll learn\" section."
+  end
+
+  MALFORMED = {
+    "takeaways not a list" => [ { takeaways: "Learn things" }, /"takeaways" must be a list/ ],
+    "a takeaway without a title" => [ { takeaways: [ { text: "No title." } ] }, /title and a text for takeaway 1/ ],
+    "a blank takeaway title" => [ { takeaways: [ { title: "  ", text: "x" } ] }, /needs a title for takeaway 1/ ],
+    "a takeaway text that would read as a title" => [ { takeaways: [ { title: "A", text: "- b" } ] }, /can't start with a dash/ ],
+    "too many takeaways" => [ { takeaways: Array.new(11) { |i| { title: "T#{i}", text: "x" } } }, /at most 10 takeaways/ ],
+    "a long takeaway title" => [ { takeaways: [ { title: "t" * 121, text: "x" } ] }, /titles of up to 120 characters/ ],
+    "sections not a list" => [ { sections: { heading: "x" } }, /"sections" must be a list/ ],
+    "lines not a list" => [ { sections: [ { heading: "H", lines: "one line" } ] }, /list of lines \(text\) for section 1/ ],
+    "a line that is not text" => [ { sections: [ { heading: "H", lines: [ 1 ] } ] }, /for section 1/ ],
+    "a section without a heading" => [ { sections: [ { heading: "", lines: [ "x" ] } ] }, /need a heading in section 1/ ],
+    "too many sections" => [ { sections: Array.new(9) { |i| { heading: "S#{i}", lines: [ "x" ] } } }, /at most 8 sections/ ],
+    "a long heading" => [ { sections: [ { heading: "h" * 81, lines: [ "x" ] } ] }, /headings of up to 80/ ],
+    "too many lines" => [ { sections: [ { heading: "H", lines: Array.new(13, "x") } ] }, /up to 12 lines/ ],
+    "a long line" => [ { sections: [ { heading: "H", lines: [ "l" * 301 ] } ] }, /lines of up to 300/ ]
+  }.freeze
+
+  MALFORMED.each do |name, (meta, message)|
+    test "refuses #{name}, before anything changes" do
+      deck = live_deck
+      kept_sections = [ { "heading" => "Typed by hand", "lines" => [ "Kept: yes" ] } ]
+      deck.update!(what_youll_learn: "- Kept\nOld.", sections: kept_sections)
+      # A valid value for the other key, so a refusal can't hide behind it.
+      write_meta({ takeaways: [ { title: "New", text: "x" } ], sections: [ { heading: "New", lines: [ "x" ] } ] }.merge(meta))
+      error = assert_raises(DeckPackageImport::Invalid) { DeckPackageImport.call(@dir, author: users(:admin), into: deck) }
+      assert_match message, error.message
+      deck.reload
+      assert_equal "The Old Title", deck.title
+      assert_equal "- Kept\nOld.", deck.what_youll_learn
+      assert_equal kept_sections, deck.sections
+    end
+  end
+
   private
 
   def write_meta(overrides = {}) = write_deck_meta(@dir, overrides)
+  def write_meta_without(*keys) = write_deck_meta(@dir, {}, without: keys)
 end

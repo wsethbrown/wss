@@ -60,7 +60,7 @@ misread brief is a batch thrown away.
 |---|---|---|
 | `speaker-notes.md` | written by hand (`wss-deck-speaker-notes`) | the host: before-the-night kit, then the script |
 | `research-outline.md` | written by hand (`wss-deck-outline`) | anyone rebuilding the night; sources, not-confirmed list, image credits |
-| `deck.json` | written by hand | the site: slug, title, subtitle, category, difficulty, duration, description, tags, pours |
+| `deck.json` | written by hand | the site: slug, title, subtitle, category, difficulty, duration, description, tags, pours, takeaways, sections |
 | `slides.py` + `assets/` | written by hand, using `tools/decks/wsskit.py` | the slides and their images |
 | `<slug>.pptx` | built | the room; opens in Keynote and PowerPoint |
 | `<slug>-speaker-notes.pdf`, `<slug>-research-outline.pdf` | built | owner downloads on the site |
@@ -70,6 +70,27 @@ The worked example is `tools/decks/examples/the-rye-from-lawrenceburg/` (sources
 build it to see the outputs). `deck.json` fields: `difficulty` is Beginner, Intermediate or
 Advanced; `tags` is one comma-separated string; each pour is
 `{name, origin, style, strength, notes}`; no `price` (see Pricing).
+
+Two more keys fill the rest of the customer's deck page, so nobody types them at upload:
+
+- `takeaways`: the "What you'll learn" list, `[{"title": "...", "text": "..."}]`. Up to 10;
+  a title of up to 120 characters, a one-sentence text of up to 400, on one line each, and the
+  text must not start with `-`, `*` or a bullet. Three or four is usual.
+- `sections`: the deck's extra sections, shown after the story where "What you'll taste" used
+  to be, `[{"heading": "...", "lines": ["...", "..."]}]`. Up to 8 sections, a heading of up to
+  80 characters, up to 12 lines of up to 300 characters each. Plain text, no Markdown. A line
+  `"Label: text"` (label up to 24 characters) shows as a labelled row (`"Nose: vanilla and oak"`,
+  `"Glass A: handed out at slide 2"`); a section with one plain line shows as a short paragraph;
+  otherwise the lines are a list. Use them for what suits this deck (what you'll need, who it is
+  for, the tasting profile of a single-bottle night, the running order of the glasses), not as
+  a fixed set. None is fine.
+
+Draft both when the deck is made, in the same step as the description, from the outline and the
+script (nothing in them that the outline does not establish). They are customer copy: propose
+their wording to the owner for approval with the rest of the deck's wording, never write them
+straight into a deck the owner has not seen. `build.py` checks their shape and limits and fails
+before building; the site refuses a package that breaks them. Leaving a key out means a
+re-upload keeps whatever the admin typed on the deck page; an empty list clears it.
 
 ## Choosing the story and the bottles
 
@@ -187,7 +208,8 @@ and never changes an existing deck's price) and do not suggest a price unless as
 2. Research and write the outline: `wss-deck-outline`.
 3. Write the speaker notes from the outline: `wss-deck-speaker-notes`. The script fixes the
    slide count and order.
-4. Write `deck.json` and `slides.py`, gather and credit images.
+4. Write `deck.json` (description, takeaways and sections drafted together, for the owner's
+   approval) and `slides.py`, gather and credit images.
 5. Build, QA, fix, rebuild.
 6. Show the owner this one deck. Load it as a draft only when they are happy.
 
