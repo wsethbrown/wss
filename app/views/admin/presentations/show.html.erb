@@ -4,10 +4,15 @@
            lede: "Created by #{@presentation.author&.full_name} on #{@presentation.created_at.strftime('%B %d, %Y')}",
            back: [ "Presentations", admin_presentations_path ] do %>
   <%= link_to "Edit", edit_admin_presentation_path(@presentation), class: "btn btn-primary min-h-11 py-2.5" %>
+  <%= link_to "Replace with a package", new_admin_presentation_package_path(@presentation), class: "btn btn-secondary min-h-11 py-2.5" %>
   <% if current_user.can_delete? %>
     <%= render "admin/shared/confirm_button", label: "Delete", url: admin_presentation_path(@presentation),
                confirm: "Are you sure you want to delete this presentation?", variant: :button %>
   <% end %>
+<% end %>
+
+<% if (package_summary = flash[:package_summary]).present? %>
+  <%= render "admin/presentations/package_summary", presentation: @presentation, summary: package_summary %>
 <% end %>
 
 <div class="grid grid-cols-1 gap-6 lg:grid-cols-3">

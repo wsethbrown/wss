@@ -127,9 +127,13 @@ Rails.application.routes.draw do
   # Admin panel
   namespace :admin do
     get "dashboard", to: "dashboard#index"
+    # Finished deck packages (.zip): "Upload a package" creates a new draft;
+    # "Replace with a package" updates that one deck in place.
+    resources :deck_packages, only: [ :new, :create ]
     resources :presentations do
       collection { post :import }
       member { post :publish; post :unpublish; post :render_slides }
+      resource :package, only: [ :new, :create ], controller: "deck_packages"
       # The deck's pour list, linked to catalog bottles (Phase 3 deck ties).
     end
     resources :users, only: [ :index, :show, :edit, :update ] do

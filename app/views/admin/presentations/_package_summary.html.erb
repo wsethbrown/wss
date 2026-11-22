@@ -1,0 +1,52 @@
+<%# What a package upload just did to this deck, shown once on the deck's admin
+    page after Admin::DeckPackagesController redirects here. Counts, files,
+    price and status are read from the deck now (so they are always true);
+    only "created" and the importer's warnings ride in the flash.
+    Locals: presentation, summary ({ "created" => bool, "warnings" => [String] }) %>
+<% created = summary["created"] %>
+<% warnings = Array(summary["warnings"]) %>
+<% downloads = [
+     [ "Deck file", presentation.pdf_file ],
+     [ "Speaker notes", presentation.speaker_notes ],
+     [ "Research outline", presentation.outline_file ]
+   ].select { |_, attachment| attachment.attached? } %>
+<section id="package-summary" class="card mb-6 p-5 sm:p-6" aria-labelledby="package-summary-title">
+  <h2 id="package-summary-title" class="text-lg font-semibold text-ink">
+    <%= created ? "New draft from the package" : "This deck now matches the package" %>
+  </h2>
+  <dl class="mt-3 grid grid-cols-1 gap-x-8 divide-y divide-hairline text-sm sm:grid-cols-2 sm:divide-y-0">
+    <div class="flex justify-between gap-4 py-2 sm:border-b sm:border-hairline"><dt class="text-mute">Slides</dt><dd class="font-medium text-gray-900 tabular-nums"><%= pluralize(presentation.slide_images.count, "slide") %></dd></div>
+    <div class="flex justify-between gap-4 py-2 sm:border-b sm:border-hairline"><dt class="text-mute">Pours</dt><dd class="font-medium text-gray-900 tabular-nums"><%= pluralize(presentation.presentation_bottles.count, "pour") %></dd></div>
+    <div class="flex justify-between gap-4 py-2 sm:border-b sm:border-hairline"><dt class="text-mute">Price</dt><dd class="font-medium text-gray-900 tabular-nums"><%= number_to_currency(presentation.price || 0) %></dd></div>
+    <div class="flex justify-between gap-4 py-2 sm:border-b sm:border-hairline"><dt class="text-mute">Status</dt><dd class="font-medium text-gray-900"><%= presentation.published? ? "Published" : "Draft" %></dd></div>
+    <div class="flex flex-col gap-1 py-2 sm:col-span-2 sm:flex-row sm:justify-between sm:gap-4">
+      <dt class="shrink-0 text-mute">Downloads</dt>
+      <dd class="min-w-0 break-words font-medium text-gray-900 sm:text-right">
+        <%= downloads.any? ? downloads.map { |label, a| "#{label} (#{a.filename})" }.join(", ") : "None attached" %>
+      </dd>
+    </div>
+  </dl>
+
+  <% if warnings.any? %>
+    <div class="mt-4 rounded-2xl bg-whiskey-100 px-4 py-3 text-sm text-ink">
+      <p class="font-semibold">Worth a look</p>
+      <ul class="mt-1 list-disc space-y-1 pl-5">
+        <% warnings.each do |warning| %>
+          <li><%= warning %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <p class="mt-4 text-sm text-mute">
+    <% if presentation.published? %>
+      It is live in the library.
+    <% else %>
+      It is not in the library until it is published. Check the price, then publish it from the Actions panel.
+    <% end %>
+  </p>
+  <p class="mt-3">
+    <%= link_to "Open the deck page →", presentation_path(presentation),
+                target: "_blank", rel: "noopener", class: "text-sm #{admin_link_class}" %>
+  </p>
+</section>

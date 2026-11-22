@@ -11,74 +11,115 @@
 #   slides/slide-01.png ...        the rendered slides, in order; the first is the cover
 #
 # The slides arrive already rendered, so nothing here runs LibreOffice and no
-# render job is enqueued. Run it again on the same package and it updates the
-# same deck (matched by title): files and pours are replaced, while the price
-# and the published state an admin has set are left alone.
+# render job is enqueued.
+#
+# Which deck it loads into:
+#   into: deck         updates THAT deck, whatever its title (the admin's
+#                      "Replace with a package", and `decks:load DECK_ID=`).
+#   create_only: true  always creates; refuses with TitleTaken when a deck
+#                      already has the package's title (the admin's
+#                      "Upload a package", so an upload never overwrites a
+#                      different deck by accident).
+#   neither            the rake task's default: updates the deck with the same
+#                      title, or creates one.
+#
+# On an update the package replaces the title, description, category,
+# difficulty, running time, story, files, slides, pours and tags, while the
+# price, the published state, the featured flag, the author, purchases and
+# counters stay as the admin left them.
+#
+# Everything is checked before anything changes, and the changes are saved in
+# one transaction: a package refused part-way leaves the deck as it was. New
+# files are attached by replacement, so the old ones are purged only after the
+# commit (never before), and a live deck is never left without slides.
 #
 # New decks are created unpublished unless `publish: true` is passed, in line
 # with the import rule: import drafts, humans publish.
 class DeckPackageImport
   class Invalid < StandardError; end
 
-  DEFAULT_PRICE = BigDecimal("12.99")
+  # The package's title belongs to a deck the caller did not ask to update.
+  class TitleTaken < Invalid
+    attr_reader :deck
 
-  def self.call(dir, author:, publish: false)
-    new(dir, author: author, publish: publish).call
+    def initialize(message, deck)
+      super(message)
+      @deck = deck
+    end
   end
 
-  def initialize(dir, author:, publish: false)
+  DEFAULT_PRICE = BigDecimal("12.99")
+
+  attr_reader :warnings
+
+  def self.call(dir, **options)
+    new(dir, **options).call
+  end
+
+  def initialize(dir, author:, publish: false, into: nil, create_only: false)
     @dir = Pathname(dir)
     @author = author
     @publish = publish
+    @into = into
+    @create_only = create_only
+    @warnings = []
   end
+
+  def created? = @created
 
   def call
     meta = read_meta
     check_files!(meta)
-    deck = Presentation.find_or_initialize_by(title: meta.fetch("title"))
-    created = deck.new_record?
+    deck = target_for(meta.fetch("title"))
+    @created = deck.new_record?
+    check_script_matches_slides
+    note_missing_downloads(deck, meta)
+    note_missing_pours(deck, meta["pours"])
 
     Presentation.transaction do
       deck.assign_attributes(
         author: deck.author || @author,
+        title: meta.fetch("title"),
         description: meta["description"],
         category: meta["category"],
         difficulty: meta["difficulty"],
         duration: meta["duration"],
         content: story
       )
-      deck.price = BigDecimal((meta["price"] || DEFAULT_PRICE).to_s) if created
-      deck.published = false if created
+      deck.price = BigDecimal((meta["price"] || DEFAULT_PRICE).to_s) if @created
+      deck.published = false if @created
+      assign_files(deck, meta)
       deck.save!
 
-      attach_files(deck, meta)
       replace_pours(deck, meta["pours"])
       deck.tag_names = meta["tags"] if meta["tags"].present?
       deck.update!(published: true) if @publish && !deck.published?
     end
 
     Rails.logger.info(
-      "[DeckPackageImport] #{created ? 'created' : 'updated'} presentation #{deck.id} (#{deck.title}): " \
-      "#{deck.slide_images.count} slides, #{deck.presentation_bottles.count} pours, published=#{deck.published?}"
+      "[DeckPackageImport] #{@created ? 'created' : 'updated'} presentation #{deck.id}" \
+      "#{' (explicit target)' if @into}: #{deck.slide_images.count} slides, " \
+      "#{deck.presentation_bottles.count} pours, published=#{deck.published?}, #{@warnings.size} warning(s)"
     )
     deck
   rescue ActiveRecord::RecordInvalid => e
-    Rails.logger.error("[DeckPackageImport] #{@dir.basename}: #{e.class}: #{e.message}")
-    raise Invalid, "#{@dir.basename}: #{e.message}"
+    Rails.logger.error("[DeckPackageImport] #{@dir.basename}: refused on save: #{e.class}: #{e.message}")
+    raise Invalid, "The deck couldn't be saved: #{e.record.errors.full_messages.to_sentence}"
   end
 
   private
 
   def read_meta
     file = @dir.join("deck.json")
-    raise Invalid, "#{@dir.basename}: deck.json is missing" unless file.file?
+    refuse!("The package has no deck.json") unless file.file?
 
     meta = JSON.parse(file.read)
-    %w[slug title].each { |key| raise Invalid, "#{@dir.basename}: deck.json has no #{key}" if meta[key].blank? }
+    refuse!("deck.json is not a list of deck details") unless meta.is_a?(Hash)
+    %w[slug title].each { |key| refuse!("deck.json has no #{key}") if meta[key].blank? }
     meta
   rescue JSON::ParserError => e
-    Rails.logger.error("[DeckPackageImport] #{@dir.basename}: deck.json is not valid JSON: #{e.message}")
-    raise Invalid, "#{@dir.basename}: deck.json is not valid JSON"
+    Rails.logger.warn("[DeckPackageImport] #{@dir.basename}: deck.json is not valid JSON (#{e.class})")
+    raise Invalid, "deck.json can't be read: it is not valid JSON"
   end
 
   def check_files!(meta)
@@ -87,43 +128,108 @@ class DeckPackageImport
     missing << "slides/slide-01.png" if slide_paths.empty?
     return if missing.empty?
 
-    Rails.logger.warn("[DeckPackageImport] #{@dir.basename}: refused, missing #{missing.join(', ')}")
-    raise Invalid, "#{@dir.basename}: missing #{missing.join(', ')}"
+    refuse!("The package is missing #{missing.to_sentence}")
+  end
+
+  def target_for(title)
+    if @into
+      other = Presentation.where(title: title).where.not(id: @into.id).first
+      if other
+        Rails.logger.warn("[DeckPackageImport] #{@dir.basename}: refused update of presentation #{@into.id}, " \
+                          "title taken by presentation #{other.id}")
+        raise TitleTaken.new("Another deck is already called \"#{title}\". Rename or delete that deck first, " \
+                             "then upload the package again.", other)
+      end
+      return @into
+    end
+
+    existing = Presentation.find_by(title: title)
+    return existing || Presentation.new unless @create_only
+    return Presentation.new unless existing
+
+    Rails.logger.warn("[DeckPackageImport] #{@dir.basename}: refused new deck, title taken by presentation #{existing.id}")
+    raise TitleTaken.new("A deck called \"#{title}\" already exists. To update it, open that deck and " \
+                         "use \"Replace with a package\".", existing)
+  end
+
+  def refuse!(message)
+    Rails.logger.warn("[DeckPackageImport] #{@dir.basename}: refused: #{message}")
+    raise Invalid, "#{message}."
+  end
+
+  def script
+    @script ||= @dir.join("speaker-notes.md").read
   end
 
   # The script, as the story readers see: the presenter's set-up block above
   # the first rule is dropped, and "## [SLIDE 4] Title" becomes "## Title".
   def story
-    text = @dir.join("speaker-notes.md").read
+    text = script
     text = text.split(/^---\s*$/, 2).last if text.match?(/^---\s*$/)
     text.gsub(/^## \[SLIDE \d+\] /, "## ").strip
+  end
+
+  def check_script_matches_slides
+    sections = script.scan(/^## \[SLIDE \d+\]/).size
+    return if sections == slide_paths.size
+
+    @warnings << "The package has #{slide_paths.size} slides but the script has #{sections} [SLIDE n] sections. " \
+                 "The deck was loaded; check the script against the slides."
+  end
+
+  OPTIONAL_DOWNLOADS = {
+    speaker_notes: [ "-speaker-notes.pdf", "speaker notes PDF" ],
+    outline_file: [ "-research-outline.pdf", "research outline PDF" ]
+  }.freeze
+
+  def note_missing_downloads(deck, meta)
+    OPTIONAL_DOWNLOADS.each do |slot, (suffix, label)|
+      name = "#{meta['slug']}#{suffix}"
+      next if @dir.join(name).file?
+
+      attachment = deck.public_send(slot)
+      @warnings << if !@created && attachment.attached?
+        "The package has no #{label} (#{name}), so the deck keeps its previous one (#{attachment.filename})."
+      else
+        "The package has no #{label} (#{name}), so owners won't get one."
+      end
+    end
+  end
+
+  def note_missing_pours(deck, pours)
+    return if pours.present?
+
+    @warnings << if !@created && deck.presentation_bottles.exists?
+      "deck.json lists no pours, so the deck keeps its existing pour list."
+    else
+      "deck.json lists no pours, so the deck has no pour list."
+    end
   end
 
   def slide_paths
     @slide_paths ||= @dir.glob("slides/slide-*.png").sort
   end
 
-  def attach_files(deck, meta)
+  # Assigned, not attached: nothing is stored until the save, a failed save
+  # stores nothing, and replaced files are purged only after the commit.
+  def assign_files(deck, meta)
     slug = meta["slug"]
-    attach_one(deck.pdf_file, @dir.join("#{slug}.pptx"))
-    attach_one(deck.speaker_notes, @dir.join("#{slug}-speaker-notes.pdf"), "application/pdf")
-    attach_one(deck.outline_file, @dir.join("#{slug}-research-outline.pdf"), "application/pdf")
-    attach_one(deck.featured_image, slide_paths.first, "image/png")
-
-    deck.slide_images.purge if deck.slide_images.attached?
-    slide_paths.each do |path|
-      deck.slide_images.attach(io: path.open("rb"), filename: path.basename.to_s, content_type: "image/png")
+    assign_one(deck, :pdf_file, @dir.join("#{slug}.pptx"))
+    assign_one(deck, :speaker_notes, @dir.join("#{slug}-speaker-notes.pdf"), "application/pdf")
+    assign_one(deck, :outline_file, @dir.join("#{slug}-research-outline.pdf"), "application/pdf")
+    assign_one(deck, :featured_image, slide_paths.first, "image/png")
+    deck.slide_images = slide_paths.map do |path|
+      { io: path.open("rb"), filename: path.basename.to_s, content_type: "image/png" }
     end
   end
 
-  def attach_one(attachment, path, content_type = nil)
+  def assign_one(deck, slot, path, content_type = nil)
     unless path&.file?
-      Rails.logger.info("[DeckPackageImport] #{@dir.basename}: no #{path&.basename}, skipping that download")
+      Rails.logger.info("[DeckPackageImport] #{@dir.basename}: no #{path&.basename}, leaving #{slot} as it is")
       return
     end
 
-    attachment.purge if attachment.attached?
-    attachment.attach(io: path.open("rb"), filename: path.basename.to_s, content_type: content_type)
+    deck.public_send("#{slot}=", { io: path.open("rb"), filename: path.basename.to_s, content_type: content_type }.compact)
   end
 
   # The package is the source of truth for what the deck calls for, so the

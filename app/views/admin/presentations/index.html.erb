@@ -5,6 +5,7 @@
 <%= render "admin/shared/page_header", title: "Presentations",
            lede: "#{@presentations.count} presentations total" do %>
   <%= link_to "New presentation", new_admin_presentation_path, class: "btn btn-primary min-h-11 py-2.5" %>
+  <%= link_to "Upload a package", new_admin_deck_package_path, class: "btn btn-secondary min-h-11 py-2.5" %>
 <% end %>
 
 <%= render "admin/shared/table", rows: @presentations,
