@@ -1,0 +1,31 @@
+<%# The deck's pour list: one row per pour that opens to its fields. ONE pour
+    list. Rows are nested attributes on the deck, so they save with "Save
+    deck" like every other field, and a row can either point at a catalog
+    bottle (giving the deck real tasting scores and naming the deck on that
+    bottle's page) or just carry text for a pour that isn't catalogued, like a
+    cocktail. Used on the deck page (Pour list tab) and the new-deck form.
+    Locals: form, presentation %>
+<section class="card p-5 sm:p-6" data-controller="pour-list">
+  <h2 class="text-xl font-semibold text-ink">The pour list <span class="ml-1 align-middle text-sm font-normal text-mute">(optional)</span></h2>
+  <p class="mb-4 mt-1 text-sm text-mute">
+    Appears on: the deck's pour list section, and in the buyer's "what you get" manifest with a count.
+  </p>
+
+  <div data-pour-list-target="container" class="border-t border-hairline">
+    <%= form.fields_for :presentation_bottles do |pour_form| %>
+      <%= render "admin/presentations/pour_fields", f: pour_form %>
+    <% end %>
+  </div>
+
+  <button type="button" data-action="click->pour-list#add"
+          class="btn btn-secondary mt-4 min-h-11 py-2.5">
+    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+    Add a pour
+  </button>
+
+  <template data-pour-list-target="template">
+    <%= form.fields_for :presentation_bottles, PresentationBottle.new, child_index: "NEW_RECORD" do |pour_form| %>
+      <%= render "admin/presentations/pour_fields", f: pour_form %>
+    <% end %>
+  </template>
+</section>

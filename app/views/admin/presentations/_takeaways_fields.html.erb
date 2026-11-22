@@ -1,0 +1,48 @@
+<%# The takeaways ("What you'll learn"), edited as cards by
+    what_youll_learn_controller into one hidden field. Locals: form, presentation %>
+<section id="f-pitch" class="card scroll-mt-56 p-5 sm:p-7" data-controller="what-youll-learn">
+  <h2 class="text-xl font-semibold text-ink">The takeaways, what you'll learn</h2>
+  <p class="mb-5 mt-1 text-sm text-mute">Appears on: the "What you'll learn" grid, right under the hero.</p>
+
+  <%= form.hidden_field :what_youll_learn, id: "what_youll_learn_hidden" %>
+  <input type="hidden" id="existing-what-youll-learn" value="<%= presentation.what_youll_learn %>" />
+
+  <div data-what-youll-learn-target="container" class="mb-4 space-y-4"></div>
+
+  <button type="button"
+          data-action="click->what-youll-learn#addLearningPoint"
+          class="btn btn-secondary min-h-11 py-2.5">
+    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+    Add takeaway
+  </button>
+
+  <template data-what-youll-learn-target="template">
+    <div class="learning-point-item rounded-2xl border border-hairline bg-paper p-4">
+      <div class="mb-3 flex items-start justify-between">
+        <h3 class="text-sm font-semibold text-ink">Takeaway</h3>
+        <button type="button"
+                data-action="click->what-youll-learn#removeLearningPoint"
+                class="inline-flex h-11 w-11 items-center justify-center rounded-xl text-red-700 transition hover:bg-red-50" aria-label="Remove takeaway">
+          <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12"></path></svg>
+        </button>
+      </div>
+      <div class="space-y-3">
+        <div>
+          <label class="<%= admin_label_class %>">Title</label>
+          <input type="text"
+                 class="learning-title <%= admin_field_class %>"
+                 placeholder="e.g., Rye Whiskey Foundations"
+                 data-action="input->what-youll-learn#fieldChanged">
+        </div>
+        <div>
+          <label class="<%= admin_label_class %>">Description</label>
+          <textarea
+                 class="learning-description <%= admin_field_class %>"
+                 rows="2"
+                 placeholder="e.g., What sets rye apart, mash bills, legal definitions, and signature character."
+                 data-action="input->what-youll-learn#fieldChanged"></textarea>
+        </div>
+      </div>
+    </div>
+  </template>
+</section>

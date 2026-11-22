@@ -1,8 +1,8 @@
-<% content_for :title, "New Presentation - Admin" %>
+<% content_for :title, "New deck - Admin" %>
 
-<%= render "admin/shared/page_header", title: "New presentation",
+<%= render "admin/shared/page_header", title: "New deck",
            lede: "Create a new whiskey presentation for the platform.",
-           back: [ "Presentations", admin_presentations_path ] %>
+           back: [ "Decks", admin_presentations_path ] %>
 
 <%# Import from a deck file: parses the .pptx/.ppt/.pdf into a pre-filled draft.
     The form's action, field name and multipart/turbo settings belong to the
@@ -23,4 +23,4 @@
 
 <p class="mb-6 text-sm font-medium text-mute">or fill it in from scratch</p>
 
-<%= render 'form', presentation: @presentation, submit_text: 'Create draft' %>
+<%= render "form", presentation: @presentation, submit_text: "Create draft" %>

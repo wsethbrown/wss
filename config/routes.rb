@@ -134,6 +134,9 @@ Rails.application.routes.draw do
       collection { post :import }
       member { post :publish; post :unpublish; post :render_slides }
       resource :package, only: [ :new, :create ], controller: "deck_packages"
+      # "Open" on the deck page: one of the deck's files by slot name (a
+      # whitelist in the controller), for any admin, whoever owns the deck.
+      get "files/:slot", to: "presentation_files#show", as: :file
       # The deck's pour list, linked to catalog bottles (Phase 3 deck ties).
     end
     resources :users, only: [ :index, :show, :edit, :update ] do

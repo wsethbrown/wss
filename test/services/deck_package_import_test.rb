@@ -194,6 +194,65 @@ class DeckPackageImportTest < ActiveSupport::TestCase
     assert_empty importer.warnings
   end
 
+  # --- The script for each slide, kept for the admin deck page ---
+
+  test "keeps the script for each slide, in order, without changing the story" do
+    deck = DeckPackageImport.call(@dir, author: users(:admin))
+
+    assert_equal [
+      { "title" => "Test Deck", "body" => "Thanks for coming." },
+      { "title" => "Pour one — A Rye", "body" => "Try it neat." },
+      { "title" => "Last word", "body" => "Goodnight." }
+    ], deck.reload.slide_script
+    assert_match(/\A## Test Deck/, deck.content.strip, "the story is built as before")
+    assert_no_match(/Running order/, deck.slide_script.to_json, "the presenter's set-up block is not a slide")
+  end
+
+  test "a section's body keeps its Markdown and drops a trailing rule" do
+    File.write(File.join(@dir, "speaker-notes.md"), <<~MD)
+      Set-up.
+
+      ---
+
+      ## [SLIDE 1] Open
+
+      _Hold up the glass._
+
+      > **SAY IT**
+      > Out loud.
+
+      ---
+
+      ## [SLIDE 2] Close
+
+      Bye.
+    MD
+    deck = DeckPackageImport.call(@dir, author: users(:admin))
+    first = deck.reload.slide_script.first
+    assert_equal "Open", first["title"]
+    assert_equal "_Hold up the glass._\n\n> **SAY IT**\n> Out loud.", first["body"]
+  end
+
+  test "a re-import replaces the script, and a script with no slide sections leaves it empty" do
+    deck = DeckPackageImport.call(@dir, author: users(:admin))
+    File.write(File.join(@dir, "speaker-notes.md"), "## [SLIDE 1] Only one\n\nNew words.\n")
+    DeckPackageImport.call(@dir, author: users(:admin), into: deck)
+    assert_equal [ { "title" => "Only one", "body" => "New words." } ], deck.reload.slide_script
+
+    File.write(File.join(@dir, "speaker-notes.md"), "## A chapter\n\nNo slide markers here.\n")
+    DeckPackageImport.call(@dir, author: users(:admin), into: deck)
+    assert_equal [], deck.reload.slide_script
+  end
+
+  test "a package refused on save leaves the old script in place" do
+    deck = DeckPackageImport.call(@dir, author: users(:admin))
+    old = deck.reload.slide_script
+    File.write(File.join(@dir, "speaker-notes.md"), "## [SLIDE 1] Replaced\n\nGone.\n")
+    write_meta(description: "x" * 1001)
+    assert_raises(DeckPackageImport::Invalid) { DeckPackageImport.call(@dir, author: users(:admin), into: deck) }
+    assert_equal old, deck.reload.slide_script
+  end
+
   test "publish: a $0 package is not published free unless that is confirmed" do
     write_meta(price: 0)
     assert_raises(DeckPackageImport::Invalid) { DeckPackageImport.call(@dir, author: users(:admin), publish: true) }

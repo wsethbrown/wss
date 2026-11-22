@@ -42,7 +42,7 @@ class Admin::DeckPackagesControllerTest < ActionDispatch::IntegrationTest
       post admin_deck_packages_path, params: { package: upload }
     end
     deck = Presentation.order(:id).last
-    assert_redirected_to admin_presentation_path(deck)
+    assert_redirected_to edit_admin_presentation_path(deck)
     assert_equal "Test Deck", deck.title
     assert_not deck.published?
     assert_equal 3, deck.slide_images.count
@@ -72,7 +72,7 @@ class Admin::DeckPackagesControllerTest < ActionDispatch::IntegrationTest
 
   test "replacing updates that deck in place, whatever its title, and keeps price and published" do
     deck = live_deck
-    get admin_presentation_path(deck)
+    get edit_admin_presentation_path(deck)
     assert_select "a[href=?]", new_admin_presentation_package_path(deck), text: "Replace with a package"
     get new_admin_presentation_package_path(deck)
     assert_response :success
@@ -81,7 +81,7 @@ class Admin::DeckPackagesControllerTest < ActionDispatch::IntegrationTest
     assert_no_difference -> { Presentation.count } do
       post admin_presentation_package_path(deck), params: { package: upload }
     end
-    assert_redirected_to admin_presentation_path(deck)
+    assert_redirected_to edit_admin_presentation_path(deck)
     deck.reload
     assert_equal "Test Deck", deck.title
     assert_equal BigDecimal("24"), deck.price

@@ -1,0 +1,13 @@
+<%# The deck form's validation errors. Shown above the tabs on the deck page
+    (deck-tabs then opens the tab holding the first field in error), and at
+    the top of the new-deck form. Locals: presentation %>
+<% if presentation.errors.any? %>
+  <div class="mt-6 rounded-2xl bg-red-50 px-5 py-4 text-red-700" role="alert">
+    <h2 class="text-base font-semibold">Please fix the following errors:</h2>
+    <ul class="mt-2 list-inside list-disc">
+      <% presentation.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+    </ul>
+  </div>
+<% end %>

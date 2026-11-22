@@ -1,0 +1,33 @@
+<%# What you'll taste: one profile for the whole flight. When all four notes
+    are empty the section is hidden on the buyer page, so the fields fold
+    away behind "Add tasting notes" (a native <details>: no JavaScript needed).
+    Locals: form, presentation %>
+<% fields = {
+     nose_notes:   [ "Nose",   "e.g., Vanilla, honey, light oak, subtle fruit", "Aromas, before the first sip" ],
+     palate_notes: [ "Palate", "e.g., Smooth and balanced, caramel, then spice", "Flavors on the tongue" ],
+     finish_notes: [ "Finish", "e.g., Medium length, warming oak, gentle smoke", "The aftertaste, and how long it lasts" ],
+     body_notes:   [ "Body",   "e.g., Medium-bodied, smooth, approachable", "Mouthfeel and texture" ]
+   } %>
+<% empty = fields.keys.none? { |field| presentation.public_send(field).present? } %>
+<% open = !empty || fields.keys.any? { |field| presentation.errors[field].any? } %>
+<section id="f-tasting" class="card scroll-mt-56 p-5 sm:p-7">
+  <h2 class="text-xl font-semibold text-ink">What you'll taste <span class="ml-1 align-middle text-sm font-normal text-mute">(optional)</span></h2>
+  <p class="mt-1 text-sm text-mute">Appears on: the tasting section, set like a back label.</p>
+
+  <details class="group mt-5" <%= "open" if open %>>
+    <summary class="flex min-h-11 cursor-pointer list-none flex-wrap items-center gap-x-2 text-sm group-open:hidden [&::-webkit-details-marker]:hidden">
+      <span class="text-mute">Hidden on the buyer page: all four notes are empty.</span>
+      <span class="<%= admin_link_class %>">Add tasting notes</span>
+    </summary>
+
+    <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+      <% fields.each do |field, (label, placeholder, hint)| %>
+        <div>
+          <%= form.label field, label, class: admin_label_class %>
+          <%= form.text_area field, rows: 3, class: admin_field_class, placeholder: placeholder %>
+          <p class="mt-1 text-xs text-mute"><%= hint %></p>
+        </div>
+      <% end %>
+    </div>
+  </details>
+</section>

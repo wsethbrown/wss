@@ -24,7 +24,7 @@
 #                      title, or creates one.
 #
 # On an update the package replaces the title, description, category,
-# difficulty, running time, story, files, slides, pours and tags, while the
+# difficulty, running time, story, slide script, files, slides, pours and tags, while the
 # price, the published state, the featured flag, the author, purchases and
 # counters stay as the admin left them.
 #
@@ -85,7 +85,8 @@ class DeckPackageImport
         category: meta["category"],
         difficulty: meta["difficulty"],
         duration: meta["duration"],
-        content: story
+        content: story,
+        slide_script: slide_script
       )
       deck.price = BigDecimal((meta["price"] || DEFAULT_PRICE).to_s) if @created
       deck.published = false if @created
@@ -103,7 +104,8 @@ class DeckPackageImport
     Rails.logger.info(
       "[DeckPackageImport] #{@created ? 'created' : 'updated'} presentation #{deck.id}" \
       "#{' (explicit target)' if @into}: #{deck.slide_images.count} slides, " \
-      "#{deck.presentation_bottles.count} pours, published=#{deck.published?}, #{@warnings.size} warning(s)"
+      "#{deck.presentation_bottles.count} pours, #{slide_script.size} slide script section(s), " \
+      "published=#{deck.published?}, #{@warnings.size} warning(s)"
     )
     deck
   rescue ActiveRecord::RecordInvalid => e
@@ -171,6 +173,23 @@ class DeckPackageImport
     text = script
     text = text.split(/^---\s*$/, 2).last if text.match?(/^---\s*$/)
     text.gsub(/^## \[SLIDE \d+\] /, "## ").strip
+  end
+
+  SLIDE_HEADING = /^## \[SLIDE \d+\][ \t]*(.*)$/
+
+  # The script for each slide, kept beside its slide on the admin deck page:
+  # one { "title", "body" } per "## [SLIDE n] Title" section, in the order the
+  # sections appear (the slides are in order too). The body is the section's
+  # Markdown, with a closing "---" rule dropped. Empty when the script has no
+  # slide sections. Paid content: admin pages only, never a buyer page.
+  def slide_script
+    @slide_script ||= begin
+      parts = script.split(SLIDE_HEADING, -1)
+      parts.shift # whatever comes before the first section (the set-up block)
+      parts.each_slice(2).map do |title, body|
+        { "title" => title.to_s.strip, "body" => body.to_s.strip.sub(/\n*^-{3,}\s*\z/, "").strip }
+      end
+    end
   end
 
   def check_script_matches_slides

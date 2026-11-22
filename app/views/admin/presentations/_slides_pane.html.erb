@@ -1,0 +1,110 @@
+<%# The Slides and script tab: every slide (ordered by id), a filmstrip with
+    the free preview slides marked, one large slide, and beside it the script
+    for that slide (kept per slide by DeckPackageImport). slide-viewer does the
+    stepping, the arrow keys and "Find in the script"; without JavaScript the
+    first slide shows large, each thumbnail opens its slide, and every
+    slide's script is listed.
+
+    The script is paid content: it is only ever rendered here, on an admin
+    page. Locals: form, presentation, slides, script, saved (optional: the deck
+    as stored, after a refused save) %>
+<% saved = local_assigns[:saved] || presentation %>
+<% total = slides.size %>
+<% free = saved.effective_preview_slide_count %>
+<% has_script = script.any? %>
+
+<section class="card p-5 sm:p-6"
+         data-controller="slide-viewer"
+         data-slide-viewer-total-value="<%= total %>">
+  <h2 class="sr-only">Slides and script</h2>
+
+  <div class="mb-5 flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center sm:justify-between">
+    <% if total.positive? && has_script %>
+      <div class="hidden min-w-0 flex-1 items-center gap-3 sm:max-w-md" data-slide-viewer-target="findBox">
+        <input type="search" placeholder="Find in the script" aria-label="Find in the script" autocomplete="off"
+               class="<%= admin_field_class %> min-h-11"
+               data-slide-viewer-target="query"
+               data-action="input->slide-viewer#find keydown->slide-viewer#queryKeydown">
+        <span class="shrink-0 whitespace-nowrap text-sm text-mute" data-slide-viewer-target="hits" aria-live="polite"></span>
+      </div>
+    <% end %>
+    <label class="flex flex-wrap items-center gap-2 text-sm text-mute">
+      Free preview, first
+      <%= form.number_field :preview_slide_count, min: 1, value: presentation.preview_slide_count || 3,
+            class: "#{admin_field_class} !w-20 min-h-11 !py-2",
+            data: { slide_viewer_target: "free", action: "input->slide-viewer#freeChanged" } %>
+      of <%= pluralize(total, "slide") %>
+    </label>
+  </div>
+
+  <% if total.positive? %>
+    <div class="grid grid-cols-1 gap-5 <%= has_script ? 'lg:grid-cols-[10.5rem_minmax(0,1fr)_minmax(0,22rem)]' : 'lg:grid-cols-[10.5rem_minmax(0,1fr)]' %> lg:items-start">
+      <%# Filmstrip: a sideways strip on a phone, a two-column scroller beside the slide on desktop. %>
+      <div class="order-2 flex gap-2 overflow-x-auto pb-1 lg:order-1 lg:grid lg:max-h-[34rem] lg:grid-cols-2 lg:overflow-y-auto lg:overflow-x-visible lg:p-0.5"
+           data-slide-viewer-target="film">
+        <% slides.each_with_index do |slide, i| %>
+          <a href="<%= url_for(image_variant(slide, :hero)) %>" target="_blank" rel="noopener"
+             class="relative block w-24 shrink-0 rounded-[10px] border-2 border-transparent transition-opacity aria-[current=true]:border-ink lg:w-auto"
+             aria-label="Slide <%= i + 1 %><%= ", #{script[i]['title']}" if script[i].present? && script[i]['title'].present? %>"
+             data-slide-viewer-target="thumb" data-index="<%= i %>"
+             data-hero-url="<%= url_for(image_variant(slide, :hero)) %>"
+             data-action="click->slide-viewer#pick">
+            <%= image_tag image_variant(slide, :card), alt: "", loading: "lazy",
+                          class: "block aspect-video w-full rounded-lg object-cover" %>
+            <span class="absolute bottom-1 left-1 rounded-md bg-ink/85 px-1.5 py-0.5 text-[11px] font-semibold leading-none text-white tabular-nums"><%= i + 1 %></span>
+            <span class="absolute right-1 top-1 rounded-md bg-white px-1.5 py-0.5 text-[10px] font-bold leading-none text-ink"
+                  data-slide-viewer-target="badge" <%= "hidden" unless i < free %>>free</span>
+          </a>
+        <% end %>
+      </div>
+
+      <div class="order-1 min-w-0 space-y-3 lg:order-2">
+        <%= image_tag image_variant(slides.first, :hero), alt: "Slide 1",
+                      class: "block aspect-video w-full rounded-[18px] border border-hairline bg-char object-contain",
+                      data: { slide_viewer_target: "stage" } %>
+        <div class="hidden flex-wrap items-center justify-between gap-2" data-slide-viewer-target="controls">
+          <button type="button" class="btn btn-secondary min-h-11 py-2" data-action="slide-viewer#previous">← Previous</button>
+          <span class="font-semibold text-ink tabular-nums" data-slide-viewer-target="position" aria-live="polite">Slide 1 of <%= total %></span>
+          <button type="button" class="btn btn-secondary min-h-11 py-2" data-action="slide-viewer#next">Next →</button>
+        </div>
+      </div>
+
+      <% if has_script %>
+        <div class="order-3 min-w-0 rounded-[22px] border border-hairline bg-white p-5 lg:max-h-[34rem] lg:overflow-y-auto"
+             data-slide-viewer-target="notes">
+          <% script.first(total).each_with_index do |entry, i| %>
+            <article data-slide-viewer-target="script" data-index="<%= i %>" class="[&+article]:mt-8">
+              <h3 class="text-lg font-semibold text-ink"><%= entry["title"].presence || "Slide #{i + 1}" %></h3>
+              <p class="mb-3 mt-0.5 text-xs text-mute">Script for slide <%= i + 1 %></p>
+              <div class="prose-deck !text-base"><%= render_markdown(entry["body"].to_s) %></div>
+            </article>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <% unless has_script %>
+      <p class="mt-5 text-sm text-mute">
+        <% if saved.speaker_notes.attached? %>
+          Speaker notes · <%= saved.speaker_notes.filename %> ·
+          <%= link_to "Open", admin_presentation_file_path(presentation, "speaker_notes"), target: "_blank", rel: "noopener", class: "inline-flex min-h-11 items-center #{admin_link_class}" %>
+        <% end %>
+      </p>
+    <% end %>
+  <% elsif saved.slide_render_pending? %>
+    <div class="rounded-2xl border border-hairline bg-paper px-4 py-3 text-sm text-ink">
+      <span class="font-semibold text-ink">Rendering slide previews&hellip;</span> usually under a minute. Reload to see them.
+    </div>
+  <% elsif saved.pdf_file.attached? %>
+    <div class="rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">
+      <span class="font-semibold">No slide previews yet.</span> Use
+      <a href="#publish" class="font-semibold underline underline-offset-4">"Re-render slide previews"</a>, or re-upload the deck file in
+      <a href="#pane-files" class="font-semibold underline underline-offset-4">Files</a>.
+    </div>
+  <% else %>
+    <div class="rounded-2xl border border-hairline bg-paper px-4 py-3 text-sm text-ink">
+      <span class="font-semibold">No deck file,</span> required to publish. Add it in
+      <a href="#pane-files" class="<%= admin_link_class %>">Files</a>.
+    </div>
+  <% end %>
+</section>

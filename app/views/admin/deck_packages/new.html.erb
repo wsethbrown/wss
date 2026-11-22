@@ -7,11 +7,11 @@
 <% if replacing %>
   <%= render "admin/shared/page_header", title: "Replace with a package",
              lede: @presentation.title,
-             back: [ @presentation.title, admin_presentation_path(@presentation) ] %>
+             back: [ @presentation.title, edit_admin_presentation_path(@presentation, anchor: "files") ] %>
 <% else %>
   <%= render "admin/shared/page_header", title: "Upload a package",
              lede: "Load a finished deck from its package zip, as a new draft.",
-             back: [ "Presentations", admin_presentations_path ] %>
+             back: [ "Decks", admin_presentations_path ] %>
 <% end %>
 
 <% if @error.present? %>
@@ -22,7 +22,7 @@
       <p class="mt-2">
         <% if replacing %>
           <%= link_to "Open the other deck called #{@taken_deck.title} →",
-                      admin_presentation_path(@taken_deck), class: "font-semibold underline underline-offset-4" %>
+                      edit_admin_presentation_path(@taken_deck), class: "font-semibold underline underline-offset-4" %>
         <% else %>
           <%= link_to "Replace #{@taken_deck.title} with this package instead →",
                       new_admin_presentation_package_path(@taken_deck), class: "font-semibold underline underline-offset-4" %>
@@ -46,7 +46,7 @@
         </div>
         <div class="mt-5 flex flex-wrap gap-3 border-t border-hairline pt-5">
           <%= f.submit (replacing ? "Replace this deck" : "Upload package"), class: "btn btn-primary" %>
-          <%= link_to "Cancel", (replacing ? admin_presentation_path(@presentation) : admin_presentations_path),
+          <%= link_to "Cancel", (replacing ? edit_admin_presentation_path(@presentation, anchor: "files") : admin_presentations_path),
                       class: "btn btn-secondary" %>
         </div>
       <% end %>

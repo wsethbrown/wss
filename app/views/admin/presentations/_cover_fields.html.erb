@@ -1,0 +1,107 @@
+<%# The cover: what the library card and the deck page hero say.
+    Locals: form, presentation, files_link (true on the deck page: show the
+    banner image with a link to the Files tab, where its upload lives; the
+    new-deck form has the upload in its files card instead) %>
+<% files_link = local_assigns.fetch(:files_link, false) %>
+<% saved = local_assigns[:saved] || presentation %>
+<section id="f-cover" class="card scroll-mt-56 p-5 sm:p-7">
+  <h2 class="text-xl font-semibold text-ink">The cover</h2>
+  <p class="mb-5 mt-1 text-sm text-mute">Appears on: the library card, the deck page hero, and search filters.</p>
+
+  <div class="grid grid-cols-1 gap-5 md:grid-cols-2">
+    <div class="md:col-span-2">
+      <%= form.label :title, class: admin_label_class %>
+      <%= form.text_field :title, class: admin_field_class, placeholder: "e.g., Introduction to Scotch Whisky" %>
+    </div>
+
+    <div class="md:col-span-2">
+      <%= form.label :description, "Description, the one-line pitch", class: admin_label_class %>
+      <%= form.text_area :description, rows: [ (presentation.description.to_s.length / 90.0).ceil + 1, 3 ].max.clamp(3, 10),
+            class: admin_field_class, placeholder: "One or two sentences under the title, why THIS deck, in the buyer's language." %>
+      <p class="mt-1 text-xs text-mute">Shows under the title on the hero and on every library card. This line does the most selling per word on the site.</p>
+    </div>
+
+    <div data-controller="category-picker">
+      <%= form.label :category, class: admin_label_class %>
+      <%# A real dropdown (datalist looked like one but filtered against the
+          current value, so it never appeared to open). "+ New category…"
+          swaps in a text field; the disabled control doesn't submit. %>
+      <% categories = (Presentation.distinct.pluck(:category).compact +
+          [ "Scotch Whisky", "Bourbon", "Irish Whiskey", "Japanese Whisky",
+            "Rye Whiskey", "Canadian Whisky", "Cocktails", "General Education" ]).uniq.sort %>
+      <%= form.select :category,
+          options_for_select(categories, presentation.category) + options_for_select([ [ "+ New category…", "__new__" ] ]),
+          { include_blank: "No category" },
+          { class: admin_field_class,
+            data: { category_picker_target: "select", action: "change->category-picker#change" } } %>
+      <div class="hidden" data-category-picker-target="inputWrapper">
+        <div class="flex gap-2">
+          <%= form.text_field :category, value: "", disabled: true, id: "presentation_category_new",
+              placeholder: "Name the new category",
+              class: admin_field_class,
+              data: { category_picker_target: "input" } %>
+          <button type="button" data-action="click->category-picker#backToList"
+                  class="btn btn-secondary min-h-11 shrink-0 whitespace-nowrap py-2.5"
+                  title="Back to the category list">↩ list</button>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <%= form.label :difficulty, class: admin_label_class %>
+      <%= form.select :difficulty,
+          options_for_select([ [ "Beginner", "Beginner" ], [ "Intermediate", "Intermediate" ], [ "Advanced", "Advanced" ] ], presentation.difficulty),
+          { include_blank: "Select difficulty level" },
+          { class: admin_field_class } %>
+    </div>
+
+    <div>
+      <%= form.label :price, "Price (USD)", class: admin_label_class %>
+      <%= form.number_field :price, step: 0.01, min: 0, class: admin_field_class, placeholder: "9.99" %>
+      <p class="mt-1 text-xs text-mute">0 makes the deck free to claim.</p>
+      <label class="mt-2 flex min-h-11 items-center gap-3 text-sm text-ink">
+        <%= form.check_box :free_confirmed, class: "h-5 w-5 rounded border-hairline text-ink focus:ring-ink/30" %>
+        <span>This deck is free (needed to publish at $0)</span>
+      </label>
+    </div>
+
+    <div>
+      <%= form.label :duration, "Running time", class: admin_label_class %>
+      <%= form.text_field :duration, class: admin_field_class, placeholder: "45 min" %>
+      <p class="mt-1 text-xs text-mute">How long the night runs when presented. A bare number reads as minutes.</p>
+    </div>
+
+    <div class="md:col-span-2">
+      <%= form.label :tag_names, "Tags", class: admin_label_class %>
+      <%= form.text_field :tag_names, placeholder: "smoky, islay, blind tasting",
+          class: admin_field_class %>
+      <p class="mt-1 text-xs text-mute">Comma-separated, up to 10. Lowercased automatically; buyers can filter the library by tag.</p>
+    </div>
+
+    <div class="rounded-2xl border border-hairline bg-paper p-4 md:col-span-2">
+      <label class="flex items-start gap-3">
+        <%= form.check_box :featured, class: "mt-0.5 h-5 w-5 rounded border-hairline text-ink focus:ring-ink/30" %>
+        <span>
+          <span class="block text-sm font-medium text-ink">Feature this deck</span>
+          <span class="block text-xs text-mute">Spotlights it on the homepage, pins it to the top of the library, and adds a Featured badge. Use it to push a timely deck (a Derby Mint Julep, a Christmas eggnog). The most recently featured published deck becomes the homepage spotlight.</span>
+        </span>
+      </label>
+    </div>
+
+    <% if files_link %>
+      <%# The banner's upload is in the Files tab (one file field per slot). %>
+      <div class="md:col-span-2">
+        <p class="<%= admin_label_class %>">Banner image</p>
+        <% if saved.featured_image.attached? %>
+          <div class="mb-3">
+            <%= image_tag image_variant(saved.featured_image, :card), alt: "", class: "h-32 w-auto rounded-[18px] border border-hairline" %>
+          </div>
+        <% else %>
+          <p class="mb-1 text-sm text-mute">not uploaded</p>
+        <% end %>
+        <p class="text-xs text-mute">Sits behind the hero title. Landscape works best (JPEG, PNG, GIF, or WebP, max 15MB).
+          <a href="#pane-files" class="inline-flex min-h-11 items-center <%= admin_link_class %>">Open or replace files →</a></p>
+      </div>
+    <% end %>
+  </div>
+</section>

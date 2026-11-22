@@ -35,7 +35,7 @@ class Admin::DeckPackagesController < Admin::BaseController
                       "from a deck package: #{deck.slide_images.count} slides, #{deck.presentation_bottles.count} pours, " \
                       "published=#{deck.published?}, #{importer.warnings.size} warning(s)"
     flash[:package_summary] = { "created" => importer.created?, "warnings" => importer.warnings }
-    redirect_to admin_presentation_path(deck),
+    redirect_to edit_admin_presentation_path(deck),
                 notice: importer.created? ? "Package uploaded. The new deck is a draft." : "Package loaded into this deck."
   rescue DeckPackageImport::TitleTaken => e
     @taken_deck = e.deck

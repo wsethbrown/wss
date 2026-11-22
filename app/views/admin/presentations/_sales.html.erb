@@ -1,0 +1,36 @@
+<%# The Sales tab: who bought the deck and how, and its download analytics.
+    Locals: presentation, purchases %>
+<div class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start">
+  <%= render "admin/presentations/purchase_stats", purchases: purchases,
+             footer: link_to("Download analytics", admin_presentation_downloads_analytics_path(presentation),
+                             class: "btn btn-secondary min-h-11 py-2.5") %>
+
+  <% if purchases.empty? %>
+    <section class="card p-5 sm:p-6">
+      <h2 class="text-lg font-semibold text-ink">Recent purchases</h2>
+      <p class="mt-1 text-sm text-mute">Nobody owns this deck yet.</p>
+    </section>
+  <% end %>
+</div>
+
+<% if purchases.any? %>
+  <%= render "admin/shared/table", rows: purchases.first(10), title: "Recent purchases",
+             columns: [ "User", "Purchase type", [ "Amount", :right ], [ "Date", :right ] ] do |purchase| %>
+    <%= admin_td(purchase.user.full_name) %>
+    <%= admin_td do %>
+      <% if purchase.purchase_type == "credit" %>
+        <%= render "admin/shared/status_chip", label: "Credit", tone: :attention %>
+      <% else %>
+        <%= render "admin/shared/status_chip", label: "Direct", tone: :ok %>
+      <% end %>
+    <% end %>
+    <%= admin_td(align: :right) do %>
+      <% if purchase.purchase_type == "direct" %>
+        <%= number_to_currency(purchase.purchase_price || presentation.price) %>
+      <% else %>
+        1 Credit
+      <% end %>
+    <% end %>
+    <%= admin_td(purchase.created_at.strftime("%b %d, %Y"), align: :right) %>
+  <% end %>
+<% end %>
