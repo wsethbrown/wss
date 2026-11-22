@@ -48,9 +48,7 @@ OVH's default login is user `ubuntu` with sudo, not root; Kamal here deploys as 
    the Mac and the server, points `config/deploy.yml` at the new address, regenerates the
    master key, restores the 27 October dump into the new database, deploys with Kamal, removes
    the junk accounts, sets up the sign-up human check and walks through the DNS change.
-   **If `bin/relaunch-production` and `docs/relaunch.md` are not in the checkout, they are
-   still being written in the cloud session: pull again later, or follow
-   `docs/launch-checklist.md` and the production-launch skill by hand.** The script was tested
+   Both `bin/relaunch-production` and `docs/relaunch.md` are on the branch (`bin/relaunch-production --help` lists the steps). The script was tested
    against stand-ins only, never against a real server or Kamal, so expect to debug it. It is
    written to be re-run from any step.
 4. **Cloudflare (browser), when the script asks.**
