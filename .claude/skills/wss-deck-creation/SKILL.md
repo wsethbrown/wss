@@ -188,6 +188,10 @@ should live; never leave them only in a scratch directory.
 2. Counts match: slides = `[SLIDE n]` sections = PNGs (the build checks; confirm the number).
 3. Open the pptx notes for two or three slides and read them: script present, right slide.
 4. The pptx opens cleanly (the build re-opens it; if you can, open it in Keynote or PowerPoint).
+   Keynote is the strict one: it refuses a pptx whose notes master is not listed in
+   `presentation.xml`, which the build now writes and checks (confirmed in Keynote on
+   22 November 2026: rebuilt decks open with slides and notes). For a pptx built earlier or
+   made elsewhere, see "Keynote" in `tools/decks/README.md` (`repair_pptx.py --check`).
 5. Read both PDFs' first pages: header band, title, no stray "UNTITLED" or template text.
 6. Re-read the script against the outline: every fact on a slide is in "What's established"
    or hedged; nothing in "Not confirmed" is stated as fact; no Jameson; every image credited.

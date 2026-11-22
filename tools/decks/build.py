@@ -15,7 +15,8 @@
     <slug>.pptx, <slug>-speaker-notes.pdf, <slug>-research-outline.pdf, slides/slide-NN.png
 
 Then it checks: one [SLIDE n] per slide, every notes field filled, one PNG per slide,
-the script split by a single '---' rule. Look at every PNG yourself afterwards; a passing
+the script split by a single '---' rule, the notes master listed in presentation.xml
+(without that Keynote refuses the file). Look at every PNG yourself afterwards; a passing
 check does not mean the slides look right.
 """
 import json
@@ -30,6 +31,7 @@ KIT = Path(__file__).resolve().parent
 sys.path.insert(0, str(KIT))
 
 import pdfs  # noqa: E402
+import repair_pptx  # noqa: E402
 import wsskit  # noqa: E402
 
 REQUIRED = ['deck.json', 'speaker-notes.md', 'research-outline.md', 'slides.py']
@@ -169,6 +171,12 @@ def check(out, slug, n):
         txt = s.notes_slide.notes_text_frame.text if s.has_notes_slide else ''
         if not txt.startswith('[SLIDE %d]' % i) or len(txt) < 40:
             problems.append('slide %d has an empty or misnumbered notes field' % i)
+    try:
+        problem = repair_pptx.notes_master_problem(out / (slug + '.pptx'))
+        if problem:
+            problems.append(problem + ' (Keynote refuses the file)')
+    except repair_pptx.UNREADABLE as e:
+        problems.append('could not read the pptx to check its notes master: ' + repair_pptx.explain(e))
     for name in [slug + '-speaker-notes.pdf', slug + '-research-outline.pdf']:
         if not (out / name).is_file():
             problems.append('missing ' + name)

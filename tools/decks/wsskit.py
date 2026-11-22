@@ -16,6 +16,7 @@ from pptx import Presentation
 from pptx.dml.color import RGBColor
 from pptx.enum.shapes import MSO_CONNECTOR, MSO_SHAPE
 from pptx.enum.text import MSO_ANCHOR, PP_ALIGN
+from pptx.opc.constants import RELATIONSHIP_TYPE as RT
 from pptx.oxml.ns import qn
 from pptx.util import Inches, Pt
 
@@ -287,8 +288,30 @@ def to_plain(body):
     return '\n\n'.join(out)
 
 
+def link_notes_master(presentation):
+    """List the notes master in presentation.xml. True if it had to be added.
+
+    python-pptx creates the notes master part and its relationship the first time a slide gets
+    notes, but never writes <p:notesMasterIdLst> into presentation.xml. PowerPoint, Google
+    Slides and LibreOffice find the master through the relationship anyway. Keynote does not:
+    it refuses the whole file ("The file format is invalid"), and macOS Quick Look hangs on it.
+    The element goes straight after <p:sldMasterIdLst>, where the schema puts it. It names a
+    part and draws nothing, so the slides look the same."""
+    pres = presentation.element
+    if pres.find(qn('p:notesMasterIdLst')) is not None:
+        return False
+    rids = [r.rId for r in presentation.part.rels.values() if r.reltype == RT.NOTES_MASTER]
+    if not rids:
+        return False  # no slide has notes, so there is no notes master to list
+    lst = etree.Element(qn('p:notesMasterIdLst'))
+    etree.SubElement(lst, qn('p:notesMasterId')).set(qn('r:id'), rids[0])
+    pres.find(qn('p:sldMasterIdLst')).addnext(lst)
+    return True
+
+
 def finish(notes_md, out_path):
-    """Check slide n <-> [SLIDE n], fill every notes field, strip theme styles, save."""
+    """Check slide n <-> [SLIDE n], fill every notes field, strip theme styles, list the
+    notes master (Keynote needs it, see link_notes_master), save."""
     notes = load_notes(notes_md)
     expected = list(range(1, len(SLIDES) + 1))
     if sorted(notes) != expected:
@@ -300,6 +323,7 @@ def finish(notes_md, out_path):
     for sl in prs.slides:
         for el in list(sl.shapes._spTree.iter(qn('p:style'))):
             el.getparent().remove(el)
+    link_notes_master(prs)
     prs.core_properties.title = TITLE
     prs.core_properties.author = 'The Whiskey Share Society'
     prs.save(str(out_path))
