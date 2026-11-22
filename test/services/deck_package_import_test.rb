@@ -61,6 +61,13 @@ class DeckPackageImportTest < ActiveSupport::TestCase
     end
   end
 
+  test "a new deck whose package names no price gets the $16.99 default" do
+    write_meta_without(:price)
+    deck = DeckPackageImport.call(@dir, author: users(:admin))
+    assert_equal BigDecimal("16.99"), DeckPackageImport::DEFAULT_PRICE
+    assert_equal BigDecimal("16.99"), deck.price
+  end
+
   test "a re-import keeps the price an admin has set" do
     deck = DeckPackageImport.call(@dir, author: users(:admin))
     deck.update_columns(price: 5)

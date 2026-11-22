@@ -21,7 +21,8 @@ source of truth for what's done and what's next. Key invariants established ther
   Do not reintroduce email-domain admin checks.
 - **Credits:** `credit_transactions` is the ledger and single source of truth. `users.credits` is a
   cache recomputed from the ledger; NEVER write it directly. All changes go through
-  `CreditTransaction.record!` / `use_credit` / `grant_monthly_credit` / `expire_all_credits`.
+  `CreditTransaction.record!` / `use_credit` / `grant_monthly_credit`. Credits are never wiped
+  when a membership ends; `use_credit` refuses to spend them until the member is active again.
 - **Stripe webhooks:** Idempotent via the `StripeEvent` claim table — process each event once.
 - **Secrets:** No `.pem`/`.key`/`.env`/`*.log` in git (see `.gitignore`); use env vars / credentials.
   The previously committed Apple signing key is compromised and must be rotated.

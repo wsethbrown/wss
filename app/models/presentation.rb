@@ -342,6 +342,13 @@ class Presentation < ApplicationRecord
     user_presentations.exists?(user: user)
   end
 
+  # For labels only ("Included with your membership"): the deck is published and
+  # included, and this user's membership is active. Access itself is decided by
+  # User#can_access_presentation?, which applies the same rule.
+  def included_for?(user)
+    published? && included_with_membership? && user.present? && user.has_active_subscription?
+  end
+
   # File access control methods
   def can_view_sneak_peek?(user = nil)
     # Sneak peek is always available to everyone

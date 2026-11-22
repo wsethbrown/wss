@@ -115,6 +115,9 @@ class Admin::PresentationsController < Admin::BaseController
       # A new deck file makes the old slide previews stale, re-render.
       DeckSlideRenderJob.perform_later(@presentation.id) if presentation_params[:pdf_file].present?
       Rails.logger.info "Admin #{current_user.id} saved presentation #{@presentation.id} (tab #{tab_param})"
+      if @presentation.saved_change_to_included_with_membership?
+        Rails.logger.info "Admin #{current_user.id} set presentation #{@presentation.id} included_with_membership=#{@presentation.included_with_membership?}"
+      end
       redirect_to deck_page(tab_param), notice: "Presentation updated successfully."
     else
       Rails.logger.warn "Admin #{current_user.id} update of presentation #{@presentation.id} refused (tab #{tab_param}): #{@presentation.errors.full_messages.to_sentence}"
@@ -311,6 +314,7 @@ class Admin::PresentationsController < Admin::BaseController
       :scorecard,
       :featured,
       :free_confirmed,
+      :included_with_membership,
       supplemental_materials: [],
       # The extra sections: one { heading, lines } per card on the Listing
       # tab, lines as one textarea string (Presentation#sections= splits it).

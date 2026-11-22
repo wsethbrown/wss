@@ -17,8 +17,10 @@ module Membership
   # What paid membership unlocks beyond a free account.
   BENEFITS = [
     "One deck credit every month, unlock any narrative tasting deck",
+    "Selected decks are included with your membership.",
     "Create and run your own society, host tasting nights, manage members and events",
-    "Keep your credit-unlocked decks for as long as you're a member"
+    "Decks you open with a credit stay open while you're a member. If you cancel, they lock until " \
+    "you rejoin or buy them, and your unused credits are kept for when you come back."
   ].freeze
 
   # What any free account can already do (no membership required).

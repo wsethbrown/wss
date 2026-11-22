@@ -17,7 +17,8 @@ class Event < ApplicationRecord
   # Presentation#can_download_full_presentation? (so a site admin organising
   # the night keeps every deck), everyone else through
   # User#can_access_presentation? (bought outright is forever; a credit unlock
-  # counts only while that person's membership is active). Authorship grants
+  # counts only while that person's membership is active; a deck included with
+  # membership counts the same way, with no purchase row). Authorship grants
   # nothing. The deck already attached stays selectable unless
   # include_current is false (create, where it is the value being checked).
   #
@@ -29,9 +30,14 @@ class Event < ApplicationRecord
         Presentation.published.order(:title).to_a
       else
         offerers = deck_offerers(organizer)
-        candidates = Presentation.published
-                                 .where(id: UserPresentation.where(user_id: offerers.map(&:id)).select(:presentation_id))
-                                 .order(:title).to_a
+        candidates = Presentation.published.where(id: UserPresentation.where(user_id: offerers.map(&:id)).select(:presentation_id))
+        # Decks included with membership are candidates while any offerer is an
+        # active member; the access check below decides, and writes no
+        # purchase or credit row.
+        if offerers.any?(&:has_active_subscription?)
+          candidates = candidates.or(Presentation.published.where(included_with_membership: true))
+        end
+        candidates = candidates.order(:title).to_a
         candidates.select do |deck|
           (organizer && deck.can_download_full_presentation?(organizer)) ||
             offerers.any? { |person| person != organizer && person.can_access_presentation?(deck.id) }

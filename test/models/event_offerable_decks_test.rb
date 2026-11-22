@@ -50,6 +50,35 @@ class EventOfferableDecksTest < ActiveSupport::TestCase
     assert_not @event.deck_offerable?(d.id)
   end
 
+  # Decks included with membership: offerable while an offerer's membership is
+  # active, with no purchase or credit row written, and never while unpublished.
+  test "an included deck is offerable while the host's membership is active, and stops when it lapses" do
+    d = deck("Included Night")
+    d.update!(included_with_membership: true)
+    activate(@host)
+    assert_no_difference [ "UserPresentation.count", "CreditTransaction.count" ] do
+      assert_includes @event.offerable_decks, d
+      assert @event.deck_offerable?(d.id)
+    end
+    assert @host.can_access_presentation?(d.id), "the host can open and present it"
+
+    lapse(@host)
+    @host.reload
+    @event.host.reload
+    assert_not_includes @event.offerable_decks, d
+    assert_not @host.can_access_presentation?(d.id)
+  end
+
+  test "an included deck is not offerable when no offerer is a member, or when it is unpublished" do
+    d = deck("Included Night")
+    d.update!(included_with_membership: true)
+    assert_not_includes @event.offerable_decks, d
+
+    activate(@host)
+    d.update_column(:published, false)
+    assert_not_includes @event.offerable_decks, d
+  end
+
   test "a deck bought outright counts forever, for the host too" do
     d = deck("Bought Outright")
     own(@host, d, "direct")

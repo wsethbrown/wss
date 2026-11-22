@@ -49,10 +49,26 @@ class CreditTransactionTest < ActiveSupport::TestCase
     assert_not @user.user_presentations.exists?(presentation: @presentation)
   end
 
-  test "expire_all_credits zeroes the balance" do
-    CreditTransaction.record!(user: @user, amount: 5, transaction_type: "granted")
-    CreditTransaction.expire_all_credits(@user)
-    assert_equal 0, @user.reload.credits
+  # Owner rule: a lapsed member keeps their balance but cannot spend it. The
+  # ledger refuses the spend itself, not only the purchase screen.
+  test "use_credit refuses a member with no active membership and keeps the balance" do
+    CreditTransaction.record!(user: @user, amount: 2, transaction_type: "granted")
+    @user.update!(subscription_status: "canceled", subscription_ends_at: 1.day.ago)
+
+    assert_no_difference -> { CreditTransaction.count } do
+      assert_not CreditTransaction.use_credit(@user, @presentation)
+    end
+    assert_equal 2, @user.reload.credits
+    assert_not @user.user_presentations.exists?(presentation: @presentation)
+
+    # Rejoining makes the kept balance spendable again.
+    @user.update!(subscription_status: "active", subscription_ends_at: 1.month.from_now)
+    assert CreditTransaction.use_credit(@user, @presentation)
+    assert_equal 1, @user.reload.credits
+  end
+
+  test "the ledger has no way to wipe a balance" do
+    assert_not CreditTransaction.respond_to?(:expire_all_credits)
   end
 
   test "admin_adjustment is a valid transaction type" do
@@ -105,12 +121,14 @@ class CreditTransactionTest < ActiveSupport::TestCase
     @user.update!(subscription_ends_at: nil) # open-ended, so the 2027 dates stay active
     travel_to Time.utc(2027, 5, 2, 9) do
       CreditTransaction.grant_monthly_credit(@user)
-      CreditTransaction.expire_all_credits(@user, "Subscription cancelled")
+      @user.update!(subscription_status: "canceled")
     end
     travel_to Time.utc(2027, 5, 25, 9) do
+      @user.update!(subscription_status: "active")
       assert CreditTransaction.grant_welcome_credit(@user)
     end
-    assert_equal 1, @user.reload.credits
+    # The credit kept from before the cancel plus the new welcome credit.
+    assert_equal 2, @user.reload.credits
     assert_equal CreditTransaction.balance_for(@user), @user.credits
   end
 

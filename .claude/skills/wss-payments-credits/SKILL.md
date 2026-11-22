@@ -15,7 +15,7 @@ in the Stripe dashboard — there is NO in-app refund flow. Do not build one una
 **users.credits == CreditTransaction.where(user:).sum(:amount)** — the ledger is
 the source of truth; the column is a self-healing cache (`recompute_cached_balance`
 after_create is the ONLY writer of users.credits). ALL mutations go through
-CreditTransaction.record!/use_credit/grant_*/expire_all_credits — every one is
+CreditTransaction.record!/use_credit/grant_*, and every one is
 row-locked (`user.with_lock`). NEVER user.update(credits:) — the admin form once
 allowed this and it was removed. Admin adjustments: Admin → Credits → adjust.
 
@@ -59,8 +59,10 @@ user via `stripe_customer_id`** (sync = `current_user`; webhook = `find_user_by_
 ## Monthly renewal & expiry
 `invoice.payment_succeeded` + `billing_reason == "subscription_cycle"` →
 `grant_monthly_credit` (+1, guarded by `subscription_active?`).
-`customer.subscription.deleted` immediate → `expire_all_credits` (single negative
-ledger row zeroing the balance).
+`customer.subscription.deleted` KEEPS the balance (owner rule, 2026-11: "credits
+shouldn't be wiped when membership ends. They just can't utilize them"). It logs
+the balance kept; `use_credit` refuses while `subscription_active?` is false, so the
+credits are spendable again on rejoin. Old `expired` ledger rows are history only.
 
 ## One-shot banners (commit 0630764)
 Subscription success/cancel banners render ONCE then redirect to strip the query

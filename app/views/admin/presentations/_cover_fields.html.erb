@@ -69,6 +69,13 @@
         <%= form.check_box :free_confirmed, class: "h-5 w-5 rounded border-hairline text-ink focus:ring-ink/30" %>
         <span>This deck is free (needed to publish at $0)</span>
       </label>
+      <label class="mt-2 flex min-h-11 items-start gap-3 text-sm text-ink">
+        <%= form.check_box :included_with_membership, class: "mt-0.5 h-5 w-5 rounded border-hairline text-ink focus:ring-ink/30" %>
+        <span>
+          <span class="block">Included with membership</span>
+          <span class="mt-0.5 block text-xs text-mute">Members open this deck without spending a credit. Everyone else pays the price.</span>
+        </span>
+      </label>
     </div>
 
     <div>

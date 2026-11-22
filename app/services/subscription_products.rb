@@ -3,6 +3,10 @@
 # AND admin revenue both read this, so a price is never hardcoded in two places.
 # Live values are fetched from Stripe (1h cache); tests and a keyless/unreachable
 # Stripe fall back to `fallback`.
+#
+# Each product carries two prices: `price` is the monthly equivalent (pricing
+# cards, MRR) and `billed_price` is what one invoice charges, every
+# `billing_months` months (the admin user page's plan label).
 module SubscriptionProducts
   module_function
 
@@ -32,6 +36,8 @@ module SubscriptionProducts
                 id: "monthly",
                 name: monthly_price.product.name || "Monthly Membership",
                 price: monthly_price.unit_amount,
+                billed_price: monthly_price.unit_amount,
+                billing_months: billing_months(monthly_price.recurring, "month"),
                 interval: "month",
                 display_interval: "month",
                 features: (monthly_price.product.metadata.to_h["features"]&.split(",")&.map(&:strip) || Membership::BENEFITS),
@@ -60,6 +66,8 @@ module SubscriptionProducts
                 id: "quarterly",
                 name: quarterly_price.product.name || "Quarterly Membership",
                 price: monthly_equivalent,
+                billed_price: quarterly_price.unit_amount,
+                billing_months: billing_months(quarterly_price.recurring, "month"),
                 interval: "month",
                 display_interval: "month",
                 features: (quarterly_price.product.metadata.to_h["features"]&.split(",")&.map(&:strip) || Membership::BENEFITS).reject { |f| f.include?("%") || f.downcase.include?("save") || f.downcase.include?("savings") },
@@ -88,6 +96,8 @@ module SubscriptionProducts
                 id: "yearly",
                 name: yearly_price.product.name || "Yearly Membership",
                 price: monthly_equivalent,
+                billed_price: yearly_price.unit_amount,
+                billing_months: billing_months(yearly_price.recurring, "year"),
                 interval: "month",
                 display_interval: "month",
                 features: (yearly_price.product.metadata.to_h["features"]&.split(",")&.map(&:strip) || Membership::BENEFITS).reject { |f| f.include?("%") || f.downcase.include?("save") || f.downcase.include?("savings") },
@@ -125,6 +135,23 @@ module SubscriptionProducts
     end
   end
 
+  # Months between invoices for a Stripe price's recurring settings, or nil for
+  # an interval that is not whole months (week/day).
+  def billing_months(recurring, default_interval)
+    interval = recurring&.interval || default_interval
+    count = (recurring&.interval_count || 1).to_i
+    case interval
+    when "month" then count
+    when "year" then count * 12
+    end
+  end
+
+  # Every plan a member can be on (the three membership plans and the two
+  # founding offers), keyed by plan id, with the billed price and period.
+  def plans_by_id
+    (all + founding).index_by { |p| p[:id].to_s }
+  end
+
   # plan id ("monthly"/"quarterly"/"yearly") => monthly-equivalent price in cents.
   # Founding plans are included so admin MRR counts them at their real rates.
   def monthly_cents_by_plan
@@ -149,7 +176,7 @@ module SubscriptionProducts
 
         begin
           price = Stripe::Price.retrieve({ id: ENV[env_id] })
-          offer.merge(price: price.unit_amount, price_id: price.id)
+          offer.merge(price: price.unit_amount, billed_price: price.unit_amount, price_id: price.id)
         rescue => e
           failed = true
           Rails.logger.error "Error fetching founding price #{env_id}: #{e.message}"
@@ -176,6 +203,8 @@ module SubscriptionProducts
         id: "founding_society",
         name: "Founding Society",
         price: 500,
+        billed_price: 500,
+        billing_months: 1,
         interval: "month",
         price_id: ENV.fetch("STRIPE_FOUNDING_SOCIETY_PRICE_ID", "price_founding_society")
       },
@@ -183,6 +212,8 @@ module SubscriptionProducts
         id: "founding_monthly",
         name: "Founding Monthly",
         price: 1099,
+        billed_price: 1099,
+        billing_months: 1,
         interval: "month",
         price_id: ENV.fetch("STRIPE_FOUNDING_MONTHLY_PRICE_ID", "price_founding_monthly")
       }
@@ -195,6 +226,8 @@ module SubscriptionProducts
         id: "monthly",
         name: "Monthly Membership",
         price: 1599,
+        billed_price: 1599,
+        billing_months: 1,
         interval: "month",
         features: Membership::BENEFITS,
         popular: false,
@@ -204,6 +237,8 @@ module SubscriptionProducts
         id: "quarterly",
         name: "Quarterly Membership",
         price: 1299,
+        billed_price: 3897,
+        billing_months: 3,
         interval: "month",
         features: Membership::BENEFITS,
         popular: false,
@@ -214,6 +249,8 @@ module SubscriptionProducts
         id: "yearly",
         name: "Yearly Membership",
         price: 1099,
+        billed_price: 13_188,
+        billing_months: 12,
         interval: "month",
         features: Membership::BENEFITS,
         popular: true,

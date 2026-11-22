@@ -27,8 +27,8 @@
 #
 # On an update the package replaces the title, description, category,
 # difficulty, running time, story, slide script, files, slides, pours and tags, while the
-# price, the published state, the featured flag, the author, purchases and
-# counters stay as the admin left them.
+# price, the published state, the featured flag, the included-with-membership
+# flag, the author, purchases and counters stay as the admin left them.
 #
 # The subtitle, the takeaways ("What you'll learn") and the extra sections are replaced only
 # when deck.json has the key: an empty list clears them, and a package without
@@ -54,7 +54,7 @@ class DeckPackageImport
     end
   end
 
-  DEFAULT_PRICE = BigDecimal("12.99")
+  DEFAULT_PRICE = BigDecimal("16.99")
 
   attr_reader :warnings
 

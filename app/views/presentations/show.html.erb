@@ -36,8 +36,11 @@
     and the Downloads box both read, derived from the controller's @full_story
     so the page can never promise more than the downloads controller allows.
     A lapsed credit owner who is not an admin keeps owner_tools false. %>
-<% admin_access = user_signed_in? && current_user.admin? && @full_story && (owned_purchase.nil? || lapsed_credit_owner) %>
-<% owner_tools = user_signed_in? && @full_story && (admin_access || (owned_purchase.present? && !lapsed_credit_owner)) %>
+<%# included_access: an active member opening a deck included with membership,
+    with no purchase row; @full_story already reflects it (User#can_access_presentation?). %>
+<% included_access = user_signed_in? && @full_story && owned_purchase.nil? && @presentation.included_for?(current_user) %>
+<% admin_access = user_signed_in? && current_user.admin? && @full_story && !included_access && (owned_purchase.nil? || lapsed_credit_owner) %>
+<% owner_tools = user_signed_in? && @full_story && (admin_access || included_access || (owned_purchase.present? && !lapsed_credit_owner)) %>
 <%# Rendered slides, loaded once: the cover, the slide count and the teaser all use them. %>
 <% slide_list = @presentation.slide_images.attached? ? @presentation.slide_images_attachments.includes(:blob).order(:id).to_a : [] %>
 <% get_label = if !user_signed_in?
@@ -76,6 +79,8 @@
         <% if admin_access %>
           <p class="font-display text-2xl font-semibold text-ink">Admin access</p>
           <p class="mt-1 text-mute">You can open every deck as a site admin. Customers see the price and purchase options here.</p>
+        <% elsif included_access %>
+          <p class="font-display text-2xl font-semibold text-ink">Included with your membership</p>
         <% elsif owned_purchase %>
           <% if lapsed_credit_owner %>
             <p class="font-display text-2xl font-semibold text-ink">Membership paused</p>
@@ -87,6 +92,9 @@
         <% else %>
           <p class="font-display text-3xl font-semibold tabular-nums text-ink"><%= @presentation.formatted_price %></p>
           <p class="mt-1 text-mute"><%= @presentation.free? ? 'Free for everyone' : 'One-time purchase, yours for good' %></p>
+          <% if @presentation.included_with_membership? && !@presentation.free? %>
+            <p class="mt-1 text-sm font-semibold text-ink">Included with membership</p>
+          <% end %>
           <% if viewer_can_credit %>
             <p class="mt-1 text-sm font-semibold text-ink">Members can use a credit at checkout.</p>
           <% end %>
@@ -119,7 +127,7 @@
       </div>
     </div>
 
-    <% unless owned_purchase || admin_access %>
+    <% unless owned_purchase || admin_access || included_access %>
       <%# What you get, an honest manifest built ONLY from what exists. %>
       <% manifest = [
         (slide_list.any? ? "The full deck, #{slide_list.size} slides" : (@presentation.pdf_file.attached? ? "The full presentation file" : nil)),

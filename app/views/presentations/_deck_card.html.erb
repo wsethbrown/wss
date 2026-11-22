@@ -2,6 +2,8 @@
     Used on the homepage, the library, the deck page and the account library.
     Locals: deck (Presentation), owned (Boolean, optional) %>
 <% owned = local_assigns.fetch(:owned, false) %>
+<%# A deck included with membership reads as included for an active member (no purchase row). %>
+<% included = !owned && user_signed_in? && deck.included_for?(current_user) %>
 <% meta = [ deck.category.presence, deck.difficulty.presence, deck.duration_label ].compact.join(" · ") %>
 <%# The card reveals as it first scrolls in (the appear controller on <main>). %>
 <%= link_to presentation_path(deck), class: 'group block h-full', data: { appear_target: 'item' } do %>
@@ -18,7 +20,7 @@
         <p class="mt-1 text-sm text-mute"><%= meta %></p>
       <% end %>
       <div class="mt-auto flex items-center justify-between gap-3 pt-4">
-        <span class="font-semibold tabular-nums text-ink"><%= owned ? 'In your library' : deck.formatted_price %></span>
+        <span class="font-semibold tabular-nums text-ink"><%= if owned then 'In your library' elsif included then 'Included with your membership' else deck.formatted_price end %></span>
         <%# A rating only when there are real reviews. %>
         <% if deck.reviewed? %>
           <span class="flex shrink-0 items-baseline gap-1 whitespace-nowrap"

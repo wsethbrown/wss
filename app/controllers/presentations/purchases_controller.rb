@@ -46,6 +46,15 @@ class Presentations::PurchasesController < ApplicationController
   # row to a direct purchase; see Presentations::CheckoutFulfillment).
   def check_already_purchased
     owned = current_user.user_presentations.find_by(presentation_id: @presentation.id)
+
+    # A member never pays for, or spends a credit on, a deck included with
+    # membership: they already have it while the membership lasts.
+    if !owned&.direct_purchase? && current_user.included_with_membership_access?(@presentation.id)
+      Rails.logger.info "Purchase of presentation #{@presentation.id} skipped for user #{current_user.id}: included with membership"
+      redirect_to @presentation, notice: "Included with your membership"
+      return
+    end
+
     return unless owned
     return if owned.credit_purchase? && !@presentation.free? && !current_user.can_access_presentation?(@presentation.id)
 
