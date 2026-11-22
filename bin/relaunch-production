@@ -929,7 +929,10 @@ step_database() {
   [ "$DRY_RUN" = 0 ] || { plan "pick a dump, copy it to the server and load it into $DB_NAME"; return 0; }
   pick_dump
   gzip -t "$DUMP" 2>/dev/null || fail "$(basename "$DUMP") is damaged (not valid gzip)." "pick an older dump, or download it again."
-  gunzip -c "$DUMP" 2>/dev/null | head -n 40 | grep -q 'PostgreSQL database dump' || fail "$(basename "$DUMP") is not a pg_dump file." "pick another dump."
+  # pipefail is on: head closing early kills gunzip with SIGPIPE on any real
+  # (large) dump, which made a good file look bad. Ignore gunzip's status here
+  # (gzip -t above already vouched for it) and let grep read to the end.
+  { gunzip -c "$DUMP" 2>/dev/null || true; } | head -n 40 | grep 'PostgreSQL database dump' >/dev/null || fail "$(basename "$DUMP") is not a pg_dump file." "pick another dump."
   ok "$(basename "$DUMP") is a valid dump ($(human_size "$(file_size "$DUMP")"))"
 
   local filtered; filtered="$WORK/relaunch-$(basename "$DUMP")"
