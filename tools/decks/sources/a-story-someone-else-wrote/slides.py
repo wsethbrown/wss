@@ -41,7 +41,7 @@ text(s, 0.8, 3.95, 11.733, 0.55, 'Value vs. Prestige', size=26, italic=True, col
      align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
 rect(s, SLIDE_W / 2 - 0.45, 4.72, 0.9, 0.045, fill=MARK)
 text(s, 2.4, 5.0, 8.533, 1.0,
-     'A blind tasting, and an argument that your own palate knows more than the price tag does.',
+     'A blind tasting of six whiskeys. Score each one, then see the names and prices.',
      size=20, italic=True, color=CREAM_MUTE, align=PP_ALIGN.CENTER, ls=1.15)
 text(s, 0.8, 6.55, 11.733, 0.35, 'The Whiskey Share Society  ·  A blind tasting', size=11, font=SANS,
      color=CREAM_MUTE, align=PP_ALIGN.CENTER)
@@ -49,18 +49,17 @@ text(s, 0.8, 6.55, 11.733, 0.35, 'The Whiskey Share Society  ·  A blind tasting
 # ---------------------------------------------------------------- 2 the premise
 s = new_slide()
 label_line(s, 0.85, 0.85, 6.5, 'The premise')
-heading(s, 1.3, 'Tonight, the label doesn’t get a vote.', size=36, w=6.9, h=1.3)
+heading(s, 1.3, 'Tonight is a blind tasting.', size=36, w=6.9, h=1.3)
 text(s, 0.85, 2.85, 6.4, 3.6, [
-    'Some of that story is real craft. Some of it is theater. The only way to tell which is to take the '
-    'bottle away and taste what’s actually in the glass.',
-    'Blind, start to finish. Score each pour on its own merits. Names (and prices) to be revealed at the end.',
-    [('Then we find out how much the price tag was actually influencing you.', {'bold': True})],
+    'A price reflects age, proof and barrel selection. It also reflects scarcity and marketing.',
+    'Score each pour before you know what it is. Names and prices come at the end.',
+    [('Then compare your scores with the prices.', {'bold': True})],
 ], size=18, ls=1.25, space_after=12)
 rrect(s, 7.95, 0.85, 4.53, 5.65, r=0.36, fill=WHITE, line=HAIR)
 rect(s, 8.4, 1.55, 0.9, 0.045, fill=MARK_DEEP)
 text(s, 8.4, 1.85, 3.7, 2.9, 'A bottle’s price is a story someone else wrote.', size=32, italic=True,
      color=INK, ls=1.15)
-text(s, 8.4, 4.55, 3.7, 1.2, 'About rarity, marketing, a waitlist.', size=18, font=SANS, color=MUTE, ls=1.2)
+text(s, 8.4, 4.55, 3.7, 1.2, 'Age, proof, scarcity, marketing.', size=18, font=SANS, color=MUTE, ls=1.2)
 footer(s, 2)
 
 # ---------------------------------------------------------------- 3 tips on tasting
@@ -119,10 +118,9 @@ def sample_slide(n, letter, name, meta, body, nose, taste, finish, photo, discus
 
 sample_slide(4, 'A', 'Buffalo Trace',
              'Buffalo Trace Distillery  ·  Frankfort, KY  ·  90 proof  ·  Mash Bill #1',
-             'The flagship of one of the most awarded distilleries in the world. No age statement, though the '
-             'juice is generally reckoned to be eight to ten years old. It built its reputation on being easy to '
-             'like and easy to find, and for most of its life it sat on shelves around twenty-odd dollars, until '
-             'the bourbon boom turned it into an allocated bottle.',
+             'Buffalo Trace’s flagship bourbon. It has no age statement and is generally thought to be eight to ten '
+             'years old. For most of its life it was easy to find at about twenty dollars. Demand has since made '
+             'it an allocated bottle in many places.',
              'Caramel · Vanilla · Orange zest · Light oak',
              'Brown sugar · Honey · Summer fruit · Soft spice',
              'Short to medium · Oak · Cherry · Gentle pepper',
@@ -132,33 +130,32 @@ sample_slide(5, 'B', 'Blanton’s Original',
              'Buffalo Trace Distillery  ·  Frankfort, KY  ·  93 proof  ·  Mash Bill #2',
              'The world’s first commercially marketed single-barrel bourbon, released in 1984 by Elmer T. Lee '
              'from Buffalo Trace’s metal-clad Warehouse H. The horse-and-jockey caps spell out B-L-A-N-T-O-N-S '
-             'across eight different stoppers. It is a consistent, well-regarded pour, and also one of the most '
-             'hyped bottles in America, regularly sold well above shelf price on the secondary market.',
+             'across eight different stoppers. It is well regarded and in high demand, and often sells for well '
+             'above its list price.',
              'Honeysuckle · Vanilla · Citrus peel · Caramel',
              'Light caramel · Honey · Brown sugar · Charred oak',
              'Crisp, medium · Vanilla · Dry leather · Light peppercorn',
              'blantons.png',
-             'Same distillery as sample A, different mash bill. Could you tell they were related?')
+             'Same distillery as sample A, different mash bill. Did A and B taste related?')
 
 sample_slide(6, 'C', 'Evan Williams Bottled-in-Bond',
              'Heaven Hill Distillery  ·  Bardstown, KY  ·  100 proof  ·  Bottled-in-Bond',
              '“Bottled-in-bond” is a legal standard, not a marketing phrase. It requires the product of one '
              'distilling season, by one distiller, at one distillery; at least four years in a federally '
-             'supervised warehouse; and bottling at exactly 100 proof, not 99, not 101. The Act behind it was '
+             'supervised warehouse; and bottling at exactly 100 proof. The Act behind it was '
              'signed in 1897, among the first consumer-protection laws in the country. It is the cheapest bottle '
              'on the table tonight, and the only one carrying a federal guarantee of what it is.',
              'Caramel · Vanilla · Peanut brittle · Toasted oak',
              'Brown sugar · Cornbread · Baking spice · Dark fruit',
              'Long & dry · Oak tannin · Cocoa · Lingering spice',
              'evan_williams_bib.png',
-             'The cheapest pour of the night, straight after the most expensive one. Did you feel the drop?')
+             'This was the cheapest pour, straight after the most expensive. How did you score it against B?')
 
 sample_slide(7, 'D', 'Four Roses Small Batch Select',
              'Four Roses Distillery  ·  Lawrenceburg, KY  ·  104 proof  ·  Non-chill-filtered',
              'Four Roses runs ten distinct recipes, two mash bills crossed with five proprietary yeasts. This '
              'expression blends six of them, every barrel at least six years old, bottled without chill-filtering '
-             'at 104 proof. It is a deliberately constructed blend rather than a single barrel, built to show the '
-             'distillery’s range in one glass.',
+             'at 104 proof. It is a blend of recipes, not a single barrel.',
              'Apricot · Clove & nutmeg · Vanilla · Cedar / cigar box',
              'Raspberry jam · Black pepper · Cinnamon · Creamy vanilla',
              'Medium to long · Cinnamon caramel · Toasted oak · Mint chocolate',
@@ -166,26 +163,25 @@ sample_slide(7, 'D', 'Four Roses Small Batch Select',
 
 sample_slide(8, 'E', 'Barrell Seagrass',
              'Barrell Craft Spirits  ·  Louisville, KY  ·  118.4 proof  ·  Cask strength',
-             'The odd one out, and not even a bourbon. Barrell does not distill; they source rye from the U.S. '
+             'This one is a rye, not a bourbon. Barrell does not distill; they source rye from the U.S. '
              'and Canada, then finish it separately in three different casks: Martinique rum, Madeira, and '
-             'apricot brandy. Blended back together at cask strength, it tastes unlike anything else on the table.',
+             'apricot brandy. The three are blended back together and bottled at cask strength.',
              'Apricot · Tropical fruit · Cedar · Rye spice',
              'Candied apricot · Rum sweetness · Vanilla & toffee · White pepper',
              'Medium · Spiced apricot · Rye bread · Salted peanut',
              'barrell_seagrass.png',
-             'This is a triple-finished rye, not a bourbon. Did the finishing casks give it away, or fool you?')
+             'Did you notice it was not a bourbon?')
 
 sample_slide(9, 'F', 'Elijah Craig Barrel Proof',
              'Heaven Hill Distillery  ·  Bardstown, KY  ·  118.2 proof  ·  10 yrs 7 mos',
              'Uncut and unfiltered, whatever strength it left the barrel at is exactly what is in the bottle. This '
-             'release lands at 118.2 proof and ten years, seven months; the number changes with every batch. It is '
-             'a long-standing favorite among barrel-proof bourbons, and it opens up considerably with a few drops '
-             'of water. We pour it last because its heat lingers longest.',
+             'release is 118.2 proof and ten years, seven months old; both change with every batch. A few drops of '
+             'water change it noticeably. It is poured last because its heat lingers.',
              'Charred oak · Dark toffee · Vanilla bean · Flamed orange peel',
              'Brown sugar · Dark chocolate · Black pepper · Cherry cordial',
              'Long & hot · Chocolate · Torched sugar · Lingering spice',
              'elijah_craig_bp.png',
-             'The highest-impact pour, tasted last. Did its strength help it or hurt it on your card?')
+             'Did its strength raise or lower your score?')
 
 # ---------------------------------------------------------------- 10 one thing to notice
 s = new_slide(INK)
@@ -203,18 +199,16 @@ for i, (letter, name, price, meta, photo) in enumerate(pair):
     text(s, tx, y + 2.3, 1.6, 1.4, meta.split('  ·  '), size=12.5, font=SANS, color=CREAM_MUTE, ls=1.2)
 text(s, 8.0, 2.55, 4.48, 3.9,
      'Both are made by Buffalo Trace in Frankfort, Kentucky, from different mash bills. One sells for around '
-     'forty dollars; the other, near three times that. Whether the gap showed up on your scorecard is the '
-     'question worth talking about.',
+     'forty dollars and the other for about three times that. Compare your scores for the two.',
      size=19, color=CREAM, ls=1.3)
 footer(s, 10, dark=True)
 
 # ---------------------------------------------------------------- 11 the reveal table
 s = new_slide()
 label_line(s, 0.85, 0.8, 6.5, 'The reveal')
-heading(s, 1.22, 'Now we put the prices back on.', size=38, h=0.8)
+heading(s, 1.22, 'The prices.', size=38, h=0.8)
 text(s, 0.85, 1.95, 11.6, 0.45,
-     'Fill in the room’s averages as we tally. Then compare the column you cared about, score, against the '
-     'one you couldn’t see.', size=16, italic=True, color=MUTE)
+     'The room’s scores beside each bottle’s price.', size=16, italic=True, color=MUTE)
 rows = [('', 'Bottle', 'Proof', 'Price', 'Room score', 'Room rank'),
         ('A', 'Buffalo Trace', '90', '$40', '', ''),
         ('B', 'Blanton’s Original', '93', '$120', '', ''),
@@ -279,15 +273,14 @@ footer(s, 11)
 # ---------------------------------------------------------------- 12 the point
 s = new_slide()
 label_line(s, 0.85, 0.85, 6.5, 'The point')
-heading(s, 1.3, 'You ranked every one of these on your personal taste. That ranking is the honest one.',
+heading(s, 1.3, 'You scored these without knowing what they cost.',
         size=36, w=11.2, h=1.8)
 rrect(s, 0.85, 3.25, 11.63, 2.95, r=0.3, fill=WHITE, line=HAIR)
 text(s, 1.35, 3.6, 10.6, 2.3,
-     'None of this makes expensive bourbon a scam. Sometimes the price buys real age, real proof, real craft. '
-     'Sometimes it buys a pretty cap and a good story. Both are fine to enjoy, as long as you know which one '
-     'you’re paying for.',
+     'Sometimes a higher price buys more age, more proof or better barrels. Sometimes it buys scarcity and a '
+     'story. Your scores show which of tonight’s bottles were worth it to you.',
      size=22, ls=1.3)
 footer(s, 12)
 
 # ---------------------------------------------------------------- 13 Sláinte
-slainte_slide('Tonight your palate already told you.')
+slainte_slide('Pour another of whichever you scored highest.')
