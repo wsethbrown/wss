@@ -115,11 +115,12 @@ class DashboardControllerTest < ActionDispatch::IntegrationTest
     assert_select "#account-details-content, [data-tab]", minimum: 1
   end
 
-  test "the nav logo goes to the dashboard when signed in and the homepage when not" do
+  test "the nav logo goes to the homepage whether signed in or not" do
     get root_path
     assert_select "nav a[href='#{root_path}'] img[alt='Whiskey Share Society']"
     sign_in @seth
     get root_path
-    assert_select "nav a[href='#{dashboard_path}'] img[alt='Whiskey Share Society']"
+    assert_select "nav a[href='#{root_path}'] img[alt='Whiskey Share Society']"
+    assert_select "nav a[href='#{dashboard_path}'] img", count: 0
   end
 end

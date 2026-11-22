@@ -135,13 +135,16 @@
     <nav class="fixed left-1/2 top-3 z-50 w-[min(1240px,calc(100%-1.5rem))] -translate-x-1/2 rounded-[22px] bg-char shadow-[0_10px_30px_-12px_rgba(22,51,42,0.45)]">
       <div class="flex items-center justify-between py-2 pl-4 pr-2.5">
         <!-- Logo -->
-        <%# Home is the dashboard once signed in; the marketing homepage otherwise. %>
-        <a href="<%= user_signed_in? ? dashboard_path : root_path %>" class="flex items-center gap-3 text-cream hover:text-whiskey-200 transition">
+        <%# The logo always goes home; signed-in users reach /dashboard via the Dashboard nav link. %>
+        <a href="<%= root_path %>" class="flex items-center gap-3 text-cream hover:text-whiskey-200 transition">
           <%= image_tag "wss-logo-inverted.png", alt: "Whiskey Share Society", class: "h-9 w-auto" %>
           <span class="hidden sm:inline font-display text-[17px] font-semibold">Whiskey Share Society</span>
         </a>
         <!-- Navigation Links -->
         <div class="hidden md:flex gap-2 items-center">
+          <% if user_signed_in? %>
+            <%= nav_link_to 'Dashboard', dashboard_path %>
+          <% end %>
           <%= nav_link_to 'Societies', societies_path %>
           <%= nav_link_to 'Decks', presentations_path %>
           <%= nav_link_to 'Reviews', reviews_path %>
@@ -188,6 +191,9 @@
             </svg>
           </summary>
           <div class="absolute right-0 mt-3 w-56 rounded-2xl border border-oak-edge bg-char p-2 shadow-xl">
+            <% if user_signed_in? %>
+              <%= link_to 'Dashboard', dashboard_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
+            <% end %>
             <%= link_to 'Societies', societies_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
             <%= link_to 'Decks', presentations_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
             <%= link_to 'Reviews', reviews_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
