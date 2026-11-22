@@ -226,7 +226,9 @@
       </div>
     </div>
 
-    <!-- Main Content. Pages that open with a full-bleed char masthead manage
+    <!-- Main Content. The appear controller reveals cards, rows and headings
+         marked data-appear-target="item" as they first scroll in, and pours
+         each glass when it is seen (appear_controller.js). Pages that open with a full-bleed char masthead manage
          their own width and top padding; everything else gets the standard
          constrained container. -->
     <% full_bleed = (controller_name == 'home' && %w[index membership].include?(action_name)) ||
@@ -240,11 +242,11 @@
       <%# No top padding here: every full-bleed page opens with a char masthead
           that clears the fixed nav itself (pt-16/pt-28). Layout padding on top
           of that rendered as a white strip above the masthead. %>
-      <main id="main-content" class="min-h-[80vh] w-full">
+      <main id="main-content" class="min-h-[80vh] w-full" data-controller="appear">
         <%= yield %>
       </main>
     <% else %>
-      <main id="main-content" class="max-w-6xl mx-auto px-4 min-h-[80vh] pt-24 pb-16">
+      <main id="main-content" class="max-w-6xl mx-auto px-4 min-h-[80vh] pt-24 pb-16" data-controller="appear">
         <%= yield %>
       </main>
     <% end %>

@@ -53,4 +53,14 @@ class HomeRitualCloseTest < ActionDispatch::IntegrationTest
     offenders = animated.select { |list| list.split(",").any? { |sel| sel.match?(/\.beat|\.story/) } }
     assert_empty offenders, "the closing line must not rely on a scroll animation: #{offenders.inspect}"
   end
+
+  # The beats' words reveal through the time-based appear controller, which
+  # always runs to the end. The closing beat stays out of it entirely: it is
+  # the page's last word and is never faded, not even for half a second.
+  test "the closing beat never reveals; the beats before it do" do
+    get root_path
+    assert_select "#{CLOSE}[data-appear-target], #{CLOSE} [data-appear-target]", 0
+    assert_select ".story .b2 [data-appear-target=item]", minimum: 1
+    assert_select ".story .beat[data-appear-target]", 0, "a tall beat would reveal before its words are on screen"
+  end
 end

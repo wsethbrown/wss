@@ -167,7 +167,7 @@
     <% end %>
     <section id="deck-downloads" class="mt-6">
       <% if downloads.any? %>
-        <div class="card p-5 sm:p-6">
+        <div class="card p-5 sm:p-6" data-appear-target="item">
           <h2 class="font-display text-xl font-semibold text-ink">Downloads</h2>
           <ul class="mt-3 divide-y divide-hairline">
             <% downloads.each do |label, path| %>
@@ -221,7 +221,7 @@
     <% unless @full_story %>
       <% if slide_list.any? %>
         <section class="<%= section_class %>">
-          <div class="md:col-span-4">
+          <div class="self-start md:col-span-4" data-appear-target="item">
             <h2 class="<%= heading_class %>">Inside the deck</h2>
           </div>
           <div class="md:col-span-8">
@@ -253,7 +253,7 @@
         </section>
       <% elsif @presentation.parsed_slides_preview.any? %>
         <section class="<%= section_class %>">
-          <div class="md:col-span-4">
+          <div class="self-start md:col-span-4" data-appear-target="item">
             <h2 class="<%= heading_class %>">Slide-by-slide outline</h2>
           </div>
           <div class="md:col-span-8">
@@ -292,7 +292,7 @@
     <% pour_list = @presentation.presentation_bottles.ordered.includes(:bottle).to_a %>
     <% if pour_list.any? %>
       <section class="<%= section_class %>">
-        <div class="md:col-span-4">
+        <div class="self-start md:col-span-4" data-appear-target="item">
           <h2 class="<%= heading_class %>">What this deck calls for</h2>
           <p class="mt-3 text-mute">The pours this deck is built around. Pour what you can find; plenty of societies substitute, and the story still works.</p>
         </div>
@@ -323,7 +323,7 @@
     <% poured = @presentation.pours_from_nights %>
     <% if poured.any? %>
       <section class="<%= section_class %>">
-        <div class="md:col-span-4">
+        <div class="self-start md:col-span-4" data-appear-target="item">
           <h2 class="<%= heading_class %>">What societies actually poured</h2>
           <p class="mt-3 text-mute">Bottles opened on nights that ran this deck, scored by the rooms that were there.</p>
         </div>
@@ -360,10 +360,12 @@
 
     <%# Deck reviews: the real thing. Only owners and attendees may write one
         (model-enforced); everyone may read them. %>
+    <%# The review form is never revealed (people type in it): only the heading
+        column and the list of reviews are. %>
     <section id="reviews" class="<%= section_class %>">
       <% deck_reviews = @presentation.presentation_reviews.recent.includes(:user).to_a %>
       <% my_review = user_signed_in? ? deck_reviews.find { |r| r.user_id == current_user.id } : nil %>
-      <div class="md:col-span-4">
+      <div class="self-start md:col-span-4" data-appear-target="item">
         <h2 class="<%= heading_class %>">Reviews</h2>
         <% if deck_reviews.any? %>
           <div class="mt-3 flex flex-wrap items-center gap-2">
@@ -402,7 +404,7 @@
         <% end %>
 
         <% if deck_reviews.any? %>
-          <ul class="card divide-y divide-hairline">
+          <ul class="card divide-y divide-hairline" data-appear-target="item">
             <% deck_reviews.each do |review| %>
               <li class="p-5 sm:px-6">
                 <div class="flex items-center justify-between gap-3">
@@ -427,7 +429,7 @@
 
     <!-- The author, and tags as a "where next?" device for a reader who finished the teaser -->
     <section class="<%= section_class %>">
-      <div class="md:col-span-4">
+      <div class="self-start md:col-span-4" data-appear-target="item">
         <h2 class="<%= heading_class %>">About the author</h2>
       </div>
       <div class="space-y-6 md:col-span-8">
@@ -445,7 +447,7 @@
           <% if author.bio.present? %>
             <p class="mt-4 text-sm leading-relaxed text-gray-900"><%= author.bio %></p>
           <% end %>
-          <%= link_to "View profile →", profile_path(author), class: "mt-4 inline-block text-sm font-semibold text-ink hover:underline" %>
+          <%= link_to with_arrow("View profile"), profile_path(author), class: "mt-4 inline-block text-sm font-semibold text-ink hover:underline" %>
         </div>
 
         <%# Tags link to the library filtered by that tag. %>
@@ -464,9 +466,9 @@
   <!-- More from the library, never dead-end a reader -->
   <% if @more_decks&.any? %>
     <section class="border-t border-hairline pt-12">
-      <div class="flex flex-wrap items-end justify-between gap-4">
+      <div class="flex flex-wrap items-end justify-between gap-4" data-appear-target="item">
         <h2 class="<%= heading_class %>">More from the library</h2>
-        <%= link_to 'See all decks →', presentations_path, class: 'text-sm font-semibold text-ink hover:underline' %>
+        <%= link_to with_arrow('See all decks'), presentations_path, class: 'text-sm font-semibold text-ink hover:underline' %>
       </div>
       <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <% @more_decks.each do |deck| %>

@@ -3,7 +3,8 @@
     Locals: deck (Presentation), owned (Boolean, optional) %>
 <% owned = local_assigns.fetch(:owned, false) %>
 <% meta = [ deck.category.presence, deck.difficulty.presence, deck.duration_label ].compact.join(" · ") %>
-<%= link_to presentation_path(deck), class: 'group block h-full' do %>
+<%# The card reveals as it first scrolls in (the appear controller on <main>). %>
+<%= link_to presentation_path(deck), class: 'group block h-full', data: { appear_target: 'item' } do %>
   <article class="card-hover flex h-full flex-col p-3">
     <div class="relative" style="view-transition-name: deck-cover-<%= deck.id %>">
       <%= deck_cover deck %>

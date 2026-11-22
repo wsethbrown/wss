@@ -380,15 +380,108 @@
 ::view-transition-new(root) { animation-duration: 180ms; }
 ::view-transition-group(*) { animation-duration: 280ms; animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1); }
 
-/* The pour in a glass rises once when the glass first appears. */
-@keyframes glass-pour {
-  from { transform: translateY(34px); }
-  to   { transform: translateY(0); }
+/* Motion (docs/redesign/DESIGN_SYSTEM.md, "Motion"). Two curves:
+   --motion-ease-out, a strong ease-out for things arriving (reveals, presses),
+   and --motion-ease-pour, the gentler settle the view transitions and the
+   glass already used. Only transform, translate, scale and opacity move. */
+:root {
+  --motion-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --motion-ease-pour: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
-svg[data-glass] g > path { animation: glass-pour 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 
+/* Reveal on first view (appear_controller.js). Every class here is added in
+   the browser by the controller, never by the server, so without JavaScript,
+   or under reduced motion (the controller does nothing), the page is simply
+   there. The controller removes the classes once the reveal has run, so an
+   element's own hover and press styles are untouched afterwards.
+   `translate` rather than `transform`, so it composes with an element's own
+   transform instead of replacing it. */
+@media (prefers-reduced-motion: no-preference) {
+  .appear-pending {
+    opacity: 0;
+    translate: 0 16px;
+  }
+  .appear-pending.is-in {
+    opacity: 1;
+    translate: none;
+    transition:
+      opacity 500ms var(--motion-ease-out) var(--appear-delay, 0ms),
+      translate 500ms var(--motion-ease-out) var(--appear-delay, 0ms);
+  }
+  /* The pour in a glass: the level rises from under the bowl's foot to its
+     drawn height the first time the glass is seen. At rest the level is
+     simply drawn where it belongs. */
+  svg[data-glass].glass-wait g > path { transform: translateY(var(--glass-rise, 38px)); }
+  svg[data-glass].glass-pouring g > path { animation: glass-pour 900ms var(--motion-ease-pour) var(--appear-delay, 0ms) both; }
+}
+@media (prefers-reduced-motion: no-preference) and (max-width: 639px) {
+  .appear-pending { translate: 0 12px; }
+}
+@keyframes glass-pour {
+  from { transform: translateY(var(--glass-rise, 38px)); }
+  to   { transform: none; }
+}
+@media print {
+  .appear-pending { opacity: 1 !important; translate: none !important; }
+  svg[data-glass].glass-wait g > path,
+  svg[data-glass].glass-pouring g > path { transform: none !important; animation: none !important; }
+}
+
+/* Press and hover feedback. Buttons and tappable cards press in on :active,
+   which is the only feedback a phone gets (Tailwind's preflight removes the
+   iOS tap highlight, and a tap lasts 60-100ms). The press goes in fast, 80ms
+   on the strong ease-out, and also steps the fill a shade (existing tokens
+   only); the release keeps the element's own 150ms. `scale` is its own
+   property, so it composes with a card's hover lift instead of cancelling
+   it. Kept under reduced motion: it is feedback, not travel. */
+:where(.btn, .btn-primary, .btn-secondary, .btn-ghost, .card-hover, .chip):active:not(:disabled):not([aria-disabled="true"]),
+a:active > .card-hover {
+  scale: .98;
+  transition-duration: 80ms;
+  transition-timing-function: var(--motion-ease-out);
+}
+/* White on whiskey-700 is 15:1; ink on whiskey-100 is 11:1. */
+.btn-primary:active:not(:disabled):not([aria-disabled="true"]) { background-color: var(--color-whiskey-700); }
+:where(.btn-secondary, .btn-ghost):active:not(:disabled):not([aria-disabled="true"]),
+.chip:active:not([aria-current="true"]):not([aria-pressed="true"]) { background-color: var(--color-whiskey-100); }
+
+/* A deck cover leans in slightly inside its frame on hover (the frame has
+   overflow: hidden, so the card does not grow). Pointer devices only: a tap
+   would leave it stuck scaled. */
+.deck-cover img { transition: scale 250ms var(--motion-ease-out); }
+@media (hover: hover) and (pointer: fine) {
+  a:hover .deck-cover img { scale: 1.02; }
+}
+
+/* An arrow after a link's words nudges toward where the link goes. The arrow
+   is a span (`with_arrow`), so the link's text is unchanged. */
+/* In the components layer so utilities (`hidden sm:block`) still win. */
+@layer components {
+  .arrow {
+    display: inline-block;
+    transition: translate 150ms var(--motion-ease-out);
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  a:hover .arrow, .group:hover .arrow { translate: 3px 0; }
+}
+
+/* Turbo's progress bar, drawn in the mark instead of Turbo's default blue.
+   Turbo's own rule is injected at the top of <head>, so this later one wins. */
+.turbo-progress-bar {
+  height: 2px;
+  background-color: var(--color-mark-deep);
+}
+
+/* Reduced motion, site-wide: nothing travels on hover (no card lift, no
+   cover lean, no arrow nudge); the press (fill step and .98) stays, because
+   it is feedback, not travel. The reveal and the pour do not run at all
+   (appear_controller.js does nothing). */
 @media (prefers-reduced-motion: reduce) {
-  svg[data-glass] g > path { animation: none; }
+  .deck-cover img, .arrow { transition: none; }
+  .card-hover:hover { translate: none; }
+  a:hover .deck-cover img { scale: none; }
+  a:hover .arrow, .group:hover .arrow { translate: none; }
   ::view-transition-group(*),
   ::view-transition-old(*),
   ::view-transition-new(*) { animation: none !important; }

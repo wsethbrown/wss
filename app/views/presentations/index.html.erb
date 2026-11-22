@@ -126,13 +126,13 @@
       <%= paginate @presentations if @presentations.respond_to?(:total_pages) %>
     </div>
   <% elsif @library_empty %>
-    <div class="card px-6 py-12 text-center sm:px-10">
+    <div class="card px-6 py-12 text-center sm:px-10" data-appear-target="item">
       <p class="font-display text-xl font-semibold text-ink">The library is being stocked.</p>
       <p class="mt-2 text-mute">The first decks are on their way, check back soon, or join a society in the meantime.</p>
       <%= link_to 'Browse societies', societies_path, class: 'btn btn-secondary mt-6' %>
     </div>
   <% else %>
-    <div class="card px-6 py-12 text-center sm:px-10">
+    <div class="card px-6 py-12 text-center sm:px-10" data-appear-target="item">
       <p class="font-display text-xl font-semibold text-ink">No decks match.</p>
       <p class="mt-2 text-mute">Try a different search, or clear the filters to see the whole library.</p>
       <%= link_to 'Show all decks', presentations_path, class: 'btn btn-secondary mt-6' %>

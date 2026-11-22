@@ -147,7 +147,7 @@
             <% if @event.presentation %>
               <%= link_to presentation_path(@event.presentation), class: "group block" do %>
                 <p class="text-lg font-semibold leading-snug text-ink group-hover:text-whiskey-500"><%= @event.presentation.title %></p>
-                <p class="mt-1 text-sm font-semibold text-ink">See the deck <span aria-hidden="true">→</span></p>
+                <p class="mt-1 text-sm font-semibold text-ink">See the deck <span class="arrow" aria-hidden="true">→</span></p>
               <% end %>
             <% else %>
               <p class="text-sm text-mute">No deck attached. Plenty of nights run without one.</p>

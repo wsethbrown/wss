@@ -9,7 +9,7 @@
   <% next unless section.is_a?(Hash) %>
   <% kind, content = deck_section_layout(section["lines"]) %>
   <section class="<%= deck_section_class %>" data-deck-section>
-    <div class="md:col-span-4">
+    <div class="self-start md:col-span-4" data-appear-target="item">
       <h2 class="<%= deck_heading_class %>"><%= section["heading"] %></h2>
     </div>
     <div class="md:col-span-8">

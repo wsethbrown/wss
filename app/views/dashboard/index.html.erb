@@ -38,7 +38,7 @@
                 <% else %>
                   <%= link_to society_event_path(event.society, event),
                         class: "inline-flex min-h-11 items-center gap-1 text-sm font-semibold text-ink hover:underline" do %>
-                    Coming along? <span aria-hidden="true">→</span>
+                    Coming along? <span class="arrow" aria-hidden="true">→</span>
                   <% end %>
                 <% end %>
               </div>
@@ -75,7 +75,7 @@
                     <span class="block font-semibold text-ink [overflow-wrap:anywhere]"><%= event.title %></span>
                     <span class="block text-sm text-mute tabular-nums"><%= event.start_time.in_time_zone.strftime("%a, %b %-d · %-l:%M %p %Z") %></span>
                   </span>
-                  <span class="shrink-0 text-sm font-semibold text-ink">Coming along? <span aria-hidden="true">→</span></span>
+                  <span class="shrink-0 text-sm font-semibold text-ink">Coming along? <span class="arrow" aria-hidden="true">→</span></span>
                 <% end %>
               </li>
             <% end %>

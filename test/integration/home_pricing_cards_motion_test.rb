@@ -2,18 +2,19 @@ require "test_helper"
 
 # The homepage pricing cards (#pricing .plan) are links to /membership. They
 # must be fully opaque at any scroll position and never depend on a
-# scroll-driven animation to become visible. Under the hx-rise rule a card
-# whose scroll stopped mid-entry stayed part-faded (reported as greyed out in
-# Safari), and the animation's fill overrode the .plan:hover lift. Other
-# surfaces may still rise in; the plan cards may not.
+# scroll-driven animation to become visible. Under the old hx-rise rule
+# (animation-timeline: view()) a card whose scroll stopped mid-entry stayed
+# part-faded (reported as greyed out in Safari), and the animation's fill
+# overrode the .plan:hover lift.
+#
+# They now reveal through the site's appear controller: a time-based fade
+# that runs once, to the end, and then removes its classes. The page's own
+# CSS never lowers a card's opacity; the only start state is a class the
+# controller adds in the browser (see AppearMotionTest).
 class HomePricingCardsMotionTest < ActionDispatch::IntegrationTest
-  # Every selector list in the page's inline <style> whose block declares a
-  # scroll-driven timeline or the hx-rise animation.
-  def animated_selectors(body)
+  def page_rules(body)
     css = Nokogiri::HTML(body).css("style").map(&:text).join("\n")
-    css.scan(/([^{}]+)\{([^{}]*)\}/).filter_map do |selectors, block|
-      selectors.strip if block.match?(/animation-timeline|hx-rise/)
-    end
+    css.scan(/([^{}]+)\{([^{}]*)\}/)
   end
 
   test "homepage pricing cards render as links to the membership page" do
@@ -22,24 +23,28 @@ class HomePricingCardsMotionTest < ActionDispatch::IntegrationTest
     assert_select "#pricing .plans a.plan[href='#{membership_path}']", count: 3
   end
 
-  test "no scroll-driven or rise animation targets the pricing cards" do
+  test "nothing on the homepage is scroll-driven, the pricing cards least of all" do
     get root_path
     assert_response :success
 
-    selectors = animated_selectors(response.body)
-    assert selectors.any?, "expected the homepage to keep its rise-in motion for other surfaces"
-    offenders = selectors.select { |list| list.split(",").any? { |sel| sel.match?(/\.plan\b/) } }
-    assert_empty offenders, "pricing cards must not depend on a scroll animation to be opaque: #{offenders.inspect}"
+    animated = page_rules(response.body).filter_map { |sel, block| sel.strip if block.match?(/animation-timeline|hx-rise/) }
+    assert_empty animated, "scroll-scrubbed motion can stop half-way: #{animated.inspect}"
+  end
+
+  test "the pricing cards reveal through the time-based appear controller" do
+    get root_path
+    assert_select "main[data-controller~=appear] #pricing a.plan[data-appear-target=item]", count: 3
+    refute_match(/appear-pending/, response.body, "the server never sends a card hidden")
   end
 
   test "the pricing cards are not given a starting opacity below one" do
     get root_path
     assert_response :success
 
-    css = Nokogiri::HTML(response.body).css("style").map(&:text).join("\n")
-    plan_blocks = css.scan(/([^{}]+)\{([^{}]*)\}/).select { |sel, _| sel.split(",").any? { |s| s.match?(/\.plan\b/) } }
+    plan_blocks = page_rules(response.body).select { |sel, _| sel.split(",").any? { |s| s.match?(/\.plan\b/) } }
     plan_blocks.each do |sel, block|
       refute_match(/opacity:\s*0?\.\d|opacity:\s*0\s*[;}]/, block, "#{sel.strip} lowers the card's opacity")
+      refute_match(/animation/, block, "#{sel.strip} animates the card")
     end
   end
 end

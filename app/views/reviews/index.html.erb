@@ -44,7 +44,7 @@
 
     <div class="card divide-y divide-hairline overflow-hidden">
       <% @bottles.each do |bottle| %>
-        <%= link_to bottle_path(bottle), class: "flex items-center justify-between gap-4 px-4 py-3 transition hover:bg-paper" do %>
+        <%= link_to bottle_path(bottle), class: "flex items-center justify-between gap-4 px-4 py-3 transition hover:bg-paper", data: { appear_target: "item" } do %>
           <div class="flex min-w-0 items-center gap-3">
             <%= render "bottles/identity_tile", bottle: bottle, tone: :light, size: :sm %>
             <div class="min-w-0">
@@ -69,10 +69,10 @@
 
     <% if @societies.any? %>
       <div class="mt-12">
-        <h2 class="mb-4 font-display text-2xl font-semibold text-ink sm:text-3xl">Societies</h2>
+        <h2 class="mb-4 font-display text-2xl font-semibold text-ink sm:text-3xl" data-appear-target="item">Societies</h2>
         <div class="card divide-y divide-hairline overflow-hidden">
           <% @societies.each do |society| %>
-            <%= link_to society_path(society), class: "flex items-center justify-between gap-4 px-5 py-4 transition hover:bg-paper" do %>
+            <%= link_to society_path(society), class: "flex items-center justify-between gap-4 px-5 py-4 transition hover:bg-paper", data: { appear_target: "item" } do %>
               <span class="min-w-0">
                 <span class="block truncate font-semibold text-ink"><%= society.name %></span>
                 <span class="block truncate text-sm text-mute">
@@ -103,7 +103,7 @@
       </div>
 
       <% if @feed == "nights" %>
-        <h2 class="mb-2 font-display text-2xl font-semibold text-ink sm:text-3xl"><%= @night_society ? "Tasting nights · #{@night_society.name}" : "From society tasting nights" %></h2>
+        <h2 class="mb-2 font-display text-2xl font-semibold text-ink sm:text-3xl" data-appear-target="item"><%= @night_society ? "Tasting nights · #{@night_society.name}" : "From society tasting nights" %></h2>
         <% if @night_societies.any? %>
           <div class="mb-6 flex flex-wrap items-center gap-2">
             <% if @night_society %>
@@ -127,10 +127,10 @@
           <p class="text-mute">No tastings from society nights yet.</p>
         <% end %>
       <% elsif @feed == "hot" %>
-        <h2 class="mb-6 font-display text-2xl font-semibold text-ink sm:text-3xl">Hot tastings</h2>
+        <h2 class="mb-6 font-display text-2xl font-semibold text-ink sm:text-3xl" data-appear-target="item">Hot tastings</h2>
         <div class="grid gap-4 sm:grid-cols-2"><%= render partial: "reviews/review_card", collection: @hot_reviews, as: :review %></div>
       <% elsif @recent_reviews.any? && (params[:q].blank? || @tags.any? || @distillery) %>
-        <h2 class="mb-6 font-display text-2xl font-semibold text-ink sm:text-3xl"><%= if @tags.any? then "Tastings of #{@tags.join(" + ")}" elsif @distillery then "Tastings from #{@distillery}" else "Latest tastings" end %></h2>
+        <h2 class="mb-6 font-display text-2xl font-semibold text-ink sm:text-3xl" data-appear-target="item"><%= if @tags.any? then "Tastings of #{@tags.join(" + ")}" elsif @distillery then "Tastings from #{@distillery}" else "Latest tastings" end %></h2>
         <div class="grid gap-4 sm:grid-cols-2"><%= render partial: "reviews/review_card", collection: @recent_reviews, as: :review %></div>
       <% end %>
     </div>

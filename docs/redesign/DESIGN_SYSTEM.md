@@ -86,14 +86,15 @@ Rules:
   redrawn anywhere else. For a score, `level` is score / 5; for the table (RSVPs) going is 1, maybe
   0.5, unanswered 0; in a verdict the numeral is the serve order. Tones: `:ink` on paper and white,
   `:cream` on green. Minimum size 28px. It always sits beside its number or count (or carries
-  sr-only text), is aria-hidden, and has no shading or animation. Replaces star rows for display;
+  sr-only text), is aria-hidden, and has no shading. Its one motion is the pour (see Motion). Replaces star rows for display;
   the half-step star control in review forms is an input and stays.
 - **Photograph**: only through `shared/_duotone`, which prints a greyscale image in bottle green
   and cream. Public-domain or owner-supplied images only, at most one per view, never behind
   text. Sources and licences are listed in `IMAGE_CREDITS.md`.
 - **Primary button**: `btn btn-primary` (green, white text, 16px radius). One per view.
 - **Secondary button**: `btn btn-secondary` (white, hairline).
-- **Text link with arrow**: bold ink text followed by `→`.
+- **Text link with arrow**: bold ink text followed by `→`. Write it as `link_to with_arrow("Words"), path` so the
+  arrow is its own span (`.arrow`) and nudges on hover; the link's text is unchanged.
 - **Chip**: `inline-flex min-h-9 items-center rounded-xl border border-hairline bg-white px-3.5 text-sm font-medium text-ink`.
 - **Step or count marker**: 32px rounded-[11px] paper square with a bold numeral.
 - **Lists of records**: rows separated by hairlines inside a `.card` or `.inset`. Title in
@@ -125,9 +126,58 @@ Rules:
 
 ## Motion
 
-Quiet and functional: 150ms hover lifts of 1–3px, the hero player's slide change, and
-scroll-in reveals. Pages cross-fade (view transitions), a deck's cover travels from
-its card to the deck page, and the level in a glass rises once when it appears. Everything is disabled under `prefers-reduced-motion: reduce`.
+Quiet and functional. Movement is only `transform`, `translate` or `scale`, and fades only
+`opacity`; hover and press states may also change colour, background and `box-shadow` (the
+homepage buttons and chips do). Never animate layout (width, height, margins). Two curves, as
+tokens in `application.css`: `--motion-ease-out` (`cubic-bezier(0.23, 1, 0.32, 1)`) for things
+arriving and for presses, and `--motion-ease-pour` (`cubic-bezier(0.2, 0.7, 0.2, 1)`) for the
+glass and the view transitions. No animation library.
+
+- **Press**: buttons, tappable cards, chips, the homepage buttons and pricing rows press in to
+  `scale: .98` on `:active`, going in over 80ms on the strong ease-out, and step their fill a
+  shade (primary to `whiskey-700`, secondary, ghost and chips to `whiskey-100`); release takes
+  the element's own 150ms. This is the only feedback a phone gets (preflight hides the iOS tap
+  highlight; `application.js` adds the touchstart listener iOS needs for `:active`).
+- **Hover** (150ms): lifts of 1–3px; a deck cover scales to 1.02 inside its frame; an arrow
+  after a link's words moves 3px (`with_arrow`, or `class="arrow"` on an arrow span; the
+  homepage's `.more` arrow matches). Hand-written `:hover` rules sit inside
+  `@media (hover: hover) and (pointer: fine)` so a tap never leaves them stuck; Tailwind's
+  `hover:` variant is already limited to `(hover: hover)`. Focus-visible styles are never
+  changed by motion; keyboard focus on the hero player pauses its reel.
+- **Reveal on first view**: one system, the `appear` Stimulus controller on the public layout's
+  `<main>`. Mark a card, list row, short panel or section heading with
+  `data-appear-target="item"`. Out of view at load, it waits hidden and, the first time it
+  scrolls in, eases up 16px (12px on phones) and fades in over 500ms. Items that arrive in the
+  same moment stagger by 0, then 60, then 110ms and so on (the gaps shrink, capped at 200ms); in
+  practice that is cards side by side in a grid on a wide screen, so most reveals, and nearly
+  all on a phone's single column, start at once. Rules: the hidden state is a class the
+  controller adds (no JS means visible); anything on screen at load is left alone; it is
+  time-based, runs once and then removes its classes; nothing on screen stays hidden even if the
+  observer never fires (a sweep when the scroll or a resize settles, and a one-off 1.5s limit);
+  focusing anything inside a waiting item shows it at once; print shows everything; Turbo
+  snapshots and back/forward visits are never hidden.
+  **Never mark anything taller than about one screen**: mark its heading (a deck section's
+  heading column, a tall card's heading row) and let the content stand. Reading text never fades.
+  The controller refuses to hide an item taller than 1.2 times the viewport as a safety net.
+  One entrance per container: never mark an item inside another item, and mark a group of
+  words that read together (a homepage beat's numeral, heading, text and link) as one item.
+  Never mark the header, the footer, a form someone types in, the page heading, the homepage's
+  closing beat, or anything in admin (its layout has no controller). Never scroll-scrub a
+  reveal (`animation-timeline`): it stops part-faded wherever the scroll stops.
+- **The glass pours** (900ms) the first time it is seen, through the same controller
+  (`data-appear-target="glass"`, set by `shared/_glass`). A glass inside a revealing card pours
+  120ms after its card starts, once the card is visible. At rest, without JS and in admin the
+  level is simply drawn.
+- **The hero player** cross-fades its real preview slides, one tick per slide lit in step (a
+  one-slide reel does not cycle); hovering with a pointer or focusing it pauses the reel. The
+  story faces' ticks do not animate: each lights its own position.
+- **Pages** cross-fade (view transitions), and a deck's cover travels from its card to the deck
+  page. Turbo's progress bar is a 2px `mark-deep` line.
+- **Reduced motion** (`prefers-reduced-motion: reduce`), the same everywhere: the appear
+  controller does nothing, so nothing is hidden and no glass pours; the reel and ticks stand
+  still on the first slide; view transitions are off; nothing travels on hover (no card lift,
+  cover lean or arrow nudge). The press (fill step and `.98`) and colour changes stay: they are
+  feedback, not travel.
 
 ## Copy
 

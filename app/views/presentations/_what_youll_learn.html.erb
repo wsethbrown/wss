@@ -3,7 +3,7 @@
 <% points = presentation.parsed_what_youll_learn %>
 <% if points.any? %>
   <section class="<%= deck_section_class %>">
-    <div class="md:col-span-4">
+    <div class="self-start md:col-span-4" data-appear-target="item">
       <h2 class="<%= deck_heading_class %>">What you'll learn</h2>
     </div>
     <div class="md:col-span-8">

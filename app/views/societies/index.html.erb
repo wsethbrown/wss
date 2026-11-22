@@ -19,13 +19,13 @@
 
     <%# Your societies %>
     <section class="mb-14" aria-labelledby="your-societies-heading">
-      <h2 id="your-societies-heading" class="mb-5 font-display text-2xl font-semibold text-ink sm:text-3xl">Your societies</h2>
+      <h2 id="your-societies-heading" data-appear-target="item" class="mb-5 font-display text-2xl font-semibold text-ink sm:text-3xl">Your societies</h2>
 
       <% if @user_societies.any? %>
         <div class="card overflow-hidden">
           <ul class="divide-y divide-hairline">
             <% @user_societies.each do |society| %>
-              <li>
+              <li data-appear-target="item">
                 <%= render "societies/index_row", society: society,
                       label: @user_society_roles[society.id] %>
               </li>
@@ -33,7 +33,7 @@
           </ul>
         </div>
       <% else %>
-        <div class="card flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between">
+        <div class="card flex flex-col gap-4 p-6 sm:flex-row sm:items-center sm:justify-between" data-appear-target="item">
           <div>
             <h3 class="text-xl font-semibold text-ink">Start your whiskey journey</h3>
             <% if can_create_society %>
@@ -51,7 +51,7 @@
 
     <%# Discover %>
     <section aria-labelledby="discover-heading">
-      <h2 id="discover-heading" class="mb-5 font-display text-2xl font-semibold text-ink sm:text-3xl">Discover societies</h2>
+      <h2 id="discover-heading" data-appear-target="item" class="mb-5 font-display text-2xl font-semibold text-ink sm:text-3xl">Discover societies</h2>
 
       <%# Search: name + location text. The old ZIP-radius search was decorative,
           no coordinates or geocoding existed; it even requested browser
@@ -84,7 +84,7 @@
         <div class="card overflow-hidden">
           <ul class="divide-y divide-hairline">
             <% @societies.each do |society| %>
-              <li>
+              <li data-appear-target="item">
                 <%= render "societies/index_row", society: society,
                       label: (society.is_private ? "Private" : "Public") %>
               </li>
@@ -92,11 +92,11 @@
           </ul>
         </div>
       <% else %>
-        <div class="card p-6">
+        <div class="card p-6" data-appear-target="item">
           <h3 class="text-xl font-semibold text-ink">No societies found</h3>
           <% if params[:search].present? || params[:location].present? %>
             <p class="mt-1 text-mute">Try adjusting your search criteria to find more societies.</p>
-            <%= link_to "Show all societies →", societies_path, class: "mt-4 inline-block font-semibold text-ink hover:underline" %>
+            <%= link_to with_arrow("Show all societies"), societies_path, class: "mt-4 inline-block font-semibold text-ink hover:underline" %>
           <% else %>
             <p class="mt-1 text-mute">There are no societies to discover right now.</p>
           <% end %>
@@ -113,7 +113,7 @@
     <div class="grid grid-cols-1 gap-6 md:grid-cols-12 md:items-start">
       <%# What a society is. Sentences reused from the homepage ("Gather your
           society") and /membership; see the D2 hand-back for sources. %>
-      <section class="panel-ink p-7 sm:p-8 md:col-span-5" aria-labelledby="what-heading">
+      <section class="panel-ink p-7 sm:p-8 md:col-span-5" aria-labelledby="what-heading" data-appear-target="item">
         <%= render "shared/duotone", src: "photos/saloon-1897.jpg",
               alt: "Men gathered at the bar of a saloon in Black Hawk, Colorado, in 1897",
               css: "mb-7 aspect-[4/3]" %>
@@ -132,16 +132,16 @@
           <div class="card overflow-hidden">
             <ul class="divide-y divide-hairline">
               <% @societies.limit(6).each do |society| %>
-                <li>
+                <li data-appear-target="item">
                   <%= render "societies/index_row", society: society, row_class: "society-card" %>
                 </li>
               <% end %>
             </ul>
           </div>
-          <%= link_to "Join to see all societies →", new_user_registration_path,
+          <%= link_to with_arrow("Join to see all societies"), new_user_registration_path,
                 class: "mt-5 inline-block font-semibold text-ink hover:underline" %>
         <% else %>
-          <div class="card p-6">
+          <div class="card p-6" data-appear-target="item">
             <h3 class="text-xl font-semibold text-ink">No public societies yet</h3>
             <p class="mt-1 text-mute">Be the first to create a public whiskey society!</p>
           </div>

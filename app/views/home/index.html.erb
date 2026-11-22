@@ -49,14 +49,21 @@
     .hx section { padding: 56px 0; }
 
     .hx .btn2 { display: inline-flex; align-items: center; gap: 8px; min-height: 52px; padding: 0 24px; border-radius: 16px; font-weight: 600; font-size: 16px; letter-spacing: -.01em;
-                background: var(--ink); color: #f6f4ee; transition: transform .15s, box-shadow .15s; box-shadow: 0 1px 2px rgba(22, 51, 42, .3); }
-    .hx .btn2:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(22, 51, 42, .55); }
+                background: var(--ink); color: #f6f4ee; transition: transform .15s, box-shadow .15s, scale .15s; box-shadow: 0 1px 2px rgba(22, 51, 42, .3); }
+    @media (hover: hover) and (pointer: fine) { .hx .btn2:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(22, 51, 42, .55); } }
+    /* Press in on tap or click (the only feedback a phone gets). */
     .hx .btn2--quiet { background: var(--card); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
-    .hx .btn2--quiet:hover { box-shadow: inset 0 0 0 1px rgba(22, 51, 42, .3); }
+    @media (hover: hover) and (pointer: fine) { .hx .btn2--quiet:hover { box-shadow: inset 0 0 0 1px rgba(22, 51, 42, .3); } }
     .hx .btn2--light { background: #f6f4ee; color: var(--ink); }
+    /* Press in on tap or click, the only feedback a phone gets: fast in (80ms,
+       strong ease-out), a shade darker or lighter, released over 150ms. */
+    .hx :is(.btn2, .plan, .chips a):active { scale: .98; transition-duration: 80ms; transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+    .hx .btn2:active { background: #10261f; }
+    .hx :is(.btn2--quiet, .btn2--light, .chips a):active { background: #ecebe3; }
     .hx .more { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 15px; color: var(--ink); }
-    .hx .more::after { content: "→"; transition: transform .15s; }
-    .hx .more:hover::after { transform: translateX(3px); }
+    /* The arrow nudges 3px like every .arrow on the site (application.css). */
+    .hx .more::after { content: "→"; transition: translate .15s cubic-bezier(0.23, 1, 0.32, 1); }
+    @media (hover: hover) and (pointer: fine) { .hx .more:hover::after { translate: 3px 0; } }
     .hx a:focus-visible, .hx summary:focus-visible { outline: 2px solid var(--mark-deep); outline-offset: 3px; border-radius: 8px; }
 
     /* Hero */
@@ -64,30 +71,28 @@
     .hx .hero-grid { display: grid; gap: 48px; align-items: center; }
     .hx .acts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
     .hx .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
-    .hx .chips a { display: inline-flex; align-items: center; min-height: 36px; padding: 0 14px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); font-size: 14px; font-weight: 500; color: var(--ink); transition: background .15s; }
-    .hx .chips a:hover { background: #ecebe3; }
+    .hx .chips a { display: inline-flex; align-items: center; min-height: 36px; padding: 0 14px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); font-size: 14px; font-weight: 500; color: var(--ink); transition: background .15s, scale .15s; }
+    @media (hover: hover) and (pointer: fine) { .hx .chips a:hover { background: #ecebe3; } }
     .hx .note { margin-top: 20px; font-size: 14px; }
 
-    /* The deck player, with the following slide riding on its corner. */
-    .hx .stage { position: relative; padding: 0 0 19% 0; }
-    .hx .player { display: block; background: var(--ink); border-radius: 28px; padding: 10px;
-                  box-shadow: 0 1px 2px rgba(22, 51, 42, .25), 0 50px 90px -36px rgba(22, 51, 42, .6); transition: transform .25s; }
-    .hx .stage:hover .player { transform: translateY(-4px); }
-    .hx .reel { position: relative; aspect-ratio: 16 / 9; border-radius: 19px; overflow: hidden; background: #0e211b; }
-    .hx .reel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; animation: hx-reel <%= reel * 4 %>s infinite; }
-    .hx .bar { display: flex; align-items: center; gap: 14px; padding: 14px 12px 6px; color: #f6f4ee; font-size: 14px; }
-    .hx .bar b { font-weight: 600; white-space: nowrap; }
-    .hx .bar span { opacity: .65; white-space: nowrap; }
-    .hx .ticks { flex: 1; display: flex; gap: 5px; min-width: 40px; }
-    .hx .ticks i { flex: 1; height: 3px; border-radius: 3px; background: #f6f4ee; opacity: .22; animation: hx-tick <%= reel * 4 %>s infinite; }
-    .hx .next { position: absolute; right: -3%; bottom: 0; width: 36%; border-radius: 16px; padding: 5px; background: var(--card);
-                box-shadow: 0 1px 2px rgba(22, 51, 42, .2), 0 24px 44px -18px rgba(22, 51, 42, .5); transition: transform .25s; }
-    .hx .stage:hover .next { transform: translate(4px, 4px); }
-    .hx .next .reel { border-radius: 12px; }
-    .hx .stage:hover img, .hx .stage:hover .ticks i { animation-play-state: paused; }
+    /* The hero player's reel: its real preview slides cross-fade in turn, and
+       one tick per slide lights in step with it (same cycle, same delay).
+       Hovering or focusing the player pauses both. The four story faces'
+       ticks do not animate: each lights the one tick for its own position. */
+    <% if reel > 1 %>
     @keyframes hx-reel { 0% { opacity: 0; } 3% { opacity: 1; } <%= step %>% { opacity: 1; } <%= step + 3 %>% { opacity: 0; } 100% { opacity: 0; } }
-    @keyframes hx-tick { 0% { opacity: 1; } <%= step %>% { opacity: 1; } <%= step + 3 %>% { opacity: .22; } 100% { opacity: .22; } }
-
+    @keyframes hx-tick { 0% { opacity: .22; } 3% { opacity: 1; } <%= step %>% { opacity: 1; } <%= step + 3 %>% { opacity: .22; } 100% { opacity: .22; } }
+    .hx .ticks--reel i { animation: hx-tick <%= reel * 4 %>s infinite; }
+    <% else %>
+    /* A one-slide reel does not cycle: the slide shows and its tick stays lit. */
+    .hx .reel img, .hx .ticks--reel i { opacity: 1 !important; animation: none !important; }
+    <% end %>
+    /* Hover pauses only with a pointer (a tap would leave it stuck paused);
+       keyboard focus always pauses. */
+    @media (hover: hover) and (pointer: fine) { .hx .player:hover :is(.reel img, .ticks i) { animation-play-state: paused; } }
+    .hx .player:focus-visible :is(.reel img, .ticks i) { animation-play-state: paused; }
+    .hx a.player { transition: transform .25s cubic-bezier(0.23, 1, 0.32, 1); }
+    @media (hover: hover) and (pointer: fine) { .hx a.player:hover { transform: translateY(-2px); } }
 
     /* The pinned presentation. Faces share one grid column and each sticks
        from its own row to the end, so a later face slides up over the last. */
@@ -97,6 +102,9 @@
     .hx .story .bar b { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
     .hx .beat { display: flex; flex-direction: column; justify-content: center; }
     .hx .beat .n { display: inline-flex; align-items: center; justify-content: center; align-self: flex-start; min-width: 34px; height: 34px; padding: 0 11px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); font-weight: 600; font-size: 14px; margin-bottom: 22px; }
+    /* Each beat's words reveal as one (.beat-body), never the tall beat
+       itself, whose top enters long before its centred words do. */
+    .hx .beat-body { display: flex; flex-direction: column; }
     .hx .beat h2 + p { margin-top: 18px; }
     .hx .beat .more { margin-top: 24px; align-self: flex-start; }
     .hx .face { margin-bottom: 36px; }
@@ -256,8 +264,8 @@
        No opacity anywhere in these rules (see the motion note below). */
     .hx .plans { display: grid; gap: 10px; align-self: start; }
     .hx .plan { display: grid; grid-template-columns: minmax(0, 1fr) auto 44px; grid-template-areas: "head price go" "bill save go"; align-items: center; column-gap: 20px; row-gap: 6px;
-                min-height: 112px; padding: 22px 22px 22px 26px; border-radius: 26px; background: var(--card); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); transition: transform .15s, box-shadow .15s; }
-    .hx .plan:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 1px rgba(22, 51, 42, .3); }
+                min-height: 112px; padding: 22px 22px 22px 26px; border-radius: 26px; background: var(--card); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); transition: transform .15s, box-shadow .15s, scale .15s; }
+    @media (hover: hover) and (pointer: fine) { .hx .plan:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 1px rgba(22, 51, 42, .3); } }
     .hx .plan-head { grid-area: head; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; min-width: 0; }
     .hx .plan h3 { font-size: 22px; line-height: 1.1; }
     .hx .plan-tag { display: inline-flex; align-items: center; min-height: 28px; padding: 0 10px; border-radius: 10px; font-size: 13px; font-weight: 600; background: var(--bg); color: var(--ink); white-space: nowrap; }
@@ -266,9 +274,9 @@
     .hx .plan-price small { margin-left: 3px; font-size: 15px; font-weight: 500; letter-spacing: 0; color: var(--mute); }
     .hx .plan-save { grid-area: save; justify-self: end; display: inline-flex; align-items: center; min-height: 26px; padding: 0 9px; border-radius: 9px; font-size: 13px; font-weight: 600; background: #ecebe3; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
     .hx .plan-go { grid-area: go; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 14px; background: var(--bg); color: var(--ink); transition: transform .15s; }
-    .hx .plan:hover .plan-go { transform: translateX(3px); }
+    @media (hover: hover) and (pointer: fine) { .hx .plan:hover .plan-go { transform: translateX(3px); } }
     .hx .plan--pick { background: var(--ink); color: #f6f4ee; box-shadow: none; }
-    .hx .plan--pick:hover { box-shadow: 0 18px 36px -20px rgba(22, 51, 42, .7); }
+    @media (hover: hover) and (pointer: fine) { .hx .plan--pick:hover { box-shadow: 0 18px 36px -20px rgba(22, 51, 42, .7); } }
     .hx .plan--pick h3, .hx .plan--pick .plan-price { color: #f6f4ee; }
     .hx .plan--pick .plan-bill, .hx .plan--pick .plan-price small { color: rgba(246, 244, 238, .72); }
     .hx .plan--pick .plan-tag, .hx .plan--pick .plan-save { background: #1d4034; color: #f6f4ee; box-shadow: inset 0 0 0 1px #2f5546; }
@@ -305,27 +313,24 @@
       .hx .split { grid-template-columns: 5fr 7fr; gap: 64px; }
     }
 
-    /* Surfaces rise into place as they scroll in. The pricing cards (.plan)
-       are left out on purpose: they are links and must be fully opaque at any
-       scroll position. Under this rule they sat part-faded wherever the scroll
-       stopped mid-entry, and the animation's fill also overrode .plan:hover. */
-    @media (prefers-reduced-motion: no-preference) {
-      @supports (animation-timeline: view()) {
-        .hx .tile, .hx .panel, .hx .faq { animation: hx-rise linear both; animation-timeline: view(); animation-range: entry 0% entry 55%; }
-        @keyframes hx-rise { from { opacity: 0; transform: translateY(36px) scale(.985); } to { opacity: 1; transform: none; } }
-      }
-    }
+    /* Cards, rows, panels and headings reveal once, the first time they
+       scroll in, through the site's appear controller (data-appear-target on
+       the markup below; application.css; appear_controller.js). It is
+       time-based and always runs to the end, so nothing here is ever left
+       part-faded. The old scroll-scrubbed rise left the pricing cards
+       greyed out wherever the scroll stopped.
+       The closing beat never reveals. */
+    /* Reduced motion: nothing travels on hover; the press (shade and .98)
+       stays, as it does across the site (application.css). */
     @media (prefers-reduced-motion: reduce) {
-      .hx * { transition: none !important; }
+      .hx .btn2:hover, .hx .plan:hover, .hx .plan:hover .plan-go, .hx a.player:hover { transform: none; }
+      .hx .more:hover::after { translate: none; }
       .hx .reel img, .hx .ticks i { animation: none; }
-      .hx .reel img:first-child { opacity: 1; }
-      .hx .next .reel img:first-child { opacity: 0; }
-      .hx .next .reel img:nth-child(2) { opacity: 1; }
+      .hx .reel img:first-child, .hx .ticks--reel i:first-child { opacity: 1; }
     }
   </style>
 <% end %>
 
-<div class="hx">
 <div class="hx">
   <div class="wrap">
     <div class="story">
@@ -350,7 +355,8 @@
             </div>
             <div class="bar">
               <b><%= @showcase_deck.title %></b>
-              <div class="ticks" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
+              <%# One tick per slide in the reel, lit with its slide. %>
+              <div class="ticks ticks--reel" aria-hidden="true"><% showcase_slides.size.times do |i| %><i style="animation-delay: <%= i * 4 %>s"></i><% end %></div>
               <span><%= [ "#{@showcase_deck.slide_images.count} slides", @showcase_deck.duration.presence ].compact.join(" · ") %></span>
             </div>
           <% end %>
@@ -362,13 +368,15 @@
 
       <!-- Beat 2: pick a deck, with the real library on screen -->
       <div id="how-it-works" class="beat b2">
-        <span class="n">1 of 3</span>
-        <h2>Pick <em>a deck</em></h2>
-        <p class="lede">Browse the library and choose the story you want to tell, bourbon, scotch, rye, or something stranger. Filter by difficulty and budget.</p>
-        <%= link_to "See the full library", presentations_path, class: "more" %>
+        <div class="beat-body" data-appear-target="item">
+          <span class="n">1 of 3</span>
+          <h2>Pick <em>a deck</em></h2>
+          <p class="lede">Browse the library and choose the story you want to tell, bourbon, scotch, rye, or something stranger. Filter by difficulty and budget.</p>
+          <%= link_to "See the full library", presentations_path, class: "more" %>
+        </div>
       </div>
       <div class="face f2">
-        <div class="player">
+        <div class="player" data-appear-target="item">
           <div class="screen">
             <div class="sl sl--paper">
               <h4>Latest decks</h4>
@@ -388,17 +396,19 @@
 
       <!-- Beat 3: gather, with the next real tasting night on screen -->
       <div class="beat b3">
-        <span class="n">2 of 3</span>
-        <h2>Gather <em>your society</em></h2>
-        <p class="lede">Start a private society for your friends or join a public one near you. Schedule the night, share the link, and RSVPs take care of themselves.</p>
-        <%= link_to "Browse societies", societies_path, class: "more" %>
+        <div class="beat-body" data-appear-target="item">
+          <span class="n">2 of 3</span>
+          <h2>Gather <em>your society</em></h2>
+          <p class="lede">Start a private society for your friends or join a public one near you. Schedule the night, share the link, and RSVPs take care of themselves.</p>
+          <%= link_to "Browse societies", societies_path, class: "more" %>
+        </div>
       </div>
       <div class="face f3">
         <%# The one photograph on this page (owner-supplied, AI-generated; see
             docs/redesign/IMAGE_CREDITS.md). Same band in both invite states. %>
         <% gathering_photo = capture do %><%= render "shared/duotone", src: "photos/tasting-night-living-room.jpg", css: "invite-photo", width: 1280, height: 512,
               alt: "Five friends at a whiskey tasting in a lamp-lit living room. One stands by the TV with a glass raised, presenting, and four listen from the sofas, laughing, with glasses in hand." %><% end %>
-        <div class="player">
+        <div class="player" data-appear-target="item">
           <div class="screen screen--invite">
             <% if @next_event %>
               <%# The next real tasting night at a public society, drawn as its
@@ -457,13 +467,15 @@
 
       <!-- Beat 4: pour, with the real tasting record on screen -->
       <div class="beat b4">
-        <span class="n">3 of 3</span>
-        <h2>Pour <em>and present</em></h2>
-        <p class="lede">Open the deck, pour the first bottle, and tell the story. Everyone rates each whiskey as you go, and the scores are saved to your society's record.</p>
-        <%= link_to "Read the record", reviews_path, class: "more" %>
+        <div class="beat-body" data-appear-target="item">
+          <span class="n">3 of 3</span>
+          <h2>Pour <em>and present</em></h2>
+          <p class="lede">Open the deck, pour the first bottle, and tell the story. Everyone rates each whiskey as you go, and the scores are saved to your society's record.</p>
+          <%= link_to "Read the record", reviews_path, class: "more" %>
+        </div>
       </div>
       <div class="face f4">
-        <div class="player">
+        <div class="player" data-appear-target="item">
           <div class="screen<%= ' screen--tall' if @verdict_rows.blank? && @featured_review %>">
             <div class="sl sl--ink">
               <% if @verdict_rows.present? %>
@@ -500,7 +512,7 @@
                       <div class="rv-by">
                         <%= link_to "#{review.user.first_name} #{review.user.last_name}", profile_path(review.user) %> <%= render "shared/century_badge", record: review.user, tone: :dark %> · <%= review.created_at.strftime("%B %-d, %Y") %>
                       </div>
-                      <%= link_to "Read the full tasting →", review_path(review), class: "rv-more" %>
+                      <%= link_to with_arrow("Read the full tasting"), review_path(review), class: "rv-more" %>
                     </div>
                   </div>
                   <% if profile.any? %>
@@ -544,7 +556,7 @@
     <% spot_image = @spotlight_deck.slide_images.attached? ? @spotlight_deck.slide_images.order(:id).first : (@spotlight_deck.featured_image.attached? ? @spotlight_deck.featured_image : nil) %>
     <section style="padding-bottom:0">
       <div class="wrap">
-        <div class="tile spot">
+        <div class="tile spot" data-appear-target="item">
           <% if spot_image %>
             <%= link_to presentation_path(@spotlight_deck), class: "spot-img", aria: { hidden: true }, tabindex: -1 do %>
               <%= image_tag image_variant(spot_image, :card), alt: "", loading: "lazy" %>
@@ -566,13 +578,14 @@
 
   <section>
     <div class="wrap">
+      <%# The panel stays put; its two halves reveal (it is tall on a phone). %>
       <div class="panel">
-        <div>
+        <div data-appear-target="item">
           <h2>Born from a <em>real society.</em></h2>
           <p class="lede">The first Whiskey Share Society started as a circle of friends in 2019. Each month one of us drew a topic, did the research, bought the bottles, and told its story over a deck of slides and a glass of whiskey.</p>
           <div class="acts"><%= link_to "Find your society", societies_path, class: "btn2 btn2--light" %></div>
         </div>
-        <ol class="rules" aria-label="House rules">
+        <ol class="rules" aria-label="House rules" data-appear-target="item">
           <% rules.each do |rule| %><li><%= rule %></li><% end %>
         </ol>
       </div>
@@ -581,7 +594,7 @@
 
   <section id="pricing">
     <div class="wrap split">
-      <div>
+      <div data-appear-target="item">
         <h2>Choose <em>your pour.</em></h2>
         <p class="lede" style="margin-top:18px">One membership, three ways to pay it. Every plan unlocks the same thing, a deck credit every month and a society of your own.</p>
         <div class="acts"><%= link_to "See the plans", membership_path, class: "btn2" %></div>
@@ -592,7 +605,7 @@
       <div class="plans">
         <% @stripe_products.each do |product| %>
           <% savings = plan_savings_percent(product, @stripe_products) %>
-          <%= link_to membership_path, class: "plan #{'plan--pick' if product[:popular]}" do %>
+          <%= link_to membership_path, class: "plan #{'plan--pick' if product[:popular]}", data: { appear_target: "item" } do %>
             <span class="plan-head">
               <h3><%= product[:name].to_s.gsub(" Membership", "") %></h3>
               <% if product[:popular] %><span class="plan-tag">Best value</span><% end %>
@@ -603,15 +616,15 @@
             <span class="plan-go" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
           <% end %>
         <% end %>
-        <p class="plans-note">Joining a society is free · Membership required to run a society</p>
+        <p class="plans-note" data-appear-target="item">Joining a society is free · Membership required to run a society</p>
       </div>
     </div>
   </section>
 
   <section id="faq" style="padding-bottom:96px">
     <div class="wrap split">
-      <div><h2>Frequently asked <em>questions</em></h2></div>
-      <div class="faq">
+      <div data-appear-target="item"><h2>Frequently asked <em>questions</em></h2></div>
+      <div class="faq" data-appear-target="item">
         <% faqs.each do |q, a| %>
           <details>
             <summary><%= q %></summary>

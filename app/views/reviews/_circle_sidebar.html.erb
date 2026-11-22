@@ -4,7 +4,7 @@
   <h2 class="mb-4 text-xl font-semibold text-ink">Circle</h2>
   <% if circle_reviews.any? %>
     <div class="space-y-3"><%= render partial: "reviews/circle_row", collection: circle_reviews, as: :review %></div>
-    <%= link_to "See all →", reviews_path(feed: "circle"), class: "mt-4 block text-sm font-semibold text-ink hover:underline" %>
+    <%= link_to with_arrow("See all"), reviews_path(feed: "circle"), class: "mt-4 block text-sm font-semibold text-ink hover:underline" %>
   <% elsif in_circle %>
     <p class="text-sm text-mute">No pours from your circle yet, their next tastings will land here.</p>
     <%= link_to "Manage who you follow", account_path(anchor: "followed"), class: "mt-2 inline-block text-sm font-semibold text-ink hover:underline" %>
