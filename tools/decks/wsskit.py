@@ -25,7 +25,7 @@ __all__ = [
     'W100', 'W200', 'SANS', 'SERIF', 'SLIDE_W', 'SLIDE_H', 'PP_ALIGN', 'MSO_ANCHOR', 'MSO_SHAPE',
     'A', 'KIT', 'LOGO_CREAM', 'LOGO_GREEN', 'LOGO_RATIO', 'TITLE',
     'new_slide', 'bg', 'rect', 'rrect', 'text', 'picture', 'line', 'dot', 'footer', 'heading',
-    'bottle_placeholder', 'title_slide', 'slainte_slide', 'glass_slide',
+    'bottle_placeholder', 'bottle_panel', 'title_slide', 'slainte_slide', 'glass_slide',
 ]
 
 # The site palette (docs/redesign/DESIGN_SYSTEM.md). Orange is a mark, never text on a light ground.
@@ -193,6 +193,19 @@ def bottle_placeholder(slide, x, y, w, h):
     nw, nh = bw * 0.30, h * 0.17
     rrect(slide, cx - nw / 2, by - nh + 0.05, nw, nh, r=0.06, fill=W200)
     rrect(slide, cx - nw * 0.62, by - nh - 0.12, nw * 1.24, 0.2, r=0.05, fill=W200)
+
+
+def bottle_panel(slide, photo, x=0.85, y=0.8, w=3.4, h=5.3, credit=None):
+    """The left panel of a pour slide: the bottle's photograph, or the placeholder card when
+    there is none. photo is a file name in the package's assets/ folder, cropped to the slot
+    with crop_bottle.py. credit is one line under the photo: who took it, the license, where
+    it is from, and "Pictured: ..." first if it is not exactly the bottle being poured."""
+    if photo:
+        picture(slide, A / photo, x, y, w, h, radius_in=0.26)
+    else:
+        bottle_placeholder(slide, x, y, w, h)
+    if credit:
+        text(slide, x, y + h + 0.1, w, 0.45, credit, size=9.5, font=SANS, color=MUTE, ls=1.05)
 
 
 def title_slide(title, hook, series='The Whiskey Share Society'):

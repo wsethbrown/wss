@@ -44,11 +44,11 @@ def rows_card(s, x, y, w, items, label_w, row_h, mark=None, label_size=20, size=
         yy += row_h
 
 
-def pour_slide(n, pour, name, note, maker, style, abv, two_line_name=False):
-    """One pour: a bottle-shaped placeholder card (no free photograph of the bottles),
+def pour_slide(n, pour, name, note, maker, style, abv, two_line_name=False, photo=None, credit=None):
+    """One pour: the bottle's photograph (or the placeholder card when there is none),
     the pour line, the name, a short note, and Maker / Style / ABV."""
     s = new_slide()
-    bottle_placeholder(s, X, 0.8, 3.4, 5.3)
+    bottle_panel(s, photo, X, 0.8, 3.4, 5.3, credit)
     x, w = 4.85, 7.63
     kicker(s, pour, x=x)
     name_h = 1.55 if two_line_name else 0.85
@@ -84,7 +84,9 @@ credit(s, 7.35, 0.6 + th + 0.08, tw,
 # ---------------------------------------------------------------- 2 pour 1
 pour_slide(2, 'Glass 1 of 4', 'Cardhu 12 Year Old',
            ['The distillery’s own single malt.'],
-           'Cardhu, Knockando', 'Speyside single malt, 12 years', '40%')
+           'Cardhu, Knockando', 'Speyside single malt, 12 years', '40%',
+           photo='cardhu-12.jpg',
+           credit='Pictured: an older label. Photograph: Grap, CC BY-SA 3.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 3 the farm
 s = new_slide()
@@ -176,7 +178,9 @@ footer(s, 8)
 pour_slide(9, 'Glass 2 of 4', 'Glenfiddich 12 Year Old',
            ['William Grant started Glenfiddich with Cardow’s old stills.',
             'Glass 1 and this one are both 12 years old.'],
-           'Glenfiddich, Dufftown', 'Speyside single malt, 12 years', '40%')
+           'Glenfiddich, Dufftown', 'Speyside single malt, 12 years', '40%',
+           photo='glenfiddich-12.jpg',
+           credit='Pictured: an older label. Photograph: Blueye, CC BY-SA 3.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 10 the sale
 s = new_slide()
@@ -226,7 +230,8 @@ footer(s, 11)
 # ---------------------------------------------------------------- 12 pour 3
 pour_slide(12, 'Glass 3 of 4', ['Johnnie Walker', 'Black Label'],
            ['John Walker & Sons bought Cardow in 1893.'],
-           'John Walker & Sons', 'Blended Scotch, 12 years', '40%', two_line_name=True)
+           'John Walker & Sons', 'Blended Scotch, 12 years', '40%', two_line_name=True,
+           photo='johnnie-walker-black.jpg', credit='Photograph: Marcelo Verfe, via Pexels. Cropped.')
 
 # ---------------------------------------------------------------- 13 2003
 s = new_slide()
@@ -259,7 +264,8 @@ footer(s, 14)
 # ---------------------------------------------------------------- 15 pour 4
 pour_slide(15, 'Glass 4 of 4', ['Johnnie Walker', 'Green Label'],
            ['A blended malt. Cardhu Pure Malt was the same kind of whisky.', 'Sold as Johnnie Walker Pure Malt until 2004.'],
-           'John Walker & Sons', 'Blended malt, 15 years', '43%', two_line_name=True)
+           'John Walker & Sons', 'Blended malt, 15 years', '43%', two_line_name=True,
+           photo='johnnie-walker-green.jpg', credit='Photograph: from Pexels. Cropped.')
 
 # ---------------------------------------------------------------- 16 Sláinte
 slainte_slide('To Helen and Elizabeth Cumming.')

@@ -268,3 +268,7 @@ Each is marked with how much of it was read for this outline.
 - **Slide 8.** "Glenfiddich Distillery stills.jpg", by Colin Smith, 4 April 2003, Geograph Britain and Ireland via Wikimedia Commons. CC BY-SA 2.0. Cropped.
 
 No free photograph of any of the four bottles was used; the pour slides use a plain bottle placeholder. No photograph of Helen or Elizabeth Cumming with a clear licence was found.
+- **Slide 2.** "CARDHU Bottle and Box.jpg", by Grap, 23 May 2010, Wikimedia Commons. CC BY-SA 3.0. Cropped. It shows the 2010 label ("Aged 12 Years", 40% vol, 70cl), not the bottle now on sale.
+- **Slide 9.** "Bottle of Glenfiddich 12yo.jpg", by Blueye, 3 September 2008, Wikimedia Commons. CC BY-SA 3.0 and GFDL. Cropped. It shows the 2008 label.
+- **Slide 12.** "Whisky in Glass and Bottle", by Marcelo Verfe, Pexels photo 15724170 (pexels.com/photo/whisky-in-glass-and-bottle-15724170). Pexels license. Cropped. The photographer's name is also in the file's own data. The Pexels page could not be opened from the build machine, so the license was not read there; the owner chose the photo.
+- **Slide 15.** "A Bottle of Johnnie Walker", Pexels photo 5185740 (pexels.com/photo/a-bottle-of-johnnie-walker-5185740). Pexels license. Cropped. Search results credit Jerome Govender; the file's own data names Pieter Botha. The page could not be opened to settle it, so the slide credits Pexels only. The label reads "Green Label, Malt Scotch Whisky, Aged 15 Years, 750ml 43% alc/vol".
