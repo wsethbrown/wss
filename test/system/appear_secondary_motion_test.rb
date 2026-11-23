@@ -8,10 +8,6 @@ require "application_system_test_case"
 class AppearSecondaryMotionTest < ApplicationSystemTestCase
   BUSY = ".draw-wait, .draw-run, .perform-wait, .perform-run, .photo-wait, .photo-run, .glass-wait, .glass-pouring, .img-wait".freeze
 
-  def cdp(command, **params)
-    page.driver.browser.execute_cdp(command, **params)
-  end
-
   def scroll_through_page
     page.execute_script(<<~JS)
       window.__scrollDone = false;
@@ -83,19 +79,18 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
     assert_equal 0.0, offset.to_f
   end
 
-  # Viewport state is per browser tab and Capybara reuses the tab across
-  # tests, so a size or emulation set by one test must never reach the next.
-  # Every test here starts and ends with no device-metrics override.
-  setup { cdp("Emulation.clearDeviceMetricsOverride") }
-
+  # No viewport emulation anywhere in this file: Capybara reuses one browser
+  # tab across tests, and a CDP device-metrics override (used here briefly)
+  # both leaked between tests and, under CI's headless Chrome, left this
+  # test's held motion never starting, which local Chrome could not
+  # reproduce. The window is resized (before the visit, so the page and its
+  # observers are built at the final size) and put back in ensure.
+  #
   # The faces are sticky only from 900px up; below that their computed top
-  # is "auto", which made every recorded start NaN (null) and failed this
-  # test as "f2 performed" whenever the viewport came out narrow. So the
-  # viewport is pinned with CDP (as the scroll-row test does, rather than
-  # resizing the window, which did not reliably take effect after that
-  # test's override), and the layout is checked before scrolling.
+  # is "auto", so the layout is checked before scrolling, and every failure
+  # prints what the page looked like.
   test "on a wide screen a face's motion waits until the face is pinned" do
-    cdp("Emulation.setDeviceMetricsOverride", width: 1440, height: 900, deviceScaleFactor: 1, mobile: false)
+    page.driver.browser.manage.window.resize_to(1440, 900)
     visit root_path
     assert_selector ".f3 .screen.perform-wait", visible: :all
     layout = page.evaluate_script(<<~JS)
@@ -109,6 +104,8 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
     page.execute_script(<<~JS)
       window.__starts = {};
       window.__done = false;
+      window.__scrolls = 0;
+      window.addEventListener("scroll", () => { window.__scrolls++ }, { passive: true });
       (() => {
         const end = document.querySelector(".beat--close").getBoundingClientRect().top + scrollY;
         let y = scrollY, prev = performance.now();
@@ -130,8 +127,11 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
     JS
     Timeout.timeout(90) { sleep 0.1 until page.evaluate_script("window.__done") }
     report = page.evaluate_script(<<~JS)
-      ({ starts: window.__starts, width: window.innerWidth,
-         screens: Object.fromEntries([ "f2", "f3", "f4" ].map((f) => [ f, document.querySelector(`.${f} .screen`).className ])) })
+      ({ starts: window.__starts, width: window.innerWidth, height: window.innerHeight, scrollEvents: window.__scrolls,
+         scrollY: Math.round(window.scrollY),
+         players: Object.fromEntries([ "f2", "f3", "f4" ].map((f) => [ f, document.querySelector(`.${f} .player`).className ])),
+         screens: Object.fromEntries([ "f2", "f3", "f4" ].map((f) => [ f, document.querySelector(`.${f} .screen`).className ])),
+         faceTops: Object.fromEntries([ "f2", "f3", "f4" ].map((f) => [ f, Math.round(document.querySelector(`.${f}`).getBoundingClientRect().top) ])) })
     JS
     %w[f2 f3 f4].each do |f|
       start = report["starts"][f]
@@ -141,7 +141,7 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
     end
     assert_no_selector BUSY, visible: :all, wait: 5
   ensure
-    cdp("Emulation.clearDeviceMetricsOverride")
+    page.driver.browser.manage.window.resize_to(1400, 1400)
   end
 
   test "an RSVP re-pours the table and ends at the true level" do
@@ -178,39 +178,37 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
     end
   end
 
-  # Deterministic on purpose. CI's database is the fixtures, which give the
-  # deck filters no categories, no levels and no tags: the select row is just
-  # "All categories" and the sort, which fits at 375px (no overflow, so rightly
-  # no fade), and there is no tag row at all. A resized headless window is not
-  # guaranteed to be 375px wide either. So this makes the rows long enough to
-  # scroll, pins the viewport with CDP, and checks the overflow first so a
-  # future failure says why.
-  test "a sideways row on a phone fades at the edge with more to scroll" do
+  # The fade logic, without touching the viewport. On a wide screen the deck
+  # filter rows wrap or fit (md: classes), so the test narrows one row in
+  # place: inline styles make it a 300px sideways-scrolling row, exactly what
+  # a phone gets, and the controller's ResizeObserver picks the change up.
+  # (Neither the controller nor the mask CSS is tied to a media query; only
+  # the row's own overflow classes are.) The row gets real content from a few
+  # long-named decks, because CI's fixtures give the filters almost nothing.
+  test "a sideways row fades at the edge with more to scroll" do
     3.times do |i|
       deck = Presentation.create!(author: users(:admin), title: "Scroll Row Deck #{i}", content: "Smoke.", price: 10,
                                   category: "A long category name for scrolling #{i}", difficulty: %w[Beginner Intermediate Advanced][i])
       deck.update_column(:published, true)
-      8.times do |n|
-        tag = Tag.find_or_create_by!(name: "scrolling tag number #{n}") { |t| t.category = "deck"; t.color = "#16332A" }
-        PresentationTag.find_or_create_by!(presentation: deck, tag: tag)
-      end
     end
-    cdp("Emulation.setDeviceMetricsOverride", width: 375, height: 812, deviceScaleFactor: 1, mobile: false)
     visit presentations_path
     row = "#deck-filters .scroll-row"
-    assert_selector row, visible: :all
-    assert_equal 375, page.evaluate_script("window.innerWidth"), "the viewport is a phone's"
-    sizes = page.evaluate_script("(() => { const r = document.querySelector('#{row}'); return [r.scrollWidth, r.clientWidth]; })()")
-    assert_operator sizes[0], :>, sizes[1], "the row must overflow for this test to mean anything (scrollWidth #{sizes[0]}, clientWidth #{sizes[1]})"
     assert_selector "#{row}[data-controller~=scroll-fade]", visible: :all
+    assert_no_selector "#{row}[data-more-start], #{row}[data-more-end]", visible: :all, wait: 2 # it fits: no fade
+    page.execute_script(<<~JS)
+      const r = document.querySelector("#{row}");
+      Object.assign(r.style, { width: "300px", flex: "none", overflowX: "auto", flexWrap: "nowrap", marginLeft: "0", marginRight: "0" });
+    JS
+    sizes = page.evaluate_script("(() => { const r = document.querySelector('#{row}'); return [r.scrollWidth, r.clientWidth]; })()")
+    assert_operator sizes[0], :>, sizes[1], "the narrowed row must overflow for this test to mean anything (scrollWidth #{sizes[0]}, clientWidth #{sizes[1]})"
     assert_selector "#{row}[data-more-end]", visible: :all, wait: 3
     assert_no_selector "#{row}[data-more-start]", visible: :all
     page.execute_script("document.querySelector('#{row}').scrollTo({ left: 60, behavior: 'instant' })")
     assert_selector "#{row}[data-more-start][data-more-end]", visible: :all, wait: 2
     page.execute_script("const r = document.querySelector('#{row}'); r.scrollTo({ left: r.scrollWidth, behavior: 'instant' })")
     assert_selector "#{row}[data-more-start]:not([data-more-end])", visible: :all, wait: 2
-  ensure
-    cdp("Emulation.clearDeviceMetricsOverride")
+    mask = page.evaluate_script("(() => { const s = getComputedStyle(document.querySelector('#{row}')); return s.maskImage || s.webkitMaskImage; })()")
+    assert_match(/linear-gradient/, mask.to_s, "the fade is drawn")
   end
 
   test "focusing a link inside a waiting wheel shows the wheel at once" do
