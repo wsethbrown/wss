@@ -255,12 +255,22 @@ glass and the view transitions. No animation library.
   caches the page the frame is put at rest; disconnecting cancels every frame and listener.
   On phones, words too small to read in the band (row prices, the invite's time, tag, place
   and going count, the table's initials, the review's quote, credit line and link) are left
-  out of the band; the faces still carry them. A window too short to hold the frame (a phone
-  in landscape: the band would take more than half the height; a wide window that cannot fit
-  the frame below the nav) shows the static faces instead, and the frame comes back if the
-  window grows. If anything in the frame throws, it stops and the static faces show. Going live
-  changes the story's height, so the reader's place is kept: a link to `/#pricing` still lands on
-  its target at once (instantly, before anything there is sorted for its reveal).
+  out of the band; the faces still carry them. A window too short to hold the frame shows the
+  static faces instead, and the frame comes back if the window grows. It is decided by the
+  width and the small viewport's height (`100svh`, the window with a phone's toolbar showing),
+  never by `innerHeight`, so a phone's toolbar collapsing and returning as the reader scrolls
+  changes nothing (no switch, no measuring, no log). With hysteresis: below 900px the band
+  and the nav go live when they take at most 56% of that height and stay live up to 60%, so
+  the words always keep at least 40% (nav and band take 326px at 375 wide, 334px at 390,
+  357px at 430: an iPhone mini, 13/14 or Pro Max runs the frame; an iPhone SE and a phone in
+  landscape show the faces); a wide window goes live with 16px to spare below the frame and
+  stays live while the frame fits. If anything in the frame throws, it stops for good (nothing
+  pending, nothing listening) and the static faces show. Going live or static changes the
+  story's height, so the reader's place is kept: going static, the words of the step the frame
+  was showing stay where they were; going live, the step being read does (kept clear of the
+  band); a link to `/#pricing` still lands on its target at once (instantly, before anything
+  there is sorted for its reveal). In the band's caption a long deck title gives way to the
+  slide count and ends in an ellipsis, as the faces' bar does.
 - **The re-pour**: when an RSVP's Turbo stream replaces the event's attendees region, each
   seat glass in the table (`data-repour` on `events/_table`) whose level changed moves from
   its old level to the new one over 500ms on the pour curve, seats matched in order. Only

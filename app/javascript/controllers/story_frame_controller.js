@@ -41,6 +41,28 @@ const FILL = 2.4 // seconds: the glasses at the table, one after another
 const MAX_DT = 0.05 // seconds: a frame never advances the clock by more
 const H = 56.25 // the screen's height in cqw (16:9)
 const WIDE = "(min-width: 900px)"
+// How much of the window's height the phone band (with the nav above it) may
+// take. It goes live at up to BAND_ENTER and keeps running up to BAND_EXIT, so
+// the words below it always keep at least 40% and a window near the line
+// never flips back and forth. Measured (November 2026): nav and band take 326px
+// at 375 wide, 334px at 390 and 357px at 430, so the small viewports of an
+// iPhone mini (375x635), an iPhone 13/14 (390x664) and a Pro Max (430x740)
+// run the frame (51%, 50%, 48%); an iPhone SE (375x548, 59%) and any phone in
+// landscape show the static faces.
+const BAND_ENTER = 0.56
+const BAND_EXIT = 0.6
+// A wide window: room below the pinned frame to go live (it stops at none).
+const PIN_ENTER = 16
+// Letters as the reader sees them (an accented letter or an emoji is one).
+const GRAPHEMES = typeof Intl !== "undefined" && Intl.Segmenter ? new Intl.Segmenter(undefined, { granularity: "grapheme" }) : null
+const letters = (s) => (GRAPHEMES ? Array.from(GRAPHEMES.segment(s), (g) => g.segment) : [ ...s ])
+// An element's place in the page by layout (the offsetTop chain), so a
+// transform on it (the appear controller's rise) never moves the measure.
+function docTop(el) {
+  let y = 0
+  for (let e = el; e; e = e.offsetParent) y += e.offsetTop
+  return y
+}
 
 // Easing -----------------------------------------------------------------
 function bezier(x1, y1, x2, y2) {
@@ -126,7 +148,7 @@ class Roll {
     this.lines = this.states.map((s) => {
       const line = document.createElement("span")
       line.className = "mm-rl"
-      const units = this.words ? (s.match(/\S+\s*/g) || []) : [ ...s ]
+      const units = this.words ? (s.match(/\S+\s*/g) || []) : letters(s)
       for (const u of units) {
         const span = document.createElement("span")
         span.className = "mm-ru"
@@ -139,10 +161,17 @@ class Roll {
     this.key = null
   }
 
+  // Its width is its widest state's (a caption may then give way in the
+  // bar, cut by CSS); each line is measured whole, never as cut.
   measure() {
     this.el.style.width = ""
     let max = 0
-    for (const L of this.lines) { L.w = L.line.offsetWidth; max = Math.max(max, L.w) }
+    for (const L of this.lines) {
+      L.line.style.maxWidth = "none"
+      L.w = L.line.offsetWidth
+      L.line.style.maxWidth = ""
+      max = Math.max(max, L.w)
+    }
     this.el.style.width = `${Math.ceil(max + 1)}px`
     this.key = null
   }
@@ -231,10 +260,11 @@ export default class extends Controller {
     if (!this.hasFrameTarget || !this.hasScreenTarget || this.beatTargets.length < 5) return
     // Without these the frame cannot run safely: the static faces stay.
     if (!("ResizeObserver" in window) || !("IntersectionObserver" in window) || !window.matchMedia) {
-      console.warn("Story frame: this browser lacks ResizeObserver or IntersectionObserver; showing the static faces")
+      console.warn("Story frame: this browser lacks ResizeObserver, IntersectionObserver or matchMedia; showing the static faces")
       return
     }
     this.onScroll = this.onScroll.bind(this)
+    this.onResize = this.onResize.bind(this)
     this.scheduleRelayout = this.scheduleRelayout.bind(this)
     this.tick = this.tick.bind(this)
     this.atRest = this.atRest.bind(this)
@@ -255,15 +285,18 @@ export default class extends Controller {
       this.live = false
       this.cache = new Map()
       this.padding = document.documentElement.style.scrollPaddingTop
+      this.inputs = null
+      this.probeHeight()
       window.addEventListener("scroll", this.onScroll, { passive: true })
-      window.addEventListener("resize", this.scheduleRelayout)
+      window.addEventListener("resize", this.onResize)
       document.addEventListener("turbo:before-cache", this.atRest)
       document.addEventListener("visibilitychange", this.onVisibility)
       this.reduce.addEventListener?.("change", this.scheduleRelayout)
       this.wide.addEventListener?.("change", this.scheduleRelayout)
       // The screen's size and the story's height (a face shown by keyboard
       // focus, late fonts or images) both move the steps: measure again.
-      this.resizer = new ResizeObserver(this.scheduleRelayout)
+      // While the faces show, only a change in what decides it does anything.
+      this.resizer = new ResizeObserver(() => (this.live ? this.scheduleRelayout() : this.onResize()))
       this.resizer.observe(this.screenTarget)
       this.resizer.observe(this.element)
       // Off screen, nothing plays: a step change there simply lands.
@@ -289,7 +322,7 @@ export default class extends Controller {
   teardown() {
     if (!this.onScroll) return
     window.removeEventListener("scroll", this.onScroll)
-    window.removeEventListener("resize", this.scheduleRelayout)
+    window.removeEventListener("resize", this.onResize)
     document.removeEventListener("turbo:before-cache", this.atRest)
     document.removeEventListener("visibilitychange", this.onVisibility)
     this.reduce?.removeEventListener?.("change", this.scheduleRelayout)
@@ -301,7 +334,11 @@ export default class extends Controller {
     if (this.layoutFrame) cancelAnimationFrame(this.layoutFrame)
     this.raf = this.scrollFrame = this.layoutFrame = null
     this.anim = null
-    this.goStatic()
+    // Holding the place only matters on a page still showing (a failure);
+    // a controller leaving with its page has nothing to keep.
+    this.goStatic(this.element.isConnected)
+    this.probe?.remove()
+    this.probe = null
   }
 
   // Anything thrown: stop, detach, and leave the static faces showing.
@@ -311,48 +348,76 @@ export default class extends Controller {
     this.teardown()
   }
 
-  goStatic() {
+  goStatic(hold = true) {
     const was = this.element.classList.contains("is-live")
-    const restore = was ? this.holdPlace() : null
+    const restore = was && hold ? this.holdPlace() : null
     this.live = false
     this.element.classList.remove("is-live")
     if (this.padding !== undefined) document.documentElement.style.scrollPaddingTop = this.padding
     restore?.()
   }
 
-  // Going live (or back) changes the story's height: the faces leave the
-  // flow and the steps are spaced for the frame. Keep what the reader was
-  // looking at where it was: the element a #fragment points at (so a link to
-  // /#pricing still lands on the pricing rows), else the first thing in view.
-  // Instant, never smooth, and before the appear controller sorts what is on
-  // screen, so nothing that was in view starts hidden.
+  // Going live or static changes the story's height: the faces leave or
+  // rejoin the flow and the steps are spaced for the frame or not. Keep what
+  // the reader was looking at where it was: on opening, the element a
+  // #fragment points at (so a link to /#pricing still lands on the pricing
+  // rows); else, going
+  // static, the words of the step the frame was showing; else, going live,
+  // the words of the step being read (or the first section in view). Going
+  // live on a phone, words that were in view are kept clear of the band.
+  // Measured by layout, not by transform, so a reveal in flight never moves
+  // it. Instant, never smooth, and before the appear controller sorts what is
+  // on screen, so nothing that was in view starts hidden.
   holdPlace() {
     let target = null
-    try { target = window.location.hash && document.getElementById(decodeURIComponent(window.location.hash.slice(1))) } catch (_) { target = null }
-    // A #fragment: land on it, wherever the browser had got to.
+    // A #fragment: on the first decision only (the page just opened at it),
+    // land on it, wherever the browser had got to. Later the reader has moved on.
+    if (this.inputs === null) {
+      try { target = window.location.hash && document.getElementById(decodeURIComponent(window.location.hash.slice(1))) } catch (_) { target = null }
+    }
     if (target) return () => target.scrollIntoView({ block: "start", behavior: "instant" })
     if (window.scrollY <= 0) return null
-    const candidates = [ ...this.beatTargets, ...document.querySelectorAll("main section") ]
-    const anchor = candidates.find((el) => el.getBoundingClientRect().bottom > 0)
+    const words = (b) => b.querySelector(".beat-body, h1, h2") || b
+    const top = (el) => docTop(el) - window.scrollY
+    const navBottom = this.navBottom || 0
+    let anchor = null
+    if (this.live) anchor = words(this.beatTargets[this.target] || this.beatTargets[0])
+    else {
+      // The step being read: the last whose words have come up into the top
+      // 60% below the nav; else the first step or section still in view.
+      const line = navBottom + (window.innerHeight - navBottom) * 0.6
+      const steps = this.beatTargets.map(words).filter((el) => top(el) + el.offsetHeight > navBottom && top(el) <= line)
+      anchor = steps[steps.length - 1] ||
+        [ ...this.beatTargets.map(words), ...document.querySelectorAll("main section") ].find((el) => top(el) + el.offsetHeight > navBottom)
+    }
     if (!anchor) return null
-    const before = anchor.getBoundingClientRect().top
+    const before = top(anchor)
+    const wasInView = before >= navBottom && this.beatTargets.some((b) => words(b) === anchor)
     return () => {
-      const shift = anchor.getBoundingClientRect().top - before
+      let want = before
+      if (wasInView && this.element.classList.contains("is-live") && !this.wide.matches) {
+        want = Math.max(want, this.navBottom + 8 + this.frameTarget.offsetHeight + 8)
+      }
+      const shift = top(anchor) - want
       if (Math.abs(shift) >= 1) window.scrollTo({ top: window.scrollY + shift, behavior: "instant" })
     }
   }
 
   // Run the frame if the window can hold it; otherwise the static faces.
+  // Called once on connect and then only when what decides it has changed.
   start() {
     const restore = this.holdPlace()
+    const first = this.inputs === null
     this.element.classList.add("is-live")
     this.measure()
-    if (!this.fits()) {
-      console.info(`Story frame: ${window.innerWidth}x${window.innerHeight} is too short to hold the frame; showing the static faces`)
-      this.goStatic()
+    this.inputs = this.inputsKey()
+    if (!this.fits(true)) {
+      console.info(`Story frame: ${this.fitText()} cannot hold the frame; showing the static faces`)
+      this.goStatic(false)
       restore?.()
       return
     }
+    if (!first) console.info(`Story frame: ${this.fitText()} now holds the frame; running it`)
     restore?.()
     this.measure() // the steps' positions after the scroll is put back
     this.live = true
@@ -364,12 +429,47 @@ export default class extends Controller {
   }
 
   // A wide window holds the pinned frame below the nav; a narrow one keeps
-  // at least half its height below the band for the words.
-  fits() {
-    const vh = window.innerHeight
-    const pin = this.frameTarget.querySelector(".mm-pin").offsetHeight
-    if (this.wide.matches) return this.navBottom + 16 + pin + 16 <= vh
-    return this.navBottom + 8 + this.frameTarget.offsetHeight <= vh * 0.5
+  // enough of its height below the band for the words (BAND_ENTER, BAND_EXIT).
+  // entering: the stricter test for going live; once live, the looser one.
+  // Measured against the small viewport, so a phone's toolbar coming and
+  // going never changes the answer.
+  fits(entering = false) {
+    const vh = this.stableHeight()
+    if (this.wide.matches) return this.navBottom + 16 + this.frameTarget.querySelector(".mm-pin").offsetHeight + (entering ? PIN_ENTER : 0) <= vh
+    return this.bandBottom() <= vh * (entering ? BAND_ENTER : BAND_EXIT)
+  }
+
+  bandBottom() { return this.navBottom + 8 + this.frameTarget.offsetHeight }
+
+  fitText() {
+    const vh = this.stableHeight()
+    const used = this.wide.matches ? this.navBottom + 16 + this.frameTarget.querySelector(".mm-pin").offsetHeight : this.bandBottom()
+    return `${window.innerWidth}px wide, ${vh}px tall (the frame takes ${used}px, ${Math.round((100 * used) / vh)}%)`
+  }
+
+  // The small viewport's height (100svh: the window with a phone's toolbar
+  // showing), which stays put while the toolbar collapses and returns, unlike
+  // innerHeight. Browsers without svh: the root's clientHeight.
+  probeHeight() {
+    if (!window.CSS?.supports?.("height", "100svh")) return
+    this.probe = document.createElement("div")
+    this.probe.setAttribute("aria-hidden", "true")
+    this.probe.style.cssText = "position:fixed;left:0;top:0;width:0;height:100svh;visibility:hidden;pointer-events:none"
+    document.body.appendChild(this.probe)
+  }
+
+  stableHeight() {
+    const h = this.probe?.offsetHeight
+    return h > 0 ? h : document.documentElement.clientHeight
+  }
+
+  // What decides live or static: the width and the stable height.
+  inputsKey() { return `${window.innerWidth}x${this.stableHeight()}` }
+
+  // A window resize that changes neither (a phone's toolbar) does nothing at all.
+  onResize() {
+    if (this.failed || this.inputsKey() === this.inputs) return
+    this.scheduleRelayout()
   }
 
   scheduleRelayout() {
@@ -410,19 +510,27 @@ export default class extends Controller {
     const pin = this.frameTarget.querySelector(".mm-pin")
     this.element.style.setProperty("--mm-pin-h", `${pin.offsetHeight}px`)
     this.rolls.forEach((r) => r.measure())
-    // Where each step's words start (the closing line has no .beat-body: its heading)
-    this.tops = this.beatTargets.map((b) => (b.querySelector(".beat-body, h1, h2") || b).getBoundingClientRect().top + window.scrollY)
+    // Where each step's words start (the closing line has no .beat-body: its
+    // heading), by layout: the appear controller's rise must not shift them.
+    this.tops = this.beatTargets.map((b) => docTop(b.querySelector(".beat-body, h1, h2") || b))
     this.phone = !this.wide.matches
     // On a phone, keep anything focused or scrolled to clear of the band.
-    document.documentElement.style.scrollPaddingTop = this.phone ? `${this.navBottom + 8 + this.frameTarget.offsetHeight + 8}px` : this.padding
+    document.documentElement.style.scrollPaddingTop = this.phone ? `${this.bandBottom() + 8}px` : this.padding
   }
 
   relayout() {
     if (!this.cfg || this.failed) return
     try {
-      if (!this.live) return this.start()
+      // Static: try again only if what decides it has changed.
+      if (!this.live) return this.inputsKey() === this.inputs ? undefined : this.start()
       this.measure()
-      if (!this.fits()) { this.anim = null; if (this.raf) { cancelAnimationFrame(this.raf); this.raf = null } return this.goStatic() }
+      this.inputs = this.inputsKey()
+      if (!this.fits()) {
+        console.info(`Story frame: ${this.fitText()} can no longer hold the frame; showing the static faces`)
+        this.anim = null
+        if (this.raf) { cancelAnimationFrame(this.raf); this.raf = null }
+        return this.goStatic()
+      }
       if (this.reduce.matches) { this.pick(); this.land() }
       this.cache.clear()
       this.rolls.forEach((r) => { r.key = null })

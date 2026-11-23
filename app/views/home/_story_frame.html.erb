@@ -17,7 +17,12 @@
     .hx .mm-screen { position: relative; aspect-ratio: 16 / 9; border-radius: 19px; overflow: hidden; clip-path: inset(0 round 19px); container-type: inline-size; background: var(--ink); isolation: isolate; }
     .hx .mm-bar { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 12px 6px; min-height: 40px; color: #f6f4ee; font-size: 14px; }
     .hx .mm-bar > :first-child { font-weight: 600; letter-spacing: -.01em; }
-    .hx .mm-bar > :last-child { opacity: .65; font-variant-numeric: tabular-nums; }
+    .hx .mm-bar > :last-child { opacity: .65; font-variant-numeric: tabular-nums; flex: none; }
+    /* A long deck title gives way to the slide count beside it and ends in an
+       ellipsis, as the faces' bar does (home/index .story .bar b). Clipped
+       across only, so its letters still rise and lift through the line. */
+    .hx .mm-bar > :first-child { flex: 0 1 auto; min-width: 0; overflow-x: clip; }
+    .hx .mm-bar > :first-child .mm-rl { max-width: 100%; overflow-x: clip; text-overflow: ellipsis; }
     .hx .mm-screen a, .hx .mm-screen img { pointer-events: none; }
     .hx .mm-layer { position: absolute; inset: 0; }
     .hx .mm-paper { background: #f6f4ee; }

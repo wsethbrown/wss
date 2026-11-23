@@ -10,35 +10,78 @@ require "application_system_test_case"
 # emulation: the window is resized before the visit and put back in ensure,
 # and reduced motion is stubbed in the page (matchMedia) before the
 # controller is connected again. Every failure prints the whole record.
+#
+# Window sizes: headless Chrome's page is about 87px shorter than its window
+# (a 820x1000 window gives 820x913) and no narrower than 500px, so every test
+# reads the real size back and picks sizes with room to spare either way.
 class HomeStoryFrameSystemTest < ApplicationSystemTestCase
+  # Shared by the scripts below: window.__sf.
+  HELPERS = <<~JS.freeze
+    window.__sf = {
+      sleep: (ms) => new Promise((r) => setTimeout(r, ms)),
+      frames: (n) => new Promise((r) => { const f = () => (n-- <= 0 ? r() : requestAnimationFrame(f)); f(); }),
+      async until(ok, limit = 10000) {
+        const start = performance.now();
+        while (!ok() && performance.now() - start < limit) await this.sleep(20);
+        return ok();
+      },
+      // Put a step's words 30% down the reading area: the step being read.
+      read(i) {
+        const c = window.__storyFrame;
+        const area = innerWidth >= 900 ? 0 : document.querySelector(".mm").getBoundingClientRect().bottom;
+        scrollTo({ top: c.tops[i] - area - (innerHeight - area) * 0.3, behavior: "instant" });
+      },
+      // Where a step's words are on screen, against the nav and the band.
+      words(i) {
+        const el = document.querySelectorAll(".story [data-story-frame-target=beat]")[i].querySelector(".beat-body, h1, h2");
+        const r = el.getBoundingClientRect(), nav = document.querySelector("body > nav, nav.fixed").getBoundingClientRect().bottom;
+        const live = !!document.querySelector(".story.is-live");
+        const band = live && innerWidth < 900 ? document.querySelector(".mm").getBoundingClientRect().bottom : nav;
+        return { top: Math.round(r.top), bottom: Math.round(r.bottom), nav: Math.round(nav), band: Math.round(band) };
+      },
+      state() {
+        const c = window.__storyFrame, mm = document.querySelector(".mm");
+        return { width: innerWidth, height: innerHeight, stable: c ? c.stableHeight() : null,
+                 live: !!document.querySelector(".story.is-live"), P: c ? c.P : null, target: c ? c.target : null,
+                 raf: c ? c.raf : null, scrollFrame: c ? c.scrollFrame : null, layoutFrame: c ? c.layoutFrame : null,
+                 failed: c ? c.failed : null, pos: getComputedStyle(mm).position,
+                 padding: document.documentElement.style.scrollPaddingTop, measures: c ? c.__measures : null,
+                 log: (window.__frameLog || []).slice(-6) };
+      },
+      // Count the controller's measures and its console lines from here on.
+      watch() {
+        const c = window.__storyFrame;
+        if (!c.__measures && c.__measures !== 0) { const m = c.measure; c.measure = function () { c.__measures++; return m.apply(this, arguments); }; }
+        c.__measures = 0;
+        window.__frameLog = [];
+      }
+    };
+    if (!window.__consoleHooked) {
+      window.__consoleHooked = true;
+      for (const k of [ "info", "warn", "error" ]) {
+        const real = console[k].bind(console);
+        console[k] = (...a) => { (window.__frameLog ||= []).push(`${k}: ${a.map(String).join(" ")}`); real(...a); };
+      }
+    }
+  JS
+
   PROBE = <<~JS.freeze
     window.__frameProbe = (async (plan) => {
-      const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
-      const c = () => window.__storyFrame;
+      const sf = window.__sf, c = () => window.__storyFrame;
       const t0 = performance.now(), record = [];
       const snap = (at) => ({ at, t: Math.round(performance.now() - t0), P: +c().P.toFixed(3), target: c().target,
                               playing: !!c().raf, live: !!document.querySelector(".story.is-live") });
-      // Put a step's words 30% down the reading area: the step being read.
-      const read = (i) => {
-        const area = innerWidth >= 900 ? 0 : document.querySelector(".mm").getBoundingClientRect().bottom;
-        scrollTo({ top: c().tops[i] - area - (innerHeight - area) * 0.3, behavior: "instant" });
-      };
       // Wait on state, never on time: until the step read is the current one,
       // the frame has arrived at it and nothing is pending (up to 10s).
       let want = 0;
-      const until = async (ok, limit = 10000) => {
-        const start = performance.now();
-        while (!ok() && performance.now() - start < limit) await sleep(20);
-        return ok();
-      };
       const settled = () => c().target === want && c().P === want && !c().raf;
       for (const step of plan) {
-        if (step.read !== undefined) { want = step.read; read(step.read); record.push(snap(`read ${step.read}`)); }
+        if (step.read !== undefined) { want = step.read; sf.read(step.read); record.push(snap(`read ${step.read}`)); }
         if (step.event) { document.dispatchEvent(new Event(step.event)); record.push(snap(step.event)); }
         // Mid-move: wait until the frame is under way past a point, not for a time.
-        if (step.past !== undefined) { const ok = await until(() => c().P >= step.past); record.push({ ...snap("past"), reached: ok }); }
-        if (step.settle) { const ok = await until(settled); record.push({ ...snap(step.settle), settled: ok }); }
-        if (step.sample) { for (let n = 0; n < step.sample; n++) { record.push(snap("sample")); await sleep(80); } }
+        if (step.past !== undefined) { const ok = await sf.until(() => c().P >= step.past); record.push({ ...snap("past"), reached: ok }); }
+        if (step.settle) { const ok = await sf.until(settled); record.push({ ...snap(step.settle), settled: ok }); }
+        if (step.sample) { for (let n = 0; n < step.sample; n++) { record.push(snap("sample")); await sf.sleep(80); } }
       }
       return { width: innerWidth, height: innerHeight, record,
                bandTop: Math.round(document.querySelector(".mm").getBoundingClientRect().top) };
@@ -48,12 +91,47 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
   def visit_at(width, height)
     page.driver.browser.manage.window.resize_to(width, height)
     visit root_path
+    wait_for_frame_connected
+  end
+
+  # The controller has connected and made its first decision (live or not).
+  def wait_for_frame_connected
+    wait_for("the frame's controller to connect") { page.evaluate_script("!!(window.__storyFrame && window.__storyFrame.inputs)") }
+    page.execute_script(HELPERS)
+  end
+
+  def frame_state
+    page.execute_script(HELPERS) if page.evaluate_script("!window.__sf")
+    page.evaluate_script("window.__sf.state()")
+  end
+
+  # Waits on state, never on time; the failure names what it waited for and
+  # the frame's whole state.
+  def wait_for(what, timeout: 10)
+    deadline = Process.clock_gettime(Process::CLOCK_MONOTONIC) + timeout
+    loop do
+      value = yield
+      return value if value
+      flunk "Timed out waiting for #{what}: #{frame_state rescue 'no state'}" if Process.clock_gettime(Process::CLOCK_MONOTONIC) > deadline
+      sleep 0.05
+    end
+  end
+
+  # Runs an async script body in the page (with window.__sf) and returns its result.
+  def run_async(body, arg = nil)
+    page.execute_script(HELPERS)
+    page.execute_script("window.__asyncResult = undefined; (async (arg) => { #{body} })(arguments[0]).then((r) => { window.__asyncResult = r ?? null; }, (e) => { window.__asyncResult = { error: String(e) }; });", arg)
+    wait_for("the page script to finish", timeout: 60) { page.evaluate_script("window.__asyncResult !== undefined") }
+    result = page.evaluate_script("window.__asyncResult")
+    flunk "page script threw: #{result['error']}" if result.is_a?(Hash) && result["error"]
+    result
   end
 
   def run_probe(plan)
     assert_selector ".story.is-live", visible: :all
+    page.execute_script(HELPERS)
     page.execute_script("window.__frameResult = undefined; #{PROBE}", plan)
-    Timeout.timeout(60) { sleep 0.1 until page.evaluate_script("window.__frameResult !== undefined") }
+    wait_for("the probe to finish", timeout: 60) { page.evaluate_script("window.__frameResult !== undefined") }
     page.evaluate_script("window.__frameResult")
   end
 
@@ -64,15 +142,24 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end
 
-  # Stimulus disconnects and connects a controller when its attribute goes and comes back.
-  def reconnect_frame(before = "")
+  # Stimulus disconnects and connects a controller when its attribute goes and
+  # comes back. Waits until it really has: a new controller instance, or (when
+  # the new one declines to run) the line it logs instead.
+  def reconnect_frame(before = "", expect_log: nil)
+    page.execute_script(HELPERS)
     page.execute_script(<<~JS)
+      window.__oldFrame = window.__storyFrame;
+      window.__frameLog = [];
       #{before}
       const story = document.querySelector(".story");
       story.removeAttribute("data-controller");
       setTimeout(() => story.setAttribute("data-controller", "story-frame"), 50);
     JS
-    sleep 0.4
+    if expect_log
+      wait_for("the new controller to log #{expect_log.inspect}") { page.evaluate_script("(window.__frameLog || []).some((l) => l.includes(#{expect_log.to_json}))") }
+    else
+      wait_for("a new controller instance") { page.evaluate_script("!!window.__storyFrame && window.__storyFrame !== window.__oldFrame && !!window.__storyFrame.inputs") }
+    end
   end
 
   def static_face_shown?(selector)
@@ -128,6 +215,7 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
         ? { matches: true, media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }
         : real(q);
     JS
+    assert page.evaluate_script("window.__storyFrame.reduce.matches"), "the new controller sees reduced motion"
     # The step changes on the frame after the scroll (the scroll handler runs
     # once per frame), so wait for it, then check it never travels.
     r = run_probe([ { read: 2, settle: "at 2", sample: 3 }, { read: 3, settle: "at 3", sample: 3 } ])
@@ -141,19 +229,52 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end
 
-  test "if the frame cannot run, or fails, the static faces show" do
+  test "without what the frame needs, the controller declines and the static faces show" do
     visit_at(1440, 900)
     assert_selector ".story.is-live", visible: :all
-    # No ResizeObserver: the controller declines and the faces stay.
-    reconnect_frame("window.__RO = window.ResizeObserver; window.ResizeObserver = undefined;")
-    assert static_face_shown?(".face.f1"), "no observer: the hero's face shows"
-    # A failure inside the controller (an unreadable config): it stops and the faces show.
-    reconnect_frame(<<~JS)
-      window.ResizeObserver = window.__RO;
-      document.querySelector(".mm").dataset.config = "{";
-    JS
-    assert static_face_shown?(".face.f1"), "after a failure the hero's face shows"
+    reconnect_frame("window.ResizeObserver = undefined;", expect_log: "Story frame: this browser lacks")
+    assert_nil page.evaluate_script("window.__storyFrame"), "the old controller is gone and the new one never ran"
+    assert static_face_shown?(".face.f1"), "the hero's face shows"
     assert static_face_shown?(".face.f3"), "and every other face"
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
+  test "a failure mid-move stops the frame for good: nothing pending, nothing re-armed, the faces and the page as they were" do
+    # A phone-width window, where the live band sets scroll-padding-top.
+    visit_at(500, 1000)
+    assert_selector ".story.is-live", visible: :all
+    live = frame_state
+    refute_equal "", live["padding"], "live on a phone, the band sets scroll-padding-top: #{live}"
+    r = run_async(<<~JS)
+      const sf = window.__sf, c = window.__storyFrame;
+      sf.read(1);
+      await sf.until(() => c.P === 1 && !c.raf);
+      sf.read(2);
+      const moving = await sf.until(() => c.P >= 1.2 && c.P < 2 && !!c.raf);
+      c.render = () => { throw new Error("test: render fails"); };
+      const stopped = await sf.until(() => c.failed, 5000);
+      sf.watch();
+      scrollBy({ top: 300, behavior: "instant" });
+      dispatchEvent(new Event("resize"));
+      await sf.frames(5);
+      return { moving, stopped, after: sf.state() };
+    JS
+    assert r["moving"], "caught mid-move: #{r}"
+    assert r["stopped"], "the throw stopped it: #{r}"
+    # A real resize too: nothing listens any more.
+    page.driver.browser.manage.window.resize_to(500, 900)
+    after = run_async("await window.__sf.frames(10); return window.__sf.state();")
+    [ r["after"], after ].each do |s|
+      refute s["live"], "the static faces show: #{s}"
+      assert s["failed"], s
+      assert_nil s["raf"], "no move pending: #{s}"
+      assert_nil s["scrollFrame"], "no scroll frame pending: #{s}"
+      assert_nil s["layoutFrame"], "no layout frame pending: #{s}"
+      assert_equal "", s["padding"], "scroll-padding-top is as the page had it: #{s}"
+      assert_equal 0, s["measures"], "nothing measured after the failure: #{s}"
+    end
+    assert static_face_shown?(".face.f3"), "every face shows"
   ensure
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end
@@ -163,24 +284,22 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
     r = run_probe([ { read: 2, settle: "wide" } ])
     assert r["record"].last["settled"], r
     assert_equal 2, r["record"].last["P"], r
-    page.driver.browser.manage.window.resize_to(820, 1000)
-    state = nil
-    Timeout.timeout(10) do
-      loop do
-        state = page.evaluate_script("({ P: window.__storyFrame.P, playing: !!window.__storyFrame.raf, width: innerWidth, live: !!document.querySelector('.story.is-live'), pos: getComputedStyle(document.querySelector('.mm')).position })")
-        break if state["width"] < 900 && state["pos"] == "sticky" && !state["playing"]
-        sleep 0.1
-      end
+    # An iPad in portrait. The band (with the nav) takes about 490px at 820
+    # wide, well inside the 56% a phone-width window may give it at this height.
+    page.driver.browser.manage.window.resize_to(820, 1180)
+    state = wait_for("the band below 900px") do
+      s = frame_state
+      s if s["width"] < 900 && s["stable"] == s["height"] && (s["pos"] == "sticky" || !s["live"]) && !s["raf"] && !s["layoutFrame"]
     end
-    assert_equal 2, state["P"], state
-    assert state["live"], state
+    assert state["live"], "an 820px-wide window #{state['height']}px tall holds the band: #{state}"
     assert_equal "sticky", state["pos"], "the band below 900px: #{state}"
+    assert_equal 2, state["P"], state
   ensure
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end
 
   test "on a phone the frame is a band pinned under the nav and follows the same steps" do
-    r = probe((1..4).map { |i| { read: i, settle: "step #{i}" } }, width: 400, height: 860)
+    r = probe((1..4).map { |i| { read: i, settle: "step #{i}" } }, width: 500, height: 1000)
     assert_operator r["width"], :<, 900, "a phone-width window: #{r}"
     settled = r["record"].select { |s| s["at"].start_with?("step") }
     assert(settled.all? { |s| s["settled"] }, "each move reached its step: #{r}")
@@ -188,9 +307,92 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
     assert_operator r["bandTop"], :<, 140, "pinned near the top, under the nav: #{r}"
   end
 
+  # A phone's toolbar collapsing and coming back changes innerHeight and fires
+  # resize; the frame decides by the small viewport, which stays put. No
+  # emulation: innerHeight is overridden in the page and resize dispatched.
+  test "a phone's toolbar coming and going changes nothing: no switch, no measure, no log" do
+    visit_at(500, 1000)
+    assert_selector ".story.is-live", visible: :all
+    r = run_async(<<~JS)
+      const sf = window.__sf, c = window.__storyFrame, real = innerHeight;
+      const own = Object.getOwnPropertyDescriptor(window, "innerHeight");
+      sf.read(2);
+      await sf.until(() => c.P === 2 && !c.raf);
+      sf.watch();
+      const before = sf.words(2);
+      const states = [];
+      for (const h of [ real + 84, real - 84, real + 84, real ]) {
+        Object.defineProperty(window, "innerHeight", { configurable: true, get: () => h });
+        dispatchEvent(new Event("resize"));
+        await sf.frames(4);
+        states.push({ h, ...sf.state() });
+      }
+      if (own) Object.defineProperty(window, "innerHeight", own); else delete window.innerHeight;
+      return { real, before, after: sf.words(2), states };
+    JS
+    r["states"].each do |s|
+      assert s["live"], "still live with innerHeight #{s['h']}: #{r}"
+      assert_equal 0, s["measures"], "nothing measured: #{r}"
+      assert_empty s["log"], "nothing logged: #{r}"
+      assert_equal 2, s["P"], r
+    end
+    assert_equal r["before"], r["after"], "the words have not moved: #{r}"
+  end
+
+  # The decision by the stable height, overridden in the page: between the
+  # two thresholds it stays as it is; past them it switches, and the step
+  # being read stays in view either way.
+  test "live and static switch with room to spare either way, keeping the step being read in view" do
+    visit_at(500, 1000)
+    assert_selector ".story.is-live", visible: :all
+    r = run_async(<<~JS)
+      const sf = window.__sf, c = window.__storyFrame;
+      sf.read(2);
+      await sf.until(() => c.P === 2 && !c.raf);
+      const band = c.bandBottom(), out = [];
+      // band / share: the height at which the band takes that share
+      for (const [ share, label ] of [ [ 0.58, "between, live" ], [ 0.62, "too short" ], [ 0.58, "between, static" ], [ 0.54, "tall enough" ] ]) {
+        const h = Math.round(band / share);
+        c.stableHeight = () => h;
+        dispatchEvent(new Event("resize"));
+        await sf.frames(4);
+        await sf.until(() => !c.layoutFrame && !c.raf);
+        out.push({ label, h, live: sf.state().live, P: c.P, words: sf.words(2) });
+      }
+      return { band, out };
+    JS
+    assert_equal [ true, false, false, true ], r["out"].map { |s| s["live"] }, r
+    r["out"].each do |s|
+      w = s["words"]
+      assert_operator w["top"], :>=, w["band"] - 1, "#{s['label']}: the step's words start below the nav and band: #{r}"
+      assert_operator w["top"], :<, page.evaluate_script("innerHeight"), "#{s['label']}: and on screen: #{r}"
+    end
+    assert_equal 2, r["out"].last["P"], "the frame shows the step being read: #{r}"
+  end
+
+  test "a short wide window shows the static faces, and the frame comes back when it grows" do
+    visit_at(1440, 480)
+    short = frame_state
+    refute short["live"], "a window #{short['width']}x#{short['height']} cannot hold the 400px frame below the nav: #{short}"
+    assert static_face_shown?(".face.f1"), "the hero's face shows: #{short}"
+    page.driver.browser.manage.window.resize_to(1440, 900)
+    grown = wait_for("the frame to go live") { s = frame_state; s if s["live"] && !s["layoutFrame"] }
+    assert_operator grown["height"], :>, short["height"], grown
+    r = run_probe([ { read: 2, settle: "at 2" } ])
+    assert r["record"].last["settled"], r
+    pin = page.evaluate_script(<<~JS)
+      ({ pin: Math.round(document.querySelector(".mm-pin").getBoundingClientRect().top),
+         nav: Math.round(document.querySelector("body > nav, nav.fixed").getBoundingClientRect().bottom) })
+    JS
+    assert_operator pin["pin"], :>=, pin["nav"] + 8, "the pinned frame sits below the nav, never under it: #{pin}"
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
   test "a phone in landscape is too short for the band: the words and faces show" do
     visit_at(844, 390)
-    assert_no_selector ".story.is-live", visible: :all, wait: 2
+    state = frame_state
+    refute state["live"], "the controller decided, and not to run: #{state}"
     visible = page.evaluate_script(<<~JS)
       (() => {
         const h = document.querySelector(".b2 h2");
@@ -202,6 +404,45 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
     JS
     assert visible["inView"], visible
     assert visible["onTop"], "nothing covers the step's heading: #{visible}"
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
+  # The longest hero title the frame takes (StoryFrameHelper: 44 characters)
+  # beside the slide count, in a phone's band. Headless Chrome will not go
+  # below 500px, so the band is narrowed in the page to the 351px it has in a
+  # 375px window (measured); the bar's own CSS does the rest.
+  test "a long deck title in the band's caption gives way to the slide count: no overlap, nothing outside the bar" do
+    title = "The Long Road From Kentucky To The Highlands"
+    assert_equal 44, title.length
+    deck = Presentation.create!(author: users(:admin), title: title, content: "A story.", price: 9.99, category: "Bourbon", duration: "90 min")
+    deck.slide_images.attach(io: File.open(file_fixture("sample_review.jpg")), filename: "s0.png", content_type: "image/png")
+    deck.update_columns(published: true, featured: true)
+    visit_at(375, 900)
+    assert_selector ".story.is-live", visible: :all
+    width = page.evaluate_script("innerWidth")
+    page.execute_script("document.querySelector('.mm-pin').style.maxWidth = '351px'") if width > 400
+    r = run_async(<<~JS)
+      const sf = window.__sf, c = window.__storyFrame;
+      await sf.until(() => document.querySelector(".mm-pin").offsetWidth <= 351 || innerWidth <= 400);
+      await sf.frames(3);
+      await sf.until(() => !c.layoutFrame);
+      const rect = (el) => { const r = el.getBoundingClientRect(); return { left: Math.round(r.left), right: Math.round(r.right) }; };
+      const l = document.querySelector("[data-mm=cap-l]"), rr = document.querySelector("[data-mm=cap-r]");
+      const shown = (el) => [ ...el.querySelectorAll(".mm-rl") ].find((x) => getComputedStyle(x).visibility === "visible");
+      const line = shown(l);
+      return { width: innerWidth, P: c.P, bar: rect(document.querySelector(".mm-bar")), left: rect(l), line: rect(line), right: rect(rr),
+               rightLine: rect(shown(rr)), text: line.textContent, cut: line.scrollWidth > line.clientWidth };
+    JS
+    assert_equal 0, r["P"], r
+    assert_equal title, r["text"], "the hero's title, whole in the text: #{r}"
+    assert r["cut"], "too long for the bar, so it is cut (with an ellipsis): #{r}"
+    assert_operator r["line"]["right"], :<=, r["right"]["left"], "the title stops before the slide count: #{r}"
+    assert_operator r["left"]["right"], :<=, r["right"]["left"], r
+    [ r["left"], r["line"], r["right"], r["rightLine"] ].each do |box|
+      assert_operator box["left"], :>=, r["bar"]["left"], "inside the bar: #{r}"
+      assert_operator box["right"], :<=, r["bar"]["right"], "inside the bar: #{r}"
+    end
   ensure
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end

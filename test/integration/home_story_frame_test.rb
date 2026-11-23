@@ -234,4 +234,20 @@ class HomeStoryFrameTest < ActionDispatch::IntegrationTest
     get root_path
     assert_no_match "Allocated Bottles Night", frame.to_s
   end
+
+  # The longest hero title the frame takes beside the slide count in a phone's
+  # bar: the title gives way and ends in an ellipsis (the browser check is in
+  # test/system/home_story_frame_test.rb).
+  test "the band's caption: a long title gives way to the slide count and is cut with an ellipsis" do
+    long = "The Long Road From Kentucky To The Highlands and Beyond"
+    published_deck(long, slides: 1)
+    get root_path
+    caps = JSON.parse(css_select(".mm [data-mm=cap-l]").first["data-states"])
+    assert caps[0].start_with?("The Long Road"), "the showcase deck's title: #{caps[0]}"
+    assert_operator caps[0].length, :<=, 44, "the hero title is cut for the frame: #{caps[0]}"
+    css = css_select("style").map(&:text).join("\n")
+    assert_match(/\.hx \.mm-bar > :first-child \{ flex: 0 1 auto; min-width: 0; overflow-x: clip; \}/, css, "the title's box may shrink")
+    assert_match(/\.hx \.mm-bar > :first-child \.mm-rl \{ max-width: 100%; overflow-x: clip; text-overflow: ellipsis; \}/, css, "and its line ends in an ellipsis")
+    assert_match(/\.hx \.mm-bar > :last-child \{[^}]*flex: none;/, css, "the slide count keeps its width")
+  end
 end
