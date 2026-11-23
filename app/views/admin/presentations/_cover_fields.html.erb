@@ -101,6 +101,42 @@
       </label>
     </div>
 
+    <%# The deck's review bottle (Presentation#record_bottle): the bottle whose
+        newest public review the homepage's tasting record leads with while
+        this deck is the featured one (HomepageFeature). The search box is not
+        submitted; the hidden record_bottle_id is. Typing something else, or
+        clearing the box, removes the choice. %>
+    <% review_bottle = form.object.record_bottle %>
+    <% review_shown = HomepageFeature.review_of(review_bottle&.id) %>
+    <div class="rounded-2xl border border-hairline bg-paper p-4 md:col-span-2"
+         data-controller="bottle-search" data-bottle-search-url-value="<%= search_bottles_path %>"
+         data-bottle-search-name-field-value="true"
+         data-bottle-search-unlinked-label-value="No review bottle chosen.">
+      <label for="presentation_record_bottle_search" class="<%= admin_label_class %>">Review bottle for the homepage</label>
+      <div class="relative">
+      <input type="text" id="presentation_record_bottle_search" value="<%= review_bottle&.name %>" autocomplete="off"
+             placeholder="Start typing a bottle from the catalog"
+             data-bottle-search-target="input" data-action="input->bottle-search#query"
+             class="<%= admin_field_class %>">
+      <%= form.hidden_field :record_bottle_id, data: { bottle_search_target: "bottleId" } %>
+      <div data-bottle-search-target="results"
+           class="absolute inset-x-0 top-full z-20 mt-1 hidden overflow-hidden rounded-2xl border border-hairline bg-white shadow-lg"></div>
+      </div>
+      <p data-bottle-search-target="linkState" class="mt-1 text-xs <%= review_bottle ? 'text-ink' : 'text-mute' %>">
+        <%= review_bottle ? "Linked to #{review_bottle.display_name}" : "No review bottle chosen." %>
+      </p>
+      <% if review_bottle %>
+        <p class="mt-1 text-xs text-mute">
+          <% if review_shown %>
+            The homepage will show the review from <%= review_shown.created_at.strftime("%B %-d, %Y") %>.
+          <% else %>
+            This bottle has no public review yet, so the homepage uses a bottle from the pour list or the newest review until it has one.
+          <% end %>
+        </p>
+      <% end %>
+      <p class="mt-1 text-xs text-mute">When this deck is the featured one on the homepage, the tasting record shows the newest public review of this bottle. Each deck needs a different bottle. With no deck featured, the homepage features the three best-selling decks in turn, a day each.</p>
+    </div>
+
     <% if files_link %>
       <%# The banner's upload is in the Files tab (one file field per slot). %>
       <div class="md:col-span-2">

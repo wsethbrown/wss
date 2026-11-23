@@ -206,4 +206,35 @@ class Admin::PresentationsControllerTest < ActionDispatch::IntegrationTest
     patch admin_presentation_path(@deck), params: { presentation: { price: "0", free_confirmed: "1" } }
     assert_equal BigDecimal("0"), @deck.reload.price
   end
+
+  # The deck's review bottle (the homepage's tasting record leads with its
+  # newest public review while this deck is featured).
+  test "the edit page offers a review bottle, and saving sets, keeps unique and clears it" do
+    get edit_admin_presentation_path(@deck)
+    assert_response :success
+    assert_select "input[type=hidden][name='presentation[record_bottle_id]']", 1
+    assert_select "label[for=presentation_record_bottle_search]", text: "Review bottle for the homepage"
+
+    patch admin_presentation_path(@deck), params: { presentation: { record_bottle_id: bottles(:eagle_rare).id } }
+    assert_equal bottles(:eagle_rare), @deck.reload.record_bottle
+    get edit_admin_presentation_path(@deck)
+    assert_select "#presentation_record_bottle_search[value=?]", bottles(:eagle_rare).name
+    assert_select "p", text: /The homepage will show the review from/
+
+    other = Presentation.create!(author: users(:admin), title: "Other Deck", content: "Story.", price: 10)
+    patch admin_presentation_path(other), params: { presentation: { record_bottle_id: bottles(:eagle_rare).id } }
+    assert_response :unprocessable_entity
+    assert_nil other.reload.record_bottle_id
+    assert_match "Review bottle is already used by another deck", response.body
+
+    patch admin_presentation_path(@deck), params: { presentation: { record_bottle_id: "" } }
+    assert_nil @deck.reload.record_bottle_id
+  end
+
+  test "deleting a bottle from the catalog clears a deck's review bottle" do
+    bottle = Bottle.create!(name: "Short Lived", distillery: "Test")
+    @deck.update!(record_bottle: bottle)
+    bottle.destroy!
+    assert_nil @deck.reload.record_bottle_id
+  end
 end

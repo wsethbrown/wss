@@ -38,7 +38,11 @@ export default class extends Controller {
     // Name mode (the deck pour form): the search box IS the name field, so it
     // takes the bottle's bare name rather than "Name · Distillery", and typing
     // something else unlinks the row. Off everywhere else.
-    nameField: { type: Boolean, default: false }
+    nameField: { type: Boolean, default: false },
+    // What the link state says once a name-mode box no longer names its
+    // bottle. The deck pour form's wording by default; the deck's review
+    // bottle (admin deck page) says its own.
+    unlinkedLabel: { type: String, default: "Not linked to the catalog, so this pour earns no scores." }
   }
 
   query() {
@@ -142,7 +146,7 @@ export default class extends Controller {
     this.bottleIdTarget.value = ""
     this.linkedName = null
     if (!this.hasLinkStateTarget) return
-    this.linkStateTarget.textContent = "Not linked to the catalog, so this pour earns no scores."
+    this.linkStateTarget.textContent = this.unlinkedLabelValue
     this.linkStateTarget.classList.remove("text-ink")
     this.linkStateTarget.classList.add("text-mute")
   }

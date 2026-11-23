@@ -1,20 +1,23 @@
 class HomeController < ApplicationController
   include DesignPreview
 
-  RECORD_ROWS = 3 # slide four's tasting record without a verdict: reviews listed, at most
-
   def index
     @stripe_products = fetch_stripe_products
     # The library rows (the face and the story frame); their covers preloaded,
     # so a row costs no queries of its own.
     @featured_presentations = Presentation.published.recent.limit(3)
                                           .includes(slide_images_attachments: { blob: :variant_records }, featured_image_attachment: { blob: :variant_records }).to_a
-    # The one deck to spotlight: the most recently featured published deck.
-    @spotlight_deck = Presentation.published.featured.recent.first
-    # Real rendered slides for the hero screen: the spotlight deck when it has
-    # slides, otherwise the newest deck that does.
-    with_slides = Presentation.published.joins(:slide_images_attachments).distinct
-    @showcase_deck = with_slides.featured.recent.first || with_slides.recent.first
+    # The deck to feature and the review its tasting record leads with,
+    # chosen together, once, so the hero, the spotlight, the library row and
+    # the record agree (HomepageFeature): an admin-featured deck, else the
+    # three best sellers in turn, a day each. ?rotation=1..3 previews each
+    # place (admins; anyone in development).
+    @feature = HomepageFeature.new(slot: (params[:rotation] if design_preview_allowed?))
+    # Real rendered slides for the hero screen: the featured deck.
+    @showcase_deck = @feature.deck
+    # The spotlight tile: the most recently featured published deck (even one
+    # without slides, which shows its cover), else the hero's deck.
+    @spotlight_deck = Presentation.published.featured.recent.first || @showcase_deck
     # Real public data for the homepage slides: the next tasting night at a
     # public society and the top-rated bottles, the same rows /reviews shows.
     @next_event = Event.upcoming.joins(:society).where(societies: { is_private: false }).includes(:society).first
@@ -23,7 +26,15 @@ class HomeController < ApplicationController
     # reviews, its pours ranked by the room (slide four shows its top three in
     # place of the tasting record when there is one). Public societies only and
     # Event#pours_revealed? with no bypass, so a secret pour stays secret.
-    load_verdict
+    # A deck's own review bottle comes first: the admin chose it for this deck.
+    if @showcase_deck&.record_bottle_id && @feature.chosen_review?
+      @verdict_night = nil
+      @verdict_rows = []
+      @verdict_reviews = []
+      Rails.logger.info "Home: deck #{@showcase_deck.id} has a review bottle with a public review, slide four shows it in place of a verdict"
+    else
+      load_verdict
+    end
     load_next_event_guests
     load_featured_review
     @deck_categories = Presentation.published.where.not(category: [ nil, "" ]).distinct.order(:category).limit(6).pluck(:category)
@@ -101,35 +112,27 @@ class HomeController < ApplicationController
     Rails.logger.info "Home: slide three shows event #{@next_event.id} (society #{@next_event.society_id}, #{@next_event_going} going)"
   end
 
-  # Slide four's review when there is no verdict: the newest review that can
-  # draw a palate wheel, else the newest review. Stricter than the /reviews
-  # feed (which lists every review, veiling private nights): only solo
-  # reviews and reviews from a PUBLIC society's night whose pours are
-  # revealed (Event#pours_revealed?, no manager bypass) can be featured, so
-  # nothing from a private or still-secret night reaches the homepage.
+  # Slide four's review when there is no verdict, from HomepageFeature: the
+  # featured deck's own bottle (its review bottle, else its pour list), else
+  # the newest public review. Only solo reviews and reviews from a PUBLIC
+  # society's night whose pours are revealed can be shown, so nothing from a
+  # private or still-secret night reaches the homepage.
   #
-  # From the same reviews, the tasting record's rows (@record_reviews): the
-  # featured review first, then the newest others, one per bottle, three at
-  # most. Empty unless there are at least two, when slide four keeps the one
-  # review. Their users and bottles are preloaded with them.
+  # With it, the tasting record's rows (@record_reviews): that review first,
+  # then the newest others, one per bottle, three at most. Empty unless there
+  # are at least two, when slide four keeps the one review. Their users and
+  # bottles are preloaded with them.
   def load_featured_review
     @featured_review = nil
     @record_reviews = []
     return if @verdict_rows.present?
 
-    public_nights = Event.joins(:society).where(societies: { is_private: false }).select(:id)
-    candidates = Review.where(event_id: nil).or(Review.where(event_id: public_nights))
-    recent = candidates.includes(:user, :bottle, :event).recent_first.limit(20).to_a
-    skipped = recent.select { |r| r.event && !r.event.pours_revealed? }
-    Rails.logger.info "Home: skipped #{skipped.size} review(s) from unrevealed nights for slide four (#{skipped.map(&:id).join(', ')})" if skipped.any?
-    recent -= skipped
-    @featured_review = recent.detect { |r| r.wheel_display_profile.any? } || recent.first
-    rows = ([ @featured_review ].compact + recent).uniq(&:bottle_id).first(RECORD_ROWS)
-    @record_reviews = rows if rows.size >= 2
+    @featured_review = @feature.review
+    @record_reviews = @feature.record_reviews
     if @record_reviews.any?
-      Rails.logger.info "Home: slide four lists reviews #{@record_reviews.map(&:id).join(', ')} (bottles #{@record_reviews.map(&:bottle_id).join(', ')}, wheel from review #{@featured_review.id}: #{@featured_review.wheel_display_profile.any? ? 'yes' : 'no'})"
+      Rails.logger.info "Home: slide four lists reviews #{@record_reviews.map(&:id).join(', ')} (bottles #{@record_reviews.map(&:bottle_id).join(', ')}, #{@feature.review_source}, wheel from review #{@featured_review.id}: #{@featured_review.wheel_display_profile.any? ? 'yes' : 'no'})"
     elsif @featured_review
-      Rails.logger.info "Home: slide four shows review #{@featured_review.id} (bottle #{@featured_review.bottle_id}, user #{@featured_review.user_id}, wheel #{@featured_review.wheel_display_profile.any? ? 'yes' : 'no'})"
+      Rails.logger.info "Home: slide four shows review #{@featured_review.id} (bottle #{@featured_review.bottle_id}, user #{@featured_review.user_id}, #{@feature.review_source}, wheel #{@featured_review.wheel_display_profile.any? ? 'yes' : 'no'})"
     else
       Rails.logger.info "Home: no reviews yet, slide four shows only its heading"
     end

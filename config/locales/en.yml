@@ -34,3 +34,5 @@ en:
       presentation:
         # Its errors read "Extra sections need a heading in section 2".
         sections: "Extra sections"
+        # Its errors read "Review bottle is already used by another deck."
+        record_bottle_id: "Review bottle"

@@ -118,6 +118,9 @@ class Admin::PresentationsController < Admin::BaseController
       if @presentation.saved_change_to_included_with_membership?
         Rails.logger.info "Admin #{current_user.id} set presentation #{@presentation.id} included_with_membership=#{@presentation.included_with_membership?}"
       end
+      if @presentation.saved_change_to_record_bottle_id?
+        Rails.logger.info "Admin #{current_user.id} set presentation #{@presentation.id} review bottle to #{@presentation.record_bottle_id || 'none'}"
+      end
       redirect_to deck_page(tab_param), notice: "Presentation updated successfully."
     else
       Rails.logger.warn "Admin #{current_user.id} update of presentation #{@presentation.id} refused (tab #{tab_param}): #{@presentation.errors.full_messages.to_sentence}"
@@ -313,6 +316,7 @@ class Admin::PresentationsController < Admin::BaseController
       :recommendations_sheet,
       :scorecard,
       :featured,
+      :record_bottle_id,
       :free_confirmed,
       :included_with_membership,
       supplemental_materials: [],
