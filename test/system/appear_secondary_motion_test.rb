@@ -116,7 +116,7 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
         const step = (now) => {
           // Cap the step so a slow frame on CI cannot jump a face past its pinned stretch.
           y += 400 * Math.min(now - prev, 40) / 1000; prev = now;
-          const before = scrollY; scrollTo(0, y); if (scrollY !== before) lastMove = now;
+          const before = scrollY; scrollTo({ top: y, behavior: "instant" }); if (scrollY !== before) lastMove = now;
           const maxScroll = document.documentElement.scrollHeight - innerHeight;
           for (const f of [ "f2", "f3", "f4" ]) {
             const screen = document.querySelector(`.${f} .screen`);
@@ -172,7 +172,7 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
 
     visit event_path(event)
     assert_selector "[data-role=the-table][data-repour] svg[data-glass]", visible: :all
-    page.execute_script("document.querySelector('[data-repour]').scrollIntoView({ block: 'center' })")
+    page.execute_script("document.querySelector('[data-repour]').scrollIntoView({ block: 'center', behavior: 'instant' })")
     before = page.evaluate_script("[...document.querySelectorAll('[data-repour] svg[data-glass]')].map((g) => g.dataset.glass)")
     find("button.rsvp-option[data-answer=yes]").click
     assert_selector "[data-repour] svg[data-glass]", visible: :all, wait: 5
