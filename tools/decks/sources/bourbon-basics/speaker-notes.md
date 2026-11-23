@@ -180,9 +180,6 @@ Its author was Joseph Fleischman. He wrote that a man who takes a glass of whisk
 > **DO NOT OVERSELL IT**
 > Not every rectifier was a fraud. The best grade in the 1885 manual is a blend of good straight whiskeys. And the stories about tobacco in the barrel were called "a popular error" by the 1853 manual itself.
 
-> **ENSLAVED LABOR**
-> Optional. Before the end of slavery the biggest names in Kentucky whiskey used enslaved labor. The records that survive show enslaved people rolling barrels and gathering grain. They do not show whether enslaved people also did the distilling.
-
 ## [SLIDE 9] 1897: bottled in bond
 
 On the 3rd of March 1897 Congress passed "An Act to allow the bottling of distilled spirits in bond". A Kentucky distiller, Colonel Edmund Haynes Taylor Junior, usually gets the credit for pushing it, along with the Treasury Secretary, John G. Carlisle.

@@ -54,7 +54,7 @@ heading(s, 1.15, 'George Ross and two partners build a distillery.', size=34, x=
 text(s, 7.1, 2.95, 5.35, 3.7, [
     'Ross had started the town’s first brewery two years earlier. The distillery is named for Rossville, the settlement beside Lawrenceburg where it stood.',
     'In 1877 a new owner rebuilt it in brick to mash 2,100 bushels of grain a day. It burned in 1897, when a newspaper called it the largest distillery in Indiana.',
-    [('The distillery brought the Rossville name back in 2018. That is glass 4.', {'bold': True})],
+    [('The distillery brought the Rossville name back in 2018, for its Rossville Union rye.', {'bold': True})],
 ], size=17, ls=1.22, space_after=10)
 footer(s, 3)
 
@@ -70,7 +70,7 @@ text(s, 7.1, 2.95, 5.35, 2.2, [
 ], size=17, ls=1.22, space_after=10)
 rrect(s, 7.1, 4.75, 5.38, 1.7, r=0.26, fill=WHITE, line=HAIR)
 text(s, 7.4, 4.95, 4.8, 0.9, '“Enough whisky to float a navy or flood a city.”', size=19, italic=True, color=INK, ls=1.15)
-text(s, 7.4, 5.85, 4.8, 0.4, 'A revenue officer, quoted in the 1885 county history', size=12, font=SANS, color=MUTE)
+text(s, 7.4, 5.85, 4.8, 0.4, 'Source: the 1885 county history, quoting a revenue officer.', size=12, font=SANS, color=MUTE)
 footer(s, 4)
 
 # ---------------------------------------------------------------- 5 Prohibition and Remus
@@ -85,7 +85,7 @@ rrect(s, 7.45, 0.85, 5.03, 5.65, r=0.4, fill=OAK, line=OAK_EDGE)
 rect(s, 7.95, 1.55, 0.9, 0.045, fill=MARK)
 text(s, 7.95, 1.85, 4.1, 2.6, '“Whisky does not walk off by itself.”', size=32, italic=True, color=CREAM, ls=1.15)
 text(s, 7.95, 4.75, 4.1, 1.3,
-     'Representative Fiorello La Guardia to the House, reported in the Indianapolis Times, 24 March 1926.',
+     'Representative Fiorello La Guardia. He said it to the House, and the Indianapolis Times reported it on 24 March 1926.',
      size=14, font=SANS, color=CREAM_MUTE, ls=1.2)
 footer(s, 5, dark=True)
 
@@ -124,7 +124,7 @@ footer(s, 7, dark=True)
 # ---------------------------------------------------------------- 6 nearly the end
 s = new_slide()
 heading(s, 0.85, 'Three owners in ten years.', size=40, h=0.9)
-text(s, 0.85, 1.8, 11.6, 0.5, 'What happened to the plant after Seagram.',
+text(s, 0.85, 1.8, 11.6, 0.5, 'Pernod Ricard in 2001, CL Financial in 2007, MGP Ingredients in 2011.',
      size=19, italic=True, color=MUTE)
 stops = [
     ('2001', 'Pernod Ricard', 'Seagram is broken up. The Lawrenceburg plant goes to Pernod Ricard.'),
@@ -176,7 +176,7 @@ rrect(s, cx - pw / 2, cy - ph / 2, pw, ph, r=0.3, fill=INK)
 dot(s, cx - pw / 2 + 0.38, cy - 0.17, 0.13, MARK)
 text(s, cx - pw / 2 + 0.55, cy - 0.38, pw - 0.7, 0.42, 'Lawrenceburg', size=20, font=SANS, bold=True, color=CREAM)
 text(s, cx - pw / 2 + 0.55, cy + 0.04, pw - 0.7, 0.36, 'Indiana, 95% rye', size=14, font=SANS, color=CREAM_MUTE)
-text(s, 0.85, 6.4, 11.6, 0.3, 'Some of the brands reported to have bottled Lawrenceburg rye. Far from a complete list.',
+text(s, 0.85, 6.4, 11.6, 0.3, 'Some of the brands reported to have bottled Lawrenceburg rye. The list is not complete.',
      size=11, font=SANS, color=MUTE)
 footer(s, 9)
 

@@ -20,7 +20,7 @@ The Whiskey Share Society
 
 Thanks for coming. Tonight is about American rye whiskey.
 
-In the early United States, rye was the whiskey of Pennsylvania and Maryland. By the late 1900s there were only a few rye brands left in the shops. The old eastern names were still on some of them, but the whiskey was made in Kentucky by bourbon companies. Now there are hundreds of ryes. I'll go through how that happened, and we'll taste four of them along the way. One is reported to be just over half rye, which is the least the law allows. The others have more.
+In the early United States, rye was the whiskey of Pennsylvania and Maryland. By the late 1900s there were only a few rye brands left in the shops. The old eastern names were still on some of them, but the whiskey was made in Kentucky by bourbon companies. Now there are hundreds of ryes. There are four to taste tonight: Old Overholt, Pikesville, Old Forester Rye and Bulleit 95 Rye.
 
 ## [SLIDE 2] Why mid-Atlantic farmers grew rye
 
@@ -52,7 +52,7 @@ Most of those descriptions were written much later, and very few recipes from th
 
 ## [SLIDE 5] Overholt: West Overton, then Broad Ford
 
-The first bottle tonight is Overholt. Abraham Overholt was born in 1784 and died in 1870. He came from a Mennonite farming family in Westmoreland County, south-east of Pittsburgh. The brand dates itself to 1810, when the family was making whiskey at West Overton. It used that date in its advertising, and the advertisement on the slide is from 1897. Later the family built a much bigger distillery at Broad Ford, on the Youghiogheny River.
+Abraham Overholt was born in 1784 and died in 1870. He came from a Mennonite farming family in Westmoreland County, south-east of Pittsburgh. The Overholt brand dates itself to 1810, when the family was making whiskey at West Overton. It used that date in its advertising, and the advertisement on the slide is from 1897. Later the family built a much bigger distillery at Broad Ford, on the Youghiogheny River.
 
 Abraham's grandson was Henry Clay Frick, who got rich from coke and steel. Frick took over the business in the 1880s and brought in his friend Andrew Mellon as a partner. The whiskey was named Old Overholt in 1888. When Frick died in December 1919, he left his share to Mellon. Mellon was Secretary of the Treasury for most of Prohibition, and he was criticized for owning part of a distillery. He sold his share in 1925.
 
@@ -60,7 +60,9 @@ Broad Ford reopened after Prohibition and made whiskey until 1951. For the next 
 
 ## [SLIDE 6] Pour 1 of 4: Old Overholt
 
-First pour, Old Overholt. The man on the label is Abraham Overholt. This is the standard straight rye. It used to be three years old and 80 proof. Around 2020 it went up to 86 proof, and in 2022 it went up to four years old.
+_Pour glass 1 now._
+
+This is Old Overholt. The man on the label is Abraham Overholt. This is the standard straight rye. It used to be three years old and 80 proof. Around 2020 it went up to 86 proof, and in 2022 it went up to four years old.
 
 Beam doesn't publish the recipe, so I can't tell you how much rye is in it. It has a Pennsylvania name and it is made in Kentucky.
 
@@ -74,7 +76,9 @@ The one still on sale is Pikesville. It is named after a town just north-west of
 
 ## [SLIDE 8] Pour 2 of 4: Pikesville Straight Rye
 
-Second pour, Pikesville Straight Rye. Heaven Hill brought it back in 2015 at six years old and 110 proof. Heaven Hill doesn't print the recipe. It is widely reported as 51 percent rye, 39 percent corn and 10 percent malted barley. Fifty-one percent is the least rye the law allows.
+_Pour glass 2 now._
+
+This is Pikesville Straight Rye. Heaven Hill brought it back in 2015 at six years old and 110 proof. Heaven Hill doesn't print the recipe. It is widely reported as 51 percent rye, 39 percent corn and 10 percent malted barley. Fifty-one percent is the least rye the law allows.
 
 Take a small sip neat. Then add a few drops of water and taste it again. There is a lot of corn in this one, so see if you get some sweetness under the spice.
 
@@ -110,11 +114,13 @@ These ryes were cheap, and not much was sold. One report says that in the 1990s 
 
 This is what American law says. To be called rye whisky, at least 51 percent of the grain has to be rye. It can come off the still at no more than 160 proof. It has to go into the barrel at no more than 125 proof. The barrel has to be new charred oak. If it is aged for at least two years with nothing added, it can be called straight rye. If it is under four years old, the label has to give the age.
 
-That leaves a lot of room. One rye can be 51 percent rye and nearly 40 percent corn. Another can be 95 percent rye. The first is closer to a bourbon with a lot of rye in it than it is to the second, and both are sold as rye. Pikesville is at the low end. The last two pours, Old Forester Rye and Bulleit 95 Rye, have more.
+One rye can be 51 percent rye and nearly 40 percent corn. Another can be 95 percent rye. The first is closer to a bourbon with a lot of rye in it than it is to the second, and both are sold as rye. Pikesville is reported to be 51 percent rye. Old Forester Rye is 65 percent and Bulleit 95 Rye is 95 percent.
 
 ## [SLIDE 13] Pour 3 of 4: Old Forester Rye
 
-Third pour, Old Forester Rye, from Brown-Forman in Louisville. It came out in 2019. Brown-Forman publishes the recipe: 65 percent rye, 20 percent malted barley and 15 percent corn. The label calls it Kentucky Straight Rye Whisky, and it is 100 proof.
+_Pour glass 3 now._
+
+This is Old Forester Rye, from Brown-Forman in Louisville. It came out in 2019. Brown-Forman publishes the recipe: 65 percent rye, 20 percent malted barley and 15 percent corn. The label calls it Kentucky Straight Rye Whisky, and it is 100 proof.
 
 Taste it next to the Pikesville. See if you get less of the corn sweetness and more of the rye. People say rye tastes peppery, or like rye bread, and sometimes grassy or minty.
 
@@ -136,15 +142,17 @@ The law says a whiskey label has to name the state where it was distilled if tha
 
 ## [SLIDE 16] Pour 4 of 4: Bulleit 95 Rye
 
-Last pour, Bulleit 95 Rye. Bulleit says it is 95 percent rye and 5 percent malted barley, which is the Lawrenceburg recipe. It is a straight rye at 90 proof, and it came out in 2011.
+_Pour glass 4 now._
+
+This is Bulleit 95 Rye. Bulleit says it is 95 percent rye and 5 percent malted barley, which is the Lawrenceburg recipe. It is a straight rye at 90 proof, and it came out in 2011.
 
 Turn the bottle round and find where it was distilled. Diageo owns Bulleit and makes the bourbon in Kentucky. The rye still comes from MGP in Indiana. In 2026 Bulleit launched a blend of bourbon and rye, and the rye in that was made and aged in Lawrenceburg too.
 
-Taste it next to the Pikesville. One is about half rye and the other is almost all rye. The 95 percent recipe is usually described as drier and more herbal, with less sweetness. Some people get dill or mint. Then go back to whichever of the four you liked best, and I'll ask for a show of hands.
+Taste it next to the Pikesville. One is about half rye and the other is almost all rye. The 95 percent recipe is usually described as drier and more herbal, with less sweetness. Some people get dill or mint. Then go back to whichever of the four you liked best.
+
+_Ask for a show of hands for each of the four._
 
 ## [SLIDE 17] Reading a rye label
-
-This last slide is what a rye label tells you.
 
 "Rye whisky" means at least 51 percent rye, aged in new charred oak. "Straight" means at least two years old with nothing added. If it is under four years old, the label gives the age. "Distilled in", followed by a state, tells you where it was made when that is different from where it was bottled.
 

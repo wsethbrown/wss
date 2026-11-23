@@ -42,7 +42,7 @@ Prices are rough US shelf prices, checked in November 2026. They vary by state. 
 
 - **George Dickel Rye.** About $22 to $30. 90 proof. Charcoal filtered.
 - **Angel's Envy Rye.** Lawrenceburg rye that the brand finishes itself. It costs more. Check the price and the back label.
-- **High West Double Rye.** 92 proof. Check the price locally. It is Indiana 95% rye blended with High West's own Utah rye. That is a blend and not a filter, but it works in this glass.
+- **High West Double Rye.** 92 proof. Check the price locally. It is Indiana 95% rye blended with High West's own Utah rye. Here the step the brand adds is blending.
 
 **Glass 3: named for a town**
 
@@ -90,11 +90,11 @@ We have four of those ryes tonight.
 
 _Pour glass 1, the Bulleit 95 Rye. Keep talking while you pour._
 
-This is Bulleit 95 Rye. Drink it whenever you like. We'll come back to it after the history.
+This is Bulleit 95 Rye. Drink it whenever you like.
 
 The 95 is the recipe. It's 95% rye and 5% malted barley. Many American ryes are only a little over half rye, and much of the rest is corn. So the spice and the grassy, herbal notes in this glass come mostly from the rye.
 
-Keep a little in the glass. The next two pours are the same recipe, and it helps to taste them together.
+Keep a little in the glass. George Dickel Rye and Templeton Rye, glasses 2 and 3, are made to the same recipe, and it helps to taste them together.
 
 ## [SLIDE 3] 1847: the Rossville distillery
 
@@ -106,7 +106,7 @@ In 1877 a man named N. J. Walsh bought it and rebuilt it in brick. It could mash
 
 Today's owner says the Rossville distillery made rye. The 1885 history doesn't say what it made.
 
-The distillery started using the Rossville name again in 2018. That bottle is glass 4.
+The distillery started using the Rossville name again in 2018, for its Rossville Union rye.
 
 ## [SLIDE 4] 1885: a whiskey town
 
@@ -114,7 +114,7 @@ By 1885 the county had seven distilleries, and four of them were in Lawrenceburg
 
 The distilleries were also feedlots. The grain left over after distilling was fed to cattle and hogs, which were kept in pens beside the stills. When Walsh rebuilt Rossville he put in pens for 1,500 cattle.
 
-Two brothers called Squibb opened their own distillery nearby in 1869. We'll hear about it on the next slide, and the name comes up again at the end.
+Two brothers called Squibb opened their own distillery nearby in 1869.
 
 ## [SLIDE 5] Prohibition
 
@@ -168,7 +168,7 @@ Rye was becoming popular again, and new brands wanted to sell it. Rye needs year
 
 Templeton, in Iowa, was the first to bottle it. Bulleit Rye came out in 2011. George Dickel, the Tennessee distillery, put out a rye. So did Redemption, Smooth Ambler in West Virginia, High West in Utah, and others. The slide doesn't show all of them.
 
-Each brand started with the same rye and chose its own age and proof. Some filtered it or blended it. The next three glasses are three of those brands.
+Each brand started with the same rye and chose its own age and proof. Some filtered it or blended it. Bulleit, George Dickel and Templeton are three of those brands.
 
 ## [SLIDE 10] Glass 1 again: Bulleit 95 Rye
 
@@ -204,7 +204,7 @@ The whiskey was distilled and aged in Indiana and bottled in Iowa. The label sai
 
 In 2018 Templeton opened its own distillery in the town. It cost $35 million. That whiskey needed time to age.
 
-The Straight Rye in your glass came out in November 2024. It is at least four years old and 90 proof, and it uses the 95% recipe. The company says it is selected from whiskey it bought. The company didn't say where it was distilled. The back label should.
+The Straight Rye in your glass came out in November 2024. It is at least four years old and 90 proof, and it uses the 95% recipe. The company says it is selected from whiskey it bought. The company didn't say where it was distilled. The back label should name the state.
 
 In October 2025 Templeton released its first rye distilled, aged and bottled in Iowa. It was a limited single barrel.
 

@@ -165,8 +165,8 @@ footer(s, 4)
 
 # ---------------------------------------------------------------- 5 pour 1
 pour_slide(5, 'Pour 1 of 4', ['Old Overholt', 'Straight Rye'],
-           'A brand that began in Westmoreland County, one of the four counties at the center of the '
-           'rebellion, in the years after 1794.',
+           'The brand began in Westmoreland County in 1810. Westmoreland was one of the four counties '
+           'of the rebellion.',
            'Jim Beam, Kentucky', 'Straight rye whiskey', '86')
 
 # ---------------------------------------------------------------- 6 collectors attacked
@@ -252,7 +252,7 @@ footer(s, 9)
 
 # ---------------------------------------------------------------- 10 pour 2
 pour_slide(10, 'Pour 2 of 4', ['Pikesville', 'Straight Rye'],
-           ['A Maryland rye name. Maryland was one of the four states that sent militia west in 1794.',
+           ['Pikesville was a Maryland rye. Maryland was one of the four states that sent militia west in 1794.',
             'It is 110 proof.'],
            'Heaven Hill, Kentucky', 'Straight rye whiskey', '110')
 

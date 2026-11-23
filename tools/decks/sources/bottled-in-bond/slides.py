@@ -142,7 +142,7 @@ s = new_slide()
 pw = (CW - 0.25) / 2
 sides = [(X, WHITE, HAIR, INK, 'Straight whiskey',
           ['Grain, mashed and distilled', 'A charred oak barrel',
-           [('Years', {'bold': True}), (' of waiting', {})]]),
+           [('Years', {'bold': True}), (' in a warehouse', {})]]),
          (X + pw + 0.25, OAK, OAK_EDGE, CREAM, 'Rectified whiskey',
           ['Neutral spirit off a column still', 'Color and flavor added',
            [('Sold ', {}), ('without', {'bold': True}), (' aging', {})]])]
@@ -169,7 +169,7 @@ year_slide(5, '1870', ['Old Forester goes on sale', 'in sealed bottles.'],
            'brand they could rely on.',
            'Each bottle carried his signed guarantee.',
            'brown-forman-louisville.jpg', 1255 / 1056,
-           'Brown-Forman, the company Brown founded, in Louisville. Photo: Nyttend, public domain.',
+           'Brown-Forman in Louisville. Brown founded the company. Photo: Nyttend, public domain.',
            body_y=3.95, body_w=6.0)
 
 # ---------------------------------------------------------------- 6 bonded warehouses
@@ -193,10 +193,10 @@ hw = (CW - 0.4) / 2
 ih = hw * 375 / 982
 people = [(X, 'taylor-distillery-1891.jpg', 'The distillery of E. H. Taylor Jr. & Co., Frankfort, 1891 engraving.',
            'Col. Edmund Haynes Taylor Jr.',
-           'Distiller in Frankfort, Kentucky, and a long-time opponent of the rectifiers.'),
+           'A distiller in Frankfort, Kentucky. He campaigned against the rectifiers for years.'),
           (X + hw + 0.4, 'carlisle-engraving.jpg', 'Carlisle, engraved by the Bureau of Engraving and Printing.',
            'John Griffin Carlisle',
-           'Secretary of the Treasury, whose department ran the bonded warehouses.')]
+           'Secretary of the Treasury. His department ran the bonded warehouses.')]
 for cx, img, cap, name, desc in people:
     picture(s, A / img, cx, 1.6, hw, ih, radius_in=0.2)
     credit(s, cx, 1.6 + ih + 0.06, hw, cap)
@@ -286,7 +286,7 @@ footer(s, 12)
 
 # ---------------------------------------------------------------- 13 pour 3
 pour_slide(13, 'Pour 3 of 4', ['Rittenhouse Rye', 'Bottled-in-Bond'],
-           'The Act covers distilled spirits of any kind, not only bourbon.',
+           'The Act covers distilled spirits of any kind.',
            card=('Heaven Hill, Kentucky', 'Straight rye whisky', '100'), two_line_name=True)
 
 # ---------------------------------------------------------------- 14 what happened to bonded whiskey
@@ -312,7 +312,7 @@ footer(s, 14)
 
 # ---------------------------------------------------------------- 15 pour 4
 pour_slide(15, 'Pour 4 of 4', ['Old Forester', '1897'],
-           'George Garvin Brown’s brand, in a bottling named after the year of the Act.',
+           'Old Forester was George Garvin Brown’s brand. This bottling is named after the year of the Act.',
            card=('Brown-Forman, Kentucky', 'Kentucky straight bourbon', '100'), two_line_name=True)
 
 # ---------------------------------------------------------------- 16 reading the label

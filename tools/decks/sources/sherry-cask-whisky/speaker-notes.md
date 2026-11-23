@@ -68,7 +68,9 @@ None of this is a rule. The age of the cask matters, and so does how many times 
 
 ## [SLIDE 8] Pour 1 of 4: Glenmorangie The Original
 
-First pour. This is Glenmorangie The Original, twelve years old. It comes from Tain, in the northern Highlands. The distillery dates from 1843. The French luxury group LVMH has owned it since 2004.
+_Pour glass 1 now._
+
+This is Glenmorangie The Original, twelve years old. It comes from Tain, in the northern Highlands. The distillery dates from 1843. The French luxury group LVMH has owned it since 2004.
 
 For decades The Original was ten years old. In 2024 Glenmorangie replaced it with this twelve-year-old. It is still 40 percent.
 
@@ -94,7 +96,9 @@ The second way is to go to Jerez and pay to have casks built and filled with she
 
 ## [SLIDE 11] Pour 2 of 4: Glenmorangie Lasanta
 
-Second pour. This is a finish. Glenmorangie Lasanta is twelve years old and comes from the same distillery as the first pour. Glenmorangie says it spends about ten years in bourbon barrels and then two more in oloroso and Pedro Ximénez sherry casks.
+_Pour glass 2 now._
+
+This is a finish. Glenmorangie Lasanta is twelve years old and comes from the same distillery as the first pour. Glenmorangie says it spends about ten years in bourbon barrels and then two more in oloroso and Pedro Ximénez sherry casks.
 
 Taste it next to the Original. They are the same age and from the same distillery. The Original stayed in bourbon barrels for all twelve years. The Lasanta spent its last two in sherry casks, so most of the difference comes from those two years. Look at the colour first. Then see if you get more dried fruit, and if it feels drier at the end.
 
@@ -116,7 +120,9 @@ A seasoned cask was built to be sold to a distiller. It usually held sherry for 
 
 ## [SLIDE 14] Pour 3 of 4: Macallan 12 Sherry Oak
 
-Third pour. Macallan 12 Sherry Oak. The distillery is at Easter Elchies, near Craigellachie on the River Spey. A farmer called Alexander Reid took out the licence in 1824.
+_Pour glass 3 now._
+
+Macallan 12 Sherry Oak. The distillery is at Easter Elchies, near Craigellachie on the River Spey. A farmer called Alexander Reid took out the licence in 1824.
 
 Macallan has its casks made to order. The company says this whisky is aged in "predominantly sherry seasoned European oak casks". Older bottles said the casks were all sherry casks. Macallan says it chooses the oak in northern Spain and has the casks built and seasoned in Jerez.
 
@@ -140,7 +146,9 @@ In 2008 it was sold to a company led by Billy Walker. He made GlenDronach a sher
 
 ## [SLIDE 17] Pour 4 of 4: GlenDronach 12
 
-Last pour. GlenDronach 12, at 43 percent. The distillery says it is aged for at least twelve years in Pedro Ximénez and oloroso casks, with no caramel added.
+_Pour glass 4 now._
+
+GlenDronach 12, at 43 percent. The distillery says it is aged for at least twelve years in Pedro Ximénez and oloroso casks, with no caramel added.
 
 Like the Macallan, this has been in sherry casks all its life. Some of them are PX casks. Put it next to the Macallan. Both are twelve years old and 43 percent, and both were aged in sherry casks. See if you find this one darker or sweeter.
 

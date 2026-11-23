@@ -98,6 +98,8 @@ The writer and diplomat Sir Robert Bruce Lockhart described him as "one third ge
 
 ## [SLIDE 3] Glass 1: Craigellachie 13
 
+_Pour glass 1 now._
+
 Glass 1 is Craigellachie 13. It is bottled at 46 percent.
 
 Craigellachie is on Speyside. The distillery was built in 1890 and 1891 at a place where four railway lines met. Mackie was one of several investors. His firm bought the whole distillery in 1916, and most of its whisky went into his blends.

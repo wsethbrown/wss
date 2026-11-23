@@ -18,9 +18,9 @@ What "bottled in bond" means and the 1897 law it comes from. Four pours, 17 slid
 
 ## [SLIDE 1] Bottled in Bond
 
-Thanks for coming. Tonight is about the words "bottled in bond". You have probably seen them on a whiskey label. They come from a law passed in 1897, and they still have a legal meaning today.
+Thanks for coming. Tonight is about the words "bottled in bond". They are printed on some whiskey labels. They come from a law passed in 1897, and they still have a legal meaning today.
 
-All four bottles tonight are bottled in bond. That means they are all 100 proof and they all follow the same rules. I'll tell you how the law came about, and we'll taste as we go. By the end you should be able to read a whiskey label in a shop and know which words mean something.
+All four bottles tonight are bottled in bond. That means they are all 100 proof and they all follow the same rules.
 
 ## [SLIDE 2] In the 1870s, whiskey was sold from the barrel
 
@@ -36,17 +36,17 @@ The first was what we now call straight whiskey. It was made from grain, distill
 
 The second was rectified whiskey. A rectifier bought neutral spirit, which was cheap and could be made in huge amounts. He added coloring and flavoring so it looked and tasted something like aged whiskey. This was legal, and a large share of what Americans drank was made this way.
 
-The rectifiers said blending was a skill and their customers liked what they made. They kept saying so for the next thirty years.
+The rectifiers said blending was a skill and their customers liked what they made.
 
 ## [SLIDE 4] Pour 1 of 4: Evan Williams Bottled-in-Bond
 
 _Pour glass 1 now._
 
-This is Evan Williams Bottled-in-Bond, the one with the white label. Heaven Hill makes it. It is usually the cheapest of the four, so we'll compare the others to it.
+This is Evan Williams Bottled-in-Bond, the one with the white label. Heaven Hill makes it. It is usually the cheapest of the four.
 
 Try it with nothing added first. Then add a few drops of water and try it again. 100 proof can feel hot if you are used to 80 or 90.
 
-Look at the front label and find the words "bottled in bond". We'll look at the small print on the back later.
+Look at the front label and find the words "bottled in bond".
 
 ## [SLIDE 5] 1870: Old Forester goes on sale in sealed bottles
 
@@ -82,11 +82,11 @@ The law was signed on the third of March 1897. Grover Cleveland signed it on his
 
 Its full title is "An Act to allow the bottling of distilled spirits in bond". It was voluntary. A distiller who wanted the government stamp could bottle under government supervision. A distiller who did not want it carried on as before.
 
-People often call this the first consumer protection law in America. It was not. There was a federal law on imported drugs in 1848 and one on margarine in 1886. But it did come nine years before the Pure Food and Drug Act.
+People often call this the first consumer protection law in America. There were earlier ones: a federal law on imported drugs in 1848 and one on margarine in 1886. The Bottled-in-Bond Act did come nine years before the Pure Food and Drug Act.
 
 ## [SLIDE 9] What a bonded label guarantees
 
-These are the rules. They are almost the same today as in 1897.
+The rules are almost the same today as in 1897.
 
 The whiskey has to come from one distillery and one distiller. It cannot be a mix of barrels bought from different places.
 
@@ -132,7 +132,7 @@ _Pour glass 3 now._
 
 This one is a rye. It is Rittenhouse Bottled-in-Bond.
 
-A lot of people think bottled in bond is only for bourbon. The law says "distilled spirits", so it covers rye and other spirits too.
+The law says "distilled spirits", so it covers rye and other spirits as well as bourbon.
 
 Heaven Hill makes Rittenhouse in Kentucky. The label is based on the one the brand used in the 1930s. It spells "whisky" without the e.
 
@@ -152,19 +152,19 @@ _Pour glass 4 now._
 
 This is Old Forester 1897 Bottled in Bond.
 
-Old Forester is the brand George Garvin Brown started selling in sealed bottles in 1870. This bottle is named after the year of the Bottled-in-Bond Act. Brown argued against that Act. His company now sells a bonded whiskey named after it.
+Old Forester is the brand George Garvin Brown started selling in sealed bottles in 1870. This bottle is named after the year of the Bottled-in-Bond Act, which Brown argued against.
 
-It costs the most of the four. When you have finished it, go back to any of the others you liked. Then I'll ask for a show of hands. Which one would you buy for yourself?
+It costs the most of the four. When you have finished it, go back to any of the others you liked. 
+
+_Ask for a show of hands: "Which one would you buy for yourself?"_
 
 ## [SLIDE 16] Reading an American whiskey label
-
-This slide shows which words on an American whiskey label have a legal meaning.
 
 "Bottled in bond" means the rules we went through. "Straight" has a legal meaning too. A straight bourbon or rye has been aged at least two years in new charred oak. An age statement has to give the age of the youngest whiskey in the bottle. Any whiskey under four years old has to have one.
 
 "Small batch", "reserve" and "handcrafted" have no legal meaning. A company can use them any way it likes.
 
-A bonded label does not tell you that you will like the whiskey. It tells you who made it, where, and about when. It tells you it is at least four years old and has nothing added.
+A bonded label tells you who made the whiskey, where, and about when. It tells you the whiskey is at least four years old and has nothing added but water.
 
 ## [SLIDE 17] Sláinte
 

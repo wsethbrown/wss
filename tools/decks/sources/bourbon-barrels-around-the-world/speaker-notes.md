@@ -22,7 +22,7 @@ Tonight is about what happens to a bourbon barrel after the bourbon comes out of
 
 By law, bourbon has to be aged in new charred oak. So a barrel can hold bourbon once. After that the distillery sells it, and most of them go abroad. They are used to age Scotch, Irish whiskey, rum and tequila.
 
-We'll start with the tree and follow the barrel from there. We have four bottles tonight. The first is a bourbon. The second is a Scotch aged mostly in that bourbon's used barrels. The third is an Irish whiskey whose owner ships its own used barrels over from America. The fourth is a Scotch from a distillery that has barrels built in America and lends them to an American distiller first.
+There are four bottles tonight. Maker's Mark is a bourbon. Laphroaig 10 is a Scotch aged mostly in Maker's Mark's used barrels. Slane is an Irish whiskey whose owner ships its own used barrels over from America. Glenmorangie is a Scotch from a distillery that has barrels built in America and lends them to an American distiller first.
 
 ## [SLIDE 2] The barrel starts as an American white oak
 
@@ -46,7 +46,7 @@ The hoops hold it together. The wood also swells when it gets wet, and that clos
 
 ## [SLIDE 4] Inside a charred stave
 
-Before the ends go in, the inside of the barrel is heated again. There are two ways to do it. Toasting is slow heat that cooks the wood without setting it on fire. Charring is fire. The barrel is put over a burner and the inside burns for less than a minute.
+Before the ends go in, the inside of the barrel is heated again. There are two ways to do it. Toasting is slow heat that cooks the wood without setting it on fire. In charring, the barrel is put over a burner and the inside burns for less than a minute.
 
 Char comes in four grades, number one to number four. Number four is the heaviest. It's called alligator char because the surface cracks into scales like an alligator's skin.
 
@@ -69,9 +69,11 @@ So every bourbon distillery ends up with empty barrels it can't fill with bourbo
 
 ## [SLIDE 6] Pour 1 of 4: Maker's Mark
 
-Let's pour the first one. This is Maker's Mark, from Loretto, Kentucky, at 90 proof. It is a wheated bourbon. That means the second grain in the recipe, after corn, is wheat. Most bourbons use rye.
+_Pour glass 1 now._
 
-I picked it because we know where its barrels go. Maker's Mark and Laphroaig have had the same owner since the late 1980s. Today that is Suntory. Most of the bourbon barrels Laphroaig uses come from Maker's Mark. In 2022 Laphroaig released a whisky aged only in Maker's Mark barrels. So this glass is the first fill, and the next glass is mostly the second fill of the same barrels.
+This is Maker's Mark, from Loretto, Kentucky, at 90 proof. It is a wheated bourbon. That means the second grain in the recipe, after corn, is wheat. Most bourbons use rye.
+
+I picked it because we know where its barrels go. Maker's Mark and Laphroaig have had the same owner since the late 1980s. Today that is Suntory. Most of the bourbon barrels Laphroaig uses come from Maker's Mark. In 2022 Laphroaig released a whisky aged only in Maker's Mark barrels. So Maker's Mark is the first fill of those barrels, and Laphroaig is mostly the second.
 
 Look at the color before you taste it. Nothing can be added to bourbon except water, so all of that color came from the barrel. Then taste it, and see if you can find vanilla and caramel. Those come from the red layer.
 
@@ -113,9 +115,11 @@ Until the late 1980s most barrels were taken apart and shipped to Scotland as bu
 
 ## [SLIDE 11] Pour 2 of 4: Laphroaig 10
 
-Second pour. This is Laphroaig 10, from Islay, an island off the west coast of Scotland. Most of its bourbon barrels came from Maker's Mark.
+_Pour glass 2 now._
 
-You'll notice smoke first. That comes from peat. Peat is burnt to dry the barley, and it has nothing to do with the barrel.
+This is Laphroaig 10, from Islay, an island off the west coast of Scotland. Most of its bourbon barrels came from Maker's Mark.
+
+It is smoky. The smoke comes from peat. Peat is burnt to dry the barley, and it has nothing to do with the barrel.
 
 Under the smoke, look for vanilla and something sweet, close to what you tasted in the Maker's Mark. That part came from the barrel.
 
@@ -131,19 +135,21 @@ Most single malts are a mix of first-fill and refill casks. The label rarely say
 
 ## [SLIDE 13] Pour 3 of 4: Slane Irish Whiskey
 
-Third pour. This is Slane Irish Whiskey, from Slane Castle in County Meath, at 40 percent. It is a blend of malt and grain whiskey.
+_Pour glass 3 now._
+
+This is Slane Irish Whiskey, from Slane Castle in County Meath, at 40 percent. It is a blend of malt and grain whiskey.
 
 Slane is owned by Brown-Forman, the Louisville company that also owns Jack Daniel's and Woodford Reserve. Brown-Forman makes its own barrels. It bought Slane in 2015 and built a distillery at the castle.
 
 Slane uses three kinds of cask. Some of the whiskey goes into new American oak. Some goes into barrels that have already held Brown-Forman's Tennessee whiskey and bourbon. Some goes into Oloroso sherry casks. The three are blended before bottling.
 
-So this is the same arrangement as Maker's Mark and Laphroaig. One company owns both ends and ships its own used barrels across the Atlantic. Press reports say most of those barrels held Jack Daniel's. The company only says Tennessee whiskey and bourbon.
+This is the same arrangement as Maker's Mark and Laphroaig. One company owns the American distillery and the one abroad, and ships its own used barrels across the Atlantic. Press reports say most of those barrels held Jack Daniel's. The company only says Tennessee whiskey and bourbon.
 
 Taste it next to the Laphroaig. There is no peat here, so the sweet side of American oak is easier to find. You may also get some dried fruit from the sherry casks.
 
 ## [SLIDE 14] Glenmorangie buys the tree and lends the barrel
 
-Glenmorangie does it the other way round. It is a distillery in Tain, in the north of Scotland, and it wanted more control over its barrels.
+Glenmorangie is a distillery in Tain, in the north of Scotland.
 
 This is how the company describes it. It picks its own oak in the Ozark Mountains of Missouri. The staves are dried in the open air for about two years. The barrels are built to its order. Then it lends the new barrels to an American distiller, who fills them with bourbon or Tennessee whiskey for about four years. Jack Daniel's and Heaven Hill are the two usually named. After that the barrels are shipped to Scotland.
 
@@ -151,7 +157,9 @@ So the barrel is built for the Scotch, and the American whiskey is there mostly 
 
 ## [SLIDE 15] Pour 4 of 4: Glenmorangie The Original 12
 
-Last pour. This is Glenmorangie The Original, at 40 percent. For about sixty years it was a 10-year-old. In 2024 the company changed it to a 12-year-old. The company says it is aged in bourbon casks.
+_Pour glass 4 now._
+
+This is Glenmorangie The Original, at 40 percent. For about sixty years it was a 10-year-old. In 2024 the company changed it to a 12-year-old. The company says it is aged in bourbon casks.
 
 There is no peat in it and it is light, so it's a good one for tasting what a used bourbon barrel does. Look for vanilla, and for coconut. The coconut is the oak lactones.
 
@@ -159,9 +167,7 @@ When you've finished, go back to the Maker's Mark and taste the two side by side
 
 ## [SLIDE 16] Reading the wood on a label
 
-This is what a label can tell you about the barrel.
-
-"Bourbon" and "straight bourbon" mean new charred oak and no added color. That is the law. So in a bourbon, the color comes from the wood.
+"Bourbon" and "straight bourbon" mean new charred oak and no added color, by law. So in a bourbon, the color comes from the wood.
 
 "Ex-bourbon", "first fill" and "refill" on a Scotch or Irish label mean the cask was used before, and how many times. The producer doesn't have to print them.
 

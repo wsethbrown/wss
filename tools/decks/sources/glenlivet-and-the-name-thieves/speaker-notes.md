@@ -83,7 +83,9 @@ Welcome. Tonight is about the word Glenlivet and a court case over who could put
 
 Glenlivet is a place. It is the valley of a small river called the Livet, in Speyside. From 1824 a family called Smith ran a distillery there. In the 1880s they took legal action to stop other distilleries calling their whisky Glenlivet. The Smiths thought those distilleries were stealing the name, and that is the title of tonight's deck.
 
-The Smiths did not win. We'll get to what happened, and we'll taste The Glenlivet next to three of the whiskies they were trying to stop.
+The Smiths did not win. The case was settled in 1884, and the other distilleries were allowed to keep the word as long as it came after their own name.
+
+Tonight's four whiskies are The Glenlivet and three from distilleries that used the word after their own names.
 
 ## [SLIDE 2] Pour 1 of 4: The Glenlivet 12
 
@@ -134,7 +136,7 @@ They kept running that notice for years. It was still being printed in a Bombay 
 
 In 1881 John Gordon Smith wrote down what he was angry about. He said merchants were buying cheaper whisky from other distilleries and selling it to customers as Glenlivet. He named two of those distilleries: Glenfarclas and Cragganmore.
 
-Both were legal, licensed distilleries a few miles from his. Glenfarclas is the next glass.
+Both were legal, licensed distilleries a few miles from his.
 
 ## [SLIDE 8] Pour 2 of 4: Glenfarclas 12
 
@@ -158,15 +160,11 @@ The case went on for two years. In 1884 the two sides settled out of court. No j
 
 ## [SLIDE 10] What the 1884 settlement gave each side
 
-This is what the two sides agreed.
-
 Smith kept his trade mark. From then on, only his whisky could be called The Glenlivet.
 
 The other distilleries could use the word Glenlivet as long as it came after their own name. One account lists ten of them: Glenlossie, Macallan, Aberlour, Benrinnes, Cragganmore, Linkwood, Glenrothes, Glen Grant, Mortlach and Glenfarclas. Merchants could still sell "blended Glenlivet". Usher had to change his label to say his whisky was a blend of Glenlivet and other whiskies.
 
 Smith and Usher also paid £3,000 of the other side's legal costs. Their own costs were up to £15,000.
-
-So the Smiths called the others name thieves, and then signed an agreement that let them keep using the name.
 
 > **IF SOMEONE ASKS**
 > The hyphen, as in "Aberlour-Glenlivet", came later. The settlement only said the word could follow the distillery's name. The cost figures also differ between sources. One gives £30,000.
@@ -203,7 +201,7 @@ _Ask: "Is this the lightest of the four?"_
 
 ## [SLIDE 14] Miles from The Glenlivet, in a straight line
 
-This slide shows how far each of tonight's distilleries is from The Glenlivet in a straight line. Glenfarclas is about six miles away. Aberlour is about nine and a half. Glen Moray is about twenty-one.
+These are straight-line distances from The Glenlivet. Glenfarclas is about six miles away. Aberlour is about nine and a half. Glen Moray is about twenty-one.
 
 None of those three is in Glenlivet. Under the settlement that did not matter, as long as their own name came first.
 
@@ -211,7 +209,7 @@ None of those three is in Glenlivet. Under the settlement that did not matter, a
 
 By the 1980s, 28 distilleries were using Glenlivet in their name. Most have stopped. Macallan dropped it, and Aberlour's company changed its name in 2007.
 
-You can still find it in a few places. Glen Moray and Tomintoul both have companies registered with Glenlivet in the name. The independent bottler Cadenhead's was still printing names like Linkwood-Glenlivet on its labels in 2022.
+It is still in use in a few places. Glen Moray and Tomintoul both have companies registered with Glenlivet in the name. The independent bottler Cadenhead's was still printing names like Linkwood-Glenlivet on its labels in 2022.
 
 _Ask: "Now that you've had all four, which one would you buy?"_
 

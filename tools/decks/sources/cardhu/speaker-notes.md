@@ -79,7 +79,7 @@ Welcome, and thanks for coming.
 
 Tonight is about one Speyside distillery. It is called Cardhu now. For most of its history it was called Cardow. The two best-known people in its story are Helen Cumming and her daughter-in-law, Elizabeth Cumming. In 1893 the family sold it to John Walker & Sons, the company that makes Johnnie Walker. It was the first distillery that company owned.
 
-We have four whiskies tonight, and we'll pour them as we go.
+We have four whiskies tonight.
 
 ## [SLIDE 2] Glass 1: Cardhu 12 Year Old
 
@@ -87,7 +87,7 @@ _Pour glass 1 now if it is not already poured. Keep talking while you pour._
 
 This is Cardhu 12. It is a single malt, so all of it was made at Cardhu. It is bottled at 40 percent.
 
-Diageo owns Cardhu and Johnnie Walker, and it says Cardhu is one of the main malts in Johnnie Walker. We'll taste a Johnnie Walker later. For now, taste this by itself.
+Diageo owns Cardhu and Johnnie Walker, and it says Cardhu is one of the main malts in Johnnie Walker.
 
 _Ask: "What do you taste first? Is there any smoke in it?"_
 
@@ -101,7 +101,7 @@ The distillery counts 1811 as the year it started. It names John and Helen as it
 
 ## [SLIDE 4] The stories told about Helen Cumming
 
-The distillery tells three stories about Helen. They come from the family and the distillery, and there is no written record from the time. I'll tell them as stories.
+The distillery tells three stories about Helen. They come from the family and the distillery, and there is no written record from the time.
 
 In the first one, Helen hears that the excise officers are coming. They were the tax men who looked for illegal stills. She hides the still, rubs flour on her arms and tells them she has been baking.
 
@@ -173,7 +173,7 @@ Elizabeth died suddenly the next May. She was 67. A local newspaper called her "
 
 Today Diageo owns both Cardhu and Johnnie Walker. In 2019 it called Cardhu "a key single malt in Johnnie Walker today". It named Cardhu as one of four distilleries that are homes of Johnnie Walker. The other three are Glenkinchie, Caol Ila and Clynelish.
 
-Diageo does not publish the recipe for any of its blends. Whisky guides say Black Label has Cardhu in it, along with Caol Ila, Clynelish, Lagavulin and Talisker. Black Label also has a lot of grain whisky in it. So Cardhu is one of many whiskies in the next glass, and nobody outside the company knows how much.
+Diageo does not publish the recipe for any of its blends. Whisky guides say Black Label has Cardhu in it, along with Caol Ila, Clynelish, Lagavulin and Talisker. Black Label also has a lot of grain whisky in it. So Cardhu is one of many whiskies in Black Label, and nobody outside the company knows how much.
 
 ## [SLIDE 12] Glass 3: Johnnie Walker Black Label
 
@@ -202,7 +202,7 @@ New rules for Scotch whisky came into force on 23 November 2009.
 
 A whisky made from the single malts of more than one distillery now has to be called a blended malt. Nobody can use the words "pure malt" on Scotch. And a distillery's name can only be used as a brand if all the whisky in the bottle was made at that distillery. Cardhu is on the list of distillery names the rule covers.
 
-The rules do not mention what happened in 2003.
+The rules came six years after the row over Cardhu Pure Malt. They do not mention it, and the work on the definitions had other causes as well.
 
 ## [SLIDE 15] Glass 4: Johnnie Walker Green Label
 

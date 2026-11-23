@@ -108,7 +108,7 @@ text(s, X + 0.35, 2.85, 5.85, 1.5,
      '“Lord Conyngham, the Chamberlain, was looking everywhere for pure Glenlivet whisky; '
      'the King drank nothing else.”', size=20, italic=True, color=INK, ls=1.2)
 text(s, X + 0.35, 4.3, 5.85, 0.7,
-     ['Elizabeth Grant of Rothiemurchus, on George IV’s visit', 'to Edinburgh. Memoirs of a Highland Lady, 1898.'],
+     'Elizabeth Grant of Rothiemurchus, Memoirs of a Highland Lady, 1898. She is writing about George IV’s visit to Edinburgh in 1822.',
      size=13, font=SANS, color=MUTE, ls=1.1)
 text(s, X, 5.4, 6.55, 0.9, ['Her family’s whisky was contraband. George Smith’s', 'distillery did not exist until 1824.'],
      size=18, color=INK, ls=1.2)
@@ -172,7 +172,7 @@ rect(s, X + 0.4, 2.4, 0.9, 0.045, fill=MARK_DEEP)
 text(s, X + 0.4, 2.65, CW - 0.8, 1.9,
      'Dealers were selling “lower priced Whiskies of a different character” bought as '
      '“Glenfarclas Glenlivet or Cragganmore Glenlivet”.', size=26, italic=True, color=INK, ls=1.2)
-text(s, X, 5.15, CW, 0.5, 'Smith’s written statement of his intention to take legal action, as quoted by ScotchWhisky.com.',
+text(s, X, 5.15, CW, 0.5, 'John Gordon Smith, 1881. Source: ScotchWhisky.com.',
      size=16, italic=True, color=MUTE)
 footer(s, 7)
 
@@ -243,13 +243,13 @@ for cx, label, rows in [
 text(s, X, 5.55, CW, 0.4, 'Advertisements in Slater’s Royal National Commercial Directory of Scotland, 1900.',
      size=14, italic=True, color=MUTE)
 rrect(s, X, 6.0, CW, 0.7, r=0.2, fill=W100)
-text(s, X + 0.3, 6.0, CW - 0.6, 0.7, 'The trade’s joke: Glenlivet, the longest glen in Scotland.',
+text(s, X + 0.3, 6.0, CW - 0.6, 0.7, 'People in the trade joked that Glenlivet was the longest glen in Scotland.',
      size=19, color=INK, anchor=MSO_ANCHOR.MIDDLE)
 footer(s, 12)
 
 # ---------------------------------------------------------------- 13 pour 4
 pour_slide(13, 'Pour 4 of 4', 'Glen Moray 12',
-           ['Built at Elgin in 1897, after the settlement.', 'It took the suffix anyway.',
+           ['Built at Elgin in 1897, after the settlement.', 'By 1900 it was Glen Moray-Glenlivet.',
             'Still registered: Glen Moray-Glenlivet Distillery Co.'],
            'Glen Moray, Elgin', 'Speyside single malt, 12 years', '40%',
            'glenmoray.jpg',
@@ -291,4 +291,4 @@ rows_card(s, X, 1.95, CW, [
 footer(s, 15)
 
 # ---------------------------------------------------------------- 16 Sláinte
-slainte_slide('To George Smith and his son, who fought for the name, and to their neighbours, who kept it.')
+slainte_slide('To the Smiths and to their neighbours.')

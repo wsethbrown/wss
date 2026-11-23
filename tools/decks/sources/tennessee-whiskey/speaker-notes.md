@@ -20,9 +20,9 @@ Tennessee whiskey and Nearest Green. Four pours, 19 slides, about 45 minutes.
 
 Thanks for coming. Tonight is Tennessee whiskey. In practice that means Jack Daniel's, George Dickel and a few newer names.
 
-Tennessee whiskey is made like bourbon, with one extra step. The new spirit is run through charcoal before it goes into the barrel. We'll start with that.
+Tennessee whiskey is made like bourbon, with one extra step. The new spirit is run through charcoal before it goes into the barrel.
 
-We'll also talk about a man called Nathan Green, who was known as Nearest Green. He was enslaved. He ran a still near Lynchburg, and he taught Jack Daniel to make whiskey. For a long time the company left him out of its history. Not much about him was written down, so I'll tell you which parts are well supported and which are not.
+Nathan Green, who was known as Nearest Green, was enslaved. He ran a still near Lynchburg, and he taught Jack Daniel to make whiskey. For a long time the company left him out of its history. Not much about him was written down. Some parts of his story are well supported and some are not.
 
 ## [SLIDE 2] Maple charcoal, between the still and the barrel
 
@@ -38,7 +38,7 @@ The trade calls this the Lincoln County Process. Lynchburg is in Moore County, a
 
 The charcoal takes out some of the oils and heavier flavors in the new spirit. Spirit that has been through the charcoal tastes cleaner and a little sweeter than it did before.
 
-People disagree about how much of that difference is left after four or more years in a barrel. The Tennessee distilleries say a lot. Some Kentucky distillers say not much. Two of tonight's pours are here so you can compare for yourselves.
+People disagree about how much of that difference is left after four or more years in a barrel. The Tennessee distilleries say a lot. Some Kentucky distillers say not much. Two of tonight's whiskeys are the same proof: George Dickel, which goes through the charcoal, and Buffalo Trace, a Kentucky bourbon that does not.
 
 Nobody knows who did it first. Some people credit a distiller called Alfred Eaton in the 1820s. Others say enslaved Africans brought the method with them. There is no good evidence for either story.
 
@@ -66,19 +66,21 @@ Slavery ended in 1865. Green stayed and worked for Daniel as a free man. When Da
 
 Two of Green's sons, George and Eli, worked for Daniel too, and so did his grandsons. The family and the company say seven generations of Green's descendants have worked at the distillery.
 
-This photograph shows Jack Daniel in the white hat with some of his workers. We don't know when it was taken. You will see it online captioned as Nearest Green, but no photograph of him is known to exist. Jack Daniel's says it has reason to believe the man on the left is his son George.
+This photograph shows Jack Daniel in the white hat with some of his workers. We don't know when it was taken. It is captioned online as Nearest Green, but no photograph of him is known to exist. Jack Daniel's says it has reason to believe the man on the left is his son George.
 
 ## [SLIDE 7] Pour 1 of 4: Jack Daniel's Old No. 7
 
-Let's pour the first one. This is the standard Jack Daniel's, with the black label, at 80 proof. It is called Old No. 7. There are several stories about where that name came from, and nobody knows which is true.
+_Pour glass 1 now._
+
+This is the standard Jack Daniel's, with the black label, at 80 proof. It is called Old No. 7. There are several stories about where that name came from, and nobody knows which is true.
 
 Before you think about flavor, notice how thick or thin it feels in your mouth. The charcoal is meant to make the whiskey lighter.
 
 ## [SLIDE 8] 1910: Tennessee bans making whiskey, ten years before the rest of the country.
 
-Tennessee banned alcohol early. In 1909 the legislature passed two laws. One banned the sale of liquor in nearly the whole state. The other banned making it, starting in 1910. The governor, Malcolm Patterson, vetoed both. The legislature passed them again over his veto.
+In 1908 Edward Carmack was shot dead in the street in Nashville. Carmack was a politician and newspaper editor who campaigned for prohibition. The man who shot him was Robin Cooper, whose father was an ally of the governor, Malcolm Patterson. Father and son were both convicted of murder, and Patterson pardoned the father. That turned a lot of people towards prohibition.
 
-A killing helped the laws through. In 1908 Edward Carmack was shot dead in the street in Nashville. Carmack was a politician and newspaper editor who campaigned for prohibition. The man who shot him was Robin Cooper, whose father was an ally of Governor Patterson. Father and son were both convicted of murder, and Patterson pardoned the father. That turned a lot of people towards prohibition.
+In 1909 the legislature passed two laws. One banned the sale of liquor in nearly the whole state. The other banned making it, starting in 1910. Patterson vetoed both. The legislature passed them again over his veto.
 
 ## [SLIDE 9] Lynchburg from 1907 to 1938
 
@@ -92,7 +94,7 @@ Moore County is still a dry county. The distillery can sell bottles there only b
 
 ## [SLIDE 10] George Dickel, a Nashville merchant
 
-The other old name in Tennessee whiskey is George Dickel. He was born in Germany and ran a wholesale liquor business in Nashville. He was a merchant, not a distiller. In 1888 his firm bought into the Cascade distillery near Tullahoma and became the only company that sold its whisky.
+The other old name in Tennessee whiskey is George Dickel. He was born in Germany and ran a wholesale liquor business in Nashville. He sold whisky and did not distill it. In 1888 his firm bought into the Cascade distillery near Tullahoma and became the only company that sold its whisky.
 
 Dickel died in 1894. When Tennessee banned distilling, Cascade whisky was made in Louisville, Kentucky, until Prohibition stopped it there too. It came back to Tennessee when a company called Schenley built a new distillery near the old site. That distillery first ran in 1959.
 
@@ -100,7 +102,9 @@ Dickel chills the spirit before it goes through the charcoal. The company says G
 
 ## [SLIDE 11] Pour 2 of 4: George Dickel Signature Recipe
 
-Second pour. This is George Dickel Signature Recipe. Until recently it was called No. 12, and the whisky has not changed. It is made at Cascade Hollow, which Diageo owns.
+_Pour glass 2 now._
+
+This is George Dickel Signature Recipe. Until recently it was called No. 12, and the whisky has not changed. It is made at Cascade Hollow, which Diageo owns.
 
 It goes through maple charcoal like the Jack Daniel's. But it comes from a different distillery with a different recipe, it is chilled before the charcoal, and it is 90 proof where the Jack Daniel's is 80. Taste the two side by side. See if one is sweeter or feels heavier.
 
@@ -126,21 +130,21 @@ Jack Daniel's does not put "bourbon" on its label. The company has said the char
 
 ## [SLIDE 14] Pour 3 of 4: Buffalo Trace
 
-Third pour. This one is from Kentucky. It is Buffalo Trace, from the Buffalo Trace distillery in Frankfort.
+_Pour glass 3 now._
+
+This one is from Kentucky. It is Buffalo Trace, from the Buffalo Trace distillery in Frankfort.
 
 It is a bourbon, and it does not go through charcoal before the barrel. It is 90 proof, the same as the Dickel, and that is why I picked it. Taste them one after the other. See if you can taste what the charcoal does.
 
 ## [SLIDE 15] 2016: The New York Times reports on Nearest Green, June 2016
 
-Back to Nearest Green. His name was never completely lost. It is in the 1967 biography, and people in Lynchburg knew about him. But for most of the twentieth century the company told its story through Jack Daniel and Lem Motlow. Green was not in the tours or the advertising.
+Nearest Green's name was never completely lost. It is in the 1967 biography, and people in Lynchburg knew about him. But for most of the twentieth century the company told its story through Jack Daniel and Lem Motlow. Green was not in the tours or the advertising.
 
 In 2016 Jack Daniel's celebrated 150 years, counting from 1866. As part of that, the company offered Green's story to the press. The New York Times ran it on the front page on the 25th of June 2016, and it got a lot of attention.
 
 One person who read it was Fawn Weaver, a writer and businesswoman. She started researching Green's life and his family, and she set up a foundation in his name. A lot of what people now say about Green comes from her research. Jack Daniel's now calls Green its first master distiller.
 
 ## [SLIDE 16] What is known about Nearest Green
-
-People often tell Green's story as if all of it were certain. It isn't, so here is where things stand.
 
 Three things are well supported. Green was enslaved. He worked a still near Lynchburg. And he taught the young Jack Daniel. That is in the 1967 biography, people in Lynchburg remembered it, and the company accepts it. A few people doubt even that, because no record from the time shows Green working as a distiller for Call or Daniel.
 
@@ -150,15 +154,19 @@ Most of the recent research was done by Fawn Weaver. She went on to found a whis
 
 ## [SLIDE 17] Pour 4 of 4: Jack Daniel's Bonded
 
-Last pour. You might have expected Uncle Nearest here, from Weaver's company. I left it out. In August 2025 a court put the company in the hands of a receiver, after its lender sued over more than 100 million dollars in loans. The receiver is trying to sell it, and nobody knows what will be on the shelf after that.
+_Pour glass 4 now._
 
-So we go back to Jack Daniel's, the distillery that now calls Green its first master distiller. This is Jack Daniel's Bonded. "Bottled in bond" means the whiskey was made at one distillery in one season, aged at least four years in a warehouse supervised by the government, and bottled at exactly 100 proof. It is the strongest of the four. Taste it neat, then add a few drops of water. Then compare it with the first pour.
+Uncle Nearest, the whiskey from Weaver's company, is not one of tonight's pours. In August 2025 a court put the company in the hands of a receiver, after its lender sued over more than 100 million dollars in loans. The receiver is trying to sell it, and nobody knows what will be on the shelf after that.
 
-When you're done, go back over all four. I'll ask for a show of hands on which one you'd buy.
+The last pour is from Jack Daniel's, the distillery that now calls Green its first master distiller. This is Jack Daniel's Bonded. "Bottled in bond" means the whiskey was made at one distillery in one season, aged at least four years in a warehouse supervised by the government, and bottled at exactly 100 proof. It is the strongest of the four. Taste it neat, then add a few drops of water. Then compare it with the first pour.
+
+When you're done, go back over all four.
+
+_Ask for a show of hands: "Which one would you buy?"_
 
 ## [SLIDE 18] Reading a Tennessee whiskey label
 
-One more slide. This is what the words on a Tennessee whiskey label mean.
+This is what the words on a Tennessee whiskey label mean.
 
 "Tennessee whiskey" has been defined by state law since 2013. It follows the rules for bourbon, it is made in Tennessee, and it goes through maple charcoal before the barrel.
 

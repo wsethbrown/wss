@@ -88,7 +88,7 @@ text(s, X, 2.6, 6.4, 1.4, ['Bourbon Barrels', 'Around the World'], size=48, font
 rect(s, X + 0.03, 4.12, 0.9, 0.045, fill=MARK)
 text(s, X, 4.35, 6.2, 0.45, 'Four pours', size=17, font=SANS, bold=True, color=CREAM)
 text(s, X, 4.95, 5.9, 1.5,
-     ['Why most of the world’s whisky is aged', 'in barrels that held bourbon first.'],
+     ['Why most Scotch whisky is aged', 'in barrels that held bourbon first.'],
      size=20, italic=True, color=CREAM_MUTE, ls=1.2)
 tw = 5.13
 th = tw * 1254 / 1104

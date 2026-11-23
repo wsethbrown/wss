@@ -97,7 +97,7 @@ rows_card(s, X, 2.3, CW, [
 rrect(s, X, 5.5, CW, 0.9, r=0.2, fill=W100)
 text(s, X + 0.3, 5.5, CW - 0.6, 0.9,
      [[('“A wild and desolate district.”  ', {'italic': True}),
-       ('Alfred Barnard, on the road to Cardow, 1887', {'font': SANS, 'size': 15, 'color': MUTE})]],
+       ('Alfred Barnard, 1887', {'font': SANS, 'size': 15, 'color': MUTE})]],
      size=21, color=INK, anchor=MSO_ANCHOR.MIDDLE)
 footer(s, 3)
 
@@ -135,7 +135,7 @@ rect(s, X + 0.03, 2.5, 1.2, 0.045, fill=MARK)
 text(s, X, 2.75, 11.0, 0.8, 'Elizabeth Cumming takes over Cardow.', size=32, font=SANS,
      bold=True, color=CREAM, ls=0.95)
 text(s, X, 3.75, 10.5, 2.6, [
-    'Lewis Cumming’s widow, 24 years younger than him and a local farmer’s daughter.',
+    'She was Lewis Cumming’s widow, a local farmer’s daughter, 24 years younger than him.',
     'She was pregnant with her fourth child. Their five-year-old daughter died three days after her father.',
     [('Barnard later names her only as “Mrs. Cumming, the proprietress”.', {'color': CREAM_MUTE})],
 ], size=20, color=CREAM, ls=1.2, space_after=12)
@@ -174,7 +174,7 @@ footer(s, 8)
 
 # ---------------------------------------------------------------- 9 pour 2
 pour_slide(9, 'Glass 2 of 4', 'Glenfiddich 12 Year Old',
-           ['Started by William Grant with Cardow’s old stills.',
+           ['William Grant started Glenfiddich with Cardow’s old stills.',
             'Glass 1 and this one are both 12 years old.'],
            'Glenfiddich, Dufftown', 'Speyside single malt, 12 years', '40%')
 
@@ -225,7 +225,7 @@ footer(s, 11)
 
 # ---------------------------------------------------------------- 12 pour 3
 pour_slide(12, 'Glass 3 of 4', ['Johnnie Walker', 'Black Label'],
-           ['The firm that bought Cardow in 1893.'],
+           ['John Walker & Sons bought Cardow in 1893.'],
            'John Walker & Sons', 'Blended Scotch, 12 years', '40%', two_line_name=True)
 
 # ---------------------------------------------------------------- 13 2003
@@ -258,7 +258,7 @@ footer(s, 14)
 
 # ---------------------------------------------------------------- 15 pour 4
 pour_slide(15, 'Glass 4 of 4', ['Johnnie Walker', 'Green Label'],
-           ['A blended malt, the kind of whisky Cardhu Pure Malt was.', 'Sold as Johnnie Walker Pure Malt until 2004.'],
+           ['A blended malt. Cardhu Pure Malt was the same kind of whisky.', 'Sold as Johnnie Walker Pure Malt until 2004.'],
            'John Walker & Sons', 'Blended malt, 15 years', '43%', two_line_name=True)
 
 # ---------------------------------------------------------------- 16 Sláinte

@@ -18,9 +18,9 @@ The Old Fashioned, the Manhattan and the Sazerac. Four drinks, 18 slides, about 
 
 ## [SLIDE 1] Whiskey Cocktails
 
-Thanks for coming. Tonight is a Cocktails Chapter night. We are not pouring four whiskeys neat. We are going to make four drinks and taste them. They are the plain whiskey cocktail, the Old Fashioned, the Manhattan and the Sazerac.
+Thanks for coming. Tonight is a Cocktails Chapter night. We are going to make four drinks and taste them: the plain whiskey cocktail, the Old Fashioned, the Manhattan and the Sazerac.
 
-We'll make them in the order they first appeared in print, from 1806 to about 1900. For each one I'll tell you what we know about where it came from. Some of the best-known stories about them are not true.
+They are in the order they first appeared in print, from 1806 to about 1900. Some of the best-known stories about where these drinks came from are not true.
 
 ## [SLIDE 2] The first printed definition, 1806
 
@@ -46,7 +46,7 @@ Let's make the first one. This is as close to the 1806 drink as we can get.
 
 **Recipe:** put 1 sugar cube (or 1 teaspoon of white sugar) in a small tumbler with ¼ oz of water and 2 dashes of Angostura bitters. Stir or crush until the sugar has dissolved. Add 2 oz of Old Overholt Rye and stir. No ice, no garnish.
 
-Taste it at room temperature first. Then drop in one ice cube and taste it again a minute later. The next recipe we look at, from 1862, has ice in it.
+Taste it at room temperature first. Then drop in one ice cube and taste it again a minute later.
 
 Two things in this glass are newer than 1806. Angostura bitters went on sale in Venezuela in 1824, as a stomach medicine. And Old Overholt is a four-year-old straight rye at 86 proof, which is much older than most whiskey was in 1806. Abraham Overholt started making rye to sell at West Overton, Pennsylvania, in 1810. Beam makes Old Overholt in Kentucky now.
 
@@ -62,15 +62,15 @@ Compare that with 1806. He uses syrup where the 1806 drink had loose sugar, beca
 
 The 1876 edition of Thomas's book adds an "Improved Whiskey Cocktail". It has two dashes of maraschino liqueur and one of absinthe.
 
-Not everybody wanted the extras. In February 1880 the Chicago Tribune mentions "old-fashioned" cocktails. In 1882 a Chicago bartender told the same paper that old-fashioned cocktails were in fashion. He said they were made with whiskey, and that rye was more popular than bourbon. "Old-fashioned" meant the plain recipe, with sugar, bitters, whiskey and peel and nothing else. In 1895 a New York bartender, George Kappeler, printed a recipe for an Old-Fashioned Whiskey Cocktail. It is a small lump of sugar dissolved in a little water, Angostura bitters, ice, a piece of lemon peel and whiskey.
+In February 1880 the Chicago Tribune mentions "old-fashioned" cocktails. In 1882 a Chicago bartender told the same paper that old-fashioned cocktails were in fashion. He said they were made with whiskey, and that rye was more popular than bourbon. "Old-fashioned" meant the plain recipe, with sugar, bitters, whiskey and peel and nothing else. In 1895 a New York bartender, George Kappeler, printed a recipe for an Old-Fashioned Whiskey Cocktail. It is a small lump of sugar dissolved in a little water, Angostura bitters, ice, a piece of lemon peel and whiskey.
 
 The whiskey had changed by then too. In Kentucky it had become normal to age bourbon for several years in charred barrels. Some of it was sold in sealed bottles with a brand name on them. Brown-Forman says its Old Forester was the first bourbon sold only in sealed bottles, starting in 1870.
 
 ## [SLIDE 7] The Pendennis Club claim is weak.
 
-You will often hear that the Old Fashioned was invented at the Pendennis Club in Louisville. The Pendennis is a gentlemen's club that was founded in 1881. The story is that a bartender there made the drink for Colonel James E. Pepper, who was a bourbon distiller. Pepper then took it to the bar of the Waldorf hotel in New York.
+A common story is that the Old Fashioned was invented at the Pendennis Club in Louisville. The Pendennis is a gentlemen's club that was founded in 1881. The story is that a bartender there made the drink for Colonel James E. Pepper, who was a bourbon distiller. Pepper then took it to the bar of the Waldorf hotel in New York.
 
-That story first appears in a book about the Waldorf bar from 1931, and even that book only says the drink "was said to have been" invented at the Pendennis. The Chicago paper was writing about old-fashioned cocktails in 1880, a year before the club was founded. And the drink is the 1806 cocktail with ice in it. The club may well have made a good one. There is no evidence it made the first one.
+That story first appears in a book about the Waldorf bar from 1931, and even that book only says the drink "was said to have been" invented at the Pendennis. The Chicago paper was writing about old-fashioned cocktails in 1880, a year before the club was founded. And the drink is the 1806 cocktail with ice in it. There is no evidence the club made the first one.
 
 ## [SLIDE 8] Pour 2 of 4: Old Fashioned
 
@@ -78,7 +78,7 @@ Second drink. I've used Old Forester because it is a Louisville bourbon, from th
 
 **Recipe:** in a rocks glass, dissolve 1 sugar cube (or ¼ oz simple syrup) in a barspoon of water with 2 dashes of Angostura bitters. Add 2 oz of Old Forester 86 Proof and one large piece of ice, or a few cubes. Stir for about twenty seconds. Cut a strip of orange peel, twist it over the glass so the oil goes on the surface, and drop it in.
 
-No muddled fruit and no cherry. I'll come back to those on slide 15.
+No muddled fruit and no cherry. An orange slice and a cherry first show up in Old Fashioned recipes in 1933.
 
 Taste it next to the first one. This one is cold, it has more water in it from the ice, and it is made with bourbon where the first was made with rye.
 
@@ -92,7 +92,7 @@ The whiskey was usually rye. For most of the 1800s the East Coast drank rye from
 
 ## [SLIDE 10] The Jennie Jerome story is wrong.
 
-The story you will hear most often is that the Manhattan was invented for a party at the Manhattan Club in New York in late 1874. The party is supposed to have been given by Jennie Jerome. She was a New Yorker who had married Lord Randolph Churchill in Paris that April. The party was to celebrate Samuel Tilden being elected governor of New York.
+The most common story is that the Manhattan was invented for a party at the Manhattan Club in New York in late 1874. The party is supposed to have been given by Jennie Jerome. She was a New Yorker who had married Lord Randolph Churchill in Paris that April. The party was to celebrate Samuel Tilden being elected governor of New York.
 
 The dates don't work. Tilden was elected on the 3rd of November 1874. Jennie Jerome was in England, and on the 30th of November she gave birth to Winston Churchill at Blenheim Palace. She was not giving a party in New York that month.
 
@@ -114,7 +114,7 @@ On the same street was a bar called the Merchants Exchange Coffee House, with a 
 
 The Sazerac cocktail is first named in print in 1899.
 
-You will sometimes hear that Peychaud invented the cocktail. The story is that he served brandy in egg cups, that the French for egg cup is "coquetier", and that "coquetier" turned into "cocktail". It isn't true. The word was in print in New Hampshire and New York years before Peychaud was selling bitters.
+Another story is that Peychaud invented the cocktail. The story is that he served brandy in egg cups, that the French for egg cup is "coquetier", and that "coquetier" turned into "cocktail". It isn't true. The word was in print in New Hampshire and New York years before Peychaud was selling bitters.
 
 ## [SLIDE 13] Cognac or rye: the printed record starts with whiskey.
 
@@ -136,19 +136,17 @@ Smell it before you drink it. You should smell the absinthe more than you taste 
 
 Prohibition ran from January 1920 to December 1933. For those years most people drank whatever bootleggers sold. The photograph is New York in 1921. Agents are pouring seized liquor into a sewer after a raid.
 
-An orange slice and a cherry show up in Old Fashioned recipes in 1933. They are a garnish. They are not crushed into the drink. People usually say the fruit was there to cover the taste of bootleg liquor, but nobody has proved that. Crushing the fruit in the glass may only have started after the Second World War.
+An orange slice and a cherry show up in Old Fashioned recipes in 1933, as a garnish. People usually say the fruit was there to cover the taste of bootleg liquor, but nobody has proved that. Crushing the fruit in the glass may only have started after the Second World War.
 
 ## [SLIDE 16] The origin stories were written down later.
 
-Look at when tonight's stories were written down. The man called Black is from 1923. The Pendennis Club story is from 1931. The cognac Sazerac is from 1937. All three were written long after the drinks were first made. The recipes are older. Thomas printed his in 1862, Byron in 1884 and Kappeler in 1895, and the first Sazerac recipe is from 1908.
+Tonight's three origin stories were written down long after the drinks were first made. The man called Black is from 1923. The Pendennis Club story is from 1931. The cognac Sazerac is from 1937. The recipes are older. Thomas printed his in 1862, Byron in 1884 and Kappeler in 1895, and the first Sazerac recipe is from 1908.
 
 After Prohibition ended there was not much straight whiskey, so distillers stretched it by selling blends. Rye lost ground to bourbon. These drinks came back when bartenders started reading the old books again. In 2007 David Wondrich published a book called Imbibe!, which reprinted Jerry Thomas's recipes with the history behind them.
 
 ## [SLIDE 17] The four recipes, for home
 
 The plain whiskey cocktail is 2 oz of whiskey, a teaspoon of sugar, a splash of water and 2 dashes of Angostura. The Old Fashioned is the same drink stirred over ice, with orange peel. The Manhattan uses 1 oz of sweet vermouth where the others use sugar, and it is served with no ice. The Sazerac uses rye, Peychaud's bitters and a glass rinsed with absinthe, and you throw the lemon peel away.
-
-If you only remember one thing, a Manhattan is two parts rye to one part vermouth. Keep an open bottle of vermouth in the fridge. It is wine, and it goes off within a few weeks.
 
 ## [SLIDE 18] Sláinte.
 

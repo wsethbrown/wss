@@ -20,7 +20,7 @@ The Whiskey Share Society
 
 Thanks for coming. Tonight is about blended Scotch. Most of the Scotch ever drunk has been blended.
 
-Around 1830 Scotch was a local drink. By 1910 it was sold all over the world, and almost all of it was blended. A blend is malt whisky and grain whisky mixed. We'll taste a grain whisky, then a malt whisky, then two blends.
+Around 1830 Scotch was a local drink. By 1910 it was sold all over the world, and almost all of it was blended. A blend is malt whisky and grain whisky mixed. The four whiskies tonight are a grain whisky, a malt whisky and two blends.
 
 The painting on the slide is The Illicit Highland Whisky Still by Edwin Landseer, from 1829. The copper pot still is behind the girl on the right.
 
@@ -38,7 +38,7 @@ It's in the diagram. Steam goes in at the bottom of the left column, which is ca
 
 A pot still is filled, boiled and emptied, one batch at a time. A Coffey still keeps running as long as you keep feeding it. It makes a much stronger and lighter spirit, and it can use cheaper grains than malted barley.
 
-Coffey wasn't the first. Robert Stein, from a Lowland distilling family, had patented a continuous still a few years earlier, and his relatives the Haigs used it at Cameronbridge in Fife. Coffey's worked better and replaced it. The big Dublin distillers didn't want Coffey's still. The Scots did. The first Scottish distillery to put one in was Grange, in 1834.
+Coffey wasn't the first. Robert Stein, from a Lowland distilling family, had patented a continuous still a few years earlier, and his relatives the Haigs used it at Cameronbridge in Fife. Coffey's worked better and replaced it. The big Dublin distillers didn't want Coffey's still. The first Scottish distillery to put one in was Grange, in 1834.
 
 ## [SLIDE 4] Pour 1 of 4: Haig Club Clubman
 
@@ -56,11 +56,9 @@ By the 1840s Scotland was making two different drinks, and both were called whis
 
 Malt whisky was made the old way, from malted barley, in a pot still, in small batches. It had a lot of flavour and it varied a lot. Grain whisky was cheap and there was plenty of it. It was so light that it didn't sell well by itself as whisky. The big Lowland distillers had been sending their spirit to London since the 1770s, to be made into gin.
 
-The next step was to mix the two.
-
 ## [SLIDE 6] Andrew Usher vats Glenlivet, 1853
 
-Andrew Usher of Edinburgh usually gets the credit for that. The Ushers were the Edinburgh agents for Smith's Glenlivet. In 1853 the law changed to let a merchant mix whiskies from the same distillery before paying the tax on them. That year Usher started selling Old Vatted Glenlivet. Vatting meant mixing young and old casks from one distillery, so that every bottle tasted about the same.
+Andrew Usher of Edinburgh usually gets the credit for mixing malt whisky and grain whisky. The Ushers were the Edinburgh agents for Smith's Glenlivet. In 1853 the law changed to let a merchant mix whiskies from the same distillery before paying the tax on them. That year Usher started selling Old Vatted Glenlivet. Vatting meant mixing young and old casks from one distillery, so that every bottle tasted about the same.
 
 Now a customer could ask for a whisky by name and get the same thing twice. Later, when the law allowed it, Usher's firm started mixing grain whisky into the malt. People call him the father of blending for that. Other merchants were doing much the same at the time.
 
@@ -86,7 +84,7 @@ The Act also meant a blender could mix cheap grain whisky with expensive malt an
 
 ## [SLIDE 9] The first big blenders were grocers
 
-Grocers and wine merchants were already buying whisky by the cask. Four of the blends you know were started by them.
+Grocers and wine merchants were already buying whisky by the cask. Four of the first big blending firms were started by them.
 
 John Walker opened a grocery in Kilmarnock in 1820 and sold whisky along with everything else. His son Alexander built up the whisky side. James Chivas joined a grocery business on King Street in Aberdeen around 1838. The firm says it held a royal warrant to supply Queen Victoria from 1843. His brother John joined him in 1857. John Dewar set up as a wine and spirit merchant on the High Street in Perth in 1846. George Ballantine opened a grocer's in Edinburgh in 1827, and later a bigger shop in Glasgow.
 
@@ -142,7 +140,7 @@ _Ask: "Go back to the Clubman. Can you pick out the grain whisky in the Dewar's 
 
 ## [SLIDE 15] 1898: Pattisons of Leith fails
 
-The boom ended in 1898. Robert and Walter Pattison ran a blending firm in Leith. In the mid-1890s they grew it fast, sold shares in it, borrowed a lot and spent a lot on publicity. There's a story that they gave away hundreds of parrots trained to say "Drink Pattisons' Whisky". You'll hear it everywhere, but it may just be a story.
+The boom ended in 1898. Robert and Walter Pattison ran a blending firm in Leith. In the mid-1890s they grew it fast, sold shares in it, borrowed a lot and spent a lot on publicity. There's a story that they gave away hundreds of parrots trained to say "Drink Pattisons' Whisky". Nearly every account of the firm repeats it, but it may just be a story.
 
 The firm stopped paying its debts in December 1898. The brothers were arrested in April 1901 and tried in Edinburgh that July. Both were found guilty of fraud. Robert got eighteen months and Walter got nine.
 
@@ -160,7 +158,7 @@ The Commission didn't set a minimum age. That came in 1915, when a new law requi
 
 ## [SLIDE 17] Reading a Scotch label
 
-This is how to read a Scotch label today. The rules were set in 2009, and they still use the 1909 definition.
+The rules for Scotch labels were set in 2009, and they still use the 1909 definition.
 
 Single malt comes from one distillery and is made only from malted barley, in pot stills. Single grain comes from one distillery but can use other grains and column stills, like our first pour. Blended malt is single malts from more than one distillery, with no grain whisky. Blended Scotch is malt and grain whisky mixed, like the last two pours. An age statement gives the age of the youngest whisky in the bottle.
 

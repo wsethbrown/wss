@@ -18,15 +18,15 @@ Canadian whisky and the American market. Four pours, 18 slides, about 45 minutes
 
 ## [SLIDE 1] Canadian Whisky
 
-Tonight is Canadian whisky. In the US most people know it as the light, cheap whisky you mix with ginger ale. We'll look at where that idea came from and taste four bottles to see if it is fair.
+Tonight is Canadian whisky, and four bottles of it. In the US it has a name for being light and cheap, a whisky to mix with ginger ale.
 
 A lot of the whisky Americans drank was made in Ontario and Quebec. That happened twice, and both times the cause was American. The first was a war tax in the 1860s. The second was Prohibition in the 1920s.
 
-The photograph is Hiram Walker's distillery at Walkerville, seen from the Detroit River in the early 1900s. Partway through I'll explain how Canadian whisky is made, because it is made differently from bourbon and Scotch.
+The photograph is Hiram Walker's distillery at Walkerville, seen from the Detroit River in the early 1900s.
 
 ## [SLIDE 2] Five Ontario distillers, 1837 to 1864
 
-You still see these five names on Canadian bottles. Almost all of them started as millers. Ontario grew more wheat than it could sell, and a mill could turn the grain it had left over into whisky.
+These five names are still on Canadian bottles. Almost all of them started as millers. Ontario grew more wheat than it could sell, and a mill could turn the grain it had left over into whisky.
 
 The oldest is Gooderham & Worts in Toronto. William Gooderham and his brother-in-law James Worts built a windmill on the waterfront in 1832. In 1837 Gooderham added a distillery to use up spare and second-grade grain. By the 1870s it was one of the largest distilleries in the world.
 
@@ -36,7 +36,7 @@ The painting is Gooderham & Worts in about 1896. Those buildings are now Toronto
 
 ## [SLIDE 3] 1858: Hiram Walker, a Detroit grain merchant, starts distilling across the river
 
-Hiram Walker is the one who matters most tonight. He was an American, born in Massachusetts in 1816. He went into business in Detroit as a grocer and grain merchant. In 1856 he bought land on the Canadian side of the Detroit River and built a flour mill and a distillery. By 1858 he was selling flour and whisky.
+Hiram Walker was an American, born in Massachusetts in 1816. He went into business in Detroit as a grocer and grain merchant. In 1856 he bought land on the Canadian side of the Detroit River and built a flour mill and a distillery. By 1858 he was selling flour and whisky.
 
 He built a town around the distillery for his workers and called it Walkerville. It became part of Windsor in 1935.
 
@@ -54,9 +54,9 @@ _Pour glass 1 now._
 
 This is Canadian Club. It was Walker's brand, and it is still made by Hiram Walker & Sons in Windsor. Suntory owns the brand now. The 1858 on the label is the year Walker started.
 
-This is the kind of whisky most Americans think of when you say Canadian. Smell it first with nothing added and tell me what you get. Then add a splash of soda or water. A lot of Canadian Club has always been drunk with soda, so see how much of the flavour is still there.
+It is one of the big blends that have sold best in the US. Smell it first with nothing added and tell me what you get. Then add a splash of soda or water. A lot of Canadian Club has always been drunk with soda, so see how much of the flavour is still there.
 
-Canadian Club mixes its whiskies before they go into the barrel, and it always has. Most Canadian distillers do it the other way round and mix after ageing. The next few slides explain that.
+Canadian Club mixes its whiskies before they go into the barrel, and it always has. Most Canadian distillers do it the other way round and mix after ageing.
 
 ## [SLIDE 6] 1890: Canada requires two years in wood
 
@@ -68,11 +68,11 @@ A rule like this is easier for big distillers. They have the warehouses and the 
 
 ## [SLIDE 7] Each grain is distilled and aged on its own
 
-This is how Canadian whisky is made. A bourbon distillery mixes its grains first. It is mostly corn, with some rye or wheat and a little malted barley, and it is all distilled together.
+A bourbon distillery mixes its grains first. It is mostly corn, with some rye or wheat and a little malted barley, and it is all distilled together.
 
 Most Canadian distilleries keep the grains apart. Each grain is distilled on its own, often on a different still and to a different strength. Each one is aged on its own. The blender mixes them only when they are ready.
 
-So in Canada "blended" means whiskies mixed after ageing. In America a blended whiskey can have plain neutral spirit added to it. That is not what "blended" means here.
+So in Canada "blended" means whiskies mixed after ageing. In America a blended whiskey can have plain neutral spirit added to it.
 
 ## [SLIDE 8] Base whisky and flavouring whisky
 
@@ -96,7 +96,7 @@ People often say rye is spicy and grassy. Do you get that here?
 
 Prohibition started in the US in 1920.
 
-Canada had temperance laws too, but they were mostly set by the provinces and they were about selling drink to Canadians. Making whisky and exporting it stayed legal. If it ended up in the United States, that was against American law, not Canadian law.
+Canada had temperance laws too, but they were mostly set by the provinces and they were about selling drink to Canadians. Making whisky and exporting it stayed legal. Taking it into the United States broke American law. Exporting it broke no Canadian law.
 
 So the distilleries kept running. The papers for a shipment would name somewhere like Cuba or Mexico. Then a fast boat would take it across to Michigan in a few minutes. The Detroit River is narrow and has islands in it, and in winter it freezes.
 
@@ -157,8 +157,6 @@ He used the Canadian method. The rye, barley and corn are distilled separately, 
 Now go back to the one you liked best. Hands up if it was one of the light blends. Hands up for the rye.
 
 ## [SLIDE 17] Reading a Canadian whisky label
-
-This slide is what to look for on a Canadian bottle.
 
 Canadian whisky, Canadian rye whisky and rye whisky are the same thing in law. It has to be made and aged in Canada. It has to spend at least three years in small wooden barrels, and it has to be at least 40 percent alcohol.
 

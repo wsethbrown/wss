@@ -20,7 +20,7 @@ Western Pennsylvania, 1791 to 1794. Four pours, 18 slides, about 45 minutes.
 
 Thanks for coming. Tonight is about a tax on whiskey. In 1791 the new federal government taxed whiskey made in America, and a lot of people in western Pennsylvania refused to pay it.
 
-The story runs from 1791 to 1794. It ends with President Washington riding out with an army. No other sitting president has led troops in the field. After that we'll look at an old story that the rebels ran off to Kentucky and invented bourbon. It is probably not true.
+In 1794 President Washington rode out with an army to enforce the tax. No other sitting president has led troops in the field.
 
 ## [SLIDE 2] In 1790 the federal government took on the war debts.
 
@@ -48,7 +48,9 @@ Whiskey also kept, and people used it as money. Farmers paid debts, store bills 
 
 ## [SLIDE 5] Pour 1 of 4: Old Overholt Straight Rye
 
-First pour. This is Old Overholt, a straight rye.
+_Pour glass 1 now._
+
+This is Old Overholt, a straight rye.
 
 The Overholts were Mennonite farmers in Westmoreland County, one of the four counties in tonight's story. Abraham Overholt started distilling there, at West Overton, in 1810. Old Overholt became one of the best-known Pennsylvania ryes. Today it is made in Kentucky by Jim Beam. It is four years old and 86 proof.
 
@@ -96,7 +98,9 @@ The leading men of Pittsburgh went out to meet them. They agreed to throw out th
 
 ## [SLIDE 10] Pour 2 of 4: Pikesville Straight Rye
 
-Second pour. This is Pikesville, a straight rye. It was a Maryland brand, started in 1895 and named after a town outside Baltimore. Maryland and Pennsylvania were the two old rye states. Maryland also sent militia to the army you're about to hear about.
+_Pour glass 2 now._
+
+This is Pikesville, a straight rye. It was a Maryland brand, started in 1895 and named after a town outside Baltimore. Maryland and Pennsylvania were the two old rye states. In 1794 Maryland was one of the four states that sent militia to western Pennsylvania.
 
 Today Pikesville is made in Kentucky by Heaven Hill. It is 110 proof, which is strong. Take a small sip neat, then add water and try it again.
 
@@ -122,7 +126,7 @@ About twenty prisoners were marched to Philadelphia. They got there around Chris
 
 ## [SLIDE 13] 1802: Jefferson's Congress repeals the excise
 
-The government had shown it could enforce a federal law in a place where people did not want it. That mattered a lot to Hamilton.
+The government had shown it could enforce a federal law in a place where people did not want it.
 
 The rebellion also became a fight between the parties. Washington blamed the political clubs that supported Jefferson for stirring up the trouble. Jefferson's party had been against the whiskey tax from the beginning.
 
@@ -130,7 +134,9 @@ Jefferson became president in 1801. In April 1802 he signed a law that ended the
 
 ## [SLIDE 14] Pour 3 of 4: Michter's US*1 Straight Rye
 
-Third pour. This is Michter's straight rye. The name comes from an old distillery in Schaefferstown, in Lebanon County in eastern Pennsylvania. It was one of the last Pennsylvania rye distilleries, and it closed in 1989. In the 1990s a new company bought the name and started again in Kentucky. It distills in Louisville now.
+_Pour glass 3 now._
+
+This is Michter's straight rye. The name comes from an old distillery in Schaefferstown, in Lebanon County in eastern Pennsylvania. It was one of the last Pennsylvania rye distilleries, and it closed in 1989. In the 1990s a new company bought the name and started again in Kentucky. It distills in Louisville now.
 
 So all three of tonight's ryes have Pennsylvania or Maryland names, and all three are made in Kentucky. Rye was made in Pennsylvania and Maryland for more than a century after the rebellion. Prohibition, and the drop in rye drinking after it, ended that.
 
@@ -138,7 +144,7 @@ This is a single barrel rye at 84.8 proof. Taste it next to the other two. All t
 
 ## [SLIDE 15] The rebels and bourbon: a legend
 
-You will read in bourbon books and on some bottles that the whiskey rebels ran away to Kentucky to escape the tax, and invented bourbon there.
+Some bourbon books and some bottles say that the whiskey rebels ran away to Kentucky to escape the tax, and invented bourbon there.
 
 It probably did not happen that way. Kentucky had distillers in the 1780s, before there was a tax. Kentucky became a state in 1792, so the tax applied there as well. The distillers in Kentucky mostly refused to pay it too. Moving there did not get anyone out of the tax.
 
@@ -146,15 +152,17 @@ Bourbon County was created in 1785, when Kentucky was still part of Virginia. Th
 
 ## [SLIDE 16] Pour 4 of 4: Elijah Craig Small Batch
 
-The last pour is a bourbon. It is named after a man with a legend of his own.
+_Pour glass 4 now._
+
+The last pour is a bourbon, Elijah Craig Small Batch.
 
 Elijah Craig was a Baptist preacher. He was jailed in Virginia for preaching without a license, and later he moved to Kentucky. He ran several businesses there, and one of them was a distillery. In 1874, long after he died, a history of Kentucky said he made the first bourbon in 1789. Later people added that he was the first to char his barrels. There is no good evidence for either claim.
 
-This is Elijah Craig Small Batch, made by Heaven Hill, at 94 proof. Taste it after the ryes. It is sweeter, and that comes from the corn. Corn is the main difference between bourbon and the rye whiskey those Pennsylvania farmers made.
+It is made by Heaven Hill, at 94 proof. Taste it after the ryes. It is sweeter, and that comes from the corn. Corn is the main difference between bourbon and the rye whiskey those Pennsylvania farmers made.
 
 ## [SLIDE 17] Reading a rye whiskey label
 
-One more slide before the toast. This is what the words on a rye label mean.
+This is what the words on a rye label mean.
 
 "Rye whiskey" is defined by law in the United States. The grain has to be at least 51 percent rye, and the whiskey has to be aged in new charred oak. "Straight" means it is at least two years old and has nothing added. If it is less than four years old, the label has to give the age. "Bottled in bond" means it was made by one distillery in one season, aged at least four years and bottled at exactly 100 proof.
 

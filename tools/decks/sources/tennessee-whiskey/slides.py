@@ -120,7 +120,7 @@ rows_card(s, X, 2.0, CW, [
     ('Maple', 'sugar maple, stacked and burned in the open'),
     ('Charcoal', 'broken up and packed about ten feet deep'),
     ('New spirit', 'dripped through it, slowly'),
-    ('Barrel', 'filled after the charcoal, not before'),
+    ('Barrel', 'filled after the spirit has been through the charcoal'),
 ], label_w=2.6, row_h=1.05, mark=3, label_size=24, size=22)
 footer(s, 2)
 
@@ -209,7 +209,7 @@ fw = fh * 888 / 1284
 heading(s, 0.85, ['George Dickel, a', 'Nashville merchant'], size=40, w=R - fw - X - 0.4, h=1.5)
 text(s, X, 2.6, R - fw - X - 0.5, 3.5,
      ['From 1888 his firm was sole distributor of the Cascade distillery near Tullahoma.',
-      'He sold whisky. He was not a' + NB + 'distiller.',
+      'He sold whisky and did not distill' + NB + 'it.',
       [('Schenley revived the brand at a new distillery in' + NB + '1959.', {'color': MUTE})]],
      size=21, color=INK, ls=1.2, space_after=14)
 picture(s, A / 'george-dickel-giers.jpg', R - fw, 0.75, fw, fh, radius_in=0.26)
