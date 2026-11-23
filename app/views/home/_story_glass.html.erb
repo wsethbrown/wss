@@ -29,10 +29,17 @@
     @media (min-width: 900px) {
       /* Shares the faces' column from the first step to the end of the
          story, hangs into the 72px gutter to its left, and is held at the
-         middle of the screen. */
-      .hx .story-glass { position: sticky; grid-column: 2; grid-row: 2 / 6; align-self: start; height: 0; right: auto; bottom: auto;
-                         top: calc(50svh - 48px); opacity: 1; transition: none; }
-      .hx .story-glass svg { position: absolute; top: 0; left: -72px; width: 72px; height: 96px; }
+         middle of the screen. At the end of the story it comes to rest
+         with its foot standing on the top edge of what follows (the
+         spotlight card, else the origin panel): that is the next
+         section's top padding (--section-pad, home/index) below the
+         story. --glass-foot is how far the foot's bottom sits below the
+         drawing's top: shared/_glass's foot ends at y 72.5 with a 2.4
+         stroke, so 73.7 of its 80 units, at 96px tall. */
+      .hx .story-glass { --glass-foot: calc(96px * 73.7 / 80);
+                         position: sticky; grid-column: 2; grid-row: 2 / 6; align-self: start; height: 0; right: auto; bottom: auto;
+                         top: calc(50svh - 48px - var(--section-pad) + var(--glass-foot)); opacity: 1; transition: none; }
+      .hx .story-glass svg { position: absolute; top: calc(var(--section-pad) - var(--glass-foot)); left: -72px; width: 72px; height: 96px; }
     }
     @media (prefers-reduced-motion: reduce) { .hx .story-glass { transition: none; } }
     @media print { .hx .story-glass { display: none; } }

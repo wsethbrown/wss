@@ -54,7 +54,10 @@ class HomeStoryGlassTest < ActionDispatch::IntegrationTest
     desktop = css[/@media \(min-width: 900px\)\s*\{[^@]*\.story-glass[^@]*/m].to_s
     assert_match(/position:\s*sticky/, desktop)
     assert_match(/height:\s*0/, desktop, "on desktop it takes no height")
-    assert_match(/top:\s*calc\(50svh - 48px\)/, desktop, "held at the middle of the screen")
+    # Held at the middle of the screen: the sticky box sits as far below
+    # 50svh - 48px as the drawing hangs above it (placed by its foot, #52).
+    assert_match(/top:\s*calc\(50svh - 48px - var\(--section-pad\) \+ var\(--glass-foot\)\)/, desktop, "held at the middle of the screen")
+    assert_match(/\.story-glass svg\s*\{[^}]*top:\s*calc\(var\(--section-pad\) - var\(--glass-foot\)\)/, desktop, "the drawing hung by the same amount")
     assert_match(/left:\s*-72px;\s*width:\s*72px;\s*height:\s*96px/, desktop, "a 96px gauge filling the 72px gutter")
     assert_match(/@media print\s*\{\s*\.hx \.story-glass\s*\{\s*display:\s*none/, css)
     # The step words keep clear of it.

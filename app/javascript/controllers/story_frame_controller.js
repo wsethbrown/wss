@@ -16,10 +16,15 @@ import { Controller } from "@hotwired/stimulus"
 //   current only once they fall back past ENTER + HYST.
 // - The move to the current step then plays on a clock to the end (DUR per
 //   move, eased overall), so a stopped scroll never leaves the frame half
-//   way. Turning back mid-move reverses from where it is; a jump over several
-//   steps is compressed (CATCH_UP). At the table step the glasses then fill
-//   one after another on their own (FILL); at the record, once the card has
-//   landed, its palate wheel draws on its own clock (WHEEL_*).
+//   way. Turning back mid-move reverses from where it is; passing on to the
+//   next step mid-move keeps going (compressed if need be, CATCH_UP). A
+//   reader who gets well away from what the frame shows (more than JUMP
+//   steps: a fast scroll, Home, a link back to the top) is not shown every
+//   move in between at speed: the frame goes straight to their step and the
+//   old picture fades off it (a cross-fade, JUMP_FADE). At the table step
+//   the glasses then fill one after another on their own (FILL); at the
+//   record, once the card has landed, its palate wheel draws on its own
+//   clock (WHEEL_*).
 // - The clock advances by frame time, capped per frame, so a backgrounded
 //   tab neither jumps nor stalls on return. Nothing runs per frame unless a
 //   move, the fill or the wheel is playing, and nothing plays while the frame
@@ -38,6 +43,12 @@ const HYST = 0.12
 const DUR = [ 1.05, 1.25, 1.2, 1.3 ] // seconds: hero to library, library to invite, invite to table, table to record
 const CATCH_UP = 1.5 // a jump over several steps takes no longer than this ...
 const PER_STEP_MIN = 0.42 // ... unless each step would get less
+// Further than this from what the frame shows (in steps), the frame cuts
+// straight to the reader's step and cross-fades from the old picture
+// instead of playing the moves in between. One step back at reading pace
+// (exactly 1) still plays its move in reverse.
+const JUMP = 1.5
+const JUMP_FADE = 0.3 // seconds: the old picture fades off the new
 const FILL = 2.4 // seconds: the glasses at the table, one after another
 // The record's palate wheel, on its own clock once the record has arrived
 // (never with the scroll): each lit wedge grows out from under the hub and
@@ -296,6 +307,7 @@ export default class extends Controller {
       this.v = 0
       this.target = 0
       this.anim = null
+      this.ghost = null // the old picture fading off a jump (JUMP)
       this.raf = null
       this.visible = true
       this.live = false
@@ -350,6 +362,7 @@ export default class extends Controller {
     if (this.layoutFrame) cancelAnimationFrame(this.layoutFrame)
     this.raf = this.scrollFrame = this.layoutFrame = null
     this.anim = null
+    this.dropGhost()
     // Holding the place only matters on a page still showing (a failure);
     // a controller leaving with its page has nothing to keep.
     this.goStatic(this.element.isConnected)
@@ -371,6 +384,7 @@ export default class extends Controller {
     this.live = false
     this.element.classList.remove("is-live")
     if (this.padding !== undefined) document.documentElement.style.scrollPaddingTop = this.padding
+    this.element.style.removeProperty("--mm-clear")
     restore?.()
   }
 
@@ -380,7 +394,9 @@ export default class extends Controller {
   // #fragment points at (so a link to /#pricing still lands on the pricing
   // rows); else, going
   // static, the words of the step the frame was showing; else, going live,
-  // the words of the step being read (or the first section in view). Going
+  // the words of the step being read (or the first section in view), where
+  // they were when the reader last scrolled (notePlace): a window resized
+  // has already re-laid the svh heights by the time this runs. Going
   // live on a phone, words that were in view are kept clear of the band.
   // Measured by layout, not by transform, so a reveal in flight never moves
   // it. Instant, never smooth, and before the appear controller sorts what is
@@ -397,18 +413,14 @@ export default class extends Controller {
     const words = (b) => b.querySelector(".beat-body, h1, h2") || b
     const top = (el) => docTop(el) - window.scrollY
     const navBottom = this.navBottom || 0
-    let anchor = null
-    if (this.live) anchor = words(this.beatTargets[this.target] || this.beatTargets[0])
-    else {
-      // The step being read: the last whose words have come up into the top
-      // 60% below the nav; else the first step or section still in view.
-      const line = navBottom + (window.innerHeight - navBottom) * 0.6
-      const steps = this.beatTargets.map(words).filter((el) => top(el) + el.offsetHeight > navBottom && top(el) <= line)
-      anchor = steps[steps.length - 1] ||
-        [ ...this.beatTargets.map(words), ...document.querySelectorAll("main section") ].find((el) => top(el) + el.offsetHeight > navBottom)
-    }
+    let anchor = null, before = null
+    if (this.live) {
+      anchor = words(this.beatTargets[this.target] || this.beatTargets[0])
+      if (this.noted?.el === anchor) before = this.noted.top
+    } else if (this.noted?.el.isConnected) ({ el: anchor, top: before } = this.noted)
+    else anchor = this.readingAnchor()
     if (!anchor) return null
-    const before = top(anchor)
+    if (before === null) before = top(anchor)
     const wasInView = before >= navBottom && this.beatTargets.some((b) => words(b) === anchor)
     return () => {
       let want = before
@@ -420,6 +432,33 @@ export default class extends Controller {
     }
   }
 
+  // The step being read, while the faces show: the last whose words have
+  // come up into the top 60% below the nav; else the first step or section
+  // still in view.
+  readingAnchor() {
+    const words = (b) => b.querySelector(".beat-body, h1, h2") || b
+    const top = (el) => docTop(el) - window.scrollY
+    const navBottom = this.navBottom || 0
+    const line = navBottom + (window.innerHeight - navBottom) * 0.6
+    const steps = this.beatTargets.map(words).filter((el) => top(el) + el.offsetHeight > navBottom && top(el) <= line)
+    return steps[steps.length - 1] ||
+      [ ...this.beatTargets.map(words), ...document.querySelectorAll("main section") ].find((el) => top(el) + el.offsetHeight > navBottom)
+  }
+
+  // After each scroll, note what the reader is reading (live: the current
+  // step's words) and where, so a later switch (holdPlace) puts it back
+  // where they saw it. Not once a resize has changed what decides it: the
+  // layout has already moved under them.
+  notePlace() {
+    if (this.failed || this.inputs === null || this.inputsKey() !== this.inputs) return
+    let el = null
+    if (this.live) {
+      const b = this.beatTargets[this.target]
+      el = b && (b.querySelector(".beat-body, h1, h2") || b)
+    } else if (window.scrollY > 0) el = this.readingAnchor()
+    this.noted = el ? { el, top: docTop(el) - window.scrollY } : null
+  }
+
   // Across a change of layout while live: the current step's words keep their
   // place on screen where they can, within the stretch of scroll where pick()
   // still chooses that step (its words at or above its line plus HYST, the
@@ -427,7 +466,9 @@ export default class extends Controller {
   keepStep() {
     const t = this.target
     const words = (b) => b.querySelector(".beat-body, h1, h2") || b
-    const before = docTop(words(this.beatTargets[t])) - window.scrollY
+    const el = words(this.beatTargets[t])
+    // where the reader last saw them, if noted (a resize has already moved them)
+    const before = this.noted?.el === el ? this.noted.top : docTop(el) - window.scrollY
     return () => {
       const a = this.area(), line = (i) => a.top + a.h * ENTER[i]
       const lo = t > 0 ? this.tops[t] - (line(t) + a.h * HYST) + 2 : 0
@@ -452,6 +493,8 @@ export default class extends Controller {
       console.info(`Story frame: ${this.fitText()} cannot hold the frame; showing the static faces`)
       this.goStatic(false)
       restore?.()
+      this.noted = null
+      this.notePlace()
       return
     }
     if (!first) console.info(`Story frame: ${this.fitText()} now holds the frame; running it`)
@@ -459,6 +502,7 @@ export default class extends Controller {
     this.measure() // the steps' positions after the scroll is put back
     this.live = true
     this.pick()
+    this.notePlace()
     this.P = this.target
     this.f = this.target === 3 && this.reduce.matches ? 1 : 0
     this.w = this.target === 4 && this.reduce.matches ? this.wheelEnd : 0
@@ -561,8 +605,14 @@ export default class extends Controller {
     // heading), by layout: the appear controller's rise must not shift them.
     this.tops = this.beatTargets.map((b) => docTop(b.querySelector(".beat-body, h1, h2") || b))
     this.phone = !this.wide.matches
-    // On a phone, keep anything focused or scrolled to clear of the band.
-    document.documentElement.style.scrollPaddingTop = this.phone ? `${this.bandBottom() + 8}px` : this.padding
+    // On a phone, keep anything focused or scrolled to clear of the nav, and
+    // anything in the story clear of the band too: the page's scroll-padding
+    // is the nav's, and the story's own elements add the band's height as
+    // their scroll-margin (--mm-clear, home/_story_frame). The band only
+    // covers the story, so a link to the rest of the page (/#pricing) lands
+    // just under the nav, not below a band that has scrolled away.
+    document.documentElement.style.scrollPaddingTop = this.phone ? `${this.navBottom + 8}px` : this.padding
+    this.element.style.setProperty("--mm-clear", this.phone ? `${this.bandBottom() - this.navBottom}px` : "0px")
   }
 
   relayout() {
@@ -571,17 +621,20 @@ export default class extends Controller {
       // Static: try again only if what decides it has changed.
       if (!this.live) return this.inputsKey() === this.inputs ? undefined : this.start()
       // A change of layout while live (a tablet turned, a window resized
-      // across 900px or to another width) moves every step's words: keep the
-      // current step current.
+      // across 900px, to another width or height) moves every step's words:
+      // keep the current step current.
       const width = this.screenTarget.offsetWidth / 100
-      const keep = this.phone !== !this.wide.matches || Math.abs(width - this.u) > 0.001 ? this.keepStep() : null
+      // (and a window made taller or shorter: the svh heights move them too)
+      const keep = this.phone !== !this.wide.matches || Math.abs(width - this.u) > 0.001 || this.inputsKey() !== this.inputs ? this.keepStep() : null
+      this.dropGhost() // drawn at the old size
       this.measure()
       this.inputs = this.inputsKey()
       if (!this.fits()) {
         console.info(`Story frame: ${this.fitText()} can no longer hold the frame; showing the static faces`)
         this.anim = null
         if (this.raf) { cancelAnimationFrame(this.raf); this.raf = null }
-        return this.goStatic()
+        this.goStatic()
+        return this.notePlace()
       }
       keep?.()
       if (this.reduce.matches) { this.pick(); this.land() }
@@ -625,11 +678,13 @@ export default class extends Controller {
   }
 
   onScroll() {
-    if (this.scrollFrame || !this.live) return
+    if (this.scrollFrame || this.failed) return
     this.scrollFrame = requestAnimationFrame(() => {
       this.scrollFrame = null
+      if (!this.live) return this.notePlace()
       const before = this.target
       this.pick()
+      this.notePlace()
       if (this.target !== before) this.retarget()
     })
   }
@@ -646,6 +701,7 @@ export default class extends Controller {
   retarget() {
     if (this.reduce.matches || !this.visible || document.hidden) return this.land()
     if (this.anim ? this.anim.to === this.target : this.P === this.target) return this.kick()
+    if (Math.abs(this.target - this.P) > JUMP) return this.jump()
     const T = this.legSeconds(this.P, this.target)
     // Passing on to a further step mid-move keeps its speed (a Hermite curve
     // from the current velocity), so it never stalls and restarts; turning
@@ -656,8 +712,54 @@ export default class extends Controller {
     this.kick()
   }
 
+  // Far from what the frame shows: straight to the current step, the old
+  // picture laid over it as a still copy that fades away (tick). The step
+  // then plays only its own part: the glasses fill at the table, the
+  // record's wheel draws afresh (never un-drawn). A jump during the fade
+  // keeps the copy it has, so the reader sees one fade, not a stack of them.
+  jump() {
+    try {
+      if (!this.ghost) this.ghost = this.layGhost()
+    } catch (error) {
+      console.warn(`Story frame: could not cross-fade from ${this.P.toFixed(2)} to step ${this.target}; landing there`, error)
+      this.dropGhost()
+      return this.land()
+    }
+    this.anim = null
+    this.P = this.target
+    this.v = 0
+    this.f = 0
+    this.w = 0
+    this.draw()
+    this.kick()
+  }
+
+  // A still copy of the player (screen and caption) over the live one.
+  // Copies carry no ids, targets or data-mm, so nothing finds them but this.
+  layGhost() {
+    const player = this.frameTarget.querySelector(".mm-player")
+    const el = document.createElement("div")
+    el.className = "mm-ghost"
+    for (const child of player.children) el.appendChild(child.cloneNode(true))
+    for (const n of el.querySelectorAll("[id], [data-mm], [data-story-frame-target]")) {
+      n.removeAttribute("id"); n.removeAttribute("data-mm"); n.removeAttribute("data-story-frame-target")
+    }
+    player.appendChild(el)
+    const bar = player.querySelector(".mm-bar")
+    if (bar) bar.style.opacity = "0" // the live caption fades in as the copy's fades out
+    return { el, bar, t: 0 }
+  }
+
+  dropGhost() {
+    if (!this.ghost) return
+    this.ghost.el.remove()
+    if (this.ghost.bar) this.ghost.bar.style.opacity = ""
+    this.ghost = null
+  }
+
   // Straight to the current step's resting arrangement, no travel.
   land() {
+    this.dropGhost()
     this.anim = null
     this.P = this.target
     if (this.P <= 2) this.f = 0
@@ -672,7 +774,7 @@ export default class extends Controller {
 
   onVisibility() { if (!document.hidden) this.last = null }
 
-  playing() { return !!this.anim || this.filling() || this.drawing() }
+  playing() { return !!this.anim || !!this.ghost || this.filling() || this.drawing() }
 
   filling() { return this.P === 3 && this.target === 3 && this.f < 1 && !this.reduce.matches }
 
@@ -702,6 +804,17 @@ export default class extends Controller {
       if (e >= 1) { this.P = a.to; this.anim = null }
     }
     this.v = dt > 0 ? (this.P - before) / dt : 0
+    if (this.ghost) {
+      const g = this.ghost
+      g.t += dt
+      const e = clamp01(g.t / JUMP_FADE)
+      if (e >= 1) this.dropGhost()
+      else {
+        const o = PLAY(e)
+        g.el.style.opacity = (1 - o).toFixed(3)
+        if (g.bar) g.bar.style.opacity = o.toFixed(3)
+      }
+    }
     if (this.P <= 2) this.f = 0
     if (this.P === 3 && this.target === 3 && this.f < 1) this.f = Math.min(1, this.f + dt / FILL)
     // The wheel draws only once the record has arrived, and is put back only

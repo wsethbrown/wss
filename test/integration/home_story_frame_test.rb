@@ -378,4 +378,26 @@ class HomeStoryFrameTest < ActionDispatch::IntegrationTest
     assert_match(/\.hx \.mm-bar > :first-child \.mm-rl \{ max-width: 100%; overflow-x: clip; text-overflow: ellipsis; \}/, css, "and its line ends in an ellipsis")
     assert_match(/\.hx \.mm-bar > :last-child \{[^}]*flex: none;/, css, "the slide count keeps its width")
   end
+
+  # Issue #52: at the end of the story (900px and up) the story glass rests
+  # with its foot on the top edge of the next section's card. The CSS places
+  # it by the foot: --glass-foot is where the drawing's foot ends, as a share
+  # of its 80-unit height at 96px, and the next section's top padding
+  # (--section-pad) is the drop. This keeps that number true to the drawing
+  # (a redrawn foot must move it); the geometry itself is checked in the
+  # browser (test/system/home_story_frame_test.rb).
+  test "the story glass is placed by its foot, and the foot it is placed by is the drawing's" do
+    get root_path
+    css = css_select("style").map(&:text).join("\n")
+    foot = css[/--glass-foot: calc\(96px \* ([\d.]+) \/ 80\)/, 1]
+    assert foot, "the story glass names where its foot ends"
+    assert_match(/\.hx \.story-glass svg \{[^}]*top: calc\(var\(--section-pad\) - var\(--glass-foot\)\);[^}]*height: 96px;/, css, "hung so the foot is one section's padding below the story")
+    assert_match(/\.hx \{ --pad: 32px; --section-pad: 80px; \}/, css, "the wide layout's section padding is the variable the glass reads")
+    svg = css_select(".story-glass svg").first
+    assert_equal "0 0 60 80", svg["viewBox"]
+    base = svg.css("path").find { |p| p["d"].start_with?("M25.5 61.5") }
+    assert base, "the glass's foot"
+    lowest = base["d"].scan(/-?[\d.]+/).map(&:to_f).each_slice(2).map(&:last).max
+    assert_in_delta lowest + base["stroke-width"].to_f / 2, foot.to_f, 0.001, "the foot ends where the CSS says (its lowest point plus half its stroke)"
+  end
 end

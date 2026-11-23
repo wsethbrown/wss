@@ -340,7 +340,7 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
     visit_at(500, 1000)
     assert_selector ".story.is-live", visible: :all
     live = frame_state
-    refute_equal "", live["padding"], "live on a phone, the band sets scroll-padding-top: #{live}"
+    refute_equal "", live["padding"], "live on a phone, the frame sets scroll-padding-top (the nav's): #{live}"
     r = run_async(<<~JS)
       const sf = window.__sf, c = window.__storyFrame;
       sf.read(1);
@@ -552,6 +552,149 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
       assert_operator box["left"], :>=, r["bar"]["left"], "inside the bar: #{r}"
       assert_operator box["right"], :<=, r["bar"]["right"], "inside the bar: #{r}"
     end
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
+  # Issue #51: a reader who gets well away from what the frame shows (here,
+  # from the record straight to the top) is not shown every move backwards at
+  # speed. The frame goes straight to their step and a still copy of the old
+  # picture fades off it (JUMP_FADE, 0.3s); the record's wheel is reset, not
+  # un-drawn. One step back at reading pace still plays its move in reverse.
+  test "a fast scroll back from the record goes straight to the top with one short cross-fade" do
+    visit_at(1440, 900)
+    assert_selector ".story.is-live", visible: :all
+    r = run_async(<<~JS)
+      const sf = window.__sf, c = window.__storyFrame;
+      for (const i of [ 1, 2, 3, 4 ]) { sf.read(i); await sf.until(() => c.P === i && !c.anim); }
+      await sf.until(() => !c.raf);
+      const atRecord = { P: c.P, w: c.w, end: c.wheelEnd };
+      const t0 = performance.now(), seen = [];
+      let ghosted = false;
+      scrollTo({ top: 0, behavior: "instant" });
+      while (performance.now() - t0 < 5000) {
+        await sf.frames(1);
+        const g = !!document.querySelector(".mm-ghost");
+        ghosted = ghosted || g;
+        seen.push({ t: Math.round(performance.now() - t0), P: +c.P.toFixed(3), w: c.w, ghost: g });
+        if (c.P === 0 && !c.raf && !g) break;
+      }
+      const done = seen[seen.length - 1];
+      sf.read(2);
+      await sf.until(() => c.P === 2 && !c.raf);
+      sf.read(1);
+      const back = [];
+      await sf.until(() => { back.push(+c.P.toFixed(3)); return c.P === 1 && !c.raf; });
+      return { atRecord, ghosted, done, values: [ ...new Set(seen.map((s) => s.P)) ], back,
+               ghostLeft: document.querySelectorAll(".mm-ghost").length, bar: document.querySelector(".mm-bar").style.opacity };
+    JS
+    assert_equal 4, r["atRecord"]["P"], r
+    assert_equal r["atRecord"]["end"], r["atRecord"]["w"], "the wheel was drawn at the record: #{r}"
+    assert r["ghosted"], "the old picture was laid over the new to fade: #{r}"
+    assert_equal [ 0, 4 ], r["values"].sort, "only ever the record or the top, never a step in between: #{r}"
+    assert_equal 0, r["done"]["P"], r
+    assert_operator r["done"]["t"], :<, 1500, "the fade is short (0.3s; generous for a slow machine): #{r}"
+    assert_equal 0, r["done"]["w"], "the wheel is reset, ready to draw again: #{r}"
+    assert_equal 0, r["ghostLeft"], "the copy is gone: #{r}"
+    assert_equal "", r["bar"], "the live caption is back at full: #{r}"
+    assert(r["back"].any? { |p| p > 1 && p < 2 }, "one step back at reading pace still plays its move: #{r}")
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
+  # Issue #52: at the end of the story the glass stands on the card below it.
+  test "at the end of the story the glass's foot stands on the spotlight card's top edge" do
+    deck = Presentation.create!(author: users(:admin), title: "Spotlight Deck", content: "A story.", price: 9.99)
+    deck.update_columns(published: true, featured: true)
+    [ 1440, 1000 ].each do |width|
+      visit_at(width, 900)
+      assert_selector ".tile.spot"
+      r = run_async(<<~JS)
+        const sf = window.__sf, card = document.querySelector(".tile.spot");
+        scrollTo({ top: card.getBoundingClientRect().top + scrollY - innerHeight / 2, behavior: "instant" });
+        // wait on the card's reveal to finish, not on time
+        await sf.until(() => getComputedStyle(card).transform === "none" && getComputedStyle(card).opacity === "1");
+        await sf.frames(3);
+        const svg = document.querySelector(".story-glass svg");
+        const foot = [ ...svg.querySelectorAll("path") ].find((p) => p.getAttribute("d").startsWith("M25.5 61.5"));
+        const scale = svg.getBoundingClientRect().height / 80;
+        return { width: innerWidth, foot: foot.getBoundingClientRect().bottom + (parseFloat(foot.getAttribute("stroke-width")) / 2) * scale,
+                 card: card.getBoundingClientRect().top, position: getComputedStyle(document.querySelector(".story-glass")).position };
+      JS
+      assert_operator r["width"], :>=, 900, r
+      assert_equal "sticky", r["position"], r
+      assert_in_delta r["card"], r["foot"], 0.6, "flush on the card's top edge at #{r['width']}px: #{r}"
+    end
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
+  # Issue #44: the band covers only the story, so only the story's own
+  # elements keep clear of it; a link to the rest of the page lands its
+  # heading just under the nav.
+  test "on a phone a link to #pricing lands its heading just under the nav, and the story's own link still clears the band" do
+    page.driver.browser.manage.window.resize_to(500, 1000)
+    visit "#{root_path}#pricing"
+    wait_for_frame_connected
+    assert_selector ".story.is-live", visible: :all
+    r = run_async(<<~JS)
+      const sf = window.__sf, c = window.__storyFrame;
+      const still = async () => { let last = -1, same = 0; await sf.until(() => { same = scrollY === last ? same + 1 : 0; last = scrollY; return same > 8; }); };
+      const nav = () => Math.round(document.querySelector("body > nav, nav.fixed").getBoundingClientRect().bottom);
+      const heading = () => Math.round(document.querySelector("#pricing h2").getBoundingClientRect().top);
+      await sf.until(() => !c.layoutFrame && !c.scrollFrame);
+      await still();
+      const loaded = heading();
+      scrollTo({ top: 0, behavior: "instant" });
+      await sf.frames(2);
+      const a = document.createElement("a");
+      a.href = "#pricing"; a.textContent = "Pricing";
+      document.querySelector(".hx").prepend(a);
+      a.click();
+      await still();
+      const clicked = heading();
+      a.remove();
+      scrollTo({ top: 0, behavior: "instant" });
+      await sf.frames(2);
+      document.querySelector('a[href="#how-it-works"]').click();
+      await still();
+      const story = { words: Math.round(document.querySelector("#how-it-works .beat-body").getBoundingClientRect().top),
+                      band: Math.round(document.querySelector(".mm").getBoundingClientRect().bottom) };
+      return { width: innerWidth, nav: nav(), loaded, clicked, story, padding: document.documentElement.style.scrollPaddingTop };
+    JS
+    assert_operator r["width"], :<, 900, r
+    [ r["loaded"], r["clicked"] ].each do |top|
+      assert_operator top, :>=, r["nav"], "the heading is not under the nav: #{r}"
+      assert_operator top, :<=, r["nav"] + 120, "it is just under it, not below a band that has scrolled away: #{r}"
+    end
+    assert_operator r["story"]["words"], :>=, r["story"]["band"], "the story's own link still clears the band: #{r}"
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
+  # Issue #45: growing a short wide window re-lays the svh heights before the
+  # controller runs; the words the reader was reading go back where they were.
+  test "growing a short wide window keeps the words being read where they were, and their step" do
+    visit_at(1440, 480)
+    refute frame_state["live"], frame_state
+    # Measured by layout (the offsetTop chain), as the controller does: the
+    # words' reveal rises a few pixels by transform while it plays.
+    top = "(() => { let y = 0; for (let e = document.querySelector('.b3 .beat-body'); e; e = e.offsetParent) y += e.offsetTop; return Math.round(y - scrollY); })()"
+    before = run_async(<<~JS)
+      const sf = window.__sf;
+      scrollTo({ top: scrollY + #{top} - 120, behavior: "instant" });
+      await sf.frames(4);
+      return #{top};
+    JS
+    page.driver.browser.manage.window.resize_to(1440, 900)
+    wait_for("the frame to go live") { s = frame_state; s if s["live"] && !s["layoutFrame"] && !s["scrollFrame"] }
+    after = run_async(<<~JS)
+      const sf = window.__sf, c = window.__storyFrame;
+      await sf.until(() => c.P === c.target && !c.raf);
+      return { top: #{top}, P: c.P, target: c.target };
+    JS
+    assert_in_delta before, after["top"], 2, "the words stay where the reader saw them: before #{before}, after #{after}"
+    assert_equal 2, after["target"], "and the frame shows their step: #{after}"
   ensure
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end

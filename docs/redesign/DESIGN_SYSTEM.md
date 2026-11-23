@@ -212,7 +212,8 @@ glass and the view transitions. No animation library.
     inside the frame, which clips it, so nothing moves around it.
 - **The homepage story** (`home/_story_frame`, `story_frame_controller.js`, content from
   `StoryFrameHelper`; owner's choice, November 2026, "magic move"). One frame stays pinned beside
-  the story (a band under the nav below 900px) and never swaps, covers or fades: the objects
+  the story (a band under the nav below 900px) and never swaps, covers or fades (one
+  exception, a reader far from what it shows; see below): the objects
   inside it travel from each step's arrangement to the next, the way Keynote's Magic Move
   carries shared objects between slides. The hero's slide shrinks into its row in the library;
   the picked row fills orange and opens into the invite, its title rolling into the night's;
@@ -232,7 +233,14 @@ glass and the view transitions. No animation library.
   fall back past that line plus 12% of the screen (hysteresis). The move then plays to its end
   whatever the scroll does: 1.05 to 1.3s per move on one overall curve (under way at once,
   settling gently), reversing from where it is if the reader turns back, and compressed to at
-  most 1.5s (or 0.42s a step) for a jump over several steps. At the table the glasses then
+  most 1.5s (or 0.42s a step) when the reader passes on to the next step mid-move. A reader
+  more than one and a half steps from what the frame shows (a fast scroll, Home, a link back
+  to the top; owner's choice, November 2026, issue #51) is never shown the moves in between
+  at speed: the frame goes straight to their step and a still copy of the old picture, caption
+  included, fades off it over 0.3s (`JUMP`, `JUMP_FADE`). The step then plays only its own
+  part: the glasses fill, the wheel draws afresh (it is reset, never un-drawn). One step back
+  at reading pace still plays its move in reverse; under reduced motion it simply lands. At
+  the table the glasses then
   fill on their own over 2.4s, the caption rolling "Glass k of n". At the record, once the move
   has arrived, the wheel draws on its own (never with the scroll): each lit wedge grows from
   under the hub over 0.9s and takes its colour 0.2s behind (over 0.9s), the next starting 0.25s
@@ -243,9 +251,11 @@ glass and the view transitions. No animation library.
   drawn (the numbers are the `WHEEL_*` constants in the controller). The clock advances by frame
   time capped at 50ms, so a backgrounded tab neither jumps nor stalls; nothing runs per frame
   unless a move, the fill or the wheel is playing, and nothing plays while the frame is off
-  screen (a step change there just lands). Turning a tablet or resizing across 900px while the
-  frame runs keeps the current step: its words keep their place where they can, within the
-  stretch of scroll where that step stays current.
+  screen (a step change there just lands). Turning a tablet, resizing across 900px or making
+  the window taller or shorter while the frame runs keeps the current step: its words keep
+  the place the reader last saw them at (noted after every scroll, since the browser has
+  already re-laid the `svh` heights by the time the controller hears of a resize) where they
+  can, within the stretch of scroll where that step stays current.
   **Data** follows the static faces' rules: the hero's showcase deck and its first slide (the
   ink title slide without one); the "Latest decks" rows (the showcase deck takes the last row
   when it is not among them); the next public night with its guests (at most four glasses,
@@ -277,10 +287,14 @@ glass and the view transitions. No animation library.
   landscape show the faces); a wide window goes live with 16px to spare below the frame and
   stays live while the frame fits. If anything in the frame throws, it stops for good (nothing
   pending, nothing listening) and the static faces show. Going live or static changes the
-  story's height, so the reader's place is kept: going static, the words of the step the frame
-  was showing stay where they were; going live, the step being read does (kept clear of the
-  band); a link to `/#pricing` still lands on its target at once (instantly, before anything
-  there is sorted for its reveal). In the band's caption a long deck title gives way to the
+  story's height, so the reader's place is kept, where the reader last saw it: going static,
+  the words of the step the frame was showing; going live (a short window made taller, issue
+  #45), the step being read does (kept clear of the band); a link to `/#pricing` still lands
+  on its target at once (instantly, before anything there is sorted for its reveal). On a
+  phone the page's `scroll-padding-top` is the nav's, and only the story's own elements
+  add the band's height (`scroll-margin-top`, `--mm-clear`): the band covers only the story,
+  so `/#pricing` lands its heading just under the nav (issue #44) while a link or focus into
+  the story still clears the band. In the band's caption a long deck title gives way to the
   slide count and ends in an ellipsis, as the faces' bar does.
 - **The re-pour**: when an RSVP's Turbo stream replaces the event's attendees region, each
   seat glass in the table (`data-repour` on `events/_table`) whose level changed moves from
@@ -301,7 +315,10 @@ glass and the view transitions. No animation library.
   It stays tied to the scroll (the frame beside it plays on a clock): it follows the scroll directly
   (it is a gauge, not a reveal, so `appear: false` keeps it out of the pour). Desktop: a 96px
   gauge in the gutter between the step words and the frame, sticky at the middle of the screen;
-  the beats keep 28px of right padding so the words never meet it. Phones: 40px in the
+  the beats keep 28px of right padding so the words never meet it. At the end of the story it
+  comes to rest standing on the next card (the spotlight, else the origin panel): its foot's
+  bottom (73.7 of the drawing's 80 units) sits exactly the next section's top padding
+  (`--section-pad`) below the story, so it is flush on the card's top edge (issue #52). Phones: 40px in the
   bottom-right corner, inside the 20px page gutter, shown only while the steps are on screen.
   aria-hidden, no words, `pointer-events: none`, out of the flow (no layout shift), hidden
   until its controller runs and in print. Under reduced motion it steps a third at a time as
