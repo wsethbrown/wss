@@ -143,22 +143,24 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
   end
 
   # Stimulus disconnects and connects a controller when its attribute goes and
-  # comes back. Waits until it really has: a new controller instance, or (when
+  # comes back. Waits until it really has: the old one disconnected and it connected again, or (when
   # the new one declines to run) the line it logs instead.
   def reconnect_frame(before = "", expect_log: nil)
     page.execute_script(HELPERS)
     page.execute_script(<<~JS)
-      window.__oldFrame = window.__storyFrame;
       window.__frameLog = [];
       #{before}
-      const story = document.querySelector(".story");
-      story.removeAttribute("data-controller");
-      setTimeout(() => story.setAttribute("data-controller", "story-frame"), 50);
+      document.querySelector(".story").removeAttribute("data-controller");
     JS
+    # Stimulus reuses the controller object for the same element, so identity
+    # proves nothing: disconnect clears window.__storyFrame, and connect sets
+    # it again with a fresh decision. Wait for each in turn.
+    wait_for("the old controller to disconnect") { page.evaluate_script("window.__storyFrame === null && !document.querySelector('.story.is-live')") }
+    page.execute_script("document.querySelector('.story').setAttribute('data-controller', 'story-frame')")
     if expect_log
       wait_for("the new controller to log #{expect_log.inspect}") { page.evaluate_script("(window.__frameLog || []).some((l) => l.includes(#{expect_log.to_json}))") }
     else
-      wait_for("a new controller instance") { page.evaluate_script("!!window.__storyFrame && window.__storyFrame !== window.__oldFrame && !!window.__storyFrame.inputs") }
+      wait_for("the controller to connect again") { page.evaluate_script("!!(window.__storyFrame && window.__storyFrame.inputs)") }
     end
   end
 

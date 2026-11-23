@@ -259,7 +259,7 @@ export default class extends Controller {
   connect() {
     if (!this.hasFrameTarget || !this.hasScreenTarget || this.beatTargets.length < 5) return
     // Without these the frame cannot run safely: the static faces stay.
-    if (!("ResizeObserver" in window) || !("IntersectionObserver" in window) || !window.matchMedia) {
+    if (typeof window.ResizeObserver !== "function" || typeof window.IntersectionObserver !== "function" || typeof window.matchMedia !== "function") {
       console.warn("Story frame: this browser lacks ResizeObserver, IntersectionObserver or matchMedia; showing the static faces")
       return
     }
