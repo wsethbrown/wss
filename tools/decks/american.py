@@ -8,7 +8,9 @@ straight quotes there are Python's. It rewrites the files and prints every chang
 read them. Do not run it on a deck whose subject is British.
 """
 import re, sys
-PAIRS = [("colour","color"),("flavour","flavor"),("favour","favor"),("honour","honor"),("labour","labor"),
+PAIRS = [("centred","centered"),("centring","centering"),("catalogued","cataloged"),("cataloguing","cataloging"),
+         ("savoury","savory"),("sulphur","sulfur"),("instalment","installment"),("barrelled","barreled"),
+         ("colour","color"),("flavour","flavor"),("favour","favor"),("honour","honor"),("labour","labor"),
          ("neighbour","neighbor"),("harbour","harbor"),("rumour","rumor"),("humour","humor"),("vapour","vapor"),
          ("odour","odor"),("mould","mold"),("smoulder","smolder"),("centre","center"),("litre","liter"),
          ("metre","meter"),("theatre","theater"),("fibre","fiber"),("grey","gray"),("defence","defense"),
@@ -22,7 +24,7 @@ ISE = re.compile(r"\b(\w+?)(is)(e|ed|es|ing|ation|ations)\b")
 ISE_WORDS = {"organ","recogn","real","special","standard","author","critic","emphas","popular","modern","character",
              "capital","national","general","summar","apolog","categor","memor","util","minim","maxim","final","civil",
              "legal","industrial","commercial","central","normal","symbol","vapor","pasteur","caramel","oxid","homogen",
-             "steril","crystall","neutral","harmon","econom","prior","local","global","public","subsid","colon","rational"}
+             "steril","crystall","digit","monopol","neutral","harmon","econom","prior","local","global","public","subsid","colon","rational"}
 def conv(seg):
     for b, a in PAIRS:
         seg = re.sub(b, a, seg); seg = re.sub(b.capitalize(), a.capitalize(), seg); seg = re.sub(b.upper(), a.upper(), seg)

@@ -92,9 +92,9 @@ _SET UP: four empty glasses in front of everyone, marked 1 to 4. Water on the ta
 
 Good evening, and welcome.
 
-Tonight is four bourbons and the words printed on their labels. Most of those words have a legal meaning. A distiller who prints "bourbon" or "straight" or "bonded" has to meet a federal rule to do it. We'll go through what each of those words means. A few other words on a label have no rule behind them, and we'll cover those too.
+Tonight is four bourbons and the words printed on their labels. Most of those words have a legal meaning. A distiller who prints "bourbon" or "straight" or "bonded" has to meet a federal rule to do it. A few other words on a label have no rule behind them.
 
-You do not need to know anything about whiskey to follow this. We'll start by pouring one.
+You do not need to know anything about whiskey to follow this.
 
 ## [SLIDE 2] Glass 1: Maker's Mark
 
@@ -102,15 +102,15 @@ _Pour glass 1 now. Half an ounce each is plenty. Keep talking while you pour._
 
 This is Maker's Mark, from Loretto, Kentucky. It is 90 proof, which is 45% alcohol.
 
-Have a look at the front label. It says "Kentucky Straight Bourbon Whisky". We'll go through that line one word at a time tonight. The first word is "bourbon".
+Have a look at the front label. It says "Kentucky Straight Bourbon Whisky".
 
-Don't drink it all. You will want some left to compare with glass 2.
+Don't drink it all. Keep some to compare with glass 2.
 
 _Ask: "Before I tell you anything about it, what do you smell?" Take two or three answers, then move on._
 
 ## [SLIDE 3] How to taste it
 
-There is no wrong answer when you say what you smell or taste. You have been smelling and tasting food all your life. That is all you need.
+There is no wrong answer when you say what you smell or taste. You have been smelling and tasting food all your life.
 
 Here is a simple way to do it. Lift the glass slowly until you can smell the whiskey, and stop there. Breathe normally. Ask yourself what else smells like this.
 
@@ -128,9 +128,9 @@ _Walk the list on the slide. Take it slowly._
 
 It is made in the United States. The grain is at least 51% corn. It comes off the still at no more than 160 proof. It goes into new, charred oak barrels at no more than 125 proof. It is bottled at 80 proof or more. And nothing is added for color or flavor.
 
-So the color in your glass came from the barrel. It went into the barrel clear.
+The color in your glass came from the barrel. The whiskey was clear when it went in.
 
-There is no minimum age on that list. Plain bourbon does not have one. The words that tell you about age are "straight" and "bonded", and the number on glass 3. We will get to those.
+There is no minimum age on that list. A whiskey can meet every one of those rules without spending any set time in the barrel. A label says something about age only when it carries another word, "straight" or "bonded", or prints an age such as "Aged Nine Years".
 
 ## [SLIDE 5] It does not have to come from Kentucky
 
@@ -138,7 +138,7 @@ Nothing in the federal rule mentions Kentucky. Bourbon can be made in any state.
 
 When a state's name is printed beside the word "bourbon", the whiskey was distilled and aged in that state. Kentucky's own law adds that it must be aged there at least a year before it can use the name.
 
-In 1964 Congress passed a resolution calling bourbon "a distinctive product of the United States". Its purpose was to stop imported whiskey being sold as bourbon. It was a resolution and not a law, and it did not define bourbon. The definition was already in the regulations.
+In 1964 Congress passed a resolution calling bourbon "a distinctive product of the United States". Its purpose was to stop imported whiskey being sold as bourbon. The resolution changed no rule. The definition of bourbon was already in the regulations.
 
 > **IF SOMEONE ASKS WHERE THE NAME COMES FROM**
 > Nobody knows for sure. Some historians say it comes from Bourbon County, Kentucky. Another theory is Bourbon Street in New Orleans. It has not been settled.
@@ -151,7 +151,7 @@ Distillers describe the difference like this. Wheat makes a softer, sweeter bour
 
 Maker's Mark publishes its recipe: 70% corn, 16% wheat, 14% malted barley, and no rye.
 
-The next glass has no wheat. Its maker does not publish the recipe. It is usually reported as about 27% rye, and the label says "High Rye Mash Bill".
+Glass 2 is Old Grand-Dad Bonded, and its second grain is rye. Its maker does not publish the recipe. It is usually reported as about 27% rye, and the label says "High Rye Mash Bill".
 
 ## [SLIDE 7] Glass 2: Old Grand-Dad Bonded
 
@@ -165,17 +165,17 @@ _Ask: "What is different about the second one?" Let them answer before you say a
 
 Two things changed between the glasses. The second grain went from wheat to rye, and the proof went up by ten.
 
-Now look at the label. It says "Bonded". The rule behind that word dates from 1897. First I'll tell you what buying whiskey was like before then.
+The label says "Bonded". The rule behind that word dates from 1897.
 
 ## [SLIDE 8] Before the rules
 
-In the 1800s a distiller sold whiskey by the barrel. The drinker bought it from a saloon or a merchant, by the glass or in a plain bottle. In between there was a trade called rectifying. Rectifiers bought spirit, then blended it, colored it and flavored it. The trade was legal, licensed and taxed.
+Before 1897 a distiller sold whiskey by the barrel. The drinker bought it from a saloon or a merchant, by the glass or in a plain bottle. In between there was a trade called rectifying. Rectifiers bought spirit, then blended it, colored it and flavored it. The trade was legal, licensed and taxed.
 
 Rectifiers had printed manuals. One from 1853 gives a recipe for "Old Bourbon Whiskey" with no bourbon in it: neutral spirit, water, strong tea and oil of wintergreen, colored with cochineal and burnt sugar.
 
 Another, from 1885, lists eleven grades of whiskey by price. The cheapest is spirit, water and coloring. The next one up adds something called "Oil of Bourbon", and is sold as bourbon.
 
-The man who wrote that second book worked in the trade. He wrote that a man who orders whiskey, even at a first-class bar, "does not know what he drinks".
+Its author was Joseph Fleischman. He wrote that a man who takes a glass of whiskey, even at a first-class bar, "does not know what he drinks".
 
 > **DO NOT OVERSELL IT**
 > Not every rectifier was a fraud. The best grade in the 1885 manual is a blend of good straight whiskeys. And the stories about tobacco in the barrel were called "a popular error" by the 1853 manual itself.
@@ -204,7 +204,7 @@ In 1906 Congress passed the Pure Food and Drugs Act, and the argument began over
 
 The question went to the President. In December 1909 William Howard Taft ruled that any spirit distilled from grain could be called whiskey. But the words "straight", "bourbon" and "rye" were kept for whiskey that was aged and unmixed, and whiskey made from neutral spirit had to say so on the label.
 
-Wiley thought the rectifiers had won.
+Ten years later Wiley wrote that Taft had "decided all questions in favor of the rectifiers".
 
 Today "straight" on a bourbon label means at least two years in the barrel. If the whiskey is less than four years old, the label must give its age. And when a label gives an age, it is the age of the youngest whiskey in the bottle.
 
@@ -235,13 +235,13 @@ The proof changes in the barrel too. On the hot upper floors of a Kentucky wareh
 
 ## [SLIDE 13] Words with rules, and words without
 
-So far every word we have looked at has a rule behind it: bourbon, straight, bonded, and the age.
+Bourbon, straight, bonded and a printed age each have a federal rule behind them.
 
 Some words on a label have no federal definition. "Small batch" is one. So are "reserve" and "handmade". "Single barrel" is not defined either. A label is not allowed to mislead, but no rule says how small a small batch is.
 
-Pick up the Knob Creek. "Small Batch" is molded into the glass. It may well be true. The regulations do not say what it means.
+Pick up the Knob Creek. "Small Batch" is molded into the glass. No regulation says what that means.
 
-The last bottle has one more term with a rule behind it. The term is "barrel proof".
+"Barrel proof" does have a rule. It is on the label of glass 4.
 
 ## [SLIDE 14] Glass 4: Wild Turkey Rare Breed
 
@@ -249,7 +249,7 @@ _Pour glass 4 now. Pour a little less than before. Make sure the water is within
 
 This is Wild Turkey Rare Breed, from Lawrenceburg, Kentucky. The label says "Barrel Proof".
 
-That has a rule. The whiskey must be bottled within two degrees of proof of what it was when it came out of the barrel. Most whiskey has water added before bottling to bring it down to a set strength.
+Under the rule for that term, the whiskey must be bottled within two degrees of proof of what it was when it came out of the barrel. Most whiskey has water added before bottling to bring it down to a set strength.
 
 This bottle says 116.8 proof, which is 58.4% alcohol. There is no age on the label. The company says it is a mix of six, eight and twelve year old bourbon.
 
@@ -271,8 +271,6 @@ Old Grand-Dad: "Bonded". One distillery, one season, at least four years old, 10
 Knob Creek: "Aged Nine Years". Nothing in the bottle is younger than nine.
 
 Rare Breed: "Barrel Proof". The strength it came out of the barrel.
-
-The next time you are in a shop, pick up a bottle you have never tried and read the label before you look at the price.
 
 _Ask: "Which of the four would you buy again?" Let this one run._
 

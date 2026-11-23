@@ -171,6 +171,21 @@ line. Write the fact. The patterns to cut, on slides and in the script:
   Jr., a Kentucky distiller. Historians credit him with pushing for the Act." Quote enough
   of a sentence that it stands without a caption explaining who it is about. A source note
   is "Source: Maker's Mark.", not "Published by the maker."
+- **Teasers and pointers to something the room has not met yet.** A script once said, on the
+  slide about what "bourbon" means: "The words that tell you about age are 'straight' and
+  'bonded', and the number on glass 3. We will get to those." The owner: "this reads super
+  weird... it reads like AI slop teasers. You REALLY need to get better at identifying and
+  eliminating these mistakes." Glass 3 had not been poured, so "the number on glass 3" meant
+  nothing to the listener. Say the fact where it belongs and name the thing: "A label says
+  something about age only when it carries another word, 'straight' or 'bonded', or prints
+  an age such as 'Aged Nine Years'." Before a script is done, search it for every one of
+  these and rewrite or cut it: "we'll get to", "we'll come back to", "more on that",
+  "first I'll tell you", "we'll start by", "the next glass", "the last bottle has one more",
+  "one word at a time", and any mention of a glass, bottle or slide by number before the
+  room has it. Also cut the one-line paragraph that hints at a story and stops ("Wiley
+  thought the rectifiers had won."): give the fact ("Ten years later Wiley wrote that Taft
+  had 'decided all questions in favor of the rectifiers'.") or leave it out. And cut the
+  parting advice at the end ("read the label before you look at the price").
 - **"Tonight: Maker's Mark."** in the kit's list of glasses. The host may pour something
   else, so the script names a suggestion: "Suggested bottle: Maker's Mark." (the owner's
   wording; "Our recommendation" is the other form they offered).
