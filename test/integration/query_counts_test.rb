@@ -76,6 +76,24 @@ class QueryCountsTest < ActionDispatch::IntegrationTest
     assert_operator many.size, :<=, few.size, "homepage queries grew with library rows:\n#{growth(few, many)}"
   end
 
+  # The tasting record without a verdict night lists the newest public reviews,
+  # one row per bottle, each with its reviewer: preloaded, so a row costs no
+  # queries of its own.
+  test "homepage query count does not grow with the tasting record's rows" do
+    Review.destroy_all
+    review = lambda do |i|
+      Review.new(user: new_user(i, with_photo: false), bottle: Bottle.create!(name: "QC Record #{i}", distillery: "QC"),
+                 rating: 4.0, notes: "n", flavor_wheel: { "smoky" => 0.5 }).save!(validate: false)
+    end
+    2.times { |i| review.(i) }
+    few = measure(root_path)
+    assert_select ".face.f4 .rv-rows li.pour", 2
+    6.times { |i| review.(10 + i) }
+    many = measure(root_path)
+    assert_select ".face.f4 .rv-rows li.pour", 3
+    assert_operator many.size, :<=, few.size, "homepage queries grew with the record's rows:\n#{growth(few, many)}"
+  end
+
   def add_society_rows(society, event, count, offset)
     count.times do |i|
       member = new_user(offset + i)

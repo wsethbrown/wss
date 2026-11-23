@@ -1,6 +1,8 @@
 class HomeController < ApplicationController
   include DesignPreview
 
+  RECORD_ROWS = 3 # slide four's tasting record without a verdict: reviews listed, at most
+
   def index
     @stripe_products = fetch_stripe_products
     # The library rows (the face and the story frame); their covers preloaded,
@@ -105,8 +107,14 @@ class HomeController < ApplicationController
   # reviews and reviews from a PUBLIC society's night whose pours are
   # revealed (Event#pours_revealed?, no manager bypass) can be featured, so
   # nothing from a private or still-secret night reaches the homepage.
+  #
+  # From the same reviews, the tasting record's rows (@record_reviews): the
+  # featured review first, then the newest others, one per bottle, three at
+  # most. Empty unless there are at least two, when slide four keeps the one
+  # review. Their users and bottles are preloaded with them.
   def load_featured_review
     @featured_review = nil
+    @record_reviews = []
     return if @verdict_rows.present?
 
     public_nights = Event.joins(:society).where(societies: { is_private: false }).select(:id)
@@ -116,7 +124,11 @@ class HomeController < ApplicationController
     Rails.logger.info "Home: skipped #{skipped.size} review(s) from unrevealed nights for slide four (#{skipped.map(&:id).join(', ')})" if skipped.any?
     recent -= skipped
     @featured_review = recent.detect { |r| r.wheel_display_profile.any? } || recent.first
-    if @featured_review
+    rows = ([ @featured_review ].compact + recent).uniq(&:bottle_id).first(RECORD_ROWS)
+    @record_reviews = rows if rows.size >= 2
+    if @record_reviews.any?
+      Rails.logger.info "Home: slide four lists reviews #{@record_reviews.map(&:id).join(', ')} (bottles #{@record_reviews.map(&:bottle_id).join(', ')}, wheel from review #{@featured_review.id}: #{@featured_review.wheel_display_profile.any? ? 'yes' : 'no'})"
+    elsif @featured_review
       Rails.logger.info "Home: slide four shows review #{@featured_review.id} (bottle #{@featured_review.bottle_id}, user #{@featured_review.user_id}, wheel #{@featured_review.wheel_display_profile.any? ? 'yes' : 'no'})"
     else
       Rails.logger.info "Home: no reviews yet, slide four shows only its heading"

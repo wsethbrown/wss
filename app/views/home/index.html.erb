@@ -203,6 +203,12 @@
     .hx .rv-by { margin-top: 1.8cqw; font-size: max(12px, 2.3cqw); color: rgba(246, 244, 238, .72); }
     .hx .rv-by a { color: #f6f4ee; font-weight: 600; }
     .hx .rv-more { display: inline-block; margin-top: 1.2cqw; font-weight: 600; font-size: max(12px, 2.3cqw); color: #f6f4ee; }
+    /* ... or each drink with its review, as rows (the verdict's rows, with the reviewer below the drink). */
+    .hx .rv-rows { margin-top: auto; padding-top: 2.4cqw; }
+    .hx .rv-rows .pour { gap: 2cqw; font-size: 3.2cqw; }
+    .hx .rv-who { display: flex; flex-direction: column; min-width: 0; }
+    .hx .rv-who small { display: block; margin-top: .3cqw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: rgba(246, 244, 238, .72); font-size: max(11px, 2.3cqw); }
+    .hx .rv-who small a { color: #f6f4ee; }
     .hx .rv-card { position: relative; min-height: 0; margin: -2.6cqw -3cqw -2.6cqw 0; padding: 1.4cqw; border-radius: 3.4cqw; background: #fff; display: flex; align-items: center; justify-content: center; }
     .hx .rv-card > [data-score] { position: absolute; top: 2cqw; left: 2.4cqw; font-size: max(14px, 2.8cqw); }
     .hx .rv-wheel { width: 100%; height: 100%; }
@@ -356,7 +362,8 @@
   <div class="wrap">
     <% frame = story_frame(showcase: @showcase_deck, showcase_slides: showcase_slides, slide_count: showcase_slide_count, decks: @featured_presentations,
                            event: @next_event, guests: @next_event_guests, going: @next_event_going,
-                           verdict_night: @verdict_night, verdict_rows: @verdict_rows, verdict_reviews: @verdict_reviews, review: @featured_review) %>
+                           verdict_night: @verdict_night, verdict_rows: @verdict_rows, verdict_reviews: @verdict_reviews, review: @featured_review,
+                           record_reviews: @record_reviews) %>
     <div class="story" data-controller="story-frame">
       <%= render "home/story_frame", frame: frame %>
       <!-- Beat 1: the pitch, with the real deck on screen -->
@@ -528,6 +535,28 @@
                 <% tasting = { "Nose" => review.nose, "Palate" => review.palate, "Finish" => review.finish }.compact_blank %>
                 <% quote = review.notes.presence %>
                 <div class="review">
+                  <% if @record_reviews.present? %>
+                    <%# Each drink with its review (the newest public reviews,
+                        one per bottle): the score glass and number, the
+                        reviewer as the tasting card shows them. The card
+                        beside them is the first row's review. %>
+                    <div class="rv-txt">
+                      <h4>The tasting record</h4>
+                      <ul class="rv-rows">
+                        <% @record_reviews.each do |row| %>
+                          <li class="pour">
+                            <%= render "shared/glass", level: row.rating.to_f / 5, tone: :cream, size: 28 %>
+                            <span class="rv-who">
+                              <%= link_to row.bottle.name, bottle_path(row.bottle) %>
+                              <small><%= link_to "#{row.user.first_name} #{row.user.last_name}", profile_path(row.user), class: "rv-name" %> <%= render "shared/century_badge", record: row.user, tone: :dark %></small>
+                            </span>
+                            <span data-score-text><%= number_with_precision(row.rating.to_f, precision: 2, strip_insignificant_zeros: true) %><span class="sr-only"> out of 5</span></span>
+                          </li>
+                        <% end %>
+                      </ul>
+                      <%= link_to with_arrow("Read the full tasting"), review_path(review), class: "rv-more" %>
+                    </div>
+                  <% else %>
                   <div class="rv-txt">
                     <h4>The tasting record</h4>
                     <div class="rv-foot">
@@ -540,6 +569,7 @@
                       <%= link_to with_arrow("Read the full tasting"), review_path(review), class: "rv-more" %>
                     </div>
                   </div>
+                  <% end %>
                   <% if profile.any? %>
                     <div class="rv-card">
                       <%= render "shared/score", value: review.rating.to_f %>

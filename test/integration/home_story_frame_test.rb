@@ -164,8 +164,10 @@ class HomeStoryFrameTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "without a verdict the record is the featured review, its glass landing on the review's score" do
+  test "without a verdict, a lone review is the record, its glass landing on the review's score" do
     societies(:single_malt).update_column(:is_private, true)
+    get root_path
+    Review.where.not(id: controller.instance_variable_get(:@featured_review)).destroy_all
     get root_path
     review = controller.instance_variable_get(:@featured_review)
     assert review
@@ -184,6 +186,117 @@ class HomeStoryFrameTest < ActionDispatch::IntegrationTest
     assert_equal 0, config["record_glasses"]
     assert_equal "", roll("title")[2]
     assert_select ".mm [data-mm=card], .mm [data-mm=review], .mm [data-mm=score]", 0
+  end
+
+  # The record without a verdict night: each drink with its review. Reviews are
+  # made here, so the fixtures' own never decide the rows.
+  def tasting(user, bottle, rating, at:, wheel: {}, event: nil)
+    review = Review.new(user: user, bottle: bottle, event: event, rating: rating, notes: "Notes for #{bottle.name}.", flavor_wheel: wheel)
+    review.save!(validate: false)
+    review.update_columns(created_at: at, updated_at: at)
+    review
+  end
+
+  def fresh_bottle(name)
+    Bottle.create!(name: name, distillery: "Frame Distillery")
+  end
+
+  def by_states
+    css_select(".mm [data-mm=by] .mm-roll").map { |r| JSON.parse(r["data-states"])[1] }
+  end
+
+  test "without a verdict, the record lists the three newest public reviews, one row per bottle" do
+    Review.destroy_all
+    one, two, three, four = %w[Row One Row Two Row Three Row Four].each_slice(2).map { |w| fresh_bottle(w.join(" ")) }
+    newest = tasting(users(:john), one, 4.5, at: 1.hour.ago, wheel: { "smoky" => 0.6, "sweet" => 0.3 })
+    tasting(users(:jane), one, 3.0, at: 2.hours.ago) # the same bottle again: not a row of its own
+    second = tasting(users(:jane), two, 3.5, at: 3.hours.ago)
+    third = tasting(users(:seth), three, 4.0, at: 4.hours.ago)
+    tasting(users(:admin), four, 2.0, at: 5.hours.ago) # a fourth: past the three
+    get root_path
+    assert_equal [ newest, second, third ], controller.instance_variable_get(:@record_reviews)
+    assert_equal "reviews", config["record"]
+    assert_equal [ "", "The tasting record" ], roll("heading")
+    assert_equal 3, config["record_glasses"]
+    assert_equal [ 0.9, 0.7, 0.8 ], config["levels"], "each row's glass is its review's score out of 5"
+    assert_equal true, config["wheel"]
+    names = css_select(".mm [data-mm=label] .mm-roll").map { |r| JSON.parse(r["data-states"])[2] }.compact_blank
+    assert_equal [ "Row One", "Row Two", "Row Three" ], names
+    assert_equal [ "4.5", "3.5", "4" ], css_select(".mm [data-mm=score] .mm-roll").map { |r| JSON.parse(r["data-states"])[1] }
+    assert_equal [ "John Doe", "Jane Smith", "Seth Brown" ], by_states
+    assert_select ".mm [data-mm=vline]", 3
+    assert_equal "", roll("title")[2], "no night, so no night's title"
+    # The card is the first row's review: its score and its wheel.
+    assert_select ".mm .mm-card [data-mm=card-score] [data-score='4.5']", 1
+    assert_select ".mm .mm-card .wheel-wedge", 2
+    assert_select ".mm [data-mm=review] .mm-rv-quote", 0
+    assert_select ".mm [data-mm=review] .mm-rv-more", text: /Read the full tasting/
+    # The face carries the same rows, linked, and the link to the first row's tasting.
+    assert_select ".face.f4 .rv-rows li.pour", 3
+    assert_equal [ bottle_path(one), bottle_path(two), bottle_path(three) ], css_select(".face.f4 .rv-rows li.pour > .rv-who > a:first-child").map { |a| a["href"] }
+    assert_equal [ "John Doe", "Jane Smith", "Seth Brown" ], css_select(".face.f4 .rv-rows .rv-name").map { |a| a.text.strip }
+    assert_equal [ "4.5", "3.5", "4" ], css_select(".face.f4 .rv-rows li.pour > span[data-score-text]").map { |s| s.text.sub("out of 5", "").strip }
+    assert_select ".face.f4 a.rv-more[href=?]", review_path(newest)
+    assert_select ".face.f4 .rv-card .rv-wheel svg", 1
+  end
+
+  test "the rows take only reviews the single review could take: none from a private or still-secret night" do
+    Review.destroy_all
+    private_night = events(:mystery_flight)
+    private_night.society.update_column(:is_private, true)
+    tasting(users(:john), fresh_bottle("Private Pour"), 5, at: 1.minute.ago, event: private_night)
+    a = tasting(users(:jane), fresh_bottle("Open Pour A"), 4, at: 1.hour.ago)
+    b = tasting(users(:seth), fresh_bottle("Open Pour B"), 3, at: 2.hours.ago)
+    get root_path
+    assert_equal [ a, b ], controller.instance_variable_get(:@record_reviews)
+    assert_equal "reviews", config["record"]
+    assert_no_match "Private Pour", frame.to_s
+    assert_no_match "Private Pour", css_select(".face.f4").to_s
+  end
+
+  test "with one review the record keeps the single review" do
+    Review.destroy_all
+    only = tasting(users(:john), fresh_bottle("Lone Pour"), 4, at: 1.hour.ago, wheel: { "smoky" => 0.5 })
+    get root_path
+    assert_empty controller.instance_variable_get(:@record_reviews)
+    assert_equal only, controller.instance_variable_get(:@featured_review)
+    assert_equal "review", config["record"]
+    assert_select ".mm [data-mm=by]", 0
+    assert_select ".face.f4 .rv-rows", 0
+    assert_select ".face.f4 .rv-bottle", text: "Lone Pour"
+  end
+
+  test "with no reviews the record has no rows either" do
+    Review.destroy_all
+    get root_path
+    assert_equal "empty", config["record"]
+    assert_select ".mm [data-mm=by], .mm [data-mm=vline], .face.f4 .rv-rows", 0
+  end
+
+  test "a verdict night still wins over the reviews' rows" do
+    3.times { |i| tasting(users(:john), fresh_bottle("Solo #{i}"), 4, at: i.minutes.ago) }
+    get root_path
+    assert_equal "verdict", config["record"]
+    assert_empty controller.instance_variable_get(:@record_reviews).to_a
+    assert_select ".mm [data-mm=by], .face.f4 .rv-rows", 0
+  end
+
+  test "the rows' names reach the page escaped exactly once" do
+    Review.destroy_all
+    tricky = %(Maker's <b>Mark</b> & Co)
+    user = users(:jane)
+    user.update_columns(first_name: %(O'Brien <i>&</i>), last_name: "Smith")
+    tasting(user, fresh_bottle(tricky), 4, at: 1.hour.ago)
+    tasting(users(:john), fresh_bottle("Plain Pour"), 3, at: 2.hours.ago)
+    get root_path
+    assert_equal "reviews", config["record"]
+    labels = css_select(".mm [data-mm=label] .mm-roll").map { |r| JSON.parse(r["data-states"])[2] }
+    assert_includes labels, tricky.truncate(22, separator: " ")
+    assert_includes by_states, %(O'Brien <i>&</i> Smith)
+    assert_select ".face.f4 .rv-rows a", text: tricky
+    assert_select ".face.f4 .rv-rows .rv-name", text: %(O'Brien <i>&</i> Smith)
+    refute_match(/&amp;amp;|&amp;#39;|&amp;lt;/, response.body)
+    assert_no_match(/<b>Mark<\/b>/, response.body)
   end
 
   test "at the table, one glass per guest who said yes (at most four), captioned glass by glass" do

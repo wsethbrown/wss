@@ -231,6 +231,93 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end
 
+  # The record's wheel draws on its own clock once the record has arrived:
+  # not complete when the move lands, complete later with the page still.
+  WHEEL = <<~JS.freeze
+    window.__wheel = () => {
+      const c = window.__storyFrame;
+      return { P: c.P, target: c.target, w: c.w, end: c.wheelEnd, wedges: c.wedges.length, playing: !!c.raf,
+               grown: c.wedges.every((w) => w.s === 1), tinted: c.wedges.every((w) => w.c === 1),
+               labels: c.wheelLabels.length > 0 && c.wheelLabels.every((l) => getComputedStyle(l).opacity === "1") };
+    };
+  JS
+
+  def reviews_with_wheels
+    Review.destroy_all
+    %w[Smoke Honey Orchard].each_with_index do |name, i|
+      bottle = Bottle.create!(name: "#{name} Pour", distillery: "Frame Distillery")
+      review = Review.new(user: users(:john), bottle: bottle, rating: 4 - i * 0.5, notes: "A note.",
+                          flavor_wheel: { "smoky" => 0.7, "sweet" => 0.5, "fruity" => 0.4, "spicy" => 0.3 })
+      review.save!(validate: false)
+      review.update_columns(created_at: i.hours.ago)
+    end
+  end
+
+  test "the record's wheel draws on its own after the move lands, and draws again on the next visit" do
+    reviews_with_wheels
+    visit_at(1440, 900)
+    assert_selector ".story.is-live", visible: :all
+    page.execute_script(WHEEL)
+    r = run_async(<<~JS)
+      const sf = window.__sf, c = window.__storyFrame;
+      sf.read(4);
+      await sf.until(() => c.P === 4 && !c.anim);
+      const landed = window.__wheel(), y = scrollY;
+      await sf.until(() => c.w >= c.wheelEnd && !c.raf);
+      const done = { ...window.__wheel(), still: scrollY === y };
+      sf.read(3);
+      await sf.until(() => c.P === 3 && c.target === 3 && !c.anim);
+      const away = window.__wheel();
+      return { landed, done, away };
+    JS
+    landed, done, away = r.values_at("landed", "done", "away")
+    assert_operator landed["wedges"], :>, 0, "the card has a wheel: #{r}"
+    assert_operator landed["end"], :>=, 2, "four wedges a quarter second apart, each about a second: #{r}"
+    refute landed["tinted"], "not complete when the move lands: #{r}"
+    assert_operator landed["w"], :<, landed["end"] / 2, r
+    assert landed["playing"], "it goes on playing: #{r}"
+    assert done["still"], "the page stayed still: #{r}"
+    assert done["grown"] && done["tinted"] && done["labels"], "complete on its own: #{r}"
+    refute done["playing"], "and then nothing runs: #{r}"
+    assert_equal 0, away["w"], "leaving the record, it is ready to draw again: #{r}"
+  end
+
+  test "under reduced motion, and before Turbo caches the page, the record's wheel is simply drawn" do
+    reviews_with_wheels
+    visit_at(1440, 900)
+    assert_selector ".story.is-live", visible: :all
+    page.execute_script(WHEEL)
+    # Mid-draw, turbo:before-cache puts it at rest: drawn.
+    cached = run_async(<<~JS)
+      const sf = window.__sf, c = window.__storyFrame;
+      sf.read(4);
+      await sf.until(() => c.P === 4 && !c.anim);
+      document.dispatchEvent(new Event("turbo:before-cache"));
+      return window.__wheel();
+    JS
+    assert cached["grown"] && cached["tinted"] && cached["labels"], "at rest, drawn: #{cached}"
+    refute cached["playing"], cached
+    reconnect_frame(<<~JS)
+      const real = window.matchMedia.bind(window);
+      window.matchMedia = (q) => q.includes("prefers-reduced-motion: reduce")
+        ? { matches: true, media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }
+        : real(q);
+    JS
+    page.execute_script(WHEEL)
+    r = run_async(<<~JS)
+      const sf = window.__sf, c = window.__storyFrame;
+      sf.read(2);
+      await sf.until(() => c.P === 2);
+      sf.read(4);
+      await sf.until(() => c.P === 4);
+      return window.__wheel();
+    JS
+    assert r["grown"] && r["tinted"] && r["labels"], "complete the moment it shows: #{r}"
+    refute r["playing"], r
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
   test "without what the frame needs, the controller declines and the static faces show" do
     visit_at(1440, 900)
     assert_selector ".story.is-live", visible: :all
@@ -281,6 +368,8 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end
 
+  # Both layouts live: the step being shown stays current across the switch,
+  # either way (a tablet turned, a window resized across 900px).
   test "crossing 900px keeps the current step" do
     visit_at(1440, 900)
     r = run_probe([ { read: 2, settle: "wide" } ])
@@ -296,6 +385,18 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
     assert state["live"], "an 820px-wide window #{state['height']}px tall holds the band: #{state}"
     assert_equal "sticky", state["pos"], "the band below 900px: #{state}"
     assert_equal 2, state["P"], state
+    assert_equal 2, state["target"], state
+    # And back to wide.
+    page.driver.browser.manage.window.resize_to(1440, 900)
+    back = wait_for("the pinned frame again") do
+      s = frame_state
+      s if s["width"] >= 900 && s["pos"] != "sticky" && s["live"] && !s["raf"] && !s["layoutFrame"] && !s["scrollFrame"]
+    end
+    still = run_async("await window.__sf.frames(6); return window.__sf.state();")
+    [ back, still ].each do |s|
+      assert_equal 2, s["P"], "back on a wide window, still step 2: #{s}"
+      assert_equal 2, s["target"], s
+    end
   ensure
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end

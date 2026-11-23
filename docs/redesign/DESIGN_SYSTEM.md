@@ -219,8 +219,8 @@ glass and the view transitions. No animation library.
   the photo slides down into its band and settles; the date and the guests' glasses arrive;
   the invite parts (the photo slides up, the orange drains down) onto the table, a raised green
   band where the glasses stand while the slide takes the main area; the glasses fill one after
-  another; then they lift into the record's rows (or onto the review's score), the card rises
-  from below and the wheel draws in pour by pour. Objects with no counterpart rise or draw in;
+  another; then they lift into the record's rows (or onto the review's score) and the card rises
+  from below; once it has landed, its wheel draws on its own clock. Objects with no counterpart rise or draw in;
   text changes by rolling (old words lift away, new ones rise), never by fading. Everything is
   a pure function of one progress number, each object in its own window of the move with its
   own easing (the site's two curves plus a slow-settle travel curve; paths bow because the two
@@ -233,10 +233,19 @@ glass and the view transitions. No animation library.
   whatever the scroll does: 1.05 to 1.3s per move on one overall curve (under way at once,
   settling gently), reversing from where it is if the reader turns back, and compressed to at
   most 1.5s (or 0.42s a step) for a jump over several steps. At the table the glasses then
-  fill on their own over 2.4s, the caption rolling "Glass k of n". The clock advances by frame
+  fill on their own over 2.4s, the caption rolling "Glass k of n". At the record, once the move
+  has arrived, the wheel draws on its own (never with the scroll): each lit wedge grows from
+  under the hub over 0.9s and takes its colour 0.2s behind (over 0.9s), the next starting 0.25s
+  later (closer for a wheel with many wedges, so the last has its colour by 3s; a verdict
+  night's pour by pour, otherwise in reading order round the wheel), then the labels fade in
+  over 0.4s. Leaving the record it stays drawn until the card has sunk away, then is ready to
+  draw again; under reduced motion, off screen and before Turbo caches the page it is simply
+  drawn (the numbers are the `WHEEL_*` constants in the controller). The clock advances by frame
   time capped at 50ms, so a backgrounded tab neither jumps nor stalls; nothing runs per frame
-  unless a move or the fill is playing, and nothing plays while the frame is off screen (a
-  step change there just lands).
+  unless a move, the fill or the wheel is playing, and nothing plays while the frame is off
+  screen (a step change there just lands). Turning a tablet or resizing across 900px while the
+  frame runs keeps the current step: its words keep their place where they can, within the
+  stretch of scroll where that step stays current.
   **Data** follows the static faces' rules: the hero's showcase deck and its first slide (the
   ink title slide without one); the "Latest decks" rows (the showcase deck takes the last row
   when it is not among them); the next public night with its guests (at most four glasses,
@@ -244,7 +253,9 @@ glass and the view transitions. No animation library.
   real night never shows more people than said yes, and none when nobody has; the sample's
   four); the verdict's top three pours (any beyond the table's glasses rise straight into
   the record) and the night's
-  blended wheel, else the featured review, else the heading alone. The deck rides on the
+  blended wheel; else, with two or more, the newest public reviews as rows (one per bottle, at
+  most three: the drink, its score glass and number, the reviewer; the card is the first row's
+  review and its wheel); else the one featured review; else the heading alone. The deck rides on the
   invite and the record only when it is that night's deck (or on the sample invite). Long
   strings are cut for the frame with an ellipsis; the faces keep them whole.
   **Safety.** The frame is `aria-hidden` and nothing in it takes focus. Each step's static face

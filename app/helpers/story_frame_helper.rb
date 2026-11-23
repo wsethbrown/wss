@@ -14,7 +14,9 @@
 # - The table: one glass per guest on the invite (at most four), so a real
 #   night never shows more people than said yes; the sample invite's four.
 # - The record: the verdict (top three pours, ranked by the room), else the
-#   featured review, else the heading alone.
+#   newest public reviews as rows (each drink with its score and reviewer, the
+#   card the first row's wheel), else the featured review alone, else the
+#   heading alone.
 #
 # The frame is presentational (aria-hidden); the static faces carry the same
 # content for screen readers, without JS and in print. Strings are cut for
@@ -26,12 +28,14 @@ module StoryFrameHelper
 
   # slide_count: the showcase deck's slide count (counted once by the page).
   # verdict_reviews: the verdict night's reviews, already loaded by HomeController.
-  def story_frame(showcase:, showcase_slides:, slide_count:, decks:, event:, guests:, going:, verdict_night:, verdict_rows:, verdict_reviews:, review:)
+  # record_reviews: the tasting record's rows when there is no verdict (two or
+  # three reviews, users and bottles preloaded; HomeController#load_featured_review).
+  def story_frame(showcase:, showcase_slides:, slide_count:, decks:, event:, guests:, going:, verdict_night:, verdict_rows:, verdict_reviews:, review:, record_reviews: [])
     deck = showcase || decks.first
     rows = library_rows(showcase, decks)
     picked = rows.index { |r| r[:deck] == deck } || 0
     invite = invite_shape(event, guests, going)
-    record = record_shape(verdict_night, verdict_rows, verdict_reviews, review)
+    record = record_shape(verdict_night, verdict_rows, verdict_reviews, review, record_reviews)
     table = invite[:glasses]
     shape = {
       deck: deck,
@@ -47,7 +51,7 @@ module StoryFrameHelper
       slide_in_invite: invite[:sample] || (event.present? && deck.present? && event.presentation_id == deck.id),
       slide_in_record: record[:kind] == :verdict && deck.present? && verdict_night.presentation_id == deck.id
     }
-    Rails.logger.debug { "Story frame: deck #{deck&.id || 'none'}, #{rows.size} rows (picked #{picked}), invite #{invite[:sample] ? 'sample' : "event #{event.id}"}, record #{record[:kind]}, #{table} at the table" }
+    Rails.logger.debug { "Story frame: deck #{deck&.id || 'none'}, #{rows.size} rows (picked #{picked}), invite #{invite[:sample] ? 'sample' : "event #{event.id}"}, record #{record[:kind]}#{" (reviews #{record[:reviews].map(&:id).join(', ')})" if record[:kind] == :reviews}, #{table} at the table" }
     shape
   end
 
@@ -86,7 +90,8 @@ module StoryFrameHelper
     end
   end
 
-  def record_shape(night, rows, reviews, review)
+  def record_shape(night, rows, reviews, review, listed)
+    listed = Array(listed)
     if rows.present?
       shown = rows.first(3)
       reviews = Array(reviews)
@@ -95,12 +100,26 @@ module StoryFrameHelper
         pours: shown.map { |r| { name: plain(r[:pour].bottle.name, 22), bottle: r[:pour].bottle,
                                  score: number_with_precision(r[:mean], precision: 2, strip_insignificant_zeros: true), level: (r[:mean] / 5.0).clamp(0, 1) } },
         profile: profile, wedge_pours: wedge_pours(shown, reviews, profile) }
+    elsif listed.size >= 2
+      first = listed.first
+      { kind: :reviews, glasses: listed.size, title: "", meta: "", review: first, reviews: listed,
+        pours: listed.map { |r| { name: plain(r.bottle.name, 22), by: plain(reviewer_name(r), 28), score: score_text(r.rating), level: (r.rating.to_f / 5).clamp(0, 1) } },
+        profile: first.wheel_display_profile }
     elsif review
       { kind: :review, glasses: 1, title: plain(review.bottle.name, 20), meta: plain(review.bottle.distillery, 30), review: review,
         level: (review.rating.to_f / 5).clamp(0, 1), profile: review.wheel_display_profile }
     else
       { kind: :empty, glasses: 0, title: "", meta: "" }
     end
+  end
+
+  # The reviewer as the tasting record shows them (home/index, the review's own page).
+  def reviewer_name(review)
+    "#{review.user.first_name} #{review.user.last_name}"
+  end
+
+  def score_text(value)
+    number_with_precision(value.to_f, precision: 2, strip_insignificant_zeros: true)
   end
 
   # Which pour draws which wedge of the night's wheel: each family goes to

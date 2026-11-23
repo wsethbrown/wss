@@ -18,11 +18,12 @@ import { Controller } from "@hotwired/stimulus"
 //   move, eased overall), so a stopped scroll never leaves the frame half
 //   way. Turning back mid-move reverses from where it is; a jump over several
 //   steps is compressed (CATCH_UP). At the table step the glasses then fill
-//   one after another on their own (FILL).
+//   one after another on their own (FILL); at the record, once the card has
+//   landed, its palate wheel draws on its own clock (WHEEL_*).
 // - The clock advances by frame time, capped per frame, so a backgrounded
 //   tab neither jumps nor stalls on return. Nothing runs per frame unless a
-//   move or the fill is playing, and nothing plays while the frame is off
-//   screen (a step change there simply lands).
+//   move, the fill or the wheel is playing, and nothing plays while the frame
+//   is off screen (a step change there simply lands, the wheel drawn).
 //
 // Safety: the frame is aria-hidden and nothing in it takes focus; each
 // step's static face carries the same content (the controller only adds
@@ -38,6 +39,20 @@ const DUR = [ 1.05, 1.25, 1.2, 1.3 ] // seconds: hero to library, library to inv
 const CATCH_UP = 1.5 // a jump over several steps takes no longer than this ...
 const PER_STEP_MIN = 0.42 // ... unless each step would get less
 const FILL = 2.4 // seconds: the glasses at the table, one after another
+// The record's palate wheel, on its own clock once the record has arrived
+// (never with the scroll): each lit wedge grows out from under the hub and
+// takes its colour, one after another (a verdict night's pour by pour, each
+// pour's in reading order round the wheel; a review's in reading order), then
+// the labels fade in. Leaving the record it stays drawn until the card has
+// sunk out of sight, then is ready to draw again.
+const WHEEL_GROW = 0.9 // seconds: one wedge grows to full size
+const WHEEL_TINT_LAG = 0.2 // seconds: its colour starts this long after it starts growing ...
+const WHEEL_TINT = 0.9 // ... and takes this long
+const WHEEL_STAGGER = 0.25 // seconds from one wedge to the next ...
+const WHEEL_SPAN = 3 // ... less for a wheel with many wedges, so the last has its colour by this
+const WHEEL_LABELS = 0.4 // seconds: the labels fade in as the last wedge starts to grow
+const WHEEL_START = 0.56 // of the move to the record: the wheel starts as its card lands, not at the move's end
+const CARD_RISE = [ 0.14, 0.56 ] // the record's card rises in this window of the table-to-record move
 const MAX_DT = 0.05 // seconds: a frame never advances the clock by more
 const H = 56.25 // the screen's height in cqw (16:9)
 const WIDE = "(min-width: 900px)"
@@ -277,6 +292,7 @@ export default class extends Controller {
       this.build()
       this.P = 0
       this.f = 0
+      this.w = 0 // seconds into the wheel's drawing
       this.v = 0
       this.target = 0
       this.anim = null
@@ -403,6 +419,26 @@ export default class extends Controller {
     }
   }
 
+  // Across a change of layout while live: the current step's words keep their
+  // place on screen where they can, within the stretch of scroll where pick()
+  // still chooses that step (its words at or above its line plus HYST, the
+  // next step's below its own line). Measured by layout; instant.
+  keepStep() {
+    const t = this.target
+    const words = (b) => b.querySelector(".beat-body, h1, h2") || b
+    const before = docTop(words(this.beatTargets[t])) - window.scrollY
+    return () => {
+      const a = this.area(), line = (i) => a.top + a.h * ENTER[i]
+      const lo = t > 0 ? this.tops[t] - (line(t) + a.h * HYST) + 2 : 0
+      const hi = t + 1 < this.tops.length ? this.tops[t + 1] - line(t + 1) - 2 : Infinity
+      const y = Math.max(0, lo > hi ? (lo + hi) / 2 : Math.max(lo, Math.min(hi, this.tops[t] - before)))
+      if (Math.abs(y - window.scrollY) >= 1) {
+        console.info(`Story frame: the layout changed; keeping step ${t} current`)
+        window.scrollTo({ top: y, behavior: "instant" })
+      }
+    }
+  }
+
   // Run the frame if the window can hold it; otherwise the static faces.
   // Called once on connect and then only when what decides it has changed.
   start() {
@@ -424,6 +460,7 @@ export default class extends Controller {
     this.pick()
     this.P = this.target
     this.f = this.target === 3 && this.reduce.matches ? 1 : 0
+    this.w = this.target === 4 && this.reduce.matches ? this.wheelEnd : 0
     this.render()
     this.kick()
   }
@@ -489,14 +526,23 @@ export default class extends Controller {
       paper: q("paper"), oak: q("oak"), mark: q("mark"), photo: q("photo"), ph: q("ph"), card: q("card"), cardScore: q("card-score"),
       head: q("head"), heading: q("heading"), slide: q("slide"), lift: q("lift"), time: q("time"), tag: q("tag"), date: q("date"),
       title: q("title"), meta: q("meta"), going: q("going"), review: q("review"),
-      rows: all("row"), glasses: byK("glass"), labels: byK("label"), scores: byK("score"), vlines: byK("vline")
+      rows: all("row"), glasses: byK("glass"), labels: byK("label"), scores: byK("score"), vlines: byK("vline"), bys: byK("by")
     }
     this.el.phImg = this.el.ph?.querySelector("img")
     this.roll = roll
     this.capL = roll(q("cap-l"))
     this.capR = roll(q("cap-r"))
     this.glassDrawings = this.el.glasses.map((g) => new Glass(g))
-    this.wedges = [ ...this.frameTarget.querySelectorAll(".mm-card .wheel-wedge") ].map((p) => ({ el: p, from: parseFloat(p.style.getPropertyValue("--from")) || 0.25, k: +(p.dataset.pour || 0), s: null, c: null }))
+    // The wheel's wedges in the order they draw (by pour, then round the
+    // wheel from the top, as the markup has them), each with its start time.
+    this.wedges = [ ...this.frameTarget.querySelectorAll(".mm-card .wheel-wedge") ]
+      .map((p, i) => ({ el: p, from: parseFloat(p.style.getPropertyValue("--from")) || 0.25, k: +(p.dataset.pour || 0), i, s: null, c: null }))
+      .sort((a, b) => a.k - b.k || a.i - b.i)
+    const n = this.wedges.length
+    const stagger = n > 1 ? Math.min(WHEEL_STAGGER, (WHEEL_SPAN - WHEEL_TINT_LAG - WHEEL_TINT) / (n - 1)) : 0
+    this.wedges.forEach((w, j) => { w.at = j * stagger })
+    this.labelsAt = n ? (n - 1) * stagger : 0
+    this.wheelEnd = n ? Math.max(this.labelsAt + WHEEL_LABELS, (n - 1) * stagger + WHEEL_TINT_LAG + WHEEL_TINT) : 0
     this.wheelLabels = [ ...this.frameTarget.querySelectorAll(".mm-card .wheel-label") ]
     // Nothing in the frame takes focus: it is presentational and moves.
     for (const el of this.frameTarget.querySelectorAll("a, button, [tabindex]")) el.setAttribute("tabindex", "-1")
@@ -523,6 +569,11 @@ export default class extends Controller {
     try {
       // Static: try again only if what decides it has changed.
       if (!this.live) return this.inputsKey() === this.inputs ? undefined : this.start()
+      // A change of layout while live (a tablet turned, a window resized
+      // across 900px or to another width) moves every step's words: keep the
+      // current step current.
+      const width = this.screenTarget.offsetWidth / 100
+      const keep = this.phone !== !this.wide.matches || Math.abs(width - this.u) > 0.001 ? this.keepStep() : null
       this.measure()
       this.inputs = this.inputsKey()
       if (!this.fits()) {
@@ -531,6 +582,7 @@ export default class extends Controller {
         if (this.raf) { cancelAnimationFrame(this.raf); this.raf = null }
         return this.goStatic()
       }
+      keep?.()
       if (this.reduce.matches) { this.pick(); this.land() }
       this.cache.clear()
       this.rolls.forEach((r) => { r.key = null })
@@ -609,6 +661,8 @@ export default class extends Controller {
     this.P = this.target
     if (this.P <= 2) this.f = 0
     if (this.P === 3 && this.reduce.matches) this.f = 1
+    // At rest at the record its wheel is drawn; anywhere else it is ready to draw.
+    this.w = this.P === 4 ? this.wheelEnd : 0
     if (this.raf) { cancelAnimationFrame(this.raf); this.raf = null }
     if (this.live) this.draw()
   }
@@ -617,7 +671,11 @@ export default class extends Controller {
 
   onVisibility() { if (!document.hidden) this.last = null }
 
-  playing() { return !!this.anim || (this.P === 3 && this.target === 3 && this.f < 1 && !this.reduce.matches) }
+  playing() { return !!this.anim || this.filling() || this.drawing() }
+
+  filling() { return this.P === 3 && this.target === 3 && this.f < 1 && !this.reduce.matches }
+
+  drawing() { return this.P >= 3 + WHEEL_START && this.target === 4 && this.w < this.wheelEnd && !this.reduce.matches }
 
   kick() {
     if (this.raf || !this.live || !this.playing() || !this.visible) return
@@ -645,6 +703,10 @@ export default class extends Controller {
     this.v = dt > 0 ? (this.P - before) / dt : 0
     if (this.P <= 2) this.f = 0
     if (this.P === 3 && this.target === 3 && this.f < 1) this.f = Math.min(1, this.f + dt / FILL)
+    // The wheel draws only once the record has arrived, and is put back only
+    // once its card has sunk out of sight.
+    if (this.P <= 3 + CARD_RISE[0]) this.w = 0
+    else if (this.drawing()) this.w = Math.min(this.wheelEnd, this.w + dt)
     this.draw()
     if (this.live && this.playing() && this.visible) this.raf = requestAnimationFrame(this.tick)
   }
@@ -671,8 +733,14 @@ export default class extends Controller {
     const P = this.P, f = this.f, cfg = this.cfg, phone = this.phone
     const tBC = local(P, 1), tCD = local(P, 2), tDE = local(P, 3)
     const n = cfg.rows, p = cfg.picked, S = cfg.seats, T = cfg.table ?? cfg.invite_glasses, gI = cfg.invite_glasses, gR = cfg.record_glasses
-    const kind = cfg.record, verdict = kind === "verdict", reviewed = kind === "review"
-    const wheelCard = verdict && cfg.wheel
+    const kind = cfg.record, verdict = kind === "verdict", reviewed = kind === "review", listed = kind === "reviews"
+    // The record as rows (a verdict night's pours, or each drink with its
+    // review), and the review's card on the right (one review, or the first row's).
+    const rowsShown = verdict || listed, carded = reviewed || listed
+    const wheelCard = (verdict && cfg.wheel) || listed
+    // Where a record's row starts (its rule), and its glass, name, score and reviewer within it.
+    const ROW = listed ? { top: 13.4, step: 9.4, glass: 1.6, label: 1.4, score: 3.1, by: 5.1 } : { top: 21.3, step: 7.6, glass: 1.1, label: 2.6, score: 2.6, by: 0 }
+    const rowY = (k, part) => ROW.top + ROW.step * k + (part ? ROW[part] : 0)
     const rowTop = (i) => 53 - 12 * (n - i)
     const pTop = n ? rowTop(p) : 29
     const seat = (k) => ((k + 0.5) * 100) / Math.max(1, T)
@@ -819,7 +887,7 @@ export default class extends Controller {
       const cx = 44 + 5.6 * k, cy = 46.1, sx = seat(k) - 3
       // In the record: a row's glass, the review's score glass, or it sinks away.
       let ex = sx, ey = 50, es = 0.8, eo = 0
-      if (verdict && kept) { ex = 5; ey = 22.4 + 7.6 * k; es = 0.6; eo = 1 } else if (reviewed && k === 0) { ex = 57.2; ey = 5.2; es = 0.46; eo = P >= 4 ? 0 : 1 }
+      if (rowsShown && kept) { ex = 5; ey = rowY(k, "glass"); es = 0.6; eo = 1 } else if (reviewed && k === 0) { ex = 57.2; ey = 5.2; es = 0.46; eo = P >= 4 ? 0 : 1 }
       let x, y, s, o, lift = 0
       if (seated) {
         // to the record: a bowed path up and left into its row, the rightmost first
@@ -838,7 +906,7 @@ export default class extends Controller {
       this.place(g, x, y, s, o)
       // A pour at the table; in the record, the room's score (glass level = mean / 5).
       const poured = seated ? fill(k) : 0
-      const want = verdict && kept ? cfg.levels[k] : (reviewed && k === 0 ? cfg.levels[0] : poured)
+      const want = rowsShown && kept ? cfg.levels[k] : (reviewed && k === 0 ? cfg.levels[0] : poured)
       let lv = 0
       if (P > 2 && P < 3) lv = poured * band(tCD, 0.3, 0.85, E.lin)
       else if (P === 3) lv = poured
@@ -853,10 +921,10 @@ export default class extends Controller {
         const ls = tr(P, [ 0.7, 0.7, 0.7, 0.7, 1 ], [ null, null, null, bands[3] ])
         const w1 = ((lr?.lines[1]?.w || 0) / this.u) * ls
         const cxl = seat(k)
-        const atRow = verdict && kept
+        const atRow = rowsShown && kept
         // a label with no seat waits at its row, where it rolls in
         const lx = seated ? tr(P, [ cxl - w1 / 2, cxl - w1 / 2, cxl - w1 / 2, cxl - w1 / 2, atRow ? 11.4 : cxl - w1 / 2 ], [ null, null, null, bands[3] ], E.arcA) : 11.4
-        const ly = seated ? tr(P, [ 53.1, 53.1, 53.1, 53.1, atRow ? 23.9 + 7.6 * k : 56 ], [ null, null, null, bands[3] ], E.arcB) - lift : 23.9 + 7.6 * k
+        const ly = seated ? tr(P, [ 53.1, 53.1, 53.1, 53.1, atRow ? rowY(k, "label") : 56 ], [ null, null, null, bands[3] ], E.arcB) - lift : rowY(k, "label")
         const phoneO = phone ? tr(P, [ 0, 0, 0, 0, 1 ], [ null, null, null, [ 0.5, 0.8 ] ], E.lin) : 1
         this.place(label, lx, ly, ls, phoneO)
         lr?.set(tr(P, [ 0, 0, 0, 1, 2 ], [ null, null, [ 0.6 + 0.05 * k, 0.95 + 0.05 * k ], atRow ? [ 0.3 + 0.05 * k, 0.6 + 0.05 * k ] : [ 0, 0.22 ] ], E.lin))
@@ -865,42 +933,49 @@ export default class extends Controller {
       const score = this.el.scores[k]
       if (score) {
         const sr = this.roll(score)
-        this.place(score, (wheelCard ? 51 : 95) - (sr?.lines[1]?.w || 0) / this.u, 23.9 + 7.6 * k)
+        this.place(score, (wheelCard ? 51 : 95) - (sr?.lines[1]?.w || 0) / this.u, rowY(k, "score"))
         sr?.set(tr(P, [ 0, 0, 0, 0, 1 ], [ null, null, null, [ 0.44 + 0.08 * k, 0.66 + 0.08 * k ] ], E.lin))
       }
       const rule = this.el.vlines[k]
       if (rule) {
         this.css(rule, "width", `${wheelCard ? 46 : 90}cqw`)
         const vs = tr(P, [ 0, 0, 0, 0, 1 ], [ null, null, null, [ 0.3 + 0.06 * k, 0.62 + 0.06 * k ] ], E.out)
-        this.place(rule, 5, 21.3 + 7.6 * k, 1, vs > 0 ? 1 : 0, ` scaleX(${vs.toFixed(4)})`)
+        this.place(rule, 5, rowY(k), 1, vs > 0 ? 1 : 0, ` scaleX(${vs.toFixed(4)})`)
+      }
+      // Who reviewed it, under the drink's name (rows of reviews only).
+      const by = this.el.bys[k]
+      if (by) {
+        this.place(by, 11.4, rowY(k, "by"))
+        this.roll(by)?.set(tr(P, [ 0, 0, 0, 0, 1 ], [ null, null, null, [ 0.4 + 0.06 * k, 0.7 + 0.06 * k ] ], E.lin))
       }
     }
 
-    // The record: its heading rolls in, the card rises from below the frame
-    // and its wheel draws in pour by pour, each pour's wedges with its score.
+    // The record: its heading rolls in, the card rises from below the frame,
+    // and once the record has arrived its wheel draws on its own clock (this.w).
     this.roll(this.el.heading)?.set(tr(P, [ 0, 0, 0, 0, 1 ], [ null, null, null, [ 0.04, 0.4 ] ], E.lin))
     this.place(this.el.heading, reviewed ? 7 : 5, reviewed ? 5.4 : 4.4)
     if (this.el.card) {
       // early, so the frame is anchored while the glasses are in the air
-      const pc = P >= 4 ? 1 : P > 3 ? band(tDE, 0.14, 0.56) : 0
-      const cx = reviewed ? 54.5 : 56, cy = reviewed ? 3.4 : 4
+      const pc = P >= 4 ? 1 : P > 3 ? band(tDE, CARD_RISE[0], CARD_RISE[1]) : 0
+      const cx = carded ? 54.5 : 56, cy = carded ? 3.4 : 4
       this.place(this.el.card, cx, cy + 54 * (1 - pc), 1, pc > 0 ? 1 : 0)
       // the review's own score glass shows once glass 0 has landed on it
-      this.css(this.el.cardScore?.querySelector("svg"), "visibility", P >= 4 ? "visible" : "hidden")
+      // (rows of reviews: their glasses land on the rows, so it is simply there)
+      this.css(this.el.cardScore?.querySelector("svg"), "visibility", P >= 4 || listed ? "visible" : "hidden")
     }
+    const wt = this.w
     for (const w of this.wedges) {
-      const a = 0.4 + 0.08 * (reviewed ? 0 : w.k), b = Math.min(1, a + 0.312) // grow and colour 30% slower than first built
-      const g = P >= 4 ? 1 : P > 3 ? band(tDE, a, b, E.out) : 0
+      const g = E.out(clamp01((wt - w.at) / WHEEL_GROW))
       const sc = lerp(w.from, 1, g)
       if (w.s !== sc) { w.el.style.transform = `scale(${sc.toFixed(4)})`; w.s = sc }
-      const fc = P >= 4 ? 1 : P > 3 ? band(tDE, a + 0.16, Math.min(1, b + 0.056), E.out) : 0
+      const fc = E.out(clamp01((wt - w.at - WHEEL_TINT_LAG) / WHEEL_TINT))
       if (w.c !== fc) { w.el.style.fill = fc >= 1 ? "" : mixOk(SOFT, SAGE, fc); w.c = fc }
     }
-    const lo = P >= 4 ? 1 : P > 3 ? band(tDE, 0.86, 1, E.lin) : 0
+    const lo = this.wedges.length ? clamp01((wt - this.labelsAt) / WHEEL_LABELS) : (P >= 4 ? 1 : P > 3 ? band(tDE, 0.86, 1, E.lin) : 0)
     for (const t of this.wheelLabels) this.css(t, "opacity", lo.toFixed(3))
     if (this.el.review) {
       const pr = P >= 4 ? 1 : P > 3 ? band(tDE, 0.3, 0.72, E.pour) : 0
-      this.place(this.el.review, 7, 36.4 + 3 * (1 - pr), 1, phone ? 0 : pr)
+      this.place(this.el.review, listed ? 5 : 7, (listed ? rowY(cfg.record_glasses) + 2.4 : 36.4) + 3 * (1 - pr), 1, phone ? 0 : pr)
     }
 
     // The frame's caption rolls with the step.

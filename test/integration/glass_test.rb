@@ -228,9 +228,9 @@ class GlassPagesTest < ActionDispatch::IntegrationTest
     get root_path
     slide = css_select(".f4 .sl").first
     assert_match "The tasting record", slide.text
-    # No verdict glasses: the one glass is the featured review's score
-    # (shared/_score), drawn on the review's white card.
-    assert_equal 1, slide.css("svg[data-glass]").size
+    # No verdict glasses: one glass per listed review, plus the featured
+    # review's score (shared/_score) on the white card.
+    assert_equal slide.css(".rv-rows li.pour").size + 1, slide.css("svg[data-glass]").size
     assert_equal 1, slide.css(".review .rv-card [data-score] svg[data-glass]").size
     assert_no_match "The verdict", slide.text
     assert_no_match "Allocated Bottles Night", response.body

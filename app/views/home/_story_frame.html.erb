@@ -51,6 +51,7 @@
     .hx .mm-t-going { font-weight: 600; font-size: 2.5cqw; font-variant-numeric: tabular-nums; color: var(--ink); }
     .hx .mm-t-label { font-weight: 600; font-size: 2.8cqw; letter-spacing: -.03em; }
     .hx .mm-t-score { font-weight: 600; font-size: 2.8cqw; font-variant-numeric: tabular-nums; color: #f6f4ee; }
+    .hx .mm-t-by { font-family: "Source Serif 4", Georgia, serif; font-size: 2.2cqw; color: rgba(246, 244, 238, .72); }
     .hx .mm-vline { width: 46cqw; height: .35cqw; background: #f6f4ee; border-radius: .2cqw; }
     /* The glass: shared/_glass, recoloured by the controller as it passes
        from orange (ink lines) to green (cream lines). */
@@ -119,7 +120,7 @@
       .hx .mm-slide, .hx .mm-lift { border-radius: 14px; }
       .hx .mm-bar { padding: 8px 8px 3px; font-size: 13px; min-height: 30px; }
       .hx .mm-t-label, .hx .mm-t-score { font-size: 3.3cqw; }
-      .hx .mm-rm { display: none; }
+      .hx .mm-rm, .hx .mm-t-by { display: none; }
       .hx .mm-card .wheel-label { display: none; }
       .hx .story.is-live .beat { min-height: 62svh; }
       .hx .story.is-live .b4 { min-height: 92svh; }
@@ -132,10 +133,11 @@
 <% rec = f[:record] %>
 <% heading = rec[:kind] == :verdict ? "The verdict" : "The tasting record" %>
 <% invite_caption = inv[:sample] ? "Gather your society" : "The next tasting night" %>
+<% listed = rec[:kind] == :reviews %>
 <% config = { rows: f[:rows].size, picked: f[:picked], sample: inv[:sample], invite_glasses: inv[:glasses], going: inv[:going].present?,
               record: rec[:kind], record_glasses: rec[:glasses], seats: f[:seats], table: f[:table], slide_in_invite: f[:slide_in_invite],
               slide_in_record: f[:slide_in_record], wheel: rec[:profile].present?,
-              levels: rec[:kind] == :verdict ? rec[:pours].map { |p| p[:level].round(3) } : (rec[:kind] == :review ? [ rec[:level].round(3) ] : []) } %>
+              levels: rec[:pours] ? rec[:pours].map { |p| p[:level].round(3) } : (rec[:kind] == :review ? [ rec[:level].round(3) ] : []) } %>
 <div class="mm" data-story-frame-target="frame" data-config="<%= config.to_json %>" aria-hidden="true">
   <div class="mm-pin">
     <div class="mm-player">
@@ -149,12 +151,12 @@
           </div>
         </div>
 
-        <%# The record's card: the night's palate wheel, or the review's score and wheel (or notes). %>
+        <%# The record's card: the night's palate wheel, or the (first row's) review's score and wheel (or notes). %>
         <% if rec[:kind] == :verdict && rec[:profile].present? %>
           <div class="mm-obj mm-card" data-mm="card">
             <div class="mm-wheel"><%= render "reviews/palate_wheel", profile: rec[:profile], draw: false, wedge_pours: rec[:wedge_pours] %></div>
           </div>
-        <% elsif rec[:kind] == :review %>
+        <% elsif rec[:kind] == :review || listed %>
           <% review = rec[:review] %>
           <% tasting = { "Nose" => review.nose, "Palate" => review.palate, "Finish" => review.finish }.compact_blank %>
           <div class="mm-obj mm-card mm-card--review<%= ' mm-card--notes' if rec[:profile].blank? %>" data-mm="card">
@@ -184,7 +186,7 @@
 
         <%# The record's heading and the rules between its rows. %>
         <div class="mm-obj" data-mm="heading"><span class="mm-h4 mm-t-heading"><span class="mm-roll" data-states="<%= [ "", heading ].to_json %>"></span></span></div>
-        <% if rec[:kind] == :verdict %>
+        <% if rec[:pours] %>
           <% rec[:pours].each_index do |k| %><div class="mm-obj mm-vline" data-mm="vline" data-k="<%= k %>"></div><% end %>
         <% end %>
 
@@ -210,7 +212,9 @@
         <div class="mm-obj" data-mm="meta"><span class="mm-t-where mm-roll" data-mode="words" data-states="<%= [ f[:rows][f[:picked]]&.dig(:meta).to_s, inv[:where], rec[:meta] ].to_json %>"></span></div>
         <div class="mm-obj" data-mm="going"><span class="mm-t-going mm-roll" data-states="<%= [ "", inv[:going], "" ].to_json %>"></span></div>
 
-        <% if rec[:kind] == :review %>
+        <% if listed %>
+          <div class="mm-obj mm-rv" data-mm="review"><span class="mm-rv-more"><%= with_arrow("Read the full tasting") %></span></div>
+        <% elsif rec[:kind] == :review %>
           <% review = rec[:review] %>
           <% quote = review.notes.presence %>
           <div class="mm-obj mm-rv" data-mm="review">
@@ -222,11 +226,14 @@
 
         <%# The glasses: guests on the invite, seats at the table, the night's pours. %>
         <% f[:seats].times do |k| %>
-          <% pour = rec[:kind] == :verdict ? rec[:pours][k] : nil %>
+          <% pour = rec[:pours]&.[](k) %>
           <div class="mm-obj mm-glass" data-mm="glass" data-k="<%= k %>"><%= render "shared/glass", level: 1, size: 40, appear: false %></div>
           <div class="mm-obj" data-mm="label" data-k="<%= k %>"><span class="mm-t-label mm-roll" data-states="<%= [ "", inv[:initials][k].to_s, pour ? pour[:name] : "" ].to_json %>"></span></div>
           <% if pour %>
             <div class="mm-obj" data-mm="score" data-k="<%= k %>"><span class="mm-t-score mm-roll" data-align="right" data-states="<%= [ "", pour[:score] ].to_json %>"></span></div>
+          <% end %>
+          <% if pour && pour[:by] %>
+            <div class="mm-obj" data-mm="by" data-k="<%= k %>"><span class="mm-t-by mm-roll" data-mode="words" data-states="<%= [ "", pour[:by] ].to_json %>"></span></div>
           <% end %>
         <% end %>
       </div>
