@@ -187,7 +187,10 @@ def build(src_path, out_path, kind, label, TITLE, SUB):
         c.drawImage(logo, M - 6, H - band_h + (band_h - lh) / 2, lw, lh, mask='auto')
         x = M + lw + 14
         c.setFillColor(MARK_ON_GREEN); c.setFont('Oswald', 9); c.drawString(x, H - 36, label.upper())
-        c.setFillColor(CREAM); c.setFont('Oswald', 25); c.drawString(x, H - 64, TITLE)
+        size = 25  # a long title shrinks to stay inside the right margin
+        while size > 16 and pdfmetrics.stringWidth(TITLE, 'Oswald', size) > W - M - x:
+            size -= 0.5
+        c.setFillColor(CREAM); c.setFont('Oswald', size); c.drawString(x, H - 64, TITLE)
         c.setFillColor(CREAM_MUTE); c.setFont('Crimson-Italic', 11.5); c.drawString(x, H - 84, SUB)
         footer(c, d)
         c.restoreState()
