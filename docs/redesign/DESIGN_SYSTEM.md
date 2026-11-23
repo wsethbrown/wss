@@ -167,7 +167,9 @@ glass and the view transitions. No animation library.
   screen, something can be on screen and still waiting, but only while the page is scrolling:
   when the scroll or a resize settles (150ms) everything waiting on screen starts its motion
   (started, not snapped; only what a jump carried past is shown at once), and a one-off 1.5s
-  limit does the same even if the observer never fires;
+  limit does the same even if the observer never fires; the one exception is motion inside a
+  pinned homepage face that has not settled (see "Pinned faces play when settled" below),
+  which starts when the face settles or after one second of stillness;
   focusing anything inside a waiting item shows it at once; print shows everything; Turbo
   snapshots and back/forward visits are never hidden.
   **Never mark anything taller than about one screen**: mark its heading (a deck section's
@@ -214,7 +216,8 @@ glass and the view transitions. No animation library.
     spot with no later face over it, or the page can scroll no further, or the reader has
     stopped (150ms) with the face all or nearly all (90%) in view. A reader who stops with the
     face still partly below the fold gets the motion after one second of stillness, so nothing
-    stays in a start state. On phones the faces are a plain stack and play on the normal
+    stays in a start state (the same applies when a layout shift, not a scroll, brings a face
+    in). A face that a later face has already slid over is shown finished, not played unseen. On phones the faces are a plain stack and play on the normal
     trigger.
   - **Photographs settle** (`photo` on `shared/_duotone`): from `scale: 1.04` to 1 over 1.2s
     inside the frame, which clips it, so nothing moves around it.

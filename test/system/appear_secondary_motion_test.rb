@@ -105,32 +105,40 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
     assert_operator layout["width"], :>=, 900, "the faces only pin from 900px up: #{layout}"
     assert_equal %w[sticky sticky sticky], layout["sticky"], "the faces must be sticky to test pinning: #{layout}"
 
-    # Scroll at a reading pace and note where each face was when it started.
+    # Scroll at a reading pace. Where each face was, and how long the page
+    # had been still, are recorded at the moment its class changes (a
+    # MutationObserver), not on the next animation frame, so a stalled CI
+    # frame cannot make a legal idle start look like a start mid-scroll.
     page.execute_script(<<~JS)
       window.__starts = {};
       window.__done = false;
       window.__scrolls = 0;
-      window.addEventListener("scroll", () => { window.__scrolls++ }, { passive: true });
+      window.__lastScrollAt = performance.now();
+      window.addEventListener("scroll", () => { window.__scrolls++; window.__lastScrollAt = performance.now() }, { passive: true });
+      new MutationObserver((records) => {
+        for (const record of records) {
+          const screen = record.target;
+          if (!screen.matches(".face .screen") || !screen.classList.contains("perform-run")) continue;
+          const face = screen.closest(".face");
+          const f = [ "f2", "f3", "f4" ].find((name) => face.classList.contains(name));
+          if (!f || f in window.__starts) continue;
+          const rect = face.getBoundingClientRect();
+          window.__starts[f] = { offset: Math.round(rect.top - parseFloat(getComputedStyle(face).top)),
+                                 top: Math.round(rect.top), bottom: Math.round(rect.bottom), pinned: getComputedStyle(face).top,
+                                 inView: (Math.min(rect.bottom, innerHeight) - Math.max(rect.top, 0)) / rect.height,
+                                 atEnd: scrollY >= document.documentElement.scrollHeight - innerHeight - 1,
+                                 stillMs: Math.round(performance.now() - window.__lastScrollAt) };
+        }
+      }).observe(document.querySelector("main"), { attributes: true, attributeFilter: [ "class" ], subtree: true });
       (() => {
-        let y = scrollY, prev = performance.now(), lastMove = performance.now();
+        let y = scrollY, prev = performance.now();
         const step = (now) => {
           // Cap the step so a slow frame on CI cannot jump a face past its pinned stretch.
           y += 400 * Math.min(now - prev, 40) / 1000; prev = now;
-          const before = scrollY; scrollTo({ top: y, behavior: "instant" }); if (scrollY !== before) lastMove = now;
-          const maxScroll = document.documentElement.scrollHeight - innerHeight;
-          for (const f of [ "f2", "f3", "f4" ]) {
-            const screen = document.querySelector(`.${f} .screen`);
-            if (!(f in window.__starts) && screen.classList.contains("perform-run")) {
-              const face = screen.closest(".face");
-              const rect = face.getBoundingClientRect();
-              window.__starts[f] = { offset: Math.round(rect.top - parseFloat(getComputedStyle(face).top)),
-                                     top: Math.round(rect.top), bottom: Math.round(rect.bottom), pinned: getComputedStyle(face).top,
-                                     inView: (Math.min(rect.bottom, innerHeight) - Math.max(rect.top, 0)) / rect.height,
-                                     atEnd: scrollY >= maxScroll - 1, stillMs: Math.round(now - lastMove) };
-            }
-          }
+          scrollTo({ top: y, behavior: "instant" });
           const close = document.querySelector(".beat--close").getBoundingClientRect();
-          const finished = close.top + close.height / 2 <= innerHeight / 2 || scrollY >= maxScroll - 1;
+          const finished = close.top + close.height / 2 <= innerHeight / 2 ||
+                           scrollY >= document.documentElement.scrollHeight - innerHeight - 1;
           if (!finished) requestAnimationFrame(step); else window.__done = true;
         };
         requestAnimationFrame(step);
@@ -149,13 +157,99 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
       assert start, "#{f} never had perform-run while scrolling: #{report}"
       assert start["offset"].is_a?(Numeric), "#{f}'s start could not be measured: #{report}"
       pinned = start["offset"].abs <= 1
-      settled_short = start["atEnd"] || (start["inView"] >= 0.9 && start["stillMs"] >= 100)
+      # The controller treats the page as still after SETTLE - 10 = 140ms; this
+      # page's own scroll listener runs a moment after the controller's in the
+      # same event, so allow 1ms.
+      settled_short = start["atEnd"] || (start["inView"] >= 0.9 && start["stillMs"] >= 139)
       assert pinned || settled_short, "#{f} started while still travelling (#{start['offset']}px from its pinned spot, " \
                                       "#{(start['inView'] * 100).round}% in view): #{report}"
     end
     assert_no_selector BUSY, visible: :all, wait: 5
   ensure
     page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
+  # The pause paths, which a continuous scroll never takes. Everything is
+  # driven and timed inside the page: positions come from live geometry, and
+  # the moment f3's screen gets perform-run is taken by a MutationObserver
+  # against performance.now(), so Ruby-side sleeps play no part. Margins are
+  # wide: the code starts held motion 150ms after the last scroll if the face
+  # is (nearly) all in view, else after 1000ms of stillness.
+  PAUSE_PROBE = <<~JS.freeze
+    window.__pause = (async (mode) => {
+      const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+      const face = document.querySelector(".f3"), screen = face.querySelector(".screen");
+      const pinned = parseFloat(getComputedStyle(face).top);
+      const info = () => {
+        const r = face.getBoundingClientRect();
+        return { top: Math.round(r.top), bottom: Math.round(r.bottom), height: Math.round(r.height), pinned,
+                 inView: +((Math.min(r.bottom, innerHeight) - Math.max(r.top, 0)) / r.height).toFixed(2), innerHeight };
+      };
+      let ranAt = null, ranGeometry = null;
+      new MutationObserver(() => {
+        if (ranAt === null && screen.classList.contains("perform-run")) { ranAt = performance.now(); ranGeometry = info(); }
+      }).observe(screen, { attributes: true, attributeFilter: [ "class" ] });
+      // Where f3's top must sit: half in view, or all in view but short of its pin.
+      const height = face.getBoundingClientRect().height;
+      const wantTop = mode === "inView" ? Math.max(pinned + 40, innerHeight - height - 24) : innerHeight - height / 2;
+      // Get there in a few quick steps (still a scroll), then stop.
+      const target = scrollY + (face.getBoundingClientRect().top - wantTop);
+      const from = scrollY;
+      // (The step below the pin is a plain 1:1 scroll: the face moves with the page until it pins.)
+      // behavior "instant": the page sets scroll-behavior: smooth, which would
+      // otherwise animate each step and blur the moment the scroll stops.
+      const jump = (top) => scrollTo({ top, behavior: "instant" });
+      for (let i = 1; i <= 6; i++) { jump(from + (target - from) * i / 6); await sleep(30); }
+      const stoppedAt = performance.now();
+      const atStop = info();
+      let nudgedAt = null;
+      if (mode === "cancel") {
+        await sleep(700);
+        jump(scrollY + 8);
+        nudgedAt = performance.now();
+      }
+      await sleep(mode === "inView" ? 1200 : 3000);
+      return { mode, atStop, ranAfterStop: ranAt === null ? null : Math.round(ranAt - stoppedAt),
+               ranAfterNudge: ranAt === null || nudgedAt === null ? null : Math.round(ranAt - nudgedAt),
+               ranGeometry, classes: screen.className };
+    })(arguments[0]).then((r) => { window.__pauseResult = r; });
+  JS
+
+  def pause_probe(mode)
+    page.driver.browser.manage.window.resize_to(1440, 900)
+    visit root_path
+    assert_selector ".f3 .screen.perform-wait", visible: :all
+    sticky = page.evaluate_script("getComputedStyle(document.querySelector('.f3')).position")
+    assert_equal "sticky", sticky, "f3 must be a pinned face for this test (width #{page.evaluate_script('innerWidth')})"
+    page.execute_script("window.__pauseResult = undefined; #{PAUSE_PROBE}", mode)
+    Timeout.timeout(20) { sleep 0.1 until page.evaluate_script("window.__pauseResult !== undefined") }
+    page.evaluate_script("window.__pauseResult")
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
+  test "a face stopped half in view waits, then plays after a second of stillness" do
+    r = pause_probe("half")
+    assert_in_delta 0.5, r["atStop"]["inView"], 0.2, "setup: f3 should be about half in view when the scroll stops: #{r}"
+    assert r["ranAfterStop"], "f3 never played after the page was still: #{r}"
+    assert_operator r["ranAfterStop"], :>=, 700, "f3 played too soon, while only half in view: #{r}"
+    assert_operator r["ranAfterStop"], :<=, 2500, "f3 played too late: #{r}"
+  end
+
+  test "scrolling again during the wait restarts the second of stillness" do
+    r = pause_probe("cancel")
+    assert_in_delta 0.5, r["atStop"]["inView"], 0.2, "setup: f3 should be about half in view when the scroll stops: #{r}"
+    assert r["ranAfterStop"], "f3 never played after the page was still: #{r}"
+    assert_operator r["ranAfterStop"], :>=, 1100, "f3 played on the first pause's timer despite the later scroll: #{r}"
+    assert_operator r["ranAfterNudge"], :>=, 700, "f3 played too soon after the later scroll: #{r}"
+  end
+
+  test "a face stopped nearly all in view, short of its pin, plays straight away" do
+    r = pause_probe("inView")
+    assert_operator r["atStop"]["inView"], :>=, 0.9, "setup: f3 should be (nearly) all in view: #{r}"
+    assert_operator r["atStop"]["top"] - r["atStop"]["pinned"], :>, 5, "setup: f3 should be short of its pin: #{r}"
+    assert r["ranAfterStop"], "f3 never played: #{r}"
+    assert_operator r["ranAfterStop"], :<=, 600, "f3 should start once the scroll settles (150ms): #{r}"
   end
 
   test "an RSVP re-pours the table and ends at the true level" do

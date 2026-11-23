@@ -40,7 +40,9 @@ import { Controller } from "@hotwired/stimulus"
 //
 // The triggers sit inside the viewport, so while the page scrolls an item
 // can be on screen and still waiting. When the scroll settles (150ms) that
-// band is emptied: everything waiting on screen starts its motion.
+// band is emptied: everything waiting on screen starts its motion, except
+// motion held for a pinned face that is not yet settled (above), which
+// starts once the face settles or after HELD_IDLE of stillness.
 //
 // Safety rules, each one a bug this replaced or could have caused:
 // - The hidden start state is a class this controller adds, never server
@@ -343,9 +345,16 @@ export default class extends Controller {
       // Inside a pinned (sticky) container that is still sliding into
       // place: hold it until the container has settled, so it plays where
       // it will stay and not while it travels.
-      if (force !== "late" && this.unsettled(target) && !(force === "idle" && this.inView(target))) {
+      // The page is still if the scroll has settled (an idle sweep) or a
+      // layout shift with no scroll brought this in (late fonts, images).
+      const idle = force === "idle" || (!force && this.pageIdle())
+      if (force !== "late" && this.unsettled(target) && !(idle && this.inView(target) && !this.covered(target))) {
+        // Stopped with the face covered by a later one (Page Down, End, a
+        // scrollbar jump): nobody can see it, so show it finished rather
+        // than spend the motion unseen.
+        if (idle && this.covered(target)) { this.held.delete(target); this.finish(target); continue }
         this.held.add(target); this.checkHeldSoon()
-        if (force === "idle") this.holdLate()
+        if (idle) this.holdLate()
         continue
       }
       this.held.delete(target)
@@ -489,12 +498,12 @@ export default class extends Controller {
       if (!rect || rect.bottom <= 0) this.finish(target) // gone, or passed: show at once
       else if (rect.top < height) onScreen.push({ target, rect })
     }
-    // Once the scroll has stopped, everything waiting on screen starts,
-    // settled or not, so nothing is left in a start state. (The one-off
+    // Once the scroll has stopped, everything waiting on screen starts, so
+    // nothing is left in a start state; motion held for a pinned face starts
+    // only if the face is (nearly) all in view, else after HELD_IDLE. (The one-off
     // time limit can land mid-scroll; then a sliding face keeps waiting for
     // its spot, and the settle after the scroll starts it at the latest.)
-    const idle = !this.lastScroll || performance.now() - this.lastScroll >= SETTLE - 10
-    this.reveal(onScreen, idle ? "idle" : false)
+    this.reveal(onScreen, this.pageIdle() ? "idle" : false)
   }
 
   // A face held while the page is still: start it once the page has stayed
@@ -510,12 +519,27 @@ export default class extends Controller {
         this.held.delete(el)
         if (!this.waiting.has(el) || !el.isConnected) continue
         const rect = el.getBoundingClientRect()
-        if (rect.bottom <= 0) this.finish(el)
+        if (rect.bottom <= 0 || this.covered(el)) this.finish(el) // passed, or out of sight under a later face
         else if (rect.top < height) late.push({ target: el, rect })
         else this.held.add(el)
       }
       this.reveal(late, "late")
     }, HELD_IDLE - SETTLE)
+  }
+
+  pageIdle() {
+    return !this.lastScroll || performance.now() - this.lastScroll >= SETTLE - 10
+  }
+
+  // A later sticky face has slid over the face around el.
+  covered(el) {
+    const box = el.closest("[data-appear-settle]")
+    if (!box || getComputedStyle(box).position !== "sticky") return false
+    const top = box.getBoundingClientRect().top
+    for (let next = box.nextElementSibling; next; next = next.nextElementSibling) {
+      if (next.matches("[data-appear-settle]") && next.getBoundingClientRect().top <= top + 1) return true
+    }
+    return false
   }
 
   // The face around el is all, or very nearly all (90%), on screen.
@@ -543,12 +567,7 @@ export default class extends Controller {
     // place as it ever will: that is its settled spot.
     const atEnd = window.scrollY >= document.documentElement.scrollHeight - window.innerHeight - 1
     if (Math.abs(top - pinned) > 1 && !atEnd) return true
-    let next = box.nextElementSibling
-    while (next) {
-      if (next.matches("[data-appear-settle]") && next.getBoundingClientRect().top <= top + 1) return true
-      next = next.nextElementSibling
-    }
-    return false
+    return this.covered(el)
   }
 
   checkHeldSoon() {
@@ -558,6 +577,8 @@ export default class extends Controller {
       const ready = []
       for (const el of [ ...this.held ]) {
         if (!this.waiting.has(el) || !el.isConnected) { this.held.delete(el); continue }
+        // Scrolled back up past it: show it finished and stop checking it.
+        if (el.getBoundingClientRect().bottom <= 0) { this.held.delete(el); this.finish(el); continue }
         if (!this.unsettled(el)) ready.push({ target: el, rect: el.getBoundingClientRect() })
       }
       if (ready.length) { ready.forEach(({ target }) => this.held.delete(target)); this.reveal(ready, "late") }
