@@ -37,11 +37,11 @@ def rows_card(s, x, y, w, items, label_w, row_h, mark=None, label_size=20, size=
         yy += row_h
 
 
-def pour_slide(n, pour, name, note, maker, style, abv):
-    """One pour: a bottle-shaped placeholder card, the pour line, the name, a short note,
-    and Maker / Style / ABV, as in Peat Reek."""
+def pour_slide(n, pour, name, note, maker, style, abv, photo=None, credit=None):
+    """One pour: the bottle's photograph (or the placeholder card when there is none), the pour
+    line, the name, a short note, and Maker / Style / ABV, as in Peat Reek."""
     s = new_slide()
-    bottle_placeholder(s, X, 0.8, 3.4, 5.3)
+    bottle_panel(s, photo, X, 0.8, 3.4, 5.3, credit)
     x, w = 4.85, 7.63
     kicker(s, pour, x=x)
     text(s, x, 1.25, w, 0.85, name, size=46, font=SANS, bold=True, color=INK, ls=0.92)
@@ -95,7 +95,9 @@ footer(s, 2)
 pour_slide(3, 'Glass 1 of 4', 'Craigellachie 13',
            ['From the Speyside distillery Mackie invested in, built in 1890 and 1891.',
             'No peat.'],
-           'Craigellachie, Speyside', 'Speyside single malt, 13 years', '46%')
+           'Craigellachie, Speyside', 'Speyside single malt, 13 years', '46%',
+           photo='craigellachie-13.jpg',
+           credit='Pictured: the label, close up. Photograph: Thomon, CC BY-SA 4.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 4 two distilleries
 s = new_slide()
@@ -156,7 +158,9 @@ footer(s, 6)
 # ---------------------------------------------------------------- 7 pour 2
 pour_slide(7, 'Glass 2 of 4', 'White Horse',
            ['Mackie’s blend, built on Lagavulin.'],
-           'Diageo', 'Blended Scotch whisky', '40%')
+           'Diageo', 'Blended Scotch whisky', '40%',
+           photo='white-horse.jpg',
+           credit='Pictured: on a shop shelf, beside other bottles. Photograph: Dssoobgh Rremyoo, CC BY-SA 4.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 8 1907
 s = new_slide()
@@ -171,7 +175,9 @@ footer(s, 8)
 # ---------------------------------------------------------------- 9 pour 3
 pour_slide(9, 'Glass 3 of 4', 'Lagavulin 16',
            ['Mackie’s own distillery.'],
-           'Lagavulin, Islay', 'Islay single malt, 16 years', '43%')
+           'Lagavulin, Islay', 'Islay single malt, 16 years', '43%',
+           photo='lagavulin-16.jpg',
+           credit='Pictured: an older label. Photograph: Céréales Killer, CC BY-SA 3.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 10 Malt Mill
 s = new_slide()
@@ -223,7 +229,9 @@ footer(s, 12)
 pour_slide(13, 'Glass 4 of 4', 'Laphroaig 10',
            ['The whisky Mackie sold for years and then tried to copy.',
             'Same strength as the Lagavulin. Made two miles away.'],
-           'Laphroaig, Islay', 'Islay single malt, 10 years', '43%')
+           'Laphroaig, Islay', 'Islay single malt, 10 years', '43%',
+           photo='laphroaig-10.jpg',
+           credit='Pictured: the 40% bottling. Photograph: Datenralfi, CC BY-SA 3.0 DE, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 14 today
 s = new_slide()
