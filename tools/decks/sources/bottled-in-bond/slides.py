@@ -148,7 +148,7 @@ sides = [(X, WHITE, HAIR, INK, 'Straight whiskey',
            [('Sold ', {}), ('without', {'bold': True}), (' aging', {})]])]
 for (cx, fill, edge, col, name, rows) in sides:
     rrect(s, cx, 0.8, pw, 5.6, r=0.3, fill=fill, line=edge)
-    text(s, cx + 0.45, 1.2, pw - 0.9, 0.9, name, size=40, font=SANS, bold=True, color=col)
+    text(s, cx + 0.45, 1.2, pw - 0.6, 0.9, name, size=40, font=SANS, bold=True, color=col)
     if fill == OAK:
         rect(s, cx + 0.47, 2.15, 0.9, 0.045, fill=MARK)
     yy = 2.55

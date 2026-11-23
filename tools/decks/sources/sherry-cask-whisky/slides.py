@@ -197,7 +197,7 @@ footer(s, 4)
 s = new_slide()
 text(s, 0.75, 0.6, 6.6, 1.8, '1915', size=130, font=SANS, bold=True, color=INK, ls=0.9)
 rect(s, X + 0.03, 2.5, 1.2, 0.045, fill=MARK)
-text(s, X, 2.75, 6.6, 1.3, ['Whisky must spend two years', 'in bond before sale.'], size=32, font=SANS, bold=True,
+text(s, X, 2.75, 6.9, 1.3, ['Whisky must spend two years', 'in bond before sale.'], size=32, font=SANS, bold=True,
      color=INK, ls=0.95)
 text(s, X, 4.2, 6.5, 2.0,
      'Raised to three years in 1916. Before the war, much Scotch was sold within months of distilling.',
@@ -207,7 +207,7 @@ footer(s, 5)
 
 # ---------------------------------------------------------------- 6 1938
 s = new_slide()
-heading(s, 0.85, 'From 1938, bourbon goes into new barrels', size=40, w=CW, h=0.9)
+heading(s, 0.85, 'From 1938, bourbon goes into new barrels', size=38, w=CW, h=0.9)
 rows_card(s, X, 2.1, CW, [
     ('Filled', 'New charred oak, as American law requires.'),
     ('Emptied', 'The barrel cannot hold bourbon again.'),

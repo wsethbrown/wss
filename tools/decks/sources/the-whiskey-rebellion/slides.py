@@ -187,7 +187,7 @@ footer(s, 6)
 
 # ---------------------------------------------------------------- 7 summonses to Philadelphia
 s = new_slide()
-heading(s, 0.85, 'July 1794: summonses to a court in Philadelphia', size=36, w=CW, h=0.9)
+heading(s, 0.85, 'July 1794: summonses to a court in Philadelphia', size=34, w=CW, h=0.9)
 gap = 1.9
 bw = (CW - gap) / 2
 by, bh = 1.95, 1.75

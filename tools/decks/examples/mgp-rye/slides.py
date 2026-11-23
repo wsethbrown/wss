@@ -62,7 +62,7 @@ footer(s, 3)
 s = new_slide()
 text(s, 0.75, 0.9, 6.2, 2.2, '1885', size=150, font=SANS, bold=True, color=INK, ls=0.9)
 rect(s, 0.88, 3.25, 1.2, 0.045, fill=MARK_DEEP)
-text(s, 0.85, 3.55, 5.6, 1.0, 'Seven distilleries in one county', size=26, font=SANS, bold=True, color=INK)
+text(s, 0.85, 3.55, 6.0, 1.0, 'Seven distilleries in one county', size=26, font=SANS, bold=True, color=INK)
 text(s, 0.85, 4.1, 5.6, 0.6, 'Four of them in Lawrenceburg', size=18, italic=True, color=MUTE)
 heading(s, 1.15, 'Lawrenceburg was a whiskey town.', size=34, x=7.1, w=5.4, h=1.4)
 text(s, 7.1, 2.95, 5.35, 2.2, [

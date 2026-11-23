@@ -115,7 +115,7 @@ credit(s, 7.53, 0.55 + th + 0.08, tw,
 
 # ---------------------------------------------------------------- 2 maple charcoal
 s = new_slide()
-heading(s, 0.85, 'Maple charcoal, between the still and the' + NB + 'barrel', size=36, w=CW, h=0.9)
+heading(s, 0.85, 'Maple charcoal, between the still and the' + NB + 'barrel', size=34, w=CW, h=0.9)
 rows_card(s, X, 2.0, CW, [
     ('Maple', 'sugar maple, stacked and burned in the open'),
     ('Charcoal', 'broken up and packed about ten feet deep'),
@@ -150,7 +150,7 @@ for i, (name, body) in enumerate(people):
     rrect(s, cx, 2.0, cw3, 3.0, r=0.26, fill=WHITE, line=HAIR)
     if i == 1:
         rect(s, cx + 0.35, 2.25, 0.9, 0.045, fill=MARK_DEEP)
-    text(s, cx + 0.35, 2.4, cw3 - 0.45, 0.55, name, size=20, font=SANS, bold=True, color=INK)
+    text(s, cx + 0.35, 2.4, cw3 - 0.45, 0.55, name, size=19, font=SANS, bold=True, color=INK)
     text(s, cx + 0.35, 3.05, cw3 - 0.6, 1.9, body, size=19, color=INK, ls=1.2)
 strip(s, 5.4, 0.85, 'This comes from a 1967 biography and local memory. Little was written' + NB + 'down.',
       size=20)
@@ -280,7 +280,7 @@ s = new_slide()
 text(s, 0.75, 0.55, 8.0, 2.1, '2016', size=150, font=SANS, bold=True, color=INK, ls=0.9)
 rect(s, X + 0.03, 2.75, 1.2, 0.045, fill=MARK_DEEP)
 text(s, X, 3.0, CW, 0.7, 'The New York Times reports on Nearest Green, June' + NB + '2016.',
-     size=30, font=SANS, bold=True, color=INK, ls=0.98)
+     size=28, font=SANS, bold=True, color=INK, ls=0.98)
 text(s, X, 3.95, CW, 2.2,
      ['Jack Daniel’s put his story forward for its 150th anniversary. Fawn Weaver read the article and began '
       'researching his' + NB + 'life.',

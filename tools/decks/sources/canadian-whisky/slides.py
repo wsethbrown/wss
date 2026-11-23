@@ -88,11 +88,11 @@ def pour_slide(n, pour, name, note, maker, style, abv, two_line_name=False, widt
     return s
 
 
-def big_figure(n, head, figure, body, quiet, quiet_y=5.2):
+def big_figure(n, head, figure, body, quiet, quiet_y=5.2, head_size=32):
     """A big-figure slide on paper: the old slide's heading, the figure in green at 150 pt with a
     short orange rule under it, the sentence and the quieter line under that."""
     s = new_slide()
-    heading(s, 0.75, head, size=32, w=CW, h=0.7)
+    heading(s, 0.75, head, size=head_size, w=CW, h=0.7)
     text(s, 0.75, 1.45, 9.0, 2.1, figure, size=150, font=SANS, bold=True, color=INK, ls=0.9)
     rect(s, X + 0.03, 3.65, 1.2, 0.045, fill=MARK_DEEP)
     text(s, X, 3.95, 10.4, 1.0, body, size=24, color=INK, ls=1.2)
@@ -182,7 +182,7 @@ big_figure(6, 'Canada requires two years in wood', '1890',
 
 # ---------------------------------------------------------------- 7 each grain on its own
 s = new_slide()
-heading(s, 0.75, 'Each grain is distilled and aged on its own', size=40, w=CW, h=0.9)
+heading(s, 0.75, 'Each grain is distilled and aged on its own', size=38, w=CW, h=0.9)
 tw7 = 8.3
 grains = [('Corn', 'column still, high strength', 'base whisky'),
           ('Wheat', 'column still, high strength', 'base whisky'),
@@ -220,7 +220,7 @@ sides = [(X, WHITE, HAIR, INK, 'Base whisky',
           ['Usually rye', 'Distilled to a lower strength', 'Keeps more taste of the grain', 'A smaller share'])]
 for (cx, fill, edge, col, name, lines_) in sides:
     rrect(s, cx, 0.8, pw, 5.6, r=0.3, fill=fill, line=edge)
-    text(s, cx + 0.45, 1.15, pw - 0.9, 0.85, name, size=38, font=SANS, bold=True, color=col)
+    text(s, cx + 0.45, 1.15, pw - 0.6, 0.85, name, size=38, font=SANS, bold=True, color=col)
     if fill == OAK:
         rect(s, cx + 0.47, 2.05, 0.9, 0.045, fill=MARK)
     yy = 2.4
@@ -296,11 +296,11 @@ footer(s, 13)
 big_figure(14, 'Other spirits or wine in Canadian whisky sold in the US', '9.09%',
            'One part in eleven: ten parts whisky to one part of something\u00a0else.',
            'The figure is not in Canada’s own definition of whisky, which allows caramel and flavouring. '
-           'Labels rarely say what was\u00a0added.', quiet_y=4.85)
+           'Labels rarely say what was\u00a0added.', quiet_y=4.85, head_size=30)
 
 # ---------------------------------------------------------------- 15 the name for being light
 s = new_slide()
-heading(s, 0.75, 'Why Canadian whisky has a name for being light', size=36, w=CW, h=0.9)
+heading(s, 0.75, 'Why Canadian whisky has a name for being light', size=34, w=CW, h=0.9)
 pw = (CW - 0.25) / 2
 cards = [(X, WHITE, HAIR, INK, 'Mostly base whisky',
           'The big blends sold in the US since Repeal, made for highballs and\u00a0mixing.'),
@@ -308,7 +308,7 @@ cards = [(X, WHITE, HAIR, INK, 'Mostly base whisky',
           'All-rye and high-rye bottlings, a small share of exports until\u00a0recently.')]
 for (cx, fill, edge, col, name, body) in cards:
     rrect(s, cx, 1.85, pw, 2.75, r=0.3, fill=fill, line=edge)
-    text(s, cx + 0.4, 2.1, pw - 0.8, 0.7, name, size=30, font=SANS, bold=True, color=col)
+    text(s, cx + 0.4, 2.1, pw - 0.6, 0.7, name, size=28, font=SANS, bold=True, color=col)
     if fill == OAK:
         rect(s, cx + 0.42, 2.85, 0.9, 0.045, fill=MARK)
     text(s, cx + 0.4, 3.1, pw - 0.8, 1.4, body, size=20, color=col, ls=1.2)

@@ -124,7 +124,7 @@ for i, (name, body) in enumerate(cards):
     rrect(s, cx, 2.1, cw, 2.2, r=0.26, fill=WHITE, line=HAIR)
     if i == 1:
         rect(s, cx + 0.35, 2.35, 0.9, 0.045, fill=MARK_DEEP)
-    text(s, cx + 0.35, 2.5, cw - 0.6, 0.6, name, size=26, font=SANS, bold=True, color=INK)
+    text(s, cx + 0.35, 2.5, cw - 0.45, 0.6, name, size=25, font=SANS, bold=True, color=INK)
     text(s, cx + 0.35, 3.2, cw - 0.6, 1.0, body, size=20, color=INK, ls=1.2)
     if i < 2:
         text(s, cx + cw, 2.1, gap, 2.2, '+' if i == 0 else '→', size=30, font=SANS, bold=True, color=MUTE,
@@ -224,7 +224,7 @@ footer(s, 10)
 
 # ---------------------------------------------------------------- 11 Dublin closes
 s = new_slide()
-heading(s, 0.85, 'Dublin closes and Midleton opens, 1971\u00a0to\u00a01976', size=36, w=CW, h=0.9)
+heading(s, 0.85, 'Dublin closes and Midleton opens, 1971\u00a0to\u00a01976', size=34, w=CW, h=0.9)
 rows_card(s, X, 2.0, CW, [
     ('1971', 'Bow Street stops distilling. Its production moves to John’s Lane.'),
     ('1975', 'A new distillery opens at Midleton, County Cork.'),

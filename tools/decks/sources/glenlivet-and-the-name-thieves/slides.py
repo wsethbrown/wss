@@ -46,7 +46,7 @@ def rows_card(s, x, y, w, items, label_w, row_h, mark=None, label_size=20, size=
         yy += row_h
 
 
-def pour_slide(n, pour, name, note, maker, style, abv, photo, cap):
+def pour_slide(n, pour, name, note, maker, style, abv, photo, cap, name_size=44):
     """One pour: a photograph of the distillery (no free photograph of the bottles), the pour line,
     the name, a short note, and Maker / Style / ABV."""
     s = new_slide()
@@ -54,7 +54,7 @@ def pour_slide(n, pour, name, note, maker, style, abv, photo, cap):
     credit(s, X, 6.18, 3.4, cap)
     x, w = 4.85, 7.63
     kicker(s, pour, x=x)
-    text(s, x, 1.25, w, 0.85, name, size=44, font=SANS, bold=True, color=INK, ls=0.92)
+    text(s, x, 1.25, w, 0.85, name, size=name_size, font=SANS, bold=True, color=INK, ls=0.92)
     text(s, x, 2.4, w, 2.0, note, size=21, italic=True, color=INK, ls=1.2, space_after=6)
     rrect(s, x, 4.6, w, 1.35, r=0.26, fill=WHITE, line=HAIR)
     cols = [('Maker', maker, 2.55), ('Style', style, 3.35), ('ABV', abv, 1.1)]
@@ -223,7 +223,8 @@ pour_slide(11, 'Pour 3 of 4', 'Aberlour 12 Double Cask',
             'Company name until 2007: Aberlour-Glenlivet.'],
            'Aberlour, Aberlour', 'Speyside single malt, 12 years', '40%',
            'aberlour.jpg',
-           'Aberlour, 2013. Photo: Peter Moore, CC BY-SA 2.0, via geograph.org.uk and Wikimedia Commons. Cropped.')
+           'Aberlour, 2013. Photo: Peter Moore, CC BY-SA 2.0, via geograph.org.uk and Wikimedia Commons. Cropped.',
+           name_size=42)
 
 # ---------------------------------------------------------------- 12 1900
 s = new_slide()

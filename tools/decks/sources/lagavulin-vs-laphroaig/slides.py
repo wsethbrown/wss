@@ -75,7 +75,7 @@ credit(s, 7.35, ty + th + 0.08, tw,
 
 # ---------------------------------------------------------------- 2 Mackie
 s = new_slide()
-heading(s, 0.75, 'Peter Mackie, 1855 to 1924', size=40, w=7.4, h=0.9)
+heading(s, 0.75, 'Peter Mackie, 1855 to 1924', size=40, w=7.9, h=0.9)
 text(s, X, 1.65, 7.2, 0.5, 'Owner of Lagavulin, maker of White Horse.',
      size=19, italic=True, color=MUTE)
 rows_card(s, X, 2.45, 7.3, [

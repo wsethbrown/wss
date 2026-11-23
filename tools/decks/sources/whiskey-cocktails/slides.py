@@ -262,7 +262,7 @@ footer(s, 15)
 
 # ---------------------------------------------------------------- 16 the stories came later
 s = new_slide()
-heading(s, 0.85, 'The origin stories were written down later.', size=40, w=CW, h=0.9)
+heading(s, 0.85, 'The origin stories were written down later.', size=38, w=CW, h=0.9)
 events = [('1923', 'A Hoffman House bartender names a man called Black.'),
           ('1931', 'A Waldorf memoir credits the Pendennis Club.'),
           ('1933', 'Repeal. Bars reopen.'),

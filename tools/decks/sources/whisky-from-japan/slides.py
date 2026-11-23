@@ -42,7 +42,7 @@ def strip(s, x, y, w, h, runs, size=15, fill=W100, color=INK):
 s = new_slide(INK)
 picture(s, LOGO_CREAM, 0.85, 0.75, 1.9, 1.9 * LOGO_RATIO)
 ja(text(s, 0.85, 2.55, 6.0, 0.5, 'ウイスキー', size=20, font=SANS, color=CREAM_MUTE))
-text(s, 0.85, 3.05, 6.4, 1.0, 'Whisky From Japan', size=50, font=SANS, bold=True, color=CREAM, ls=0.95)
+text(s, 0.85, 3.05, 6.6, 1.0, 'Whisky From Japan', size=48, font=SANS, bold=True, color=CREAM, ls=0.95)
 rect(s, 0.88, 4.2, 0.9, 0.045, fill=MARK)
 text(s, 0.85, 4.45, 6.0, 0.6, 'Hakata: a whisky made in Japan that cannot be labeled Japanese whisky', size=24, italic=True, color=CREAM_MUTE)
 text(s, 0.85, 6.3, 6.4, 0.6, 'The Whiskey Share Society  ·  Hakata  ·  Hikari Distillery, Fukuoka',
@@ -57,7 +57,7 @@ label(s, 1.2, 'How whisky reached Japan')
 heading(s, 1.62, 'Japan had no whisky until the late nineteenth century.', size=30, h=1.0)
 picture(s, A / 'perry.jpg', 0.85, 2.55, 3.0, 3.75, radius_in=0.22)
 text(s, 0.85, 6.38, 3.0, 0.3, 'Commodore Matthew Perry, 1853', size=10.5, font=SANS, color=MUTE)
-text(s, 4.35, 2.55, 8.1, 3.0, [
+text(s, 4.35, 2.55, 8.13, 3.0, [
     [('The country had been sealed for more than two hundred years.', {'bold': True, 'font': SANS, 'size': 18.5})],
     'An American naval squadron under Commodore Perry forced it open in 1853. Whisky came with the expedition and with the traders and diplomats who followed.',
     'Whisky has been drunk in Japan for about a hundred and fifty years. It has been made there for about a hundred.',
@@ -241,7 +241,7 @@ for n, name, owner, cap, photo, (la, lo), cx, cy in cards:
     picture(s, A / photo, cx + 0.12, cy + 0.12, CW - 0.24, 0.92, radius_in=0.14)
     badge(cx + 0.38, cy + 1.3, n, 0.3)
     text(s, cx + 0.62, cy + 1.15, CW - 0.8, 0.3, name, size=14, font=SANS, bold=True, color=INK)
-    text(s, cx + 0.22, cy + 1.48, CW - 0.4, 0.25, owner, size=10, font=SANS, color=MUTE)
+    text(s, cx + 0.22, cy + 1.48, CW - 0.34, 0.25, owner, size=9.5, font=SANS, color=MUTE)
     text(s, cx + 0.22, cy + 1.72, CW - 0.4, 0.5, cap, size=12, color=INK, ls=1.08)
     mx, my = pt(la, lo)
     badge(mx, my, n)
@@ -293,7 +293,7 @@ for i, (lab, lead, body, foot) in enumerate(cols):
     x = 0.85 + i * (cw3 + 0.3)
     rrect(s, x, 2.1, cw3, 3.75, r=0.3, fill=OAK, line=OAK_EDGE)
     text(s, x + 0.32, 2.35, cw3 - 0.6, 0.3, lab, size=13, font=SANS, bold=True, color=CREAM_MUTE)
-    text(s, x + 0.32, 2.7, cw3 - 0.6, 0.5, lead, size=22, font=SANS, bold=True, color=CREAM)
+    text(s, x + 0.32, 2.7, cw3 - 0.5, 0.5, lead, size=22, font=SANS, bold=True, color=CREAM)
     text(s, x + 0.32, 3.35, cw3 - 0.6, 1.6, body, size=15.5, color=CREAM, ls=1.2)
     rect(s, x + 0.34, 4.98, 0.5, 0.035, fill=MARK)
     text(s, x + 0.32, 5.1, cw3 - 0.6, 0.6, foot, size=14.5, font=SANS, bold=True, color=CREAM, ls=1.1)
@@ -315,7 +315,7 @@ for i, (k, v) in enumerate(tsteps, 1):
     text(s, 0.85, yy, 0.46, 0.46, str(i), size=15, font=SANS, bold=True, color=INK, align=PP_ALIGN.CENTER,
          anchor=MSO_ANCHOR.MIDDLE)
     text(s, 1.55, yy - 0.04, 6.8, 0.35, k, size=17, font=SANS, bold=True, color=INK)
-    text(s, 1.55, yy + 0.32, 6.8, 0.4, v, size=17, color=INK)
+    text(s, 1.55, yy + 0.32, 7.1, 0.4, v, size=17, color=INK)
     if i < 4:
         line(s, 1.55, yy + 0.83, 8.2, yy + 0.83, HAIR, 1.0)
     yy += 0.95
