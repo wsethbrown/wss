@@ -17,6 +17,30 @@ class MagicLinksTest < ApplicationSystemTestCase
     Dir.glob("#{mail_dir}/*").each { |file| File.delete(file) } if Dir.exist?(mail_dir)
   end
 
+  # Where this test's lines start in the server log (see before_teardown).
+  def before_setup
+    super
+    @log_path = Rails.root.join("log/test.log")
+    @log_start = File.exist?(@log_path) ? File.size(@log_path) : 0
+  end
+
+  # On failure, print what the app logged about magic links during this test
+  # (sent to an existing user or as a new sign-up; signed in or refused, and
+  # why). Seen once in CI: the link sent to an existing user landed back on
+  # /auth, and the output alone could not say which branch refused it. These
+  # log lines never contain a token or an address.
+  def before_teardown
+    unless passed? || skipped?
+      Rails.logger.flush if Rails.logger.respond_to?(:flush)
+      lines = File.exist?(@log_path) ? File.open(@log_path) { |f| f.seek(@log_start); f.read }.to_s.lines : []
+      lines = lines.grep(/Magic[- ]link|Started (GET|POST) "\/(auth|dashboard|magic_links)/)
+                   .map { |l| l.gsub(%r{magic_links/[A-Za-z0-9_-]+}, "magic_links/[token]") }
+      puts "\n--- Magic-link server log: #{name} ---", lines, "--- end ---"
+    end
+  ensure
+    super
+  end
+
   # Magic-link mail is sent with deliver_later and the test environment uses the
   # ActiveJob test adapter, so jobs enqueued by the app server must be performed
   # explicitly before the :file delivery writes the message to tmp/mail.
