@@ -366,7 +366,8 @@ export default class extends Controller {
 
   goStatic(hold = true) {
     const was = this.element.classList.contains("is-live")
-    const restore = was && hold ? this.holdPlace() : null
+    // (a controller detached from its element has no steps left to measure)
+    const restore = was && hold && this.beatTargets.length ? this.holdPlace() : null
     this.live = false
     this.element.classList.remove("is-live")
     if (this.padding !== undefined) document.documentElement.style.scrollPaddingTop = this.padding

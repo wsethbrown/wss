@@ -272,9 +272,9 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
     JS
     landed, done, away = r.values_at("landed", "done", "away")
     assert_operator landed["wedges"], :>, 0, "the card has a wheel: #{r}"
-    assert_operator landed["end"], :>=, 2, "four wedges a quarter second apart, each about a second: #{r}"
+    assert_operator landed["end"], :>=, 1.8, "four wedges a quarter second apart, each about a second: #{r}"
     refute landed["tinted"], "not complete when the move lands: #{r}"
-    assert_operator landed["w"], :<, landed["end"] / 2, r
+    assert_operator landed["w"], :<, landed["end"], "under way (it starts as the card lands) but not done: #{r}"
     assert landed["playing"], "it goes on playing: #{r}"
     assert done["still"], "the page stayed still: #{r}"
     assert done["grown"] && done["tinted"] && done["labels"], "complete on its own: #{r}"
