@@ -50,6 +50,10 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
   setup do
     browser = page.driver.browser
     browser.execute_cdp("Network.clearBrowserCookies") if browser.respond_to?(:execute_cdp)
+    # One browser serves the whole run, so a window an earlier test resized
+    # and did not put back (the homepage frame's phone-width tests) would
+    # reach this one: at 500px the nav hides "Sign out" and sign-in helpers fail.
+    browser.manage.window.resize_to(1400, 1400)
   end
 
   # Waits until Turbo has finished the current visit: <html aria-busy> is cleared
