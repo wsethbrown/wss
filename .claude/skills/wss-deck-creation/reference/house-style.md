@@ -234,4 +234,4 @@ Recorded so later decks can reuse or depart from them knowingly.
 - **Documents:** the owner's PDF template structure (band, rule, running head, footer, callouts,
   green stage directions) in site colours, Oswald and Crimson Text, built with reportlab from the
   markdown (`tools/decks/pdfs.py`). Slide helpers in `tools/decks/wsskit.py`; the slides
-  themselves in `tools/decks/examples/the-rye-from-lawrenceburg/slides.py`.
+  themselves in `tools/decks/examples/mgp-rye/slides.py`.

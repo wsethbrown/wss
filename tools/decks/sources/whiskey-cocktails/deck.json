@@ -1,0 +1,36 @@
+{
+  "slug": "Whiskey-Cocktails",
+  "title": "Whiskey Cocktails",
+  "subtitle": "The Old Fashioned, the Manhattan and the Sazerac",
+  "category": "Cocktails",
+  "difficulty": "Beginner",
+  "duration": "45 min",
+  "description": "How the 1806 cocktail of spirit, sugar, water and bitters became the Old Fashioned, the Manhattan and the Sazerac, and what each says about the whiskey of its day. Four pours.",
+  "pours": [
+    {
+      "name": "Plain whiskey cocktail",
+      "origin": "Made with Old Overholt Rye",
+      "style": "Built in the glass, Small tumbler",
+      "notes": "Make it as the 1806 definition reads. Taste it with no ice, then add one cube."
+    },
+    {
+      "name": "Old Fashioned",
+      "origin": "Made with Old Forester 86 Proof",
+      "style": "Stirred over ice, Rocks glass",
+      "notes": "Sugar, bitters, bourbon and a twist of orange peel, stirred over ice. No muddled fruit."
+    },
+    {
+      "name": "Manhattan",
+      "origin": "Made with Wild Turkey 101 Rye",
+      "style": "Stirred, strained, Chilled coupe",
+      "notes": "Two parts rye to one of sweet vermouth, with bitters, stirred until very cold."
+    },
+    {
+      "name": "Sazerac",
+      "origin": "Made with Sazerac Rye",
+      "style": "Stirred, strained, Rinsed rocks glass",
+      "notes": "Rinse the glass with absinthe, strain in the drink with no ice, and throw away the lemon peel."
+    }
+  ],
+  "tags": "cocktails, rye, bourbon, history"
+}

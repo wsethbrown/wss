@@ -66,7 +66,7 @@ misread brief is a batch thrown away.
 | `<slug>-speaker-notes.pdf`, `<slug>-research-outline.pdf` | built | owner downloads on the site |
 | `slides/slide-NN.png` | built | QA, and the slide images and cover on the site |
 
-The worked example is `tools/decks/examples/the-rye-from-lawrenceburg/` (sources only;
+The worked example is `tools/decks/examples/mgp-rye/` (sources only;
 build it to see the outputs). `deck.json` fields: `difficulty` is Beginner, Intermediate or
 Advanced; `tags` is one comma-separated string; each pour is
 `{name, origin, style, strength, notes}`; no `price` (see Pricing).
@@ -166,7 +166,7 @@ Departing from it: write your own helpers or palette in `slides.py`; keep the sy
 Tools: `tools/decks/` (install steps in its README). Sources go in a folder of their own:
 
 ```bash
-cp -r tools/decks/examples/the-rye-from-lawrenceburg <src>/<deck>   # then rewrite every file
+cp -r tools/decks/examples/mgp-rye <src>/<deck>   # then rewrite every file
 python3 -I tools/decks/build.py <src>/<deck> tmp/decks                # tmp/ is gitignored
 ```
 

@@ -29,10 +29,10 @@ python3 -I tools/decks/build.py <source_dir> <out_root>
 For example, the pilot deck:
 
 ```bash
-python3 -I tools/decks/build.py tools/decks/examples/the-rye-from-lawrenceburg tmp/decks
+python3 -I tools/decks/build.py tools/decks/examples/mgp-rye tmp/decks
 ```
 
-writes `tmp/decks/The-Rye-From-Lawrenceburg/` with the pptx (script in every notes field),
+writes `tmp/decks/MGP-Rye/` with the pptx (script in every notes field),
 both PDFs, `slides/slide-NN.png` and copies of the sources, then checks the counts match.
 Then load it as a draft: `bin/rails decks:load DIR=tmp/decks` (see `wss-deck-pipeline`).
 
@@ -64,7 +64,7 @@ folder outside the repo. Built files (pptx, PDFs, PNGs) are never committed.
 | `tests/test_keynote.py` | Checks the pptx structure Keynote needs (no Keynote required). |
 | `inspect_pptx.py` | Dump shapes, positions, fonts and notes of any pptx (for studying reference decks). |
 | `assets/` | The WSS logo, cream (for green grounds) and green (for paper). |
-| `examples/the-rye-from-lawrenceburg/` | The pilot package's sources: a worked example, not a template. |
+| `examples/mgp-rye/` | The pilot package's sources: a worked example, not a template. |
 
 ## Keynote
 
@@ -99,7 +99,7 @@ thumbnail for a good file and hangs on a faulty one. A deck that any other tool 
 ## A new deck
 
 ```bash
-cp -r tools/decks/examples/the-rye-from-lawrenceburg ~/decks-src/my-deck   # then rewrite every file
+cp -r tools/decks/examples/mgp-rye ~/decks-src/my-deck   # then rewrite every file
 ```
 
 Keep the sources somewhere durable, never only in a scratch directory a session can lose.

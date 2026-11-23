@@ -1,0 +1,40 @@
+{
+  "slug": "Blended-Scotch",
+  "title": "Blended Scotch",
+  "subtitle": "1830 to 1910",
+  "category": "Scotch Whisky",
+  "difficulty": "Intermediate",
+  "duration": "45 min",
+  "description": "How a new still, a few grocers and a vine pest made blended Scotch the world's whisky between 1830 and 1910. Four pours.",
+  "pours": [
+    {
+      "name": "Haig Club Clubman",
+      "origin": "Diageo, Cameronbridge, Fife",
+      "style": "Single grain Scotch whisky",
+      "strength": "40% ABV",
+      "notes": "Grain whisky on its own, which few people taste. Notice how light it is."
+    },
+    {
+      "name": "The Glenlivet 12 Year Old",
+      "origin": "Chivas Brothers, Speyside",
+      "style": "Single malt Scotch whisky",
+      "strength": "40% ABV",
+      "notes": "The malt Usher vatted. Taste it against the grain whisky: heavier, with more fruit and cereal."
+    },
+    {
+      "name": "Johnnie Walker Black Label",
+      "origin": "Diageo, Scotland",
+      "style": "Blended Scotch, 12 years",
+      "strength": "40% ABV",
+      "notes": "Malt and grain together. Look for the fruit of the malt and the lightness of the grain."
+    },
+    {
+      "name": "Dewar’s White Label",
+      "origin": "John Dewar & Sons, Perth",
+      "style": "Blended Scotch whisky",
+      "strength": "40% ABV",
+      "notes": "Taste a little neat, then try it in a tall glass with ice and soda water, as London drank it in the 1890s."
+    }
+  ],
+  "tags": "scotch, blends, history, grain whisky"
+}
