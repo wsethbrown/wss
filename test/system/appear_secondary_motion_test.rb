@@ -83,10 +83,28 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
     assert_equal 0.0, offset.to_f
   end
 
+  # Viewport state is per browser tab and Capybara reuses the tab across
+  # tests, so a size or emulation set by one test must never reach the next.
+  # Every test here starts and ends with no device-metrics override.
+  setup { cdp("Emulation.clearDeviceMetricsOverride") }
+
+  # The faces are sticky only from 900px up; below that their computed top
+  # is "auto", which made every recorded start NaN (null) and failed this
+  # test as "f2 performed" whenever the viewport came out narrow. So the
+  # viewport is pinned with CDP (as the scroll-row test does, rather than
+  # resizing the window, which did not reliably take effect after that
+  # test's override), and the layout is checked before scrolling.
   test "on a wide screen a face's motion waits until the face is pinned" do
-    page.driver.browser.manage.window.resize_to(1440, 900)
+    cdp("Emulation.setDeviceMetricsOverride", width: 1440, height: 900, deviceScaleFactor: 1, mobile: false)
     visit root_path
     assert_selector ".f3 .screen.perform-wait", visible: :all
+    layout = page.evaluate_script(<<~JS)
+      ({ width: window.innerWidth,
+         sticky: [ "f2", "f3", "f4" ].map((f) => getComputedStyle(document.querySelector(`.${f}`)).position) })
+    JS
+    assert_operator layout["width"], :>=, 900, "the faces only pin from 900px up: #{layout}"
+    assert_equal %w[sticky sticky sticky], layout["sticky"], "the faces must be sticky to test pinning: #{layout}"
+
     # Scroll at a reading pace and note where each face was when it started.
     page.execute_script(<<~JS)
       window.__starts = {};
@@ -101,7 +119,8 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
             const screen = document.querySelector(`.${f} .screen`);
             if (!(f in window.__starts) && screen.classList.contains("perform-run")) {
               const face = screen.closest(".face");
-              window.__starts[f] = Math.round(face.getBoundingClientRect().top - parseFloat(getComputedStyle(face).top));
+              window.__starts[f] = { offset: Math.round(face.getBoundingClientRect().top - parseFloat(getComputedStyle(face).top)),
+                                     top: Math.round(face.getBoundingClientRect().top), pinned: getComputedStyle(face).top };
             }
           }
           if (y < end) requestAnimationFrame(step); else window.__done = true;
@@ -110,14 +129,19 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
       })();
     JS
     Timeout.timeout(90) { sleep 0.1 until page.evaluate_script("window.__done") }
-    starts = page.evaluate_script("window.__starts")
+    report = page.evaluate_script(<<~JS)
+      ({ starts: window.__starts, width: window.innerWidth,
+         screens: Object.fromEntries([ "f2", "f3", "f4" ].map((f) => [ f, document.querySelector(`.${f} .screen`).className ])) })
+    JS
     %w[f2 f3 f4].each do |f|
-      assert starts[f], "#{f} performed"
-      assert_operator starts[f].abs, :<=, 1, "#{f} started #{starts[f]}px from its pinned spot"
+      start = report["starts"][f]
+      assert start, "#{f} never had perform-run while scrolling: #{report}"
+      assert start["offset"].is_a?(Numeric), "#{f}'s start could not be measured: #{report}"
+      assert_operator start["offset"].abs, :<=, 1, "#{f} started #{start['offset']}px from its pinned spot: #{report}"
     end
     assert_no_selector BUSY, visible: :all, wait: 5
   ensure
-    page.driver.browser.manage.window.resize_to(1400, 1400)
+    cdp("Emulation.clearDeviceMetricsOverride")
   end
 
   test "an RSVP re-pours the table and ends at the true level" do
