@@ -94,7 +94,7 @@ This is Peter Mackie. The drawing is from the magazine Vanity Fair in April 1908
 
 Mackie was born in 1855 near Stirling. His father was a farmer and grain merchant. At 23 he went to work for his uncle, who had a whisky business in Glasgow. The uncle's partners were the Graham family, who ran Lagavulin. Peter was sent to Lagavulin to learn how whisky was made. His uncle died in 1889 and Peter took over the firm.
 
-One writer described him as "one third genius, one third megalomaniac and one third eccentric".
+The writer and diplomat Sir Robert Bruce Lockhart described him as "one third genius, one third megalomaniac and one third eccentric".
 
 ## [SLIDE 3] Glass 1: Craigellachie 13
 
@@ -108,7 +108,7 @@ _Ask: "What do you taste in it?"_
 
 ## [SLIDE 4] Two distilleries two miles apart
 
-Now Islay. In the mid-1880s a writer called Alfred Barnard went round the distilleries of Britain and Ireland for a book. He visited Lagavulin and Laphroaig, and this slide shows what he found.
+In the mid-1880s a writer called Alfred Barnard went round the distilleries of Britain and Ireland for a book. He visited Lagavulin and Laphroaig, on Islay.
 
 Lagavulin was the bigger one. It made about 75,000 gallons a year. Its water came from two lochs on the hill. Some of its whisky was sold by itself as a single whisky, and Barnard thought that was unusual.
 
@@ -116,7 +116,7 @@ Laphroaig made about 23,000 gallons a year. Its water came from a small stream t
 
 Both dried their malt over peat and nothing else.
 
-Barnard wrote one more thing about Laphroaig. All of its whisky was sold by Mackie & Co of Glasgow, and he was told that had been so for sixty years.
+Barnard also wrote that all of Laphroaig's whisky was sold by Mackie & Co of Glasgow. He was told that had been so for sixty years.
 
 ## [SLIDE 5] For sixty years one firm sold both
 
@@ -140,7 +140,7 @@ _Pour glass 2 now, the White Horse._
 
 This is White Horse. It is 40 percent. Diageo makes it now. Shops that sell it still say Lagavulin is a big part of it. Diageo does not publish the recipe.
 
-The Craigellachie was 46 percent and this is 40. We are going in order of smoke tonight, not strength.
+The Craigellachie was 46 percent and this is 40. The four glasses are in order of smoke, from least to most.
 
 _Ask: "Can you taste any smoke in it?"_
 
@@ -148,7 +148,7 @@ _Ask: "Can you taste any smoke in it?"_
 
 In 1907 the man who ran Laphroaig, Alexander Johnston, died. The distillery went to his two sisters and his nephew. They thought Mackie was not giving them a fair deal. They took him to court and ended his agency.
 
-The next part comes from Laphroaig. Laphroaig says Mackie then cut off the water to its distillery. The older version of the story says he had his men pull stones out of the channel that carried the water. Laphroaig's website says he blocked the stream with rocks. In both versions a court made him put it back.
+Laphroaig says Mackie then cut off the water to its distillery. The older version of the story says he had his men pull stones out of the channel that carried the water. Laphroaig's website says he blocked the stream with rocks. In both versions a court made him put it back.
 
 > **IF SOMEONE ASKS**
 > Most accounts give 1907 for the end of the agency. One gives 1908. The water story comes only from Laphroaig, and nobody has found Mackie's side of it.
@@ -163,7 +163,7 @@ Mackie always said Lagavulin got its flavour from its water, which runs down fro
 
 Mackie died in 1924. In 1927 his firm joined the Distillers Company, and Diageo owns Lagavulin today. In 1988 the 16 was chosen as one of six whiskies sold together as the Classic Malts.
 
-Keep some of this in the glass. The Laphroaig is next and you will want to compare them.
+Keep some of this in the glass to compare with the Laphroaig, glass 4.
 
 _Ask: "What do you taste in this one?"_
 
@@ -173,7 +173,7 @@ In 1908 Mackie built a second, small distillery inside Lagavulin. He called it M
 
 Malt Mill had its own malting floor, its own peat kiln and two stills. The story is that the stills were copies of Laphroaig's and that Mackie hired Laphroaig's brewer to run the place.
 
-It did not work. Malt Mill's whisky was nothing like Laphroaig. It went into Mackie's blends, and White Horse was one of them.
+Malt Mill's whisky was nothing like Laphroaig. It went into Mackie's blends, and White Horse was one of them.
 
 Malt Mill kept going after Mackie died. It stopped around 1960, and some accounts say 1962. Its stills were moved into Lagavulin. Nobody has a bottle of Malt Mill that has been proved genuine. In the 2012 film _The Angel's Share_ the lost cask is a cask of Malt Mill.
 

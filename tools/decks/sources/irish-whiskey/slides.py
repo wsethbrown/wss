@@ -272,7 +272,7 @@ rows_card(s, X, 1.9, CW, [
     ('Single pot still', 'Malted and unmalted barley, pot stills, one distillery.'),
     ('Single malt', 'Malted barley only, pot stills, one distillery.'),
     ('Blended', 'A mix of two or more styles, usually with grain whiskey.'),
-    ('Who made it', 'New brands often buy their whiskey. Look for a distillery.'),
+    ('Who made it', 'New brands often buy their whiskey from a distillery.'),
 ], label_w=3.0, row_h=0.92, label_size=22, size=20)
 footer(s, 16)
 

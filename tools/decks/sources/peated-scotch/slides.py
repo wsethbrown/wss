@@ -164,7 +164,7 @@ footer(s, 7)
 # ---------------------------------------------------------------- 8 pour 2
 pour_slide(8, 'Pour 2 of 4', 'Bowmore 12',
            ['Usually described as medium peated.',
-            'The same age and strength as the Glenmorangie, from a different kiln.'],
+            'The same age and strength as the Glenmorangie, made from peated malt.'],
            'Bowmore, Islay', 'Islay single malt, 12 years', '40%')
 
 # ---------------------------------------------------------------- 9 ppm
@@ -172,7 +172,7 @@ s = new_slide()
 heading(s, 0.85, 'The ppm figure measures the malt', size=40, w=CW, h=0.9)
 text(s, X, 1.75, CW, 0.5, 'Parts per million of phenols, tested in a laboratory before anything is distilled.',
      size=20, italic=True, color=MUTE)
-cols = [('Malt', 'The ppm figure you read about.'),
+cols = [('Malt', 'The ppm figure is measured here.'),
         ('Still', 'Heavy phenols come late. Where the cut falls decides how many are kept.'),
         ('Cask', 'Smoke fades with each year in wood.'),
         ('Glass', 'Lower than the malt. The label cannot tell you by how much.')]

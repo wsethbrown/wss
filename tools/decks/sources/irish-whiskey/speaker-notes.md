@@ -20,13 +20,13 @@ Irish whiskey from 1880 to now. Four pours, 17 slides, about 45 minutes.
 
 Tonight is about Irish whiskey over the last 140 years.
 
-In the 1880s Irish whiskey had the best reputation of any whiskey, and a lot of it was made in Dublin. A hundred years later there were two working distilleries left in the whole of Ireland, and one company owned both. Today there are dozens again. I'll tell you how that happened, in order. We'll taste four whiskeys as we go.
+In the 1880s Irish whiskey had the best reputation of any whiskey, and a lot of it was made in Dublin. A hundred years later there were two working distilleries left in the whole of Ireland, and one company owned both. Today there are dozens again. There are four whiskeys to taste tonight.
 
-The photograph is Locke's distillery at Kilbeggan. It comes up later.
+The photograph is Locke's distillery at Kilbeggan. It was taken between 1880 and 1900. The distillery stopped in 1954.
 
 ## [SLIDE 2] Dublin's four big distillers in the 1880s
 
-We start in Dublin in the 1880s. Four firms made most of the whiskey there. John Jameson was at Bow Street, north of the river. William Jameson was a separate firm at Marrowbone Lane. John Power was at John's Lane. George Roe was at Thomas Street.
+In the 1880s four firms made most of the whiskey in Dublin. John Jameson was at Bow Street, north of the river. William Jameson was a separate firm at Marrowbone Lane. John Power was at John's Lane. George Roe was at Thomas Street.
 
 The picture is the Bow Street distillery. It was drawn for a journalist called Alfred Barnard, who visited the distilleries of Britain and Ireland in the 1880s and published a book about them in 1887.
 
@@ -50,7 +50,7 @@ This is Redbreast 12. It is made at Midleton, in County Cork, by Irish Distiller
 
 Redbreast started as a merchant's brand. Gilbey's were wine and spirit merchants in Dublin. They bought pot still whiskey from the Bow Street distillery, aged it in their own casks and bottled it. They were using the name Redbreast by 1912. Irish Distillers bought the brand in 1986.
 
-Taste it with nothing added. Notice how it feels in your mouth before you think about the flavour. Keep a little in the glass. We'll come back to it with pour three.
+Taste it with nothing added. Notice how it feels in your mouth before you think about the flavour. Keep a little in the glass to compare with pour three.
 
 ## [SLIDE 5] Pot still and Coffey still
 
@@ -68,7 +68,7 @@ In 1908 the British government set up a Royal Commission to decide what could be
 
 The Dublin distillers had lost the argument. By then the Scotch blends were already selling well in England and abroad.
 
-The picture is the John's Lane distillery, from the same book as the last one.
+The picture is the John's Lane distillery. It is from Alfred Barnard's book of 1887.
 
 ## [SLIDE 7] From 1922, two jurisdictions
 
@@ -78,7 +78,7 @@ That put the distilleries in two different countries. Most of them were now in t
 
 The photograph is Bushmills. It was taken some time before the First World War.
 
-You will see the year 1608 on Bushmills bottles. In 1608 King James I gave a local landowner a licence to distil in that part of County Antrim. The licence was not for this distillery. The company that ran Bushmills was formed in 1784.
+Bushmills bottles carry the year 1608. In 1608 King James I gave a local landowner a licence to distil in that part of County Antrim. The licence was not for this distillery. The company that ran Bushmills was formed in 1784.
 
 ## [SLIDE 8] Pour 2 of 4: Bushmills 10 Year Old
 
@@ -86,7 +86,9 @@ _Pour glass 2 now._
 
 This is Bushmills 10 Year Old. It is a single malt. All the barley is malted and there is no raw barley in it. It is distilled three times.
 
-Compare it with the Redbreast. Both are made in pot stills. Both are distilled three times. Both are 40 percent. The main difference is the raw barley in the Redbreast. Does this one feel lighter in your mouth?
+Compare it with the Redbreast. Both are made in pot stills. Both are distilled three times. Both are 40 percent. The main difference is the raw barley in the Redbreast.
+
+_Ask: "Does this one feel lighter in your mouth?"_
 
 Bushmills has had several owners. Irish Distillers owned it from 1972 to 2005. Then it was sold to Diageo. In 2014 Diageo swapped it with the owners of Jose Cuervo for the other half of Don Julio tequila.
 
@@ -110,11 +112,9 @@ Bushmills joined in 1972. After that one company owned almost every distillery i
 
 ## [SLIDE 11] Dublin closes and Midleton opens, 1971 to 1976
 
-The old distilleries closed one at a time.
-
 Tullamore stopped in 1954. So did Locke's at Kilbeggan, the distillery in the photograph on the first slide. The Kilbeggan buildings were left standing.
 
-Irish Distillers decided to leave Dublin. Bow Street stopped distilling in 1971 and its production moved to John's Lane. The company built one new distillery at Midleton in County Cork, next to the old one. It started up in July 1975. John's Lane closed in 1976. The other two Dublin distilleries had closed long before. Nobody was making whiskey in Dublin any more.
+Irish Distillers decided to leave Dublin. Bow Street stopped distilling in 1971 and its production moved to John's Lane. The company built one new distillery at Midleton in County Cork, next to the old one. It started up in July 1975. John's Lane closed in 1976. The other two Dublin distilleries had closed long before. After 1976 no whiskey was distilled in Dublin.
 
 ## [SLIDE 12] 2 working distilleries on the island by 1980
 
@@ -152,17 +152,15 @@ This is Connemara. Cooley started selling it in 1996.
 
 Cooley did two things here that were unusual for Irish whiskey. They dried some of the malt over peat smoke. And they distilled twice, the way most Scottish distilleries do, and not three times.
 
-You should taste smoke. It is a single malt like the Bushmills, so compare the two if you have any Bushmills left.
+The smoke in the taste comes from the peat. It is a single malt like the Bushmills, so compare the two if you have any Bushmills left.
 
 ## [SLIDE 16] Reading an Irish whiskey label
 
-This slide shows what the words on an Irish whiskey label mean.
-
-Irish whiskey has to be distilled in Ireland and aged there for at least three years in wooden casks. That is the law.
+By law Irish whiskey has to be distilled in Ireland and aged there for at least three years in wooden casks.
 
 Single pot still means malted and unmalted barley, at least 30 percent of each, made in pot stills at one distillery. The Redbreast is one. Single malt means malted barley only, made in pot stills at one distillery. The Bushmills and the Connemara are single malts. Blended means two or more of these kinds mixed together. Usually one of them is grain whiskey. The Powers is a blend.
 
-The last line is about who made the whiskey. A lot of the brands in the shops are newer than the whiskey in the bottle. If a brand started in 2015 and sells a ten-year-old whiskey, it bought that whiskey from someone else. For years the only places to buy it were Midleton, Bushmills and Cooley. Look on the back label for the name of a distillery. If it only names a company, the whiskey was probably bought in.
+The last line is about who made the whiskey. A lot of the brands in the shops are newer than the whiskey in the bottle. If a brand started in 2015 and sells a ten-year-old whiskey, it bought that whiskey from someone else. For years the only places to buy it were Midleton, Bushmills and Cooley. Some back labels name the distillery where the whiskey was made. If the label names only a company, the whiskey was probably bought in.
 
 ## [SLIDE 17] Sláinte
 

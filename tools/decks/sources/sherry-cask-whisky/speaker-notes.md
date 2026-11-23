@@ -10,7 +10,7 @@ Sherry casks and Scotch, 1800s to now. Four pours, 19 slides, about 45 minutes.
 
 **Running order:** slides 1–7 (14 min) · pour one (4 min) · slides 9–10 (5 min) · pour two (5 min) · slides 12–13 (5 min) · pour three (5 min) · slides 15–16 (4 min) · pour four (5 min) · close (2 min).
 
-**Before people arrive:** put the four bottles out in the order you will pour them. Glenmorangie The Original, Glenmorangie Lasanta, Macallan 12 Sherry Oak, GlenDronach 12. Pour a little more of the Original than the others, because people will go back to it. Put water on the table. If anyone has a bottle of dry oloroso or Pedro Ximénez sherry, give people a small taste of each before pour four.
+**Before people arrive:** put the four bottles out in the order you will pour them. Glenmorangie The Original, Glenmorangie Lasanta, Macallan 12 Sherry Oak, GlenDronach 12. Pour a little more of the Original than the others, because the script compares each of the other three with it. Put water on the table. If anyone has a bottle of dry oloroso or Pedro Ximénez sherry, give people a small taste of each before pour four.
 
 ---
 
@@ -20,7 +20,7 @@ Sherry casks and Scotch, 1800s to now. Four pours, 19 slides, about 45 minutes.
 
 Tonight is about the sherry butt. A butt is a 500-litre oak cask. Sherry used to be shipped from Spain to Britain in butts, and when the wine merchant had bottled the sherry he was left with an empty cask. A lot of those casks were sold to Scottish distilleries. That is how Scotch came to be aged in sherry casks. In the 1980s the casks stopped coming, and distillers had to find another way to get them.
 
-We have four bottles from three distilleries: Glenmorangie, Macallan and GlenDronach. Each one uses sherry casks differently. We'll taste them as we go.
+We have four bottles from three distilleries: Glenmorangie, Macallan and GlenDronach. One was aged only in bourbon barrels. One was finished in sherry casks. Two were aged in sherry casks from the start.
 
 ## [SLIDE 2] Scotch is aged in casks that held something else first
 
@@ -48,7 +48,7 @@ These casks were made for shipping. Many were new or nearly new, and the sherry 
 
 For most of the 1800s a lot of Scotch was sold young, often within months of being made. So the cask mattered less than it does now. We also don't know how much of it was aged in sherry casks. Distillers used whatever casks they could get. Some had held rum, port or wine, and the records rarely say which.
 
-The First World War changed that. David Lloyd George was Chancellor of the Exchequer, and he thought heavy drinking was slowing down war production. One of the laws that followed was passed in May 1915. It said whisky had to sit in a bonded warehouse for at least two years before it could be sold. In May 1916 that went up to three years, and it is still three years today. From then on every bottle of Scotch had spent years in a cask, so the cask mattered much more.
+During the First World War David Lloyd George was Chancellor of the Exchequer. He thought heavy drinking was slowing down war production. One of the laws that followed was passed in May 1915. It said whisky had to sit in a bonded warehouse for at least two years before it could be sold. In May 1916 that went up to three years, and it is still three years today. From then on every bottle of Scotch had spent years in a cask, so the cask mattered much more.
 
 ## [SLIDE 6] From 1938, bourbon goes into new barrels
 
@@ -74,11 +74,11 @@ For decades The Original was ten years old. In 2024 Glenmorangie replaced it wit
 
 It is aged only in bourbon barrels. Glenmorangie says it picks its own oak in the Ozark forests of Missouri and has the wood dried in the open air. It then lends the finished barrels to American distillers, who fill them with whiskey before the barrels come to Tain.
 
-Look at the colour, and keep a little in your glass. We'll compare the other three with it.
+Look at the colour, and keep a little in your glass to compare with the other three.
 
 ## [SLIDE 9] Sherry must be bottled in the Jerez region
 
-Back to Jerez. In the 1970s and 80s the sherry producers wanted sherry to be bottled in Spain. That way the bottling work and the money from it stayed there.
+In the 1970s and 80s the sherry producers wanted sherry to be bottled in Spain. That way the bottling work and the money from it stayed there.
 
 It happened in stages. From the early 1970s the body that regulates sherry pushed the companies to bottle it in Spain. In the 1980s it became a rule. Some accounts date the rule to 1981 and others to 1986, so the slide shows both. Sherry was no longer shipped to Britain in butts, and the cheap empty casks stopped coming.
 
@@ -86,7 +86,7 @@ That was a serious problem for the distillers who relied on sherry casks. The bo
 
 ## [SLIDE 10] Two ways round the shortage
 
-Distillers dealt with it in two main ways. Our next two bottles are one of each.
+Distillers dealt with it in two main ways. Glenmorangie Lasanta, pour two, is an example of the first. Macallan 12 Sherry Oak, pour three, is an example of the second.
 
 The first way is to use fewer sherry casks. The whisky spends most of its life in bourbon barrels and is moved into a sherry cask for the last part. That is called a finish. Glenmorangie became known for finishes in the 1990s. Its first was finished in port casks. Bill Lumsden joined Glenmorangie in 1994 and became the person most associated with them. Balvenie did it earlier. David Stewart at Balvenie finished a whisky in oloroso sherry casks in 1982. It went on sale in 1983 as Balvenie Classic, and in 1993 the same idea became Balvenie DoubleWood.
 
@@ -100,11 +100,11 @@ Taste it next to the Original. They are the same age and from the same distiller
 
 ## [SLIDE 12] Seasoned casks, made to order in Jerez
 
-This is how a cask is made to order. A cooperage builds a new cask. The distiller chooses European or American oak and how much the inside is toasted. The cask goes to a bodega, which fills it with sherry. That is usually a young oloroso or a Pedro Ximénez, and it stays in the cask for anything from several months to a couple of years. Then the cask is emptied and shipped whole to Scotland. This is called seasoning the cask. A lot of the sherry that comes out is distilled into brandy or made into vinegar.
+To make a cask to order, a cooperage builds a new cask. The distiller chooses European or American oak and how much the inside is toasted. The cask goes to a bodega, which fills it with sherry. That is usually a young oloroso or a Pedro Ximénez, and it stays in the cask for anything from several months to a couple of years. Then the cask is emptied and shipped whole to Scotland. This is called seasoning the cask. A lot of the sherry that comes out is distilled into brandy or made into vinegar.
 
 In 2015 the body that regulates sherry started certifying these casks. A certified "Sherry Cask" has to hold real sherry from the region for at least twelve months. Its president has said the average is closer to eighteen months.
 
-There was an older shortcut. For much of the 1900s some casks were treated with paxarette, which is a dark, sweet wine concentrate. It gave the cask a sherry character quickly. That stopped around the end of the 1980s.
+For much of the 1900s some casks were treated with paxarette, which is a dark, sweet wine concentrate. It gave the cask a sherry character quickly. That stopped around the end of the 1980s.
 
 ## [SLIDE 13] A solera cask and a seasoned cask
 
@@ -144,7 +144,7 @@ Last pour. GlenDronach 12, at 43 percent. The distillery says it is aged for at 
 
 Like the Macallan, this has been in sherry casks all its life. Some of them are PX casks. Put it next to the Macallan. Both are twelve years old and 43 percent, and both were aged in sherry casks. See if you find this one darker or sweeter.
 
-When you've finished, I'd like a show of hands for which of the four you would buy.
+_Ask: "Which of the four would you buy?" Take a show of hands._
 
 ## [SLIDE 18] Reading the cask on a Scotch label
 

@@ -18,9 +18,9 @@ Peat smoke in Scotch whisky. Four pours, 18 slides, about 45 minutes.
 
 ## [SLIDE 1] Peated Scotch
 
-Thanks for coming. Tonight is about peat smoke in Scotch whisky. The old Scots name for it is "peat reek". We'll look at how the smoke got into whisky, and why some distilleries kept it when most gave it up.
+Thanks for coming. Tonight is about peat smoke in Scotch whisky. The old Scots name for it is "peat reek".
 
-There are four distilleries and four glasses. The first is on the mainland and uses almost no peat now. The second is on Islay and never stopped using it. The third is on Islay too. It was rebuilt in the 1970s to make whisky for blends. The fourth was closed for most of the 1980s and started again in 1997 with new owners.
+There are four distilleries and four glasses. Glenmorangie is on the mainland and uses almost no peat now. Bowmore is on Islay and never stopped using it. Caol Ila is on Islay too. It was rebuilt in the 1970s to make whisky for blends. Ardbeg, also on Islay, was closed for most of the 1980s and started again in 1997 with new owners.
 
 ## [SLIDE 2] Peat, the fuel of a country with few trees
 
@@ -54,19 +54,19 @@ _Pour glass 1 now._
 
 This is Glenmorangie The Original, from Tain. It's made from unpeated malt. It was a ten-year-old for decades and became a twelve-year-old in 2024.
 
-This is where we start from tonight. Smell it and taste it. There's no smoke, or so little that you wouldn't notice unless someone told you. When Barnard visited, this distillery burned nothing but peat.
+Smell it and taste it. There is little or no smoke in it. When Barnard visited, this distillery burned nothing but peat.
 
 _Ask: "Can anyone find any smoke in this at all?"_
 
-Keep a little in the glass if you can. We'll compare it with the last pour.
+Keep a little in the glass to compare with the Ardbeg, pour four.
 
 ## [SLIDE 6] Islay kept burning peat
 
-Islay is the most southerly island of the Inner Hebrides, off the west coast of Scotland. Its distilleries went on burning peat long after the mainland stopped. There were practical reasons for that.
+Islay is the most southerly island of the Inner Hebrides, off the west coast of Scotland. Its distilleries went on burning peat long after the mainland stopped.
 
 The island has a lot of peat, and much of it is close to the distilleries. It had no railway, so coal had to come by boat, and that made it expensive. The blenders also wanted Islay's smoky malts. A small amount of a very smoky malt adds a lot of flavour to a blend, and they were glad to buy it.
 
-You'll also hear that Islay peat tastes of the sea, because of salt spray and seaweed in it. Peat from different places is different. Nobody has shown how much of that you can taste in the whisky. Treat the seaweed as a story.
+People also say that Islay peat tastes of the sea, because of salt spray and seaweed in it. Peat from different places is different. Nobody has shown how much of that you can taste in the whisky.
 
 Bowmore is in the middle of the island, on Loch Indaal. It is first recorded in 1779, and it calls itself the oldest working distillery on Islay.
 
@@ -84,7 +84,7 @@ _Pour glass 2 now._
 
 This is Bowmore 12.
 
-Bowmore is usually described as medium peated. You can taste the smoke now, but it isn't the first thing you notice. A lot of people find it softer and sweeter than the smoke in the next two glasses.
+Bowmore is usually described as medium peated. A lot of people find its smoke softer and sweeter than the smoke in Caol Ila or Ardbeg.
 
 Taste it next to the Glenmorangie. Both are twelve years old and both are 40 percent. The smoke is the biggest difference between them. The stills and the casks are different too.
 
@@ -110,7 +110,7 @@ The maltings are still running today.
 
 Caol Ila is on the north-east coast of Islay, near Port Askaig. It looks across the water to the island of Jura. A Glasgow businessman, Hector Henderson, founded it in 1846. By the 1970s the Distillers Company owned it. Between 1972 and 1974 the company knocked most of it down and rebuilt it. It went from two stills to six.
 
-The company didn't rebuild it to sell Caol Ila under its own name. Most of the whisky went into blends, including Johnnie Walker. Most of it still does.
+The company rebuilt it to make whisky for blends, including Johnnie Walker. Most of its whisky still goes into blends.
 
 ## [SLIDE 12] Pour 3 of 4: Caol Ila 12
 
@@ -148,7 +148,7 @@ Around the same time, drinkers started looking for smoke. Heavily peated Islay m
 
 Distilleries started to compete on how much peat they used. Bruichladdich is on the other side of Loch Indaal from Bowmore. A group of investors reopened it in 2001. In 2008 it released the first Octomore, made from malt peated to 131 ppm. The next year Ardbeg released Supernova, from malt at just over 100 ppm. Later Octomores went much higher. One released in 2017 was given as 309 ppm.
 
-The numbers for tonight's four are the ones usually published, and they change from batch to batch. Ardbeg's is the least certain. You'll see anything from 42 to 70. All four are a long way below the bottles at the bottom of the chart.
+The numbers for tonight's four are the ones usually published, and they change from batch to batch. Ardbeg's is the least certain. Published figures run from 42 to 70. All four are a long way below the bottles at the bottom of the chart.
 
 ## [SLIDE 16] Pour 4 of 4: Ardbeg Ten
 
@@ -166,15 +166,13 @@ _Ask: "Which of the four would you buy a bottle of?"_
 
 ## [SLIDE 17] Reading peat on a Scotch label
 
-Here are a few things to remember when you look at a bottle.
-
 "Peated", "heavily peated" and "smoky" have no legal meaning for Scotch. They are the producer's own description.
 
 If the label gives a ppm figure, it was measured in the malt. The whisky in the bottle has less, and the label doesn't tell you how much less.
 
 The region doesn't tell you much. Several Islay distilleries make unpeated whisky. The Port Ellen maltings sell unpeated malt as well as peated. There are peated whiskies made on the mainland.
 
-Age matters. Smoke fades in the cask, so a younger whisky usually tastes smokier than an older one from the same distillery.
+Smoke fades in the cask, so a younger whisky usually tastes smokier than an older one from the same distillery.
 
 ## [SLIDE 18] Sláinte
 
