@@ -81,20 +81,25 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
 
   # No viewport emulation anywhere in this file: Capybara reuses one browser
   # tab across tests, and a CDP device-metrics override (used here briefly)
-  # both leaked between tests and, under CI's headless Chrome, left this
-  # test's held motion never starting, which local Chrome could not
-  # reproduce. The window is resized (before the visit, so the page and its
-  # observers are built at the final size) and put back in ensure.
+  # leaked between tests. The window is resized before the visit and put
+  # back in ensure.
   #
-  # The faces are sticky only from 900px up; below that their computed top
-  # is "auto", so the layout is checked before scrolling, and every failure
-  # prints what the page looked like.
-  test "on a wide screen a face's motion waits until the face is pinned" do
+  # The rule under test (owner: motion "shouldn't load until it settles into
+  # place"): a face's motion starts when the face has settled, meaning it sits
+  # at its pinned top, or the page can scroll no further, or the reader has
+  # stopped with the face (nearly) all in view; never while it is still
+  # sliding up from the bottom edge. The scripted scroll reads the closing
+  # beat's position live every frame (a figure taken once at the start went
+  # stale on CI as the layout settled, ending the scroll with the last face
+  # still half way up), and runs until that beat is mid-screen or the page
+  # ends. Faces are sticky only from 900px up, so the layout is checked first,
+  # and every failure prints what the page looked like.
+  test "on a wide screen a face's motion waits until the face has settled" do
     page.driver.browser.manage.window.resize_to(1440, 900)
     visit root_path
     assert_selector ".f3 .screen.perform-wait", visible: :all
     layout = page.evaluate_script(<<~JS)
-      ({ width: window.innerWidth,
+      ({ width: window.innerWidth, height: window.innerHeight,
          sticky: [ "f2", "f3", "f4" ].map((f) => getComputedStyle(document.querySelector(`.${f}`)).position) })
     JS
     assert_operator layout["width"], :>=, 900, "the faces only pin from 900px up: #{layout}"
@@ -107,20 +112,26 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
       window.__scrolls = 0;
       window.addEventListener("scroll", () => { window.__scrolls++ }, { passive: true });
       (() => {
-        const end = document.querySelector(".beat--close").getBoundingClientRect().top + scrollY;
-        let y = scrollY, prev = performance.now();
+        let y = scrollY, prev = performance.now(), lastMove = performance.now();
         const step = (now) => {
           // Cap the step so a slow frame on CI cannot jump a face past its pinned stretch.
-          y += 400 * Math.min(now - prev, 40) / 1000; prev = now; scrollTo(0, y);
+          y += 400 * Math.min(now - prev, 40) / 1000; prev = now;
+          const before = scrollY; scrollTo(0, y); if (scrollY !== before) lastMove = now;
+          const maxScroll = document.documentElement.scrollHeight - innerHeight;
           for (const f of [ "f2", "f3", "f4" ]) {
             const screen = document.querySelector(`.${f} .screen`);
             if (!(f in window.__starts) && screen.classList.contains("perform-run")) {
               const face = screen.closest(".face");
-              window.__starts[f] = { offset: Math.round(face.getBoundingClientRect().top - parseFloat(getComputedStyle(face).top)),
-                                     top: Math.round(face.getBoundingClientRect().top), pinned: getComputedStyle(face).top };
+              const rect = face.getBoundingClientRect();
+              window.__starts[f] = { offset: Math.round(rect.top - parseFloat(getComputedStyle(face).top)),
+                                     top: Math.round(rect.top), bottom: Math.round(rect.bottom), pinned: getComputedStyle(face).top,
+                                     inView: (Math.min(rect.bottom, innerHeight) - Math.max(rect.top, 0)) / rect.height,
+                                     atEnd: scrollY >= maxScroll - 1, stillMs: Math.round(now - lastMove) };
             }
           }
-          if (y < end) requestAnimationFrame(step); else window.__done = true;
+          const close = document.querySelector(".beat--close").getBoundingClientRect();
+          const finished = close.top + close.height / 2 <= innerHeight / 2 || scrollY >= maxScroll - 1;
+          if (!finished) requestAnimationFrame(step); else window.__done = true;
         };
         requestAnimationFrame(step);
       })();
@@ -137,7 +148,10 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
       start = report["starts"][f]
       assert start, "#{f} never had perform-run while scrolling: #{report}"
       assert start["offset"].is_a?(Numeric), "#{f}'s start could not be measured: #{report}"
-      assert_operator start["offset"].abs, :<=, 1, "#{f} started #{start['offset']}px from its pinned spot: #{report}"
+      pinned = start["offset"].abs <= 1
+      settled_short = start["atEnd"] || (start["inView"] >= 0.9 && start["stillMs"] >= 100)
+      assert pinned || settled_short, "#{f} started while still travelling (#{start['offset']}px from its pinned spot, " \
+                                      "#{(start['inView'] * 100).round}% in view): #{report}"
     end
     assert_no_selector BUSY, visible: :all, wait: 5
   ensure

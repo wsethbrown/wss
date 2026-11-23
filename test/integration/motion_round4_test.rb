@@ -18,8 +18,13 @@ class MotionRound4Test < ActionDispatch::IntegrationTest
     js = File.read(CONTROLLER)
     assert_includes js, "unsettled(el)"
     assert_match(/style\.position !== "sticky"\) return false/, js, "phones (not sticky) are not held")
-    assert_match(/!force && this\.unsettled\(target\)/, js, "a held face waits for its spot")
-    assert_match(/this\.reveal\(onScreen, idle\)/, js, "once the scroll stops, anything held on screen starts")
+    assert_match(/force !== "late" && this\.unsettled\(target\) && !\(force === "idle" && this\.inView\(target\)\)/, js,
+                 "a held face waits for its spot, or for the reader to stop with it all in view")
+    assert_match(/this\.reveal\(onScreen, idle \? "idle" : false\)/, js)
+    assert_match(/HELD_IDLE = 1000/, js, "a face stopped short (partly below the fold) still starts once the page is still")
+    assert_match(/shown \/ rect\.height >= 0\.9/, js, "all, or very nearly all, in view")
+    assert_match(/const atEnd = window\.scrollY >= document\.documentElement\.scrollHeight - window\.innerHeight - 1/, js,
+                 "a face that cannot travel further has settled")
     assert_includes js, "this.held.size", "held motion is re-checked as the page scrolls"
   end
 

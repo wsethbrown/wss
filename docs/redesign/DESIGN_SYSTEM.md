@@ -209,10 +209,12 @@ glass and the view transitions. No animation library.
     record's words settle while its wheel draws. CSS in `home/index`.
   - **Pinned faces play when settled.** On a wide screen the homepage faces are sticky: each
     slides up and pins. Everything inside a face (`data-appear-settle` on the face: its
-    perform, wheel, pour and photo settle) waits until the face sits at its pinned spot and
-    no later face has slid over it, then plays, so nothing is spent while the face is
-    travelling. When the scroll stops (150ms), anything still waiting on screen starts
-    anyway, settled or not. On phones the faces are a plain stack and play on the normal
+    perform, wheel, pour and photo settle) waits until the face has settled, then plays, so
+    nothing is spent while the face is still sliding up: settled means it sits at its pinned
+    spot with no later face over it, or the page can scroll no further, or the reader has
+    stopped (150ms) with the face all or nearly all (90%) in view. A reader who stops with the
+    face still partly below the fold gets the motion after one second of stillness, so nothing
+    stays in a start state. On phones the faces are a plain stack and play on the normal
     trigger.
   - **Photographs settle** (`photo` on `shared/_duotone`): from `scale: 1.04` to 1 over 1.2s
     inside the frame, which clips it, so nothing moves around it.

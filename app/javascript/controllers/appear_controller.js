@@ -31,8 +31,12 @@ import { Controller } from "@hotwired/stimulus"
 //
 // On a wide screen the homepage faces are sticky: they slide up and pin in
 // place. Motion inside one (marked data-appear-settle) waits until the face
-// has reached its pinned spot and is the one on top, then plays, so it is
-// not spent while the face is still travelling.
+// has settled, then plays, so it is not spent while the face is still
+// travelling. Settled: at its pinned spot and the one on top; or the page
+// can scroll no further; or the reader has stopped (150ms) with the face all
+// or very nearly all (90%) in view. A reader who stops with the face still
+// partly below the fold gets the motion after HELD_IDLE of stillness, so
+// nothing stays in a start state.
 //
 // The triggers sit inside the viewport, so while the page scrolls an item
 // can be on screen and still waiting. When the scroll settles (150ms) that
@@ -51,9 +55,10 @@ import { Controller } from "@hotwired/stimulus"
 // - Nothing on screen can stay hidden, even if the observer never fires:
 //   when the scroll (or a resize) settles, anything waiting above the bottom
 //   of the screen is revealed (or, if a jump carried it past, shown at once);
-//   a one-off time limit after load does the same for items, and for motion
-//   held for a pinned face only if the page has stopped scrolling (the
-//   settle after the scroll starts it at the latest); and focusing anything
+//   a one-off time limit after load does the same for items; motion held
+//   for a pinned face starts when the face settles, when the scroll stops
+//   with the face (nearly) all in view, or once the page has been still for
+//   HELD_IDLE whatever its position; and focusing anything
 //   inside a waiting item shows that item at once, so a keyboard user never
 //   lands on something invisible.
 // - Before Turbo caches the page, everything is finished, so a cached
@@ -84,6 +89,10 @@ const POUR_EASE = "cubic-bezier(0.2, 0.7, 0.2, 1)" // --motion-ease-pour
 const STAGGER = [ 0, 60, 110, 150, 180, 200 ] // ms; gaps shrink, then cap
 const ITEM = "[data-appear-target~='item']"
 const SETTLE = 150 // ms after the last scroll or resize event
+// Motion held for a pinned face that has stopped short of its spot (the
+// reader paused with it partly below the fold) starts once the page has been
+// still this long: it is no longer travelling, and nothing may stay hidden.
+const HELD_IDLE = 1000 // ms after the last scroll
 const LIMIT = 1500 // ms after targets are sorted: the one-off safety net
 const TALL = 1.2 // x the viewport height: an item this tall is never hidden
 const POUR_LAG = 120 // ms: secondary motion in a revealing card starts once the card shows
@@ -141,6 +150,7 @@ export default class extends Controller {
     window.removeEventListener("resize", this.onScroll)
     this.element.removeEventListener("focusin", this.onFocus)
     clearTimeout(this.settleTimer)
+    clearTimeout(this.lateTimer)
     clearTimeout(this.limitTimer)
     this.limitTimer = null
     if (this.frame) cancelAnimationFrame(this.frame)
@@ -314,6 +324,9 @@ export default class extends Controller {
 
   // Start the reveal of a batch arriving together, top to bottom, left to
   // right, with the shrinking stagger.
+  // force: false (start held motion only once its face has settled),
+  // "idle" (the scroll has stopped: also start a face that is all, or very
+  // nearly all, in view), "late" (still for HELD_IDLE: start everything).
   reveal(arriving, force = false) {
     if (!arriving.length) return
     arriving.sort((a, b) => (a.rect.top - b.rect.top) || (a.rect.left - b.rect.left))
@@ -330,7 +343,11 @@ export default class extends Controller {
       // Inside a pinned (sticky) container that is still sliding into
       // place: hold it until the container has settled, so it plays where
       // it will stay and not while it travels.
-      if (!force && this.unsettled(target)) { this.held.add(target); this.checkHeldSoon(); continue }
+      if (force !== "late" && this.unsettled(target) && !(force === "idle" && this.inView(target))) {
+        this.held.add(target); this.checkHeldSoon()
+        if (force === "idle") this.holdLate()
+        continue
+      }
       this.held.delete(target)
       // Inside a card still waiting: the card goes first (it is further
       // into view than its own trigger needs).
@@ -477,7 +494,37 @@ export default class extends Controller {
     // time limit can land mid-scroll; then a sliding face keeps waiting for
     // its spot, and the settle after the scroll starts it at the latest.)
     const idle = !this.lastScroll || performance.now() - this.lastScroll >= SETTLE - 10
-    this.reveal(onScreen, idle)
+    this.reveal(onScreen, idle ? "idle" : false)
+  }
+
+  // A face held while the page is still: start it once the page has stayed
+  // still for HELD_IDLE (cancelled by any scroll, which re-arms the sweep).
+  holdLate() {
+    clearTimeout(this.lateTimer)
+    this.lateTimer = setTimeout(() => {
+      if (!this.active || !this.held.size) return
+      if (this.lastScroll && performance.now() - this.lastScroll < HELD_IDLE - 20) return
+      const height = window.innerHeight
+      const late = []
+      for (const el of [ ...this.held ]) {
+        this.held.delete(el)
+        if (!this.waiting.has(el) || !el.isConnected) continue
+        const rect = el.getBoundingClientRect()
+        if (rect.bottom <= 0) this.finish(el)
+        else if (rect.top < height) late.push({ target: el, rect })
+        else this.held.add(el)
+      }
+      this.reveal(late, "late")
+    }, HELD_IDLE - SETTLE)
+  }
+
+  // The face around el is all, or very nearly all (90%), on screen.
+  inView(el) {
+    const box = el.closest("[data-appear-settle]") || el
+    const rect = box.getBoundingClientRect()
+    if (!rect.height) return true
+    const shown = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0)
+    return shown / rect.height >= 0.9
   }
 
   // A sticky container marked data-appear-settle (a homepage face) has
@@ -492,7 +539,10 @@ export default class extends Controller {
     const pinned = parseFloat(style.top)
     if (Number.isNaN(pinned)) return false
     const top = box.getBoundingClientRect().top
-    if (Math.abs(top - pinned) > 1) return true
+    // The page cannot scroll any further, so the face has come as far into
+    // place as it ever will: that is its settled spot.
+    const atEnd = window.scrollY >= document.documentElement.scrollHeight - window.innerHeight - 1
+    if (Math.abs(top - pinned) > 1 && !atEnd) return true
     let next = box.nextElementSibling
     while (next) {
       if (next.matches("[data-appear-settle]") && next.getBoundingClientRect().top <= top + 1) return true
@@ -510,7 +560,7 @@ export default class extends Controller {
         if (!this.waiting.has(el) || !el.isConnected) { this.held.delete(el); continue }
         if (!this.unsettled(el)) ready.push({ target: el, rect: el.getBoundingClientRect() })
       }
-      if (ready.length) { ready.forEach(({ target }) => this.held.delete(target)); this.reveal(ready, true) }
+      if (ready.length) { ready.forEach(({ target }) => this.held.delete(target)); this.reveal(ready, "late") }
     })
   }
 
