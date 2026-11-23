@@ -12,7 +12,7 @@
       "origin": "Glenmorangie, Tain",
       "style": "Single malt, 12 years",
       "strength": "40% ABV",
-      "notes": "Matured only in ex-bourbon casks. Keep a little in your glass to come back to."
+      "notes": "Aged only in ex-bourbon casks. Keep a little in your glass to come back to."
     },
     {
       "name": "Glenmorangie Lasanta",
@@ -26,14 +26,14 @@
       "origin": "Macallan, Speyside",
       "style": "Single malt, 12 years",
       "strength": "43% ABV",
-      "notes": "Matured in sherry-seasoned oak casks from Jerez, mostly European oak. Compare it with the Lasanta."
+      "notes": "Aged in sherry-seasoned oak casks from Jerez, mostly European oak. Compare it with the Lasanta."
     },
     {
       "name": "GlenDronach 12",
       "origin": "GlenDronach, Forgue",
       "style": "Single malt, 12 years",
       "strength": "43% ABV",
-      "notes": "Matured in Pedro Ximénez and oloroso casks. Put it beside the Macallan."
+      "notes": "Aged in Pedro Ximénez and oloroso casks. Put it next to the Macallan."
     }
   ],
   "tags": "scotch, casks, sherry, single malt"

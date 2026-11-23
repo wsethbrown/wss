@@ -1,11 +1,11 @@
 {
   "slug": "Lagavulin-vs-Laphroaig",
   "title": "Lagavulin vs Laphroaig",
-  "subtitle": "",
+  "subtitle": "Two Islay distilleries and the firm that sold both",
   "category": "Scotch Whisky",
   "difficulty": "Intermediate",
   "duration": "45 min",
-  "description": "For sixty years the firm that ran Lagavulin also sold Laphroaig's whisky. When Laphroaig ended the agency in 1907, Peter Mackie built Malt Mill inside Lagavulin to make a Laphroaig of his own. Four pours.",
+  "description": "For sixty years the firm that ran Lagavulin also sold Laphroaig's whisky. When Laphroaig ended the agency in 1907, Peter Mackie built a small distillery inside Lagavulin to make whisky like Laphroaig. Four pours.",
   "pours": [
     {
       "name": "Craigellachie 13",
@@ -33,7 +33,7 @@
       "origin": "Laphroaig, Islay",
       "style": "Islay single malt, 10 years",
       "strength": "43% ABV",
-      "notes": "The neighbour Mackie sold for years and then tried to copy at Malt Mill. Same strength as the Lagavulin, two miles down the road."
+      "notes": "The whisky Mackie sold for years and then tried to copy. Same strength as the Lagavulin. Made two miles away."
     }
   ],
   "tags": "scotch, islay, peat, single malt, blended scotch"
