@@ -220,9 +220,12 @@ def slainte_slide(toast, word='Sláinte'):
     return s
 
 
-def glass_slide(n, glass, name, meta, body, facts, ask, photo=None, credit=None):
-    """One pour: photo (or placeholder) at left, the glass line, name, meta line, two short
-    paragraphs, a white card of three short facts, and an 'Ask the room' strip.
+def glass_slide(n, glass, name, meta, body, facts, ask=None, photo=None, credit=None):
+    """One pour: photo (or placeholder) at left, the glass line ("Glass 1", nothing more),
+    name, meta line, two short paragraphs and a white card of three short facts.
+    Nothing addressed to the host goes on the slide: when to pour and what to ask the room
+    are stage directions in speaker-notes.md. `ask` is accepted and ignored so older
+    sources still build; do not pass it in new ones.
     photo is a file name in the package's assets/ folder, cropped to about 3.4 x 5.3."""
     s = new_slide()
     px, py, pw, ph = 0.85, 0.8, 3.4, 5.3
@@ -245,9 +248,6 @@ def glass_slide(n, glass, name, meta, body, facts, ask, photo=None, credit=None)
         text(s, cx + 0.28, yy, 2.4, 0.3, label, size=11.5, font=SANS, bold=True, color=MUTE)
         text(s, cx + 0.28, yy + 0.3, 2.4, 0.62, val, size=14, color=INK, ls=1.1)
         yy += 0.98
-    rrect(s, x, 6.1, 7.63, 0.62, r=0.18, fill=W100)
-    text(s, x + 0.3, 6.1, 7.1, 0.62, [[('Ask the room  ', {'font': SANS, 'bold': True, 'size': 12.5, 'italic': False}),
-                                      (ask, {})]], size=15, italic=True, color=INK, anchor=MSO_ANCHOR.MIDDLE)
     footer(s, n)
     return s
 

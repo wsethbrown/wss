@@ -160,7 +160,20 @@ line. Write the fact. The patterns to cut, on slides and in the script:
   room to guess the year. They will guess too late." The owner: "#1 don't ever make
   declarations like this #2 don't put this IN the slide where everyone can see it." Directions
   to the host go in the script as stage directions, never in slide text, and never say how the
-  room will answer.
+  room will answer. That covers the glass line and the question too: a slide once carried
+  "Glass 1. Pour it now." and an "Ask the room  What do you smell?" strip, and the owner said
+  "We shouldn't have these types of callouts ON the slides." The slide says "Glass 1"; the
+  pour, the question and "keep some for the next glass" are `_..._` directions here.
+- **Labels and captions built as one long noun phrase.** "Joseph Fleischman, who worked in
+  the trade, on the man ordering whiskey at a bar, 1885" and "Col. E. H. Taylor Jr., the
+  Kentucky distiller historians credit with pushing for it" (the owner: "it reads weird").
+  Name the person or the source, stop, then say the rest as a sentence: "Col. E. H. Taylor
+  Jr., a Kentucky distiller. Historians credit him with pushing for the Act." Quote enough
+  of a sentence that it stands without a caption explaining who it is about. A source note
+  is "Source: Maker's Mark.", not "Published by the maker."
+- **A label above a heading that only announces it.** "The first word on the label" over
+  "What 'bourbon' means." Cut the label. Also cut the corrective pair on a slide: "It was a
+  resolution, not a law." Give the fact: "Senate Concurrent Resolution 19, May 1964".
 - **A sentence that leaves a question open.** "He never saw this written down" (the owner:
   "what is 'this'"); "Roosevelt has waited years for someone to put that in print" ("why?").
   If a line makes the reader ask what or why, answer it in the line or cut it.

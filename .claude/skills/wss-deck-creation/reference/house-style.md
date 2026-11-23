@@ -229,8 +229,11 @@ Recorded so later decks can reuse or depart from them knowingly.
   number at y 6.93 in, 10 pt mute. History slides lead with a 150 pt year. Bottle slides: photo or
   bottle-shaped placeholder card 3.4 × 5.3 in at left, "Glass n" line with an orange dot, the name at
   38 pt, a meta line (where distilled · whose hands · proof · approximate price), two short
-  paragraphs, a white card of three short facts (Distilled / Their hands / Look for), and an
-  "Ask the room" strip.
+  paragraphs and a white card of three short facts (Distilled / Their hands / Look for). The
+  glass line is "Glass n" and nothing else. Nothing addressed to the host goes on a slide: no
+  "Pour it now", no "Ask the room" strip, no "Keep some for glass 2", no "Taste it beside the
+  last one". The owner, November 2026: "We shouldn't have these types of callouts ON the
+  slides." When to pour, what to ask and what to compare are stage directions in the script.
 - **Documents:** the owner's PDF template structure (band, rule, running head, footer, callouts,
   green stage directions) in site colours, Oswald and Crimson Text, built with reportlab from the
   markdown (`tools/decks/pdfs.py`). Slide helpers in `tools/decks/wsskit.py`; the slides
