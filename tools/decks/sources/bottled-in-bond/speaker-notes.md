@@ -6,11 +6,11 @@ The Whiskey Share Society
 
 ## Part One: before the night
 
-1897. Four pours, 17 slides, about 45 minutes.
+What "bottled in bond" means and the 1897 law it comes from. Four pours, 17 slides, about 45 minutes.
 
-**Running order:** slides 1–3 (8 min) · pour one (5 min) · slides 5–9 (10 min) · pour two (5 min) · slides 11–12 (5 min) · pour three (5 min) · slide 14 (3 min) · pour four (5 min) · close (2 min).
+**Running order:** slides 1 to 3 (8 min) · pour one (5 min) · slides 5 to 9 (10 min) · pour two (5 min) · slides 11 and 12 (5 min) · pour three (5 min) · slide 14 (3 min) · pour four (5 min) · close (2 min).
 
-**Before people arrive:** put the four bottles out in pouring order. Evan Williams Bottled-in-Bond, Old Grand-Dad Bonded, Rittenhouse Rye Bottled-in-Bond, Old Forester 1897. Have water and a dropper on the table. Everything tonight is 100 proof, so keep the pours small.
+**Before people arrive:** put the four bottles out in the order you will pour them. Evan Williams Bottled-in-Bond, Old Grand-Dad Bonded, Rittenhouse Rye Bottled-in-Bond, Old Forester 1897. Put water and a dropper on the table. All four are 100 proof, so keep the pours small.
 
 ---
 
@@ -18,150 +18,154 @@ The Whiskey Share Society
 
 ## [SLIDE 1] Bottled in Bond
 
-Thanks for coming. Tonight's topic is the phrase "bottled in bond", which you've probably seen on a label and skipped over because it sounds like tax paperwork. It more or less is tax paperwork, but there's a good story behind it, and it turns out to be one of the few phrases on a whiskey bottle with an actual legal definition.
+Thanks for coming. Tonight is about the words "bottled in bond". You have probably seen them on a whiskey label. They come from a law passed in 1897, and they still have a legal meaning today.
 
-All four bottles tonight are bonded, which means they're all 100 proof and they all had to meet the same set of rules from a law passed in 1897. I'll go through how that law came about, we'll taste as we go, and by the end you should be able to pick up a bottle in a shop and know what the label is telling you.
+All four bottles tonight are bottled in bond. That means they are all 100 proof and they all follow the same rules. I'll tell you how the law came about, and we'll taste as we go. By the end you should be able to read a whiskey label in a shop and know which words mean something.
 
 ## [SLIDE 2] In the 1870s, whiskey was sold from the barrel
 
-To see why anyone wanted a law, you have to picture how whiskey was sold in the 1870s and 80s. Hardly any of it came in a bottle with a brand on it. The distillery filled barrels and sold them to a wholesaler, the wholesaler sold them on to saloons and grocers, and if you wanted whiskey you brought a jug or you bought it by the glass.
+In the 1870s and 1880s very little whiskey came in a bottle with a brand on it. The distillery filled barrels and sold them to a wholesaler. The wholesaler sold them to saloons and grocers. If you wanted whiskey, you brought a jug or you bought it by the glass.
 
-You might know which distillery had filled the barrel. What you couldn't know was what had happened to it since, because it had passed through other people's storerooms on the way to you and any of them could have topped it up or watered it down.
+You might know which distillery filled the barrel. You could not know what had happened to it after that. It had been in other people's storerooms, and any of them could have watered it down or added something to it.
 
 ## [SLIDE 3] Straight whiskey and rectified whiskey
 
-On top of that, there were really two different products going by the name whiskey.
+There were also two different products being sold as whiskey.
 
-One was what we'd now call straight whiskey: grain, mashed and distilled, then put in a charred barrel and left in a warehouse for years.
+The first was what we now call straight whiskey. It was made from grain, distilled, put in a charred barrel and left in a warehouse for years.
 
-The other came from a trade called rectifying. A rectifier bought neutral spirit, which the new column stills could turn out cheaply and in huge quantities, and then added colouring and flavouring so it looked and tasted something like aged whiskey. This was legal, and it was a large share of what Americans drank.
+The second was rectified whiskey. A rectifier bought neutral spirit, which was cheap and could be made in huge amounts. He added colouring and flavouring so it looked and tasted something like aged whiskey. This was legal, and a large share of what Americans drank was made this way.
 
-You'll read some alarming lists of what went into it, things like tobacco and creosote. I'd treat those with caution, because most of them trace back to the straight-whiskey distillers and the pure-food campaigners, who both wanted the rectifiers to look as bad as possible. The rectifiers' own recipe books are the better evidence, and I haven't been able to check them for myself, so I won't name ingredients tonight.
-
-The rectifiers had a case, too. They said blending was a skill and their customers liked the result, and they kept making that argument for the next thirty years.
+The rectifiers said blending was a skill and their customers liked what they made. They kept saying so for the next thirty years.
 
 ## [SLIDE 4] Pour 1 of 4: Evan Williams Bottled-in-Bond
 
-Let's have the first one. This is Evan Williams Bottled-in-Bond, the white label, made by Heaven Hill. It's normally the cheapest bottle of the four, and I've put it first so we've got a reference point for the others.
+_Pour glass 1 now._
 
-Try it neat to begin with. Then put a few drops of water in and try it again, because 100 proof can be a bit hot if you're used to 80 or 90, and water opens it up quite a lot.
+This is Evan Williams Bottled-in-Bond, the one with the white label. Heaven Hill makes it. It is usually the cheapest of the four, so we'll compare the others to it.
 
-While you're tasting, have a look at the front label and find where it says bottled in bond. We'll come back to the small print on the back later on.
+Try it with nothing added first. Then add a few drops of water and try it again. 100 proof can feel hot if you are used to 80 or 90.
+
+Look at the front label and find the words "bottled in bond". We'll look at the small print on the back later.
 
 ## [SLIDE 5] 1870: Old Forester goes on sale in sealed bottles
 
-One of the first people to try to fix the trust problem was a pharmaceutical salesman in Louisville called George Garvin Brown. Doctors prescribed whiskey in those days, and according to the company's account, the ones Brown called on complained that they couldn't get the same thing twice. So in 1870 he started selling a bourbon called Old Forester that came only in sealed glass bottles, each with his signed guarantee on the label. He didn't distil it himself; the company says he bought whiskey from local distilleries and blended it.
+George Garvin Brown sold medicines to doctors in Louisville. Doctors prescribed whiskey in those days. The company says the doctors complained to Brown that whiskey was never the same twice. So in 1870 he started selling a bourbon called Old Forester. It came only in sealed glass bottles, and each bottle had his signed guarantee on the label. He did not distil it himself. He bought whiskey from local distilleries and blended it.
 
-Brown-Forman, the company he founded, calls Old Forester America's first bottled bourbon, and the phrase is a registered trademark. I haven't found independent evidence either way, so I'll leave it as their claim.
+Brown-Forman is the company he founded. It says Old Forester was America's first bottled bourbon.
 
-It was a good idea and the brand did well. The weakness was that the guarantee was only as good as Brown's reputation, and it didn't take long for other people to start refilling and faking branded bottles.
+The brand did well. But the guarantee was only Brown's word, and before long other people were refilling branded bottles and faking them.
 
 ## [SLIDE 6] Bonded warehouses, from 1868
 
-The thing that eventually solved it had been around since 1868, and it was a tax arrangement.
+There was a heavy federal tax on whiskey. At first a distiller owed the tax as soon as the whiskey was made. That was hard on anyone who wanted to age it, because he paid the tax years before he could sell.
 
-Whiskey carried a heavy federal excise tax, and originally you owed it as soon as the spirit came off the still. That was a real problem for anyone who wanted to age their whiskey, since they'd be paying tax long before they could sell it. The revenue act of July 1868 required every distillery to have a warehouse, which became a bonded warehouse under federal control, and the tax was paid when the barrels came out. The time you could leave whiskey in bond was short at first and was lengthened over the following decades; by the 1890s it was eight years.
+A law in July 1868 changed that. Every distillery had to have a warehouse under federal control, called a bonded warehouse. The tax was paid when a barrel came out. The time a barrel could stay in was short at first. By the 1890s it was eight years.
 
-In return, the government put its own officer on the premises, called a storekeeper. He controlled access to the warehouse, and every barrel was recorded going in and coming out. He was there to make sure nobody slipped untaxed whiskey out the back, but a side effect was that the government had a record of where every one of those barrels was made, when it was filled, and how long it had been sitting there.
+The government put its own officer in each warehouse. He controlled who went in, and he wrote down every barrel going in and coming out. His job was to stop anyone taking whiskey out without paying the tax. But it also meant the government had a record of who made each barrel, when it was filled and how long it had been there.
 
 ## [SLIDE 7] The two men behind the Act
 
-Two people get most of the credit for turning that into a guarantee for drinkers.
+Two men get most of the credit for the law.
 
-The first is Colonel Edmund Haynes Taylor Junior, who had a distillery in Frankfort, Kentucky, and whose name is still on Old Taylor and the E.H. Taylor bottles. He'd been campaigning against the rectifiers for years.
+The first is Colonel Edmund Haynes Taylor Junior. He had a distillery in Frankfort, Kentucky, and his name is still on Old Taylor and the E.H. Taylor bottles. He had been campaigning against the rectifiers for years.
 
-The second is John G. Carlisle, also from Kentucky, who was Secretary of the Treasury under Cleveland. The bonded warehouses and the officers in them came under his department. Accounts differ on which of the two did more: Taylor organised the distillers, and Carlisle pushed the bill through.
+The second is John G. Carlisle, also from Kentucky. He was Secretary of the Treasury under President Cleveland, and the bonded warehouses came under his department. Taylor organised the distillers and Carlisle got the bill through.
 
-The law had opponents too. The rectifiers argued that it gave the straight distillers an unfair advantage, and two of the people who made that case were Isaac Bernheim and George Garvin Brown, the Old Forester man, who blended whiskey he bought in.
+The rectifiers argued against it. They said it gave the straight whiskey distillers an unfair advantage. Two of the men who said so were Isaac Bernheim and George Garvin Brown, the man who started Old Forester.
 
-I should say that Taylor had money riding on this. He made straight whiskey and the rectifiers were his competitors, so a law that gave his bottles a government stamp and theirs nothing was going to help his sales. I don't think that makes the law a bad one, but he wasn't doing it out of public spirit alone.
+Taylor stood to make money from this. He made straight whiskey and the rectifiers were his competitors. A law that put a government stamp on his bottles and not on theirs was good for his sales.
 
 ## [SLIDE 8] 3 March 1897: The Bottled-in-Bond Act becomes law
 
-The law was approved on the third of March 1897. Grover Cleveland signed it on his last full day as president. McKinley was inaugurated the following day.
+The law was signed on the third of March 1897. Grover Cleveland signed it on his last full day as president. McKinley took office the next day.
 
-Its full title is "An Act to allow the bottling of distilled spirits in bond", and the word "allow" matters. Nobody was required to do anything. If a distiller wanted to bottle under government supervision and get the stamp, he could, and if he didn't, he carried on as before.
+Its full title is "An Act to allow the bottling of distilled spirits in bond". It was voluntary. A distiller who wanted the government stamp could bottle under government supervision. A distiller who did not want it carried on as before.
 
-You'll often see this described as the first consumer protection law in America. That's a stretch, because there were federal laws on imported drugs in 1848 and on margarine in 1886. It did come nine years ahead of the Pure Food and Drug Act, though, which is the one people usually think of.
+People often call this the first consumer protection law in America. It was not. There was a federal law on imported drugs in 1848 and one on margarine in 1886. But it did come nine years before the Pure Food and Drug Act.
 
 ## [SLIDE 9] What a bonded label guarantees
 
-These are the requirements, and they're almost the same today as they were in 1897.
+These are the rules. They are almost the same today as in 1897.
 
-The whiskey has to come from one distillery and one distiller, so it can't be a mix of barrels bought from different places.
+The whiskey has to come from one distillery and one distiller. It cannot be a mix of barrels bought from different places.
 
-It has to come from one distilling season, and there are two a year, spring and fall, which the regulations define as January to June and July to December. So everything in the bottle was made within the same six months.
+It has to come from one season. There are two seasons a year. Spring is January to June and fall is July to December. So everything in the bottle was made in the same six months.
 
 It has to be aged at least four years in a bonded warehouse.
 
-It has to be bottled at 100 proof, which is 50 percent alcohol. That's exact, so 101 doesn't qualify.
+It has to be bottled at 100 proof, which is 50 percent alcohol. It has to be exactly 100. A whiskey at 101 does not count.
 
-Nothing can be added except pure water to bring it down to proof. Filtering is allowed.
+Nothing can be added except water. Filtering is allowed.
 
-And the label has to say which distillery made it, and where it was bottled if that was a different place.
+The label also has to say which distillery made it.
 
 ## [SLIDE 10] Pour 2 of 4: Old Grand-Dad Bonded
 
-Second pour. This is Old Grand-Dad Bonded, which Jim Beam makes. Its published recipe is about 27 percent rye, against about 10 in the Evan Williams, so it should come across as spicier.
+_Pour glass 2 now._
 
-Before you taste it, I'd like you to have a go at reading the bottle. You're looking for three things. One is the word "bonded" or "bottled in bond". The second is "100 proof". The third is in the small print, usually on the back or the side: the letters DSP, then a state abbreviation, then a number. DSP stands for Distilled Spirits Plant, and the number is the federal registration for the building where it was distilled. That's the "name the distillery" requirement from the last slide.
+This is Old Grand-Dad Bonded. Jim Beam makes it. It is about 27 percent rye. The Evan Williams is about 10. So this one should taste spicier.
 
-Then taste it next to the first one. They're the same proof and were made under the same rules, so what you're noticing is mostly the difference in recipe and in the two distilleries.
+Before you taste it, pick up the bottle and find three things. The first is "bonded" or "bottled in bond". The second is "100 proof". The third is in the small print, usually on the back or the side. Look for the letters DSP, then a state, then a number. DSP stands for Distilled Spirits Plant. The number tells you which distillery made the whiskey.
+
+Now taste it next to the first one. They are the same proof and follow the same rules. What is different is the recipe and the distillery.
 
 ## [SLIDE 11] 1906: The Pure Food and Drug Act starts an argument: what is whisky?
 
-The 1897 law didn't settle the argument between the straight distillers and the rectifiers, because it only covered people who chose to use it.
+The 1897 law did not end the argument between the straight whiskey distillers and the rectifiers. It only covered distillers who chose to use it.
 
-In 1906 Congress passed the Pure Food and Drug Act, and the job of enforcing it fell to a chemist at the Department of Agriculture named Harvey Wiley. Wiley sided with the straight distillers. His view was that the word whiskey should be reserved for the aged product, and that anything made from neutral spirit ought to say so plainly on the label.
+In 1906 Congress passed the Pure Food and Drug Act. The man in charge of enforcing it was a government chemist called Harvey Wiley. Wiley agreed with the straight whiskey distillers. He thought only aged whiskey should be called whiskey. Anything made from neutral spirit should say so on the label.
 
-The rectifiers were selling a large share of the whiskey in the country and they weren't about to put that on their bottles. Historians still argue about how much the fight was about consumers and how much it was one part of the trade using the law against the other. The dispute went on for three years, through hearings and appeals, and it became known as the "What is whisky?" question.
+The rectifiers sold a large share of the whiskey in the country, and they would not put that on their bottles. They fought Wiley for three years, through hearings and appeals. People called it the "What is whisky?" question.
 
 ## [SLIDE 12] December 1909: President Taft rules on it himself
 
-It ended up in front of President Taft, who had been a judge before he was president. His Solicitor General, Lloyd Bowers, held fresh hearings, and Taft read the record himself and issued his decision on the 27th of December 1909.
+In the end President Taft decided it. Taft had been a judge before he was president. He had new hearings held, read the evidence himself and gave his decision on the 27th of December 1909.
 
-Taft disagreed with Wiley on the main point. He ruled that spirit made from grain could be called whisky even if it was neutral spirit, so the rectifiers could go on using the word. But the label had to tell you what you were getting: "straight whisky" for the aged product, a "blend" where straight whisky was mixed with neutral-spirit whisky, and the main ingredient named where it was made from neutral spirit.
+Taft did not agree with Wiley. He said spirit made from grain could be called whisky, even if it was neutral spirit. So the rectifiers could keep using the word. But the label had to say what was in the bottle. Aged whiskey was labelled "straight whisky". Straight whisky mixed with neutral spirit was labelled a "blend".
 
-For our purposes, the useful thing to remember is that a bonded bourbon or rye is also a straight whiskey: at least four years in wood, with nothing added but water.
+A bonded bourbon or rye is also a straight whiskey. It has had at least four years in wood and nothing added but water.
 
 ## [SLIDE 13] Pour 3 of 4: Rittenhouse Rye Bottled-in-Bond
 
-Third pour, and this one's a rye: Rittenhouse Bottled-in-Bond.
+_Pour glass 3 now._
 
-People tend to assume bottled in bond is a bourbon term. The Act's title says "distilled spirits", and the rules apply to other spirits as well as bourbon.
+This one is a rye. It is Rittenhouse Bottled-in-Bond.
 
-Rittenhouse is an older brand than its maker; the label is based on its packaging from the 1930s, after Repeal. It's made in Kentucky by Heaven Hill these days, and the label spells it "whisky", without the e.
+A lot of people think bottled in bond is only for bourbon. The law says "distilled spirits", so it covers rye and other spirits too.
 
-Next to the two bourbons it should taste drier and more peppery, with less of the caramel you get from corn. And have a look for the DSP number on this one too.
+Heaven Hill makes Rittenhouse in Kentucky. The label is based on the one the brand used in the 1930s. It spells "whisky" without the e.
+
+It should taste drier and more peppery than the two bourbons, with less caramel. Find the DSP number on this bottle too.
 
 ## [SLIDE 14] What happened to bonded whiskey
 
-I'll go through the rest of the history quickly.
+Prohibition started in January 1920. You could still buy whiskey legally if a doctor prescribed it. Six companies had a licence to sell it. The pints sold in pharmacies were bottled in bond at 100 proof. Until Prohibition ended in December 1933, that was about the only legal American whiskey.
 
-When Prohibition came in, in January 1920, you could still get whiskey legally with a doctor's prescription. Six companies were licensed to sell it, and the medicinal pints sold in pharmacies were bottled in bond at 100 proof. So until Repeal in December 1933 it was more or less the only legal American whiskey.
+From the 1960s bonded whiskey sold less. People were drinking more vodka. In the 1970s prices rose and distillers lowered their proofs to save money. Bonded bottles ended up on the bottom shelf. The green tax stamp that used to go over the cork was dropped in the early 1980s.
 
-From the 1960s bonded whiskey lost ground. People were drinking more vodka and lighter spirits, inflation in the seventies pushed distillers to lower their proofs, and bonded bottles ended up on the bottom shelf. The green strip stamp that used to go over the cork went in the early eighties, and federal strip stamps on spirits ended altogether in July 1985.
-
-The comeback started in the 2010s. Bartenders liked having a 100-proof whiskey that was cheap and held up in cocktails. And a lot of the small distilleries that opened in the 2000s were by then old enough to have four-year-old whiskey, and a bonded label was a way of showing they'd distilled it themselves and hadn't bought it in.
+It came back in the 2010s. Bartenders wanted a cheap 100 proof whiskey that still tasted of something in a cocktail. And many of the small distilleries that opened in the 2000s now had whiskey that was four years old. A bonded label showed they had made it themselves and had not bought it from someone else.
 
 ## [SLIDE 15] Pour 4 of 4: Old Forester 1897
 
-Last pour. This is Old Forester 1897 Bottled in Bond.
+_Pour glass 4 now._
 
-Old Forester is the brand George Garvin Brown launched in sealed bottles in 1870, the one from earlier. This bottling is the second in the company's Whiskey Row Series, named after dates in its history, and 1897 is for the Bottled-in-Bond Act. Brown argued against the Act, and the whiskey writer Chuck Cowdery has pointed out the irony of his company now selling a bonded Old Forester.
+This is Old Forester 1897 Bottled in Bond.
 
-It costs the most of the four. When you've finished, go back and re-taste whichever of the others you liked. I'm curious which one people would buy for themselves, so I'll ask for a show of hands in a minute.
+Old Forester is the brand George Garvin Brown started selling in sealed bottles in 1870. This bottle is named after the year of the Bottled-in-Bond Act. Brown argued against that Act. His company now sells a bonded whiskey named after it.
+
+It costs the most of the four. When you have finished it, go back to any of the others you liked. Then I'll ask for a show of hands. Which one would you buy for yourself?
 
 ## [SLIDE 16] Reading an American whiskey label
 
-To finish, a quick guide to which words on an American whiskey label you can rely on.
+This slide shows which words on an American whiskey label have a legal meaning.
 
-"Bottled in bond" has the legal meaning we've been through. "Straight" has a legal meaning too: for bourbon and rye, at least two years in new charred oak. If there's an age statement, it has to be the age of the youngest whiskey in the bottle, and whiskey under four years old must carry one.
+"Bottled in bond" means the rules we went through. "Straight" has a legal meaning too. A straight bourbon or rye has been aged at least two years in new charred oak. An age statement has to give the age of the youngest whiskey in the bottle. Any whiskey under four years old has to have one.
 
-"Small batch", "reserve" and "handcrafted" have no legal definition, so a company can use them however it likes.
+"Small batch", "reserve" and "handcrafted" have no legal meaning. A company can use them any way it likes.
 
-A bonded label isn't a guarantee that you'll enjoy what's inside. What it gives you is who made it, where, roughly when, and that it's at least four years old with nothing added, which is more than most labels will tell you.
+A bonded label does not tell you that you will like the whiskey. It tells you who made it, where, and about when. It tells you it is at least four years old and has nothing added.
 
 ## [SLIDE 17] Sláinte
 
-That's everything from me. Thanks for listening, and thanks to everyone who brought a bottle. Sláinte.
+That's all from me. Thank you for coming, and thank you to everyone who brought a bottle. Sláinte.

@@ -10,7 +10,7 @@ The Whiskey Share Society
 
 **Running order:** slides 1–5 (11 min) · pour one (5 min) · slide 7 (3 min) · pour two (5 min) · slides 9–12 (10 min) · pour three (5 min) · slides 14–15 (5 min) · pour four (5 min) · close (2 min).
 
-**Before people arrive:** put the four bottles out in pouring order. Old Overholt, Pikesville, Old Forester Rye, Bulleit 95 Rye. Pikesville is 110 proof, so keep the pours small and have water and a dropper on the table. Turn the Bulleit so its back label faces the room; you will need it for the last pour.
+**Before people arrive:** put the four bottles out in the order you will pour them. Old Overholt, Pikesville, Old Forester Rye, Bulleit 95 Rye. Pikesville is 110 proof, so keep the pours small and put water and a dropper on the table. Turn the Bulleit so its back label faces the room. You will need it for the last pour.
 
 ---
 
@@ -18,139 +18,137 @@ The Whiskey Share Society
 
 ## [SLIDE 1] American Rye
 
-Thanks for coming. Tonight is about American rye whiskey. Tonight rye is the main grain, not the spice in a bourbon.
+Thanks for coming. Tonight is about American rye whiskey.
 
-In the early United States, rye was the whiskey of Pennsylvania and Maryland. By the late twentieth century there were only a few rye brands left in the shops, and the old eastern names among them were made in Kentucky by bourbon companies. Now there are hundreds. I'll go through how that happened, and we'll taste four ryes along the way: one reported to be made from just over half rye, which is the legal minimum, and others with a good deal more.
+In the early United States, rye was the whiskey of Pennsylvania and Maryland. By the late 1900s there were only a few rye brands left in the shops. The old eastern names were still on some of them, but the whiskey was made in Kentucky by bourbon companies. Now there are hundreds of ryes. I'll go through how that happened, and we'll taste four of them along the way. One is reported to be just over half rye, which is the least the law allows. The others have more.
 
 ## [SLIDE 2] Why mid-Atlantic farmers grew rye
 
-Start with the farming. Rye is a hardy grain. You sow it in the autumn, it sits through the winter, and it grows on ground that wheat and corn don't like much: thin, stony, hilly soil, which describes a lot of Pennsylvania and western Maryland.
+Rye is a hardy grain. You sow it in the autumn and it sits through the winter. It grows on thin, stony, hilly ground that wheat and corn don't do well on. A lot of Pennsylvania and western Maryland is like that.
 
-The people farming that ground in the 1700s were largely Germans in eastern Pennsylvania and Scots-Irish further west, and both came from places where rye was an ordinary crop.
+The people farming there in the 1700s were mostly Germans in eastern Pennsylvania and Scots-Irish further west. Both groups had grown rye at home.
 
-The other reason is transport. A farm west of the Alleghenies in the 1790s was days by wagon or pack horse from Philadelphia or Baltimore. Whiskey takes far less room than grain for the same value, and keeps. So a farmer with more rye than his household needed turned the surplus into whiskey, and in western Pennsylvania whiskey was traded much like money, because coins were scarce there.
+The other reason is transport. In the 1790s a farm west of the Allegheny mountains was days from Philadelphia or Baltimore by wagon or pack horse. Whiskey takes up far less room than grain for the same value, and it keeps. So a farmer with more rye than his family needed made the rest into whiskey. Coins were scarce in western Pennsylvania, and people there traded whiskey much like money.
 
 ## [SLIDE 3] 1799: Washington's distillery at Mount Vernon makes almost 11,000 gallons
 
-The best-documented rye distillery of the period belonged to George Washington. In 1797 he hired a Scottish farm manager, James Anderson, who had distilled before and persuaded him to make whiskey beside the Mount Vernon gristmill. They started that February with two stills in the mill's cooperage. It went well enough that Washington built a stone still house large enough for five copper pot stills, and it was working by 1798.
+The rye distillery we know most about from that time belonged to George Washington. In 1797 he hired a Scottish farm manager called James Anderson. Anderson had made whiskey before, and he talked Washington into making it next to the mill at Mount Vernon. They started that February with two stills. It went well, so Washington built a stone still house big enough for five stills. It was working by 1798.
 
-The ledgers for 1799 record more than eighty sales, totalling 10,942 gallons of whiskey worth $7,674. Mount Vernon describes it as almost 11,000 gallons and calls it the largest distillery in America at the time. There was no national survey to check that against.
+The account books for 1799 show sales of 10,942 gallons of whiskey, worth $7,674. Mount Vernon says it was the largest distillery in America at the time.
 
-The recipe comes from the distillery ledgers of 1798 and 1799: 60 percent rye, 35 percent corn and 5 percent malted barley. It is worked out from the grain the distillery used, not from a written recipe.
+The same books show what grain the distillery used. It works out at 60 percent rye, 35 percent corn and 5 percent malted barley.
 
-Washington died in December 1799. His heirs ran the distillery until about 1808, and it burned in 1814. Mount Vernon rebuilt it on its original foundations with a $2.1 million grant from the Distilled Spirits Council. It opened in 2007, and it makes small batches of rye on that recipe, sold mainly at Mount Vernon itself.
+Washington died in December 1799. His family ran the distillery until about 1808, and it burned down in 1814. Mount Vernon rebuilt it on the original foundations and opened it in 2007. It makes small batches of rye to that recipe and sells most of it at Mount Vernon.
 
 ## [SLIDE 4] Pennsylvania and Maryland
 
 By the 1800s American rye had two regional names.
 
-Monongahela meant rye from western Pennsylvania, named after the river that runs north to Pittsburgh. The usual description is that it was made with a lot of rye and little or no corn, and that it was the bolder, drier style.
+Monongahela meant rye from western Pennsylvania. It is named after the river that runs north to Pittsburgh. It is usually described as mostly rye with little or no corn, and as bold and dry.
 
-Maryland rye came from Baltimore and the farms around it. It is usually described as softer and sweeter, with some corn in the mash.
+Maryland rye came from Baltimore and the farms around it. It is usually described as softer and sweeter, with some corn in the recipe.
 
-I'd be careful with those descriptions. They come mostly from much later writers, and very few nineteenth-century mash bills survive. What is solid is that both states had large rye industries, and that buyers knew their whiskey by where it came from.
+Most of those descriptions were written much later, and very few recipes from the 1800s survive. We do know that both states made a lot of rye, and that buyers asked for it by where it came from.
 
 ## [SLIDE 5] Overholt: West Overton, then Broad Ford
 
-The first name on the table tonight is Overholt. Abraham Overholt, who lived from 1784 to 1870, came from a Mennonite farming family in Westmoreland County, south-east of Pittsburgh. The brand dates itself to 1810, when the family was distilling at West Overton, and it used that date in its advertising, like this one from 1897. Later they built a much larger distillery at Broad Ford, on the Youghiogheny River, which flows into the Monongahela.
+The first bottle tonight is Overholt. Abraham Overholt was born in 1784 and died in 1870. He came from a Mennonite farming family in Westmoreland County, south-east of Pittsburgh. The brand dates itself to 1810, when the family was making whiskey at West Overton. It used that date in its advertising, and the advertisement on the slide is from 1897. Later the family built a much bigger distillery at Broad Ford, on the Youghiogheny River.
 
-Abraham's grandson was Henry Clay Frick, who made a fortune in coke and steel. Frick took over the business in the 1880s and brought in two partners, his friend Andrew Mellon and Charles Mauck, each with a third; Mauck is credited with adopting the name "Old Overholt" in 1888. When Frick died in December 1919 he left his share to Mellon. Mellon was Secretary of the Treasury through most of Prohibition, and his stake in a distillery became an embarrassment; he sold it in 1925.
+Abraham's grandson was Henry Clay Frick, who got rich from coke and steel. Frick took over the business in the 1880s and brought in his friend Andrew Mellon as a partner. The whiskey was named Old Overholt in 1888. When Frick died in December 1919, he left his share to Mellon. Mellon was Secretary of the Treasury for most of Prohibition, and he was criticised for owning part of a distillery. He sold his share in 1925.
 
-Broad Ford reopened after Prohibition, and distilling there ended in 1951, under National Distillers. Where the whiskey was made for the next thirty-odd years is poorly recorded. In 1987 Beam bought National Distillers' spirits brands, Overholt among them, and moved it to Kentucky, where it is still made.
+Broad Ford reopened after Prohibition and made whiskey until 1951. For the next thirty years or so it was probably made somewhere else in Pennsylvania. In 1987 Beam bought the brand and moved it to Kentucky, and it is still made there.
 
 ## [SLIDE 6] Pour 1 of 4: Old Overholt
 
-First pour, Old Overholt. The man on the label is Abraham Overholt. This is the standard straight rye. It used to be three years old and 80 proof; around 2020 it went up to 86 proof, and in 2022 the age went up to four years.
+First pour, Old Overholt. The man on the label is Abraham Overholt. This is the standard straight rye. It used to be three years old and 80 proof. Around 2020 it went up to 86 proof, and in 2022 it went up to four years old.
 
-Beam doesn't publish the recipe, so I won't give you a number for it. It is a Pennsylvania brand made in Kentucky.
+Beam doesn't publish the recipe, so I can't tell you how much rye is in it. It has a Pennsylvania name and it is made in Kentucky.
 
-Keep a little in the glass for comparison.
+Keep a little in the glass so you can compare it with the others.
 
 ## [SLIDE 7] Pikesville, the Maryland name that survived
 
-Maryland's industry was centred on Baltimore. The city was a port and a railway hub, and before Prohibition there were a great many Maryland brands.
+Maryland's whiskey business was centred on Baltimore. The city was a port and a railway hub, and before Prohibition there were a great many Maryland brands.
 
-The one that survives is Pikesville, named after a town just north-west of Baltimore. It goes back to the 1890s, to a distillery run by the Winand family at Scott's Level, near Pikesville. Prohibition closed it. In the 1930s a Baltimore businessman revived the brand and had it made under contract at Baltimore distilleries. The last Maryland batch was distilled in 1972. Stocks kept the brand going for another ten years, and in 1982 the name and recipe were sold to Heaven Hill in Bardstown, Kentucky.
+The one still on sale is Pikesville. It is named after a town just north-west of Baltimore. It goes back to the 1890s, when the Winand family ran a distillery near Pikesville. Prohibition closed that distillery. In the 1930s a Baltimore businessman brought the brand back and paid Baltimore distilleries to make it. The last batch made in Maryland was in 1972. There was enough in the warehouse to keep selling it for another ten years. In 1982 the name and the recipe were sold to Heaven Hill in Bardstown, Kentucky.
 
 ## [SLIDE 8] Pour 2 of 4: Pikesville Straight Rye
 
-Second pour, Pikesville Straight Rye. Heaven Hill relaunched it in 2015 at six years old and 110 proof, and it is made at their Bernheim distillery. Heaven Hill doesn't print the recipe, but it is widely reported as 51 percent rye, 39 percent corn and 10 percent malted barley, which is right at the legal minimum of rye.
+Second pour, Pikesville Straight Rye. Heaven Hill brought it back in 2015 at six years old and 110 proof. Heaven Hill doesn't print the recipe. It is widely reported as 51 percent rye, 39 percent corn and 10 percent malted barley. Fifty-one percent is the least rye the law allows.
 
-Taste it neat, in a small sip, then add a few drops of water and taste again. With that much corn, look for some sweetness under the spice.
+Take a small sip neat. Then add a few drops of water and taste it again. There is a lot of corn in this one, so see if you get some sweetness under the spice.
 
-Neither of the first two pours is a Pennsylvania or a Maryland whiskey any more. Both are Kentucky ryes carrying old names.
+Both of the first two pours have old eastern names. Both are made in Kentucky now.
 
 ## [SLIDE 9] 1920: Prohibition shuts the distilleries for almost fourteen years
 
-Prohibition ran from January 1920 to December 1933, and it hit rye harder than bourbon.
+Prohibition ran from January 1920 to December 1933. It hit rye harder than bourbon.
 
-During those years six companies were licensed to sell whiskey as medicine, on a doctor's prescription, bottled from stock already in the warehouses. Old Overholt was one of the medicinal brands, which is one reason Mellon's share drew criticism. Late in the decade, as stocks ran low, the licensed companies were allowed to distil a limited amount again; accounts give 1928 or 1929.
+During those years six companies had licences to sell whiskey as medicine. You needed a doctor's prescription, and the whiskey came from barrels already in the warehouses. Old Overholt was one of the brands sold that way. That is one reason people criticised Mellon for owning a share of it. At the end of the 1920s the warehouses were running low, and the licensed companies were allowed to make a limited amount again.
 
-Everyone else closed, and the stills were sold or scrapped. When Repeal came, the industry had to start again almost from nothing, and the old rye distilleries in Pennsylvania and Maryland were starting from further back than most.
+Every other distillery closed, and the stills were sold or scrapped. When Prohibition ended, most distilleries had to start again with almost nothing. That included the old rye distilleries in Pennsylvania and Maryland.
 
 ## [SLIDE 10] Rye leaves the east after Repeal
 
-Rye did come back after Repeal, but it didn't last in the east.
+Rye came back after Prohibition, but it didn't last in the east.
 
-In 1933 there was almost no aged whiskey in the country. Distillers sold young whiskey or blended it with neutral spirit. Then in 1942 the War Production Board ordered distilleries to stop making beverage alcohol and make industrial alcohol for the war, and beverage distilling did not fully resume until 1945 or 1946.
+In 1933 there was almost no aged whiskey in the country. Distillers sold young whiskey, or mixed it with neutral spirit. Then in 1942 the government ordered distilleries to stop making whiskey and make industrial alcohol for the war. They did not get fully back to whiskey until 1945 or 1946.
 
-The usual explanation for what followed is that taste moved towards lighter drinks, blends, Canadian whisky and later vodka. Bourbon held on, and in May 1964 Congress passed a resolution recognising it as a distinctive product of the United States. Nothing like that was done for rye. I haven't seen sales figures by category to put numbers on the decline.
+After the war, the usual explanation is that people moved to lighter drinks: blended whiskey, Canadian whisky and later vodka. Bourbon held on. In May 1964 Congress passed a resolution calling bourbon a distinctive product of the United States. Nothing like that was done for rye.
 
-What is easier to show is the eastern distilleries going. Overholt stopped distilling at Broad Ford in 1951. Pikesville was last distilled in Maryland in 1972 and its name went to Kentucky in 1982. In Pennsylvania, Bomberger's at Schaefferstown, in the photograph, made Michter's until the company went bankrupt and the distillery closed in 1989 (one account says 1990). The Michter's name is now on whiskey made in Kentucky, with no link to the old plant.
+The eastern distilleries closed one by one. Overholt stopped making whiskey at Broad Ford in 1951. Pikesville was last made in Maryland in 1972, and the name went to Kentucky in 1982. The photograph is Bomberger's distillery at Schaefferstown, Pennsylvania. It made a whiskey called Michter's until the company went bankrupt and the distillery closed in 1989. The Michter's sold today is made in Kentucky and has nothing to do with the old distillery.
 
-The turn came in the 2000s, when bartenders started making the old cocktails again, from recipes written for rye.
+Rye started to come back in the 2000s. Bartenders began making the old cocktails again, and the old recipes called for rye.
 
 ## [SLIDE 11] The rye shelf before the revival
 
-Before the revival, the rye shelf came from four Kentucky bourbon distillers. Beam had Old Overholt and Jim Beam Rye. Heaven Hill had Pikesville from 1982, and in 1999 it bought Rittenhouse, a Philadelphia brand from 1934. Wild Turkey made a rye, and Buffalo Trace had Sazerac Rye. The recipes we have reported figures for sit at or near the 51 percent minimum.
+Before that, the ryes you could buy came from four Kentucky bourbon distillers. Beam had Old Overholt and Jim Beam Rye. Heaven Hill had Pikesville from 1982, and in 1999 it bought Rittenhouse, a Philadelphia brand that started in 1934. Wild Turkey made a rye. Buffalo Trace had Sazerac Rye. Where a recipe has been reported, it is at or close to 51 percent rye.
 
-They were cheap and sold in small amounts. A trade piece on Heaven Hill says it distilled rye on only one or two days a year in the 1990s.
+These ryes were cheap, and not much was sold. One report says that in the 1990s Heaven Hill made rye on only one or two days a year.
 
 ## [SLIDE 12] What the law requires of rye whisky
 
-This is the federal definition. To be called rye whisky in the United States, the mash has to be at least 51 percent rye. It can come off the still at no more than 160 proof, it has to go into the barrel at no more than 125 proof, and the barrel has to be new charred oak. If it is aged at least two years and has nothing added, it can be called straight rye, and if it is under four years old the label has to say how old.
+This is what American law says. To be called rye whisky, at least 51 percent of the grain has to be rye. It can come off the still at no more than 160 proof. It has to go into the barrel at no more than 125 proof. The barrel has to be new charred oak. If it is aged for at least two years with nothing added, it can be called straight rye. If it is under four years old, the label has to give the age.
 
-These standards come from the federal rules written after Repeal, now in Title 27 of the Code of Federal Regulations.
-
-That leaves a wide range. A rye that is 51 percent rye and nearly 40 percent corn is closer in recipe to a high-rye bourbon than to a rye that is 95 percent rye, and both are sold as rye. Pikesville sits at the bottom of the range. Old Forester Rye and Bulleit 95 Rye, the last two pours, sit higher up.
+That leaves a lot of room. One rye can be 51 percent rye and nearly 40 percent corn. Another can be 95 percent rye. The first is closer to a bourbon with a lot of rye in it than it is to the second, and both are sold as rye. Pikesville is at the low end. The last two pours, Old Forester Rye and Bulleit 95 Rye, have more.
 
 ## [SLIDE 13] Pour 3 of 4: Old Forester Rye
 
-Third pour, Old Forester Rye, from Brown-Forman in Louisville. It came out in 2019. Brown-Forman publishes the recipe: 65 percent rye, 20 percent malted barley and 15 percent corn, which it says is based on a recipe the company acquired in 1940 with a brand called Normandy Rye. The label calls it Kentucky Straight Rye Whisky, and it is bottled at 100 proof.
+Third pour, Old Forester Rye, from Brown-Forman in Louisville. It came out in 2019. Brown-Forman publishes the recipe: 65 percent rye, 20 percent malted barley and 15 percent corn. The label calls it Kentucky Straight Rye Whisky, and it is 100 proof.
 
-Taste it against the Pikesville and see whether there is less of the corn sweetness and more of the rye. People describe rye as peppery, or like rye bread, and sometimes grassy or minty. Take those as things to look for, not a checklist.
+Taste it next to the Pikesville. See if you get less of the corn sweetness and more of the rye. People say rye tastes peppery, or like rye bread, and sometimes grassy or minty.
 
 ## [SLIDE 14] 95%: Seagram's old distillery at Lawrenceburg, Indiana, makes a rye that is almost all rye
 
-Much of rye's return depended on one Indiana distillery.
+A lot of today's rye comes from one distillery in Indiana.
 
-It is in Lawrenceburg, on the Ohio River just west of Cincinnati, and was founded in 1847. Seagram, the Canadian company, bought it in 1933 and used it to make whiskey for its blends. One of the things it made was a rye from a mash of 95 percent rye and 5 percent malted barley, worked out as a blending whiskey. Accounts differ on when the recipe was settled.
+It is in Lawrenceburg, on the Ohio River just west of Cincinnati. It was founded in 1847. Seagram, the Canadian company, bought it in 1933 and used it to make whiskey for its blends. One of those whiskeys was a rye made from 95 percent rye and 5 percent malted barley. It was made for blending.
 
-When Seagram was broken up, the plant went to Pernod Ricard in 2001. In 2007 it was sold to the parent company of Angostura and ran as Lawrenceburg Distillers Indiana, or LDI. MGP Ingredients bought it in December 2011, and it now trades as Ross and Squibb. Much of its business is making whiskey and selling it to other brands.
+Seagram was broken up, and the distillery went to Pernod Ricard in 2001. In 2007 it was sold to the company that owns Angostura, and it was known as LDI. A company called MGP bought it in December 2011. It now goes by the name Ross and Squibb. A big part of its business is making whiskey and selling it to other brands.
 
 ## [SLIDE 15] Rye brands built on Indiana whiskey
 
-Many of the rye brands that appeared from the mid-2000s did not distil their own whiskey, at least at first. They bought rye from Lawrenceburg, bottled it, and put their own name and story on it: Bulleit 95 Rye and George Dickel Rye among them, and High West used it in its blends.
+Many of the rye brands that appeared from the mid-2000s did not make their own whiskey, at least at first. They bought rye from Lawrenceburg, bottled it and put their own name on it. Bulleit 95 Rye and George Dickel Rye are two of them. High West used Lawrenceburg rye in its blends.
 
-The trouble came when the story on the bottle pointed somewhere else. Templeton Rye, from Iowa, was sold with a story about a Prohibition-era local recipe and a link to Al Capone. The whiskey was distilled in Lawrenceburg. Buyers sued in 2014, in Illinois and Iowa. The company denied wrongdoing but settled in 2015, offering refunds of up to $2.5 million, adding "distilled in Indiana" to its label and dropping "Prohibition Era Recipe" and "small batch". Treat the Capone story as a legend; I know of no evidence for it. Templeton opened its own distillery in Templeton in 2018, and its first whiskey made entirely in Iowa, released in 2024, was a bourbon.
+Templeton Rye, from Iowa, got into trouble over this. It was sold with a story about a local recipe from Prohibition and a link to Al Capone. The whiskey was made in Lawrenceburg. Buyers sued in 2014. Templeton denied doing anything wrong, but it settled in 2015. It offered refunds of up to $2.5 million. It added "distilled in Indiana" to the label and took off "Prohibition Era Recipe" and "small batch". The Capone story is a legend. Templeton opened its own distillery in Iowa in 2018. The first whiskey it made entirely in Iowa came out in 2024, and it was a bourbon.
 
-Federal rules require a whisky label to name the state of distillation when it differs from the state in the bottler's address. So "Distilled in Indiana" on the back of a rye is a strong hint that it came from Lawrenceburg.
+The law says a whiskey label has to name the state where it was distilled if that is not the state in the bottler's address. So if the back of a rye says "Distilled in Indiana", it very likely came from Lawrenceburg.
 
 ## [SLIDE 16] Pour 4 of 4: Bulleit 95 Rye
 
-Last pour, Bulleit 95 Rye. Bulleit gives the mash as 95 percent rye and 5 percent malted barley, the Lawrenceburg recipe, and it is a straight rye at 90 proof. It came out in 2011.
+Last pour, Bulleit 95 Rye. Bulleit says it is 95 percent rye and 5 percent malted barley, which is the Lawrenceburg recipe. It is a straight rye at 90 proof, and it came out in 2011.
 
-Turn the bottle round and find where it was distilled. Diageo, which owns Bulleit, distils its bourbon in Kentucky, but the rye still comes from MGP in Indiana. When Bulleit launched a bourbon-and-rye blend in 2026, it said the rye in it was distilled and aged in Lawrenceburg.
+Turn the bottle round and find where it was distilled. Diageo owns Bulleit and makes the bourbon in Kentucky. The rye still comes from MGP in Indiana. In 2026 Bulleit launched a blend of bourbon and rye, and the rye in that was made and aged in Lawrenceburg too.
 
-Taste it against the Pikesville. These two are close to the two ends of the legal range: one at about half rye, the other almost all rye. The 95 percent mash is usually described as drier and more herbal, with less sweetness, and people sometimes mention dill or mint. Then go back to whichever of the four you liked best, and I'll ask for a show of hands.
+Taste it next to the Pikesville. One is about half rye and the other is almost all rye. The 95 percent recipe is usually described as drier and more herbal, with less sweetness. Some people get dill or mint. Then go back to whichever of the four you liked best, and I'll ask for a show of hands.
 
 ## [SLIDE 17] Reading a rye label
 
-To finish, what you can and can't learn from a rye label.
+This last slide is what a rye label tells you.
 
-"Rye whisky" means at least 51 percent rye, in new charred oak. "Straight" adds at least two years with nothing added, and an age statement if it is under four. "Distilled in" followed by a state tells you where it was made when that differs from where it was bottled.
+"Rye whisky" means at least 51 percent rye, aged in new charred oak. "Straight" means at least two years old with nothing added. If it is under four years old, the label gives the age. "Distilled in", followed by a state, tells you where it was made when that is different from where it was bottled.
 
-The mash bill is not required on the label. And words like "Monongahela" or "Maryland style" have no legal meaning today. Beam sells a rye called A. Overholt Monongahela Mash, made in Kentucky; the name describes a style, not a place.
+The label does not have to give the recipe. Words like "Monongahela" and "Maryland style" have no legal meaning today. Beam sells a rye called A. Overholt Monongahela Mash, and it is made in Kentucky.
 
 ## [SLIDE 18] Sláinte
 

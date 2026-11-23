@@ -213,7 +213,7 @@ glass_slide(11, 'Glass 3. Pour it now.', 'Knob Creek 9 Year',
 
 # ---------------------------------------------------------------- 12 the barrel
 s = new_slide()
-kicker(s, 'What the years in glass 3 were doing')
+kicker(s, 'What happens in the barrel')
 heading(s, 1.3, 'Whiskey goes into the barrel clear.', size=38, w=6.6, h=1.6)
 text(s, 0.85, 3.0, 6.3, 3.6, [
     'All of the colour comes from the wood. Bourbon cannot have colour added.',
@@ -271,4 +271,4 @@ ask_strip(s, 'Which of the four would you buy again?')
 footer(s, 15)
 
 # ---------------------------------------------------------------- 16 Sláinte
-slainte_slide('To the people who made these four bourbons, and to the ones who made the labels tell the truth.')
+slainte_slide('To the people who made these four bourbons.')

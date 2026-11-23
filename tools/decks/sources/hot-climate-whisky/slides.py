@@ -87,8 +87,7 @@ rect(s, X + 0.03, 4.3, 0.9, 0.045, fill=MARK)
 text(s, X, 4.5, 6.2, 0.45, 'Single malt from India and Taiwan  ·  Four pours', size=17, font=SANS, bold=True,
      color=CREAM)
 text(s, X, 5.05, 6.0, 1.5,
-     ['Three distilleries in Bangalore, Goa and', 'Yilan, and what heat does to the age on',
-      'a whisky label.'],
+     ['Three distilleries in Bangalore, Goa and', 'Yilan. Whisky ages fast in the heat, and', 'their labels give no age.'],
      size=20, italic=True, color=CREAM_MUTE, ls=1.2)
 tw = 4.95
 th = tw * 1254 / 1104
@@ -232,8 +231,7 @@ rect(s, X + 3.6, ly + 0.08, 0.32, 0.22, fill=INK)
 text(s, X + 4.05, ly, 3.8, 0.4, 'Hot warehouse, 10% a year', size=17, font=SANS, color=INK)
 dot(s, X + 3.42, ly + 0.19, 0.12, MARK_DEEP)
 text(s, X, ly + 0.6, CW, 0.9,
-     'A steady loss each year is assumed. 10% sits inside the distilleries’ own figures: Amrut 9–12%, '
-     'Paul' + NB + 'John' + NB + '8–10%.', size=18, italic=True, color=MUTE, ls=1.2)
+     'This assumes the same loss every year. Amrut says it loses 9–12% a year. Paul' + NB + 'John says' + NB + '8–10%.', size=18, italic=True, color=MUTE, ls=1.2)
 footer(s, 8)
 
 # ---------------------------------------------------------------- 9 Paul John
@@ -303,7 +301,7 @@ footer(s, 14)
 
 # ---------------------------------------------------------------- 15 pour 4
 pour_slide(15, 'Pour 4 of 4', ['Glenfiddich', '12 Year Old'],
-           ['The control: twelve years in Speyside at about 2% a year.', 'Compare it with the Kavalan.'],
+           ['Twelve years in Speyside, losing about 2% a year.', 'Compare it with the Kavalan.'],
            ['William Grant & Sons,', 'Dufftown'], ['Speyside single', 'malt Scotch'], '40%', two_line_name=True)
 
 # ---------------------------------------------------------------- 16 reading the label

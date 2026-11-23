@@ -6,11 +6,11 @@ The Whiskey Share Society
 
 ## Part One: before the night
 
-The bourbon barrel abroad. Four pours, 17 slides, about 45 minutes.
+Four pours, 17 slides, about 45 minutes. The night is about what happens to a bourbon barrel after the bourbon is emptied out of it.
 
-**Running order:** slides 1–5 (10 min) · pour one (5 min) · slides 7–10 (8 min) · pour two (5 min) · slide 12 (3 min) · pour three (5 min) · slide 14 (2 min) · pour four (5 min) · close (2 min).
+**Running order:** slides 1 to 5 (10 min), pour one (5 min), slides 7 to 10 (8 min), pour two (5 min), slide 12 (3 min), pour three (5 min), slide 14 (2 min), pour four (5 min), close (2 min).
 
-**Before people arrive:** put the four bottles out in pouring order. Maker's Mark, Laphroaig 10, Slane Irish Whiskey, Glenmorangie The Original 12. Have water on the table. The Laphroaig is heavily peated, so pour it into fresh glasses or rinse with water first; otherwise the smoke will be in everything after it.
+**Before people arrive:** put the four bottles out in pouring order. Maker's Mark, Laphroaig 10, Slane Irish Whiskey, Glenmorangie The Original 12. Put water on the table. The Laphroaig is very smoky. Pour it into fresh glasses, or have people rinse with water afterwards, or the next two pours will taste of smoke.
 
 ---
 
@@ -20,144 +20,155 @@ The bourbon barrel abroad. Four pours, 17 slides, about 45 minutes.
 
 Tonight is about what happens to a bourbon barrel after the bourbon comes out of it.
 
-American law says bourbon has to go into a new charred oak container. So every barrel in Kentucky gets used once, for bourbon, and then it has to go somewhere else. Most of them go abroad, and they end up holding a large share of the world's Scotch, Irish whiskey and rum.
+By law, bourbon has to be aged in new charred oak. So a barrel can hold bourbon once. After that the distillery sells it, and most of them go abroad. They are used to age Scotch, Irish whiskey, rum and tequila.
 
-We'll follow one barrel from the tree to its second fill. The four bottles are four points along that route: a bourbon, a Scotch aged largely in that bourbon's old barrels, an Irish whiskey whose owner sends its own American barrels across the Atlantic, and a Scotch distillery that decided to buy the tree itself.
+We'll start with the tree and follow the barrel from there. We have four bottles tonight. The first is a bourbon. The second is a Scotch aged mostly in that bourbon's used barrels. The third is an Irish whiskey whose owner ships its own used barrels over from America. The fourth is a Scotch from a distillery that has barrels built in America and lends them to an American distiller first.
 
 ## [SLIDE 2] The barrel starts as an American white oak
 
-Almost every bourbon barrel is American white oak, Quercus alba, and much of the timber comes from Missouri and the neighbouring states.
+Almost every bourbon barrel is made of American white oak. A lot of the wood comes from Missouri and the Ozarks.
 
-White oak gets used for practical reasons. The grain is tight, and the pores in the heartwood are blocked by growths called tyloses, which fill the vessels as the tree ages. That makes the wood hold liquid. Red oak has open vessels, and a barrel made from it leaks.
+White oak is used because it holds liquid. As the tree grows, the pores in the wood get plugged. The plugs are called tyloses. Red oak has open pores, and a barrel made from it leaks.
 
-Oak bends when it's heated, so a stave can be curved without cutting it to shape. Because American white oak is so watertight, the logs can be sawn into staves. French and European oak is usually split along the grain instead, which wastes more of the tree.
+Oak also bends when you heat it. That matters because the side of a barrel is made of long boards called staves, and each one has to be curved without breaking.
 
-The staves are then seasoned, usually stacked outdoors for months, so that rain and air wash out some of the harsher tannins.
+American white oak can be sawn into staves. European oak has to be split along the grain, and that uses much less of each log.
+
+The staves are stacked outdoors for months before they are used. Rain and air wash out some of the harsh tannin.
 
 ## [SLIDE 3] A cooper builds it with no glue or nails
 
-A barrel is held together by pressure and nothing else. The cooper stands about thirty staves upright inside a metal hoop, each one wider in the middle than at the ends.
+A cooper is a barrel maker. A barrel has no glue and no nails in it. The cooper stands about thirty staves upright inside a metal hoop. Each stave is wider in the middle than at the ends.
 
-Then the barrel is heated, traditionally over a small fire and now often with steam, and the open end is pulled in with a cable or a press until the staves meet. More hoops are driven down to hold the shape. The cooper cuts a groove near each end called the croze, and the round heads are fitted into it.
+Then the barrel is heated. That used to be done over a small fire, and now it is often done with steam. The open end is pulled in until the staves meet, and more hoops are driven down to hold the shape. The cooper cuts a groove near each end, called the croze, and the round ends of the barrel fit into it.
 
-The joints are tight because the wood swells when it gets wet. A dry barrel that's just been filled will often weep at the seams for a day or two until it takes up.
+The hoops hold it together. The wood also swells when it gets wet, and that closes the joints. A dry barrel that has just been filled will often leak a little at the seams for a day or two.
 
 ## [SLIDE 4] Inside a charred stave
 
-Before the heads go in, the inside of the barrel is heated again, which is where flavour comes in.
+Before the ends go in, the inside of the barrel is heated again. There are two ways to do it. Toasting is slow heat that cooks the wood without setting it on fire. Charring is fire. The barrel is put over a burner and the inside burns for less than a minute.
 
-There are two separate steps. Toasting is slow heat that cooks the wood without setting it alight. Charring is fire: the barrel is set over a burner and the inside burns for somewhere under a minute. Cooperages sell the char in grades, number one to number four. Number four is the heaviest and is called alligator char, because the surface cracks into scales like the skin of an alligator.
+Char comes in four grades, number one to number four. Number four is the heaviest. It's called alligator char because the surface cracks into scales like an alligator's skin.
 
-If you cut through a charred stave, you'd see three layers. On the inside surface is the black char itself, which behaves something like charcoal: it takes some of the sulphur compounds and rough edges out of the spirit. Behind that is a band a few millimetres thick that coopers call the red layer, where the heat has broken down the wood's sugars and caramelised them without burning them. Behind that is plain oak.
+If you cut through a charred stave you would see three layers. On the inside is the black char. It works like charcoal and takes some of the sulphur smell out of the spirit. Behind the char is a band a few millimetres thick that coopers call the red layer. There the heat has caramelised the sugars in the wood without burning them. Behind that is plain oak.
 
-Most of what bourbon takes from the barrel comes from the red layer and just behind it: vanillin, the molecule that gives vanilla its smell, and oak lactones, which smell of coconut. Then tannin, which you feel as a drying grip on your gums, and the colour. The spirit that goes into the barrel is as clear as water.
+Most of what bourbon gets from the barrel comes from the red layer and the wood just behind it. Vanillin gives the vanilla smell. Oak lactones smell of coconut. Tannin is the drying feeling on your gums. The colour comes from the barrel too. The spirit goes in as clear as water.
 
 ## [SLIDE 5] 1935: the Federal Alcohol Administration Act
 
-The reason it gets used only once is a federal rule from the 1930s.
+A bourbon barrel is used once because of a federal rule from the 1930s.
 
-After Prohibition ended in December 1933, the federal government had to write rules for an industry that had been shut for thirteen years. The Federal Alcohol Administration Act, signed on 29 August 1935, gave the Treasury the job of setting standards of identity, the legal definitions of each type of spirit. A version published in 1936 did not yet have the word "new" in the bourbon definition. The regulations of 1938 did: bourbon had to be stored in charred new oak containers. Accounts disagree on the day it took effect, 1 March or 1 July 1938, which is why the slide says only "by 1938".
+Prohibition ended in December 1933. In August 1935 the Federal Alcohol Administration Act became law, and the government then wrote a legal definition for each kind of spirit. The 1936 definition of bourbon did not say the oak had to be new. The 1938 rules did. From then on bourbon had to be stored in charred new oak.
 
-As for who wanted it, the account you'll hear most often is that coopers and the timber industry lobbied for it in the Depression. Nobody has produced the papers. One version credits the Arkansas congressman Wilbur Mills, but he only entered Congress in January 1939, after the rule was written. Treat the lobbying story as plausible and unproven.
+The usual story is that barrel makers and the timber trade pushed for the word "new" during the Depression. That has never been proved.
 
-The consequence is that every bourbon distillery has a stream of empty barrels it can't use again for bourbon.
+So every bourbon distillery ends up with empty barrels it can't fill with bourbon again.
+
+> **IF SOMEONE ASKS**
+> Some versions of the story name the Arkansas congressman Wilbur Mills. He did not enter Congress until January 1939, after the rule was written.
 
 ## [SLIDE 6] Pour 1 of 4: Maker's Mark
 
-Let's have the first one. This is Maker's Mark, from Loretto, Kentucky, at 90 proof. It's a wheated bourbon, meaning the grain after corn in the recipe is red winter wheat instead of rye, and it's made by one distillery under its own name.
+Let's pour the first one. This is Maker's Mark, from Loretto, Kentucky, at 90 proof. It is a wheated bourbon. That means the second grain in the recipe, after corn, is wheat. Most bourbons use rye.
 
-I've picked it because we know exactly where its barrels go next. Maker's Mark and Laphroaig have had the same owner since the late 1980s, today Suntory Global Spirits, and Laphroaig's ex-bourbon barrels come largely from Maker's Mark. In 2022 Laphroaig bottled its Cairdeas Warehouse 1 entirely from first-fill ex-Maker's Mark casks. I couldn't find a current statement from either company that every barrel behind the ten-year-old is ex-Maker's Mark, so I'd say "largely" rather than "all". So this is the first fill, and the second pour tonight is mostly the second fill of the same barrels.
+I picked it because we know where its barrels go. Maker's Mark and Laphroaig have had the same owner since the late 1980s. Today that is Suntory. Most of the bourbon barrels Laphroaig uses come from Maker's Mark. In 2022 Laphroaig released a whisky aged only in Maker's Mark barrels. So this glass is the first fill, and the next glass is mostly the second fill of the same barrels.
 
-Have a look at the colour before you taste it. Under bourbon law nothing can be added except water, so every bit of that colour came out of a new charred barrel. Then taste it, and see if you can find vanilla and something like caramel. Those are from the red layer.
+Look at the colour before you taste it. Nothing can be added to bourbon except water, so all of that colour came from the barrel. Then taste it, and see if you can find vanilla and caramel. Those come from the red layer.
 
 ## [SLIDE 7] Years in a Kentucky rickhouse
 
-The filled barrels go into a warehouse, which in Kentucky is usually called a rickhouse: a big wooden or brick building, often several storeys high, with the barrels lying on their sides on timber racks.
+The full barrels go into a warehouse. In Kentucky it's called a rickhouse. It is a big building, often several floors high, with the barrels lying on their sides on wooden racks.
 
-The seasons do a lot of the work. In the summer the warehouse heats up, the spirit expands and gets pushed into the wood. In winter it cools and contracts and comes back out, carrying what it has picked up. Kentucky has hot summers and cold winters, so this happens more strongly there than in Scotland.
+In summer the warehouse heats up. The spirit expands and is pushed into the wood. In winter it cools and comes back out, and it brings flavour and colour with it. Kentucky has hot summers and cold winters, so this happens more there than in Scotland.
 
-Where a barrel sits matters too. The top floors of a rickhouse get much hotter than the ground floor, so a barrel near the roof ages faster and comes out darker and stronger in flavour than one on the ground. Most distilleries blend barrels from different floors. Maker's Mark says it still rotates its barrels between floors by hand, which most distillers gave up long ago.
+The floor matters too. The top floors are much hotter than the ground floor. A barrel near the roof ages faster and comes out darker, with more flavour. Most distilleries blend barrels from different floors. Maker's Mark says it still moves its barrels between floors by hand.
 
 ## [SLIDE 8] 53: US gallons in a standard bourbon barrel, about 200 litres
 
-A standard bourbon barrel holds 53 US gallons, about 200 litres. That size is custom, not law; it's said to have replaced a 48-gallon barrel during the Second World War, but that rests on trade lore. The law does say the spirit goes in at no more than 125 proof.
+A standard bourbon barrel holds 53 US gallons, which is about 200 litres. No law sets that size. It is just what the trade uses. The story in the trade is that it replaced a 48-gallon barrel during the Second World War.
 
-Every year some of it evaporates through the wood. That's called the angels' share. In Scotland, which is cool and damp, the usual figure is about two percent a year, and the strength tends to fall because alcohol evaporates faster than water there. In a Kentucky warehouse the loss is larger, and on the hot upper floors the strength often goes up, because the dry heat takes out more water than alcohol.
+The law does set the strength. The spirit can go into the barrel at no more than 125 proof.
 
-Straight bourbon needs at least two years in the barrel.
+Every year some of the whiskey evaporates through the wood. That is called the angels' share. In Scotland it is about two percent a year. Scotland is cool and damp, and the whisky gets weaker as it ages there. In Kentucky more is lost. On the hot top floors the whiskey often gets stronger, because the dry heat takes out more water than alcohol.
+
+Straight bourbon has to spend at least two years in the barrel.
 
 ## [SLIDE 9] What the first fill leaves in the wood
 
-When the bourbon is ready, the barrel is emptied. The trade calls this dumping. What's left behind is still useful.
+When the bourbon is ready, the barrel is emptied. The trade calls that dumping. The empty barrel is still worth something, for two reasons.
 
-First, some whiskey stays soaked into the staves. Jim Beam sells a bourbon called Devil's Cut that is partly whiskey drawn back out of the wood.
+Some whiskey stays soaked into the staves. Jim Beam sells a bourbon called Devil's Cut, and part of it is whiskey pulled back out of the wood of emptied barrels.
 
-Second, the wood still has flavour in it. A first fill of bourbon takes the strongest and fastest of what the red layer has to give: the colour and a large share of the vanilla and the tannin. The second spirit gets what's left, which is gentler, and it gets it more slowly. That's one reason Scotch often spends ten or twelve years in a used barrel.
+The wood also still has flavour in it. The bourbon takes most of the colour, vanilla and tannin, and it takes them quickly. The next spirit gets what is left. That is milder, and it comes out more slowly. This is one reason Scotch often spends ten or twelve years in a used barrel.
 
 ## [SLIDE 10] Where the empty barrels go
 
-Empty bourbon barrels go to almost every other aged spirit.
+Used bourbon barrels go to most other aged spirits.
 
-The biggest buyer is Scotch whisky. Scottish law requires Scotch to spend at least three years in oak casks in Scotland, and says nothing about new wood, so most Scotch sits in ex-bourbon barrels. Irish whiskey has a similar three-year rule, in wooden casks on the island of Ireland, and uses the same barrels. In the Caribbean, a lot of rum is aged in ex-bourbon wood, and so is much of the reposado and añejo tequila made in Mexico.
+Scotch whisky uses the most. Scotch has to spend at least three years in oak casks in Scotland, and the law does not ask for new wood. Most Scotch spends at least part of that time in used bourbon barrels. The usual estimate is about 90 percent.
 
-Until about the late 1980s most barrels crossed the Atlantic knocked down into bundles of staves, called shooks, and were rebuilt in Scotland. Today they're mostly shipped whole in containers. Many are rebuilt there into larger casks called hogsheads, about 250 litres.
+Irish whiskey has the same kind of rule. It has to spend three years in wooden casks in Ireland, north or south, and it uses the same barrels. A lot of Caribbean rum is aged in them, and so is a lot of aged tequila.
+
+Until the late 1980s most barrels were taken apart and shipped to Scotland as bundles of staves, then rebuilt there. Now most are shipped whole. Many are rebuilt in Scotland into bigger casks called hogsheads, which hold about 250 litres.
 
 ## [SLIDE 11] Pour 2 of 4: Laphroaig 10
 
-Second pour. This is Laphroaig ten-year-old, from Islay, off the west coast of Scotland. Most of its barrels are the same kind as the Maker's Mark, one fill later.
+Second pour. This is Laphroaig 10, from Islay, an island off the west coast of Scotland. Most of its bourbon barrels came from Maker's Mark.
 
-You'll notice smoke first. That comes from peat, which is burnt to dry the malted barley before it's mashed, and has nothing to do with the barrel.
+You'll notice smoke first. That comes from peat. Peat is burnt to dry the barley, and it has nothing to do with the barrel.
 
-What I'd like you to look for underneath is vanilla, and something sweet and soft that's quite close to what we had in the Maker's Mark. That part came from the barrel, and some of it came from Kentucky.
+Under the smoke, look for vanilla and something sweet, close to what you tasted in the Maker's Mark. That part came from the barrel.
 
-Then look at the colour against the bourbon. Scotch is allowed to have caramel colouring added, which bourbon isn't, so colour in a Scotch tells you less about the wood than it does in a bourbon.
+Then hold it next to the bourbon and compare the colour. Scotch is allowed to have caramel colouring added and bourbon is not. So the colour of a Scotch tells you less about the barrel.
 
 ## [SLIDE 12] A Scotch cask is filled more than once
 
-A barrel in Scotland usually gets used more than once.
+In Scotland a barrel is usually filled more than once.
 
-The first time it's filled with Scotch, it's called a first-fill cask. It has the most left to give, so whisky from it is the most like bourbon in flavour. The next time, it's a refill or second-fill cask, and it gives much less. Some distilleries fill a cask three or four times. After that, the wood is more or less spent, and it either gets scraped out and re-charred, which coopers call rejuvenating, or it's retired.
+The first time it is filled with Scotch, it's called a first-fill cask. It has the most flavour left, so the whisky from it tastes the most like bourbon. The next time it's called a refill cask, and it gives less. Some distilleries fill a cask three or four times. After that the wood has little left. It is either scraped and charred again, or it is retired.
 
-Most single malts mix first-fill and refill casks. Labels rarely give the balance.
+Most single malts are a mix of first-fill and refill casks. The label rarely says how much of each.
 
 ## [SLIDE 13] Pour 3 of 4: Slane Irish Whiskey
 
-Third pour. This is Slane Irish Whiskey, from Slane Castle in County Meath, at 40 percent. It's a blend of malt and grain whiskey.
+Third pour. This is Slane Irish Whiskey, from Slane Castle in County Meath, at 40 percent. It is a blend of malt and grain whiskey.
 
-Slane belongs to Brown-Forman, the Louisville company that also owns Jack Daniel's and Woodford Reserve and makes its own barrels. Brown-Forman bought the business in 2015 and built a distillery at the castle. Slane describes this as triple casked: some of the whiskey goes into new American oak, some into what it calls seasoned casks, which are barrels that have already held Brown-Forman's Tennessee whiskey and bourbon, and some into Oloroso sherry casks from Spain. The three are blended before bottling.
+Slane is owned by Brown-Forman, the Louisville company that also owns Jack Daniel's and Woodford Reserve. Brown-Forman makes its own barrels. It bought Slane in 2015 and built a distillery at the castle.
 
-So this is the Maker's Mark and Laphroaig arrangement again: one owner sending its own empty barrels across the Atlantic. Reports say the seasoned casks are mostly ex-Jack Daniel's. The company says Tennessee whiskey and bourbon, without giving the proportions. The new-oak part is a first fill done in Ireland, which Irish law allows and bourbon law requires.
+Slane uses three kinds of cask. Some of the whiskey goes into new American oak. Some goes into barrels that have already held Brown-Forman's Tennessee whiskey and bourbon. Some goes into Oloroso sherry casks. The three are blended before bottling.
 
-Taste it against the Laphroaig. With no peat in the way, you should get the sweeter side of American oak more clearly, and some dried fruit from the sherry casks.
+So this is the same arrangement as Maker's Mark and Laphroaig. One company owns both ends and ships its own used barrels across the Atlantic. Press reports say most of those barrels held Jack Daniel's. The company only says Tennessee whiskey and bourbon.
+
+Taste it next to the Laphroaig. There is no peat here, so the sweet side of American oak is easier to find. You may also get some dried fruit from the sherry casks.
 
 ## [SLIDE 14] Glenmorangie buys the tree and lends the barrel
 
-The last link turns the arrangement around.
+Glenmorangie does it the other way round. It is a distillery in Tain, in the north of Scotland, and it wanted more control over its barrels.
 
-Glenmorangie, in Tain in the north of Scotland, decided that it wanted more control over the wood its whisky goes into. So, as the company describes it, it chooses its own oak in the Ozark Mountains of Missouri, has the staves seasoned in the open air for about two years, and has the barrels made to its specification. It then lends the new barrels to an American distiller, who fills them with bourbon or Tennessee whiskey for about four years, and then they're shipped to Scotland. Jack Daniel's and Heaven Hill are the distilleries usually named. A 2008 article in Whisky Magazine gave the loan as four to eight years, so the period has probably varied.
+This is how the company describes it. It picks its own oak in the Ozark Mountains of Missouri. The staves are dried in the open air for about two years. The barrels are built to its order. Then it lends the new barrels to an American distiller, who fills them with bourbon or Tennessee whiskey for about four years. Jack Daniel's and Heaven Hill are the two usually named. After that the barrels are shipped to Scotland.
 
-In this arrangement the American distiller is renting the barrel. It's built for its second fill, and the first fill is there mostly to season it. The company calls these designer casks. How much of its standard whisky goes into them, as opposed to barrels bought on the open market, isn't something I've been able to pin down.
+So the barrel is built for the Scotch, and the American whiskey is there mostly to season it. Glenmorangie calls these designer casks. It does not say how much of its whisky is aged in them.
 
 ## [SLIDE 15] Pour 4 of 4: Glenmorangie The Original 12
 
-Last pour. This is Glenmorangie The Original, at 40 percent. For about sixty years it was a ten-year-old. In 2024 the company made it a twelve-year-old, saying the extra two years made it creamier, and the ten has been phased out. The company says it's aged in ex-bourbon casks.
+Last pour. This is Glenmorangie The Original, at 40 percent. For about sixty years it was a 10-year-old. In 2024 the company changed it to a 12-year-old. The company says it is aged in bourbon casks.
 
-It's unpeated and light, which makes it a good bottle for tasting what American oak does after bourbon: try to find the vanilla, and anything like coconut, which would be the oak lactones.
+There is no peat in it and it is light, so it's a good one for tasting what a used bourbon barrel does. Look for vanilla, and for coconut. The coconut is the oak lactones.
 
-When you've finished, go back to the Maker's Mark and taste it next to this one. They've both been in American white oak, one in its first fill and one in its second. I'd be interested to hear which you'd buy.
+When you've finished, go back to the Maker's Mark and taste the two side by side. Both were aged in American white oak. The bourbon was the first fill and this was the second. Tell me which one you'd buy.
 
 ## [SLIDE 16] Reading the wood on a label
 
-Here's what a label can tell you about the barrel.
+This is what a label can tell you about the barrel.
 
-"Bourbon" and "straight bourbon" mean new charred oak, by law, and no added colour. So in a bourbon the colour comes from the wood.
+"Bourbon" and "straight bourbon" mean new charred oak and no added colour. That is the law. So in a bourbon, the colour comes from the wood.
 
-"Ex-bourbon", "first fill" and "refill" on a Scotch or Irish label tell you the cask was used before, and how many times. They're descriptions the producer chooses to give, and no law requires them.
+"Ex-bourbon", "first fill" and "refill" on a Scotch or Irish label mean the cask was used before, and how many times. The producer doesn't have to print them.
 
-"Double oaked", "finished" or "second barrel" means the whiskey was moved into a second cask near the end, and labels usually say what kind.
+"Double oaked" or "finished" means the whiskey was moved into a second cask near the end. The label usually says what kind.
 
-A Scotch label doesn't have to tell you whether caramel colouring was added. Some say "natural colour". If it doesn't say, you can't tell from the colour how active the cask was.
+A Scotch label doesn't have to say whether caramel colouring was added. Some say "natural colour". If the label doesn't say, you can't judge the cask by the colour.
 
 ## [SLIDE 17] Sláinte
 
-That's everything from me. Thanks for listening, and thanks to everyone who brought a bottle. Sláinte.
+Thanks for coming, and thanks to everyone who brought a bottle. Sláinte.

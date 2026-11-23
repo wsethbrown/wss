@@ -157,7 +157,7 @@ text(s, X, 2.75, CW, 0.7, 'The Federal Alcohol Administration Act', size=32, fon
 text(s, X, 3.7, 10.8, 2.8, [
     'Standards of identity written under it require bourbon to be stored in charred new oak containers. '
     'The word “new” was in them by 1938. A barrel can hold bourbon once.',
-    [('Coopers and the timber trade are said to have pressed for it. The evidence for that story is thin.',
+    [('The usual story is that barrel makers and the timber trade pushed for it. That has never been proved.',
       {'color': CREAM_MUTE, 'size': 19})],
 ], size=22, color=CREAM, ls=1.2, space_after=14)
 footer(s, 5, dark=True)
@@ -198,7 +198,7 @@ heading(s, 0.85, 'What the first fill leaves in the wood', size=40, w=CW, h=0.9)
 pw = (CW - 0.25) / 2
 cards = [(X, OAK, OAK_EDGE, CREAM, 'First fill, bourbon', 'New barrel. Most of the colour, vanilla and tannin, '
           'taken quickly.'),
-         (X + pw + 0.25, WHITE, HAIR, INK, 'Second fill, abroad', 'What is left, given up gently over ten years '
+         (X + pw + 0.25, WHITE, HAIR, INK, 'Second fill, abroad', 'What is left. It comes out slowly, over ten years '
           'or more.')]
 for cx, fill, edge, col, name, body in cards:
     rrect(s, cx, 2.0, pw, 2.6, r=0.3, fill=fill, line=edge)
@@ -277,7 +277,7 @@ for i, (name, body, fill, edge) in enumerate(steps):
         rect(s, cx + 0.25, 1.82, 0.8, 0.045, fill=MARK_DEEP)
     text(s, cx + 0.25, 1.94, c5 - 0.4, 0.75, name, size=20, font=SANS, bold=True, color=INK, ls=0.95)
     text(s, cx + 0.25, 2.72, c5 - 0.4, 1.05, body, size=16, color=INK, ls=1.15)
-text(s, X, 3.95, CW, 0.4, 'As the company describes it. It calls these designer casks.', size=19, color=INK)
+text(s, X, 3.95, CW, 0.4, 'This is how Glenmorangie describes it. It calls these designer casks.', size=19, color=INK)
 bh = CW * 298 / 2060
 picture(s, A / 'stave-bolts-truck-nara.jpg', X, 4.55, CW, bh, radius_in=0.2)
 credit(s, X, 4.55 + bh + 0.08, CW,

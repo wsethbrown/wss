@@ -278,7 +278,7 @@ for name, v, lab, col in bars:
     text(s, bx + bw + 0.18, yy, 1.6, rh, lab, size=16, color=INK, anchor=MSO_ANCHOR.MIDDLE)
     yy += rh
     line(s, X, yy, R, yy, HAIR, 1.0)
-text(s, X, 6.3, CW, 0.45, 'Malt specifications as published or widely reported. They vary between batches.',
+text(s, X, 6.3, CW, 0.45, 'These are the figures usually published. They vary from batch to batch.',
      size=16, italic=True, color=MUTE)
 footer(s, 15)
 

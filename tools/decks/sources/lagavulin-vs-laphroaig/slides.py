@@ -62,9 +62,9 @@ s = new_slide(INK)
 picture(s, LOGO_CREAM, X, 0.75, 2.2, 2.2 * LOGO_RATIO)
 text(s, X, 2.95, 6.3, 1.7, ['Lagavulin', 'vs Laphroaig'], size=54, font=SANS, bold=True, color=CREAM, ls=0.9)
 rect(s, X + 0.03, 4.72, 0.9, 0.045, fill=MARK)
-text(s, X, 4.92, 6.2, 0.45, 'Two Islay neighbours  ·  Four pours', size=17, font=SANS, bold=True, color=CREAM)
+text(s, X, 4.92, 6.2, 0.45, 'Two Islay distilleries  ·  Four pours', size=17, font=SANS, bold=True, color=CREAM)
 text(s, X, 5.48, 5.9, 1.3,
-     'For sixty years one firm sold both whiskies. In 1908 the owner of Lagavulin built a copy of Laphroaig.',
+     'One firm sold both whiskies for about sixty years. In 1908 Lagavulin’s owner tried to make Laphroaig himself.',
      size=19, italic=True, color=CREAM_MUTE, ls=1.2)
 tw, th = 5.13, 4.1
 ty = 1.35
@@ -149,7 +149,7 @@ rows_card(s, X, 2.0, CW, [
     ('The name', 'An old coaching inn on Edinburgh’s Canongate.'),
     ('1901', 'Launched in Britain after selling abroad first.'),
     ('1902–14', 'Mackie spends £90,000 advertising it. Home sales go from 700 to 70,000 cases a year.'),
-    ('The malt', 'Lagavulin at its heart, with Craigellachie.'),
+    ('The malt', 'Built on Lagavulin, with Craigellachie.'),
 ], label_w=2.0, row_h=1.05, mark=3, label_size=22, size=19)
 footer(s, 6)
 
@@ -163,8 +163,8 @@ s = new_slide()
 heading(s, 0.85, '1907: Laphroaig ends Mackie’s agency', size=40, w=CW, h=0.9)
 rows_card(s, X, 2.0, CW, [
     ('The heirs', 'Laphroaig’s owner dies. His sisters and nephew inherit it.'),
-    ('The court', 'They take Mackie to court and end his agency. One source says 1908.'),
-    ('The water', 'Laphroaig’s account: Mackie cuts off its water, and a court makes him restore it.'),
+    ('The court', 'They take Mackie to court and end his agency.'),
+    ('The water', 'Laphroaig says Mackie cut off its water and a court made him restore it.'),
 ], label_w=2.0, row_h=1.15, mark=2, label_size=22, size=19)
 footer(s, 8)
 
@@ -177,9 +177,9 @@ pour_slide(9, 'Glass 3 of 4', 'Lagavulin 16',
 s = new_slide()
 heading(s, 0.85, '1908: Malt Mill, inside Lagavulin', size=40, w=CW, h=0.9)
 cols = [('The aim', 'Make Laphroaig at Lagavulin.'),
-        ('The copy', 'As the story goes, stills like Laphroaig’s and Laphroaig’s brewer to run it.'),
+        ('The copy', 'The story is that he copied Laphroaig’s stills and hired its brewer.'),
         ('The result', 'Nothing like Laphroaig. It went into Mackie’s blends.'),
-        ('The end', 'Stopped around 1960; some say 1962. Its stills went into Lagavulin.')]
+        ('The end', 'Stopped around 1960. Its stills went into Lagavulin.')]
 for i, (t, body) in enumerate(cols):
     cx = X + i * (cw + gap)
     rrect(s, cx, 2.05, cw, 3.55, r=0.26, fill=WHITE, line=HAIR)
@@ -187,7 +187,7 @@ for i, (t, body) in enumerate(cols):
         rect(s, cx + 0.3, 2.3, 0.9, 0.045, fill=MARK_DEEP)
     text(s, cx + 0.3, 2.5, cw - 0.6, 0.6, t, size=26, font=SANS, bold=True, color=INK)
     text(s, cx + 0.3, 3.25, cw - 0.5, 2.2, body, size=18, color=INK, ls=1.2)
-text(s, X, 5.9, CW, 0.5, 'No bottle of Malt Mill has ever been authenticated.', size=18, italic=True, color=MUTE)
+text(s, X, 5.9, CW, 0.5, 'No bottle of Malt Mill has been proved genuine.', size=18, italic=True, color=MUTE)
 footer(s, 10)
 
 # ---------------------------------------------------------------- 11 Barnard (the green story slide)
@@ -198,7 +198,7 @@ text(s, X, 2.75, 11.0, 1.2, 'Barnard: two distilleries a short distance apart, t
      size=32, font=SANS, bold=True, color=CREAM, ls=0.95)
 text(s, X, 4.15, 10.6, 2.2, [
     'He gives Lagavulin and Laphroaig as his example of how locality, water and position fix a whisky’s character.',
-    [('Twenty-one years later Mackie built Malt Mill.', {'color': CREAM_MUTE})],
+    [('His book came out in 1887. Mackie built Malt Mill in 1908.', {'color': CREAM_MUTE})],
 ], size=20, color=CREAM, ls=1.2, space_after=12)
 footer(s, 11, dark=True)
 
@@ -222,7 +222,7 @@ footer(s, 12)
 # ---------------------------------------------------------------- 13 pour 4
 pour_slide(13, 'Glass 4 of 4', 'Laphroaig 10',
            ['The whisky Mackie sold for years and then tried to copy.',
-            'Same strength as the Lagavulin, two miles down the road.'],
+            'Same strength as the Lagavulin. Made two miles away.'],
            'Laphroaig, Islay', 'Islay single malt, 10 years', '43%')
 
 # ---------------------------------------------------------------- 14 today
@@ -245,5 +245,4 @@ rect(s, X + pw + 0.25 + 0.42, 3.0, 0.9, 0.045, fill=MARK)
 footer(s, 14)
 
 # ---------------------------------------------------------------- 15 Sláinte
-slainte_slide('To Barnard, who saw the difference in 1887, to Ian Hunter and Bessie Williamson, '
-              'and to Restless Peter.')
+slainte_slide('To Lagavulin and to Laphroaig.')

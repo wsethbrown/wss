@@ -152,14 +152,14 @@ for i, (name, body) in enumerate(people):
         rect(s, cx + 0.35, 2.25, 0.9, 0.045, fill=MARK_DEEP)
     text(s, cx + 0.35, 2.4, cw3 - 0.45, 0.55, name, size=20, font=SANS, bold=True, color=INK)
     text(s, cx + 0.35, 3.05, cw3 - 0.6, 1.9, body, size=19, color=INK, ls=1.2)
-strip(s, 5.4, 0.85, 'Most of this rests on a 1967 biography and oral tradition. The written trail is thin.',
+strip(s, 5.4, 0.85, 'This comes from a 1967 biography and local memory. Little was written' + NB + 'down.',
       size=20)
 footer(s, 4)
 
 # ---------------------------------------------------------------- 5 1866 (the green story slide)
 year_slide(5, '1866', ['The date on every bottle', 'of Jack Daniel’s'],
-           'His biographer, Peter Krass, puts the start of Daniel’s own business at 1875. His year of '
-           'birth is disputed' + NB + 'too.',
+           'Registration records put the start of Daniel’s own business at 1875. His year of '
+           'birth is uncertain' + NB + 'too.',
            'jack-daniel-portrait.jpg', 'Jasper Newton “Jack” Daniel. Public domain.', 1284 / 1056,
            body_y=4.0)
 
@@ -210,7 +210,7 @@ fw = fh * 888 / 1284
 heading(s, 0.85, ['George Dickel, a', 'Nashville merchant'], size=40, w=R - fw - X - 0.4, h=1.5)
 text(s, X, 2.6, R - fw - X - 0.5, 3.5,
      ['From 1888 his firm was sole distributor of the Cascade distillery near Tullahoma.',
-      'He sold it and put his name on it. He did not distil' + NB + 'it.',
+      'He sold whisky. He was not a' + NB + 'distiller.',
       [('Schenley revived the brand at a new distillery in' + NB + '1959.', {'color': MUTE})]],
      size=21, color=INK, ls=1.2, space_after=14)
 picture(s, A / 'george-dickel-giers.jpg', R - fw, 0.75, fw, fh, radius_in=0.26)
@@ -292,14 +292,14 @@ footer(s, 15)
 
 # ---------------------------------------------------------------- 16 supported and thin
 s = new_slide()
-heading(s, 0.85, 'What the record supports, and where it is' + NB + 'thin', size=36, w=CW, h=0.9)
+heading(s, 0.85, 'What is known about Nearest Green', size=36, w=CW, h=0.9)
 pw16 = (CW - 0.25) / 2
-cols = [('Supported', ['Green was enslaved and worked a still near Lynchburg.',
+cols = [('Well supported', ['Green was enslaved and worked a still near Lynchburg.',
                        'He taught the young Jack Daniel.',
                        'Jack Daniel’s calls him its first master distiller.'], False),
-        ('Thin', ['His dates of birth and death.',
-                  'What exactly he taught.',
-                  'That charcoal mellowing came from West' + NB + 'Africa.'], True)]
+        ('Not known', ['When he was born and when he died.',
+                  'What exactly he taught Daniel.',
+                  'Whether the charcoal step came from' + NB + 'him.'], True)]
 for i, (name, items, marked) in enumerate(cols):
     cx = X + i * (pw16 + 0.25)
     rrect(s, cx, 1.8, pw16, 3.6, r=0.28, fill=WHITE, line=HAIR)
@@ -312,13 +312,13 @@ for i, (name, items, marked) in enumerate(cols):
             line(s, cx + 0.4, yy, cx + pw16 - 0.4, yy, HAIR, 1.0)
         text(s, cx + 0.4, yy, pw16 - 0.8, 0.85, it, size=18, color=INK, anchor=MSO_ANCHOR.MIDDLE, ls=1.12)
         yy += 0.85
-strip(s, 5.62, 0.9, 'Weaver’s research is the main modern source. She also founded the whiskey brand named after'
+strip(s, 5.62, 0.9, 'Most of the recent research is Fawn Weaver’s. She also founded the whiskey brand named after'
       + NB + 'him.', size=19)
 footer(s, 16)
 
 # ---------------------------------------------------------------- 17 pour 4
 pour_slide(17, 'Pour 4 of 4', ['Jack Daniel’s', 'Bonded'],
-           ['Back to Lynchburg, at full strength.',
+           ['Jack Daniel’s again, this time at 100 proof.',
             'Compare it with the first pour, then try it with a few drops of water.'],
            ['Jack Daniel Distillery,', 'Lynchburg'], ['Tennessee whiskey,', 'bottled in bond'], '100',
            two_line_name=True)

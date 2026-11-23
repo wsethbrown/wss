@@ -76,7 +76,7 @@ text(s, X, 3.0, 6.5, 1.0, 'Blended Scotch', size=52, font=SANS, bold=True, color
 rect(s, X + 0.03, 4.12, 0.9, 0.045, fill=MARK)
 text(s, X, 4.35, 6.2, 0.45, '1830 to 1910  ·  Four pours', size=17, font=SANS, bold=True, color=CREAM)
 text(s, X, 4.95, 5.9, 1.5,
-     'How a new still, a few grocers and a vine pest made blended Scotch the world’s whisky.',
+     'How Scotch went from casks of malt whisky to blends sold around the world.',
      size=20, italic=True, color=CREAM_MUTE, ls=1.2)
 tw = 5.0
 th = tw * 1287 / 1104
@@ -259,7 +259,7 @@ hw = (CW - 0.5) / 2
 hh = hw * 437 / 980
 people = [(X, 'thomas-dewar-bain-news-service.jpg', 'Thomas Dewar. Bain News Service, Library of Congress.',
            'Tommy Dewar, 1864–1930',
-           'In London from 1885. Toured the world for the firm; his book of it came out in 1894.'),
+           'In London from 1885. Toured the world for the firm. His book about it came out in 1894.'),
           (X + hw + 0.5, 'james-buchanan-spy-vanity-fair-1907.jpg',
            'Buchanan by Spy, Vanity Fair, 1907: “Whisky and Horses”.',
            'James Buchanan, 1849–1935',

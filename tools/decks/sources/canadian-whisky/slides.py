@@ -318,7 +318,7 @@ footer(s, 15)
 
 # ---------------------------------------------------------------- 16 pour 4
 pour_slide(16, 'Pour 4 of 4', ['Forty Creek', 'Copper Pot Reserve'],
-           ['A winemaker’s whisky from the Niagara Peninsula.',
+           ['Made on the Niagara Peninsula at a distillery a winemaker took over in 1992.',
             'The grains are distilled and aged apart, then blended.'],
            ['Forty Creek Distillery,', 'Grimsby, Ontario (Campari)'], 'Canadian whisky', '43%',
            two_line_name=True, widths=(3.35, 2.6, 0.85))

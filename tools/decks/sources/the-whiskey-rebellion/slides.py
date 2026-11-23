@@ -110,8 +110,7 @@ rect(s, X + 0.03, 4.3, 0.9, 0.045, fill=MARK)
 text(s, X, 4.5, 6.2, 0.45, 'Western Pennsylvania, 1791–1794  ·  Four pours', size=17, font=SANS, bold=True,
      color=CREAM)
 text(s, X, 5.05, 6.2, 1.5,
-     ['How a federal tax on whiskey, passed in 1791,', 'ended with Washington marching an army',
-      'into western Pennsylvania.'],
+     ['In 1791 Congress taxed whiskey.', 'In 1794 Washington sent an army into', 'western Pennsylvania to enforce the tax.'],
      size=20, italic=True, color=CREAM_MUTE, ls=1.2)
 tw = 4.95
 th = tw * 1234 / 1104
@@ -273,7 +272,7 @@ s = new_slide()
 heading(s, 0.85, 'The rebellion ended without a battle', size=40, w=CW, h=0.9)
 rows_card(s, X, 1.95, CW, [
     ('Nov 1794', 'The army finds no one to fight. Men are pulled from their beds and held for questioning.'),
-    ('Bradford', 'David Bradford, the loudest radical, escapes down the Ohio.'),
+    ('Bradford', 'David Bradford, the best-known rebel leader, escapes down the Ohio.'),
     ('1795', 'About 20 prisoners are taken to Philadelphia. Two are convicted of treason and sentenced to hang.'),
     ('Pardoned', 'In November 1795 Washington pardons both, Philip Wigle and John Mitchell.'),
 ], label_w=2.2, row_h=1.0, mark=3, label_size=26, size=20)
@@ -321,7 +320,7 @@ footer(s, 15)
 # ---------------------------------------------------------------- 16 pour 4
 pour_slide(16, 'Pour 4 of 4', ['Elijah Craig', 'Small Batch'],
            ['Named for a Baptist preacher in Kentucky.',
-            'A later legend credits him with the first bourbon, on no good evidence.'],
+            'People later said he made the first bourbon. There is no proof of that.'],
            'Heaven Hill, Kentucky', 'Kentucky straight bourbon', '94')
 
 # ---------------------------------------------------------------- 17 reading the label

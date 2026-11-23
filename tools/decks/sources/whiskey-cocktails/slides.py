@@ -82,8 +82,7 @@ rect(s, X + 0.03, 3.98, 0.9, 0.045, fill=MARK)
 text(s, X, 4.18, 6.2, 0.75, ['The Old Fashioned, the Manhattan and the Sazerac', 'Four pours'],
      size=17, font=SANS, bold=True, color=CREAM, ls=1.1)
 text(s, X, 5.05, 5.9, 1.5,
-     'Four drinks made in the order they were written down, and what each says about the whiskey '
-     'of its day.', size=20, italic=True, color=CREAM_MUTE, ls=1.2)
+     'Four drinks, made in the order they first appeared in print.', size=20, italic=True, color=CREAM_MUTE, ls=1.2)
 tw = 5.0
 th = tw * 1285 / 1104
 picture(s, A / 'jerry-thomas-blue-blazer.jpg', R - tw, 0.55, tw, th, radius_in=0.26)
@@ -255,7 +254,7 @@ text(s, X + 0.35, 2.6, 5.7, 1.4,
      size=22, color=INK, ls=1.2)
 line(s, X + 0.35, 4.05, X + 6.05, 4.05, HAIR, 1.0)
 text(s, X + 0.35, 4.2, 5.7, 1.0,
-     'Muddling them in may be later. The bootleg-liquor explanation is plausible and hard to prove.',
+     'Crushing the fruit into the drink may have started later, after the Second World War.',
      size=18, italic=True, color=MUTE, ls=1.2)
 photo_right(s, 'prohibition-raid-1921.jpg', 1104, 1285,
             'Agents pour liquor into a New York sewer after a raid, 1921. Library of Congress.')
@@ -268,7 +267,7 @@ events = [('1923', 'A Hoffman House bartender names a man called Black.'),
           ('1931', 'A Waldorf memoir credits the Pendennis Club.'),
           ('1933', 'Repeal. Bars reopen.'),
           ('1937', 'A New Orleans drinks book gives the cognac Sazerac.'),
-          ('2007', 'Wondrich’s Imbibe! checks them against print.')]
+          ('2007', 'David Wondrich’s book Imbibe! reprints the old recipes.')]
 g5 = 0.2
 c5 = (CW - 4 * g5) / 5
 for i, (yr, body) in enumerate(events):

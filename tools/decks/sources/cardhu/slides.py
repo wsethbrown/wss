@@ -73,8 +73,8 @@ text(s, X, 3.7, 6.3, 1.2, ['The Women Behind', 'Johnnie Walker’s Malt'], size=
      color=CREAM, ls=0.98)
 rect(s, X + 0.03, 5.05, 0.9, 0.045, fill=MARK)
 text(s, X, 5.25, 6.0, 1.3,
-     'Helen and Elizabeth Cumming kept a Speyside farm distillery going until 1893, when it became the '
-     'first distillery John Walker & Sons owned.', size=18, italic=True, color=CREAM_MUTE, ls=1.2)
+     'Helen and Elizabeth Cumming, and the distillery their family sold to '
+     'John Walker & Sons in 1893.', size=18, italic=True, color=CREAM_MUTE, ls=1.2)
 tw, th = 5.13, 5.83
 picture(s, A / 'cardhu-2007.jpg', 7.35, 0.6, tw, th, radius_in=0.26)
 credit(s, 7.35, 0.6 + th + 0.08, tw,
@@ -92,7 +92,7 @@ heading(s, 0.75, ['John and Helen Cumming', 'leased Cardow in 1811'], size=36, w
 rows_card(s, X, 2.3, CW, [
     ('The farm', 'Cardow, a hill farm above the Spey in the parish of Knockando'),
     ('The lease', 'Nineteen years, from Whitsunday 1811, in John’s name'),
-    ('The whisky', 'Made on the farm without a licence. Helen made the spirit.'),
+    ('The whisky', 'Made on the farm without a licence. One account says Helen made it.'),
 ], label_w=2.2, row_h=0.95, mark=2, label_size=22, size=19)
 rrect(s, X, 5.5, CW, 0.9, r=0.2, fill=W100)
 text(s, X + 0.3, 5.5, CW - 0.6, 0.9,
@@ -109,7 +109,7 @@ rows_card(s, X, 2.3, LW, [
     ('Flag', ['While the excisemen ate, she', 'raised a red flag for the neighbours.']),
     ('Elgin', ['She walked barefoot over the', 'hills to deliver whisky.']),
 ], label_w=1.25, row_h=1.0, mark=1, size=17)
-text(s, X, 5.6, LW, 0.8, ['Family and distillery tradition.', 'No contemporary record was found.'],
+text(s, X, 5.6, LW, 0.8, ['Stories passed down by the family', 'and the distillery.'],
      size=18, italic=True, color=MUTE, ls=1.15)
 lh = PW * 761 / 944
 photo_right(s, 'landseer-illicit-still-1829.jpg', lh,
@@ -174,8 +174,8 @@ footer(s, 8)
 
 # ---------------------------------------------------------------- 9 pour 2
 pour_slide(9, 'Glass 2 of 4', 'Glenfiddich 12 Year Old',
-           ['William Grant’s distillery, started on Cardow’s old stills.',
-            'Put it next to glass 1: two Speyside malts, the same age.'],
+           ['Started by William Grant with Cardow’s old stills.',
+            'Taste it next to glass 1. Both are 12 years old.'],
            'Glenfiddich, Dufftown', 'Speyside single malt, 12 years', '40%')
 
 # ---------------------------------------------------------------- 10 the sale
@@ -219,13 +219,13 @@ text(s, X, 4.95, CW, 0.4, 'The four distilleries Diageo presents as homes of Joh
      size=17, italic=True, color=MUTE)
 rrect(s, X, 5.55, CW, 0.8, r=0.2, fill=W100)
 text(s, X + 0.3, 5.55, CW - 0.6, 0.8,
-     'Diageo does not publish its blend recipes. The guides name Cardhu among Black Label’s malts.',
+     'Diageo does not publish its blend recipes. Whisky guides list Cardhu in Black Label.',
      size=19, color=INK, anchor=MSO_ANCHOR.MIDDLE)
 footer(s, 11)
 
 # ---------------------------------------------------------------- 12 pour 3
 pour_slide(12, 'Glass 3 of 4', ['Johnnie Walker', 'Black Label'],
-           ['The firm that bought Cardow in 1893.', 'Go back to glass 1: can you find the Cardhu in it?'],
+           ['The firm that bought Cardow in 1893.', 'Go back to glass 1. Can you taste the Cardhu in this one?'],
            'John Walker & Sons', 'Blended Scotch, 12 years', '40%', two_line_name=True)
 
 # ---------------------------------------------------------------- 13 2003
@@ -262,4 +262,4 @@ pour_slide(15, 'Glass 4 of 4', ['Johnnie Walker', 'Green Label'],
            'John Walker & Sons', 'Blended malt, 15 years', '43%', two_line_name=True)
 
 # ---------------------------------------------------------------- 16 Sláinte
-slainte_slide(['To Helen Cumming, who made the whisky on a hill farm,', 'and to Elizabeth Cumming, who built the distillery.'])
+slainte_slide('To Helen and Elizabeth Cumming.')

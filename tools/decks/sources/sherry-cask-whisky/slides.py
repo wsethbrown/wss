@@ -133,8 +133,7 @@ text(s, X, 3.05, 6.2, 1.0, 'Sherry Cask Whisky', size=44, font=SANS, bold=True, 
 rect(s, X + 0.03, 4.12, 0.9, 0.045, fill=MARK)
 text(s, X, 4.35, 6.2, 0.45, 'Sherry casks and Scotch  ·  Four pours', size=17, font=SANS, bold=True, color=CREAM)
 text(s, X, 4.95, 5.9, 1.6,
-     'How Britain’s taste for a Spanish wine put its casks into Scottish distilleries, and what '
-     'distillers did when the casks stopped coming.', size=20, italic=True, color=CREAM_MUTE, ls=1.2)
+     'Why Scottish distillers started using empty sherry casks, and how they get them today.', size=20, italic=True, color=CREAM_MUTE, ls=1.2)
 tw = 5.13
 th = tw * 1284 / 1104
 picture(s, A / 'wild-spain-bodega-1893.jpg', 7.35, 0.5, tw, th, radius_in=0.26)
@@ -143,7 +142,7 @@ credit(s, 7.35, 0.5 + th + 0.08, tw,
 
 # ---------------------------------------------------------------- 2 cask sizes
 s = new_slide()
-heading(s, 0.75, ['Scotch matures in casks that held', 'something else first'], size=40, w=CW, h=1.5)
+heading(s, 0.75, ['Scotch is aged in casks that held', 'something else first'], size=40, w=CW, h=1.5)
 casks = [('Barrel', 200, 'about 200 litres, from American bourbon', W200),
          ('Hogshead', 250, 'about 250 litres, bourbon barrels rebuilt', W200),
          ('Butt', 500, 'about 500 litres, from the sherry trade', INK)]
@@ -229,7 +228,7 @@ footer(s, 7)
 
 # ---------------------------------------------------------------- 8 pour 1
 pour_slide(8, 'Pour 1 of 4', ['Glenmorangie', 'The Original'],
-           ['Matured only in ex-bourbon casks.', 'Keep a little in your glass to come back to.'],
+           ['Aged only in ex-bourbon casks.', 'Keep a little in your glass to come back to.'],
            'Glenmorangie, Tain', 'Single malt, 12 years', '40%', two_line_name=True)
 
 # ---------------------------------------------------------------- 9 1981–1986 (the green story slide)
@@ -238,9 +237,9 @@ text(s, X, 0.8, CW, 0.6, 'Sherry must be bottled in the Jerez region', size=28, 
 text(s, 0.75, 1.55, CW, 1.8, '1981–1986', size=120, font=SANS, bold=True, color=CREAM, ls=0.9)
 rect(s, X + 0.03, 3.45, 1.2, 0.045, fill=MARK)
 text(s, X, 3.75, 10.5, 2.6, [
-    'Bulk shipments in cask end, and with them the supply of transport butts to Britain.',
-    [('The sherry regulator dates its rule to the early 1980s. Other sources give 1986, when Spain joined '
-      'the European Community.', {'color': CREAM_MUTE, 'size': 19})],
+    'Sherry is no longer shipped to Britain in casks, so the supply of cheap empty butts ends.',
+    [('The rule came in stages. Some accounts date it to 1981 and others to 1986.',
+      {'color': CREAM_MUTE, 'size': 19})],
 ], size=24, color=CREAM, ls=1.2, space_after=14)
 footer(s, 9, dark=True)
 
@@ -249,11 +248,11 @@ s = new_slide()
 heading(s, 0.85, 'Two ways round the shortage', size=40, w=CW, h=0.9)
 two_cards(s, 2.0, 3.35,
           ('Finish', 'Glenmorangie, 1990s',
-           [], ['Mature in ex-bourbon barrels, then', 'move the whisky into a sherry cask', 'for its last part.']),
+           [], ['Age the whisky in ex-bourbon barrels,', 'then move it into a sherry cask', 'for its last part.']),
           ('Seasoned cask', 'Macallan',
-           [], 'Have casks built in Jerez and filled with sherry to order, then mature in them from the start.'))
+           [], 'Have casks built in Jerez and filled with sherry to order, then age the whisky in them from the start.'))
 strip(s, 5.6, 0.95, ['A finish needs far fewer sherry casks per bottle.',
-                    'Seasoned casks let a distillery keep full sherry maturation.'], size=19)
+                    'Seasoned casks let a distillery age its whisky in sherry casks from the start.'], size=19)
 footer(s, 10)
 
 # ---------------------------------------------------------------- 11 pour 2
@@ -287,7 +286,7 @@ footer(s, 13)
 
 # ---------------------------------------------------------------- 14 pour 3
 pour_slide(14, 'Pour 3 of 4', ['Macallan 12', 'Sherry Oak'],
-           ['Matured in sherry-seasoned oak casks', 'from Jerez, mostly European oak.',
+           ['Aged in sherry-seasoned oak casks', 'from Jerez, mostly European oak.',
             'Compare it with the Lasanta.'],
            'Macallan, Speyside', 'Single malt, 12 years', '43%', two_line_name=True, note_size=20)
 
@@ -316,7 +315,7 @@ footer(s, 16)
 
 # ---------------------------------------------------------------- 17 pour 4
 pour_slide(17, 'Pour 4 of 4', 'GlenDronach 12',
-           ['Matured in Pedro Ximénez and oloroso casks.', 'Put it beside the Macallan.'],
+           ['Aged in Pedro Ximénez and oloroso casks.', 'Put it next to the Macallan.'],
            'GlenDronach, Forgue', 'Single malt, 12 years', '43%')
 
 # ---------------------------------------------------------------- 18 reading the label

@@ -8,9 +8,9 @@ The Whiskey Share Society
 
 Canadian whisky and the American market. Four pours, 18 slides, about 45 minutes.
 
-**Running order:** slides 1–4 (8 min) · pour one (5 min) · slides 6–8 (7 min) · pour two (5 min) · slides 10–11 (6 min) · pour three (5 min) · slides 13–15 (5 min) · pour four (5 min) · close (2 min).
+**Running order:** slides 1 to 4 (8 min) · pour one (5 min) · slides 6 to 8 (7 min) · pour two (5 min) · slides 10 and 11 (6 min) · pour three (5 min) · slides 13 to 15 (5 min) · pour four (5 min) · close (2 min).
 
-**Before people arrive:** put the four bottles out in pouring order. Canadian Club 1858, Lot No. 40, Crown Royal Fine Deluxe, Forty Creek Copper Pot Reserve. Have water and a little soda water on the table for the first pour. Two of the bottles are 43% and two are 40%, so normal small pours are fine.
+**Before people arrive:** put the four bottles out in the order you will pour them. Canadian Club 1858, Lot No. 40, Crown Royal Fine Deluxe, Forty Creek Copper Pot Reserve. Put water and a little soda water on the table for the first pour. Two of the bottles are 43 percent and two are 40 percent, so normal small pours are fine.
 
 ---
 
@@ -18,144 +18,156 @@ Canadian whisky and the American market. Four pours, 18 slides, about 45 minutes
 
 ## [SLIDE 1] Canadian Whisky
 
-Tonight is Canadian whisky, which most of us have drunk and few of us have thought about. In the US it has a reputation as the light, cheap whisky you mix with ginger ale, and part of tonight is about where that came from and how much of it holds up.
+Tonight is Canadian whisky. In the US most people know it as the light, cheap whisky you mix with ginger ale. We'll look at where that idea came from and taste four bottles to see if it is fair.
 
-The other part is a story about a border. A lot of the whisky Americans drank was made in Ontario and Quebec, and the reasons were mostly American ones: a war tax in the 1860s, and Prohibition in the 1920s. The photograph is Hiram Walker's distillery at Walkerville, seen from the Detroit River early in the last century. I'll go through how the whisky is made in the middle, because the method differs from bourbon or Scotch, and we'll taste as we go.
+A lot of the whisky Americans drank was made in Ontario and Quebec. That happened twice, and both times the cause was American. The first was a war tax in the 1860s. The second was Prohibition in the 1920s.
+
+The photograph is Hiram Walker's distillery at Walkerville, seen from the Detroit River in the early 1900s. Partway through I'll explain how Canadian whisky is made, because it is made differently from bourbon and Scotch.
 
 ## [SLIDE 2] Five Ontario distillers, 1837 to 1864
 
-These are names you still see on Canadian bottles, and almost all of them started as millers. Upper Canada grew far more wheat than it could sell, and turning surplus grain into spirit was the usual thing for a mill to do with it.
+You still see these five names on Canadian bottles. Almost all of them started as millers. Ontario grew more wheat than it could sell, and a mill could turn the grain it had left over into whisky.
 
-The oldest is Gooderham & Worts in Toronto. William Gooderham and his brother-in-law James Worts built a windmill on the waterfront in 1832, and added a distillery in 1837 to use up surplus and second-grade grain. You'll read that by the 1870s it was the largest distillery in the world; I haven't seen that measured, so I'd say "one of the largest".
+The oldest is Gooderham & Worts in Toronto. William Gooderham and his brother-in-law James Worts built a windmill on the waterfront in 1832. In 1837 Gooderham added a distillery to use up spare and second-grade grain. By the 1870s it was one of the largest distilleries in the world.
 
-Then J.P. Wiser, who came to run a distillery at Prescott, on the St Lawrence, in 1857 and owned it by 1862. Hiram Walker in 1858, opposite Detroit. Henry Corby, who bought a mill near Belleville in 1855 and was distilling there by 1859; the village was renamed Corbyville in 1882. And Joseph Seagram, who joined a mill and distillery at Waterloo in 1864, bought out his partners one by one, and was sole owner from 1883.
+J.P. Wiser came to run a distillery at Prescott, on the St Lawrence, in 1857. He owned it by 1862. Hiram Walker started in 1858, across the river from Detroit. Henry Corby bought a mill near Belleville in 1855 and was making whisky there by 1859. The village was later renamed Corbyville. Joseph Seagram joined a mill and distillery at Waterloo in 1864. He bought out his partners one at a time and owned all of it from 1883.
 
-The painting is Gooderham & Worts in about 1896, now Toronto's Distillery District.
+The painting is Gooderham & Worts in about 1896. Those buildings are now Toronto's Distillery District.
 
 ## [SLIDE 3] 1858: Hiram Walker, a Detroit grain merchant, starts distilling across the river
 
-Hiram Walker matters most for tonight's story. He was an American, born in Massachusetts in 1816, and he went into business in Detroit as a grocer and grain merchant. In 1856 he bought land on the Canadian side of the Detroit River and put up a flour mill and a distillery. By 1858 he was selling flour and whisky; his biography dates the finished mill and distillery to about 1859.
+Hiram Walker is the one who matters most tonight. He was an American, born in Massachusetts in 1816. He went into business in Detroit as a grocer and grain merchant. In 1856 he bought land on the Canadian side of the Detroit River and built a flour mill and a distillery. By 1858 he was selling flour and whisky.
 
-He built a company town around the distillery, Walkerville, merged into Windsor in 1935.
+He built a town around the distillery for his workers and called it Walkerville. It became part of Windsor in 1935.
 
-His whisky was sold as Club whisky, and Canadian Club came in 1884. The company's story is that American distillers got a rule passed making imports show their country of origin, so Walker added "Canadian". I've never seen the rule pinned down, so treat that as the company's version.
+He sold his whisky as Club whisky. The name Canadian Club came in 1884. The company says American distillers got a rule passed that made imported whisky show its country, so Walker added "Canadian". We only have the company's word for that.
 
 ## [SLIDE 4] The US whiskey tax, raised to pay for the Civil War
 
-This is the first time American demand turned north. To pay for the Civil War, Congress put an excise tax on distilled spirits from August 1862, at twenty cents a proof gallon. It went to sixty cents in March 1864, a dollar fifty that July, and two dollars on the first of January 1865. It was cut to fifty cents in July 1868. You'll often read that the two-dollar tax was several times what the whiskey cost to make; I haven't found a production-cost figure to check that against.
+To pay for the Civil War, Congress put a tax on spirits. It started in August 1862 at twenty cents a gallon. It went up to sixty cents in March 1864 and to a dollar fifty that July. On the first of January 1865 it went up to two dollars. It was cut to fifty cents in July 1868.
 
-Walker's distillery, the one on the cover, was right on the riverbank, with Detroit on the other side. Imported whisky paid duty too, so how big his advantage was is hard to work out. But the timing is the usual explanation for how Canadian whisky got its first foothold in the US, and Walker was better placed than anyone to use it.
+Walker's distillery was on the riverbank, with Detroit on the other side. Imported whisky paid a duty as well, so it is hard to say how much cheaper his whisky was. But this is when Canadian whisky first sold in the US in large amounts, and Walker was in the best place to sell it.
 
 ## [SLIDE 5] Pour 1 of 4: Canadian Club 1858
 
-First pour. This is Canadian Club, Walker's brand, still made by Hiram Walker & Sons in Windsor. The brand belongs to Suntory now. The 1858 on the label is the year he started.
+_Pour glass 1 now._
 
-This is the style most Americans picture when they think of Canadian whisky, so it's our reference point. Smell it neat first and see what you get. Then put a splash of soda or water in, because a lot of this was always drunk as a highball, and see what stays.
+This is Canadian Club. It was Walker's brand, and it is still made by Hiram Walker & Sons in Windsor. Suntory owns the brand now. The 1858 on the label is the year Walker started.
 
-Canadian Club blends its whiskies before they go into the barrel, and has done so from the start, which is unusual. Most Canadian distillers blend after ageing, and that's what the next few slides are about.
+This is the kind of whisky most Americans think of when you say Canadian. Smell it first with nothing added and tell me what you get. Then add a splash of soda or water. A lot of Canadian Club has always been drunk with soda, so see how much of the flavour is still there.
+
+Canadian Club mixes its whiskies before they go into the barrel, and it always has. Most Canadian distillers do it the other way round and mix after ageing. The next few slides explain that.
 
 ## [SLIDE 6] 1890: Canada requires two years in wood
 
-Canada brought in an ageing rule in 1887, and by 1890 it was fully in force: whisky had to spend at least two years in wood before it could be sold. Accounts differ on whether the 1887 law set a shorter minimum first. The minimum is now three years in small wood, meaning barrels of 700 litres or less.
+Canada brought in an ageing rule in 1887 and phased it in. From 1890 whisky had to spend at least two years in wood before it could be sold. Today the minimum is three years, in barrels of 700 litres or less.
 
-Canadian writers say it was the first country to require this. I can't confirm that, but it was well ahead of the United States, which had no minimum age for whiskey. Bottled in bond, which came in 1897, needs four years, but only if the distiller chooses to use it.
+The United States had no minimum age for whiskey at that time. Bottled in bond came in 1897 and needs four years, but a distiller only has to follow it if he wants that label.
 
-A law like this suits the big distillers, who have the warehouses and the money to sit on two years of stock. At least one modern writer says that was the point, because small distillers were the likeliest to dodge the tax. By the early twentieth century the trade was in fewer, larger hands, though how far the law caused that is an interpretation.
+A rule like this is easier for big distillers. They have the warehouses and the money to hold two years of whisky before selling any. One account says that was the aim, because the small distillers were the ones most likely to dodge the tax. By the early 1900s there were fewer distillers and they were bigger. The law may be part of the reason.
 
 ## [SLIDE 7] Each grain is distilled and aged on its own
 
-Now the method. A bourbon distillery mixes its grains in one mash, mostly corn with some rye or wheat and a little malted barley, and distils the lot together.
+This is how Canadian whisky is made. A bourbon distillery mixes its grains first. It is mostly corn, with some rye or wheat and a little malted barley, and it is all distilled together.
 
-A typical Canadian distillery mashes and distils each grain separately, often on different stills and to different strengths, and ages each on its own. Only when they are mature does the blender put them together.
+Most Canadian distilleries keep the grains apart. Each grain is distilled on its own, often on a different still and to a different strength. Each one is aged on its own. The blender mixes them only when they are ready.
 
-This gives the blender control at the end rather than the start. It also means "blended" here is different from an American blended whiskey, which can be cut with neutral spirit.
+So in Canada "blended" means whiskies mixed after ageing. In America a blended whiskey can have plain neutral spirit added to it. That is not what "blended" means here.
 
 ## [SLIDE 8] Base whisky and flavouring whisky
 
-Canadian distillers sort what they make into two kinds. Base whisky is usually made from corn, sometimes wheat, and distilled in a column still to a high strength, close to neutral. It's often aged in barrels that have been used before, so it picks up wood character slowly. It makes up most of the volume in a typical blend.
+Canadian distillers make two kinds of whisky. The first is base whisky. It is usually made from corn, sometimes wheat. It is distilled to a very high strength, so it has little flavour of its own. It is often aged in barrels that have been used before, so it picks up flavour from the wood slowly. Most of a typical blend is base whisky.
 
-Flavouring whisky is usually rye, though barley and corn are used too. It's distilled to a lower strength, sometimes in a pot still, so more of the grain comes through. It's a smaller share of the bottle and carries most of the grain flavour.
+The second is flavouring whisky. It is usually rye, though barley and corn are used too. It is distilled to a lower strength, sometimes in a pot still, so it tastes more of the grain. There is less of it in the bottle, but most of the grain flavour comes from it.
 
-There's no legal recipe for the split; each distiller sets its own.
+There is no legal recipe for how much of each to use. Each distiller decides.
 
 ## [SLIDE 9] Pour 2 of 4: Lot No. 40
 
-Second pour. This is Lot No. 40, made by Corby at the same Hiram Walker distillery in Windsor; the two companies share the site now.
+_Pour glass 2 now._
 
-It's all rye, distilled in a single copper pot still. So this is close to what a flavouring whisky tastes like when it's bottled by itself. Try it straight after the Canadian Club; they come from the same distillery.
+This is Lot No. 40. It is made by Corby at the Hiram Walker distillery in Windsor, the same place as the Canadian Club.
 
-Rye on its own is often called spicy and grassy. See whether you agree.
+It is all rye, distilled in one copper pot still. This is close to what a flavouring whisky tastes like on its own. Taste it right after the Canadian Club.
+
+People often say rye is spicy and grassy. Do you get that here?
 
 ## [SLIDE 10] The US goes dry. Canadian distilleries keep making whisky for export
 
-The second time American demand turned north was Prohibition, from 1920.
+Prohibition started in the US in 1920.
 
-Canada's temperance laws were mostly provincial and about selling drink to Canadians. Making and exporting whisky was federal, and stayed legal. Importing it into the United States was an American problem.
+Canada had temperance laws too, but they were mostly set by the provinces and they were about selling drink to Canadians. Making whisky and exporting it stayed legal. If it ended up in the United States, that was against American law, not Canadian law.
 
-So the distilleries kept running. The papers for a shipment would name a destination like Cuba or Mexico, and a fast boat could reach the Michigan shore in minutes. The Detroit River is narrow, with islands in it, and in winter it freezes. You'll read that three quarters of the liquor smuggled into the US came across it; I haven't found where that figure comes from, so I wouldn't repeat it.
+So the distilleries kept running. The papers for a shipment would name somewhere like Cuba or Mexico. Then a fast boat would take it across to Michigan in a few minutes. The Detroit River is narrow and has islands in it, and in winter it freezes.
 
-This went on until 1930. An amendment to the Export Act, passed on 30 May 1930, told officials to refuse clearance to liquor shipments bound for any country that banned its import. It was written in general terms, but everyone knew which country it meant. Repeal came in December 1933.
+This went on until 1930. That May, Canada changed its Export Act. Officials now had to refuse to clear liquor shipments going to any country that banned them. The law did not name the United States, but that was the country it was aimed at. Prohibition ended in December 1933.
 
 The photograph shows Detroit police with equipment from an illegal brewery.
 
 ## [SLIDE 11] Sam Bronfman builds Seagram, 1924 to 1939
 
-The family that did best out of all this were the Bronfmans. They were Jewish immigrants from Russia who settled on the Prairies, ran hotels, and moved into the liquor trade during the First World War.
+The family that did best in these years was the Bronfmans. They were Jewish immigrants from Russia who settled on the Prairies. They ran hotels, and they went into the liquor trade during the First World War.
 
-In 1924 Sam Bronfman and his brothers opened their own distillery at LaSalle, near Montreal, under the name Distillers Corporation. In 1928 they bought Joseph E. Seagram & Sons in Waterloo from the Seagram heirs, which gave them an established name and its stocks of aged whisky.
+In 1924 Sam Bronfman and his brothers opened a distillery at LaSalle, near Montreal. In 1928 they bought Joseph E. Seagram & Sons in Waterloo from the Seagram family. That gave them a well-known name and a stock of aged whisky.
 
-The Bronfmans always said they sold legally in Canada and didn't know what happened to the whisky afterwards. The Royal Commission on Customs and Excise, which reported in 1928, heard evidence about the family. In 1934 Sam and his brothers were charged with evading customs duties. The case came to court the next year and was thrown out, with the company's shipping records said to be missing. People have argued about how much they knew ever since.
+The Bronfmans always said they sold their whisky legally in Canada and did not know where it went after that. In 1934 Sam and his brothers were charged with not paying customs duties. The case went to court the next year and was thrown out. The company's shipping records could not be found. People still argue about how much the family knew.
 
-At Repeal, American distillers had been largely shut for thirteen years and had little aged whiskey. Canadian distillers had been required to age theirs, and they had stock to sell. Seagram bought American distilleries and grew into one of the largest drinks companies in the world. Harry Hatch did something similar with Hiram Walker, which he bought in 1926 and merged with Gooderham & Worts the next year.
+When Prohibition ended, most American distillers had been shut for thirteen years and had very little aged whiskey. Canadian distillers had been ageing theirs by law, so they had whisky ready to sell. Seagram bought American distilleries and became one of the largest drinks companies in the world. Harry Hatch did much the same. He bought Hiram Walker in 1926 and merged it with Gooderham & Worts the next year.
 
-In 1939 Seagram made a new blend for the visit of George VI and Queen Elizabeth, from May to June that year, the first visit to Canada by a reigning monarch. That's Crown Royal. It was sold only in Canada until 1964.
+In 1939 King George VI and Queen Elizabeth toured Canada. It was the first visit to Canada by a reigning monarch. Seagram made a new blend for it and called it Crown Royal. It was sold only in Canada until 1964.
 
 ## [SLIDE 12] Pour 3 of 4: Crown Royal Fine Deluxe
 
-Third pour. Crown Royal Fine Deluxe, the 1939 blend. Seagram's drinks business was sold off in 2000 and 2001, and Crown Royal went to Diageo, which makes it at Gimli, on Lake Winnipeg in Manitoba.
+_Pour glass 3 now._
 
-Taste it next to the Canadian Club. Both are large blends made mostly from base whisky. See where they differ: which is sweeter, which has more wood, which has more spice from the flavouring whisky.
+This is Crown Royal Fine Deluxe, the blend from 1939. Seagram's drinks business was sold off in 2000 and 2001, and Crown Royal went to Diageo. Diageo makes it at Gimli, on Lake Winnipeg in Manitoba.
+
+Taste it next to the Canadian Club. Both are big blends made mostly from base whisky. Which one is sweeter? Which has more wood? Which has more spice?
 
 ## [SLIDE 13] Three names for one product in Canadian law
 
-So why do Canadians call all of this "rye"?
+Canadians call all of this "rye". This is the usual story of why. In the early 1800s most Ontario distillers made whisky from wheat. Some added a little rye for a stronger flavour. Customers started asking for "rye", and the word came to mean Canadian whisky in general.
 
-In the early nineteenth century most Ontario distillers made whisky from wheat. The usual account is that some added a little rye to the mash for a stronger flavour, customers began asking for "rye" by name, and the word came to mean Canadian whisky in general. It's often linked to German and Dutch settlers; I haven't seen the evidence for that part.
-
-Canadian food law treats "Canadian whisky", "Canadian rye whisky" and "rye whisky" as names for the same product, and none of them comes with a minimum rye content. For decades the definition sat in the Food and Drug Regulations; since December 2024 it has been in a document called the Canadian Food Compositional Standards, with the same substance. So a bottle labelled Canadian rye might be mostly corn. American law is different: an American straight rye must be at least 51 percent rye.
+In Canadian law, "Canadian whisky", "Canadian rye whisky" and "rye whisky" are three names for the same thing. None of them requires any amount of rye. A bottle labelled Canadian rye might be mostly corn. American law is different. An American rye has to be at least 51 percent rye.
 
 ## [SLIDE 14] 9.09%: Other spirits or wine in Canadian whisky sold in the US
 
-The other thing you can't see on the label is this. Canadian whisky sold in the United States may contain up to 9.09 percent of other spirits or wine.
+Canadian whisky sold in the United States can contain up to 9.09 percent of other spirits or wine.
 
-The odd number is one part in eleven: one part of something added to ten parts of whisky. Whisky writers give two years as the minimum age of an added spirit. The figure is not in Canada's own definition of whisky, which says only that it may contain caramel and flavouring. It is a ceiling tied to selling into the US, and since 2009, according to several writers, it hasn't limited whisky sold in Canada.
+The number is one part in eleven. That is one part of something else added to ten parts of whisky. If the added part is a spirit, it has to be at least two years old.
 
-Where it came from is disputed. Davin de Kergommeaux, who has written the standard book on Canadian whisky, has suggested a deal Sam Bronfman struck with American officials over the tariff; other writers tie it to American tax rules or to the 1989 free trade agreement. Either way, the label doesn't have to say.
+This is not in Canada's own definition of whisky. That only says caramel and flavouring are allowed. The 9.09 percent limit is about whisky sold in the US.
+
+Nobody agrees on where the number came from. One story is that Sam Bronfman made a deal with American officials over the import tariff. Others say it came from American tax rules, or from the 1989 free trade agreement. The label does not have to tell you what was added.
 
 ## [SLIDE 15] Why Canadian whisky has a name for being light
 
-Back to the reputation. After Repeal, and especially from the 1950s to the 1970s, the Canadian whiskies that sold in huge volumes in the US were the big blends like the two we've had. They were mostly base whisky, inexpensive, and meant for highballs, which is how Americans drank them. That's where "light and bland" comes from, and as a description of those bottles it isn't unfair.
+After Prohibition, and most of all from the 1950s to the 1970s, the Canadian whiskies that sold best in the US were big blends like the two we have had. They were mostly base whisky. They were cheap, and they were made for mixing with soda or ginger ale. That is how Americans drank them. So "light" is a fair description of those bottles.
 
-What it misses is that the flavouring whiskies were made all along. Every distillery had them, and they mostly disappeared into the blends. Since the 2000s more of them have been bottled on their own, like the Lot No. 40, and the range of what's sold in the US is a lot wider than it was.
+But the distilleries were making flavouring whisky the whole time. Nearly all of it went into the blends. Since the 2000s more of it has been bottled on its own, like the Lot No. 40. There is much more choice in American shops now than there used to be.
 
 ## [SLIDE 16] Pour 4 of 4: Forty Creek Copper Pot Reserve
 
-Last pour. Forty Creek is made at Grimsby, on the Niagara Peninsula, which is wine country. The man behind it, John Hall, was a winemaker who took over the distillery in 1992 and started making whisky. Campari bought it in 2014.
+_Pour glass 4 now._
 
-He uses the Canadian method. Rye, barley and corn are distilled separately, aged separately, and blended at the end, and he talks about the blending the way a winemaker talks about assembling a wine. The Copper Pot Reserve is bottled a little stronger than the standard Forty Creek. In 2022 the distillery renamed it Copper Bold; American shops mostly still sell it as Copper Pot Reserve, so look for either name.
+This is Forty Creek. It is made at Grimsby, on the Niagara Peninsula, where a lot of Ontario wine comes from. John Hall was a winemaker. He took over the distillery in 1992 and started making whisky. Campari bought it in 2014.
 
-Then go back to whichever you liked best. A show of hands at the end: light blend or rye.
+He used the Canadian method. The rye, barley and corn are distilled separately, aged separately and mixed at the end. The Copper Pot Reserve is 43 percent. In 2022 the distillery renamed it Copper Bold. Most American shops still sell it as Copper Pot Reserve, so look for either name.
+
+Now go back to the one you liked best. Hands up if it was one of the light blends. Hands up for the rye.
 
 ## [SLIDE 17] Reading a Canadian whisky label
 
-Canadian whisky, Canadian rye whisky and rye whisky are the same legal product. It has to be mashed, distilled and aged in Canada, for at least three years in small wooden barrels, and bottled at no less than 40 percent alcohol.
+This slide is what to look for on a Canadian bottle.
 
-"Rye" on its own tells you nothing about the grain. If a bottle says 100 percent rye, or gives a figure, that's the bit to read.
+Canadian whisky, Canadian rye whisky and rye whisky are the same thing in law. It has to be made and aged in Canada. It has to spend at least three years in small wooden barrels, and it has to be at least 40 percent alcohol.
 
-An age statement means the age of the youngest whisky in the blend.
+The word "rye" tells you nothing about the grain. If the label says 100 percent rye, or gives a number, you can trust that.
 
-And caramel and flavouring are allowed, a bottle sold here may hold up to 9.09 percent of other spirits or wine, and you usually won't be told.
+An age statement is the age of the youngest whisky in the bottle.
+
+Caramel and flavouring are allowed. A bottle sold in the US can have up to 9.09 percent of other spirits or wine. The label usually won't say.
 
 ## [SLIDE 18] Sláinte
 
-Thanks for listening, and to whoever brought the bottles. Sláinte.
+Thank you for coming, and thank you to whoever brought the bottles. Sláinte.
