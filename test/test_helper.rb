@@ -159,5 +159,23 @@ module ActionDispatch
     teardown do
       ActionController::Base.allow_forgery_protection = true
     end
+
+    # The CSS a page uses, in document order: any inline <style> blocks and
+    # the source of every stylesheet it links from this site. Pages keep
+    # their CSS in stylesheets rather than inline blocks (the CSP, issue #46),
+    # so a test that pins a page's styles reads them here. The Tailwind build
+    # (generated) and vendored flatpickr are left out: no test pins them.
+    def page_css(html = response.body)
+      Nokogiri::HTML(html).css("style, link[rel=stylesheet]").filter_map do |el|
+        next el.text if el.name == "style"
+
+        logical = el["href"].to_s[%r{\A/assets/(.+)-\h{8}\.css\z}, 1]
+        next if logical.nil? || %w[tailwind flatpickr].include?(logical)
+
+        asset = Rails.application.assets.load_path.find("#{logical}.css")
+        flunk "#{el['href']} is linked but is not in the asset load path" unless asset
+        asset.content.dup.force_encoding(Encoding::UTF_8)
+      end.join("\n")
+    end
   end
 end

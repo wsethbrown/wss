@@ -9,10 +9,6 @@ require "test_helper"
 # that the ticks were all driven by a leftover hx-tick animation, so all four
 # lit together on every face and then went dark.)
 class HomePlayerTicksTest < ActionDispatch::IntegrationTest
-  def page_css
-    Nokogiri::HTML(response.body).css("style").map(&:text).join("\n")
-  end
-
   # [selector list, declaration block] for every rule in the page's <style>.
   def rules
     page_css.scan(/([^{}]+)\{([^{}]*)\}/).map { |sel, block| [ sel.strip, block ] }
@@ -65,11 +61,44 @@ class HomePlayerTicksTest < ActionDispatch::IntegrationTest
       assert_includes tick["style"].to_s, delay, "a tick starts with its slide"
     end
     assert css_select(".f1 .ticks.ticks--reel").any?
+    # The reel and its ticks name their length; the stylesheet animates each
+    # length with its own keyframes (offsets cannot come from a variable, and
+    # the page carries no inline <style>: issue #46).
+    assert css_select(".f1 .reel.reel--3").any?, "the reel names its length"
+    assert css_select(".f1 .ticks.ticks--reel.ticks--reel-3").any?, "the ticks name the reel's length"
 
-    reel = rules.find { |sel, block| sel.include?(".reel img") && block.include?("hx-reel") }
-    tick = rules.find { |sel, block| sel.include?(".ticks--reel i") && block.include?("hx-tick") }
+    reel = rules.find { |sel, block| sel.include?(".hx .reel--3 img") && block.include?("hx-reel-3 ") }
+    tick = rules.find { |sel, block| sel.include?(".hx .ticks--reel-3 i") && block.include?("hx-tick-3 ") }
     assert reel && tick, "reel slides and reel ticks are both animated"
-    assert_equal reel[1][/hx-reel ([\d.]+s)/, 1], tick[1][/hx-tick ([\d.]+s)/, 1], "ticks cycle with the reel"
+    assert_equal "12s", reel[1][/hx-reel-3 ([\d.]+s)/, 1], "four seconds a slide"
+    assert_equal reel[1][/hx-reel-3 ([\d.]+s)/, 1], tick[1][/hx-tick-3 ([\d.]+s)/, 1], "ticks cycle with the reel"
+  end
+
+  # Every length the hero can show has its keyframes, exactly as the page
+  # used to write them inline: each slide holds for its share of the cycle,
+  # fading in over the first 3% and out over the 3% after its share.
+  test "the stylesheet animates every reel length the hero can show" do
+    get root_path
+    css = page_css
+    (2..HomeHelper::HERO_REEL_MAX).each do |n|
+      step = (100.0 / n).round(2)
+      assert_includes css, "@keyframes hx-reel-#{n} { 0% { opacity: 0; } 3% { opacity: 1; } #{step}% { opacity: 1; } #{step + 3}% { opacity: 0; } 100% { opacity: 0; } }", "reel of #{n}"
+      assert_includes css, "@keyframes hx-tick-#{n} { 0% { opacity: .22; } 3% { opacity: 1; } #{step}% { opacity: 1; } #{step + 3}% { opacity: .22; } 100% { opacity: .22; } }", "ticks of #{n}"
+      assert_match(/\.hx \.ticks--reel-#{n} i \{ animation: hx-tick-#{n} #{n * 4}s infinite; \}/, css, "ticks of #{n}")
+      assert_match(/\.hx \.reel--#{n} img \{ animation: hx-reel-#{n} #{n * 4}s infinite; \}/, css, "reel of #{n}")
+    end
+    refute_match(/hx-(reel|tick)-#{HomeHelper::HERO_REEL_MAX + 1}\b/, css, "no length the hero cannot show")
+  end
+
+  test "a deck that previews more slides than the reel holds shows the first of them" do
+    max = HomeHelper::HERO_REEL_MAX
+    deck = Presentation.create!(author: users(:admin), title: "Long Preview", content: "Smoke.", price: 10, featured: true, preview_slide_count: max + 1)
+    (max + 2).times { |n| deck.slide_images.attach(io: File.open(file_fixture("sample_review.jpg")), filename: "l#{n}.png", content_type: "image/png") }
+    deck.update_column(:published, true)
+    get root_path
+    assert_equal max, css_select(".f1 .reel img").size
+    assert_equal max, css_select(".f1 .ticks--reel i").size
+    assert css_select(".f1 .reel.reel--#{max}").any?
   end
 
   test "only the reel's ticks animate; a face's lit tick is never overridden" do
@@ -108,7 +137,10 @@ class HomePlayerTicksTest < ActionDispatch::IntegrationTest
     assert_equal 1, css_select(".f1 .ticks--reel i").size
     percents = page_css.scan(/([\d.]+)%\s*\{/).flatten.map(&:to_f)
     assert percents.all? { |pc| pc <= 100 }, "keyframe offsets over 100%: #{percents.select { |pc| pc > 100 }}"
-    refute_match(/@keyframes hx-reel/, page_css)
+    assert css_select(".f1 .reel.reel--1").any?
+    assert css_select(".f1 .ticks--reel.ticks--reel-1").any?
+    assert_includes page_css, ".hx .reel--1 img, .hx .ticks--reel-1 i { opacity: 1 !important; animation: none !important; }", "the one slide shows and its tick stays lit"
+    refute_match(/@keyframes hx-(reel|tick)-1\b/, page_css)
   end
 
   test "homepage hover motion is gated on a pointer, so it never sticks after a tap" do

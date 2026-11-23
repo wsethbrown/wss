@@ -20,30 +20,8 @@
       motion the level does not follow the scroll: it steps a third at a
       time as each step is reached, with no motion. %>
 <% content_for :head do %>
-  <style nonce="<%= content_security_policy_nonce %>">
-    .hx .story-glass { position: fixed; z-index: 30; right: -5px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); pointer-events: none;
-                       opacity: 0; transition: opacity 200ms var(--motion-ease-out); }
-    .hx .story-glass.is-shown { opacity: 1; }
-    .hx .story-glass svg { display: block; width: 30px; height: 40px; }
-    .hx .story-glass svg g > path { transform: translateY(var(--story-glass-drop, 28px)); }
-    @media (min-width: 900px) {
-      /* Shares the faces' column from the first step to the end of the
-         story, hangs into the 72px gutter to its left, and is held at the
-         middle of the screen. At the end of the story it comes to rest
-         with its foot standing on the top edge of what follows (the
-         spotlight card, else the origin panel): that is the next
-         section's top padding (--section-pad, home/index) below the
-         story. --glass-foot is how far the foot's bottom sits below the
-         drawing's top: shared/_glass's foot ends at y 72.5 with a 2.4
-         stroke, so 73.7 of its 80 units, at 96px tall. */
-      .hx .story-glass { --glass-foot: calc(96px * 73.7 / 80);
-                         position: sticky; grid-column: 2; grid-row: 2 / 6; align-self: start; height: 0; right: auto; bottom: auto;
-                         top: calc(50svh - 48px - var(--section-pad) + var(--glass-foot)); opacity: 1; transition: none; }
-      .hx .story-glass svg { position: absolute; top: calc(var(--section-pad) - var(--glass-foot)); left: -72px; width: 72px; height: 96px; }
-    }
-    @media (prefers-reduced-motion: reduce) { .hx .story-glass { transition: none; } }
-    @media print { .hx .story-glass { display: none; } }
-  </style>
+  <%# Its styles: app/assets/stylesheets/home/story_glass.css (no inline <style>: the CSP, issue #46). %>
+  <%= stylesheet_link_tag "home/story_glass" %>
 <% end %>
 <div class="story-glass" data-controller="story-glass" hidden aria-hidden="true">
   <%= render "shared/glass", level: 1, size: 96, appear: false %>

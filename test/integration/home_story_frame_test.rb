@@ -49,7 +49,7 @@ class HomeStoryFrameTest < ActionDispatch::IntegrationTest
     assert_select ".story [data-story-frame-target=beat]", 5
     # The server never sends the live state: without JS the faces show.
     assert_select ".story.is-live", 0
-    css = css_select("style").map(&:text).join("\n")
+    css = page_css
     assert_match(/\.hx \.mm \{ display: none; \}/, css)
     assert_match(/\.hx \.story\.is-live \.mm \{ display: block; \}/, css)
     # It joins no reveal: it moves itself.
@@ -63,7 +63,7 @@ class HomeStoryFrameTest < ActionDispatch::IntegrationTest
     order = story.children.select(&:element?).map { |el| (el["class"].to_s.split & %w[b1 f1 b2 f2 b3 f3 b4 f4 beat--close]).first }.compact
     assert_equal %w[b1 f1 b2 f2 b3 f3 b4 f4 beat--close], order
     %w[.f1 .f2 .f3 .f4].each { |f| assert_select ".story > .face#{f}", 1 }
-    css = css_select("style").map(&:text).join("\n")
+    css = page_css
     assert_match(/\.story\.is-live \.face:not\(:focus-within\)/, css, "live: faces are kept for screen readers, and show if focus reaches into one")
     assert_match(/@media screen \{\s*\.hx \.story\.is-live \.face:not\(:focus-within\)/, css, "faces are hidden on screen only, so print shows every face")
     assert_match(/@media print \{ \.hx \.mm \{ display: none !important; \}/, css, "print never shows the frame")
@@ -373,7 +373,7 @@ class HomeStoryFrameTest < ActionDispatch::IntegrationTest
     caps = JSON.parse(css_select(".mm [data-mm=cap-l]").first["data-states"])
     assert caps[0].start_with?("The Long Road"), "the showcase deck's title: #{caps[0]}"
     assert_operator caps[0].length, :<=, 44, "the hero title is cut for the frame: #{caps[0]}"
-    css = css_select("style").map(&:text).join("\n")
+    css = page_css
     assert_match(/\.hx \.mm-bar > :first-child \{ flex: 0 1 auto; min-width: 0; overflow-x: clip; \}/, css, "the title's box may shrink")
     assert_match(/\.hx \.mm-bar > :first-child \.mm-rl \{ max-width: 100%; overflow-x: clip; text-overflow: ellipsis; \}/, css, "and its line ends in an ellipsis")
     assert_match(/\.hx \.mm-bar > :last-child \{[^}]*flex: none;/, css, "the slide count keeps its width")
@@ -388,7 +388,7 @@ class HomeStoryFrameTest < ActionDispatch::IntegrationTest
   # browser (test/system/home_story_frame_test.rb).
   test "the story glass is placed by its foot, and the foot it is placed by is the drawing's" do
     get root_path
-    css = css_select("style").map(&:text).join("\n")
+    css = page_css
     foot = css[/--glass-foot: calc\(96px \* ([\d.]+) \/ 80\)/, 1]
     assert foot, "the story glass names where its foot ends"
     assert_match(/\.hx \.story-glass svg \{[^}]*top: calc\(var\(--section-pad\) - var\(--glass-foot\)\);[^}]*height: 96px;/, css, "hung so the foot is one section's padding below the story")

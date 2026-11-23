@@ -1,0 +1,374 @@
+/* The homepage (home/index.html.erb), linked from that view. Every rule is
+   scoped to .hx, so nothing here reaches another page even after a Turbo
+   visit leaves this stylesheet in the document's head.
+
+   Kept out of an inline <style>: the CSP allows inline styles only with the
+   request's nonce, and a Turbo Drive visit parses this page under the policy
+   of the page it came from, whose nonce differs (issue #46,
+   docs/redesign/CSP_REPORT_ONLY.md). A stylesheet from this site needs no
+   nonce. The story frame and the story glass have their own files beside
+   this one, linked from their partials. */
+.hx { --bg: #f6f4ee; --card: #fff; --ink: #16332a; --text: #1b2924; --mute: #5f6b64; --line: rgba(22, 51, 42, .12); --mark: #ff6d00; --mark-deep: #e65c00; --pad: 20px; --section-pad: 56px;
+      background: var(--bg); color: var(--text); font-family: "Instrument Sans", system-ui, sans-serif; overflow-x: clip; }
+.hx *, .hx *::before { box-sizing: border-box; }
+.hx .wrap { max-width: 1240px; margin: 0 auto; padding: 0 var(--pad); }
+.hx h1, .hx h2 { font-weight: 600; color: var(--ink); text-wrap: balance; }
+.hx h1 { font-size: clamp(3rem, 6.6vw, 6rem); line-height: .94; letter-spacing: -.052em; }
+.hx h2 { font-size: clamp(2.25rem, 4.6vw, 4rem); line-height: 1; letter-spacing: -.045em; }
+.hx h1 em, .hx h2 em { font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: -.035em; }
+.hx h3 { font-weight: 600; font-size: 22px; letter-spacing: -.03em; color: var(--ink); }
+.hx p { color: var(--mute); line-height: 1.55; text-wrap: pretty; }
+.hx .lede { font-size: clamp(1.0625rem, 1.5vw, 1.3125rem); max-width: 30em; }
+/* --section-pad: also where the story glass comes to rest (home/_story_glass). */
+.hx section { padding: var(--section-pad) 0; }
+
+.hx .btn2 { display: inline-flex; align-items: center; gap: 8px; min-height: 52px; padding: 0 24px; border-radius: 16px; font-weight: 600; font-size: 16px; letter-spacing: -.01em;
+            background: var(--ink); color: #f6f4ee; transition: transform .15s, box-shadow .15s, scale .15s; box-shadow: 0 1px 2px rgba(22, 51, 42, .3); }
+@media (hover: hover) and (pointer: fine) { .hx .btn2:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(22, 51, 42, .55); } }
+/* Press in on tap or click (the only feedback a phone gets). */
+.hx .btn2--quiet { background: var(--card); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+@media (hover: hover) and (pointer: fine) { .hx .btn2--quiet:hover { box-shadow: inset 0 0 0 1px rgba(22, 51, 42, .3); } }
+.hx .btn2--light { background: #f6f4ee; color: var(--ink); }
+/* Press in on tap or click, the only feedback a phone gets: fast in (80ms,
+   strong ease-out), a shade darker or lighter, released over 150ms. */
+.hx :is(.btn2, .plan, .chips a):active { scale: .98; transition-duration: 80ms; transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1); }
+.hx .btn2:active { background: #10261f; }
+.hx :is(.btn2--quiet, .btn2--light, .chips a):active { background: #ecebe3; }
+.hx .more { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 15px; color: var(--ink); }
+/* The arrow nudges 3px like every .arrow on the site (application.css). */
+.hx .more::after { content: "→"; transition: translate .15s cubic-bezier(0.23, 1, 0.32, 1); }
+@media (hover: hover) and (pointer: fine) { .hx .more:hover::after { translate: 3px 0; } }
+.hx a:focus-visible, .hx summary:focus-visible { outline: 2px solid var(--mark-deep); outline-offset: 3px; border-radius: 8px; }
+
+/* Hero */
+.hx .hero { padding: 124px 0 40px; }
+.hx .hero-grid { display: grid; gap: 48px; align-items: center; }
+.hx .acts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
+.hx .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
+.hx .chips a { display: inline-flex; align-items: center; min-height: 36px; padding: 0 14px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); font-size: 14px; font-weight: 500; color: var(--ink); transition: background .15s, scale .15s; }
+@media (hover: hover) and (pointer: fine) { .hx .chips a:hover { background: #ecebe3; } }
+.hx .note { margin-top: 20px; font-size: 14px; }
+
+/* The hero player's reel: its real preview slides cross-fade in turn, and
+   one tick per slide lights in step with it (same cycle, same delay).
+   Hovering or focusing the player pauses both. Only the hero has ticks
+   (without slides it lights the first of four, still): the step faces'
+   bars carry just their title, since ticks there read as a sideways
+   carousel when the faces really change with the vertical scroll. */
+/* One keyframe pair per reel length, 2 to HomeHelper::HERO_REEL_MAX (12):
+   keyframe offsets cannot come from a variable, and the page carries no
+   inline <style> (a Turbo visit would report it under the CSP, issue #46).
+   The reel and its ticks name their length (.reel--3, .ticks--reel-3). Each
+   slide holds for its share of a cycle of four seconds a slide, fading in
+   over the first 3% and out over the 3% after its share; its delay
+   (n * 4s) is on the slide. test/integration/home_player_ticks_test.rb
+   checks every length against that rule. */
+@keyframes hx-reel-2 { 0% { opacity: 0; } 3% { opacity: 1; } 50.0% { opacity: 1; } 53.0% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes hx-tick-2 { 0% { opacity: .22; } 3% { opacity: 1; } 50.0% { opacity: 1; } 53.0% { opacity: .22; } 100% { opacity: .22; } }
+.hx .ticks--reel-2 i { animation: hx-tick-2 8s infinite; }
+@keyframes hx-reel-3 { 0% { opacity: 0; } 3% { opacity: 1; } 33.33% { opacity: 1; } 36.33% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes hx-tick-3 { 0% { opacity: .22; } 3% { opacity: 1; } 33.33% { opacity: 1; } 36.33% { opacity: .22; } 100% { opacity: .22; } }
+.hx .ticks--reel-3 i { animation: hx-tick-3 12s infinite; }
+@keyframes hx-reel-4 { 0% { opacity: 0; } 3% { opacity: 1; } 25.0% { opacity: 1; } 28.0% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes hx-tick-4 { 0% { opacity: .22; } 3% { opacity: 1; } 25.0% { opacity: 1; } 28.0% { opacity: .22; } 100% { opacity: .22; } }
+.hx .ticks--reel-4 i { animation: hx-tick-4 16s infinite; }
+@keyframes hx-reel-5 { 0% { opacity: 0; } 3% { opacity: 1; } 20.0% { opacity: 1; } 23.0% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes hx-tick-5 { 0% { opacity: .22; } 3% { opacity: 1; } 20.0% { opacity: 1; } 23.0% { opacity: .22; } 100% { opacity: .22; } }
+.hx .ticks--reel-5 i { animation: hx-tick-5 20s infinite; }
+@keyframes hx-reel-6 { 0% { opacity: 0; } 3% { opacity: 1; } 16.67% { opacity: 1; } 19.67% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes hx-tick-6 { 0% { opacity: .22; } 3% { opacity: 1; } 16.67% { opacity: 1; } 19.67% { opacity: .22; } 100% { opacity: .22; } }
+.hx .ticks--reel-6 i { animation: hx-tick-6 24s infinite; }
+@keyframes hx-reel-7 { 0% { opacity: 0; } 3% { opacity: 1; } 14.29% { opacity: 1; } 17.29% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes hx-tick-7 { 0% { opacity: .22; } 3% { opacity: 1; } 14.29% { opacity: 1; } 17.29% { opacity: .22; } 100% { opacity: .22; } }
+.hx .ticks--reel-7 i { animation: hx-tick-7 28s infinite; }
+@keyframes hx-reel-8 { 0% { opacity: 0; } 3% { opacity: 1; } 12.5% { opacity: 1; } 15.5% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes hx-tick-8 { 0% { opacity: .22; } 3% { opacity: 1; } 12.5% { opacity: 1; } 15.5% { opacity: .22; } 100% { opacity: .22; } }
+.hx .ticks--reel-8 i { animation: hx-tick-8 32s infinite; }
+@keyframes hx-reel-9 { 0% { opacity: 0; } 3% { opacity: 1; } 11.11% { opacity: 1; } 14.11% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes hx-tick-9 { 0% { opacity: .22; } 3% { opacity: 1; } 11.11% { opacity: 1; } 14.11% { opacity: .22; } 100% { opacity: .22; } }
+.hx .ticks--reel-9 i { animation: hx-tick-9 36s infinite; }
+@keyframes hx-reel-10 { 0% { opacity: 0; } 3% { opacity: 1; } 10.0% { opacity: 1; } 13.0% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes hx-tick-10 { 0% { opacity: .22; } 3% { opacity: 1; } 10.0% { opacity: 1; } 13.0% { opacity: .22; } 100% { opacity: .22; } }
+.hx .ticks--reel-10 i { animation: hx-tick-10 40s infinite; }
+@keyframes hx-reel-11 { 0% { opacity: 0; } 3% { opacity: 1; } 9.09% { opacity: 1; } 12.09% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes hx-tick-11 { 0% { opacity: .22; } 3% { opacity: 1; } 9.09% { opacity: 1; } 12.09% { opacity: .22; } 100% { opacity: .22; } }
+.hx .ticks--reel-11 i { animation: hx-tick-11 44s infinite; }
+@keyframes hx-reel-12 { 0% { opacity: 0; } 3% { opacity: 1; } 8.33% { opacity: 1; } 11.33% { opacity: 0; } 100% { opacity: 0; } }
+@keyframes hx-tick-12 { 0% { opacity: .22; } 3% { opacity: 1; } 8.33% { opacity: 1; } 11.33% { opacity: .22; } 100% { opacity: .22; } }
+.hx .ticks--reel-12 i { animation: hx-tick-12 48s infinite; }
+/* A one-slide reel does not cycle: the slide shows and its tick stays lit. */
+.hx .reel--1 img, .hx .ticks--reel-1 i { opacity: 1 !important; animation: none !important; }
+/* Hover pauses only with a pointer (a tap would leave it stuck paused);
+   keyboard focus always pauses. */
+@media (hover: hover) and (pointer: fine) { .hx .player:hover :is(.reel img, .ticks i) { animation-play-state: paused; } }
+.hx .player:focus-visible :is(.reel img, .ticks i) { animation-play-state: paused; }
+.hx a.player { transition: transform .25s cubic-bezier(0.23, 1, 0.32, 1); }
+@media (hover: hover) and (pointer: fine) { .hx a.player:hover { transform: translateY(-2px); } }
+
+/* The story. Without JS each step's static face follows its words (beside
+   them on a wide screen); with the frame running (.is-live, added by
+   story_frame_controller.js) the faces are kept for screen readers only
+   and the frame takes their place.
+   minmax(0, 1fr): a long deck title in a player bar must not widen the
+   phone column past the screen (it clipped every face at 375px). */
+.hx .story { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 112px 0 24px; }
+.hx .story .bar b { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.hx .beat { display: flex; flex-direction: column; justify-content: center; }
+.hx .beat .n { display: inline-flex; align-items: center; justify-content: center; align-self: flex-start; min-width: 34px; height: 34px; padding: 0 11px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); font-weight: 600; font-size: 14px; margin-bottom: 22px; }
+/* Each beat's words reveal as one (.beat-body), never the tall beat
+   itself, whose top enters long before its centred words do. */
+.hx .beat-body { display: flex; flex-direction: column; }
+.hx .beat h2 + p { margin-top: 18px; }
+.hx .beat .more { margin-top: 24px; align-self: flex-start; }
+.hx .face { margin-bottom: 36px; }
+/* The closing beat: the end of the walkthrough, in the step column with
+   the beats' own type. On desktop the last face stays pinned beside it
+   until the story ends. It never animates in, so it is never left faded. */
+.hx .beat--close { padding: 12px 0 8px; }
+/* Live: a face is read, not seen (it shows if a keyboard reaches into it,
+   so focus never lands on something off screen); its reel stands still. */
+@media screen {
+  .hx .story.is-live .face:not(:focus-within) { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+  .hx .story.is-live .face * { animation: none !important; }
+  .hx .story.is-live .face:focus-within { grid-column: 1 / -1; position: relative; z-index: 25; }
+}
+.hx .beat--close h2 { font-size: clamp(2rem, 3.6vw, 3.25rem); }
+.hx .beat--close .acts { margin-top: 26px; }
+.hx .player { display: block; background: var(--ink); border-radius: 28px; padding: 10px; box-shadow: 0 1px 2px rgba(22, 51, 42, .25), 0 44px 80px -34px rgba(22, 51, 42, .6); }
+.hx .screen { position: relative; aspect-ratio: 16 / 9; border-radius: 19px; overflow: hidden; container-type: inline-size; }
+.hx .bar { display: flex; align-items: center; gap: 14px; padding: 14px 12px 6px; color: #f6f4ee; font-size: 14px; }
+.hx .bar b { font-weight: 600; white-space: nowrap; }
+.hx .bar span { opacity: .65; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.hx .ticks { flex: 1; display: flex; gap: 5px; min-width: 40px; }
+.hx .ticks i { flex: 1; height: 3px; border-radius: 3px; background: #f6f4ee; opacity: .22; }
+.hx .ticks i.on { opacity: 1; }
+.hx .reel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; }
+/* Each reel length cycles through its own keyframes (above). */
+.hx .reel--2 img { animation: hx-reel-2 8s infinite; }
+.hx .reel--3 img { animation: hx-reel-3 12s infinite; }
+.hx .reel--4 img { animation: hx-reel-4 16s infinite; }
+.hx .reel--5 img { animation: hx-reel-5 20s infinite; }
+.hx .reel--6 img { animation: hx-reel-6 24s infinite; }
+.hx .reel--7 img { animation: hx-reel-7 28s infinite; }
+.hx .reel--8 img { animation: hx-reel-8 32s infinite; }
+.hx .reel--9 img { animation: hx-reel-9 36s infinite; }
+.hx .reel--10 img { animation: hx-reel-10 40s infinite; }
+.hx .reel--11 img { animation: hx-reel-11 44s infinite; }
+.hx .reel--12 img { animation: hx-reel-12 48s infinite; }
+
+/* Slides drawn in HTML, sized in container units so they scale like images. */
+.hx .sl { position: absolute; inset: 0; padding: 6.5cqw 7cqw; display: flex; flex-direction: column; }
+.hx .sl h4 { font-weight: 600; font-size: 6.4cqw; line-height: 1; letter-spacing: -.045em; }
+.hx .sl--paper { background: #f6f4ee; color: var(--ink); }
+.hx .sl--ink { background: var(--ink); color: #f6f4ee; }
+.hx .sl--mark { background: var(--mark); color: var(--ink); }
+.hx .sl ul { list-style: none; margin: auto 0 0; padding: 0; }
+.hx .sl li { display: flex; justify-content: space-between; align-items: baseline; gap: 3cqw; padding: 2.1cqw 0; border-top: .35cqw solid currentColor; font-weight: 600; font-size: 3.6cqw; letter-spacing: -.03em; }
+.hx .sl li small { font-family: "Source Serif 4", Georgia, serif; font-weight: 400; font-size: 2.9cqw; letter-spacing: 0; white-space: nowrap; }
+.hx .sl li a { color: inherit; }
+.hx .sl .date { font-weight: 700; font-size: 17cqw; line-height: .84; letter-spacing: -.065em; }
+.hx .sl .ev { margin-top: auto; font-weight: 600; font-size: 4.4cqw; line-height: 1.04; letter-spacing: -.04em; }
+.hx .sl .where { margin-top: 1.6cqw; font-family: "Source Serif 4", Georgia, serif; font-size: 2.9cqw; }
+.hx .sl .score { display: grid; grid-template-columns: 1fr 34% 7cqw; align-items: center; }
+.hx .sl .track { height: 1.1cqw; border-radius: 1cqw; background: rgba(246, 244, 238, .18); overflow: hidden; }
+.hx .sl .track i { display: block; height: 100%; border-radius: 1cqw; background: var(--mark); }
+.hx .sl .score span { text-align: right; font-variant-numeric: tabular-nums; }
+.hx .sl .pour { display: grid; grid-template-columns: auto 1fr auto; align-items: center; padding: .9cqw 0; }
+.hx .sl .pour svg { display: block; width: auto; height: max(28px, 7.4cqw); }
+.hx .sl .pour a { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.hx .sl .pour span { font-variant-numeric: tabular-nums; }
+
+/* Slide three: the invite for a night (a real one, or a drawn sample).
+   A photograph of a tasting night is the top band, printed through
+   shared/_duotone in this slide's two inks (light in orange, shadows in
+   ink); the invite's words sit below it on solid orange, never on the
+   photo. The band shows the top of the picture so the bottles' labels
+   stay out of frame. */
+.hx .invite { padding: 0; }
+.hx .invite-photo { flex: none; height: 47%; margin: 0; border-radius: 0; background: var(--mark); }
+.hx .invite-photo::after { background: var(--ink); }
+.hx .invite-photo img { object-position: 50% 4%; }
+.hx .invite-body { flex: 1; min-height: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto 1fr; column-gap: 5cqw; align-items: end; padding: 3cqw 5cqw 3.6cqw; }
+.hx .invite .top { grid-column: 1 / -1; align-self: start; display: flex; justify-content: space-between; align-items: center; gap: 3cqw; font-weight: 600; font-size: max(11px, 2.4cqw); letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+.hx .invite .tag { display: inline-flex; align-items: center; min-height: max(20px, 4.2cqw); padding: 0 max(8px, 1.6cqw); border-radius: max(7px, 1.4cqw); box-shadow: inset 0 0 0 max(1px, .28cqw) var(--ink); white-space: nowrap; }
+.hx .invite .date { font-size: 13cqw; }
+.hx .invite .foot { min-width: 0; display: flex; flex-direction: column; gap: 2cqw; padding-bottom: .6cqw; }
+.hx .invite .ev { margin-top: 0; font-size: 4.2cqw; }
+.hx .invite .where { margin-top: 1cqw; font-size: max(11px, 2.6cqw); }
+.hx .invite .guests { flex-direction: row; align-items: center; gap: 2cqw; }
+@media (max-width: 599px) {
+  /* Phones: a square face, so the band stays tall enough to see faces. */
+  .hx .screen--invite { aspect-ratio: 1 / 1; }
+  .hx .invite-photo { height: 42%; }
+  .hx .invite-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto auto 1fr; row-gap: 2.5cqw; padding: 4cqw 5.5cqw 5cqw; }
+  .hx .invite .date { font-size: 15cqw; }
+  .hx .invite .ev { font-size: 5.4cqw; }
+  .hx .invite .where { font-size: max(12px, 3.4cqw); }
+}
+.hx .guests { flex: none; display: flex; flex-direction: column; align-items: flex-end; gap: 1.2cqw; font-weight: 600; font-size: max(11px, 2.5cqw); font-variant-numeric: tabular-nums; }
+.hx .faces { display: flex; padding-left: 1.4cqw; }
+.hx .faces > * { display: inline-flex !important; align-items: center; justify-content: center; width: max(26px, 6.6cqw) !important; height: max(26px, 6.6cqw) !important; margin-left: -1.4cqw;
+                 border-radius: 50%; background: #f6f4ee; color: var(--ink); font-style: normal; font-weight: 600; font-size: max(9px, 2.3cqw) !important; letter-spacing: -.01em; box-shadow: 0 0 0 max(2px, .5cqw) var(--mark); object-fit: cover; }
+
+/* Slide four without a verdict: one real review and its palate wheel. */
+.hx .sl .review { flex: 1; min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr) 40cqw; gap: 4.5cqw; }
+.hx .rv-txt { display: flex; flex-direction: column; min-width: 0; }
+.hx .rv-txt h4 { font-size: 4.8cqw; }
+.hx .rv-foot { margin-top: auto; padding-top: 2cqw; }
+.hx .rv-bottle { display: block; font-weight: 600; font-size: 4.6cqw; line-height: 1.04; letter-spacing: -.04em; color: #f6f4ee; }
+.hx .rv-quote { margin-top: 1.8cqw; font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-size: max(12px, 2.5cqw); line-height: 1.38; color: rgba(246, 244, 238, .82);
+                display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+.hx .rv-by { margin-top: 1.8cqw; font-size: max(12px, 2.3cqw); color: rgba(246, 244, 238, .72); }
+.hx .rv-by a { color: #f6f4ee; font-weight: 600; }
+.hx .rv-more { display: inline-block; margin-top: 1.2cqw; font-weight: 600; font-size: max(12px, 2.3cqw); color: #f6f4ee; }
+/* ... or each drink with its review, as rows (the verdict's rows, with the reviewer below the drink). */
+.hx .rv-rows { margin-top: auto; padding-top: 2.4cqw; }
+.hx .rv-rows .pour { gap: 2cqw; font-size: 3.2cqw; }
+.hx .rv-who { display: flex; flex-direction: column; min-width: 0; }
+.hx .rv-who small { display: block; margin-top: .3cqw; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: rgba(246, 244, 238, .72); font-size: max(11px, 2.3cqw); }
+.hx .rv-who small a { color: #f6f4ee; }
+.hx .rv-card { position: relative; min-height: 0; margin: -2.6cqw -3cqw -2.6cqw 0; padding: 1.4cqw; border-radius: 3.4cqw; background: #fff; display: flex; align-items: center; justify-content: center; }
+.hx .rv-card > [data-score] { position: absolute; top: 2cqw; left: 2.4cqw; font-size: max(14px, 2.8cqw); }
+.hx .rv-wheel { width: 100%; height: 100%; }
+.hx .rv-wheel figure { max-width: none; height: 100%; margin: 0; }
+.hx .rv-wheel svg { display: block; width: 100%; height: 100%; }
+.hx .rv-wheel figcaption { display: none; }
+.hx .rv-card--notes { flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 2cqw; padding: 2.6cqw; }
+.hx .rv-card--notes > [data-score] { position: static; }
+.hx .rv-card dl { margin: 0; display: grid; gap: 1.6cqw; }
+.hx .rv-card dt { font-weight: 600; font-size: max(11px, 2.2cqw); color: var(--ink); }
+.hx .rv-card dd { margin: .4cqw 0 0; font-family: "Source Serif 4", Georgia, serif; font-size: max(11px, 2.2cqw); line-height: 1.35; color: var(--text);
+                  display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+/* Phones: the review face grows taller so the wheel stays legible. */
+@media (max-width: 599px) {
+  .hx .screen--tall { aspect-ratio: 3 / 4; }
+  .hx .screen--tall .where { font-size: max(12px, 2.9cqw); }
+  .hx .screen--tall .sl h4 { font-size: 7.4cqw; }
+  .hx .sl .review { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); gap: 4cqw; }
+  .hx .rv-foot { margin-top: 3.5cqw; }
+  .hx .rv-bottle { font-size: 6.4cqw; }
+  .hx .rv-card { margin: 0 -2.5cqw -2.5cqw; border-radius: 5cqw; }
+}
+
+@media (min-width: 900px) {
+  .hx .story { grid-template-columns: .86fr 1.14fr; column-gap: 72px; row-gap: 0; padding: 0; }
+  /* The right padding keeps the step words clear of the story glass,
+     which hangs in the gutter beside them (home/_story_glass). */
+  .hx .beat { grid-column: 1; min-height: 64svh; padding: 40px 28px 40px 0; }
+  .hx .b1 { min-height: 100svh; padding-top: 104px; }
+  /* Without JS: each face sits beside its step's words and scrolls with them. */
+  .hx .face { grid-column: 2; align-self: center; margin: 0; }
+  .hx .f1 { grid-row: 1; } .hx .f2 { grid-row: 2; } .hx .f3 { grid-row: 3; } .hx .f4 { grid-row: 4; }
+  .hx .b1 { grid-row: 1; } .hx .b2 { grid-row: 2; } .hx .b3 { grid-row: 3; } .hx .b4 { grid-row: 4; }
+  .hx .beat--close { grid-row: 5; min-height: 0; padding: 24px 28px 8px 0; }
+  /* Live: the steps are spaced for reading beside the pinned frame; the
+     table step is longer (its glasses fill while it is read) and the
+     closing line holds the record. */
+  .hx .story.is-live .b4 { min-height: 112svh; }
+  .hx .story.is-live .beat--close { min-height: 78svh; padding-bottom: 40px; }
+}
+
+/* Step grid: tiles sized by how much each has to show. */
+.hx .grid { display: grid; gap: 14px; margin-top: 40px; }
+.hx .tile { display: flex; flex-direction: column; background: var(--card); border-radius: 28px; padding: 26px; box-shadow: inset 0 0 0 1px var(--line); }
+.hx .tile .n { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 11px; background: var(--bg); color: var(--ink); font-weight: 600; font-size: 14px; margin-bottom: 18px; }
+.hx .tile > p, .hx .tile .txt p { margin-top: 8px; font-size: 16px; max-width: 30em; }
+.hx .tile .more { margin-top: 22px; }
+.hx .mini { margin-top: 24px; background: var(--bg); border-radius: 20px; padding: 6px 16px; flex: 1; }
+.hx .mini > * { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 12px 0; font-size: 15px; color: var(--text); }
+.hx .mini > * + * { border-top: 1px solid var(--line); }
+.hx .mini b { font-weight: 600; letter-spacing: -.01em; }
+.hx .mini small { color: var(--mute); font-size: 13px; white-space: nowrap; font-variant-numeric: tabular-nums; }
+.hx .mini .star { color: var(--mark-deep); }
+.hx .decks a { justify-content: flex-start; }
+.hx .decks .th { flex: none; width: 84px; aspect-ratio: 16 / 9; border-radius: 9px; overflow: hidden; background: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+.hx .decks .th img { display: block; width: 100%; height: 100%; object-fit: cover; }
+.hx .decks .t { flex: 1; min-width: 0; }
+.hx .decks .t small { display: block; white-space: normal; margin-top: 2px; }
+.hx .decks .p { font-weight: 600; font-size: 15px; color: var(--ink); font-variant-numeric: tabular-nums; }
+.hx .when { display: grid !important; grid-template-columns: 54px 1fr; gap: 14px; justify-content: start; }
+.hx .when .d { text-align: center; background: var(--card); border-radius: 13px; padding: 7px 0 8px; box-shadow: inset 0 0 0 1px var(--line); }
+.hx .when .d small { display: block; text-transform: uppercase; letter-spacing: .06em; font-size: 11px; font-weight: 600; color: var(--ink); }
+.hx .when .d b { display: block; font-size: 21px; line-height: 1; margin-top: 2px; color: var(--ink); }
+.hx .when span { display: block; }
+
+.hx .spot { display: grid; gap: 28px; align-items: center; }
+.hx .spot-img img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 18px; box-shadow: 0 0 0 1px var(--line); }
+@media (min-width: 900px) { .hx .spot { grid-template-columns: 1fr 1.1fr; gap: 48px; padding: 20px 48px 20px 20px; } }
+
+/* Origin */
+.hx .panel { background: var(--ink); color: #f6f4ee; border-radius: 32px; padding: 32px 26px; display: grid; gap: 36px; }
+.hx .panel h2, .hx .panel h3 { color: #f6f4ee; }
+.hx .panel p { color: rgba(246, 244, 238, .78); margin-top: 18px; }
+.hx .rules { list-style: none; margin: 0; padding: 0; counter-reset: r; display: grid; gap: 10px; }
+.hx .rules li { counter-increment: r; background: rgba(246, 244, 238, .07); border-radius: 20px; padding: 18px 20px 20px; font-size: 17px; letter-spacing: -.015em; line-height: 1.3; }
+.hx .rules li::before { content: counter(r); display: block; color: #ff8a33; font-weight: 600; font-size: 14px; margin-bottom: 22px; }
+
+.hx .split { display: grid; gap: 32px; }
+/* Pricing: one row per plan, read left to right like a price list.
+   No opacity anywhere in these rules (see the motion note below). */
+.hx .plans { display: grid; gap: 10px; align-self: start; }
+.hx .plan { display: grid; grid-template-columns: minmax(0, 1fr) auto 44px; grid-template-areas: "head price go" "bill save go"; align-items: center; column-gap: 20px; row-gap: 6px;
+            min-height: 112px; padding: 22px 22px 22px 26px; border-radius: 26px; background: var(--card); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); transition: transform .15s, box-shadow .15s, scale .15s; }
+@media (hover: hover) and (pointer: fine) { .hx .plan:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 1px rgba(22, 51, 42, .3); } }
+.hx .plan-head { grid-area: head; display: flex; flex-wrap: wrap; align-items: center; gap: 8px 10px; min-width: 0; }
+.hx .plan h3 { font-size: 22px; line-height: 1.1; }
+.hx .plan-tag { display: inline-flex; align-items: center; min-height: 28px; padding: 0 10px; border-radius: 10px; font-size: 13px; font-weight: 600; background: var(--bg); color: var(--ink); white-space: nowrap; }
+.hx .plan-bill { grid-area: bill; font-size: 14px; color: var(--mute); }
+.hx .plan-price { grid-area: price; justify-self: end; font-weight: 600; font-size: 34px; line-height: 1; letter-spacing: -.045em; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hx .plan-price small { margin-left: 3px; font-size: 15px; font-weight: 500; letter-spacing: 0; color: var(--mute); }
+.hx .plan-save { grid-area: save; justify-self: end; display: inline-flex; align-items: center; min-height: 26px; padding: 0 9px; border-radius: 9px; font-size: 13px; font-weight: 600; background: #ecebe3; color: var(--ink); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.hx .plan-go { grid-area: go; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 14px; background: var(--bg); color: var(--ink); transition: transform .15s; }
+@media (hover: hover) and (pointer: fine) { .hx .plan:hover .plan-go { transform: translateX(3px); } }
+.hx .plan--pick { background: var(--ink); color: #f6f4ee; box-shadow: none; }
+@media (hover: hover) and (pointer: fine) { .hx .plan--pick:hover { box-shadow: 0 18px 36px -20px rgba(22, 51, 42, .7); } }
+.hx .plan--pick h3, .hx .plan--pick .plan-price { color: #f6f4ee; }
+.hx .plan--pick .plan-bill, .hx .plan--pick .plan-price small { color: rgba(246, 244, 238, .72); }
+.hx .plan--pick .plan-tag, .hx .plan--pick .plan-save { background: #1d4034; color: #f6f4ee; box-shadow: inset 0 0 0 1px #2f5546; }
+.hx .plan--pick .plan-go { background: #1d4034; color: #f6f4ee; }
+.hx .plans-note { font-size: 14px; color: var(--mute); padding: 6px 4px 0; }
+@media (max-width: 479px) {
+  .hx .plan { grid-template-columns: minmax(0, 1fr) auto; grid-template-areas: "head head" "bill bill" "price go" "save go"; row-gap: 4px; padding: 20px; }
+  .hx .plan-price { justify-self: start; margin-top: 14px; }
+  .hx .plan-save { justify-self: start; }
+  .hx .plan-go { align-self: end; }
+}
+.hx .faq { background: var(--card); border-radius: 28px; padding: 6px 26px; box-shadow: inset 0 0 0 1px var(--line); }
+.hx details + details { border-top: 1px solid var(--line); }
+.hx summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 20px; padding: 19px 0; font-weight: 600; font-size: 17px; letter-spacing: -.015em; color: var(--ink); }
+.hx summary::-webkit-details-marker { display: none; }
+.hx summary::after { content: "+"; font-weight: 400; color: var(--mute); }
+.hx details[open] summary::after { content: "–"; }
+.hx details p { padding: 0 0 20px; font-size: 16px; max-width: 42em; }
+
+@media (min-width: 900px) {
+  .hx { --pad: 32px; --section-pad: 80px; }
+  .hx .hero { padding: 168px 0 64px; }
+  .hx .hero-grid { grid-template-columns: .9fr 1.1fr; gap: 56px; }
+  .hx .grid { grid-template-columns: repeat(12, 1fr); }
+  .hx .tile { padding: 32px; }
+  .hx .g7 { grid-column: span 7; } .hx .g5 { grid-column: span 5; }
+  .hx .tile--wide { display: grid; grid-template-columns: 1fr 1.15fr; gap: 28px; }
+  .hx .tile--wide .txt { display: flex; flex-direction: column; }
+  .hx .tile--wide .txt .more { margin-top: auto; padding-top: 22px; }
+  .hx .tile--wide .mini { margin-top: 0; }
+  .hx .panel { grid-template-columns: 1fr 1.2fr; gap: 64px; padding: 64px; align-items: center; }
+  .hx .rules { grid-template-columns: 1fr 1fr; }
+  .hx .split { grid-template-columns: 5fr 7fr; gap: 64px; }
+}
+
+/* Cards, rows, panels and headings reveal once, the first time they
+   scroll in, through the site's appear controller (data-appear-target on
+   the markup below; application.css; appear_controller.js). It is
+   time-based and always runs to the end, so nothing here is ever left
+   part-faded. The old scroll-scrubbed rise left the pricing cards
+   greyed out wherever the scroll stopped.
+   The closing beat never reveals. */
+/* Reduced motion: nothing travels on hover; the press (shade and .98)
+   stays, as it does across the site (application.css). */
+@media (prefers-reduced-motion: reduce) {
+  .hx .btn2:hover, .hx .plan:hover, .hx .plan:hover .plan-go, .hx a.player:hover { transform: none; }
+  .hx .more:hover::after { translate: none; }
+  .hx .reel img, .hx .ticks i { animation: none; }
+  .hx .reel img:first-child, .hx .ticks--reel i:first-child { opacity: 1; }
+}

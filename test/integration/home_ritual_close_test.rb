@@ -46,7 +46,7 @@ class HomeRitualCloseTest < ActionDispatch::IntegrationTest
     get root_path
     assert_response :success
 
-    css = Nokogiri::HTML(response.body).css("style").map(&:text).join("\n")
+    css = page_css
     animated = css.scan(/([^{}]+)\{([^{}]*)\}/).filter_map do |selectors, block|
       selectors.strip if block.match?(/animation-timeline|hx-rise/)
     end

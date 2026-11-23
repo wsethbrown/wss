@@ -28,4 +28,23 @@ module HomeHelper
     end
     percent
   end
+
+  # The longest hero reel: app/assets/stylesheets/home/index.css holds a
+  # keyframe pair for each length up to this one. Keyframe offsets cannot come
+  # from a CSS variable, and the page carries no inline <style> (the CSP,
+  # issue #46), so a longer reel would have no animation to run.
+  HERO_REEL_MAX = 12
+
+  # The showcase deck's free-preview slides that the hero reel cycles
+  # through, the first HERO_REEL_MAX of them at most.
+  def hero_reel_slides(deck)
+    return [] unless deck
+
+    count = deck.effective_preview_slide_count
+    if count > HERO_REEL_MAX
+      Rails.logger.info "Home: deck #{deck.id} previews #{count} slides, the hero reel shows the first #{HERO_REEL_MAX}"
+      count = HERO_REEL_MAX
+    end
+    deck.slide_images.order(:id).first(count)
+  end
 end

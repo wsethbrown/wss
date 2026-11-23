@@ -100,32 +100,9 @@
       })();
     </script>
 
-    <style>
-      /* Smooth-scroll in-page anchors (e.g. hero "See how it works", deck
-         "Read the story"), but not for users who prefer reduced motion. */
-      @media (prefers-reduced-motion: no-preference) {
-        html {
-          scroll-behavior: smooth;
-        }
-      }
-      /* Sticky-footer layout. NOTE: keep body free of `height: 100%` and of any
-         overflow that creates a scroll container (overflow-x: hidden would),
-         or position: sticky descendants stop sticking. `clip` is safe. */
-      body {
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        overflow-x: clip;
-      }
-      main {
-        flex: 1 0 auto;
-      }
-      footer {
-        flex-shrink: 0;
-      }
-    </style>
+    <%# Smooth scrolling and the sticky footer: app/assets/stylesheets/layout.css
+        (no inline <style>: the CSP, issue #46). %>
+    <%= stylesheet_link_tag "layout", "data-turbo-track": "reload" %>
   </head>
 
   <body class="bg-paper text-gray-900 min-h-screen font-sans">

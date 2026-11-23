@@ -13,7 +13,7 @@ require "test_helper"
 # controller adds in the browser (see AppearMotionTest).
 class HomePricingCardsMotionTest < ActionDispatch::IntegrationTest
   def page_rules(body)
-    css = Nokogiri::HTML(body).css("style").map(&:text).join("\n")
+    css = page_css(body)
     css.scan(/([^{}]+)\{([^{}]*)\}/)
   end
 

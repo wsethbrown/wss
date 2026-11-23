@@ -6,8 +6,6 @@ require "test_helper"
 # Desktop: a 96px gauge in the gutter between the step words and the face,
 # held mid-screen. Phones: 40px in the bottom-right corner.
 class HomeStoryGlassTest < ActionDispatch::IntegrationTest
-  def page_css = css_select("style").map(&:text).join("\n")
-
   test "the homepage shows one hidden, aria-hidden glass in the story, drawn by shared/_glass" do
     get root_path
     assert_response :success

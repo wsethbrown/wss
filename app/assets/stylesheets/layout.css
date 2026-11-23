@@ -1,0 +1,30 @@
+/* The site layout's own rules (layouts/application.html.erb), linked from
+   that layout only: the admin layout and the deck preview document do not
+   use them. Kept out of an inline <style>: the CSP allows inline styles only
+   with the request's nonce, and a Turbo Drive visit parses each page under
+   the policy of the page it came from (issue #46,
+   docs/redesign/CSP_REPORT_ONLY.md). */
+/* Smooth-scroll in-page anchors (e.g. hero "See how it works", deck
+   "Read the story"), but not for users who prefer reduced motion. */
+@media (prefers-reduced-motion: no-preference) {
+  html {
+    scroll-behavior: smooth;
+  }
+}
+/* Sticky-footer layout. NOTE: keep body free of `height: 100%` and of any
+   overflow that creates a scroll container (overflow-x: hidden would),
+   or position: sticky descendants stop sticking. `clip` is safe. */
+body {
+  margin: 0;
+  padding: 0;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  overflow-x: clip;
+}
+main {
+  flex: 1 0 auto;
+}
+footer {
+  flex-shrink: 0;
+}

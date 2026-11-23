@@ -114,7 +114,7 @@ class AppearDrawInsTest < ActionDispatch::IntegrationTest
     get root_path
     assert_select ".face [data-appear-target=perform], [data-appear-target~=perform]", 0
     assert_select ".mm [data-appear-target]", 0
-    css = css_select("style").map(&:text).join("\n")
+    css = page_css
     refute_match(/\.perform-(wait|run)/, css)
     refute_includes File.read(CONTROLLER), "perform-wait"
   end
