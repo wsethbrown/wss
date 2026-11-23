@@ -95,10 +95,11 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
         const end = document.querySelector(".beat--close").getBoundingClientRect().top + scrollY;
         let y = scrollY, prev = performance.now();
         const step = (now) => {
-          y += 400 * (now - prev) / 1000; prev = now; scrollTo(0, y);
+          // Cap the step so a slow frame on CI cannot jump a face past its pinned stretch.
+          y += 400 * Math.min(now - prev, 40) / 1000; prev = now; scrollTo(0, y);
           for (const f of [ "f2", "f3", "f4" ]) {
             const screen = document.querySelector(`.${f} .screen`);
-            if (!window.__starts[f] && screen.classList.contains("perform-run")) {
+            if (!(f in window.__starts) && screen.classList.contains("perform-run")) {
               const face = screen.closest(".face");
               window.__starts[f] = Math.round(face.getBoundingClientRect().top - parseFloat(getComputedStyle(face).top));
             }
@@ -108,7 +109,7 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
         requestAnimationFrame(step);
       })();
     JS
-    Timeout.timeout(30) { sleep 0.1 until page.evaluate_script("window.__done") }
+    Timeout.timeout(90) { sleep 0.1 until page.evaluate_script("window.__done") }
     starts = page.evaluate_script("window.__starts")
     %w[f2 f3 f4].each do |f|
       assert starts[f], "#{f} performed"
