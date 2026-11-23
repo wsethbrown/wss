@@ -149,6 +149,10 @@ module ActionDispatch
 
     # Skip CSRF verification in tests for easier integration testing
     setup do
+      # Devise registers its mappings while routes load. With lazy loading
+      # (eager_load off, e.g. local runs) a test that calls sign_in before
+      # making any request would hit "Could not find a valid mapping".
+      Rails.application.reload_routes_unless_loaded
       ActionController::Base.allow_forgery_protection = false
     end
 
