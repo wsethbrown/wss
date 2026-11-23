@@ -10,7 +10,7 @@ _READ THIS FIRST. The title is how the Smith family saw it. They did not win. Th
 
 ### The one-sentence version
 
-In the 1880s the family that owned The Glenlivet went to court to stop other distilleries calling their whisky Glenlivet. The case was settled in 1884, and the other distilleries were allowed to keep the word as long as it came after their own name.
+In the 1880s the family that owned The Glenlivet took legal action to stop other distilleries calling their whisky Glenlivet. The case was settled in 1884, and the other distilleries were allowed to keep the word as long as it came after their own name.
 
 ### What the night is
 
@@ -22,7 +22,7 @@ Four.
 
 ### Cast the roles, then find the bottles
 
-- **Glass 1: The Glenlivet.** The distillery that went to court. Tonight: The Glenlivet 12 Year Old.
+- **Glass 1: The Glenlivet.** The distillery that took legal action. Tonight: The Glenlivet 12 Year Old.
 - **Glass 2: a distillery the Smiths complained about by name.** Tonight: Glenfarclas 12.
 - **Glass 3: a distillery listed in the 1884 settlement.** Tonight: Aberlour 12 Double Cask.
 - **Glass 4: a distillery built after the settlement that used the name too.** Tonight: Glen Moray 12.
@@ -81,7 +81,7 @@ _SET UP: glass 1, The Glenlivet 12, poured. The other three bottles on the table
 
 Welcome. Tonight is about the word Glenlivet and a court case over who could put it on a bottle.
 
-Glenlivet is a place. It is the valley of a small river called the Livet, in Speyside. From 1824 a family called Smith ran a distillery there. In the 1880s they went to court to stop other distilleries calling their whisky Glenlivet. The Smiths thought those distilleries were stealing the name, and that is the title of tonight's deck.
+Glenlivet is a place. It is the valley of a small river called the Livet, in Speyside. From 1824 a family called Smith ran a distillery there. In the 1880s they took legal action to stop other distilleries calling their whisky Glenlivet. The Smiths thought those distilleries were stealing the name, and that is the title of tonight's deck.
 
 The Smiths did not win. We'll get to what happened, and we'll taste The Glenlivet next to three of the whiskies they were trying to stop.
 

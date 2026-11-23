@@ -85,7 +85,7 @@ text(s, X, 2.75, 6.3, 1.6, ['Glenlivet and', 'the Name Thieves'], size=46, font=
 rect(s, X + 0.03, 4.45, 0.9, 0.045, fill=MARK)
 text(s, X, 4.65, 6.2, 0.45, 'Speyside, 1824 to now  ·  Four pours', size=17, font=SANS, bold=True, color=CREAM)
 text(s, X, 5.2, 5.9, 1.4,
-     'In the 1880s the Smiths of The Glenlivet went to law to keep the name to themselves. '
+     'In the 1880s the Smiths of The Glenlivet took legal action to keep the name to themselves. '
      'Four pours from both sides.', size=20, italic=True, color=CREAM_MUTE, ls=1.2)
 tw, th = 5.13, 5.83
 picture(s, A / 'glenlivet-gable.jpg', 7.35, 0.6, tw, th, radius_in=0.26)
@@ -173,7 +173,7 @@ rect(s, X + 0.4, 2.4, 0.9, 0.045, fill=MARK_DEEP)
 text(s, X + 0.4, 2.65, CW - 0.8, 1.9,
      'Dealers were selling “lower priced Whiskies of a different character” bought as '
      '“Glenfarclas Glenlivet or Cragganmore Glenlivet”.', size=26, italic=True, color=INK, ls=1.2)
-text(s, X, 5.15, CW, 0.5, 'Smith’s written statement of his intention to go to law, as quoted by ScotchWhisky.com.',
+text(s, X, 5.15, CW, 0.5, 'Smith’s written statement of his intention to take legal action, as quoted by ScotchWhisky.com.',
      size=16, italic=True, color=MUTE)
 footer(s, 7)
 
