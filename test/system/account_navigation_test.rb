@@ -53,6 +53,22 @@ class AccountNavigationTest < ApplicationSystemTestCase
     assert_selector "[data-controller~='account-tabs'][data-account-tabs-ready='true']"
   end
 
+  # Clicks a tab and makes sure the click arrived. Three CI failures had the
+  # same timeline: WebDriver sent clicks to /account straight after it loaded
+  # and Chrome delivered none of them (no pointerdown ever reached the page),
+  # even with the controller ready and the previous visit finished. A person
+  # whose click did nothing clicks again, so the helper does too, and prints a
+  # line when it had to, so the output shows how often clicks are being lost.
+  def click_tab(name)
+    selected = "[data-tab='#{name}'][role='tab'][aria-selected='true']"
+    4.times do |attempt|
+      find("[data-tab='#{name}']").click
+      return if has_selector?(selected, wait: 1)
+      puts "account tab '#{name}': click #{attempt + 1} did not select it; clicking again"
+    end
+    find("[data-tab='#{name}']").click
+  end
+
   def assert_tab_selected(name)
     assert_selector "[data-tab='#{name}'][role='tab'][aria-selected='true']"
     assert_selector "#tab-#{name}", count: 1
@@ -83,7 +99,7 @@ class AccountNavigationTest < ApplicationSystemTestCase
   test "clicking account details tab shows account details content" do
     sign_in_user
 
-    find("[data-tab='account-details']").click
+    click_tab("account-details")
 
     assert_tab_selected("account-details")
     assert_selector "[data-tab='profile'][aria-selected='false']"
@@ -97,15 +113,15 @@ class AccountNavigationTest < ApplicationSystemTestCase
 
     assert_only_panel_visible("profile")
 
-    find("[data-tab='account-details']").click
+    click_tab("account-details")
     assert_tab_selected("account-details")
     assert_only_panel_visible("account-details")
 
-    find("[data-tab='presentations']").click
+    click_tab("presentations")
     assert_tab_selected("presentations")
     assert_only_panel_visible("presentations")
 
-    find("[data-tab='profile']").click
+    click_tab("profile")
     assert_tab_selected("profile")
     assert_only_panel_visible("profile")
   end
@@ -131,7 +147,7 @@ class AccountNavigationTest < ApplicationSystemTestCase
 
     # Each tab selects itself and shows only its own panel
     tabs.each do |t|
-      find("[data-tab='#{t[:tab]}']").click
+      click_tab("#{t[:tab]}")
       assert_tab_selected(t[:tab])
       assert_only_panel_visible(t[:tab])
     end
