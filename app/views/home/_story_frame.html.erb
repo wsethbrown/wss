@@ -214,6 +214,9 @@
 
         <% if listed %>
           <div class="mm-obj mm-rv" data-mm="review"><span class="mm-rv-more"><%= with_arrow("Read the full tasting") %></span></div>
+        <% elsif rec[:kind] == :review && rec[:sample] %>
+          <%# The sample review has no words, reviewer or link: its name and
+              "Sample review" are the title and meta above. %>
         <% elsif rec[:kind] == :review %>
           <% review = rec[:review] %>
           <% quote = review.notes.presence %>

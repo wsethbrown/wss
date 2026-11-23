@@ -33,6 +33,14 @@ class HomeStoryFrameTest < ActionDispatch::IntegrationTest
     deck
   end
 
+  # The deck the homepage features, pouring these catalog bottles: the record
+  # leads with a review of the deck's own bottle (HomepageFeature).
+  def featured_deck_pouring(*bottles)
+    deck = published_deck("Pouring Deck", slides: 1)
+    bottles.each { |b| deck.presentation_bottles.create!(bottle: b) }
+    deck
+  end
+
   test "one frame, inside the story the controller runs, sent hidden and presentational" do
     get root_path
     assert_response :success
@@ -164,13 +172,14 @@ class HomeStoryFrameTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "without a verdict, a lone review is the record, its glass landing on the review's score" do
-    societies(:single_malt).update_column(:is_private, true)
+  test "without a verdict, the featured deck's lone review is the record, its glass landing on the review's score" do
+    Review.destroy_all
+    bottle = Bottle.create!(name: "Lone Record Pour", distillery: "Frame Distillery")
+    review = Review.new(user: users(:john), bottle: bottle, rating: 4.5, notes: "Notes.", flavor_wheel: { "smoky" => 0.5 })
+    review.save!(validate: false)
+    featured_deck_pouring(bottle)
     get root_path
-    Review.where.not(id: controller.instance_variable_get(:@featured_review)).destroy_all
-    get root_path
-    review = controller.instance_variable_get(:@featured_review)
-    assert review
+    assert_equal review, controller.instance_variable_get(:@featured_review)
     assert_equal "review", config["record"]
     assert_equal [ "", "The tasting record" ], roll("heading")
     assert_equal review.bottle.name.truncate(20, separator: " "), roll("title")[2]
@@ -179,13 +188,15 @@ class HomeStoryFrameTest < ActionDispatch::IntegrationTest
     assert_select ".mm [data-mm=review]", 1
   end
 
-  test "with no reviews at all the record is its heading alone" do
+  test "with no review of the featured deck's bottles the record is the sample review, said to be one" do
     Review.destroy_all
     get root_path
-    assert_equal "empty", config["record"]
-    assert_equal 0, config["record_glasses"]
-    assert_equal "", roll("title")[2]
-    assert_select ".mm [data-mm=card], .mm [data-mm=review], .mm [data-mm=score]", 0
+    assert_equal "review", config["record"]
+    assert_equal 1, config["record_glasses"]
+    assert_equal "Weller Antique 107", roll("title")[2]
+    assert_equal "Sample review", roll("meta")[2]
+    assert_select ".mm [data-mm=card]", 1
+    assert_select ".mm [data-mm=review], .mm [data-mm=score], .mm [data-mm=by]", 0
   end
 
   # The record without a verdict night: each drink with its review. Reviews are
@@ -213,6 +224,7 @@ class HomeStoryFrameTest < ActionDispatch::IntegrationTest
     second = tasting(users(:jane), two, 3.5, at: 3.hours.ago)
     third = tasting(users(:seth), three, 4.0, at: 4.hours.ago)
     tasting(users(:admin), four, 2.0, at: 5.hours.ago) # a fourth: past the three
+    featured_deck_pouring(one)
     get root_path
     assert_equal [ newest, second, third ], controller.instance_variable_get(:@record_reviews)
     assert_equal "reviews", config["record"]
@@ -247,6 +259,7 @@ class HomeStoryFrameTest < ActionDispatch::IntegrationTest
     tasting(users(:john), fresh_bottle("Private Pour"), 5, at: 1.minute.ago, event: private_night)
     a = tasting(users(:jane), fresh_bottle("Open Pour A"), 4, at: 1.hour.ago)
     b = tasting(users(:seth), fresh_bottle("Open Pour B"), 3, at: 2.hours.ago)
+    featured_deck_pouring(a.bottle)
     get root_path
     assert_equal [ a, b ], controller.instance_variable_get(:@record_reviews)
     assert_equal "reviews", config["record"]
@@ -257,6 +270,7 @@ class HomeStoryFrameTest < ActionDispatch::IntegrationTest
   test "with one review the record keeps the single review" do
     Review.destroy_all
     only = tasting(users(:john), fresh_bottle("Lone Pour"), 4, at: 1.hour.ago, wheel: { "smoky" => 0.5 })
+    featured_deck_pouring(only.bottle)
     get root_path
     assert_empty controller.instance_variable_get(:@record_reviews)
     assert_equal only, controller.instance_variable_get(:@featured_review)
@@ -266,10 +280,10 @@ class HomeStoryFrameTest < ActionDispatch::IntegrationTest
     assert_select ".face.f4 .rv-bottle", text: "Lone Pour"
   end
 
-  test "with no reviews the record has no rows either" do
+  test "the sample review has no rows either" do
     Review.destroy_all
     get root_path
-    assert_equal "empty", config["record"]
+    assert_equal "review", config["record"]
     assert_select ".mm [data-mm=by], .mm [data-mm=vline], .face.f4 .rv-rows", 0
   end
 
@@ -286,8 +300,9 @@ class HomeStoryFrameTest < ActionDispatch::IntegrationTest
     tricky = %(Maker's <b>Mark</b> & Co)
     user = users(:jane)
     user.update_columns(first_name: %(O'Brien <i>&</i>), last_name: "Smith")
-    tasting(user, fresh_bottle(tricky), 4, at: 1.hour.ago)
+    lead = tasting(user, fresh_bottle(tricky), 4, at: 1.hour.ago)
     tasting(users(:john), fresh_bottle("Plain Pour"), 3, at: 2.hours.ago)
+    featured_deck_pouring(lead.bottle)
     get root_path
     assert_equal "reviews", config["record"]
     labels = css_select(".mm [data-mm=label] .mm-roll").map { |r| JSON.parse(r["data-states"])[2] }

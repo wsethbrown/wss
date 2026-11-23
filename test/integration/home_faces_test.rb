@@ -122,6 +122,16 @@ class HomeFacesTest < ActionDispatch::IntegrationTest
 
   # --- Beat 4: the tasting record -------------------------------------------
 
+  # The deck the homepage features, pouring these catalog bottles: the record
+  # shows a review of the deck's own bottle (HomepageFeature), else the sample.
+  def featured_deck_pouring(*bottles)
+    deck = Presentation.create!(author: users(:admin), title: "Pouring Deck", content: "A story.", price: 9.99)
+    deck.update_column(:published, true)
+    deck.slide_images.attach(io: File.open(file_fixture("sample_review.jpg")), filename: "s.jpg", content_type: "image/jpeg")
+    bottles.each { |b| deck.presentation_bottles.create!(bottle: b) }
+    deck
+  end
+
   test "a revealed public night with reviews still shows the verdict" do
     get root_path
     assert_response :success
@@ -129,8 +139,9 @@ class HomeFacesTest < ActionDispatch::IntegrationTest
     assert_select ".f4 .review", count: 0
   end
 
-  test "without a verdict the face shows the latest review with its palate wheel" do
-    Review.where.not(event_id: nil).destroy_all
+  test "without a verdict the face shows the featured deck's review with its palate wheel" do
+    Review.destroy_all
+    featured_deck_pouring(bottles(:lagavulin))
     review = Review.create!(user: users(:jane), bottle: bottles(:lagavulin), rating: 4.5,
                             notes: "Peat smoke and sea spray.", nose: "Smoke",
                             flavor_wheel: { "smoky" => "0.9", "coastal" => "0.6" })
@@ -151,6 +162,7 @@ class HomeFacesTest < ActionDispatch::IntegrationTest
     Review.destroy_all
     review = Review.create!(user: users(:jane), bottle: bottles(:lagavulin), rating: 3.0,
                             notes: "Quiet. A good one for the end of the night.", flavor_wheel: {})
+    featured_deck_pouring(bottles(:lagavulin))
     assert_empty review.wheel_display_profile
     get root_path
     assert_response :success
@@ -161,11 +173,12 @@ class HomeFacesTest < ActionDispatch::IntegrationTest
     assert_select ".f4 svg[aria-label='Palate wheel for this tasting']", count: 0
   end
 
-  test "a review with a wheel is preferred over a newer review without one" do
+  test "of a bottle's equal scores, a review with a wheel is preferred over a newer one without" do
     Review.destroy_all
     with_wheel = Review.create!(user: users(:jane), bottle: bottles(:lagavulin), rating: 4.0,
                                 flavor_wheel: { "sweet" => "0.8" }, created_at: 2.days.ago)
-    Review.create!(user: users(:john), bottle: bottles(:lagavulin), rating: 2.0, notes: "Fine.")
+    Review.create!(user: users(:john), bottle: bottles(:lagavulin), rating: 4.0, notes: "Fine.")
+    featured_deck_pouring(bottles(:lagavulin))
     get root_path
     assert_select ".f4 .review a[href=?]", review_path(with_wheel), count: 1
   end
@@ -174,10 +187,12 @@ class HomeFacesTest < ActionDispatch::IntegrationTest
     private_review = reviews(:jane_allocated_four_roses)
     Review.where.not(id: private_review.id).destroy_all
     private_review.update_columns(flavor_wheel: { "sweet" => "0.9" }, created_at: 1.minute.from_now)
+    featured_deck_pouring(private_review.bottle)
     get root_path
     assert_response :success
-    assert_select ".f4 .review", count: 0
+    assert_select ".f4 .where", text: "Sample review"
     assert_select ".f4 a[href=?]", review_path(private_review), count: 0
+    assert_select ".f4 a[href=?]", bottle_path(private_review.bottle), count: 0
     assert_select ".f4 h4", text: "The tasting record"
   end
 
@@ -191,19 +206,24 @@ class HomeFacesTest < ActionDispatch::IntegrationTest
     secret.save!(validate: false)
     solo = Review.create!(user: users(:jane), bottle: bottles(:eagle_rare), rating: 3.5,
                           flavor_wheel: { "oaky" => "0.5" }, created_at: 1.day.ago)
+    featured_deck_pouring(bottles(:lagavulin), bottles(:eagle_rare))
     get root_path
     assert_response :success
     assert_select ".f4 a[href=?]", review_path(secret), count: 0
     assert_select ".f4 .review a[href=?]", review_path(solo), count: 1
   end
 
-  test "with no reviews at all the face keeps its heading and renders nothing else" do
+  test "with no reviews at all the face shows the sample review, said to be a sample, linking to no tasting" do
     Review.destroy_all
     get root_path
     assert_response :success
     assert_select ".f4 h4", text: "The tasting record"
-    assert_select ".f4 .review", count: 0
-    assert_select ".f4 svg[aria-label='Palate wheel for this tasting']", count: 0
+    assert_select ".f4 .review", count: 1
+    assert_select ".f4 .rv-bottle", text: "Weller Antique 107"
+    assert_select ".f4 .where", text: "Sample review"
+    assert_select ".f4 .review [data-score='4']", count: 1
+    assert_select ".f4 svg[aria-label='Palate wheel for this tasting']", count: 1
+    assert_select ".f4 a.rv-more, .f4 .rv-by, .f4 a.rv-bottle", count: 0
   end
 
   # --- Pricing ----------------------------------------------------------------

@@ -251,6 +251,12 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
       review.save!(validate: false)
       review.update_columns(created_at: i.hours.ago)
     end
+    # The record leads with a bottle the featured deck pours (HomepageFeature);
+    # without one it would draw the sample review in place of these.
+    deck = Presentation.create!(author: users(:admin), title: "Wheel Deck", content: "A story.", price: 9.99)
+    deck.update_column(:published, true)
+    deck.slide_images.attach(io: File.open(file_fixture("sample_review.jpg")), filename: "s.jpg", content_type: "image/jpeg")
+    deck.presentation_bottles.create!(bottle: Bottle.find_by!(name: "Smoke Pour"))
   end
 
   test "the record's wheel draws on its own after the move lands, and draws again on the next visit" do

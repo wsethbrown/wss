@@ -103,4 +103,42 @@ class HomeFeaturedRotationTest < ActionDispatch::IntegrationTest
     assert controller.instance_variable_get(:@verdict_rows).present?, "with no reviewed bottle of its own the finished night shows, as before"
     assert_select ".face.f4 h4", text: "The verdict"
   end
+
+  test "a deck with no reviewed bottle of its own shows the sample review, labelled, with no reviewer or link" do
+    @decks[1].presentation_bottles.destroy_all
+    get root_path(rotation: 2)
+    assert_nil controller.instance_variable_get(:@featured_review)
+    assert_equal HomepageFeature::SAMPLE, controller.instance_variable_get(:@sample_review)
+    # The face: the bottle named, said to be a sample, its score and wheel; no real bottle, reviewer or tasting linked.
+    assert_select ".face.f4 h4", text: "The tasting record"
+    assert_select ".face.f4 .rv-bottle", text: "Weller Antique 107"
+    assert_select ".face.f4 .where", text: "Sample review"
+    assert_select ".face.f4 .rv-card .rv-wheel svg", 1
+    assert_select ".face.f4 .rv-card [data-score='4.0'], .face.f4 .rv-card [data-score='4']", 1
+    assert_select ".face.f4 a.rv-more, .face.f4 .rv-by, .face.f4 .rv-rows, .face.f4 a.rv-bottle", 0
+    @bottles.each { |b| assert_select ".face.f4 a[href=?]", bottle_path(b), 0 }
+    # The frame: one review's layout, the label where the distillery goes.
+    assert_equal "review", config["record"]
+    assert_equal 1, config["record_glasses"]
+    assert_equal [ 0.8 ], config["levels"]
+    assert_equal true, config["wheel"]
+    assert_equal "Weller Antique 107", roll("title")[2]
+    assert_equal "Sample review", roll("meta")[2]
+    assert_select ".mm .mm-card .wheel-wedge", HomepageFeature::SAMPLE.wheel.size
+    assert_select ".mm [data-mm=review]", 0
+    # The other two days keep their own bottles.
+    get root_path(rotation: 1)
+    assert_equal @bottles[0], controller.instance_variable_get(:@featured_review).bottle
+    assert_nil controller.instance_variable_get(:@sample_review)
+  end
+
+  test "a finished public night still shows before the sample" do
+    @decks[0].presentation_bottles.destroy_all
+    Review.new(user: users(:seth), bottle: bottles(:eagle_rare), event: events(:spring_blind), rating: 4.0).save!(validate: false)
+    EventBottle.find_or_create_by!(event: events(:spring_blind), bottle: bottles(:eagle_rare)) { |p| p.position = 9 }
+    get root_path(rotation: 1)
+    assert controller.instance_variable_get(:@verdict_rows).present?
+    assert_nil controller.instance_variable_get(:@sample_review)
+    assert_select ".face.f4 .where", text: "Sample review", count: 0
+  end
 end

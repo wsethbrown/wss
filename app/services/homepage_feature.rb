@@ -29,16 +29,15 @@
 #      that bottle's best-scoring public review (ties: one that can draw a
 #      palate wheel, then the newest). Decks with the fewest reviewed bottles
 #      choose first, so one deck does not take another's only bottle;
-#   2. else the newest public review of a bottle the others have not taken;
-#   3. else, when the record is too short to give every deck its own bottle,
-#      the newest public review again (logged), never an invented one.
+#   2. else none: the record shows the sample review (SAMPLE), a hardcoded
+#      illustration labelled "Sample review", never passed off as a tasting.
 # "Public" is the homepage's rule: a solo review, or one from a PUBLIC
 # society's night whose pours are revealed (Event#pours_revealed?, no manager
 # bypass). Nothing from a private or still-secret night.
 #
 # The record's rows (#record_reviews) are that review, then the newest other
 # public reviews, one per bottle, leaving out the bottles the other candidates
-# lead with; empty unless there are at least two.
+# lead with; empty unless there are at least two, and always with the sample.
 class HomepageFeature
   SLOTS = 3        # decks in the rotation
   RECORD_ROWS = 3  # reviews the tasting record lists, at most
@@ -46,6 +45,21 @@ class HomepageFeature
   PER_BOTTLE = 200 # reviews loaded for the candidates' pour list bottles, at most
 
   Pick = Struct.new(:review, :source)
+
+  # The sample review: what the tasting record shows when the featured deck
+  # has no publicly reviewed bottle on its pour list. The owner's choice of
+  # bottle; the score and the wheel are an illustration, which is why every
+  # place that draws it says "Sample review" and links nowhere. It answers the
+  # few questions the record asks of a review.
+  SampleReview = Struct.new(:bottle_name, :rating, :wheel, keyword_init: true) do
+    def wheel_display_profile = wheel
+    def notes = nil
+    def nose = nil
+    def palate = nil
+    def finish = nil
+  end
+  SAMPLE = SampleReview.new(bottle_name: "Weller Antique 107", rating: 4.0,
+                            wheel: { "sweet" => 0.9, "oaky" => 0.6, "fruity" => 0.5, "spicy" => 0.4, "grainy" => 0.3 }.freeze).freeze
 
   # day: the rotation's day. slot: 1..SLOTS to ask for one candidate by place
   # (an admin preview); ignored when it names no candidate or a deck is featured.
@@ -84,13 +98,18 @@ class HomepageFeature
     decks[position]
   end
 
-  # The review the record leads with (nil when there is no public review).
+  # The review the record leads with: the featured deck's highest rated
+  # bottle. Nil when the deck has none, and the record shows #sample.
   def review
     pick.review
   end
 
-  # :deck (a bottle on the deck's pour list), :newest, :repeat or :none (see
-  # the class comment).
+  # SAMPLE when there is no review to lead with, else nil.
+  def sample
+    SAMPLE unless review
+  end
+
+  # :deck (a bottle on the deck's pour list) or :sample.
   def review_source
     pick.source
   end
@@ -120,11 +139,6 @@ class HomepageFeature
     skipped = reviews.select { |r| r.event && !r.event.pours_revealed? }
     Rails.logger.info "Homepage feature: skipped #{skipped.size} review(s) from unrevealed nights (#{skipped.map(&:id).join(', ')})" if skipped.any?
     reviews - skipped
-  end
-
-  # Of reviews newest first: the newest that can draw a wheel, else the newest.
-  def self.best(reviews)
-    reviews.detect { |r| r.wheel_display_profile.any? } || reviews.first
   end
 
   private
@@ -164,7 +178,7 @@ class HomepageFeature
   end
 
   def pick
-    picks[position] || Pick.new(nil, :none)
+    picks[position] || Pick.new(nil, :sample)
   end
 
   def candidates
@@ -204,35 +218,20 @@ class HomepageFeature
     reviews.each_with_index.min_by { |r, at| [ -r.rating.to_f, r.wheel_display_profile.any? ? 0 : 1, at ] }.first
   end
 
-  # One Pick per candidate deck, in order; with no deck at all, one for the
-  # record alone (the newest public review, as the homepage always showed).
+  # One Pick per candidate deck, in order (with no deck at all, one for the
+  # record alone): the deck's own bottle, else the sample.
   def picks
     @picks ||= begin
-      list = candidates
-      picks = deck_picks.dup
-      claimed = picks.filter_map { |p| p&.review&.bottle_id }
-      list.each_index do |i|
-        next if picks[i]
-
-        found = self.class.best(recent_reviews.reject { |r| claimed.include?(r.bottle_id) })
-        if found
-          picks[i] = Pick.new(found, :newest)
-          claimed << found.bottle_id
-        elsif (again = self.class.best(recent_reviews))
-          picks[i] = Pick.new(again, :repeat)
-          Rails.logger.info "Homepage feature: deck #{list[i]&.id || 'none'} has no public review of a bottle of its own; repeating review #{again.id} (bottle #{again.bottle_id})"
-        else
-          picks[i] = Pick.new(nil, :none)
-        end
-      end
-      Rails.logger.info "Homepage feature: reviews " + list.each_with_index.map { |d, i|
-        "deck #{d&.id || 'none'}: #{picks[i].review ? "review #{picks[i].review.id}, bottle #{picks[i].review.bottle_id}" : 'none'} (#{picks[i].source})"
+      picks = deck_picks.map { |p| p || Pick.new(nil, :sample) }
+      Rails.logger.info "Homepage feature: reviews " + candidates.each_with_index.map { |d, i|
+        "deck #{d&.id || 'none'}: #{picks[i].review ? "review #{picks[i].review.id}, bottle #{picks[i].review.bottle_id}" : 'the sample review'}"
       }.join("; ")
       picks
     end
   end
 
-  # The newest public reviews, users, bottles and events preloaded.
+  # The newest public reviews (the record's other rows), users, bottles and
+  # events preloaded.
   def recent_reviews
     @recent_reviews ||= self.class.revealed(self.class.showable.includes(:user, :bottle, :event).recent_first.limit(RECENT).to_a)
   end

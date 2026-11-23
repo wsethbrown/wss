@@ -363,7 +363,7 @@
     <% frame = story_frame(showcase: @showcase_deck, showcase_slides: showcase_slides, slide_count: showcase_slide_count, decks: @featured_presentations,
                            event: @next_event, guests: @next_event_guests, going: @next_event_going,
                            verdict_night: @verdict_night, verdict_rows: @verdict_rows, verdict_reviews: @verdict_reviews, review: @featured_review,
-                           record_reviews: @record_reviews) %>
+                           record_reviews: @record_reviews, sample: @sample_review) %>
     <div class="story" data-controller="story-frame">
       <%= render "home/story_frame", frame: frame %>
       <!-- Beat 1: the pitch, with the real deck on screen -->
@@ -508,7 +508,7 @@
       </div>
       <div class="face f4">
         <div class="player">
-          <div class="screen<%= ' screen--tall' if @verdict_rows.blank? && @featured_review %>">
+          <div class="screen<%= ' screen--tall' if @verdict_rows.blank? && (@featured_review || @sample_review) %>">
             <div class="sl sl--ink">
               <% if @verdict_rows.present? %>
                 <%# The verdict of a real revealed night at a public society:
@@ -587,6 +587,23 @@
                       <% end %>
                     </div>
                   <% end %>
+                </div>
+              <% elsif @sample_review %>
+                <%# The featured deck has no publicly reviewed bottle of its
+                    own: a sample review (HomepageFeature::SAMPLE), said to be
+                    one, with no reviewer and no link to a tasting. %>
+                <div class="review">
+                  <div class="rv-txt">
+                    <h4>The tasting record</h4>
+                    <div class="rv-foot">
+                      <span class="rv-bottle"><%= @sample_review.bottle_name %></span>
+                      <div class="where">Sample review</div>
+                    </div>
+                  </div>
+                  <div class="rv-card">
+                    <%= render "shared/score", value: @sample_review.rating.to_f %>
+                    <div class="rv-wheel"><%= render "reviews/palate_wheel", profile: @sample_review.wheel_display_profile %></div>
+                  </div>
                 </div>
               <% else %>
                 <h4>The tasting record</h4>

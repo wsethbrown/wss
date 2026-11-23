@@ -135,6 +135,7 @@ class HomepageFeatureTest < ActiveSupport::TestCase
     assert_equal :none, f.source
     assert_equal [], f.decks
     assert_nil f.review
+    assert_equal HomepageFeature::SAMPLE, f.sample
     assert_equal [], f.record_reviews
   end
 
@@ -220,23 +221,36 @@ class HomepageFeatureTest < ActiveSupport::TestCase
 
     f = feature
     assert_nil f.review
-    assert_equal :none, f.review_source
+    assert_equal :sample, f.review_source
     assert_not f.deck_review?
 
     open = review(weller, event: events(:spring_blind), rating: 3.0)
     assert_equal open, feature.review
   end
 
-  test "a deck with no reviewed bottle of its own gets the newest public review, as before" do
+  test "a deck with no reviewed bottle of its own gets the sample review, never someone else's bottle" do
     a = deck("A")
     pour(a, bottle("Unreviewed Pour"))
-    older = review(bottle("Older"), at: 2.days.ago)
-    newest = review(bottle("Newest"), at: 1.day.ago)
+    review(bottle("Older"), at: 2.days.ago)
+    review(bottle("Newest"), at: 1.day.ago)
     f = feature
-    assert_equal newest, f.review
-    assert_equal :newest, f.review_source
+    assert_nil f.review
+    assert_equal :sample, f.review_source
     assert_not f.deck_review?
-    assert_equal [ newest, older ], f.record_reviews
+    assert_equal [], f.record_reviews
+    sample = f.sample
+    assert_equal "Weller Antique 107", sample.bottle_name
+    assert_equal 4.0, sample.rating
+    assert sample.wheel_display_profile.any?
+    assert_equal [], sample.wheel_display_profile.keys - Review::DESCRIPTOR_LEXICON.keys
+  end
+
+  test "a deck with a review of its own has no sample" do
+    a = deck("A")
+    weller = bottle("Weller")
+    pour(a, weller)
+    review(weller)
+    assert_nil feature.sample
   end
 
   test "the three decks never lead with the same bottle" do
@@ -245,30 +259,31 @@ class HomepageFeatureTest < ActiveSupport::TestCase
     c = deck("C", at: 3.days.ago)
     shared = bottle("On Two Pour Lists")
     second = bottle("A's Second Best")
-    spare = bottle("Spare")
     # A pours the shared bottle and another; B pours only the shared one; C pours none.
     pour(a, shared, second)
     pour(b, shared)
     review(shared, rating: 5.0)
     review(second, rating: 3.0)
-    review(spare, at: 9.days.ago)
+    review(bottle("Spare"), at: 9.days.ago)
 
-    leads = [ 1, 2, 3 ].map { |s| feature(slot: s).review.bottle }
-    assert_equal [ second, shared, spare ], leads, "B has one reviewed bottle, so it keeps it and A takes its next best"
-    assert_equal [ :deck, :deck, :newest ], [ 1, 2, 3 ].map { |s| feature(slot: s).review_source }
+    leads = [ 1, 2 ].map { |s| feature(slot: s).review.bottle }
+    assert_equal [ second, shared ], leads, "B has one reviewed bottle, so it keeps it and A takes its next best"
+    assert_nil feature(slot: 3).review, "C pours nothing reviewed"
+    assert_equal [ :deck, :deck, :sample ], [ 1, 2, 3 ].map { |s| feature(slot: s).review_source }
+    assert c
   end
 
-  test "when the record is too short for every deck to have its own bottle, the newest review repeats" do
+  test "a deck whose only reviewed bottle another deck leads with shows the sample, not the same bottle" do
     a = deck("A", at: 1.day.ago)
-    deck("B", at: 2.days.ago)
+    b = deck("B", at: 2.days.ago)
     weller = bottle("Weller")
     pour(a, weller)
+    pour(b, weller)
     only = review(weller)
 
     assert_equal only, feature(slot: 1).review
-    assert_equal :deck, feature(slot: 1).review_source
-    assert_equal only, feature(slot: 2).review, "with one review in the whole record, it repeats rather than show nothing"
-    assert_equal :repeat, feature(slot: 2).review_source
+    assert_nil feature(slot: 2).review
+    assert_equal HomepageFeature::SAMPLE, feature(slot: 2).sample
   end
 
   test "the record's rows never list a bottle another of the three leads with" do

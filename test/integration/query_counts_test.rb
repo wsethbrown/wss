@@ -86,6 +86,8 @@ class QueryCountsTest < ActionDispatch::IntegrationTest
                  rating: 4.0, notes: "n", flavor_wheel: { "smoky" => 0.5 }).save!(validate: false)
     end
     2.times { |i| review.(i) }
+    # The rows lead with a bottle the featured deck pours (HomepageFeature).
+    new_deck(1).presentation_bottles.create!(bottle: Bottle.find_by!(name: "QC Record 0"))
     few = measure(root_path)
     assert_select ".face.f4 .rv-rows li.pour", 2
     6.times { |i| review.(10 + i) }

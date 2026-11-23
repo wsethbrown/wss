@@ -114,28 +114,31 @@ class HomeController < ApplicationController
   end
 
   # Slide four's review when there is no verdict, from HomepageFeature: the
-  # featured deck's own bottle (the highest rated on its pour list), else
-  # the newest public review. Only solo reviews and reviews from a PUBLIC
-  # society's night whose pours are revealed can be shown, so nothing from a
-  # private or still-secret night reaches the homepage.
+  # featured deck's own bottle (the highest rated on its pour list). Only solo
+  # reviews and reviews from a PUBLIC society's night whose pours are revealed
+  # can be shown, so nothing from a private or still-secret night reaches the
+  # homepage. A deck with no such bottle gets the sample review
+  # (@sample_review, HomepageFeature::SAMPLE), labelled as a sample.
   #
-  # With it, the tasting record's rows (@record_reviews): that review first,
-  # then the newest others, one per bottle, three at most. Empty unless there
-  # are at least two, when slide four keeps the one review. Their users and
-  # bottles are preloaded with them.
+  # With a real review, the tasting record's rows (@record_reviews): that
+  # review first, then the newest others, one per bottle, three at most. Empty
+  # unless there are at least two, when slide four keeps the one review. Their
+  # users and bottles are preloaded with them.
   def load_featured_review
     @featured_review = nil
+    @sample_review = nil
     @record_reviews = []
     return if @verdict_rows.present?
 
     @featured_review = @feature.review
+    @sample_review = @feature.sample
     @record_reviews = @feature.record_reviews
     if @record_reviews.any?
-      Rails.logger.info "Home: slide four lists reviews #{@record_reviews.map(&:id).join(', ')} (bottles #{@record_reviews.map(&:bottle_id).join(', ')}, #{@feature.review_source}, wheel from review #{@featured_review.id}: #{@featured_review.wheel_display_profile.any? ? 'yes' : 'no'})"
+      Rails.logger.info "Home: slide four lists reviews #{@record_reviews.map(&:id).join(', ')} (bottles #{@record_reviews.map(&:bottle_id).join(', ')}, wheel from review #{@featured_review.id}: #{@featured_review.wheel_display_profile.any? ? 'yes' : 'no'})"
     elsif @featured_review
-      Rails.logger.info "Home: slide four shows review #{@featured_review.id} (bottle #{@featured_review.bottle_id}, user #{@featured_review.user_id}, #{@feature.review_source}, wheel #{@featured_review.wheel_display_profile.any? ? 'yes' : 'no'})"
+      Rails.logger.info "Home: slide four shows review #{@featured_review.id} (bottle #{@featured_review.bottle_id}, user #{@featured_review.user_id}, wheel #{@featured_review.wheel_display_profile.any? ? 'yes' : 'no'})"
     else
-      Rails.logger.info "Home: no reviews yet, slide four shows only its heading"
+      Rails.logger.info "Home: deck #{@showcase_deck&.id || 'none'} has no publicly reviewed bottle on its pour list, slide four shows the sample review"
     end
   end
 

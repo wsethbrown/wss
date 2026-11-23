@@ -14,9 +14,9 @@
 # - The table: one glass per guest on the invite (at most four), so a real
 #   night never shows more people than said yes; the sample invite's four.
 # - The record: the verdict (top three pours, ranked by the room), else the
-#   newest public reviews as rows (each drink with its score and reviewer, the
-#   card the first row's wheel), else the featured review alone, else the
-#   heading alone.
+#   featured deck's review with the newest public reviews as rows (each drink
+#   with its score and reviewer, the card the first row's wheel), else that
+#   review alone, else the sample review (labelled so), else the heading alone.
 #
 # The frame is presentational (aria-hidden); the static faces carry the same
 # content for screen readers, without JS and in print. Strings are cut for
@@ -30,12 +30,12 @@ module StoryFrameHelper
   # verdict_reviews: the verdict night's reviews, already loaded by HomeController.
   # record_reviews: the tasting record's rows when there is no verdict (two or
   # three reviews, users and bottles preloaded; HomeController#load_featured_review).
-  def story_frame(showcase:, showcase_slides:, slide_count:, decks:, event:, guests:, going:, verdict_night:, verdict_rows:, verdict_reviews:, review:, record_reviews: [])
+  def story_frame(showcase:, showcase_slides:, slide_count:, decks:, event:, guests:, going:, verdict_night:, verdict_rows:, verdict_reviews:, review:, record_reviews: [], sample: nil)
     deck = showcase || decks.first
     rows = library_rows(showcase, decks)
     picked = rows.index { |r| r[:deck] == deck } || 0
     invite = invite_shape(event, guests, going)
-    record = record_shape(verdict_night, verdict_rows, verdict_reviews, review, record_reviews)
+    record = record_shape(verdict_night, verdict_rows, verdict_reviews, review, record_reviews, sample)
     table = invite[:glasses]
     shape = {
       deck: deck,
@@ -51,7 +51,7 @@ module StoryFrameHelper
       slide_in_invite: invite[:sample] || (event.present? && deck.present? && event.presentation_id == deck.id),
       slide_in_record: record[:kind] == :verdict && deck.present? && verdict_night.presentation_id == deck.id
     }
-    Rails.logger.debug { "Story frame: deck #{deck&.id || 'none'}, #{rows.size} rows (picked #{picked}), invite #{invite[:sample] ? 'sample' : "event #{event.id}"}, record #{record[:kind]}#{" (reviews #{record[:reviews].map(&:id).join(', ')})" if record[:kind] == :reviews}, #{table} at the table" }
+    Rails.logger.debug { "Story frame: deck #{deck&.id || 'none'}, #{rows.size} rows (picked #{picked}), invite #{invite[:sample] ? 'sample' : "event #{event.id}"}, record #{record[:kind]}#{" (reviews #{record[:reviews].map(&:id).join(', ')})" if record[:kind] == :reviews}#{' (sample)' if record[:sample]}, #{table} at the table" }
     shape
   end
 
@@ -90,7 +90,7 @@ module StoryFrameHelper
     end
   end
 
-  def record_shape(night, rows, reviews, review, listed)
+  def record_shape(night, rows, reviews, review, listed, sample = nil)
     listed = Array(listed)
     if rows.present?
       shown = rows.first(3)
@@ -108,6 +108,11 @@ module StoryFrameHelper
     elsif review
       { kind: :review, glasses: 1, title: plain(review.bottle.name, 20), meta: plain(review.bottle.distillery, 30), review: review,
         level: (review.rating.to_f / 5).clamp(0, 1), profile: review.wheel_display_profile }
+    elsif sample
+      # The sample review (HomepageFeature::SAMPLE): drawn like one review,
+      # named a sample where the distillery would be, with no reviewer or link.
+      { kind: :review, sample: true, glasses: 1, title: plain(sample.bottle_name, 20), meta: "Sample review", review: sample,
+        level: (sample.rating.to_f / 5).clamp(0, 1), profile: sample.wheel_display_profile }
     else
       { kind: :empty, glasses: 0, title: "", meta: "" }
     end
