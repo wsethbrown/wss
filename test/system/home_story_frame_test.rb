@@ -38,6 +38,13 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
         const el = document.querySelectorAll(".story [data-story-frame-target=beat]")[i].querySelector(".beat-body, h1, h2");
         return el.getAnimations().length === 0 && getComputedStyle(el).translate === "none" && !el.classList.contains("appear-pending");
       },
+      // Where an element sits on screen by layout (the offsetTop chain), as
+      // the controller measures: a reveal rising by translate does not count.
+      at(selector) {
+        let y = 0;
+        for (let e = document.querySelector(selector); e; e = e.offsetParent) y += e.offsetTop;
+        return Math.round(y - scrollY);
+      },
       // Where a step's words are on screen, against the nav and the band.
       words(i) {
         const el = document.querySelectorAll(".story [data-story-frame-target=beat]")[i].querySelector(".beat-body, h1, h2");
@@ -468,6 +475,7 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
       const sf = window.__sf, c = window.__storyFrame;
       sf.read(2);
       await sf.until(() => c.P === 2 && !c.raf);
+      await sf.until(() => sf.revealed(2)); // a jump from the hero is quicker than the words' reveal
       const band = c.bandBottom(), out = [];
       // band / share: the height at which the band takes that share
       for (const [ share, label ] of [ [ 0.58, "between, live" ], [ 0.62, "too short" ], [ 0.58, "between, static" ], [ 0.54, "tall enough" ] ]) {
@@ -714,6 +722,149 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
     JS
     assert_in_delta before, after["top"], 2, "the words stay where the reader saw them: before #{before}, after #{after}"
     assert_equal 2, after["target"], "and the frame shows their step: #{after}"
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
+  # Review of #45: Stimulus reuses the controller object when it reconnects,
+  # so a place noted before must not survive into the new connection.
+  test "a reconnect never puts back a place noted before it" do
+    visit_at(1440, 480)
+    refute frame_state["live"], frame_state
+    r = run_async(<<~JS)
+      const sf = window.__sf, story = document.querySelector(".story");
+      scrollTo({ top: scrollY + sf.at(".b3 .beat-body") - 120, behavior: "instant" });
+      await sf.until(() => window.__storyFrame.noted && window.__storyFrame.noted.top === sf.at(".b3 .beat-body"));
+      const noted = window.__storyFrame.noted.top;
+      story.removeAttribute("data-controller");
+      await sf.until(() => window.__storyFrame === null);
+      // The reader moves on while it is away.
+      scrollTo({ top: scrollY + sf.at(".b2 .beat-body") - 200, behavior: "instant" });
+      await sf.frames(2);
+      const y = scrollY, words = sf.at(".b2 .beat-body");
+      story.setAttribute("data-controller", "story-frame");
+      await sf.until(() => !!(window.__storyFrame && window.__storyFrame.inputs));
+      await sf.frames(3);
+      return { noted, y, after: scrollY, words, wordsAfter: sf.at(".b2 .beat-body"), live: !!document.querySelector(".story.is-live") };
+    JS
+    assert_equal 120, r["noted"], "a place was noted before the reconnect: #{r}"
+    refute r["live"], r
+    assert_in_delta r["y"], r["after"], 1, "the page did not jump back to the old note: #{r}"
+    assert_in_delta r["words"], r["wordsAfter"], 1, "the words being read stay where they are: #{r}"
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
+  # Review of #51: the cross-fade's copy is cleaned up however its fade ends:
+  # Turbo caching the page, a relayout, a second jump, a reconnect.
+  test "a jump's fading copy is inert, single, and gone however the fade is cut short" do
+    visit_at(1440, 900)
+    assert_selector ".story.is-live", visible: :all
+    r = run_async(<<~JS)
+      const sf = window.__sf, c = () => window.__storyFrame, story = document.querySelector(".story");
+      const after = () => ({ ghosts: document.querySelectorAll(".mm-ghost").length,
+                             bar: document.querySelector(".mm-player > .mm-bar").style.opacity });
+      const during = () => {
+        const g = document.querySelectorAll(".mm-ghost"), el = g[0];
+        return { ghosts: g.length, inert: !!(el && el.inert),
+                 ids: el ? el.querySelectorAll("[id]").length : -1,
+                 hooks: el ? el.querySelectorAll("[data-mm], [data-story-frame-target]").length : -1,
+                 tabbable: el ? el.querySelectorAll('[tabindex]:not([tabindex="-1"])').length : -1 };
+      };
+      const settled = () => sf.until(() => !c().raf && !c().ghost && !c().layoutFrame && !c().scrollFrame);
+      // From the record straight to the top, caught while its copy is on.
+      const jump = async () => {
+        sf.read(4);
+        await sf.until(() => c().P === 4 && !c().anim && !c().ghost);
+        scrollTo({ top: 0, behavior: "instant" });
+        const on = await sf.until(() => !!document.querySelector(".mm-ghost"), 3000);
+        return on ? during() : null;
+      };
+      const out = {};
+
+      out.cacheDuring = await jump();
+      document.dispatchEvent(new Event("turbo:before-cache"));
+      out.cache = { ...after(), raf: c().raf };
+
+      out.relayoutDuring = await jump();
+      const h = c().stableHeight();
+      c().stableHeight = () => h + 40;
+      dispatchEvent(new Event("resize"));
+      await sf.until(() => !c().layoutFrame);
+      out.relayout = { ...after(), live: !!document.querySelector(".story.is-live") };
+      await settled();
+      out.relayout.raf = c().raf;
+      delete c().stableHeight;
+      dispatchEvent(new Event("resize"));
+      await settled();
+
+      out.againDuring = await jump();
+      sf.read(4); // and straight back down before the fade is over
+      await sf.frames(2);
+      out.againMid = during();
+      await settled();
+      out.again = { ...after(), raf: c().raf, P: c().P };
+
+      out.reconnectDuring = await jump();
+      story.removeAttribute("data-controller");
+      await sf.until(() => window.__storyFrame === null);
+      out.disconnected = after();
+      story.setAttribute("data-controller", "story-frame");
+      await sf.until(() => !!(window.__storyFrame && window.__storyFrame.inputs));
+      await settled();
+      out.reconnect = { ...after(), raf: c().raf };
+      return out;
+    JS
+    during = %w[cacheDuring relayoutDuring againDuring againMid reconnectDuring]
+    during.each do |k|
+      d = r[k]
+      assert d, "#{k}: a copy was laid over the frame: #{r}"
+      assert_equal 1, d["ghosts"], "#{k}: exactly one copy: #{r}"
+      assert d["inert"], "#{k}: the copy is inert: #{r}"
+      assert_equal 0, d["ids"], "#{k}: no ids in the copy: #{r}"
+      assert_equal 0, d["hooks"], "#{k}: nothing the controller or its tests look for: #{r}"
+      assert_equal 0, d["tabbable"], "#{k}: nothing in it takes focus: #{r}"
+    end
+    %w[cache relayout again disconnected reconnect].each do |k|
+      a = r[k]
+      assert_equal 0, a["ghosts"], "#{k}: the copy is gone: #{r}"
+      assert_equal "", a["bar"], "#{k}: the live caption is back at full: #{r}"
+      assert_nil a["raf"], "#{k}: nothing left running once settled: #{r}" if a.key?("raf")
+    end
+    assert r["relayout"]["live"], "the relayout kept the frame live: #{r}"
+    assert_equal 4, r["again"]["P"], "the second jump landed: #{r}"
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
+  # Review of #45: a window made taller while the frame runs (no switch) keeps
+  # the words being read where they are, and their step.
+  test "making a live window taller keeps the words being read where they are, and their step" do
+    visit_at(1440, 900)
+    assert_selector ".story.is-live", visible: :all
+    before = run_async(<<~JS)
+      const sf = window.__sf, c = window.__storyFrame;
+      sf.read(2);
+      await sf.until(() => c.P === 2 && !c.raf);
+      await sf.until(() => sf.revealed(2));
+      await sf.frames(2);
+      return { top: sf.at(".b3 .beat-body"), target: c.target, height: innerHeight };
+    JS
+    page.driver.browser.manage.window.resize_to(1440, 1000)
+    wait_for("the taller window to be laid out") do
+      s = frame_state
+      s if s["height"] > before["height"] && s["live"] && !s["layoutFrame"] && !s["scrollFrame"]
+    end
+    after = run_async(<<~JS)
+      const sf = window.__sf, c = window.__storyFrame;
+      await sf.frames(3);
+      await sf.until(() => !c.layoutFrame && !c.scrollFrame && !c.raf);
+      return { top: sf.at(".b3 .beat-body"), target: c.target, height: innerHeight, live: !!document.querySelector(".story.is-live") };
+    JS
+    assert after["live"], after
+    assert_operator after["height"], :>, before["height"], "the window really grew: #{before} #{after}"
+    assert_in_delta before["top"], after["top"], 1, "the words stay where they were: #{before} #{after}"
+    assert_equal 2, after["target"], "still step 2: #{after}"
   ensure
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end

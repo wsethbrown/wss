@@ -308,6 +308,11 @@ export default class extends Controller {
       this.target = 0
       this.anim = null
       this.ghost = null // the old picture fading off a jump (JUMP)
+      // Where the reader was, noted after each scroll (notePlace). Stimulus
+      // reuses this object on reconnect: a note from before must never be
+      // put back after the reader has moved on.
+      this.noted = null
+      this.places = null // what notePlace may note, listed once (readingAnchor)
       this.raf = null
       this.visible = true
       this.live = false
@@ -368,6 +373,8 @@ export default class extends Controller {
     this.goStatic(this.element.isConnected)
     this.probe?.remove()
     this.probe = null
+    this.noted = null
+    this.places = null
   }
 
   // Anything thrown: stop, detach, and leave the static faces showing.
@@ -435,14 +442,23 @@ export default class extends Controller {
   // The step being read, while the faces show: the last whose words have
   // come up into the top 60% below the nav; else the first step or section
   // still in view.
+  // It runs on every scroll frame while the faces show, so the elements it
+  // weighs are listed once per connect (the steps' words, then the page's
+  // sections) and it stops at the first answer.
   readingAnchor() {
-    const words = (b) => b.querySelector(".beat-body, h1, h2") || b
-    const top = (el) => docTop(el) - window.scrollY
-    const navBottom = this.navBottom || 0
+    if (!this.places) {
+      const steps = this.beatTargets.map((b) => b.querySelector(".beat-body, h1, h2") || b)
+      this.places = { steps, all: [ ...steps, ...document.querySelectorAll("main section") ] }
+    }
+    const y = window.scrollY, navBottom = this.navBottom || 0
     const line = navBottom + (window.innerHeight - navBottom) * 0.6
-    const steps = this.beatTargets.map(words).filter((el) => top(el) + el.offsetHeight > navBottom && top(el) <= line)
-    return steps[steps.length - 1] ||
-      [ ...this.beatTargets.map(words), ...document.querySelectorAll("main section") ].find((el) => top(el) + el.offsetHeight > navBottom)
+    let read = null
+    for (const el of this.places.steps) {
+      const t = docTop(el) - y
+      if (t > line) break // the steps run down the page: none further down is read
+      if (t + el.offsetHeight > navBottom) read = el
+    }
+    return read || this.places.all.find((el) => el.isConnected && docTop(el) - y + el.offsetHeight > navBottom)
   }
 
   // After each scroll, note what the reader is reading (live: the current
@@ -740,6 +756,7 @@ export default class extends Controller {
     const player = this.frameTarget.querySelector(".mm-player")
     const el = document.createElement("div")
     el.className = "mm-ghost"
+    el.inert = true
     for (const child of player.children) el.appendChild(child.cloneNode(true))
     for (const n of el.querySelectorAll("[id], [data-mm], [data-story-frame-target]")) {
       n.removeAttribute("id"); n.removeAttribute("data-mm"); n.removeAttribute("data-story-frame-target")
