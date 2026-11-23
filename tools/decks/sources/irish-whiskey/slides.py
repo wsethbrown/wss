@@ -57,11 +57,11 @@ def strip(s, y, h, t, size=19):
 
 
 def pour_slide(n, pour, name, note, maker, style, abv, two_line_name=False,
-               widths=(2.6, 3.3, 0.75), val_size=18):
-    """One pour: a bottle-shaped placeholder card (no free photograph of any of the four bottles
-    was in the old deck), the pour line, the name, the old slide's note, and Maker / Style / ABV."""
+               widths=(2.6, 3.3, 0.75), val_size=18, photo=None, credit=None):
+    """One pour: the bottle's photograph (or the placeholder card when there is none),
+    the pour line, the name, the old slide's note, and Maker / Style / ABV."""
     s = new_slide()
-    bottle_placeholder(s, X, 0.8, 3.4, 5.3)
+    bottle_panel(s, photo, X, 0.8, 3.4, 5.3, credit)
     x, w = 4.85, 7.63
     kicker(s, pour, x=x)
     name_h = 1.55 if two_line_name else 0.85
@@ -136,7 +136,9 @@ footer(s, 3)
 # ---------------------------------------------------------------- 4 pour 1
 pour_slide(4, 'Pour 1 of 4', ['Redbreast', '12 Year Old'],
            ['People say unmalted barley makes it thick and oily.'],
-           ['Irish Distillers,', 'Midleton'], ['Single pot still', 'Irish whiskey'], '40%', two_line_name=True)
+           ['Irish Distillers,', 'Midleton'], ['Single pot still', 'Irish whiskey'], '40%', two_line_name=True,
+           photo='redbreast-12.jpg',
+           credit='Pictured: an older label. Photograph: Tasma3197, CC BY-SA 3.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 5 pot still and Coffey still
 # The old slide had two column titles and no heading; it shows the script's.
@@ -262,7 +264,9 @@ footer(s, 14)
 # ---------------------------------------------------------------- 15 pour 4
 pour_slide(15, 'Pour 4 of 4', ['Connemara Original', 'Peated Single Malt'],
            ['Peat smoke and two distillations, both unusual in Irish whiskey when Cooley started.'],
-           ['Cooley,', 'County Louth'], ['Peated single malt', 'Irish whiskey'], '40%', two_line_name=True)
+           ['Cooley,', 'County Louth'], ['Peated single malt', 'Irish whiskey'], '40%', two_line_name=True,
+           photo='connemara-original.jpg',
+           credit='Photograph: Kantonicity, CC0, via Wikimedia Commons.')
 
 # ---------------------------------------------------------------- 16 reading the label
 s = new_slide()

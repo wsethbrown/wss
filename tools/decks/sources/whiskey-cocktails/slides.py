@@ -53,12 +53,12 @@ def rows_card(s, x, y, w, items, label_w, row_h, mark=None, label_size=20, size=
         yy += row_h
 
 
-def pour_slide(n, pour, name, note, spirit, method, glass, name_size=46):
-    """One drink: a bottle-shaped placeholder card for its whiskey (no free photograph of any of
-    the four bottles was in the old deck), the pour line, the drink, the old slide's note, and
+def pour_slide(n, pour, name, note, spirit, method, glass, name_size=46, photo=None, credit=None):
+    """One drink: a photograph of the drink (or the placeholder card when there is none),
+    the pour line, the drink, the old slide's note, and
     the old slide's Spirit / Method / Glass."""
     s = new_slide()
-    bottle_placeholder(s, X, 0.8, 3.4, 5.3)
+    bottle_panel(s, photo, X, 0.8, 3.4, 5.3, credit)
     x, w = 4.85, 7.63
     kicker(s, pour, x=x)
     text(s, x, 1.25, w, 0.85, name, size=name_size, font=SANS, bold=True, color=INK, ls=0.92)
@@ -126,7 +126,9 @@ footer(s, 3)
 # ---------------------------------------------------------------- 4 pour 1
 pour_slide(4, 'Pour 1 of 4', 'Plain whiskey cocktail',
            ['Rye, sugar, water and bitters, as the 1806 definition reads.'],
-           'Old Overholt Rye', 'Built in the glass', 'Small tumbler', name_size=42)
+           'Old Overholt Rye', 'Built in the glass', 'Small tumbler', name_size=42,
+           photo='plain-whiskey-cocktail.jpg',
+           credit='Pictured: whiskey in a cut-glass tumbler, with no ice or garnish. Photograph: Qwertzu111111, CC BY-SA 4.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 5 Jerry Thomas, 1862
 s = new_slide()
@@ -186,7 +188,9 @@ footer(s, 7)
 # ---------------------------------------------------------------- 8 pour 2
 pour_slide(8, 'Pour 2 of 4', 'Old Fashioned',
            ['Sugar, bitters, bourbon and a twist of orange peel,', 'stirred over ice. No muddled fruit.'],
-           'Old Forester 86 Proof', 'Stirred over ice', 'Rocks glass')
+           'Old Forester 86 Proof', 'Stirred over ice', 'Rocks glass',
+           photo='old-fashioned.jpg',
+           credit='Photograph: Erich Wagner (eventografie.de), CC BY-SA 4.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 9 1884 (the green story slide)
 s = new_slide(INK)
@@ -215,7 +219,9 @@ footer(s, 10)
 # ---------------------------------------------------------------- 11 pour 3
 pour_slide(11, 'Pour 3 of 4', 'Manhattan',
            ['Two parts rye to one of sweet vermouth,', 'with bitters, stirred until very cold.'],
-           'Wild Turkey 101 Rye', 'Stirred, strained', 'Chilled coupe')
+           'Wild Turkey 101 Rye', 'Stirred, strained', 'Chilled coupe',
+           photo='manhattan.jpg',
+           credit='Pictured: in a cocktail glass. Photograph: Graeme Maclean, CC BY 2.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 12 Peychaud and the Sazerac House
 s = new_slide()
@@ -243,7 +249,9 @@ footer(s, 13)
 # ---------------------------------------------------------------- 14 pour 4
 pour_slide(14, 'Pour 4 of 4', 'Sazerac',
            ['Served with no ice, in a glass rinsed with absinthe. The lemon peel is discarded.'],
-           'Sazerac Rye', 'Stirred, strained', 'Rinsed rocks glass')
+           'Sazerac Rye', 'Stirred, strained', 'Rinsed rocks glass',
+           photo='sazerac.jpg',
+           credit='Pictured: with the lemon peel left on the rim. Photograph: Gtandersson, CC BY 4.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 15 the fruit
 s = new_slide()

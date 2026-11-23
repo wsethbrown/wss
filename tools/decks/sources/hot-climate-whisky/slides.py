@@ -59,11 +59,12 @@ def strip(s, y, h, t, size=19):
 
 
 def pour_slide(n, pour, name, note, maker, style, abv, two_line_name=False,
-               widths=(2.6, 3.3, 0.75), val_size=18, note_size=21):
-    """One pour: a bottle-shaped placeholder card (no free photograph of any of the four bottles
-    was in the old deck), the pour line, the name, the old slide's note, and Maker / Style / ABV."""
+               widths=(2.6, 3.3, 0.75), val_size=18, note_size=21,
+               photo=None, credit=None):
+    """One pour: the bottle's photograph (or the placeholder card when there is none),
+    the pour line, the name, the old slide's note, and Maker / Style / ABV."""
     s = new_slide()
-    bottle_placeholder(s, X, 0.8, 3.4, 5.3)
+    bottle_panel(s, photo, X, 0.8, 3.4, 5.3, credit)
     x, w = 4.85, 7.63
     kicker(s, pour, x=x)
     name_h = 1.55 if two_line_name else 0.85
@@ -284,7 +285,8 @@ footer(s, 12)
 pour_slide(13, 'Pour 3 of 4', 'Kavalan Classic',
            ['The distillery’s first single malt, released in 2008.'],
            ['Kavalan (King Car),', 'Yilan, Taiwan'], 'Taiwanese single malt', '43% (US)',
-           widths=(2.6, 2.95, 1.1))
+           widths=(2.6, 2.95, 1.1), photo='kavalan-classic.jpg',
+           credit='Pictured: a 2010 bottle at 40%. Photograph: othree, CC BY 2.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 14 why no age
 s = new_slide()
@@ -301,7 +303,9 @@ footer(s, 14)
 # ---------------------------------------------------------------- 15 pour 4
 pour_slide(15, 'Pour 4 of 4', ['Glenfiddich', '12 Year Old'],
            ['Twelve years in Speyside, losing about 2% a year.'],
-           ['William Grant & Sons,', 'Dufftown'], ['Speyside single', 'malt Scotch'], '40%', two_line_name=True)
+           ['William Grant & Sons,', 'Dufftown'], ['Speyside single', 'malt Scotch'], '40%', two_line_name=True,
+           photo='glenfiddich-12.jpg',
+           credit='Pictured: an older label. Photograph: Blueye, CC BY-SA 3.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 16 reading the label
 s = new_slide()

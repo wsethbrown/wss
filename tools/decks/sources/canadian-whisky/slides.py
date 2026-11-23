@@ -68,11 +68,11 @@ def strip(s, y, h, t, size=19):
 
 
 def pour_slide(n, pour, name, note, maker, style, abv, two_line_name=False, widths=(2.75, 3.15, 1.1),
-               val_size=18):
-    """One pour: a bottle-shaped placeholder card (no photograph of any of the four bottles was in
-    the old deck), the pour line, the name, the old slide's note, and Maker / Style / ABV."""
+               val_size=18, photo=None, credit=None):
+    """One pour: the bottle's photograph (or the placeholder card when there is none),
+    the pour line, the name, the old slide's note, and Maker / Style / ABV."""
     s = new_slide()
-    bottle_placeholder(s, X, 0.8, 3.4, 5.3)
+    bottle_panel(s, photo, X, 0.8, 3.4, 5.3, credit)
     x, w = 4.85, 7.63
     kicker(s, pour, x=x)
     name_h = 1.55 if two_line_name else 0.85
@@ -172,7 +172,8 @@ footer(s, 4)
 pour_slide(5, 'Pour 1 of 4', 'Canadian Club 1858',
            ['Walker’s brand, still made in Walkerville.'],
            'Hiram Walker & Sons, Windsor, Ontario', 'Blended Canadian whisky', '40%',
-           widths=(3.0, 2.95, 0.85))
+           widths=(3.0, 2.95, 0.85), photo='canadian-club-1858.jpg',
+           credit='Pictured: the 1.14 litre bottle. Photograph: Chris Woodrich, CC BY 4.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 6 1890
 big_figure(6, 'Canada requires two years in wood', '1890',
@@ -235,7 +236,8 @@ pour_slide(9, 'Pour 2 of 4', 'Lot No. 40',
            ['All rye, from a single copper pot still.',
             'This is close to what a flavouring whisky tastes like before it is\u00a0blended.'],
            ['Corby, at the Hiram Walker', 'distillery, Windsor'], ['Canadian rye whisky,', '100% rye'], '43%',
-           widths=(3.35, 2.6, 0.85))
+           widths=(3.35, 2.6, 0.85), photo='lot-no-40.jpg',
+           credit='Photograph: Belenois, CC BY-SA 4.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 10 Prohibition (paper)
 s = new_slide()
@@ -273,7 +275,8 @@ pour_slide(12, 'Pour 3 of 4', ['Crown Royal', 'Fine Deluxe'],
            ['Seagram’s blend from 1939, now made by Diageo.',
             'Like the Canadian Club, a big blend built mostly on base\u00a0whisky.'],
            'Diageo, at Gimli, Manitoba', 'Blended Canadian whisky', '40%', two_line_name=True,
-           widths=(3.0, 2.95, 0.85))
+           widths=(3.0, 2.95, 0.85), photo='crown-royal.jpg',
+           credit='Pictured: an older one-litre bottle with the Seagram label. Photograph: Marcelo Verfe, via Pexels. Cropped.')
 
 # ---------------------------------------------------------------- 13 three names
 s = new_slide()
