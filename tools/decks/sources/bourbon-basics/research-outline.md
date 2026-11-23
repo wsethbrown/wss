@@ -528,6 +528,7 @@ Each is marked with how much of it was read. All were opened on 21 November 2026
 
 Licences were read on each file's own Wikimedia Commons, Library of Congress or Internet Archive page on 21 November 2026.
 
+- **Slide 1.** "Woodford Reserve Distillery-27527-6", photograph by Ken Thomas, 8 September 2013. Released to the public domain by the photographer. Wikimedia Commons, file of that name. The same photograph as slide 12, top, cropped to an upright frame and printed in two inks (green and cream).
 - **Slide 2.** "Maker's Mark Kentucky Straight Bourbon Whisky (52927666607)", photograph by David (Flickr), 24 April 2023. CC BY 2.0. Wikimedia Commons, file of that name. Cropped.
 - **Slide 3.** "Glencairn Glasses and Water Jug", photograph by Lord van Tasm, 14 November 2021. CC BY-SA 3.0. Wikimedia Commons, file of that name. Cropped. The whiskies in the photograph are Scotch; the slide uses it for the glasses and the water jug and does not caption it as bourbon.
 - **Slide 7.** "I was pleased to see that Josh had a bottle of Old Grand-Dad on his liquor shelf.", photograph by rick (Flickr user spine). CC BY 2.0, as stated in Flickr's own data for the photograph, read 21 November 2026. Flickr, photo 2039110949. Cropped. It shows an older 86 proof Old Grand-Dad, not the Bonded bottle poured in glass 2; no freely licensed photograph of the Bonded bottle taken by a contributor was found.

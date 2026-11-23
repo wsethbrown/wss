@@ -357,7 +357,7 @@ Each is marked with how much of it was read for this outline.
 
 ## Image credits
 
-- **Slide 4.** "Seagrams Distillers, Ridge Avenue (Lawrenceburg, Ind.)". Indiana Landmarks; contributed by IUPUI University Library via DPLA. CC BY 4.0. Wikimedia Commons, File:Seagrams Distillers, Ridge Avenue (Lawrenceburg, Ind.) - DPLA - 8e5749164388f5e4505d3f3fbe6329a3.jpg. Cropped and printed in two inks (green and cream).
+- **Slides 1 and 6.** "Seagrams Distillers, Ridge Avenue (Lawrenceburg, Ind.)". Indiana Landmarks; contributed by IUPUI University Library via DPLA. CC BY 4.0. Wikimedia Commons, File:Seagrams Distillers, Ridge Avenue (Lawrenceburg, Ind.) - DPLA - 8e5749164388f5e4505d3f3fbe6329a3.jpg. Cropped and printed in two inks (green and cream). On slide 1 the attribution is printed under the photograph, as the licence asks.
 - **Slide 8.** "Bulleit 95 Rye Frontier Whiskey", 9 April 2022. David (Flickr: brokentaco). CC BY 2.0. Wikimedia Commons, File:Bulleit 95 Rye Frontier Whiskey (52057370044).jpg. Cropped.
 - **Slide 10.** "Templeton Rye Whiskey", 12 February 2022. David (Flickr: brokentaco). CC BY 2.0. Wikimedia Commons, File:Templeton Rye Whiskey (52540441445).jpg. Cropped. The bottle pictured is Templeton Rye 6 Year, not the Straight Rye poured.
 - **Slides 1 and 14.** The Whiskey Share Society logo.

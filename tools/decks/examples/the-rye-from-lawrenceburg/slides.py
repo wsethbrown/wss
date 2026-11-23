@@ -8,9 +8,22 @@ Slide n here must be [SLIDE n] there.
 from wsskit import *
 
 # ---------------------------------------------------------------- 1 title
-title_slide('The Rye From Lawrenceburg',
-            'A distillery in Lawrenceburg, Indiana makes rye for many other brands. Tonight we pour four.',
-            series='The Whiskey Share Society  ·  Four pours, about 45 minutes')
+s = new_slide(INK)
+picture(s, LOGO_CREAM, 0.85, 0.75, 2.2, 2.2 * LOGO_RATIO)
+text(s, 0.85, 2.7, 6.2, 1.5, 'The Rye From Lawrenceburg', size=48, font=SANS, bold=True, color=CREAM, ls=0.9)
+rect(s, 0.88, 4.32, 0.9, 0.045, fill=MARK)
+text(s, 0.85, 4.55, 6.3, 1.3,
+     'A distillery in Lawrenceburg, Indiana makes rye for many other brands. Tonight we pour four.',
+     size=20, italic=True, color=CREAM_MUTE, ls=1.2)
+text(s, 0.85, 6.3, 6.2, 0.35, 'The Whiskey Share Society  ·  Four pours, about 45 minutes',
+     size=11, font=SANS, color=CREAM_MUTE)
+tw = 5.13
+th = tw * 1092 / 1400
+picture(s, A / 'seagram_duotone.jpg', 7.35, 1.2, tw, th, radius_in=0.26)
+text(s, 7.35, 1.2 + th + 0.08, tw, 0.5,
+     'Seagram’s, Ridge Avenue, Lawrenceburg. Photograph: Indiana Landmarks, IUPUI University Library, '
+     'via DPLA and Wikimedia Commons. CC BY 4.0. Cropped and printed in two inks.',
+     size=9.5, font=SANS, color=CREAM_MUTE, ls=1.05)
 
 # ---------------------------------------------------------------- 2 start with the Bulleit
 s = new_slide()

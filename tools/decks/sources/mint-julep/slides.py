@@ -75,9 +75,19 @@ def ruled(s, y, items, size=14.5, cpl=62, x=4.45, tx=6.1, tw=6.38):
 
 
 # ---------------------------------------------------------------- 1 title
-title_slide('Mint Julep',
-            'The history of the mint julep, with two versions to taste: the brandy original and the bourbon one.',
-            series='Cocktails, Chapter One  ·  The Whiskey Share Society')
+s = new_slide(INK)
+picture(s, LOGO_CREAM, 0.85, 0.75, 2.2, 2.2 * LOGO_RATIO)
+text(s, 0.85, 2.95, 6.2, 1.0, 'Mint Julep', size=60, font=SANS, bold=True, color=CREAM, ls=0.9)
+rect(s, 0.88, 4.12, 0.9, 0.045, fill=MARK)
+text(s, 0.85, 4.35, 6.45, 1.5,
+     'The history of the mint julep, with two versions to taste: the brandy original and the bourbon one.',
+     size=20, italic=True, color=CREAM_MUTE, ls=1.2)
+text(s, 0.85, 6.3, 6.2, 0.35, 'Cocktails, Chapter One  ·  The Whiskey Share Society',
+     size=11, font=SANS, color=CREAM_MUTE)
+picture(s, A / 'spearmint-kohler.jpg', 7.58, 0.6, 4.9, 5.75, radius_in=0.3)
+text(s, 7.58, 6.43, 4.9, 0.4,
+     'Spearmint. Köhler’s Medizinal-Pflanzen, 1887, plate 66, drawn by W. Müller. Public domain, via Wikimedia Commons. Cropped.',
+     size=9.5, font=SANS, color=CREAM_MUTE, ls=1.05)
 
 # ---------------------------------------------------------------- 2 the drink in your hand
 s = new_slide()

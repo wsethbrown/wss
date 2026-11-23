@@ -25,9 +25,18 @@ def ask_strip(s, q, x=0.85, y=6.1, w=11.63):
 
 
 # ---------------------------------------------------------------- 1 title
-title_slide('Bourbon Basics',
-            'Four bourbons, and what the words on their labels mean.',
-            series='The Whiskey Share Society  ·  Four pours, about 45 minutes')
+s = new_slide(INK)
+picture(s, LOGO_CREAM, 0.85, 0.75, 2.2, 2.2 * LOGO_RATIO)
+text(s, 0.85, 2.95, 6.2, 1.0, 'Bourbon Basics', size=56, font=SANS, bold=True, color=CREAM, ls=0.9)
+rect(s, 0.88, 4.12, 0.9, 0.045, fill=MARK)
+text(s, 0.85, 4.35, 5.9, 1.3, 'Four bourbons, and what the words on their labels mean.',
+     size=20, italic=True, color=CREAM_MUTE, ls=1.2)
+text(s, 0.85, 6.3, 6.2, 0.35, 'The Whiskey Share Society  ·  Four pours, about 45 minutes',
+     size=11, font=SANS, color=CREAM_MUTE)
+picture(s, A / 'rickhouse-title.jpg', 7.58, 0.6, 4.9, 5.75, radius_in=0.3)
+text(s, 7.58, 6.43, 4.9, 0.4,
+     'A rickhouse at Woodford Reserve. Ken Thomas, public domain, via Wikimedia Commons. Cropped and printed in two inks.',
+     size=9.5, font=SANS, color=CREAM_MUTE, ls=1.05)
 
 # ---------------------------------------------------------------- 2 glass 1
 glass_slide(2, 'Glass 1. Pour it now.', 'Maker’s Mark',
