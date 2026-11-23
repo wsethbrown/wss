@@ -227,8 +227,8 @@ glass and the view transitions. No animation library.
   axes ease differently), and moves only by transform and opacity, except the first orange
   fill (a clip) and colours (text and glass lines take the colour of what is under them;
   blends are in OKLab, never through a muddy middle).
-  **Scroll picks the step, a clock plays the move.** A step becomes current as its words come
-  up over the fold (the first step a little later), and stops being current only when they
+  **Scroll picks the step, a clock plays the move.** A step becomes current when the top of
+  its words is 60% of the way down the reading area, and stops being current only when they
   fall back past that line plus 12% of the screen (hysteresis). The move then plays to its end
   whatever the scroll does: 1.05 to 1.3s per move on one overall curve (under way at once,
   settling gently), reversing from where it is if the reader turns back, and compressed to at

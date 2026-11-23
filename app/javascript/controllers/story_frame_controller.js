@@ -12,7 +12,7 @@ import { Controller } from "@hotwired/stimulus"
 //   sits in its own window of the move with its own easing, so objects
 //   overlap and settle rather than moving in lockstep.
 // - The scroll only picks the current step. A step becomes current as the
-//   top of its words comes up over the fold (ENTER), and stops being
+//   top of its words nears the middle of the screen (ENTER), and stops being
 //   current only once they fall back past ENTER + HYST.
 // - The move to the current step then plays on a clock to the end (DUR per
 //   move, eased overall), so a stopped scroll never leaves the frame half
@@ -32,7 +32,7 @@ import { Controller } from "@hotwired/stimulus"
 // page the frame is put at rest; disconnecting cancels every frame,
 // listener and observer.
 
-const ENTER = [ 0, 0.9, 0.96, 0.96, 0.96 ] // of the reading area, from its top
+const ENTER = [ 0, 0.6, 0.6, 0.6, 0.6 ] // of the reading area, from its top
 const HYST = 0.12
 const DUR = [ 1.05, 1.25, 1.2, 1.3 ] // seconds: hero to library, library to invite, invite to table, table to record
 const CATCH_UP = 1.5 // a jump over several steps takes no longer than this ...
