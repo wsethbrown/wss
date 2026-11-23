@@ -8,6 +8,10 @@ require "application_system_test_case"
 class AppearSecondaryMotionTest < ApplicationSystemTestCase
   BUSY = ".draw-wait, .draw-run, .perform-wait, .perform-run, .photo-wait, .photo-run, .glass-wait, .glass-pouring, .img-wait".freeze
 
+  def cdp(command, **params)
+    page.driver.browser.execute_cdp(command, **params)
+  end
+
   def scroll_through_page
     page.execute_script(<<~JS)
       window.__scrollDone = false;
@@ -149,10 +153,31 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
     end
   end
 
+  # Deterministic on purpose. CI's database is the fixtures, which give the
+  # deck filters no categories, no levels and no tags: the select row is just
+  # "All categories" and the sort, which fits at 375px (no overflow, so rightly
+  # no fade), and there is no tag row at all. A resized headless window is not
+  # guaranteed to be 375px wide either. So this makes the rows long enough to
+  # scroll, pins the viewport with CDP, and checks the overflow first so a
+  # future failure says why.
   test "a sideways row on a phone fades at the edge with more to scroll" do
-    page.driver.browser.manage.window.resize_to(375, 812)
+    3.times do |i|
+      deck = Presentation.create!(author: users(:admin), title: "Scroll Row Deck #{i}", content: "Smoke.", price: 10,
+                                  category: "A long category name for scrolling #{i}", difficulty: %w[Beginner Intermediate Advanced][i])
+      deck.update_column(:published, true)
+      8.times do |n|
+        tag = Tag.find_or_create_by!(name: "scrolling tag number #{n}") { |t| t.category = "deck"; t.color = "#16332A" }
+        PresentationTag.find_or_create_by!(presentation: deck, tag: tag)
+      end
+    end
+    cdp("Emulation.setDeviceMetricsOverride", width: 375, height: 812, deviceScaleFactor: 1, mobile: false)
     visit presentations_path
     row = "#deck-filters .scroll-row"
+    assert_selector row, visible: :all
+    assert_equal 375, page.evaluate_script("window.innerWidth"), "the viewport is a phone's"
+    sizes = page.evaluate_script("(() => { const r = document.querySelector('#{row}'); return [r.scrollWidth, r.clientWidth]; })()")
+    assert_operator sizes[0], :>, sizes[1], "the row must overflow for this test to mean anything (scrollWidth #{sizes[0]}, clientWidth #{sizes[1]})"
+    assert_selector "#{row}[data-controller~=scroll-fade]", visible: :all
     assert_selector "#{row}[data-more-end]", visible: :all, wait: 3
     assert_no_selector "#{row}[data-more-start]", visible: :all
     page.execute_script("document.querySelector('#{row}').scrollTo({ left: 60, behavior: 'instant' })")
@@ -160,7 +185,7 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
     page.execute_script("const r = document.querySelector('#{row}'); r.scrollTo({ left: r.scrollWidth, behavior: 'instant' })")
     assert_selector "#{row}[data-more-start]:not([data-more-end])", visible: :all, wait: 2
   ensure
-    page.driver.browser.manage.window.resize_to(1400, 1400)
+    cdp("Emulation.clearDeviceMetricsOverride")
   end
 
   test "focusing a link inside a waiting wheel shows the wheel at once" do
