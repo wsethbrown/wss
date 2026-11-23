@@ -30,6 +30,15 @@ source of truth for what's done and what's next. Key invariants established ther
   green for ink and solid objects, the logo orange as a small mark only (never yellow/amber).
   `whiskey-*` is now the green-neutral scale. Rules and components: **@docs/redesign/DESIGN_SYSTEM.md**.
 
+## Issue tracker: GitHub Issues
+
+Open work lives in GitHub Issues on `wsethbrown/wss`, not in conversations.
+
+- At the start of a session, read the open issues (`gh issue list`) before picking up work.
+- Anything found but not finished in the session becomes an issue before the session ends: a bug noticed in passing, a check nobody has done, a decision waiting on the owner.
+- Reference the issue in commits and pull requests (`Fixes #N` closes it on merge). Close an issue only when the fix is verified, and say how.
+- The repository is public, so issues are too. Never put secrets, customer data, email addresses, server details or an unfixed security weakness in an issue; raise those with the owner privately.
+
 ## Development Commands
 
 ### Starting the Application
