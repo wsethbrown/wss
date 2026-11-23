@@ -14,7 +14,8 @@ module DesignHelper
   #   preloaded: an already-loaded attachment to show (skips the slide query)
   #   class:     extra classes for the wrapper
   #   alt:       alt text (defaults to the deck title)
-  def deck_cover(deck, preloaded: nil, class: nil, alt: nil)
+  #   loading:   "lazy" (default) or "eager", for covers above the fold
+  def deck_cover(deck, preloaded: nil, class: nil, alt: nil, loading: "lazy")
     extra = binding.local_variable_get(:class)
     wrapper = [ "deck-cover relative aspect-video w-full overflow-hidden rounded-[18px] border border-hairline bg-char", extra ].compact.join(" ")
     image = preloaded || deck_cover_attachment(deck)
@@ -23,7 +24,7 @@ module DesignHelper
       if image
         # Fades in if it is still loading when the page starts (the appear
         # controller's image target; cached covers are left alone).
-        image_tag image_variant(image, :card), alt: alt || deck.title, loading: "lazy", class: "absolute inset-0 h-full w-full object-cover",
+        image_tag image_variant(image, :card), alt: alt || deck.title, loading: loading, class: "absolute inset-0 h-full w-full object-cover",
                   data: { appear_target: "image" }
       else
         "".html_safe

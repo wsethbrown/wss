@@ -119,8 +119,9 @@
   <!-- Catalog -->
   <% if decks.any? %>
     <div class="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-      <% decks.each do |deck| %>
-        <%= render 'presentations/deck_card', deck: deck, owned: owned_ids.include?(deck.id) %>
+      <%# The first row (3 columns at lg) is above the fold: eager covers. %>
+      <% decks.each_with_index do |deck, i| %>
+        <%= render 'presentations/deck_card', deck: deck, owned: owned_ids.include?(deck.id), loading: (i < 3 ? "eager" : "lazy") %>
       <% end %>
     </div>
     <div class="mt-12">

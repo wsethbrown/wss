@@ -1,7 +1,9 @@
 <%# A deck as a card: cover, title, one line of meta, price or ownership.
     Used on the homepage, the library, the deck page and the account library.
-    Locals: deck (Presentation), owned (Boolean, optional) %>
+    Locals: deck (Presentation), owned (Boolean, optional),
+    loading ("lazy" or "eager", optional; eager for the first row on the library) %>
 <% owned = local_assigns.fetch(:owned, false) %>
+<% loading = local_assigns.fetch(:loading, "lazy") %>
 <%# A deck included with membership reads as included for an active member (no purchase row). %>
 <% included = !owned && user_signed_in? && deck.included_for?(current_user) %>
 <% meta = [ deck.category.presence, deck.difficulty.presence, deck.duration_label ].compact.join(" · ") %>
@@ -9,7 +11,7 @@
 <%= link_to presentation_path(deck), class: 'group block h-full', data: { appear_target: 'item' } do %>
   <article class="card-hover flex h-full flex-col p-3">
     <div class="relative" style="view-transition-name: deck-cover-<%= deck.id %>">
-      <%= deck_cover deck %>
+      <%= deck_cover deck, loading: loading %>
       <% if deck.featured? %>
         <span class="absolute left-2.5 top-2.5 inline-flex min-h-7 items-center rounded-xl bg-white px-2.5 text-xs font-semibold text-ink">Featured</span>
       <% end %>
