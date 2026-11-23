@@ -38,7 +38,7 @@ glass_slide(2, 'Glass 1', 'Maker’s Mark',
              'The second grain in its recipe is wheat.'],
             [('The word', 'Bourbon'), ('Second grain', 'Wheat'), ('Age on the label', 'None')],
             photo='makers-mark-crop.jpg',
-            credit='Photograph: David, CC BY 2.0, via Wikimedia Commons. Cropped.')
+            credit='Photograph: U.S. National Archives, public domain, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 3 how to taste
 s = new_slide()
@@ -235,7 +235,7 @@ glass_slide(14, 'Glass 4', 'Wild Turkey Rare Breed',
              'This bottle is 116.8 proof, the strongest of the four.'],
             [('The words', 'Barrel Proof'), ('Strength', '58.4% alcohol'), ('Age on the label', 'None')],
             photo='rare-breed-crop.jpg',
-            credit='Pictured: an older bottle, at 108.2 proof. Photograph: Craiglduncan, CC0, via Wikimedia Commons.')
+            credit='Pictured: the 70 cl export bottle. Photograph: Brett Jordan, CC BY 2.0, via Flickr. Cropped.')
 
 # ---------------------------------------------------------------- 15 what the four labels say
 s = new_slide()
