@@ -24,10 +24,10 @@ Four.
 
 ### Cast the roles, then find the bottles
 
-- **Glass 1: a standard bourbon made with wheat as its second grain.** You use it to explain the word "bourbon". Tonight: Maker's Mark.
-- **Glass 2: a bottled-in-bond bourbon made with a lot of rye.** You use it to explain "bonded", and the room compares rye with wheat. Tonight: Old Grand-Dad Bonded.
-- **Glass 3: a straight bourbon with its age printed on the label.** Tonight: Knob Creek 9 Year.
-- **Glass 4: a barrel proof bourbon.** It is bottled at the strength it came out of the barrel. Tonight: Wild Turkey Rare Breed.
+- **Glass 1: a standard bourbon made with wheat as its second grain.** You use it to explain the word "bourbon". Suggested bottle: Maker's Mark.
+- **Glass 2: a bottled-in-bond bourbon made with a lot of rye.** You use it to explain "bonded", and the room compares rye with wheat. Suggested bottle: Old Grand-Dad Bonded.
+- **Glass 3: a straight bourbon with its age printed on the label.** Suggested bottle: Knob Creek 9 Year.
+- **Glass 4: a barrel proof bourbon.** It is bottled at the strength it came out of the barrel. Suggested bottle: Wild Turkey Rare Breed.
 
 ### Bottle ideas by role
 

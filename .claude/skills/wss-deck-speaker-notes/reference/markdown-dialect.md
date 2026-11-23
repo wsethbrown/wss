@@ -68,7 +68,7 @@ One sentence: the story in brief.
 
 ### Cast the roles, then find the bottles
 
-- **The Role (glass 1).** What its job is. Tonight: Bottle Name.
+- **The Role (glass 1).** What its job is. Suggested bottle: Bottle Name.
 
 ### Bottle ideas by role
 
