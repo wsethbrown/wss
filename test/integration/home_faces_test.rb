@@ -22,7 +22,11 @@ class HomeFacesTest < ActionDispatch::IntegrationTest
       assert_equal "512", img["height"]
     end
     assert_select ".f3 .invite-body figure", count: 0
-    assert_select "figure.duotone", count: 1 # one photograph per view
+    # One photograph per view: the face's, and the story frame's copy of it,
+    # which is presentational (no alt) and shown only when the face is not.
+    assert_select ".face figure.duotone", count: 1
+    assert_select ".mm[aria-hidden=true] figure.duotone img[alt='']", count: 1
+    assert_select "figure.duotone", count: 2
   end
 
   test "the sample invite shares its face with the gathering photograph" do

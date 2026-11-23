@@ -10,28 +10,13 @@ class MotionRound4Test < ActionDispatch::IntegrationTest
   CONTROLLER = Rails.root.join("app/javascript/controllers/appear_controller.js")
   CSS = Rails.root.join("app/assets/tailwind/application.css")
 
-  test "every homepage face is a settle container, and motion inside it waits for it" do
+  # The faces are no longer pinned or crossfaded (the frame replaced them),
+  # so the appear controller holds nothing for them.
+  test "nothing waits for a homepage face: the faces are plain and the held machinery is gone" do
     get root_path
-    %w[.f1 .f2 .f3 .f4].each { |f| assert_select ".face#{f}[data-appear-settle]", 1, f }
-    # Everything that waits for a face sits inside one.
-    %w[.f2 .f3 .f4].each { |f| assert_select ".face#{f}[data-appear-settle] .screen[data-appear-target~=perform]", 1, f }
+    assert_select "[data-appear-settle], [data-faces-hold], [data-face-shown]", 0
     js = File.read(CONTROLLER)
-    assert_includes js, "unsettled(el)"
-    assert_match(/style\.position !== "sticky"\) return false/, js, "phones (not sticky) are not held")
-    assert_match(/force !== "late" && this\.unsettled\(target\) && !\(idle && this\.inView\(target\) && !this\.covered\(target\)\)/, js,
-                 "a held face waits for its spot, or for the reader to stop with it all in view and uncovered")
-    assert_match(/const idle = force === "idle" \|\| \(!force && this\.pageIdle\(\)\)/, js,
-                 "a layout shift with no scroll counts as a still page, so held motion cannot wait forever")
-    assert_match(/if \(idle && this\.covered\(target\)\) \{ this\.held\.delete\(target\); this\.finish\(target\)/, js,
-                 "a face already covered by a later one is shown finished, not played unseen")
-    assert_match(/bottom <= 0\) \{ this\.held\.delete\(el\); this\.finish\(el\); continue \}/, js,
-                 "a held face scrolled back past stops being rechecked")
-    assert_match(/this\.reveal\(onScreen, this\.pageIdle\(\) \? "idle" : false\)/, js)
-    assert_match(/HELD_IDLE = 1000/, js, "a face stopped short (partly below the fold) still starts once the page is still")
-    assert_match(/shown \/ rect\.height >= 0\.9/, js, "all, or very nearly all, in view")
-    assert_match(/const atEnd = window\.scrollY >= document\.documentElement\.scrollHeight - window\.innerHeight - 1/, js,
-                 "a face that cannot travel further has settled")
-    assert_includes js, "this.held.size", "held motion is re-checked as the page scrolls"
+    %w[unsettled checkHeld appear:settled data-faces-hold HELD_IDLE holdLate pageIdle covered].each { |dead| refute_includes js, dead }
   end
 
   test "phones start a reveal earlier than wide screens" do

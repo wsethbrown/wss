@@ -6,7 +6,6 @@ require "test_helper"
 #   draw     the palate wheel's wedges grow from the hub, the flavor wave's
 #            stems grow to their value and its line draws left to right,
 #            labels last
-#   perform  each homepage step face plays once as it arrives
 #   photo    a duotone photograph settles from a slight scale inside its frame
 #   image    images that are still loading fade in when they arrive
 #
@@ -32,8 +31,8 @@ class AppearDrawInsTest < ActionDispatch::IntegrationTest
 
   test "the controller knows the new targets and stays the one reveal system" do
     js = File.read(CONTROLLER)
-    assert_match(/static targets = \[\s*"item",\s*"glass",\s*"draw",\s*"perform",\s*"photo",\s*"image"\s*\]/, js)
-    %w[drawTargetConnected performTargetConnected photoTargetConnected imageTargetConnected].each do |cb|
+    assert_match(/static targets = \[\s*"item",\s*"glass",\s*"draw",\s*"photo",\s*"image"\s*\]/, js)
+    %w[drawTargetConnected photoTargetConnected imageTargetConnected].each do |cb|
       assert_includes js, cb
     end
     # An image that errors, or never fires load, is shown anyway.
@@ -108,23 +107,16 @@ class AppearDrawInsTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "the step faces perform once as they arrive; the hero does not" do
+  # The step faces no longer perform: the homepage frame moves its own
+  # objects (story_frame_controller.js), and the faces are what the page is
+  # without JS, in print and for screen readers.
+  test "the step faces hold no motion of their own and the frame holds no reveal targets" do
     get root_path
-    assert_select ".f2 .player[data-appear-target=item] .screen[data-appear-target=perform]", 1
-    assert_select ".f3 .player[data-appear-target=item] .screen[data-appear-target=perform]", 1
-    assert_select ".f4 .player[data-appear-target=item] .screen[data-appear-target=perform]", 1
-    assert_select ".f1 [data-appear-target=perform]", 0
-
+    assert_select ".face [data-appear-target=perform], [data-appear-target~=perform]", 0
+    assert_select ".mm [data-appear-target]", 0
     css = css_select("style").map(&:text).join("\n")
-    assert_match(/\.perform-wait/, css)
-    assert_match(/\.perform-run/, css)
-    # Avatars pop in, never from scale 0.
-    refute_match(/scale:\s*0\s*;|scale\(0\)/, css)
-    print = css[/@media print\s*\{(.*?)\n    \}/m, 1].to_s
-    %w[.perform-wait .perform-run .sl li .rv-txt .rv-card--notes .faces].each { |sel| assert_includes print, sel, "print undoes #{sel}" }
-    assert_match(/opacity:\s*1 !important;\s*translate:\s*none !important;\s*scale:\s*none !important;\s*animation:\s*none !important/, print)
-    perform_css = css.scan(/@media \(prefers-reduced-motion: no-preference\)\s*\{(.*?)\n    \}/m).flatten.join
-    assert_includes perform_css, ".perform-wait", "the faces' start state lives under no-preference"
+    refute_match(/\.perform-(wait|run)/, css)
+    refute_includes File.read(CONTROLLER), "perform-wait"
   end
 
   test "duotone photographs settle in their frame and fade in as they load" do
@@ -162,7 +154,6 @@ class AppearDrawInsTest < ActionDispatch::IntegrationTest
     assert_match(/DURATION = 700/, js)
     assert_match(/POUR = 1200/, js)
     assert_match(/draw: \{[^}]*ms: 1250/, js, "a draw-in is watched for about 1.2s")
-    assert_match(/perform: \{[^}]*ms: 950/, js)
     assert_match(/ON_LOAD = 300/, js, "a draw-in on screen at load plays shortly after load")
     assert_match(/kind === "draw" \|\| kind === "glass" \? ON_LOAD : 0/, js, "draw-ins and pours on screen at load wait ON_LOAD")
     assert_match(/kind === "draw" \? turbo : fresh/, js, "a draw-in replays on load only on a Turbo visit, so a finished drawing never flashes")

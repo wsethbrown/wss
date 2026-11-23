@@ -12,14 +12,12 @@ import { Controller } from "@hotwired/stimulus"
 //           first time it is seen.
 //   draw    A palate wheel or flavor wave svg. Its wedges, stems and line
 //           draw in (CSS animations under .draw-run, 1.25s at most).
-//   perform A homepage step face's screen. Its rows, avatars or record play
-//           once (.perform-run, 950ms at most; the CSS is in home/index).
 //   photo   A shared/_duotone figure. Its photograph settles from a slight
 //           scale inside the frame (.photo-run).
 //   image   An img that may still be loading. If it has not loaded when it
 //           connects, it fades in when it does (.img-wait, .img-in).
 //
-// glass, draw, perform and photo are secondary motion: each waits in its
+// glass, draw and photo are secondary motion: each waits in its
 // start state until it is well on screen (it reaches the middle 60% of the
 // viewport) and then plays once, so it plays where the eye is. One inside a
 // revealing item starts at least 120ms after its item starts to show (never
@@ -29,20 +27,12 @@ import { Controller } from "@hotwired/stimulus"
 // which may already have painted it finished), so an above-the-fold drawing
 // reached by a click is seen to draw.
 //
-// On a wide screen the homepage faces are sticky: they slide up and pin in
-// place. Motion inside one (marked data-appear-settle) waits until the face
-// has settled, then plays, so it is not spent while the face is still
-// travelling. Settled: at its pinned spot and the one on top; or the page
-// can scroll no further; or the reader has stopped (150ms) with the face all
-// or very nearly all (90%) in view. A reader who stops with the face still
-// partly below the fold gets the motion after HELD_IDLE of stillness, so
-// nothing stays in a start state.
+// The homepage story's frame moves itself (story_frame_controller.js) and
+// holds no targets of this controller.
 //
 // The triggers sit inside the viewport, so while the page scrolls an item
 // can be on screen and still waiting. When the scroll settles (150ms) that
-// band is emptied: everything waiting on screen starts its motion, except
-// motion held for a pinned face that is not yet settled (above), which
-// starts once the face settles or after HELD_IDLE of stillness.
+// band is emptied: everything waiting on screen starts its motion.
 //
 // Safety rules, each one a bug this replaced or could have caused:
 // - The hidden start state is a class this controller adds, never server
@@ -57,10 +47,7 @@ import { Controller } from "@hotwired/stimulus"
 // - Nothing on screen can stay hidden, even if the observer never fires:
 //   when the scroll (or a resize) settles, anything waiting above the bottom
 //   of the screen is revealed (or, if a jump carried it past, shown at once);
-//   a one-off time limit after load does the same for items; motion held
-//   for a pinned face starts when the face settles, when the scroll stops
-//   with the face (nearly) all in view, or once the page has been still for
-//   HELD_IDLE whatever its position; and focusing anything
+//   a one-off time limit after load does the same; and focusing anything
 //   inside a waiting item shows that item at once, so a keyboard user never
 //   lands on something invisible.
 // - Before Turbo caches the page, everything is finished, so a cached
@@ -85,16 +72,16 @@ const PHONE_ITEM_MARGIN = "0px 0px -9% 0px"
 // "not all and (min-width)" rather than max-width: no gap at 639.5px.
 const PHONE = "not all and (min-width: 640px)"
 const DEEP_MARGIN = "-20% 0px -20% 0px"
+const DEEP_STEPS = Array.from({ length: 21 }, (_, i) => i / 20)
 const ON_LOAD = 300 // ms: an on-screen draw-in or pour at load starts after this
+// The glass's level travel from empty to full, in its drawing's units (the
+// `span` in shared/_glass.html.erb; keep the two equal).
+const GLASS_SPAN = 24
 const REPOUR = 500 // ms: a glass whose level a Turbo stream changed moves to it
 const POUR_EASE = "cubic-bezier(0.2, 0.7, 0.2, 1)" // --motion-ease-pour
 const STAGGER = [ 0, 60, 110, 150, 180, 200 ] // ms; gaps shrink, then cap
 const ITEM = "[data-appear-target~='item']"
 const SETTLE = 150 // ms after the last scroll or resize event
-// Motion held for a pinned face that has stopped short of its spot (the
-// reader paused with it partly below the fold) starts once the page has been
-// still this long: it is no longer travelling, and nothing may stay hidden.
-const HELD_IDLE = 1000 // ms after the last scroll
 const LIMIT = 1500 // ms after targets are sorted: the one-off safety net
 const TALL = 1.2 // x the viewport height: an item this tall is never hidden
 const POUR_LAG = 120 // ms: secondary motion in a revealing card starts once the card shows
@@ -103,7 +90,6 @@ const POUR_LAG = 120 // ms: secondary motion in a revealing card starts once the
 const KINDS = {
   glass: { wait: "glass-wait", run: "glass-pouring", ms: POUR },
   draw: { wait: "draw-wait", run: "draw-run", ms: 1250 },
-  perform: { wait: "perform-wait", run: "perform-run", ms: 950 },
   photo: { wait: "photo-wait", run: "photo-run", ms: 1200 }
 }
 const ALL_CLASSES = [ "appear-pending", "is-in", ...Object.values(KINDS).flatMap((k) => [ k.wait, k.run ]) ]
@@ -134,7 +120,7 @@ function painted() {
 }
 
 export default class extends Controller {
-  static targets = [ "item", "glass", "draw", "perform", "photo", "image" ]
+  static targets = [ "item", "glass", "draw", "photo", "image" ]
 
   // Stimulus calls the target callbacks before connect(), so both go
   // through setup().
@@ -152,13 +138,10 @@ export default class extends Controller {
     window.removeEventListener("resize", this.onScroll)
     this.element.removeEventListener("focusin", this.onFocus)
     clearTimeout(this.settleTimer)
-    clearTimeout(this.lateTimer)
     clearTimeout(this.limitTimer)
     this.limitTimer = null
     if (this.frame) cancelAnimationFrame(this.frame)
     this.frame = null
-    if (this.heldFrame) cancelAnimationFrame(this.heldFrame)
-    this.heldFrame = null
     clearInterval(this.imageTimer)
     this.imageTimer = null
     this.active = false
@@ -168,14 +151,12 @@ export default class extends Controller {
   itemTargetConnected(el) { this.enqueue(el, "item") }
   glassTargetConnected(el) { this.enqueue(el, "glass") }
   drawTargetConnected(el) { this.enqueue(el, "draw") }
-  performTargetConnected(el) { this.enqueue(el, "perform") }
   photoTargetConnected(el) { this.enqueue(el, "photo") }
   imageTargetConnected(el) { this.watchImage(el) }
   // Removed by a Turbo stream or a re-render: stop watching it.
   itemTargetDisconnected(el) { this.forget(el) }
   glassTargetDisconnected(el) { this.forget(el) }
   drawTargetDisconnected(el) { this.forget(el) }
-  performTargetDisconnected(el) { this.forget(el) }
   photoTargetDisconnected(el) { this.forget(el) }
   imageTargetDisconnected(el) { if (this.active) this.showImage(el) }
 
@@ -217,8 +198,10 @@ export default class extends Controller {
     this.observer = this.itemObserver()
     this.onPhoneChange = this.onPhoneChange.bind(this)
     if (this.phone.addEventListener) this.phone.addEventListener("change", this.onPhoneChange)
-    this.held = new Set()          // secondary motion waiting for its pinned face to settle
-    this.deep = new IntersectionObserver(this.onIntersect, { rootMargin: DEEP_MARGIN })
+    // Secondary motion waits until half of it (or half the band, for
+    // something taller) is inside the middle 60%: comfortably in view, not
+    // just its top edge (deepEnough below; the thresholds let it fire there).
+    this.deep = new IntersectionObserver(this.onIntersect, { rootMargin: DEEP_MARGIN, threshold: DEEP_STEPS })
     document.addEventListener("turbo:before-cache", this.finishAll)
     this.onStream = this.onStream.bind(this)
     document.addEventListener("turbo:before-stream-render", this.onStream)
@@ -314,22 +297,25 @@ export default class extends Controller {
       if (level < 0.02) return
       // Start just under the bowl's foot whatever the level, so a low pour
       // starts rising at once instead of waiting below the glass.
-      el.style.setProperty("--glass-rise", `${(level * 34 + 4).toFixed(1)}px`)
+      el.style.setProperty("--glass-rise", `${(level * GLASS_SPAN + 4).toFixed(1)}px`)
     }
     el.classList.add(KINDS[kind].wait)
   }
 
-  onIntersect(entries) {
-    this.reveal(entries.filter((entry) => entry.isIntersecting && this.waiting.has(entry.target))
+  onIntersect(entries, observer) {
+    this.reveal(entries.filter((entry) => entry.isIntersecting && this.waiting.has(entry.target) &&
+                                          (observer !== this.deep || this.deepEnough(entry)))
       .map((entry) => ({ target: entry.target, rect: entry.boundingClientRect })))
+  }
+
+  deepEnough(entry) {
+    const band = entry.rootBounds ? entry.rootBounds.height : window.innerHeight * 0.6
+    return entry.intersectionRect.height >= Math.min(entry.boundingClientRect.height, band) * 0.5 - 1
   }
 
   // Start the reveal of a batch arriving together, top to bottom, left to
   // right, with the shrinking stagger.
-  // force: false (start held motion only once its face has settled),
-  // "idle" (the scroll has stopped: also start a face that is all, or very
-  // nearly all, in view), "late" (still for HELD_IDLE: start everything).
-  reveal(arriving, force = false) {
+  reveal(arriving) {
     if (!arriving.length) return
     arriving.sort((a, b) => (a.rect.top - b.rect.top) || (a.rect.left - b.rect.left))
 
@@ -342,22 +328,6 @@ export default class extends Controller {
     }
     for (const { target } of arriving) {
       if (this.kinds.get(target) === "item" || !this.waiting.has(target)) continue
-      // Inside a pinned (sticky) container that is still sliding into
-      // place: hold it until the container has settled, so it plays where
-      // it will stay and not while it travels.
-      // The page is still if the scroll has settled (an idle sweep) or a
-      // layout shift with no scroll brought this in (late fonts, images).
-      const idle = force === "idle" || (!force && this.pageIdle())
-      if (force !== "late" && this.unsettled(target) && !(idle && this.inView(target) && !this.covered(target))) {
-        // Stopped with the face covered by a later one (Page Down, End, a
-        // scrollbar jump): nobody can see it, so show it finished rather
-        // than spend the motion unseen.
-        if (idle && this.covered(target)) { this.held.delete(target); this.finish(target); continue }
-        this.held.add(target); this.checkHeldSoon()
-        if (idle) this.holdLate()
-        continue
-      }
-      this.held.delete(target)
       // Inside a card still waiting: the card goes first (it is further
       // into view than its own trigger needs).
       const card = target.parentElement && target.parentElement.closest(ITEM)
@@ -478,8 +448,6 @@ export default class extends Controller {
   // below the viewport to above it between two frames, or an observer that
   // never fires at all.
   onScroll() {
-    this.lastScroll = performance.now()
-    if (this.held.size) this.checkHeldSoon()
     clearTimeout(this.settleTimer)
     this.settleTimer = setTimeout(() => this.sweep(), SETTLE)
   }
@@ -499,90 +467,8 @@ export default class extends Controller {
       else if (rect.top < height) onScreen.push({ target, rect })
     }
     // Once the scroll has stopped, everything waiting on screen starts, so
-    // nothing is left in a start state; motion held for a pinned face starts
-    // only if the face is (nearly) all in view, else after HELD_IDLE. (The one-off
-    // time limit can land mid-scroll; then a sliding face keeps waiting for
-    // its spot, and the settle after the scroll starts it at the latest.)
-    this.reveal(onScreen, this.pageIdle() ? "idle" : false)
-  }
-
-  // A face held while the page is still: start it once the page has stayed
-  // still for HELD_IDLE (cancelled by any scroll, which re-arms the sweep).
-  holdLate() {
-    clearTimeout(this.lateTimer)
-    this.lateTimer = setTimeout(() => {
-      if (!this.active || !this.held.size) return
-      if (this.lastScroll && performance.now() - this.lastScroll < HELD_IDLE - 20) return
-      const height = window.innerHeight
-      const late = []
-      for (const el of [ ...this.held ]) {
-        this.held.delete(el)
-        if (!this.waiting.has(el) || !el.isConnected) continue
-        const rect = el.getBoundingClientRect()
-        if (rect.bottom <= 0 || this.covered(el)) this.finish(el) // passed, or out of sight under a later face
-        else if (rect.top < height) late.push({ target: el, rect })
-        else this.held.add(el)
-      }
-      this.reveal(late, "late")
-    }, HELD_IDLE - SETTLE)
-  }
-
-  pageIdle() {
-    return !this.lastScroll || performance.now() - this.lastScroll >= SETTLE - 10
-  }
-
-  // A later sticky face has slid over the face around el.
-  covered(el) {
-    const box = el.closest("[data-appear-settle]")
-    if (!box || getComputedStyle(box).position !== "sticky") return false
-    const top = box.getBoundingClientRect().top
-    for (let next = box.nextElementSibling; next; next = next.nextElementSibling) {
-      if (next.matches("[data-appear-settle]") && next.getBoundingClientRect().top <= top + 1) return true
-    }
-    return false
-  }
-
-  // The face around el is all, or very nearly all (90%), on screen.
-  inView(el) {
-    const box = el.closest("[data-appear-settle]") || el
-    const rect = box.getBoundingClientRect()
-    if (!rect.height) return true
-    const shown = Math.min(rect.bottom, window.innerHeight) - Math.max(rect.top, 0)
-    return shown / rect.height >= 0.9
-  }
-
-  // A sticky container marked data-appear-settle (a homepage face) has
-  // settled when it sits at its pinned top and no later container has
-  // slid over it. Not sticky (phones, where the faces are a plain stack):
-  // nothing to wait for.
-  unsettled(el) {
-    const box = el.closest("[data-appear-settle]")
-    if (!box) return false
-    const style = getComputedStyle(box)
-    if (style.position !== "sticky") return false
-    const pinned = parseFloat(style.top)
-    if (Number.isNaN(pinned)) return false
-    const top = box.getBoundingClientRect().top
-    // The page cannot scroll any further, so the face has come as far into
-    // place as it ever will: that is its settled spot.
-    const atEnd = window.scrollY >= document.documentElement.scrollHeight - window.innerHeight - 1
-    if (Math.abs(top - pinned) > 1 && !atEnd) return true
-    return this.covered(el)
-  }
-
-  checkHeldSoon() {
-    if (this.heldFrame) return
-    this.heldFrame = requestAnimationFrame(() => {
-      this.heldFrame = null
-      const ready = []
-      for (const el of [ ...this.held ]) {
-        if (!this.waiting.has(el) || !el.isConnected) { this.held.delete(el); continue }
-        // Scrolled back up past it: show it finished and stop checking it.
-        if (el.getBoundingClientRect().bottom <= 0) { this.held.delete(el); this.finish(el); continue }
-        if (!this.unsettled(el)) ready.push({ target: el, rect: el.getBoundingClientRect() })
-      }
-      if (ready.length) { ready.forEach(({ target }) => this.held.delete(target)); this.reveal(ready, "late") }
-    })
+    // nothing is left in a start state.
+    this.reveal(onScreen)
   }
 
   // The re-pour. A Turbo stream that replaces a region holding glasses
@@ -618,8 +504,8 @@ export default class extends Controller {
       if (to < 0.02 || Math.abs(to - from) < 0.01) return
       const rect = glass.getBoundingClientRect()
       if (rect.bottom <= 0 || rect.top >= height) return
-      // The drawing's own units: a level is 34 tall; empty sits 4 below the bowl.
-      const drop = from < 0.02 ? to * 34 + 4 : (to - from) * 34
+      // The drawing's own units: a full level is GLASS_SPAN tall; empty sits 4 below the bowl.
+      const drop = from < 0.02 ? to * GLASS_SPAN + 4 : (to - from) * GLASS_SPAN
       const paths = [ ...glass.querySelectorAll("g > path") ]
       if (!paths.length || typeof paths[0].animate !== "function") return
       // A falling level lifts the liquid to start from the old surface; its

@@ -86,7 +86,12 @@ Rules:
   redrawn anywhere else. For a score, `level` is score / 5; for the table (RSVPs) going is 1, maybe
   0.5, unanswered 0; in a verdict the numeral is the serve order. Tones: `:ink` on paper and white,
   `:cream` on green. Minimum size 28px. It always sits beside its number or count (or carries
-  sr-only text), is aria-hidden, and has no shading. Its one motion is the pour (see Motion). Replaces star rows for display;
+  sr-only text), is aria-hidden, and has no shading. The liquid is one colour; a full glass is a
+  generous pour that stops a little above the bowl's widest point, with clear headroom below the
+  rim (level travel 24 units of the 60×80 drawing). The only highlights are reflections, lit from
+  the left: a soft narrow streak low inside the bowl's left wall (with a faint green edge under it
+  on paper and white, so it reads over an empty bowl), and a smaller one on the green foot (ink
+  tone, from 36px up). Its motions are the pour and, on the event page, the re-pour (see Motion). Replaces star rows for display;
   the half-step star control in review forms is an input and stays.
 - **Photograph**: only through `shared/_duotone`, which prints a greyscale image in bottle green
   and cream. Public-domain or owner-supplied images, or free-licence stock (Unsplash, Pexels)
@@ -167,9 +172,7 @@ glass and the view transitions. No animation library.
   screen, something can be on screen and still waiting, but only while the page is scrolling:
   when the scroll or a resize settles (150ms) everything waiting on screen starts its motion
   (started, not snapped; only what a jump carried past is shown at once), and a one-off 1.5s
-  limit does the same even if the observer never fires; the one exception is motion inside a
-  pinned homepage face that has not settled (see "Pinned faces play when settled" below),
-  which starts when the face settles or after one second of stillness;
+  limit does the same even if the observer never fires;
   focusing anything inside a waiting item shows it at once; print shows everything; Turbo
   snapshots and back/forward visits are never hidden.
   **Never mark anything taller than about one screen**: mark its heading (a deck section's
@@ -194,7 +197,7 @@ glass and the view transitions. No animation library.
   redrawn). A glass pours on load only before the first paint, as before; a face or a photo on
   screen at load is left alone. These durations are the standard, set by the owner in
   November 2026 ("too soon for us to see"): reveal 700ms, pour 1.2s, draw-ins about 1.2s,
-  faces about 900ms, photo settle 1.2s.
+  photo settle 1.2s.
   - **The glass pours** (1.2s; `glass`, set by `shared/_glass`). At rest, without JS and in
     admin the level is simply drawn. `appear: false` leaves a glass out (a gauge another
     controller drives).
@@ -205,22 +208,57 @@ glass and the view transitions. No animation library.
     view-box`, checked in Chrome and WebKit), the flavor wave's stems grow from the base to their
     value and its line draws left to right (`pathLength="1"` and `stroke-dashoffset`); labels
     fade in last. Gaps shrink. The wheel's wedges stay inside their links, clickable throughout.
-  - **The homepage step faces perform** (`perform` on each face's screen, about 900ms; rows
-    500ms each with gaps 90, 80, 70, 60, 50ms): the
-    library's rows tick in one by one, the invite's guests pop in from `.7` (never from 0), the
-    record's words settle while its wheel draws. CSS in `home/index`.
-  - **Pinned faces play when settled.** On a wide screen the homepage faces are sticky: each
-    slides up and pins. Everything inside a face (`data-appear-settle` on the face: its
-    perform, wheel, pour and photo settle) waits until the face has settled, then plays, so
-    nothing is spent while the face is still sliding up: settled means it sits at its pinned
-    spot with no later face over it, or the page can scroll no further, or the reader has
-    stopped (150ms) with the face all or nearly all (90%) in view. A reader who stops with the
-    face still partly below the fold gets the motion after one second of stillness, so nothing
-    stays in a start state (the same applies when a layout shift, not a scroll, brings a face
-    in). A face that a later face has already slid over is shown finished, not played unseen. On phones the faces are a plain stack and play on the normal
-    trigger.
   - **Photographs settle** (`photo` on `shared/_duotone`): from `scale: 1.04` to 1 over 1.2s
     inside the frame, which clips it, so nothing moves around it.
+- **The homepage story** (`home/_story_frame`, `story_frame_controller.js`, content from
+  `StoryFrameHelper`; owner's choice, November 2026, "magic move"). One frame stays pinned beside
+  the story (a band under the nav below 900px) and never swaps, covers or fades: the objects
+  inside it travel from each step's arrangement to the next, the way Keynote's Magic Move
+  carries shared objects between slides. The hero's slide shrinks into its row in the library;
+  the picked row fills orange and opens into the invite, its title rolling into the night's;
+  the photo slides down into its band and settles; the date and the guests' glasses arrive;
+  the invite parts (the photo slides up, the orange drains down) onto the table, a raised green
+  band where the glasses stand while the slide takes the main area; the glasses fill one after
+  another; then they lift into the record's rows (or onto the review's score), the card rises
+  from below and the wheel draws in pour by pour. Objects with no counterpart rise or draw in;
+  text changes by rolling (old words lift away, new ones rise), never by fading. Everything is
+  a pure function of one progress number, each object in its own window of the move with its
+  own easing (the site's two curves plus a slow-settle travel curve; paths bow because the two
+  axes ease differently), and moves only by transform and opacity, except the first orange
+  fill (a clip) and colours (text and glass lines take the colour of what is under them;
+  blends are in OKLab, never through a muddy middle).
+  **Scroll picks the step, a clock plays the move.** A step becomes current as its words come
+  up over the fold (the first step a little later), and stops being current only when they
+  fall back past that line plus 12% of the screen (hysteresis). The move then plays to its end
+  whatever the scroll does: 1.05 to 1.3s per move on one overall curve (under way at once,
+  settling gently), reversing from where it is if the reader turns back, and compressed to at
+  most 1.5s (or 0.42s a step) for a jump over several steps. At the table the glasses then
+  fill on their own over 2.4s, the caption rolling "Glass k of n". The clock advances by frame
+  time capped at 50ms, so a backgrounded tab neither jumps nor stalls; nothing runs per frame
+  unless a move or the fill is playing, and nothing plays while the frame is off screen (a
+  step change there just lands).
+  **Data** follows the static faces' rules: the hero's showcase deck and its first slide (the
+  ink title slide without one); the "Latest decks" rows (the showcase deck takes the last row
+  when it is not among them); the next public night with its guests (at most four glasses,
+  the full going count), else the sample invite; at the table only the invite's glasses (a
+  real night never shows more people than said yes, and none when nobody has; the sample's
+  four); the verdict's top three pours (any beyond the table's glasses rise straight into
+  the record) and the night's
+  blended wheel, else the featured review, else the heading alone. The deck rides on the
+  invite and the record only when it is that night's deck (or on the sample invite). Long
+  strings are cut for the frame with an ellipsis; the faces keep them whole.
+  **Safety.** The frame is `aria-hidden` and nothing in it takes focus. Each step's static face
+  stays beside its words: it is the page without JS (beside the words on a wide screen,
+  below them on a phone), in print (the frame is never printed) and for screen readers (with
+  JS it is visually hidden on screen only, and shows again if keyboard focus reaches into
+  it). Under reduced motion each step shows its resting arrangement, no travel. Before Turbo
+  caches the page the frame is put at rest; disconnecting cancels every frame and listener.
+  On phones, words too small to read in the band (row prices, the invite's time, tag, place
+  and going count, the table's initials, the review's quote, credit line and link) are left
+  out of the band; the faces still carry them. A window too short to hold the frame (a phone
+  in landscape: the band would take more than half the height; a wide window that cannot fit
+  the frame below the nav) shows the static faces instead, and the frame comes back if the
+  window grows. If anything in the frame throws, it stops and the static faces show.
 - **The re-pour**: when an RSVP's Turbo stream replaces the event's attendees region, each
   seat glass in the table (`data-repour` on `events/_table`) whose level changed moves from
   its old level to the new one over 500ms on the pour curve, seats matched in order. Only
@@ -230,15 +268,16 @@ glass and the view transitions. No animation library.
   and duotone photos): only an image not yet loaded when the page starts, 200ms on the strong
   ease-out. A cached image is never touched (no flash); one that fails, or sits on screen for 2s
   without loading, or is on a page Turbo caches, is shown at once.
-- **The hero player** cross-fades its real preview slides, one tick per slide lit in step (a
-  one-slide reel does not cycle); hovering with a pointer or focusing it pauses the reel. Only the
-  hero has ticks: the step faces' bars carry just their title (ticks there read as a sideways
-  carousel, when the faces change with the vertical scroll).
+- **The hero player** (the hero's static face: without JS and in print) cross-fades its real
+  preview slides, one tick per slide lit in step (a one-slide reel does not cycle); hovering with
+  a pointer or focusing it pauses the reel. Only the hero has ticks. With the story frame
+  running, the hero shows the showcase deck's first slide and no reel.
 - **The story glass** (homepage only, `home/_story_glass`, `story_glass_controller.js`): one
-  glass that fills as the reader scrolls through the story, empty when the first step's words
-  are mid-screen and full when the closing beat's heading is. It follows the scroll directly
+  glass that fills as the reader scrolls through the story, starting as the first step's words
+  come up over the bottom of the screen and full when the closing beat's heading is mid-screen.
+  It stays tied to the scroll (the frame beside it plays on a clock): it follows the scroll directly
   (it is a gauge, not a reveal, so `appear: false` keeps it out of the pour). Desktop: a 96px
-  gauge in the gutter between the step words and the face, sticky at the middle of the screen;
+  gauge in the gutter between the step words and the frame, sticky at the middle of the screen;
   the beats keep 28px of right padding so the words never meet it. Phones: 40px in the
   bottom-right corner, inside the 20px page gutter, shown only while the steps are on screen.
   aria-hidden, no words, `pointer-events: none`, out of the flow (no layout shift), hidden
@@ -247,8 +286,8 @@ glass and the view transitions. No animation library.
 - **Pages** cross-fade (view transitions), and a deck's cover travels from its card to the deck
   page. Turbo's progress bar is a 2px `mark-deep` line.
 - **Reduced motion** (`prefers-reduced-motion: reduce`), the same everywhere: the appear
-  controller does nothing, so nothing is hidden, no glass pours (the story glass steps), nothing draws in, no face
-  performs, no photo settles and no image fades; the reel and ticks stand still on the first
+  controller does nothing, so nothing is hidden, no glass pours (the story glass steps), nothing draws in, no photo
+  settles and no image fades; the homepage frame changes step by step with no travel; the reel and ticks stand still on the first
   slide; view transitions are off; nothing travels on hover (no card lift,
   cover lean or arrow nudge). The press (fill step and `.98`) and colour changes stay: they are
   feedback, not travel.

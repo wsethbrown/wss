@@ -1,0 +1,235 @@
+<%# The homepage story's frame: one pinned screen for the whole story, whose
+    objects travel from each step's arrangement to the next
+    (story_frame_controller.js; the content comes from StoryFrameHelper).
+    Presentational: aria-hidden, nothing in it takes focus (the static faces
+    beside each step's words carry the same content for screen readers, the
+    keyboard, no JS and print). Hidden until its controller runs.
+    Every object sits at its resting place for the hero; the controller
+    places the rest. Sizes are in cqw (1cqw = 1% of the screen's width),
+    so the frame scales like a picture.
+    locals: frame (StoryFrameHelper#story_frame). %>
+<% content_for :head do %>
+  <style nonce="<%= content_security_policy_nonce %>">
+    /* The frame. Hidden until story_frame_controller.js runs (.is-live). */
+    .hx .mm { display: none; }
+    .hx .story.is-live .mm { display: block; }
+    .hx .mm-player { background: var(--ink); border-radius: 28px; padding: 10px; box-shadow: 0 1px 2px rgba(22, 51, 42, .25), 0 44px 80px -34px rgba(22, 51, 42, .6); }
+    .hx .mm-screen { position: relative; aspect-ratio: 16 / 9; border-radius: 19px; overflow: hidden; clip-path: inset(0 round 19px); container-type: inline-size; background: var(--ink); isolation: isolate; }
+    .hx .mm-bar { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 12px 6px; min-height: 40px; color: #f6f4ee; font-size: 14px; }
+    .hx .mm-bar > :first-child { font-weight: 600; letter-spacing: -.01em; }
+    .hx .mm-bar > :last-child { opacity: .65; font-variant-numeric: tabular-nums; }
+    .hx .mm-screen a, .hx .mm-screen img { pointer-events: none; }
+    .hx .mm-layer { position: absolute; inset: 0; }
+    .hx .mm-paper { background: #f6f4ee; }
+    .hx .mm-mark { background: var(--mark); will-change: transform; }
+    .hx .mm-oak { background: #1d4034; clip-path: inset(43.6cqw 0 0 0); will-change: transform; }
+    .hx .mm-ph { position: absolute; left: 0; top: 0; width: 100%; height: 26.4cqw; overflow: hidden; will-change: transform; }
+    .hx .mm-ph .duotone { width: 100%; height: 100%; margin: 0; border-radius: 0; }
+    .hx .mm-ph .duotone img { object-position: 50% 4%; transform-origin: 50% 30%; }
+    .hx .mm-obj { position: absolute; left: 0; top: 0; transform-origin: 0 0; visibility: hidden; }
+    /* Type: the faces' own sizes (home/index .sl), in cqw. */
+    .hx .mm-h4 { font-weight: 600; letter-spacing: -.045em; line-height: 1; }
+    .hx .mm-t-head { font-size: 6.4cqw; color: var(--ink); }
+    .hx .mm-t-heading { font-size: 4.8cqw; color: #f6f4ee; }
+    .hx .mm-rule { width: 86cqw; height: .35cqw; background: var(--ink); border-radius: .2cqw; }
+    .hx .mm-row { width: 86cqw; height: 12cqw; }
+    .hx .mm-row > .mm-rule { position: absolute; left: 0; top: 0; }
+    .hx .mm-th { position: absolute; left: 0; top: 2.06cqw; width: 14cqw; height: 7.875cqw; border-radius: 1cqw; overflow: hidden; background: var(--ink); box-shadow: 0 0 0 1px var(--line); }
+    .hx .mm-th img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .hx .mm-rt { position: absolute; left: 17cqw; top: 2.4cqw; max-width: 69cqw; font-weight: 600; font-size: 3.4cqw; letter-spacing: -.03em; line-height: 1.2; color: var(--ink); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hx .mm-rm { position: absolute; left: 17cqw; top: 6.9cqw; font-family: "Source Serif 4", Georgia, serif; font-size: 2.5cqw; line-height: 1.2; color: var(--mute); white-space: nowrap; }
+    .hx .mm-t-title { font-weight: 600; font-size: 4cqw; letter-spacing: -.04em; white-space: nowrap; }
+    .hx .mm-t-where { font-family: "Source Serif 4", Georgia, serif; font-size: 2.6cqw; white-space: nowrap; }
+    .hx .mm-t-date { font-weight: 700; font-size: 13cqw; letter-spacing: -.065em; --lh: 1; }
+    .hx .mm-t-time { font-weight: 600; font-size: 2.4cqw; letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
+    .hx .mm-tag { display: inline-flex; align-items: center; min-height: 4.2cqw; padding: 0 1.6cqw; border-radius: 1.4cqw; box-shadow: inset 0 0 0 .28cqw var(--ink); font-weight: 600; font-size: 2.4cqw; color: var(--ink); }
+    .hx .mm-t-going { font-weight: 600; font-size: 2.5cqw; font-variant-numeric: tabular-nums; color: var(--ink); }
+    .hx .mm-t-label { font-weight: 600; font-size: 2.8cqw; letter-spacing: -.03em; }
+    .hx .mm-t-score { font-weight: 600; font-size: 2.8cqw; font-variant-numeric: tabular-nums; color: #f6f4ee; }
+    .hx .mm-vline { width: 46cqw; height: .35cqw; background: #f6f4ee; border-radius: .2cqw; }
+    /* The glass: shared/_glass, recoloured by the controller as it passes
+       from orange (ink lines) to green (cream lines). */
+    .hx .mm-glass svg { display: block; width: 7.5cqw; height: 10cqw; overflow: visible; color: var(--ink); }
+    .hx .mm-glass svg path[stroke="#16332a"]:not([stroke-opacity]) { stroke: currentColor; }
+    .hx .mm-glass svg path[fill="#16332a"] { fill: currentColor; }
+    .hx .mm-glass svg g > path { fill: var(--mm-liquid, #e65c00); }
+    .hx .mm-glass svg path[stroke-opacity="0.18"] { stroke-opacity: var(--mm-under, .18); }
+    .hx .mm-glass svg path[data-glass-shine]:not([data-glass-shine="foot"]) { stroke: var(--mm-shine, #fff); stroke-opacity: var(--mm-shine-o, .6); }
+    .hx .mm-glass svg path[data-glass-shine="foot"] { stroke-opacity: var(--mm-foot, .4); }
+    /* The deck: a slide with a hairline edge, lifted while it travels. */
+    .hx .mm-slide-obj { width: 100cqw; height: 56.25cqw; }
+    .hx .mm-slide { position: absolute; inset: 0; border-radius: 19px; overflow: hidden; background: var(--ink);
+                    box-shadow: 0 0 0 1px rgba(22, 51, 42, .1), inset 0 0 0 max(1.5px, .22cqw) rgba(246, 244, 238, .16); }
+    .hx .mm-slide img { display: block; width: 100%; height: 100%; object-fit: cover; }
+    .hx .mm-slide-ink { position: absolute; inset: 0; padding: 6.5cqw 7cqw; color: #f6f4ee; }
+    .hx .mm-slide-ink .mm-h4 { font-size: 6.4cqw; }
+    .hx .mm-lift { position: absolute; inset: 0; border-radius: 19px; opacity: 0; will-change: opacity;
+                   box-shadow: 0 2.2cqw 5cqw -1cqw rgba(4, 12, 9, .6), 0 0 0 max(1px, .15cqw) rgba(246, 244, 238, .22); }
+    /* The record's card: the faces' .rv-card. */
+    .hx .mm-card { width: 39.5cqw; height: 48.25cqw; border-radius: 3.4cqw; background: #fff; display: flex; align-items: center; justify-content: center; will-change: transform; }
+    .hx .mm-card .mm-wheel, .hx .mm-card .mm-wheel figure { width: 37cqw; height: 37cqw; max-width: none; margin: 0; }
+    .hx .mm-card .mm-wheel svg { display: block; width: 100%; height: 100%; }
+    .hx .mm-card figcaption { display: none; }
+    .hx .mm-card--review { width: 42cqw; height: 49.5cqw; padding: 1.4cqw; }
+    .hx .mm-card--review .mm-wheel, .hx .mm-card--review .mm-wheel figure { width: 38cqw; height: 38cqw; }
+    .hx .mm-score { position: absolute; top: 2cqw; left: 2.4cqw; font-size: max(13px, 2.8cqw); }
+    .hx .mm-score svg { width: auto; height: max(22px, 4.6cqw); }
+    .hx .mm-card--notes { flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 2cqw; padding: 8cqw 2.6cqw 2.6cqw; }
+    .hx .mm-card--notes dl { margin: 0; display: grid; gap: 1.6cqw; }
+    .hx .mm-card--notes dt { font-weight: 600; font-size: 2.2cqw; color: var(--ink); }
+    .hx .mm-card--notes dd { margin: .4cqw 0 0; font-family: "Source Serif 4", Georgia, serif; font-size: 2.2cqw; line-height: 1.35; color: var(--text);
+                             display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+    .hx .mm-rv { width: 40cqw; color: rgba(246, 244, 238, .82); }
+    .hx .mm-rv-quote { font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-size: 2.5cqw; line-height: 1.38; color: rgba(246, 244, 238, .82);
+                       display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; margin: 0; }
+    .hx .mm-rv-by { margin-top: 1.8cqw; font-size: 2.3cqw; color: rgba(246, 244, 238, .72); }
+    .hx .mm-rv-by b { color: #f6f4ee; font-weight: 600; }
+    .hx .mm-rv-more { display: inline-block; margin-top: 1.2cqw; font-weight: 600; font-size: 2.3cqw; color: #f6f4ee; }
+    /* Rolling words and letters: the old text lifts away unit by unit, then
+       the new rises into place unit by unit; units shared by both stay. */
+    .hx .mm-roll { display: inline-block; position: relative; vertical-align: top; white-space: nowrap; line-height: var(--lh, 1.2); height: calc(var(--lh, 1.2) * 1em); }
+    .hx .mm-rl { position: absolute; left: 0; top: 0; white-space: pre; }
+    .hx .mm-roll[data-align="right"] .mm-rl { left: auto; right: 0; }
+    .hx .mm-ru { display: inline-block; white-space: pre; }
+
+    @media (min-width: 900px) {
+      .hx .story.is-live .mm { grid-column: 2; grid-row: 1 / 6; }
+      /* Centred below the nav, never tucked under it (the controller shows
+         the static faces instead when the window cannot hold the frame). */
+      .hx .mm-pin { position: sticky; top: max(calc(var(--mm-top, 80px) + 8px), calc(50svh + 34px - var(--mm-pin-h, 400px) / 2));
+                    margin-top: max(calc(var(--mm-top, 80px) + 8px), calc(50svh + 34px - var(--mm-pin-h, 400px) / 2)); }
+    }
+    /* Phones and tablets: a compact band pinned under the nav; the words
+       scroll beneath it. Words too small to read at this size are left out
+       (the controller fades them; the faces still carry them). */
+    @media not all and (min-width: 900px) {
+      .hx .story.is-live .mm { grid-row: 1; position: sticky; top: var(--mm-top, 80px); z-index: 20; margin: 0 -12px; padding: 0 4px 18px;
+                               background: linear-gradient(to bottom, var(--bg) 0, var(--bg) calc(100% - 18px), rgba(246, 244, 238, 0) 100%); }
+      /* paper behind the nav, so the words never show between it and the band */
+      .hx .story.is-live .mm::before { content: ""; position: absolute; left: 0; right: 0; bottom: 100%; height: var(--mm-top, 80px); background: var(--bg); }
+      .hx .story.is-live { padding-top: 84px; }
+      .hx .mm-pin { max-width: 600px; margin: 0 auto; }
+      .hx .mm-player { border-radius: 19px; padding: 5px; box-shadow: 0 1px 2px rgba(22, 51, 42, .25), 0 24px 40px -28px rgba(22, 51, 42, .6); }
+      .hx .mm-screen { border-radius: 14px; clip-path: inset(0 round 14px); }
+      .hx .mm-slide, .hx .mm-lift { border-radius: 14px; }
+      .hx .mm-bar { padding: 8px 8px 3px; font-size: 13px; min-height: 30px; }
+      .hx .mm-t-label, .hx .mm-t-score { font-size: 3.3cqw; }
+      .hx .mm-rm { display: none; }
+      .hx .mm-card .wheel-label { display: none; }
+      .hx .story.is-live .beat { min-height: 62svh; }
+      .hx .story.is-live .b4 { min-height: 92svh; }
+    }
+    @media print { .hx .mm { display: none !important; } .hx .story.is-live .beat { min-height: 0 !important; } }
+  </style>
+<% end %>
+<% f = frame %>
+<% inv = f[:invite] %>
+<% rec = f[:record] %>
+<% heading = rec[:kind] == :verdict ? "The verdict" : "The tasting record" %>
+<% invite_caption = inv[:sample] ? "Gather your society" : "The next tasting night" %>
+<% config = { rows: f[:rows].size, picked: f[:picked], sample: inv[:sample], invite_glasses: inv[:glasses], going: inv[:going].present?,
+              record: rec[:kind], record_glasses: rec[:glasses], seats: f[:seats], table: f[:table], slide_in_invite: f[:slide_in_invite],
+              slide_in_record: f[:slide_in_record], wheel: rec[:profile].present?,
+              levels: rec[:kind] == :verdict ? rec[:pours].map { |p| p[:level].round(3) } : (rec[:kind] == :review ? [ rec[:level].round(3) ] : []) } %>
+<div class="mm" data-story-frame-target="frame" data-config="<%= config.to_json %>" aria-hidden="true">
+  <div class="mm-pin">
+    <div class="mm-player">
+      <div class="mm-screen" data-story-frame-target="screen">
+        <div class="mm-layer mm-paper" data-mm="paper"></div>
+        <div class="mm-layer mm-oak" data-mm="oak"></div>
+        <div class="mm-layer mm-mark" data-mm="mark"></div>
+        <div class="mm-layer mm-photo" data-mm="photo">
+          <div class="mm-ph" data-mm="ph">
+            <%= render "shared/duotone", src: "photos/tasting-night-living-room.jpg", css: "duotone--heavy mm-ph-img", width: 1280, height: 512, alt: "", appear: false, loading: "eager" %>
+          </div>
+        </div>
+
+        <%# The record's card: the night's palate wheel, or the review's score and wheel (or notes). %>
+        <% if rec[:kind] == :verdict && rec[:profile].present? %>
+          <div class="mm-obj mm-card" data-mm="card">
+            <div class="mm-wheel"><%= render "reviews/palate_wheel", profile: rec[:profile], draw: false, wedge_pours: rec[:wedge_pours] %></div>
+          </div>
+        <% elsif rec[:kind] == :review %>
+          <% review = rec[:review] %>
+          <% tasting = { "Nose" => review.nose, "Palate" => review.palate, "Finish" => review.finish }.compact_blank %>
+          <div class="mm-obj mm-card mm-card--review<%= ' mm-card--notes' if rec[:profile].blank? %>" data-mm="card">
+            <div class="mm-score" data-mm="card-score"><%= render "shared/score", value: review.rating.to_f, appear: false %></div>
+            <% if rec[:profile].present? %>
+              <div class="mm-wheel"><%= render "reviews/palate_wheel", review: review, draw: false %></div>
+            <% elsif tasting.any? %>
+              <dl><% tasting.each do |label, text| %><div><dt><%= label %></dt><dd><%= text %></dd></div><% end %></dl>
+            <% end %>
+          </div>
+        <% end %>
+
+        <%# The library. The picked row's words and thumbnail are the travelling objects below. %>
+        <div class="mm-obj" data-mm="head"><span class="mm-h4 mm-t-head"><span class="mm-roll" data-states="<%= [ "", "Latest decks", "" ].to_json %>"></span></span></div>
+        <% f[:rows].each_with_index do |row, i| %>
+          <% if i == f[:picked] %>
+            <div class="mm-obj mm-rule" data-mm="row" data-row="<%= i %>"></div>
+          <% else %>
+            <div class="mm-obj mm-row" data-mm="row" data-row="<%= i %>">
+              <div class="mm-rule"></div>
+              <div class="mm-th"><% if row[:thumb] %><%= image_tag image_variant(row[:thumb], :card), alt: "", loading: "eager", decoding: "async" %><% end %></div>
+              <div class="mm-rt"><%= row[:title] %></div>
+              <div class="mm-rm"><%= row[:meta] %></div>
+            </div>
+          <% end %>
+        <% end %>
+
+        <%# The record's heading and the rules between its rows. %>
+        <div class="mm-obj" data-mm="heading"><span class="mm-h4 mm-t-heading"><span class="mm-roll" data-states="<%= [ "", heading ].to_json %>"></span></span></div>
+        <% if rec[:kind] == :verdict %>
+          <% rec[:pours].each_index do |k| %><div class="mm-obj mm-vline" data-mm="vline" data-k="<%= k %>"></div><% end %>
+        <% end %>
+
+        <%# The deck: the hero's first slide, the picked row's thumbnail, the slide at the table. %>
+        <div class="mm-obj mm-slide-obj" data-mm="slide">
+          <div class="mm-lift" data-mm="lift"></div>
+          <div class="mm-slide">
+            <% if f[:slide] %>
+              <%= image_tag image_variant(f[:slide], :hero), alt: "", loading: "eager", decoding: "async" %>
+            <% else %>
+              <div class="mm-slide-ink"><span class="mm-h4">Every pour has a story.</span></div>
+            <% end %>
+          </div>
+        </div>
+
+        <%# Words that travel and change by rolling. %>
+        <div class="mm-obj" data-mm="time"><span class="mm-t-time mm-roll" data-states="<%= [ "", inv[:time], "" ].to_json %>"></span></div>
+        <% if inv[:tag] %>
+          <div class="mm-obj" data-mm="tag"><span class="mm-tag"><span class="mm-roll" data-states="<%= [ "", inv[:tag], "" ].to_json %>"></span></span></div>
+        <% end %>
+        <div class="mm-obj" data-mm="date"><span class="mm-t-date mm-roll" data-states="<%= [ "", inv[:date], "" ].to_json %>"></span></div>
+        <div class="mm-obj" data-mm="title"><span class="mm-t-title mm-roll" data-mode="words" data-states="<%= [ f[:rows][f[:picked]]&.dig(:title).to_s, inv[:title], rec[:title] ].to_json %>"></span></div>
+        <div class="mm-obj" data-mm="meta"><span class="mm-t-where mm-roll" data-mode="words" data-states="<%= [ f[:rows][f[:picked]]&.dig(:meta).to_s, inv[:where], rec[:meta] ].to_json %>"></span></div>
+        <div class="mm-obj" data-mm="going"><span class="mm-t-going mm-roll" data-states="<%= [ "", inv[:going], "" ].to_json %>"></span></div>
+
+        <% if rec[:kind] == :review %>
+          <% review = rec[:review] %>
+          <% quote = review.notes.presence %>
+          <div class="mm-obj mm-rv" data-mm="review">
+            <% if quote %><p class="mm-rv-quote">&ldquo;<%= quote %>&rdquo;</p><% end %>
+            <div class="mm-rv-by"><b><%= "#{review.user.first_name} #{review.user.last_name}" %></b> <%= render "shared/century_badge", record: review.user, tone: :dark %> · <%= review.created_at.strftime("%B %-d, %Y") %></div>
+            <span class="mm-rv-more"><%= with_arrow("Read the full tasting") %></span>
+          </div>
+        <% end %>
+
+        <%# The glasses: guests on the invite, seats at the table, the night's pours. %>
+        <% f[:seats].times do |k| %>
+          <% pour = rec[:kind] == :verdict ? rec[:pours][k] : nil %>
+          <div class="mm-obj mm-glass" data-mm="glass" data-k="<%= k %>"><%= render "shared/glass", level: 1, size: 40, appear: false %></div>
+          <div class="mm-obj" data-mm="label" data-k="<%= k %>"><span class="mm-t-label mm-roll" data-states="<%= [ "", inv[:initials][k].to_s, pour ? pour[:name] : "" ].to_json %>"></span></div>
+          <% if pour %>
+            <div class="mm-obj" data-mm="score" data-k="<%= k %>"><span class="mm-t-score mm-roll" data-align="right" data-states="<%= [ "", pour[:score] ].to_json %>"></span></div>
+          <% end %>
+        <% end %>
+      </div>
+      <div class="mm-bar">
+        <%# Plain strings: escaped once here, set with textContent by the controller. %>
+        <span class="mm-roll" data-mm="cap-l" data-states="<%= [ f[:hero_title], "The library", invite_caption, f[:hero_title], "The tasting record" ].to_json %>"></span>
+        <span class="mm-roll" data-mm="cap-r" data-align="right" data-states="<%= ([ f[:hero_meta], "" ] + (1..f[:table]).map { |k| "Glass #{k} of #{f[:table]}" } + [ "" ]).to_json %>"></span>
+      </div>
+    </div>
+  </div>
+</div>

@@ -6,7 +6,7 @@ require "application_system_test_case"
 # motion, and even when IntersectionObserver never fires at all.
 class AppearRevealTest < ApplicationSystemTestCase
   ITEMS = "[data-appear-target~='item']".freeze
-  BUSY = ".appear-pending, .glass-wait, .glass-pouring, .draw-wait, .draw-run, .perform-wait, .perform-run, .photo-wait, .photo-run, .img-wait".freeze
+  BUSY = ".appear-pending, .glass-wait, .glass-pouring, .draw-wait, .draw-run, .photo-wait, .photo-run, .img-wait".freeze
 
   # Items that are hidden or not fully opaque, as "tag.class" strings.
   def faded_items
@@ -88,9 +88,9 @@ class AppearRevealTest < ApplicationSystemTestCase
     wait_for_turbo_visit
     assert_no_selector "main .appear-pending:not(.is-in)", visible: :all, wait: 1
     # A back visit replays nothing: no face performs, nothing draws again.
-    assert_no_selector ".perform-wait, .perform-run, .draw-wait, .draw-run, .glass-wait, .glass-pouring", visible: :all, wait: 0
+    assert_no_selector ".draw-wait, .draw-run, .glass-wait, .glass-pouring", visible: :all, wait: 0
     scroll_through_page
-    assert_no_selector ".perform-wait, .perform-run, .draw-wait, .draw-run", visible: :all, wait: 0
+    assert_no_selector ".draw-wait, .draw-run", visible: :all, wait: 0
     assert_everything_visible "home after back"
   end
 

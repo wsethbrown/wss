@@ -419,14 +419,14 @@
   /* The pour in a glass: the level rises from under the bowl's foot to its
      drawn height the first time the glass is seen. At rest the level is
      simply drawn where it belongs. */
-  svg[data-glass].glass-wait g > path { transform: translateY(var(--glass-rise, 38px)); }
+  svg[data-glass].glass-wait g > path { transform: translateY(var(--glass-rise, 28px)); }
   svg[data-glass].glass-pouring g > path { animation: glass-pour 1200ms var(--motion-ease-pour) var(--appear-delay, 0ms) both; }
 }
 @media (prefers-reduced-motion: no-preference) and (max-width: 639px) {
   .appear-pending { translate: 0 16px; }
 }
 @keyframes glass-pour {
-  from { transform: translateY(var(--glass-rise, 38px)); }
+  from { transform: translateY(var(--glass-rise, 28px)); }
   to   { transform: none; }
 }
 

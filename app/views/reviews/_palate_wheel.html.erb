@@ -9,7 +9,10 @@
     --d its delay, gaps shrinking), then the labels fade in. The markup is
     the final picture: without JS, in admin, in print and under reduced
     motion the wheel is simply drawn. Each wedge stays inside its link, so
-    it is clickable throughout. %>
+    it is clickable throughout.
+    draw: false leaves the wheel out of the draw-in (the homepage story frame
+    draws it itself). wedge_pours: optional family => index, written on each
+    lit wedge as data-pour (which pour of a night feeds it). %>
 <% profile = local_assigns[:profile] || review.wheel_display_profile %>
 <% if profile.any? %>
   <% families = Review::DESCRIPTOR_LEXICON.keys %>
@@ -18,7 +21,7 @@
   <% lit_delays = [ 0, 90, 170, 240, 300, 350, 390, 420, 440 ] %>
   <% lit = 0 %>
   <figure class="mx-auto max-w-xs">
-    <svg viewBox="-110 -110 220 220" role="img" aria-label="Palate wheel for this tasting" data-appear-target="draw">
+    <svg viewBox="-110 -110 220 220" role="img" aria-label="Palate wheel for this tasting"<% unless local_assigns[:draw] == false %> data-appear-target="draw"<% end %>>
       <% families.each_with_index do |family, i| %>
         <% a0 = (-90 + i * step) * Math::PI / 180 %>
         <% a1 = (-90 + (i + 1) * step) * Math::PI / 180 %>
@@ -37,7 +40,7 @@
                       "A#{hub},#{hub} 0 0 0 #{(hub * Math.cos(a0)).round(2)},#{(hub * Math.sin(a0)).round(2)} Z" %>
           <a href="<%= reviews_path(tags: family) %>">
             <path d="<%= sector %>" fill="#b8c9bf" stroke="#fff" stroke-width="1" class="wheel-wedge"
-                  style="--from: <%= (hub / r).round(3) %>; --d: <%= lit_delays[[ lit, lit_delays.size - 1 ].min] %>ms">
+                  style="--from: <%= (hub / r).round(3) %>; --d: <%= lit_delays[[ lit, lit_delays.size - 1 ].min] %>ms"<% if local_assigns[:wedge_pours] %> data-pour="<%= local_assigns[:wedge_pours][family].to_i %>"<% end %>>
               <title><%= family %>. See tastings like this.</title>
             </path>
             <text x="<%= lx %>" y="<%= ly %>" text-anchor="middle" dominant-baseline="middle"

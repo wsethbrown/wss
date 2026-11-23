@@ -1,12 +1,14 @@
 <%# The homepage.
 
-    The top of the page is one presentation. A deck screen stays pinned on
-    the right while the story scrolls past on the left, and each part of the
-    story drops a new slide onto the screen: the real deck, the real library,
-    the next real tasting night, the real tasting record. The later slides are
-    drawn in HTML with the deck template's own colours and type.
-    Pure CSS (sticky grid areas); on phones each slide follows its text.
-    Every visual is real data; nothing renders when the data is missing.
+    The top of the page is one presentation. One frame stays pinned beside
+    the story (a band at the top on phones) and its objects travel from each
+    step's arrangement to the next: the deck's slide shrinks into its row in
+    the library, the row lifts into the invite, the invite opens onto the
+    table, the glasses become the record (home/_story_frame,
+    story_frame_controller.js). Each step also has its static face beside its
+    words, server-rendered real HTML: that is the page without JS, in print
+    and for screen readers. Every visual is real data; nothing renders when
+    the data is missing.
     Styles are scoped to .hx (see docs/redesign/DESIGN_SYSTEM.md). %>
 <%
   showcase_slides =
@@ -15,6 +17,7 @@
     else
       []
     end
+  showcase_slide_count = @showcase_deck ? @showcase_deck.slide_images.count : 0
   reel = [ showcase_slides.size, 1 ].max
   step = (100.0 / reel).round(2)
   rules = [
@@ -34,7 +37,7 @@
 %>
 
 <% content_for :head do %>
-  <style>
+  <style nonce="<%= content_security_policy_nonce %>">
     .hx { --bg: #f6f4ee; --card: #fff; --ink: #16332a; --text: #1b2924; --mute: #5f6b64; --line: rgba(22, 51, 42, .12); --mark: #ff6d00; --mark-deep: #e65c00; --pad: 20px;
           background: var(--bg); color: var(--text); font-family: "Instrument Sans", system-ui, sans-serif; overflow-x: clip; }
     .hx *, .hx *::before { box-sizing: border-box; }
@@ -96,9 +99,11 @@
     .hx a.player { transition: transform .25s cubic-bezier(0.23, 1, 0.32, 1); }
     @media (hover: hover) and (pointer: fine) { .hx a.player:hover { transform: translateY(-2px); } }
 
-    /* The pinned presentation. Faces share one grid column and each sticks
-       from its own row to the end, so a later face slides up over the last. */
-    /* minmax(0, 1fr): a long deck title in a player bar must not widen the
+    /* The story. Without JS each step's static face follows its words (beside
+       them on a wide screen); with the frame running (.is-live, added by
+       story_frame_controller.js) the faces are kept for screen readers only
+       and the frame takes their place.
+       minmax(0, 1fr): a long deck title in a player bar must not widen the
        phone column past the screen (it clipped every face at 375px). */
     .hx .story { display: grid; grid-template-columns: minmax(0, 1fr); gap: 28px; padding: 112px 0 24px; }
     .hx .story .bar b { min-width: 0; overflow: hidden; text-overflow: ellipsis; }
@@ -114,6 +119,13 @@
        the beats' own type. On desktop the last face stays pinned beside it
        until the story ends. It never animates in, so it is never left faded. */
     .hx .beat--close { padding: 12px 0 8px; }
+    /* Live: a face is read, not seen (it shows if a keyboard reaches into it,
+       so focus never lands on something off screen); its reel stands still. */
+    @media screen {
+      .hx .story.is-live .face:not(:focus-within) { position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+      .hx .story.is-live .face * { animation: none !important; }
+      .hx .story.is-live .face:focus-within { grid-column: 1 / -1; position: relative; z-index: 25; }
+    }
     .hx .beat--close h2 { font-size: clamp(2rem, 3.6vw, 3.25rem); }
     .hx .beat--close .acts { margin-top: 26px; }
     .hx .player { display: block; background: var(--ink); border-radius: 28px; padding: 10px; box-shadow: 0 1px 2px rgba(22, 51, 42, .25), 0 44px 80px -34px rgba(22, 51, 42, .6); }
@@ -219,13 +231,18 @@
       /* The right padding keeps the step words clear of the story glass,
          which hangs in the gutter beside them (home/_story_glass). */
       .hx .beat { grid-column: 1; min-height: 86svh; padding: 40px 28px 40px 0; }
-      .hx .beat:first-child { min-height: 100svh; padding-top: 104px; }
-      .hx .face { grid-column: 2; align-self: start; position: sticky; top: max(112px, calc(50svh - 17.5vw)); margin: 0; }
-      .hx .f1 { grid-row: 1 / 5; } .hx .f2 { grid-row: 2 / 5; } .hx .f3 { grid-row: 3 / 5; } .hx .f4 { grid-row: 4 / 5; }
+      .hx .b1 { min-height: 100svh; padding-top: 104px; }
+      /* Without JS: each face sits beside its step's words and scrolls with them. */
+      .hx .face { grid-column: 2; align-self: center; margin: 0; }
+      .hx .f1 { grid-row: 1; } .hx .f2 { grid-row: 2; } .hx .f3 { grid-row: 3; } .hx .f4 { grid-row: 4; }
       .hx .b1 { grid-row: 1; } .hx .b2 { grid-row: 2; } .hx .b3 { grid-row: 3; } .hx .b4 { grid-row: 4; }
       .hx .beat--close { grid-row: 5; min-height: 0; padding: 24px 28px 8px 0; }
+      /* Live: the steps are spaced for reading beside the pinned frame; the
+         table step is longer (its glasses fill while it is read) and the
+         closing line holds the record. */
+      .hx .story.is-live .b4 { min-height: 112svh; }
+      .hx .story.is-live .beat--close { min-height: 78svh; padding-bottom: 40px; }
     }
-    @media (min-width: 1400px) { .hx .face { top: max(112px, calc(50svh - 230px)); } }
 
     /* Step grid: tiles sized by how much each has to show. */
     .hx .grid { display: grid; gap: 14px; margin-top: 40px; }
@@ -317,38 +334,6 @@
       .hx .split { grid-template-columns: 5fr 7fr; gap: 64px; }
     }
 
-    /* The step faces perform once as they arrive (data-appear-target=
-       "perform" on each screen; the appear controller plays it 120ms after
-       its player starts to show, once, and never on a back or forward
-       visit), once the face is well on screen. Each is done inside 950ms. The library's rows tick in one by
-       one; the invite's guests pop in in turn, from .7 and never from
-       nothing; the record's words settle while its wheel draws (the wheel's
-       own draw-in) and a verdict's rows tick in like the library's. The
-       stagger gaps shrink. Without JS, on the server's HTML and under
-       reduced motion, the faces are simply there. */
-    @media (prefers-reduced-motion: no-preference) {
-      .hx .perform-wait .sl li,
-      .hx .perform-wait .rv-txt > *,
-      .hx .perform-wait .rv-card--notes { opacity: 0; translate: 0 8px; }
-      .hx .perform-wait .faces > * { opacity: 0; scale: .7; }
-      .hx .perform-run .sl li,
-      .hx .perform-run .rv-txt > *,
-      .hx .perform-run .rv-card--notes { animation: hx-settle 500ms var(--motion-ease-out) calc(var(--appear-delay, 0ms) + var(--d, 0ms)) both; }
-      .hx .perform-run .faces > * { animation: hx-pop 400ms var(--motion-ease-out) calc(var(--appear-delay, 0ms) + 150ms + var(--d, 0ms)) both; }
-      .hx .sl li:nth-child(2), .hx .faces > :nth-child(2), .hx .rv-txt > :nth-child(2), .hx .rv-card--notes { --d: 90ms; }
-      .hx .sl li:nth-child(3), .hx .faces > :nth-child(3) { --d: 170ms; }
-      .hx .sl li:nth-child(4), .hx .faces > :nth-child(4) { --d: 240ms; }
-      .hx .sl li:nth-child(5), .hx .faces > :nth-child(5) { --d: 300ms; }
-      .hx .sl li:nth-child(n+6), .hx .faces > :nth-child(n+6) { --d: 350ms; }
-    }
-    @keyframes hx-settle { from { opacity: 0; translate: 0 8px; } to { opacity: 1; translate: none; } }
-    @keyframes hx-pop { from { opacity: 0; scale: .7; } to { opacity: 1; scale: 1; } }
-    @media print {
-      .hx :is(.perform-wait, .perform-run) :is(.sl li, .rv-txt > *, .rv-card--notes, .faces > *) {
-        opacity: 1 !important; translate: none !important; scale: none !important; animation: none !important;
-      }
-    }
-
     /* Cards, rows, panels and headings reveal once, the first time they
        scroll in, through the site's appear controller (data-appear-target on
        the markup below; application.css; appear_controller.js). It is
@@ -369,9 +354,13 @@
 
 <div class="hx">
   <div class="wrap">
-    <div class="story">
+    <% frame = story_frame(showcase: @showcase_deck, showcase_slides: showcase_slides, slide_count: showcase_slide_count, decks: @featured_presentations,
+                           event: @next_event, guests: @next_event_guests, going: @next_event_going,
+                           verdict_night: @verdict_night, verdict_rows: @verdict_rows, verdict_reviews: @verdict_reviews, review: @featured_review) %>
+    <div class="story" data-controller="story-frame">
+      <%= render "home/story_frame", frame: frame %>
       <!-- Beat 1: the pitch, with the real deck on screen -->
-      <div class="beat b1">
+      <div class="beat b1" data-story-frame-target="beat">
         <h1>Every pour<br>has <em>a story.</em></h1>
         <p class="lede" style="margin-top:26px">Narrative tasting decks for whiskey nights that hold together, the research done, the script written, the bottles picked.</p>
         <div class="acts">
@@ -380,7 +369,7 @@
         </div>
         <p class="note">One credit a month with membership · Or buy any deck outright</p>
       </div>
-      <div class="face f1" data-appear-settle>
+      <div class="face f1">
         <% if showcase_slides.any? %>
           <%# Real slides, limited to the deck's free-preview slides. %>
           <%= link_to presentation_path(@showcase_deck), class: "player", aria: { label: "#{@showcase_deck.title}, preview slides" } do %>
@@ -393,7 +382,7 @@
               <b><%= @showcase_deck.title %></b>
               <%# One tick per slide in the reel, lit with its slide. %>
               <div class="ticks ticks--reel" aria-hidden="true"><% showcase_slides.size.times do |i| %><i style="animation-delay: <%= i * 4 %>s"></i><% end %></div>
-              <span><%= [ "#{@showcase_deck.slide_images.count} slides", @showcase_deck.duration.presence ].compact.join(" · ") %></span>
+              <span><%= [ "#{showcase_slide_count} slides", @showcase_deck.duration.presence ].compact.join(" · ") %></span>
             </div>
           <% end %>
         <% else %>
@@ -403,7 +392,7 @@
       </div>
 
       <!-- Beat 2: pick a deck, with the real library on screen -->
-      <div id="how-it-works" class="beat b2">
+      <div id="how-it-works" class="beat b2" data-story-frame-target="beat">
         <div class="beat-body" data-appear-target="item">
           <span class="n">1 of 3</span>
           <h2>Pick <em>a deck</em></h2>
@@ -411,9 +400,9 @@
           <%= link_to "See the full library", presentations_path, class: "more" %>
         </div>
       </div>
-      <div class="face f2" data-appear-settle>
-        <div class="player" data-appear-target="item">
-          <div class="screen" data-appear-target="perform">
+      <div class="face f2">
+        <div class="player">
+          <div class="screen">
             <div class="sl sl--paper">
               <h4>Latest decks</h4>
               <ul>
@@ -431,7 +420,7 @@
       </div>
 
       <!-- Beat 3: gather, with the next real tasting night on screen -->
-      <div class="beat b3">
+      <div class="beat b3" data-story-frame-target="beat">
         <div class="beat-body" data-appear-target="item">
           <span class="n">2 of 3</span>
           <h2>Gather <em>your society</em></h2>
@@ -439,13 +428,13 @@
           <%= link_to "Browse societies", societies_path, class: "more" %>
         </div>
       </div>
-      <div class="face f3" data-appear-settle>
+      <div class="face f3">
         <%# The one photograph on this page (owner-supplied, AI-generated; see
             docs/redesign/IMAGE_CREDITS.md). Same band in both invite states. %>
         <% gathering_photo = capture do %><%= render "shared/duotone", src: "photos/tasting-night-living-room.jpg", css: "invite-photo", width: 1280, height: 512,
               alt: "Five friends at a whiskey tasting in a lamp-lit living room. One stands by the TV with a glass raised, presenting, and four listen from the sofas, laughing, with glasses in hand." %><% end %>
-        <div class="player" data-appear-target="item">
-          <div class="screen screen--invite" data-appear-target="perform">
+        <div class="player">
+          <div class="screen screen--invite">
             <% if @next_event %>
               <%# The next real tasting night at a public society, drawn as its
                   invite: when, what, where, and who has said yes (the names
@@ -502,7 +491,7 @@
       </div>
 
       <!-- Beat 4: pour, with the real tasting record on screen -->
-      <div class="beat b4">
+      <div class="beat b4" data-story-frame-target="beat">
         <div class="beat-body" data-appear-target="item">
           <span class="n">3 of 3</span>
           <h2>Pour <em>and present</em></h2>
@@ -510,9 +499,9 @@
           <%= link_to "Read the record", reviews_path, class: "more" %>
         </div>
       </div>
-      <div class="face f4" data-appear-settle>
-        <div class="player" data-appear-target="item">
-          <div class="screen<%= ' screen--tall' if @verdict_rows.blank? && @featured_review %>" data-appear-target="perform">
+      <div class="face f4">
+        <div class="player">
+          <div class="screen<%= ' screen--tall' if @verdict_rows.blank? && @featured_review %>">
             <div class="sl sl--ink">
               <% if @verdict_rows.present? %>
                 <%# The verdict of a real revealed night at a public society:
@@ -582,7 +571,7 @@
       <%= render "home/story_glass" %>
 
       <!-- The close: the end of the three steps, in the same column -->
-      <div class="beat beat--close">
+      <div class="beat beat--close" data-story-frame-target="beat">
         <h2>That's <em>the whole ritual.</em></h2>
         <p class="lede">Pick your first deck and set a date. The deck recommends some bottles to buy.</p>
         <div class="acts"><%= link_to "Browse the decks", presentations_path, class: "btn2" %></div>

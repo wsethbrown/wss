@@ -20,12 +20,12 @@
       motion the level does not follow the scroll: it steps a third at a
       time as each step is reached, with no motion. %>
 <% content_for :head do %>
-  <style>
+  <style nonce="<%= content_security_policy_nonce %>">
     .hx .story-glass { position: fixed; z-index: 30; right: -5px; bottom: calc(16px + env(safe-area-inset-bottom, 0px)); pointer-events: none;
                        opacity: 0; transition: opacity 200ms var(--motion-ease-out); }
     .hx .story-glass.is-shown { opacity: 1; }
     .hx .story-glass svg { display: block; width: 30px; height: 40px; }
-    .hx .story-glass svg g > path { transform: translateY(var(--story-glass-drop, 38px)); }
+    .hx .story-glass svg g > path { transform: translateY(var(--story-glass-drop, 28px)); }
     @media (min-width: 900px) {
       /* Shares the faces' column from the first step to the end of the
          story, hangs into the 72px gutter to its left, and is held at the

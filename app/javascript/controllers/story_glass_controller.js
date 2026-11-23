@@ -2,8 +2,8 @@ import { Controller } from "@hotwired/stimulus"
 
 // The story glass (home/_story_glass.html.erb, on the homepage only): a
 // glass that fills as the reader scrolls through the homepage story, empty
-// when the first step's words sit in the middle of the screen, full when the
-// closing beat's heading does. Loaded like every controller (eager, from the
+// until the first step's words come up over the bottom edge of the screen,
+// full when the closing beat's heading is mid-screen. Loaded like every controller (eager, from the
 // import map); it is small, and inert on any page without its element.
 //
 // The drawing is shared/_glass at full; this lowers its liquid by
@@ -15,7 +15,7 @@ import { Controller } from "@hotwired/stimulus"
 // steps are on screen; on desktop it is sticky beside the steps and the CSS
 // shows it.
 
-const DROP = 38 // the full level lowered this far is below the bowl: empty
+const DROP = 28 // shared/_glass's span (24) + 4: the full level lowered this far is below the bowl, empty
 
 export default class extends Controller {
   connect() {
@@ -51,9 +51,13 @@ export default class extends Controller {
     if (this.reduce.matches) {
       level = this.marks.filter((el) => centre(el) <= mid).length / this.marks.length
     } else {
-      const from = centre(this.first)
-      const to = centre(this.close)
-      level = to > from ? Math.min(1, Math.max(0, (mid - from) / (to - from))) : 1
+      // Starts filling as the first step's words come up over the bottom edge
+      // of the screen (owner: "start pouring earlier"; it used to start only
+      // once they reached the middle), full when the closing heading's centre
+      // reaches the middle. Both move 1:1 with the scroll, so this is linear.
+      const start = this.first.getBoundingClientRect().top - window.innerHeight // 0 when the words appear
+      const end = centre(this.close) - mid // 0 when the closing heading is mid-screen
+      level = end > start ? Math.min(1, Math.max(0, -start / (end - start))) : 1
     }
     this.element.style.setProperty("--story-glass-drop", `${((1 - level) * DROP).toFixed(2)}px`)
 

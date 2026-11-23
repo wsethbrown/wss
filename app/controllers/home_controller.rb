@@ -3,7 +3,10 @@ class HomeController < ApplicationController
 
   def index
     @stripe_products = fetch_stripe_products
+    # The library rows (the face and the story frame); their covers preloaded,
+    # so a row costs no queries of its own.
     @featured_presentations = Presentation.published.recent.limit(3)
+                                          .includes(slide_images_attachments: { blob: :variant_records }, featured_image_attachment: { blob: :variant_records }).to_a
     # The one deck to spotlight: the most recently featured published deck.
     @spotlight_deck = Presentation.published.featured.recent.first
     # Real rendered slides for the hero screen: the spotlight deck when it has
@@ -67,12 +70,15 @@ class HomeController < ApplicationController
                           .where(id: Review.where.not(event_id: nil).select(:event_id))
                           .limit(10).detect(&:pours_revealed?)
     @verdict_rows = []
+    @verdict_reviews = []
     unless @verdict_night
       Rails.logger.debug "Home: no revealed public night with reviews, slide four shows the tasting record"
       return
     end
 
-    by_bottle = @verdict_night.reviews.includes(:user).recent_first.group_by(&:bottle_id)
+    # Kept for the story frame's wheel, so the night's reviews load once.
+    @verdict_reviews = @verdict_night.reviews.includes(:user).recent_first.to_a
+    by_bottle = @verdict_reviews.group_by(&:bottle_id)
     @verdict_rows = helpers.verdict_rows(@verdict_night.event_bottles.ordered.includes(:bottle).to_a, by_bottle)
     Rails.logger.debug "Home: verdict from event #{@verdict_night.id} (#{@verdict_rows.size} scored pours)"
   end

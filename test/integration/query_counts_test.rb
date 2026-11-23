@@ -66,6 +66,16 @@ class QueryCountsTest < ActionDispatch::IntegrationTest
     assert_operator many.size, :<=, few.size, "library queries grew with deck count:\n#{growth(few, many)}"
   end
 
+  # The homepage's library rows (the face and the story frame) show each
+  # deck's cover: preloaded, so a row costs no queries of its own.
+  test "homepage query count does not grow with the library's rows" do
+    new_deck(1)
+    few = measure(root_path)
+    2.times { |i| new_deck(2 + i) }
+    many = measure(root_path)
+    assert_operator many.size, :<=, few.size, "homepage queries grew with library rows:\n#{growth(few, many)}"
+  end
+
   def add_society_rows(society, event, count, offset)
     count.times do |i|
       member = new_user(offset + i)

@@ -9,7 +9,9 @@
              browser reserves the space before the lazy image arrives
     Motion (the appear controller): the photograph settles from a slight
     scale to its place the first time it is seen (photo), clipped by the
-    frame so nothing shifts, and fades in if it is still loading (image). %>
-<figure class="duotone <%= local_assigns[:css] %>" data-appear-target="photo">
-  <%= image_tag src, alt: alt, loading: "lazy", decoding: "async", width: local_assigns[:width], height: local_assigns[:height], data: { appear_target: "image" } %>
+    frame so nothing shifts, and fades in if it is still loading (image).
+    appear: false leaves it out of both (the homepage story frame moves it). %>
+<% appear = local_assigns[:appear] != false %>
+<figure class="duotone <%= local_assigns[:css] %>"<% if appear %> data-appear-target="photo"<% end %>>
+  <%= image_tag src, alt: alt, loading: local_assigns.fetch(:loading, "lazy"), decoding: "async", width: local_assigns[:width], height: local_assigns[:height], data: (appear ? { appear_target: "image" } : {}) %>
 </figure>
