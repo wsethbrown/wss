@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_23_120000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_22_140000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -286,13 +286,11 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_23_120000) do
     t.jsonb "sections", default: [], null: false
     t.string "subtitle"
     t.boolean "included_with_membership", default: false, null: false
-    t.bigint "record_bottle_id"
     t.index ["author_id"], name: "index_presentations_on_author_id"
     t.index ["category"], name: "index_presentations_on_category"
     t.index ["download_count"], name: "index_presentations_on_download_count"
     t.index ["featured"], name: "index_presentations_on_featured"
     t.index ["price"], name: "index_presentations_on_price"
-    t.index ["record_bottle_id"], name: "index_presentations_on_record_bottle_id", unique: true, where: "(record_bottle_id IS NOT NULL)"
     t.index ["title"], name: "index_presentations_on_title"
     t.index ["whiskey_recommendations_json"], name: "index_presentations_on_whiskey_recommendations_json", using: :gin
   end
@@ -674,7 +672,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_23_120000) do
   add_foreign_key "presentation_reviews", "users"
   add_foreign_key "presentation_tags", "presentations"
   add_foreign_key "presentation_tags", "tags"
-  add_foreign_key "presentations", "bottles", column: "record_bottle_id", on_delete: :nullify
   add_foreign_key "presentations", "users", column: "author_id"
   add_foreign_key "review_reports", "reviews"
   add_foreign_key "review_reports", "users"

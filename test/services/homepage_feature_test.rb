@@ -35,9 +35,14 @@ class HomepageFeatureTest < ActiveSupport::TestCase
     Bottle.create!(name: name, distillery: "Test Distillery")
   end
 
-  def review(bottle, event: nil, wheel: true, at: nil, by: buyer)
+  # Puts catalog bottles on a deck's pour list, in order.
+  def pour(deck, *bottles)
+    bottles.each { |b| deck.presentation_bottles.create!(bottle: b) }
+  end
+
+  def review(bottle, event: nil, wheel: true, at: nil, by: buyer, rating: 4.0)
     @n += 1
-    r = Review.new(user: by, bottle: bottle, event: event, rating: 4.0, notes: "Real notes.",
+    r = Review.new(user: by, bottle: bottle, event: event, rating: rating, notes: "Real notes.",
                    flavor_wheel: wheel ? { "smoky" => 0.5 } : {})
     r.save!(validate: false)
     r.update_columns(created_at: at || @n.minutes.from_now)
@@ -161,69 +166,76 @@ class HomepageFeatureTest < ActiveSupport::TestCase
 
   # ── The review ────────────────────────────────────────────────────────────
 
-  test "a deck's review bottle gives the record its review" do
+  test "the record leads with the deck's highest rated bottle: best mean score across its public reviews" do
     a = deck("A", at: 1.day.ago)
-    weller = bottle("Weller")
-    other = bottle("Something Newer")
-    chosen = review(weller)
-    review(other)
-    a.update!(record_bottle: weller)
+    steady = bottle("Steady")
+    mixed = bottle("Mixed")
+    unreviewed = bottle("Unreviewed")
+    pour(a, unreviewed, mixed, steady)
+    a.presentation_bottles.create!(name: "A cocktail")
+    review(mixed, rating: 5.0)
+    review(mixed, rating: 2.0)
+    low = review(steady, rating: 4.0, at: 9.days.ago)
+    top = review(steady, rating: 4.5, at: 8.days.ago)
+    review(bottle("Newest Anywhere"), rating: 5.0)
 
     f = feature
-    assert_equal chosen, f.review
-    assert_equal :chosen, f.review_source
+    assert_equal steady, f.review.bottle, "4.25 beats 3.5, and a 5 on a bottle the deck does not pour"
+    assert_equal top, f.review, "the bottle's best-scoring review is the one shown"
+    assert_equal :deck, f.review_source
+    assert f.deck_review?
+    assert low
   end
 
-  test "the newest review of the bottle that can draw a wheel is preferred, else the newest" do
+  test "ties between bottles go to the one with more reviews, then the earlier pour" do
+    a = deck("A")
+    first = bottle("First Pour")
+    second = bottle("Second Pour")
+    third = bottle("Third Pour")
+    pour(a, first, second, third)
+    [ first, second, third ].each { |b| review(b, rating: 4.0) }
+    assert_equal first, feature.review.bottle
+    review(third, rating: 4.0)
+    assert_equal third, feature.review.bottle
+  end
+
+  test "between a bottle's equal scores, a review that can draw a wheel is shown, then the newest" do
     a = deck("A")
     weller = bottle("Weller")
+    pour(a, weller)
     wheel = review(weller, wheel: true, at: 3.days.ago)
     review(weller, wheel: false, at: 1.day.ago)
-    a.update!(record_bottle: weller)
     assert_equal wheel, feature.review
 
-    wheel.destroy
-    assert_equal false, feature.review.wheel_display_profile.any?
+    newer = review(weller, wheel: true, at: 2.days.ago)
+    assert_equal newer, feature.review
   end
 
   test "only reviews allowed on the homepage count: nothing from a private or still-secret night" do
     a = deck("A")
     weller = bottle("Weller")
-    review(weller, event: events(:allocated_night))
-    secret = events(:mystery_flight)
-    review(weller, event: secret)
-    a.update!(record_bottle: weller)
+    pour(a, weller)
+    review(weller, event: events(:allocated_night), rating: 5.0)
+    review(weller, event: events(:mystery_flight), rating: 5.0)
 
     f = feature
     assert_nil f.review
     assert_equal :none, f.review_source
+    assert_not f.deck_review?
 
-    open = review(weller, event: events(:spring_blind))
+    open = review(weller, event: events(:spring_blind), rating: 3.0)
     assert_equal open, feature.review
   end
 
-  test "without a review bottle, the deck's pour list gives one: its first linked bottle with a public review" do
+  test "a deck with no reviewed bottle of its own gets the newest public review, as before" do
     a = deck("A")
-    unreviewed = bottle("Unreviewed Pour")
-    poured = bottle("Reviewed Pour")
-    a.presentation_bottles.create!(bottle: unreviewed)
-    a.presentation_bottles.create!(name: "A cocktail")
-    a.presentation_bottles.create!(bottle: poured)
-    mine = review(poured, at: 5.days.ago)
-    review(bottle("Newest Anywhere"))
-
-    f = feature
-    assert_equal mine, f.review
-    assert_equal :pour_list, f.review_source
-  end
-
-  test "with neither, the record is the newest public review, as before" do
-    deck("A")
+    pour(a, bottle("Unreviewed Pour"))
     older = review(bottle("Older"), at: 2.days.ago)
     newest = review(bottle("Newest"), at: 1.day.ago)
     f = feature
     assert_equal newest, f.review
     assert_equal :newest, f.review_source
+    assert_not f.deck_review?
     assert_equal [ newest, older ], f.record_reviews
   end
 
@@ -232,33 +244,31 @@ class HomepageFeatureTest < ActiveSupport::TestCase
     b = deck("B", at: 2.days.ago)
     c = deck("C", at: 3.days.ago)
     shared = bottle("On Two Pour Lists")
-    own = bottle("B's Own")
+    second = bottle("A's Second Best")
     spare = bottle("Spare")
-    # A has no bottle of its own; B chose one; C's pour list shares A's bottle.
-    a.presentation_bottles.create!(bottle: shared)
-    c.presentation_bottles.create!(bottle: shared)
-    b.update!(record_bottle: own)
-    review(shared)
-    review(own)
+    # A pours the shared bottle and another; B pours only the shared one; C pours none.
+    pour(a, shared, second)
+    pour(b, shared)
+    review(shared, rating: 5.0)
+    review(second, rating: 3.0)
     review(spare, at: 9.days.ago)
 
     leads = [ 1, 2, 3 ].map { |s| feature(slot: s).review.bottle }
-    assert_equal [ shared, own, spare ], leads
-    assert_equal [ :pour_list, :chosen, :newest ], [ 1, 2, 3 ].map { |s| feature(slot: s).review_source }
+    assert_equal [ second, shared, spare ], leads, "B has one reviewed bottle, so it keeps it and A takes its next best"
+    assert_equal [ :deck, :deck, :newest ], [ 1, 2, 3 ].map { |s| feature(slot: s).review_source }
   end
 
-  test "a chosen bottle is kept for its deck: another deck's pour list cannot take it" do
+  test "when the record is too short for every deck to have its own bottle, the newest review repeats" do
     a = deck("A", at: 1.day.ago)
-    b = deck("B", at: 2.days.ago)
+    deck("B", at: 2.days.ago)
     weller = bottle("Weller")
-    a.presentation_bottles.create!(bottle: weller)
-    b.update!(record_bottle: weller)
+    pour(a, weller)
     only = review(weller)
 
-    assert_equal only, feature(slot: 2).review
-    assert_equal :chosen, feature(slot: 2).review_source
-    assert_equal only, feature(slot: 1).review, "with one review in the whole record, it repeats rather than show nothing"
-    assert_equal :repeat, feature(slot: 1).review_source
+    assert_equal only, feature(slot: 1).review
+    assert_equal :deck, feature(slot: 1).review_source
+    assert_equal only, feature(slot: 2).review, "with one review in the whole record, it repeats rather than show nothing"
+    assert_equal :repeat, feature(slot: 2).review_source
   end
 
   test "the record's rows never list a bottle another of the three leads with" do
@@ -266,8 +276,8 @@ class HomepageFeatureTest < ActiveSupport::TestCase
     b = deck("B", at: 2.days.ago)
     for_a = bottle("A's Bottle")
     for_b = bottle("B's Bottle")
-    a.update!(record_bottle: for_a)
-    b.update!(record_bottle: for_b)
+    pour(a, for_a)
+    pour(b, for_b)
     lead = review(for_a, at: 9.days.ago)
     review(for_b, at: 1.day.ago)
     x = review(bottle("X"), at: 2.days.ago)
@@ -276,15 +286,5 @@ class HomepageFeatureTest < ActiveSupport::TestCase
     assert_equal [ lead, x, y ], feature(slot: 1).record_reviews
     assert_equal [ for_b ], feature(slot: 2).record_reviews.first(1).map(&:bottle)
     assert_not_includes feature(slot: 2).record_reviews.map(&:bottle), for_a
-  end
-
-  test "two decks cannot be given the same review bottle" do
-    a = deck("A")
-    b = deck("B")
-    weller = bottle("Weller")
-    a.update!(record_bottle: weller)
-    b.record_bottle = weller
-    assert_not b.valid?
-    assert_includes b.errors[:record_bottle_id].join, "already"
   end
 end

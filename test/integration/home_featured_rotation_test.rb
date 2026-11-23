@@ -33,7 +33,7 @@ class HomeFeaturedRotationTest < ActionDispatch::IntegrationTest
     Review.destroy_all # no verdict night, no other reviews
     @decks = [ deck("Alpha Deck", at: 1.day.ago), deck("Bravo Deck", at: 2.days.ago), deck("Charlie Deck", at: 3.days.ago) ]
     @bottles = [ reviewed_bottle("Alpha Bottle", at: 3.days.ago), reviewed_bottle("Bravo Bottle", at: 2.days.ago), reviewed_bottle("Charlie Bottle", at: 1.day.ago) ]
-    @decks.zip(@bottles) { |d, b| d.update!(record_bottle: b) }
+    @decks.zip(@bottles) { |d, b| d.presentation_bottles.create!(bottle: b) }
     sign_in users(:admin) # ?rotation= is an admin preview
   end
 
@@ -89,7 +89,7 @@ class HomeFeaturedRotationTest < ActionDispatch::IntegrationTest
     assert_equal usual, controller.instance_variable_get(:@showcase_deck)
   end
 
-  test "a deck's review bottle shows even when a finished public night could" do
+  test "a deck's own reviewed bottle shows even when a finished public night could" do
     # A revealed public night with event reviews: the verdict, were it not for the bottle.
     Review.new(user: users(:seth), bottle: bottles(:eagle_rare), event: events(:spring_blind), rating: 4.0).save!(validate: false)
     EventBottle.find_or_create_by!(event: events(:spring_blind), bottle: bottles(:eagle_rare)) { |p| p.position = 9 }
@@ -98,9 +98,9 @@ class HomeFeaturedRotationTest < ActionDispatch::IntegrationTest
     assert_equal @bottles[0], controller.instance_variable_get(:@featured_review).bottle
     assert_select ".face.f4 h4", text: "The tasting record"
 
-    @decks[0].update!(record_bottle: nil)
+    @decks[0].presentation_bottles.destroy_all
     get root_path(rotation: 1)
-    assert controller.instance_variable_get(:@verdict_rows).present?, "without a review bottle the finished night shows, as before"
+    assert controller.instance_variable_get(:@verdict_rows).present?, "with no reviewed bottle of its own the finished night shows, as before"
     assert_select ".face.f4 h4", text: "The verdict"
   end
 end

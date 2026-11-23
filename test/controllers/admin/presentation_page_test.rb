@@ -337,7 +337,7 @@ class Admin::PresentationPageTest < ActionDispatch::IntegrationTest
 
   PERMITTED = %w[title description content category tag_names price duration difficulty what_youll_learn
                  featured_image pdf_file preview_slide_count speaker_notes outline_file scorecard featured free_confirmed
-                 supplemental_materials presentation_bottles_attributes sections subtitle included_with_membership record_bottle_id].freeze
+                 supplemental_materials presentation_bottles_attributes sections subtitle included_with_membership].freeze
   # Permitted but never on this form: legacy columns and a legacy upload slot.
   NOT_ON_THE_FORM = %w[tasting_notes image recommendations_sheet].freeze
   # The four tasting boxes the extra sections replaced: no longer on the form

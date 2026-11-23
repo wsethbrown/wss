@@ -26,12 +26,13 @@ class HomeController < ApplicationController
     # reviews, its pours ranked by the room (slide four shows its top three in
     # place of the tasting record when there is one). Public societies only and
     # Event#pours_revealed? with no bypass, so a secret pour stays secret.
-    # A deck's own review bottle comes first: the admin chose it for this deck.
-    if @showcase_deck&.record_bottle_id && @feature.chosen_review?
+    # The featured deck's own bottle comes first (the highest rated on its
+    # pour list), so the record matches the deck.
+    if @feature.deck_review?
       @verdict_night = nil
       @verdict_rows = []
       @verdict_reviews = []
-      Rails.logger.info "Home: deck #{@showcase_deck.id} has a review bottle with a public review, slide four shows it in place of a verdict"
+      Rails.logger.info "Home: deck #{@showcase_deck.id} has a reviewed bottle on its pour list, slide four shows it in place of a verdict"
     else
       load_verdict
     end
@@ -113,7 +114,7 @@ class HomeController < ApplicationController
   end
 
   # Slide four's review when there is no verdict, from HomepageFeature: the
-  # featured deck's own bottle (its review bottle, else its pour list), else
+  # featured deck's own bottle (the highest rated on its pour list), else
   # the newest public review. Only solo reviews and reviews from a PUBLIC
   # society's night whose pours are revealed can be shown, so nothing from a
   # private or still-secret night reaches the homepage.

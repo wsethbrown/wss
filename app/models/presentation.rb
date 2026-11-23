@@ -26,13 +26,6 @@ class Presentation < ApplicationRecord
   accepts_nested_attributes_for :presentation_bottles, allow_destroy: true,
     reject_if: ->(attrs) { attrs[:bottle_id].blank? && attrs[:name].blank? }
   has_many :events, dependent: :nullify
-  # The deck's review bottle: when this deck is the one featured on the
-  # homepage, the tasting record leads with the newest public review of this
-  # bottle (HomepageFeature). Optional, and no two decks share one, so the
-  # decks the homepage rotates through never show the same bottle.
-  belongs_to :record_bottle, class_name: "Bottle", optional: true
-  validates :record_bottle_id, uniqueness: { message: "is already used by another deck. Each deck needs a different one" },
-                               allow_nil: true
 
   has_many :presentation_tags, dependent: :destroy
   has_many :tags, through: :presentation_tags

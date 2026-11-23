@@ -21,12 +21,16 @@
 # - Only published decks with rendered slides: the hero shows the slides.
 #
 # WHICH REVIEW
-# Each candidate deck gets a review of a bottle no other candidate leads with:
-#   1. its review bottle (Presentation#record_bottle, picked in admin): the
-#      newest public review of it, preferring one that can draw a palate wheel;
-#   2. else the first linked bottle on its pour list that has a public review;
-#   3. else the newest public review of a bottle the others have not taken;
-#   4. else, when the record is too short to give every deck its own bottle,
+# Each candidate deck gets a review of a bottle no other candidate leads with,
+# with nothing for an admin to pick:
+#   1. the highest-rated bottle on its pour list (its linked catalog bottles):
+#      highest mean score across the bottle's public reviews, ties to the
+#      bottle with more reviews, then the earlier pour. The review shown is
+#      that bottle's best-scoring public review (ties: one that can draw a
+#      palate wheel, then the newest). Decks with the fewest reviewed bottles
+#      choose first, so one deck does not take another's only bottle;
+#   2. else the newest public review of a bottle the others have not taken;
+#   3. else, when the record is too short to give every deck its own bottle,
 #      the newest public review again (logged), never an invented one.
 # "Public" is the homepage's rule: a solo review, or one from a PUBLIC
 # society's night whose pours are revealed (Event#pours_revealed?, no manager
@@ -39,7 +43,7 @@ class HomepageFeature
   SLOTS = 3        # decks in the rotation
   RECORD_ROWS = 3  # reviews the tasting record lists, at most
   RECENT = 20      # newest public reviews considered for the record
-  PER_BOTTLE = 200 # reviews loaded for the candidates' own bottles, at most
+  PER_BOTTLE = 200 # reviews loaded for the candidates' pour list bottles, at most
 
   Pick = Struct.new(:review, :source)
 
@@ -85,15 +89,17 @@ class HomepageFeature
     pick.review
   end
 
-  # :chosen, :pour_list, :newest, :repeat or :none (see the class comment).
+  # :deck (a bottle on the deck's pour list), :newest, :repeat or :none (see
+  # the class comment).
   def review_source
     pick.source
   end
 
-  # True when the deck's own review bottle supplies the review: the admin
-  # chose it for this deck, so it shows even when a finished night could.
-  def chosen_review?
-    review_source == :chosen
+  # True when the featured deck's own pour list supplies the review: the
+  # record then shows it even when a finished night could. Asks only about
+  # the decks' own bottles, so the newest reviews load only when needed.
+  def deck_review?
+    deck_picks[position].present?
   end
 
   def record_reviews
@@ -102,14 +108,6 @@ class HomepageFeature
     others = picks.each_with_index.filter_map { |p, i| p.review&.bottle_id unless i == position }
     rows = ([ review ] + recent_reviews.reject { |r| others.include?(r.bottle_id) }).uniq(&:bottle_id).first(RECORD_ROWS)
     rows.size >= 2 ? rows : []
-  end
-
-  # The newest public review of a bottle, as the homepage would show it (the
-  # admin deck page says whether a review bottle has one yet).
-  def self.review_of(bottle_id)
-    return nil if bottle_id.blank?
-
-    best(revealed(showable.where(bottle_id: bottle_id).includes(:event).recent_first.limit(RECENT).to_a))
   end
 
   # Reviews that may appear on the homepage, before the reveal check.
@@ -169,37 +167,54 @@ class HomepageFeature
     picks[position] || Pick.new(nil, :none)
   end
 
+  def candidates
+    decks.presence || [ nil ]
+  end
+
+  # Step 1 for every candidate: [Pick or nil] by place.
+  def deck_picks
+    @deck_picks ||= begin
+      list = decks
+      picks = Array.new(candidates.size)
+      by_bottle = own_bottle_reviews(list)
+      pours = pour_list_bottles(list)
+      reviewed = list.to_h { |d| [ d.id, (pours[d.id] || []).select { |id| by_bottle[id].present? } ] }
+      claimed = []
+      # Fewest reviewed bottles first (then selling order), so a deck with one
+      # option keeps it.
+      list.each_with_index.sort_by { |d, i| [ reviewed[d.id].size, i ] }.each do |d, i|
+        open = reviewed[d.id] - claimed
+        next if open.empty?
+
+        bottle_id = open.each_with_index.max_by { |id, at| [ mean(by_bottle[id]), by_bottle[id].size, -at ] }.first
+        picks[i] = Pick.new(top_review(by_bottle[bottle_id]), :deck)
+        claimed << bottle_id
+      end
+      picks
+    end
+  end
+
+  def mean(reviews)
+    reviews.sum { |r| r.rating.to_f } / reviews.size
+  end
+
+  # Of one bottle's reviews (newest first): the best score, then one that can
+  # draw a wheel, then the newest.
+  def top_review(reviews)
+    reviews.each_with_index.min_by { |r, at| [ -r.rating.to_f, r.wheel_display_profile.any? ? 0 : 1, at ] }.first
+  end
+
   # One Pick per candidate deck, in order; with no deck at all, one for the
   # record alone (the newest public review, as the homepage always showed).
   def picks
     @picks ||= begin
-      list = decks.presence || [ nil ]
-      picks = Array.new(list.size)
-      claimed = []
-      reserved = list.filter_map { |d| d&.record_bottle_id }
-      by_bottle = own_bottle_reviews(list.compact)
-      pours = pour_list_bottles(list.compact)
-
-      list.each_with_index do |d, i|
-        found = d&.record_bottle_id && self.class.best(by_bottle[d.record_bottle_id] || [])
-        next unless found
-
-        picks[i] = Pick.new(found, :chosen)
-        claimed << found.bottle_id
-      end
-      list.each_with_index do |d, i|
-        next if picks[i] || d.nil?
-
-        bottle_id = (pours[d.id] || []).detect { |id| by_bottle[id].present? && !claimed.include?(id) && !reserved.include?(id) }
-        next unless bottle_id
-
-        picks[i] = Pick.new(self.class.best(by_bottle[bottle_id]), :pour_list)
-        claimed << bottle_id
-      end
+      list = candidates
+      picks = deck_picks.dup
+      claimed = picks.filter_map { |p| p&.review&.bottle_id }
       list.each_index do |i|
         next if picks[i]
 
-        found = self.class.best(recent_reviews.reject { |r| claimed.include?(r.bottle_id) || reserved.include?(r.bottle_id) })
+        found = self.class.best(recent_reviews.reject { |r| claimed.include?(r.bottle_id) })
         if found
           picks[i] = Pick.new(found, :newest)
           claimed << found.bottle_id
@@ -230,10 +245,10 @@ class HomepageFeature
                                              .group_by(&:first).transform_values { |rows| rows.map(&:last) }
   end
 
-  # { bottle id => its public reviews, newest first } for the candidates' own
-  # bottles (review bottles and pour lists), loaded in one go.
+  # { bottle id => its public reviews, newest first } for the bottles on the
+  # candidates' pour lists, loaded in one go.
   def own_bottle_reviews(decks)
-    wanted = (decks.filter_map(&:record_bottle_id) + pour_list_bottles(decks).values.flatten).uniq
+    wanted = pour_list_bottles(decks).values.flatten.uniq
     return {} if wanted.empty?
 
     self.class.revealed(self.class.showable.where(bottle_id: wanted).includes(:user, :bottle, :event).recent_first.limit(PER_BOTTLE).to_a)

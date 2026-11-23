@@ -104,7 +104,6 @@ class QueryCountsTest < ActionDispatch::IntegrationTest
       buyers.times { |b| UserPresentation.create!(user: new_user("#{i}b#{b}", with_photo: false), presentation: deck, purchase_type: "direct", purchase_price: 5, purchased_at: Time.current) }
       bottles = Array.new(pours) { |p| Bottle.create!(name: "QC Rotation #{i}-#{p}", distillery: "QC") }
       bottles.each { |b| deck.presentation_bottles.create!(bottle: b) }
-      deck.update!(record_bottle: bottles.first)
       bottles.first(reviews).each_with_index do |b, r|
         Review.new(user: new_user("#{i}r#{r}", with_photo: false), bottle: b, rating: 4.0, notes: "n", flavor_wheel: { "smoky" => 0.5 }).save!(validate: false)
       end
@@ -112,7 +111,7 @@ class QueryCountsTest < ActionDispatch::IntegrationTest
     3.times { |i| stock.(i, pours: 1, buyers: 1, reviews: 1) }
     few = measure(root_path)
     assert_equal :rotation, controller.instance_variable_get(:@feature).source
-    assert controller.instance_variable_get(:@feature).chosen_review?
+    assert controller.instance_variable_get(:@feature).deck_review?
     5.times { |i| stock.(10 + i, pours: 6, buyers: 4, reviews: 4) }
     many = measure(root_path)
     assert_operator many.size, :<=, few.size, "homepage queries grew with the rotation:\n#{growth(few, many)}"
