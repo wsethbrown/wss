@@ -344,7 +344,7 @@ Prices vary too much by region to quote.
 
 ## Image credits
 
-All images are in the public domain and were taken from Wikimedia Commons.
+All images were taken from Wikimedia Commons. All are in the public domain except the bottle photograph on slide 16, which is CC BY 2.0.
 
 - **Slide 1 (cover).** "Secale cereale illustration". U.S. Department of Agriculture drawing. Public domain (U.S. government work, PD-USGov-USDA).
 - **Slide 3.** "Gilbert Stuart Williamstown Portrait of George Washington", Gilbert Stuart, about 1796–1803 (Clark Art Institute and Smithsonian Catalog of American Portraits). Clark Art Institute. Public domain (PD-old-100).
@@ -352,3 +352,6 @@ All images are in the public domain and were taken from Wikimedia Commons.
 - **Slide 5.** "Henry Clay Frick circa 1893", photograph published in the 1890s. Public domain (PD-US-expired).
 - **Slide 9.** "Pouring whiskey into a sewer LCCN2001706109". Library of Congress, dated about 1920 by the Library. Public domain (published before 1929).
 - **Slide 10.** "Bombergers LebCo PA 1", Bomberger's Distillery, Schaefferstown, Pennsylvania. Photo by Smallbones, 2011, released to the public domain (CC0).
+- **Slide 6.** "A bottle of Old Overholt Straight Rye Whiskey", 11 April 2017. Kenneth C. Zirkel (Commons user Kzirkel). CC0 1.0. Wikimedia Commons, https://commons.wikimedia.org/wiki/File:A_bottle_of_Old_Overholt_Straight_Rye_Whiskey.jpg. Cropped; the photo is narrower than the slot, so its blurred background was extended at both sides. The label in the photo reads "Old Overholt Straight Rye Whiskey", "Since 1810", "40% alc/vol (80 proof)": it is the older label, not the current 86-proof bottle poured, and the slide says so. The license was read on the file's Commons page on 23 November 2026.
+- **Slide 16.** "Bulleit 95 Rye Frontier Whiskey", 9 April 2022. David (Flickr: brokentaco). CC BY 2.0. Wikimedia Commons, File:Bulleit 95 Rye Frontier Whiskey (52057370044).jpg. Cropped. The same photo as in the MGP rye deck, copied from that deck's assets; the label reads "Bulleit 95 Rye Frontier Whiskey". The license was not re-read in this pass; it is as recorded in that deck's outline.
+- **No free photograph found:** Pikesville Straight Rye (slide 8). The slide keeps the bottle-shaped placeholder. Looked for on Wikimedia Commons (search and brand categories), Openverse (which timed out on most queries) and by web search for Pexels, Unsplash and Flickr pages; Flickr and Unsplash could not be opened from the build machine.

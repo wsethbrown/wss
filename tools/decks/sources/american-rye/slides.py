@@ -57,15 +57,16 @@ def strip(s, y, h, t, size=19):
     text(s, X + 0.3, y, CW - 0.6, h, t, size=size, color=INK, anchor=MSO_ANCHOR.MIDDLE, ls=1.15)
 
 
-def pour_slide(n, pour, name, note, maker, style, proof, two_line_name=False, left=None):
-    """One pour: a bottle-shaped placeholder card (no free photograph of any of the four bottles
-    was in the old deck), the pour line, the name, the old slide's note, and Maker / Style / Proof.
+def pour_slide(n, pour, name, note, maker, style, proof, two_line_name=False, left=None,
+               photo=None, credit=None):
+    """One pour: the bottle's photograph (or the placeholder card when there is none), the pour line,
+    the name, the old slide's note, and Maker / Style / Proof.
     left: draws something else in the placeholder's place (slide 13's mash chart)."""
     s = new_slide()
     if left:
         left(s)
     else:
-        bottle_placeholder(s, X, 0.8, 3.4, 5.3)
+        bottle_panel(s, photo, X, 0.8, 3.4, 5.3, credit)
     x, w = 4.85, 7.63
     kicker(s, pour, x=x)
     name_h = 1.55 if two_line_name else 0.85
@@ -179,7 +180,9 @@ footer(s, 5)
 # ---------------------------------------------------------------- 6 pour 1
 pour_slide(6, 'Pour 1 of 4', 'Old Overholt',
            ['A Pennsylvania name, made in Kentucky.', 'Beam does not publish the recipe.'],
-           'Beam, Kentucky', 'Straight rye, 4 years old', '86')
+           'Beam, Kentucky', 'Straight rye, 4 years old', '86',
+           photo='old-overholt.jpg',
+           credit='Pictured: an older label, at 80 proof. Photograph: Kenneth C. Zirkel, CC0, via Wikimedia Commons. Cropped, background extended at the sides.')
 
 # ---------------------------------------------------------------- 7 Pikesville
 s = new_slide()
@@ -335,7 +338,9 @@ footer(s, 15)
 # ---------------------------------------------------------------- 16 pour 4
 pour_slide(16, 'Pour 4 of 4', 'Bulleit 95 Rye',
            ['95% rye, distilled in Indiana.'],
-           'Bulleit (Diageo), distilled by MGP', 'Straight rye whiskey', '90')
+           'Bulleit (Diageo), distilled by MGP', 'Straight rye whiskey', '90',
+           photo='bulleit95.jpg',
+           credit='Photograph: David (brokentaco), CC BY 2.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 17 reading the label
 s = new_slide()

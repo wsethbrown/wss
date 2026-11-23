@@ -265,10 +265,13 @@ Producers, proofs and availability change. Check each label before the night. Ja
 
 ## Image credits
 
-All photographs are in the public domain and were taken from Wikimedia Commons.
+All photographs were taken from Wikimedia Commons. All are in the public domain except the bottle photographs on slides 7 and 14, whose licenses are given below.
 
 - **Slide 1 (cover; formerly on slide 2).** "Making charcoal at Jack Daniel's, Jack Daniel Distillery, Lynchburg (pop. 361), Tennessee (K-14912)". Mid-twentieth-century postcard; publisher not recorded on the Commons page. Public domain (PD-US, not renewed).
 - **Slide 5.** "Jasper "Jack" Daniel". Photographer unknown. Public domain (PD-US, published before 1931).
 - **Slide 6.** "Jack Daniel's and Nathan "Nearest" Green". Photographer unknown. Undated. Public domain (PD-US, expired). The Commons title calls the man Nearest Green; no photograph of him is known, and the caption gives the company's identification of George Green instead.
 - **Slide 8.** "Patterson-malcolm-governor-tn". Portrait of Malcolm R. Patterson. Public domain (PD-US).
 - **Slide 10.** "George-Dickel-by-Giers". Portrait of George A. Dickel by Carl Giers, Nashville, nineteenth century. Public domain (PD-old-100).
+- **Slide 7.** "W2408-JackDaniels No7 70 4263", 14 April 2016. Llann Wé² (the file's camera data names "Speedklown" as author and copyright holder; the Commons page gives it as the uploader's own work). CC BY-SA 4.0. Wikimedia Commons, https://commons.wikimedia.org/wiki/File:W2408-JackDaniels_No7_70_4263.JPG. Cropped. The label reads "Jack Daniel's Old No. 7 Brand Tennessee Sour Mash Whiskey, 70cl 40% Vol.": a 70 cl bottle sold in Europe, at the same 80 proof as the US bottle, and the slide says so. The license was read on the file's Commons page on 23 November 2026.
+- **Slide 14.** "Buffalo Trace", 7 August 2010. Craiglduncan. CC BY-SA 3.0 (also GFDL). Wikimedia Commons, https://commons.wikimedia.org/wiki/File:Buffalo_Trace.JPG. Cropped. The label reads "Buffalo Trace Kentucky Straight Bourbon Whiskey"; the bottle is part empty and a filled glass stands beside it. The license was read on the file's Commons page on 23 November 2026.
+- **No free photograph found:** George Dickel Signature Recipe (slide 11) and Jack Daniel's Bonded (slide 17). Those slides keep the bottle-shaped placeholder. Commons has one Dickel bottle photo, "Dickel No.8" (Mjdestroyerofworlds, 2022, CC BY-SA 4.0), but it shows Old No. 8 at 80 proof. Signature Recipe is the former No. 12 at 90 proof, a different whisky, so the photo was not used. Looked for on Wikimedia Commons (search and brand categories), Openverse (which timed out on most queries) and by web search for Pexels, Unsplash and Flickr pages; Flickr and Unsplash could not be opened from the build machine.

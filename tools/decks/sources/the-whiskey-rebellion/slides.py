@@ -62,12 +62,12 @@ def strip(s, y, h, t, size=19):
 
 
 def pour_slide(n, pour, name, note, maker, style, proof, two_line_name=True,
-               widths=(2.85, 3.35, 0.6), val_size=18):
-    """One pour: a bottle-shaped placeholder card (no free photograph of any of the four bottles
-    was in the old deck), the pour line, the name, the old slide's note, and Maker / Style / Proof
+               widths=(2.85, 3.35, 0.6), val_size=18, photo=None, credit=None):
+    """One pour: the bottle's photograph (or the placeholder card when there is none), the pour line,
+    the name, the old slide's note, and Maker / Style / Proof
     (the old card's labels)."""
     s = new_slide()
-    bottle_placeholder(s, X, 0.8, 3.4, 5.3)
+    bottle_panel(s, photo, X, 0.8, 3.4, 5.3, credit)
     x, w = 4.85, 7.63
     kicker(s, pour, x=x)
     name_h = 1.55 if two_line_name else 0.85
@@ -167,7 +167,9 @@ footer(s, 4)
 pour_slide(5, 'Pour 1 of 4', ['Old Overholt', 'Straight Rye'],
            'The brand began in Westmoreland County in 1810. Westmoreland was one of the four counties '
            'of the rebellion.',
-           'Jim Beam, Kentucky', 'Straight rye whiskey', '86')
+           'Jim Beam, Kentucky', 'Straight rye whiskey', '86',
+           photo='old-overholt.jpg',
+           credit='Pictured: an older label, at 80 proof. Photograph: Kenneth C. Zirkel, CC0, via Wikimedia Commons. Cropped, background extended at the sides.')
 
 # ---------------------------------------------------------------- 6 collectors attacked
 s = new_slide()
@@ -296,7 +298,9 @@ footer(s, 13)
 pour_slide(14, 'Pour 3 of 4', ['Michter’s US*1', 'Straight Rye'],
            ['The name comes from an old distillery in Lebanon County, Pennsylvania.',
             'The company now distills in Louisville.'],
-           'Michter’s, Kentucky', 'Single barrel straight rye', '84.8')
+           'Michter’s, Kentucky', 'Single barrel straight rye', '84.8',
+           photo='michters-us1-rye.jpg',
+           credit='Photograph: Deehamma83, CC BY-SA 4.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 15 the legend
 s = new_slide()
@@ -321,7 +325,9 @@ footer(s, 15)
 pour_slide(16, 'Pour 4 of 4', ['Elijah Craig', 'Small Batch'],
            ['Named for a Baptist preacher in Kentucky.',
             'People later said he made the first bourbon. There is no proof of that.'],
-           'Heaven Hill, Kentucky', 'Kentucky straight bourbon', '94')
+           'Heaven Hill, Kentucky', 'Kentucky straight bourbon', '94',
+           photo='elijah-craig-small-batch.jpg',
+           credit='Photograph: David (brokentaco), CC BY 2.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 17 reading the label
 s = new_slide()

@@ -251,10 +251,14 @@ Checked a second time in November 2026. These remain open; none of them is on a 
 
 ## Image credits
 
-All images are in the public domain and were taken from Wikimedia Commons.
+All images were taken from Wikimedia Commons. All are in the public domain except the bottle photographs on slides 14 and 16, whose licenses are given below.
 
 - **Slide 1 (cover).** "Washington Reviewing the Western Army at Fort Cumberland, Maryland MET DT2045". Attributed to Frederick Kemmelmeyer, after 1794. Metropolitan Museum of Art. Public domain (PD-old-100-expired; CC0 from the museum).
 - **Slide 2.** "Alexander Hamilton portrait by John Trumbull 1806". Painting by John Trumbull, 1806. Public domain (PD-old-100-expired).
 - **Slide 4.** "Whiskey Rebellion illustrations from Scribner's Popular History of the United States 01". Engraving from _Scribner's Popular History of the United States_. Public domain (PD-US-expired).
 - **Slide 6.** "An Exciseman, carrying off two kegs of Whiskey, is pursued by two farmers, intending to tar and feather him". Anonymous hand-drawn satire; its verse is dated 13 August 1792. Atwater Kent Museum, Philadelphia (per Explore PA History). Public domain (PD-old).
 - **Slide 13.** "Rembrandt Peale - Thomas Jefferson - Google Art Project". Painting by Rembrandt Peale, 1800. Public domain (PD-old-100-expired).
+- **Slide 5.** "A bottle of Old Overholt Straight Rye Whiskey", 11 April 2017. Kenneth C. Zirkel (Commons user Kzirkel). CC0 1.0. Wikimedia Commons, https://commons.wikimedia.org/wiki/File:A_bottle_of_Old_Overholt_Straight_Rye_Whiskey.jpg. Cropped; the photo is narrower than the slot, so its blurred background was extended at both sides. The label in the photo reads "Old Overholt Straight Rye Whiskey", "Since 1810", "40% alc/vol (80 proof)": it is the older label, not the current 86-proof bottle poured, and the slide says so. The license was read on the file's Commons page on 23 November 2026.
+- **Slide 14.** "Michter's US*1 Kentucky Straight Rye", 4 March 2021. Deehamma83. CC BY-SA 4.0. Wikimedia Commons, https://commons.wikimedia.org/wiki/File:Michter%27s_US*1_Kentucky_Straight_Rye.jpg. Cropped. The label reads "Michter's US*1 Single Barrel Kentucky Straight Rye Whiskey". The bottle in the photo is nearly empty. The license was read on the file's Commons page on 23 November 2026.
+- **Slide 16.** "Elijah Craig Small Batch Kentucky Straight Bourbon Whiskey", 14 May 2022. David (Flickr: brokentaco). CC BY 2.0. Wikimedia Commons, https://commons.wikimedia.org/wiki/File:Elijah_Craig_Small_Batch_Kentucky_Straight_Bourbon_Whiskey_(52089679615).jpg. Cropped. The label reads "Elijah Craig Small Batch, Kentucky Straight Bourbon Whiskey, 94 proof". The license was read on the file's Commons page on 23 November 2026. The Flickr page it came from could not be opened.
+- **No free photograph found:** Pikesville Straight Rye (slide 10). The slide keeps the bottle-shaped placeholder. Looked for on Wikimedia Commons (search and brand categories), Openverse (which timed out on most queries) and by web search for Pexels, Unsplash and Flickr pages; Flickr and Unsplash could not be opened from the build machine.

@@ -58,11 +58,11 @@ def strip(s, y, h, t, size=19):
 
 
 def pour_slide(n, pour, name, note, maker, style, proof, two_line_name=False,
-               widths=(3.0, 2.8, 0.75), val_size=18):
-    """One pour: a bottle-shaped placeholder card (no free photograph of any of the four bottles
-    was in the old deck), the pour line, the name, the old slide's note, and Maker / Style / Proof."""
+               widths=(3.0, 2.8, 0.75), val_size=18, photo=None, credit=None):
+    """One pour: the bottle's photograph (or the placeholder card when there is none), the pour line,
+    the name, the old slide's note, and Maker / Style / Proof."""
     s = new_slide()
-    bottle_placeholder(s, X, 0.8, 3.4, 5.3)
+    bottle_panel(s, photo, X, 0.8, 3.4, 5.3, credit)
     x, w = 4.85, 7.63
     kicker(s, pour, x=x)
     name_h = 1.55 if two_line_name else 0.85
@@ -181,7 +181,10 @@ footer(s, 6)
 # ---------------------------------------------------------------- 7 pour 1
 pour_slide(7, 'Pour 1 of 4', ['Jack Daniel’s', 'Old No. 7'],
            'The charcoal is meant to make it' + NB + 'lighter.',
-           ['Jack Daniel Distillery,', 'Lynchburg'], 'Tennessee whiskey', '80', two_line_name=True)
+           ['Jack Daniel Distillery,', 'Lynchburg'], 'Tennessee whiskey', '80', two_line_name=True,
+           photo='jack-daniels-old-no-7.jpg',
+           credit='Pictured: a 70 cl bottle sold in Europe. Photograph: Llann Wé², CC BY-SA 4.0, '
+                  'via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 8 1910 (big year, on paper)
 year_slide(8, '1910', ['Tennessee bans making whiskey,', 'ten years before the rest', 'of the country.'],
@@ -273,7 +276,9 @@ footer(s, 13)
 # ---------------------------------------------------------------- 14 pour 3
 pour_slide(14, 'Pour 3 of 4', 'Buffalo Trace',
            ['A Kentucky bourbon with no charcoal step.', 'The same proof as the Dickel.'],
-           ['Buffalo Trace,', 'Frankfort, Kentucky'], ['Kentucky straight', 'bourbon'], '90')
+           ['Buffalo Trace,', 'Frankfort, Kentucky'], ['Kentucky straight', 'bourbon'], '90',
+           photo='buffalo-trace.jpg',
+           credit='Photograph: Craiglduncan, CC BY-SA 3.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 15 2016 (big year, on paper)
 s = new_slide()
