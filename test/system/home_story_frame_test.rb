@@ -31,6 +31,13 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
         const area = innerWidth >= 900 ? 0 : document.querySelector(".mm").getBoundingClientRect().bottom;
         scrollTo({ top: c.tops[i] - area - (innerHeight - area) * 0.3, behavior: "instant" });
       },
+      // A step's words have finished their one-off reveal (the appear
+      // controller's rise, a CSS translate over about 0.8s): wait on this
+      // before reading where they are on screen.
+      revealed(i) {
+        const el = document.querySelectorAll(".story [data-story-frame-target=beat]")[i].querySelector(".beat-body, h1, h2");
+        return el.getAnimations().length === 0 && getComputedStyle(el).translate === "none" && !el.classList.contains("appear-pending");
+      },
       // Where a step's words are on screen, against the nav and the band.
       words(i) {
         const el = document.querySelectorAll(".story [data-story-frame-target=beat]")[i].querySelector(".beat-body, h1, h2");
@@ -427,6 +434,9 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
       const own = Object.getOwnPropertyDescriptor(window, "innerHeight");
       sf.read(2);
       await sf.until(() => c.P === 2 && !c.raf);
+      // The words' own reveal is still rising for a moment after a short
+      // move (a jump from the hero cross-fades in 0.3s): read them at rest.
+      await sf.until(() => sf.revealed(2));
       sf.watch();
       const before = sf.words(2);
       const states = [];
@@ -608,17 +618,20 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
     deck.update_columns(published: true, featured: true)
     [ 1440, 1000 ].each do |width|
       visit_at(width, 900)
-      assert_selector ".tile.spot"
+      # Below the fold it waits for its reveal (opacity 0): present, not yet visible.
+      assert_selector ".tile.spot", visible: :all
       r = run_async(<<~JS)
         const sf = window.__sf, card = document.querySelector(".tile.spot");
         scrollTo({ top: card.getBoundingClientRect().top + scrollY - innerHeight / 2, behavior: "instant" });
         // wait on the card's reveal to finish, not on time
-        await sf.until(() => getComputedStyle(card).transform === "none" && getComputedStyle(card).opacity === "1");
+        const ok = await sf.until(() => card.getAnimations().length === 0 && getComputedStyle(card).translate === "none" &&
+                                        getComputedStyle(card).opacity === "1" && !card.classList.contains("appear-pending"));
+        if (!ok) return { error: "the card's reveal never finished" };
         await sf.frames(3);
         const svg = document.querySelector(".story-glass svg");
         const foot = [ ...svg.querySelectorAll("path") ].find((p) => p.getAttribute("d").startsWith("M25.5 61.5"));
         const scale = svg.getBoundingClientRect().height / 80;
-        return { width: innerWidth, foot: foot.getBoundingClientRect().bottom + (parseFloat(foot.getAttribute("stroke-width")) / 2) * scale,
+        return { revealed: ok, width: innerWidth, foot: foot.getBoundingClientRect().bottom + (parseFloat(foot.getAttribute("stroke-width")) / 2) * scale,
                  card: card.getBoundingClientRect().top, position: getComputedStyle(document.querySelector(".story-glass")).position };
       JS
       assert_operator r["width"], :>=, 900, r
@@ -641,7 +654,9 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
       const sf = window.__sf, c = window.__storyFrame;
       const still = async () => { let last = -1, same = 0; await sf.until(() => { same = scrollY === last ? same + 1 : 0; last = scrollY; return same > 8; }); };
       const nav = () => Math.round(document.querySelector("body > nav, nav.fixed").getBoundingClientRect().bottom);
-      const heading = () => Math.round(document.querySelector("#pricing h2").getBoundingClientRect().top);
+      // by layout (the offsetTop chain): a reveal rising by translate does not count
+      const at = (el) => { let y = 0; for (let e = el; e; e = e.offsetParent) y += e.offsetTop; return Math.round(y - scrollY); };
+      const heading = () => at(document.querySelector("#pricing h2"));
       await sf.until(() => !c.layoutFrame && !c.scrollFrame);
       await still();
       const loaded = heading();
@@ -651,14 +666,18 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
       a.href = "#pricing"; a.textContent = "Pricing";
       document.querySelector(".hx").prepend(a);
       a.click();
+      // The link's scroll starts a moment after the click: wait for it to
+      // start (state), then for it to stop.
+      await sf.until(() => scrollY > 0);
       await still();
       const clicked = heading();
       a.remove();
       scrollTo({ top: 0, behavior: "instant" });
       await sf.frames(2);
       document.querySelector('a[href="#how-it-works"]').click();
+      await sf.until(() => scrollY > 0);
       await still();
-      const story = { words: Math.round(document.querySelector("#how-it-works .beat-body").getBoundingClientRect().top),
+      const story = { words: at(document.querySelector("#how-it-works .beat-body")),
                       band: Math.round(document.querySelector(".mm").getBoundingClientRect().bottom) };
       return { width: innerWidth, nav: nav(), loaded, clicked, story, padding: document.documentElement.style.scrollPaddingTop };
     JS
