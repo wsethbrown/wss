@@ -200,7 +200,7 @@ footer(s, 10)
 
 # ---------------------------------------------------------------- 11 Cardhu in Johnnie Walker
 s = new_slide()
-heading(s, 0.85, 'Diageo calls Cardhu a key malt in Johnnie Walker', size=36, w=CW, h=0.9)
+heading(s, 0.85, 'Cardhu in Johnnie Walker', size=36, w=CW, h=0.9)
 text(s, X, 1.8, CW, 0.9,
      [[('“A key single malt in Johnnie Walker today.”  ', {'italic': True}),
        ('Diageo, 2019', {'font': SANS, 'size': 15, 'color': MUTE})]],

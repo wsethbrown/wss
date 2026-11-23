@@ -169,7 +169,7 @@ Cardow was the first distillery Walker owned. Diageo says Walker bought it to be
 
 Elizabeth died suddenly the next May. She was 67. A local newspaper called her "a true friend of all the poor". She had lent money to neighbours without charging interest.
 
-## [SLIDE 11] Diageo calls Cardhu a key malt in Johnnie Walker
+## [SLIDE 11] Cardhu in Johnnie Walker
 
 Today Diageo owns both Cardhu and Johnnie Walker. In 2019 it called Cardhu "a key single malt in Johnnie Walker today". It named Cardhu as one of four distilleries that are homes of Johnnie Walker. The other three are Glenkinchie, Caol Ila and Clynelish.
 

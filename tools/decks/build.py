@@ -180,6 +180,12 @@ def check(out, slug, n):
     for name in [slug + '-speaker-notes.pdf', slug + '-research-outline.pdf']:
         if not (out / name).is_file():
             problems.append('missing ' + name)
+    try:
+        import fit_check
+        for line in fit_check.overlaps(out / (slug + '.pptx')):
+            problems.append(line + ' (fit_check.py: shorten the text or give it room)')
+    except Exception as e:          # the check must never hide a built deck behind its own failure
+        print('fit check could not run: %s: %s' % (type(e).__name__, e))
     if problems:
         fail('checks failed:\n  - ' + '\n  - '.join(problems))
     print('checks passed: %d slides, %d notes sections, %d PNGs, both PDFs. Now look at every slide.'

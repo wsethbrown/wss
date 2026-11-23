@@ -109,7 +109,7 @@ for i, (grain, says, glass, recipe, note) in enumerate(cols):
     text(s, x + 0.4, 3.85, 4.9, 0.5, says, size=24, italic=True, color=INK)
     line(s, x + 0.4, 4.6, x + 5.29, 4.6, HAIR, 1.0)
     text(s, x + 0.4, 4.78, 4.9, 0.35, glass, size=13, font=SANS, bold=True, color=MUTE)
-    text(s, x + 0.4, 5.13, 4.9, 0.5, recipe, size=19, color=INK)
+    text(s, x + 0.4, 5.13, 4.9, 0.5, recipe, size=17.5, color=INK)
     text(s, x + 0.4, 5.72, 4.9, 0.4, note, size=13, font=SANS, color=MUTE)
 footer(s, 6)
 
