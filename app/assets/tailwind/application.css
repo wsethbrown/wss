@@ -527,6 +527,29 @@ a:active > .card-hover {
   a:hover .arrow, .group:hover .arrow { translate: 3px 0; }
 }
 
+/* A row of chips or selects that scrolls sideways on a phone (the deck
+   filters and tags). It runs to the screen edges, its padding keeping the
+   first item in line with the page, and fades out at whichever edge has more
+   to scroll (scroll_fade_controller.js sets data-more-start/end), so the
+   edge reads as "more this way", not a cut. No scrollbar. When everything
+   fits, no attribute, no fade. */
+/* scroll-padding keeps a control that keyboard focus scrolls into view (and
+   its focus ring) clear of the 40px fade. */
+.scroll-row { scrollbar-width: none; scroll-padding-inline: 48px; }
+.scroll-row::-webkit-scrollbar { display: none; }
+.scroll-row[data-more-end] {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+}
+.scroll-row[data-more-start] {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 40px);
+  mask-image: linear-gradient(to right, transparent, #000 40px);
+}
+.scroll-row[data-more-start][data-more-end] {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent);
+}
+
 /* Turbo's progress bar, drawn in the mark instead of Turbo's default blue.
    Turbo's own rule is injected at the top of <head>, so this later one wins. */
 .turbo-progress-bar {

@@ -98,6 +98,12 @@ Rules:
 - **Text link with arrow**: bold ink text followed by `→`. Write it as `link_to with_arrow("Words"), path` so the
   arrow is its own span (`.arrow`) and nudges on hover; the link's text is unchanged.
 - **Chip**: `inline-flex min-h-9 items-center rounded-xl border border-hairline bg-white px-3.5 text-sm font-medium text-ink`.
+- **Scrolling chip rows** (a row of chips or selects that scrolls sideways on a phone): `.scroll-row`
+  with `data-controller="scroll-fade"`. The row runs to the screen edges (`-mx-4 px-4`, so the
+  first item lines up with the page), shows no scrollbar, and fades out over 40px at whichever
+  edge has more to scroll (right at rest, left once scrolled, neither when it fits); a
+  keyboard-focused item is scrolled clear of the fade (48px `scroll-padding-inline`). Never a
+  hard cut at the edge. Rows that wrap instead (the reviews feed chips) need none of this.
 - **Step or count marker**: 32px rounded-[11px] paper square with a bold numeral.
 - **Lists of records**: rows separated by hairlines inside a `.card` or `.inset`. Title in
   bold ink on the left, meta in `text-mute`, the number or action on the right. Not a grid
@@ -150,7 +156,9 @@ glass and the view transitions. No animation library.
   `<main>`. Mark a card, list row, short panel or section heading with
   `data-appear-target="item"`. Out of view at load, it waits hidden and, the first time it
   comes properly into view (its top above the bottom 18% of the screen, where the eye is,
-  not at the bottom edge), eases up 24px (16px on phones) and fades in over 700ms. Items that arrive in the
+  not at the bottom edge; on phones a little earlier, above the bottom 9%, so a section eases
+  in as it rises rather than appearing abruptly), eases up 24px (16px on phones) and fades in
+  over 700ms. Items that arrive in the
   same moment stagger by 0, then 60, then 110ms and so on (the gaps shrink, capped at 200ms); in
   practice that is cards side by side in a grid on a wide screen, so most reveals, and nearly
   all on a phone's single column, start at once. Rules: the hidden state is a class the
@@ -199,8 +207,20 @@ glass and the view transitions. No animation library.
     500ms each with gaps 90, 80, 70, 60, 50ms): the
     library's rows tick in one by one, the invite's guests pop in from `.7` (never from 0), the
     record's words settle while its wheel draws. CSS in `home/index`.
+  - **Pinned faces play when settled.** On a wide screen the homepage faces are sticky: each
+    slides up and pins. Everything inside a face (`data-appear-settle` on the face: its
+    perform, wheel, pour and photo settle) waits until the face sits at its pinned spot and
+    no later face has slid over it, then plays, so nothing is spent while the face is
+    travelling. When the scroll stops (150ms), anything still waiting on screen starts
+    anyway, settled or not. On phones the faces are a plain stack and play on the normal
+    trigger.
   - **Photographs settle** (`photo` on `shared/_duotone`): from `scale: 1.04` to 1 over 1.2s
     inside the frame, which clips it, so nothing moves around it.
+- **The re-pour**: when an RSVP's Turbo stream replaces the event's attendees region, each
+  seat glass in the table (`data-repour` on `events/_table`) whose level changed moves from
+  its old level to the new one over 500ms on the pour curve, seats matched in order. Only
+  glasses on screen; none under reduced motion; the drawn level is always the final one
+  (Web Animations, nothing left behind); a seat emptied to nothing shows empty at once.
 - **Images fade in as they load** (`image` on deck covers, the deck page's slides, bottle photos
   and duotone photos): only an image not yet loaded when the page starts, 200ms on the strong
   ease-out. A cached image is never touched (no flash); one that fails, or sits on screen for 2s

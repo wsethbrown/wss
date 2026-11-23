@@ -29,6 +29,11 @@ import { Controller } from "@hotwired/stimulus"
 // which may already have painted it finished), so an above-the-fold drawing
 // reached by a click is seen to draw.
 //
+// On a wide screen the homepage faces are sticky: they slide up and pin in
+// place. Motion inside one (marked data-appear-settle) waits until the face
+// has reached its pinned spot and is the one on top, then plays, so it is
+// not spent while the face is still travelling.
+//
 // The triggers sit inside the viewport, so while the page scrolls an item
 // can be on screen and still waiting. When the scroll settles (150ms) that
 // band is emptied: everything waiting on screen starts its motion.
@@ -46,7 +51,9 @@ import { Controller } from "@hotwired/stimulus"
 // - Nothing on screen can stay hidden, even if the observer never fires:
 //   when the scroll (or a resize) settles, anything waiting above the bottom
 //   of the screen is revealed (or, if a jump carried it past, shown at once);
-//   a one-off time limit after load does the same; and focusing anything
+//   a one-off time limit after load does the same for items, and for motion
+//   held for a pinned face only if the page has stopped scrolling (the
+//   settle after the scroll starts it at the latest); and focusing anything
 //   inside a waiting item shows that item at once, so a keyboard user never
 //   lands on something invisible.
 // - Before Turbo caches the page, everything is finished, so a cached
@@ -65,8 +72,15 @@ const POUR = 1200 // ms, matches svg[data-glass].glass-pouring
 // Where things start: an item once its top is above the bottom 18% of the
 // screen; secondary motion once it reaches the middle 60%.
 const ITEM_MARGIN = "0px 0px -18% 0px"
+// Phones start a reveal a little earlier, so a section eases in as it rises
+// instead of appearing abruptly (owner, November 2026).
+const PHONE_ITEM_MARGIN = "0px 0px -9% 0px"
+// "not all and (min-width)" rather than max-width: no gap at 639.5px.
+const PHONE = "not all and (min-width: 640px)"
 const DEEP_MARGIN = "-20% 0px -20% 0px"
 const ON_LOAD = 300 // ms: an on-screen draw-in or pour at load starts after this
+const REPOUR = 500 // ms: a glass whose level a Turbo stream changed moves to it
+const POUR_EASE = "cubic-bezier(0.2, 0.7, 0.2, 1)" // --motion-ease-pour
 const STAGGER = [ 0, 60, 110, 150, 180, 200 ] // ms; gaps shrink, then cap
 const ITEM = "[data-appear-target~='item']"
 const SETTLE = 150 // ms after the last scroll or resize event
@@ -120,7 +134,9 @@ export default class extends Controller {
     this.finishAll()
     this.observer.disconnect()
     this.deep.disconnect()
+    if (this.phone.removeEventListener) this.phone.removeEventListener("change", this.onPhoneChange)
     document.removeEventListener("turbo:before-cache", this.finishAll)
+    document.removeEventListener("turbo:before-stream-render", this.onStream)
     window.removeEventListener("scroll", this.onScroll)
     window.removeEventListener("resize", this.onScroll)
     this.element.removeEventListener("focusin", this.onFocus)
@@ -129,6 +145,8 @@ export default class extends Controller {
     this.limitTimer = null
     if (this.frame) cancelAnimationFrame(this.frame)
     this.frame = null
+    if (this.heldFrame) cancelAnimationFrame(this.heldFrame)
+    this.heldFrame = null
     clearInterval(this.imageTimer)
     this.imageTimer = null
     this.active = false
@@ -181,9 +199,17 @@ export default class extends Controller {
     this.onFocus = this.onFocus.bind(this)
     // Inset triggers, so motion happens where the eye is. The band they
     // leave (on screen, still waiting) is emptied when the scroll settles.
-    this.observer = new IntersectionObserver(this.onIntersect, { rootMargin: ITEM_MARGIN })
+    // The item trigger depends on the screen size, so it is rebuilt if the
+    // phone query flips (a rotation, a resized window).
+    this.phone = window.matchMedia(PHONE)
+    this.observer = this.itemObserver()
+    this.onPhoneChange = this.onPhoneChange.bind(this)
+    if (this.phone.addEventListener) this.phone.addEventListener("change", this.onPhoneChange)
+    this.held = new Set()          // secondary motion waiting for its pinned face to settle
     this.deep = new IntersectionObserver(this.onIntersect, { rootMargin: DEEP_MARGIN })
     document.addEventListener("turbo:before-cache", this.finishAll)
+    this.onStream = this.onStream.bind(this)
+    document.addEventListener("turbo:before-stream-render", this.onStream)
     window.addEventListener("scroll", this.onScroll, { passive: true })
     window.addEventListener("resize", this.onScroll, { passive: true })
     this.element.addEventListener("focusin", this.onFocus)
@@ -254,6 +280,18 @@ export default class extends Controller {
     }
   }
 
+  itemObserver() {
+    return new IntersectionObserver(this.onIntersect, { rootMargin: this.phone.matches ? PHONE_ITEM_MARGIN : ITEM_MARGIN })
+  }
+
+  onPhoneChange() {
+    if (!this.active) return
+    this.observer.disconnect()
+    this.observer = this.itemObserver()
+    for (const el of this.waiting) if (this.kinds.get(el) === "item") this.observer.observe(el)
+    this.onScroll()
+  }
+
   watcher(el) { return this.kinds.get(el) === "item" ? this.observer : this.deep }
 
   prepare(el) {
@@ -276,7 +314,7 @@ export default class extends Controller {
 
   // Start the reveal of a batch arriving together, top to bottom, left to
   // right, with the shrinking stagger.
-  reveal(arriving) {
+  reveal(arriving, force = false) {
     if (!arriving.length) return
     arriving.sort((a, b) => (a.rect.top - b.rect.top) || (a.rect.left - b.rect.left))
 
@@ -289,6 +327,11 @@ export default class extends Controller {
     }
     for (const { target } of arriving) {
       if (this.kinds.get(target) === "item" || !this.waiting.has(target)) continue
+      // Inside a pinned (sticky) container that is still sliding into
+      // place: hold it until the container has settled, so it plays where
+      // it will stay and not while it travels.
+      if (!force && this.unsettled(target)) { this.held.add(target); this.checkHeldSoon(); continue }
+      this.held.delete(target)
       // Inside a card still waiting: the card goes first (it is further
       // into view than its own trigger needs).
       const card = target.parentElement && target.parentElement.closest(ITEM)
@@ -409,6 +452,8 @@ export default class extends Controller {
   // below the viewport to above it between two frames, or an observer that
   // never fires at all.
   onScroll() {
+    this.lastScroll = performance.now()
+    if (this.held.size) this.checkHeldSoon()
     clearTimeout(this.settleTimer)
     this.settleTimer = setTimeout(() => this.sweep(), SETTLE)
   }
@@ -427,7 +472,102 @@ export default class extends Controller {
       if (!rect || rect.bottom <= 0) this.finish(target) // gone, or passed: show at once
       else if (rect.top < height) onScreen.push({ target, rect })
     }
-    this.reveal(onScreen)
+    // Once the scroll has stopped, everything waiting on screen starts,
+    // settled or not, so nothing is left in a start state. (The one-off
+    // time limit can land mid-scroll; then a sliding face keeps waiting for
+    // its spot, and the settle after the scroll starts it at the latest.)
+    const idle = !this.lastScroll || performance.now() - this.lastScroll >= SETTLE - 10
+    this.reveal(onScreen, idle)
+  }
+
+  // A sticky container marked data-appear-settle (a homepage face) has
+  // settled when it sits at its pinned top and no later container has
+  // slid over it. Not sticky (phones, where the faces are a plain stack):
+  // nothing to wait for.
+  unsettled(el) {
+    const box = el.closest("[data-appear-settle]")
+    if (!box) return false
+    const style = getComputedStyle(box)
+    if (style.position !== "sticky") return false
+    const pinned = parseFloat(style.top)
+    if (Number.isNaN(pinned)) return false
+    const top = box.getBoundingClientRect().top
+    if (Math.abs(top - pinned) > 1) return true
+    let next = box.nextElementSibling
+    while (next) {
+      if (next.matches("[data-appear-settle]") && next.getBoundingClientRect().top <= top + 1) return true
+      next = next.nextElementSibling
+    }
+    return false
+  }
+
+  checkHeldSoon() {
+    if (this.heldFrame) return
+    this.heldFrame = requestAnimationFrame(() => {
+      this.heldFrame = null
+      const ready = []
+      for (const el of [ ...this.held ]) {
+        if (!this.waiting.has(el) || !el.isConnected) { this.held.delete(el); continue }
+        if (!this.unsettled(el)) ready.push({ target: el, rect: el.getBoundingClientRect() })
+      }
+      if (ready.length) { ready.forEach(({ target }) => this.held.delete(target)); this.reveal(ready, true) }
+    })
+  }
+
+  // The re-pour. A Turbo stream that replaces a region holding glasses
+  // marked data-repour (the RSVP table, events/_table) would make each
+  // changed glass jump to its new level. Instead: note the old levels
+  // before the swap; after it, each glass on screen whose level changed
+  // starts its liquid at the old level and moves to the new one over
+  // REPOUR on the pour curve (Web Animations, so no class or style is left
+  // behind and the drawn level is always the final one). Seats are matched
+  // in order. Nothing under reduced motion (this controller does nothing),
+  // nothing off screen, and a glass emptied to nothing simply shows empty.
+  onStream(event) {
+    const id = event.target.getAttribute && event.target.getAttribute("target")
+    const region = id && document.getElementById(id)
+    if (!region || !region.querySelector("[data-repour]")) return
+    const before = [ ...region.querySelectorAll("[data-repour] svg[data-glass]") ].map((g) => parseFloat(g.dataset.glass) || 0)
+    const render = event.detail.render
+    event.detail.render = async (stream) => {
+      await render(stream)
+      // Motion is decoration: it must never make the stream's render fail.
+      try { this.repour(id, before) } catch (_) { /* no re-pour, the level is drawn */ }
+    }
+  }
+
+  repour(id, before) {
+    const region = document.getElementById(id)
+    if (!this.active || !region) return
+    const height = window.innerHeight
+    region.querySelectorAll("[data-repour] svg[data-glass]").forEach((glass, i) => {
+      if (i >= before.length) return
+      const from = before[i]
+      const to = parseFloat(glass.dataset.glass) || 0
+      if (to < 0.02 || Math.abs(to - from) < 0.01) return
+      const rect = glass.getBoundingClientRect()
+      if (rect.bottom <= 0 || rect.top >= height) return
+      // The drawing's own units: a level is 34 tall; empty sits 4 below the bowl.
+      const drop = from < 0.02 ? to * 34 + 4 : (to - from) * 34
+      const paths = [ ...glass.querySelectorAll("g > path") ]
+      if (!paths.length || typeof paths[0].animate !== "function") return
+      // A falling level lifts the liquid to start from the old surface; its
+      // body only reaches so far down, so a still copy of the body at the
+      // new level stays underneath and keeps the bowl full below the surface.
+      let under = null
+      if (drop < 0) {
+        under = paths[0].cloneNode()
+        paths[0].before(under)
+      }
+      try {
+        const animations = paths.map((path) =>
+          path.animate([ { transform: `translateY(${drop.toFixed(2)}px)` }, { transform: "none" } ], { duration: REPOUR, easing: POUR_EASE }))
+        if (under) Promise.all(animations.map((a) => a.finished)).catch(() => {}).finally(() => under.remove())
+      } catch (_) {
+        // No Web Animations: the new level is simply drawn.
+        if (under) under.remove()
+      }
+    })
   }
 
   // A keyboard user must never focus something invisible: show the item

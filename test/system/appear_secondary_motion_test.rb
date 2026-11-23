@@ -79,6 +79,90 @@ class AppearSecondaryMotionTest < ApplicationSystemTestCase
     assert_equal 0.0, offset.to_f
   end
 
+  test "on a wide screen a face's motion waits until the face is pinned" do
+    page.driver.browser.manage.window.resize_to(1440, 900)
+    visit root_path
+    assert_selector ".f3 .screen.perform-wait", visible: :all
+    # Scroll at a reading pace and note where each face was when it started.
+    page.execute_script(<<~JS)
+      window.__starts = {};
+      window.__done = false;
+      (() => {
+        const end = document.querySelector(".beat--close").getBoundingClientRect().top + scrollY;
+        let y = scrollY, prev = performance.now();
+        const step = (now) => {
+          y += 400 * (now - prev) / 1000; prev = now; scrollTo(0, y);
+          for (const f of [ "f2", "f3", "f4" ]) {
+            const screen = document.querySelector(`.${f} .screen`);
+            if (!window.__starts[f] && screen.classList.contains("perform-run")) {
+              const face = screen.closest(".face");
+              window.__starts[f] = Math.round(face.getBoundingClientRect().top - parseFloat(getComputedStyle(face).top));
+            }
+          }
+          if (y < end) requestAnimationFrame(step); else window.__done = true;
+        };
+        requestAnimationFrame(step);
+      })();
+    JS
+    Timeout.timeout(30) { sleep 0.1 until page.evaluate_script("window.__done") }
+    starts = page.evaluate_script("window.__starts")
+    %w[f2 f3 f4].each do |f|
+      assert starts[f], "#{f} performed"
+      assert_operator starts[f].abs, :<=, 1, "#{f} started #{starts[f]}px from its pinned spot"
+    end
+    assert_no_selector BUSY, visible: :all, wait: 5
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
+  test "an RSVP re-pours the table and ends at the true level" do
+    user = User.create!(email: "repour-system@example.com", password: "password123", password_confirmation: "password123", first_name: "Re", last_name: "Pour")
+    event = events(:mystery_flight)
+    SocietyMembership.create!(user: user, society: event.society, role: "member", status: "active")
+    visit_sign_in_page
+    fill_in "magic-link-email", with: user.email
+    find("#password-toggle").click
+    fill_in "signin-password", with: "password123"
+    within("#password-signin") { click_button "Sign in" }
+    assert_link "Sign out"
+    assert_no_selector "html[aria-busy='true']", visible: :all
+
+    visit event_path(event)
+    assert_selector "[data-role=the-table][data-repour] svg[data-glass]", visible: :all
+    page.execute_script("document.querySelector('[data-repour]').scrollIntoView({ block: 'center' })")
+    before = page.evaluate_script("[...document.querySelectorAll('[data-repour] svg[data-glass]')].map((g) => g.dataset.glass)")
+    find("button.rsvp-option[data-answer=yes]").click
+    assert_selector "[data-repour] svg[data-glass]", visible: :all, wait: 5
+    Timeout.timeout(5) { sleep 0.05 until page.evaluate_script("[...document.querySelectorAll('[data-repour] svg[data-glass]')].map((g) => g.dataset.glass)") != before }
+    sleep 0.8 # the 500ms re-pour has run
+    state = page.evaluate_script(<<~JS)
+      [...document.querySelectorAll("[data-repour] svg[data-glass]")].map((g) => ({
+        animating: [...g.querySelectorAll("g > path")].some((p) => p.getAnimations().length),
+        paths: g.querySelectorAll("g > path").length,
+        moved: [...g.querySelectorAll("g > path")].some((p) => getComputedStyle(p).transform !== "none")
+      }))
+    JS
+    state.each do |glass|
+      refute glass["animating"], "the re-pour has finished"
+      refute glass["moved"], "every liquid sits at its drawn level"
+      assert_includes [ 0, 2 ], glass["paths"], "no helper copy of the body is left behind"
+    end
+  end
+
+  test "a sideways row on a phone fades at the edge with more to scroll" do
+    page.driver.browser.manage.window.resize_to(375, 812)
+    visit presentations_path
+    row = "#deck-filters .scroll-row"
+    assert_selector "#{row}[data-more-end]", visible: :all, wait: 3
+    assert_no_selector "#{row}[data-more-start]", visible: :all
+    page.execute_script("document.querySelector('#{row}').scrollTo({ left: 60, behavior: 'instant' })")
+    assert_selector "#{row}[data-more-start][data-more-end]", visible: :all, wait: 2
+    page.execute_script("const r = document.querySelector('#{row}'); r.scrollTo({ left: r.scrollWidth, behavior: 'instant' })")
+    assert_selector "#{row}[data-more-start]:not([data-more-end])", visible: :all, wait: 2
+  ensure
+    page.driver.browser.manage.window.resize_to(1400, 1400)
+  end
+
   test "focusing a link inside a waiting wheel shows the wheel at once" do
     visit review_path(reviews(:john_eagle_rare))
     page.execute_script("window.scrollTo({ top: 0, behavior: 'instant' })")

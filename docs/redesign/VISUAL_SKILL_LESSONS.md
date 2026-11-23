@@ -109,6 +109,13 @@ Authoritative values are in DESIGN_SYSTEM.md "Motion". These are the reasons beh
 - **Never mark anything taller than about one screen as a reveal item.** Mark its heading.
   Never fade long reading text.
 - **One entrance per container.** Secondary motion starts about 120ms after its container.
+- **On a pinned (sticky) layout, trigger motion when the element has settled in its final
+  spot, not when it enters the viewport.** The homepage faces slide up and pin; motion fired
+  on a viewport band played while the face was still travelling (or still covered), so in
+  real Safari the owner saw no animation on one face and a wheel filling before it had
+  arrived.
+- **On a phone, start reveals a little earlier.** A short screen makes a late trigger feel
+  abrupt; the owner asked for sections to ease in as they rise.
 - **Do not replay a drawing the browser has already painted.** It flashes. Replay only on
   Turbo visits.
 - **Progress ticks under an image mean "more images in this roll".** Do not use them to count
@@ -119,6 +126,5 @@ Authoritative values are in DESIGN_SYSTEM.md "Motion". These are the reasons beh
 
 ## Open
 
-- The re-pour for RSVP glasses exists only as a demo outside the repo.
 - Real Safari and iPhone checks are still outstanding.
 - impeccable is untried.

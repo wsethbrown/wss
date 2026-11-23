@@ -17,7 +17,9 @@
            ("#{unanswered} unanswered" if unanswered.to_i.positive?) ].compact.join(" · ")
 %>
 <% if levels.any? %>
-  <div class="mt-4" data-role="the-table">
+  <%# data-repour: when an RSVP stream replaces this, each changed glass moves
+      from its old level to its new one (appear_controller.js, repour). %>
+  <div class="mt-4" data-role="the-table" data-repour>
     <div class="flex flex-wrap items-end gap-1.5">
       <% levels.each do |level| %>
         <%= render "shared/glass", level: level, size: 40, tone: tone %>

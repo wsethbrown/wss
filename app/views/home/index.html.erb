@@ -380,7 +380,7 @@
         </div>
         <p class="note">One credit a month with membership · Or buy any deck outright</p>
       </div>
-      <div class="face f1">
+      <div class="face f1" data-appear-settle>
         <% if showcase_slides.any? %>
           <%# Real slides, limited to the deck's free-preview slides. %>
           <%= link_to presentation_path(@showcase_deck), class: "player", aria: { label: "#{@showcase_deck.title}, preview slides" } do %>
@@ -411,7 +411,7 @@
           <%= link_to "See the full library", presentations_path, class: "more" %>
         </div>
       </div>
-      <div class="face f2">
+      <div class="face f2" data-appear-settle>
         <div class="player" data-appear-target="item">
           <div class="screen" data-appear-target="perform">
             <div class="sl sl--paper">
@@ -439,7 +439,7 @@
           <%= link_to "Browse societies", societies_path, class: "more" %>
         </div>
       </div>
-      <div class="face f3">
+      <div class="face f3" data-appear-settle>
         <%# The one photograph on this page (owner-supplied, AI-generated; see
             docs/redesign/IMAGE_CREDITS.md). Same band in both invite states. %>
         <% gathering_photo = capture do %><%= render "shared/duotone", src: "photos/tasting-night-living-room.jpg", css: "invite-photo", width: 1280, height: 512,
@@ -510,7 +510,7 @@
           <%= link_to "Read the record", reviews_path, class: "more" %>
         </div>
       </div>
-      <div class="face f4">
+      <div class="face f4" data-appear-settle>
         <div class="player" data-appear-target="item">
           <div class="screen<%= ' screen--tall' if @verdict_rows.blank? && @featured_review %>" data-appear-target="perform">
             <div class="sl sl--ink">
