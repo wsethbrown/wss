@@ -39,6 +39,15 @@ Open work lives in GitHub Issues on `wsethbrown/wss`, not in conversations.
 - Reference the issue in commits and pull requests (`Fixes #N` closes it on merge). Close an issue only when the fix is verified, and say how.
 - The repository is public, so issues are too. Never put secrets, customer data, email addresses, server details or an unfixed security weakness in an issue; raise those with the owner privately.
 
+## Spelling: American
+
+The owner, 23 November 2026: use American spelling (color, flavor, labeled, aging, center,
+recognize) in everything written for this project: decks, scripts, site copy, emails, docs,
+commit messages. Two exceptions: text inside a quotation keeps the source's spelling, and a
+deck or page whose subject is British (Scotch, Irish and so on) may use British spelling.
+"Whisky" and "whiskey" follow the bottle or the country, as they always have.
+`tools/decks/american.py <files>` converts a file outside its quotation marks; read its output.
+
 ## Development Commands
 
 ### Starting the Application

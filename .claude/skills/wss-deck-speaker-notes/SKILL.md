@@ -171,6 +171,9 @@ line. Write the fact. The patterns to cut, on slides and in the script:
   Jr., a Kentucky distiller. Historians credit him with pushing for the Act." Quote enough
   of a sentence that it stands without a caption explaining who it is about. A source note
   is "Source: Maker's Mark.", not "Published by the maker."
+- **British spelling in an American deck.** "All of the colour comes from the wood." The
+  owner: use American spelling unless it is a quote or the topic is British. See CLAUDE.md,
+  "Spelling: American"; `tools/decks/american.py` converts a file outside its quotations.
 - **A label above a heading that only announces it.** "The first word on the label" over
   "What 'bourbon' means." Cut the label. Also cut the corrective pair on a slide: "It was a
   resolution, not a law." Give the fact: "Senate Concurrent Resolution 19, May 1964".

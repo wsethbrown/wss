@@ -64,7 +64,7 @@ rules = [('U.S.', 'Made in the United States'),
          ('160', 'Distilled to no more than 160 proof'),
          ('New oak', 'Aged in new, charred oak barrels, filled at no more than 125 proof'),
          ('80', 'Bottled at 80 proof or more'),
-         ('Nothing', 'No colouring or flavouring added')]
+         ('Nothing', 'No coloring or flavoring added')]
 cw, ch, gx, gy = 3.72, 1.55, 0.22, 0.2
 for i, (big, small) in enumerate(rules):
     x = 0.85 + (i % 3) * (cw + gx)
@@ -130,8 +130,8 @@ text(s, 0.85, 3.55, 5.6, 1.0, 'Before the rules', size=26, font=SANS, bold=True,
 text(s, 0.85, 4.1, 5.6, 0.6, 'From a manual for rectifiers, New York', size=18, italic=True, color=MUTE)
 heading(s, 0.95, 'A published recipe for “Old Bourbon Whiskey” with no bourbon in it.', size=30, x=7.1, w=5.4, h=1.7)
 text(s, 7.1, 2.75, 5.35, 2.4, [
-    'Neutral spirit, water, strong tea and oil of wintergreen, coloured with cochineal and burnt sugar.',
-    'Distillers sold whiskey by the barrel. Rectifiers bought spirit, then blended, coloured and flavoured it. The trade was legal and licensed.',
+    'Neutral spirit, water, strong tea and oil of wintergreen, colored with cochineal and burnt sugar.',
+    'Distillers sold whiskey by the barrel. Rectifiers bought spirit, then blended, colored and flavored it. The trade was legal and licensed.',
 ], size=15.5, ls=1.2, space_after=8)
 rrect(s, 7.1, 4.7, 5.38, 1.85, r=0.26, fill=WHITE, line=HAIR)
 text(s, 7.4, 4.85, 4.8, 1.1,
@@ -185,7 +185,7 @@ rrect(s, 8.25, 4.15, 4.23, 2.15, r=0.26, fill=WHITE, line=HAIR)
 text(s, 8.55, 4.33, 3.65, 1.2, '“I am a rectifier now; I have taken out my license.”', size=18, italic=True,
      color=INK, ls=1.15)
 text(s, 8.55, 5.3, 3.65, 0.95,
-     'Harvey Wiley, 1906. He was mixing a whiskey from alcohol, caramel and flavouring in front of a House committee.',
+     'Harvey Wiley, 1906. He was mixing a whiskey from alcohol, caramel and flavoring in front of a House committee.',
      size=11.5, font=SANS, color=MUTE, ls=1.12)
 credit(s, 8.25, 6.4, 4.23, 'Harvey W. Wiley in later life. Photograph: Harris & Ewing, Library of Congress.')
 footer(s, 10)
@@ -204,8 +204,8 @@ glass_slide(11, 'Glass 3', 'Knob Creek 9 Year',
 s = new_slide()
 heading(s, 1.0, 'Whiskey goes into the barrel clear.', size=38, w=6.6, h=1.6)
 text(s, 0.85, 3.0, 6.3, 3.6, [
-    'All of the colour comes from the wood. Bourbon cannot have colour added.',
-    'The vanilla and caramel flavours come from the wood under the char.',
+    'All of the color comes from the wood. Bourbon cannot have color added.',
+    'The vanilla and caramel flavors come from the wood under the char.',
     'About 6% is lost in the first year and 3% a year after that (Heaven Hill’s figures).',
     'On hot upper floors the proof goes up. On cool lower floors it goes down.',
 ], size=17.5, ls=1.22, space_after=10)
@@ -237,7 +237,7 @@ glass_slide(14, 'Glass 4', 'Wild Turkey Rare Breed',
             photo='rare-breed-crop.jpg',
             credit='Pictured: an older bottle, at 108.2 proof. Photograph: Craiglduncan, CC0, via Wikimedia Commons.')
 
-# ---------------------------------------------------------------- 15 read the shelf
+# ---------------------------------------------------------------- 15 what the four labels say
 s = new_slide()
 heading(s, 0.85, 'What the four labels say.', size=40, w=11.6, h=1.0)
 rrect(s, 0.85, 1.9, 11.63, 4.0, r=0.3, fill=WHITE, line=HAIR)

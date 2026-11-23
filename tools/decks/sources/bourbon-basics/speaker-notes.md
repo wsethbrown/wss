@@ -126,9 +126,9 @@ _Give them a minute to try it with glass 1._
 
 _Walk the list on the slide. Take it slowly._
 
-It is made in the United States. The grain is at least 51% corn. It comes off the still at no more than 160 proof. It goes into new, charred oak barrels at no more than 125 proof. It is bottled at 80 proof or more. And nothing is added for colour or flavour.
+It is made in the United States. The grain is at least 51% corn. It comes off the still at no more than 160 proof. It goes into new, charred oak barrels at no more than 125 proof. It is bottled at 80 proof or more. And nothing is added for color or flavor.
 
-So the colour in your glass came from the barrel. It went into the barrel clear.
+So the color in your glass came from the barrel. It went into the barrel clear.
 
 There is no minimum age on that list. Plain bourbon does not have one. The words that tell you about age are "straight" and "bonded", and the number on glass 3. We will get to those.
 
@@ -169,19 +169,19 @@ Now look at the label. It says "Bonded". The rule behind that word dates from 18
 
 ## [SLIDE 8] Before the rules
 
-In the 1800s a distiller sold whiskey by the barrel. The drinker bought it from a saloon or a merchant, by the glass or in a plain bottle. In between there was a trade called rectifying. Rectifiers bought spirit, then blended it, coloured it and flavoured it. The trade was legal, licensed and taxed.
+In the 1800s a distiller sold whiskey by the barrel. The drinker bought it from a saloon or a merchant, by the glass or in a plain bottle. In between there was a trade called rectifying. Rectifiers bought spirit, then blended it, colored it and flavored it. The trade was legal, licensed and taxed.
 
-Rectifiers had printed manuals. One from 1853 gives a recipe for "Old Bourbon Whiskey" with no bourbon in it: neutral spirit, water, strong tea and oil of wintergreen, coloured with cochineal and burnt sugar.
+Rectifiers had printed manuals. One from 1853 gives a recipe for "Old Bourbon Whiskey" with no bourbon in it: neutral spirit, water, strong tea and oil of wintergreen, colored with cochineal and burnt sugar.
 
-Another, from 1885, lists eleven grades of whiskey by price. The cheapest is spirit, water and colouring. The next one up adds something called "Oil of Bourbon", and is sold as bourbon.
+Another, from 1885, lists eleven grades of whiskey by price. The cheapest is spirit, water and coloring. The next one up adds something called "Oil of Bourbon", and is sold as bourbon.
 
 The man who wrote that second book worked in the trade. He wrote that a man who orders whiskey, even at a first-class bar, "does not know what he drinks".
 
 > **DO NOT OVERSELL IT**
 > Not every rectifier was a fraud. The best grade in the 1885 manual is a blend of good straight whiskeys. And the stories about tobacco in the barrel were called "a popular error" by the 1853 manual itself.
 
-> **ENSLAVED LABOUR**
-> Optional. Before the end of slavery the biggest names in Kentucky whiskey used enslaved labour. The records that survive show enslaved people rolling barrels and gathering grain. They do not show whether enslaved people also did the distilling.
+> **ENSLAVED LABOR**
+> Optional. Before the end of slavery the biggest names in Kentucky whiskey used enslaved labor. The records that survive show enslaved people rolling barrels and gathering grain. They do not show whether enslaved people also did the distilling.
 
 ## [SLIDE 9] 1897: bottled in bond
 
@@ -198,9 +198,9 @@ The Act was repealed in 1979, but the rule is still in the regulations. A label 
 
 ## [SLIDE 10] What "straight" means
 
-Bottling in bond was voluntary. Everything else could still be labelled however the seller liked.
+Bottling in bond was voluntary. Everything else could still be labeled however the seller liked.
 
-In 1906 Congress passed the Pure Food and Drugs Act, and the argument began over what could be called whiskey. The government's chief chemist, Harvey Wiley, mixed a whiskey in front of a House committee out of alcohol, caramel and flavouring. He told them, "I am a rectifier now; I have taken out my license."
+In 1906 Congress passed the Pure Food and Drugs Act, and the argument began over what could be called whiskey. The government's chief chemist, Harvey Wiley, mixed a whiskey in front of a House committee out of alcohol, caramel and flavoring. He told them, "I am a rectifier now; I have taken out my license."
 
 The question went to the President. In December 1909 William Howard Taft ruled that any spirit distilled from grain could be called whiskey. But the words "straight", "bourbon" and "rye" were kept for whiskey that was aged and unmixed, and whiskey made from neutral spirit had to say so on the label.
 
@@ -222,16 +222,16 @@ A straight bourbon over four years old does not have to print its age, so the nu
 
 ## [SLIDE 12] What the barrel does
 
-Whiskey comes off the still clear. Bourbon cannot have colour added, so all of the colour in these four glasses came from the wood.
+Whiskey comes off the still clear. Bourbon cannot have color added, so all of the color in these four glasses came from the wood.
 
-The barrel is charred on the inside before it is filled. The heat breaks down the wood under the char, and that is where the vanilla and caramel flavours come from. The char itself works as a filter.
+The barrel is charred on the inside before it is filled. The heat breaks down the wood under the char, and that is where the vanilla and caramel flavors come from. The char itself works as a filter.
 
 Some whiskey is lost every year. Heaven Hill, a Kentucky distillery, puts it at about 6% in the first year and 3% a year after that. Distillers call it the angel's share.
 
 The proof changes in the barrel too. On the hot upper floors of a Kentucky warehouse, water leaves faster than alcohol and the proof goes up. On the cool lower floors it goes down.
 
 > **DO NOT OVERSELL IT**
-> A figure often quoted is that 70% of the flavour comes from the barrel. Nobody has measured it. The estimates from people in the trade run from half to 70%. "Most of it" is safe.
+> A figure often quoted is that 70% of the flavor comes from the barrel. Nobody has measured it. The estimates from people in the trade run from half to 70%. "Most of it" is safe.
 
 ## [SLIDE 13] Words with rules, and words without
 
@@ -239,7 +239,7 @@ So far every word we have looked at has a rule behind it: bourbon, straight, bon
 
 Some words on a label have no federal definition. "Small batch" is one. So are "reserve" and "handmade". "Single barrel" is not defined either. A label is not allowed to mislead, but no rule says how small a small batch is.
 
-Pick up the Knob Creek. "Small Batch" is moulded into the glass. It may well be true. The regulations do not say what it means.
+Pick up the Knob Creek. "Small Batch" is molded into the glass. It may well be true. The regulations do not say what it means.
 
 The last bottle has one more term with a rule behind it. The term is "barrel proof".
 
@@ -258,9 +258,9 @@ Take a small sip as it is. Then add three or four drops of water, give it a mome
 _Ask: "What changed when you added the water?"_
 
 > **DO NOT OVERSELL IT**
-> A 2017 study is often quoted as proof that water improves whiskey. It was a computer simulation of one flavour molecule in alcohol and water. Nobody tasted anything. Go by what the room tastes.
+> A 2017 study is often quoted as proof that water improves whiskey. It was a computer simulation of one flavor molecule in alcohol and water. Nobody tasted anything. Go by what the room tastes.
 
-## [SLIDE 15] Read the shelf
+## [SLIDE 15] What the four labels say
 
 Put the four bottles side by side and read them again.
 
