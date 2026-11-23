@@ -46,16 +46,16 @@ The bourbon barrel abroad. A guide for anyone who wants to research the subject 
 - A barrel is held together by hoops and the swelling of wet wood. Brown-Forman's cooperage aims for 29 to 33 staves; a 53-gallon barrel carries six hoops.
 - Staves are raised inside a hoop, heated, drawn together, hooped, and the heads are set into a groove (the croze).
 - Toasting heats the wood without ignition. Charring burns the inner surface. Char is sold as No. 1 to No. 4; Independent Stave calls its No. 4 "alligator char". Commonly quoted times run from about 15 seconds for No. 1 to about 55 for No. 4, and vary by cooperage.
-- Heat breaks hemicellulose into wood sugars that caramelise; vanillin comes mainly from lignin; American oak is high in oak lactones (coconut). Heavier char reduces the lactone effect.
+- Heat breaks hemicellulose into wood sugars that caramelize; vanillin comes mainly from lignin; American oak is high in oak lactones (coconut). Heavier char reduces the lactone effect.
 
 ### Primary documents
 
 - Independent Stave Company and Brown-Forman Cooperage published specifications.
-- Peer-reviewed reviews of oak-derived flavour compounds in aged spirits.
+- Peer-reviewed reviews of oak-derived flavor compounds in aged spirits.
 
 ### Traps
 
-- "Red layer" is used two ways: by coopers for the caramelised band behind the char, and in a 2018 _Scientific Reports_ paper for the line showing how far spirit has soaked in. The deck uses the coopers' sense.
+- "Red layer" is used two ways: by coopers for the caramelized band behind the char, and in a 2018 _Scientific Reports_ paper for the line showing how far spirit has soaked in. The deck uses the coopers' sense.
 - Claims such as "60 to 70 percent of the flavour comes from the barrel" cannot be measured cleanly. Avoid them.
 
 ### Sources
@@ -77,7 +77,7 @@ The bourbon barrel abroad. A guide for anyone who wants to research the subject 
 - Standards of identity were published under it. An April 1936 Federal Register notice defined bourbon without the word "new"; the 1938 regulations required storage in charred new oak containers (Lazar, _In the American Grain_, from the Federal Register texts).
 - The effective date in 1938 is reported as 1 March (Veach) or 1 July (VinePair). The slide says "by 1938".
 - TTB Industry Circular 76-28 (6 December 1976) restates that bourbon must be stored in new charred oak cooperage.
-- Current rule (27 CFR 5.143): at least 51% corn, distilled at no more than 160 proof, stored at no more than 125 proof in charred new oak containers. Straight bourbon: at least two years. Bourbon may not contain added colouring, flavouring or blending materials (TTB's interpretation of 5.23).
+- Current rule (27 CFR 5.143): at least 51% corn, distilled at no more than 160 proof, stored at no more than 125 proof in charred new oak containers. Straight bourbon: at least two years. Bourbon may not contain added coloring, flavoring or blending materials (TTB's interpretation of 5.23).
 
 ### Primary documents
 
@@ -107,7 +107,7 @@ The bourbon barrel abroad. A guide for anyone who wants to research the subject 
 
 ### Nailed down
 
-- The standard American whiskey barrel holds 53 US gallons, about 200 litres. The size is custom, not law.
+- The standard American whiskey barrel holds 53 US gallons, about 200 liters. The size is custom, not law.
 - Temperature swings push spirit into and out of the wood. Upper floors of a rickhouse are hotter and drier; there proof usually rises because water escapes faster than alcohol. In Scotland's cool, damp warehouses strength falls.
 - The angels' share in Scotland averages about 2% a year, the figure Scottish Government officials have also used.
 - Maker's Mark (Loretto, Kentucky) is a wheated bourbon (red winter wheat) at 90 proof, 45% ABV. The company says it rotates its barrels between floors by hand.
@@ -139,11 +139,11 @@ The bourbon barrel abroad. A guide for anyone who wants to research the subject 
 
 ### Nailed down
 
-- Scotch whisky must be matured in an excise warehouse in Scotland, in oak casks of no more than 700 litres, for at least three years; only water and plain caramel colouring (E150A) may be added. New wood is not required. Estimates of the share matured at least partly in ex-bourbon casks cluster around 90%.
-- Irish whiskey must be matured for at least three years in wooden casks in the Republic, Northern Ireland or both; the technical file sets a 700-litre limit.
-- Until about the late 1980s most barrels were shipped to Scotland as shooks (bundles of staves) and rebuilt; today they mostly travel whole. Many are rebuilt into hogsheads of about 250 litres.
+- Scotch whisky must be matured in an excise warehouse in Scotland, in oak casks of no more than 700 liters, for at least three years; only water and plain caramel coloring (E150A) may be added. New wood is not required. Estimates of the share matured at least partly in ex-bourbon casks cluster around 90%.
+- Irish whiskey must be matured for at least three years in wooden casks in the Republic, Northern Ireland or both; the technical file sets a 700-liter limit.
+- Until about the late 1980s most barrels were shipped to Scotland as shooks (bundles of staves) and rebuilt; today they mostly travel whole. Many are rebuilt into hogsheads of about 250 liters.
 - Ex-bourbon barrels are the usual cask for aged tequila (one estimate: 70–80%) and for much Caribbean rum.
-- Casks are refilled; a first-fill cask gives the most flavour, refills progressively less. Spent casks may be rejuvenated (scraped and re-charred).
+- Casks are refilled; a first-fill cask gives the most flavor, refills progressively less. Spent casks may be rejuvenated (scraped and re-charred).
 - Laphroaig went to Allied in 1989; Maker's Mark had gone to Allied with Hiram Walker in 1987. Both passed to Fortune Brands (Beam) in 2005, then Beam Suntory in 2014, now Suntory Global Spirits.
 - Laphroaig's 2022 Cairdeas Warehouse 1 was matured entirely in first-fill ex-Maker's Mark casks. Third-party accounts say the 10-year-old's ex-bourbon casks come mostly from Maker's Mark; no current official statement that all of them do was found, so the deck says "largely".
 - Laphroaig 10 is 86 proof (43% ABV) in the US, 750 ml; 40% in some other markets.
@@ -186,7 +186,7 @@ The bourbon barrel abroad. A guide for anyone who wants to research the subject 
 
 ### Primary documents
 
-- Glenmorangie's own published accounts of its wood programme, and interviews with its director of whisky creation, Bill Lumsden.
+- Glenmorangie's own published accounts of its wood program, and interviews with its director of whisky creation, Bill Lumsden.
 - Brown-Forman's brand page for Slane.
 
 ### Traps

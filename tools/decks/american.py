@@ -3,8 +3,8 @@
     python3 -I tools/decks/american.py <file>...
 
 Text inside “curly” or "straight" quotation marks on one line is left alone, since a
-quotation keeps its source's spelling. In a .py file only curly quotes count, because
-straight quotes there are Python's. It rewrites the files and prints every changed line:
+quotation keeps its source's spelling. In a .py or .json file only curly quotes count, because
+straight quotes there belong to the file format. It rewrites the files and prints every changed line:
 read them. Do not run it on a deck whose subject is British.
 """
 import re, sys
@@ -37,7 +37,7 @@ n = 0
 for path in sys.argv[1:]:
     src = open(path, encoding="utf-8").read(); out = []
     for line in src.split("\n"):
-        parts = (CURLY if path.endswith('.py') else QUOTED).split(line)
+        parts = (CURLY if path.endswith(('.py', '.json')) else QUOTED).split(line)
         new = "".join(p if i % 2 else conv(p) for i, p in enumerate(parts))
         if new != line: n += 1; print(f"{path}: {line.strip()[:90]}\n   -> {new.strip()[:90]}")
         out.append(new)

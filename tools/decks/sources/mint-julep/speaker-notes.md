@@ -26,7 +26,7 @@ In terms of efficiency, to make the drinks for the room without too much delay:
 
 Two drinks, three bottles. Each bottle has a job in the story.
 
-- **The brandy (Glass A).** The spirit a good julep was built on around 1820. Tonight: a cognac.
+- **The brandy (Glass A).** The spirit a good julep was built on around 1820. Suggested bottle: a cognac.
 - **The peach brandy (Glass A).** The domestic lift Virginians added. Half an ounce per drink.
 - **The bourbon (Glass B).** The spirit that took the drink over after the war and phylloxera.
 
@@ -75,7 +75,7 @@ Almost all of that is a modern invention. The bourbon is recent. The Derby is re
 
 So here's my promise for the next half hour: by the end of it, you will not be able to call this a Kentucky drink with a straight face.
 
-## [SLIDE 2] Start with glass A
+## [SLIDE 2] What goes into every julep
 
 _Pour Glass A now: the Virginia julep. Don't say what's in it yet._
 
@@ -211,7 +211,7 @@ Born enslaved in Hanover County around 1824. He was small, so they made him a jo
 
 He shaved the ice for those juleps himself, with a carpenter's plane turned blade-up, wooden sides fitted to catch the fall.
 
-His only real income was tips. He had already been buying his own freedom from them, in instalments. When Elizabeth's owners were preparing to sell her away from him after she had their first child, he paused those payments and bought his wife's freedom instead. Then he went back to buying his own.
+His only real income was tips. He had already been buying his own freedom from them, in installments. When Elizabeth's owners were preparing to sell her away from him after she had their first child, he paused those payments and bought his wife's freedom instead. Then he went back to buying his own.
 
 Then the war ended, and slavery ended, and the debt evaporated.
 
@@ -244,7 +244,7 @@ On the stand in Marquette in May 1913, he swore he had never been intoxicated in
 
 The St. Louis Post-Dispatch would not let that stand. Who, it asked, was ever known to drink just part of one of Tom's? It called him the greatest mixologist of any race.
 
-It is the only time in American history a man's sobriety defence was rejected on the grounds that his bartender was too good.
+It is the only time in American history a man's sobriety defense was rejected on the grounds that his bartender was too good.
 
 Roosevelt won. The editor folded, admitting he could not produce a single witness. Roosevelt asked the court for the smallest sum the law allowed: six cents. He noted that six cents was about the price of a good newspaper. The Iron Ore sold for three.
 

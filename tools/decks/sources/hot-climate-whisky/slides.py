@@ -184,7 +184,7 @@ footer(s, 5)
 
 # ---------------------------------------------------------------- 6 pour 1
 pour_slide(6, 'Pour 1 of 4', 'Amrut Fusion',
-           ['Neat first, then a few drops of water.', 'Notice how early the oak comes through.'],
+           ['About three-quarters Indian barley with no peat, and about a quarter peated barley from Scotland.'],
            ['Amrut Distilleries,', 'Bangalore'], ['Indian single malt,', 'partly peated'], '50%')
 
 # ---------------------------------------------------------------- 7 a year in the warehouse
@@ -249,7 +249,7 @@ footer(s, 9)
 
 # ---------------------------------------------------------------- 10 pour 2
 pour_slide(10, 'Pour 2 of 4', ['Paul John', 'Brilliance'],
-           ['Indian six-row barley and ex-bourbon casks, with no peat.', 'Taste it beside the Amrut.'],
+           ['Indian six-row barley and ex-bourbon casks, with no peat.'],
            ['John Distilleries,', 'Goa'], ['Indian single malt,', 'unpeated'], '46%', two_line_name=True,
            note_size=20)
 
@@ -273,7 +273,7 @@ rows_card(s, X, 2.3, CW, [
     ('The rest', 'Young Scotch blends and malts, and St George’s, an English malt.'),
 ], label_w=2.2, row_h=0.95, mark=0, label_size=26, size=21)
 text(s, X, 4.5, CW, 1.6,
-     [[('Charles MacLean organised it for ', {}), ('The Times', {'italic': True}),
+     [[('Charles MacLean organized it for ', {}), ('The Times', {'italic': True}),
        (' around Burns Night, with four judges.', {})],
       [('In 2015 Kavalan Solist Vinho Barrique was named World’s Best Single Malt at the World Whiskies'
         + NB + 'Awards.', {'color': MUTE})]],
@@ -282,8 +282,7 @@ footer(s, 12)
 
 # ---------------------------------------------------------------- 13 pour 3
 pour_slide(13, 'Pour 3 of 4', 'Kavalan Classic',
-           ['The distillery’s first single malt, released in 2008.',
-            'Look at the colour from a distillery that began in 2006.'],
+           ['The distillery’s first single malt, released in 2008.'],
            ['Kavalan (King Car),', 'Yilan, Taiwan'], 'Taiwanese single malt', '43% (US)',
            widths=(2.6, 2.95, 1.1))
 
@@ -301,7 +300,7 @@ footer(s, 14)
 
 # ---------------------------------------------------------------- 15 pour 4
 pour_slide(15, 'Pour 4 of 4', ['Glenfiddich', '12 Year Old'],
-           ['Twelve years in Speyside, losing about 2% a year.', 'Compare it with the Kavalan.'],
+           ['Twelve years in Speyside, losing about 2% a year.'],
            ['William Grant & Sons,', 'Dufftown'], ['Speyside single', 'malt Scotch'], '40%', two_line_name=True)
 
 # ---------------------------------------------------------------- 16 reading the label

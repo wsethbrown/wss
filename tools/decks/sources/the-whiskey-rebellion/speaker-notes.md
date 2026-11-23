@@ -148,7 +148,7 @@ Bourbon County was created in 1785, when Kentucky was still part of Virginia. Th
 
 The last pour is a bourbon. It is named after a man with a legend of his own.
 
-Elijah Craig was a Baptist preacher. He was jailed in Virginia for preaching without a licence, and later he moved to Kentucky. He ran several businesses there, and one of them was a distillery. In 1874, long after he died, a history of Kentucky said he made the first bourbon in 1789. Later people added that he was the first to char his barrels. There is no good evidence for either claim.
+Elijah Craig was a Baptist preacher. He was jailed in Virginia for preaching without a license, and later he moved to Kentucky. He ran several businesses there, and one of them was a distillery. In 1874, long after he died, a history of Kentucky said he made the first bourbon in 1789. Later people added that he was the first to char his barrels. There is no good evidence for either claim.
 
 This is Elijah Craig Small Batch, made by Heaven Hill, at 94 proof. Taste it after the ryes. It is sweeter, and that comes from the corn. Corn is the main difference between bourbon and the rye whiskey those Pennsylvania farmers made.
 

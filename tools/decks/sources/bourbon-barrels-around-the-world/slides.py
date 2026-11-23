@@ -136,8 +136,8 @@ text(s, X, 2.25, 1.3, 0.5, 'Spirit', size=22, font=SANS, bold=True, color=MUTE)
 gx = X + 1.45
 g = 0.2
 cw = (R - gx - 2 * g) / 3
-layers = [('Char', 'Works like charcoal. Takes out some sulphur notes.', OAK, OAK_EDGE, CREAM),
-          ('Red layer', 'Wood sugars caramelised by heat. Vanillin, colour.', WHITE, HAIR, INK),
+layers = [('Char', 'Works like charcoal. Takes out some sulfur notes.', OAK, OAK_EDGE, CREAM),
+          ('Red layer', 'Wood sugars caramelized by heat. Vanillin, color.', WHITE, HAIR, INK),
           ('Oak', 'Tannin and oak lactones.', W100, W200, INK)]
 for i, (name, body, fill, edge, col) in enumerate(layers):
     cx = gx + i * (cw + g)
@@ -164,7 +164,7 @@ footer(s, 5, dark=True)
 
 # ---------------------------------------------------------------- 6 pour 1
 pour_slide(6, 'Pour 1 of 4', 'Maker’s Mark',
-           'Nothing may be added to bourbon but water, so all of this colour came out of one new charred barrel.',
+           'Nothing may be added to bourbon but water, so all of this color came out of one new charred barrel.',
            'Maker’s Mark, Kentucky', ['Kentucky straight', 'bourbon, wheated'], '90', strength_label='Proof',
            widths=(2.95, 3.05, 0.6))
 
@@ -185,7 +185,7 @@ footer(s, 7)
 s = new_slide()
 text(s, 0.75, 0.6, 7.0, 1.8, '53', size=150, font=SANS, bold=True, color=INK, ls=0.9)
 rect(s, X + 0.03, 2.65, 1.2, 0.045, fill=MARK_DEEP)
-text(s, X, 2.9, CW, 1.2, ['US gallons in a standard bourbon barrel,', 'about 200 litres'],
+text(s, X, 2.9, CW, 1.2, ['US gallons in a standard bourbon barrel,', 'about 200 liters'],
      size=32, font=SANS, bold=True, color=INK, ls=0.98)
 text(s, X, 4.4, 10.5, 1.4,
      'Some evaporates through the wood each year: about 2% in Scotland, usually more in Kentucky. '
@@ -196,7 +196,7 @@ footer(s, 8)
 s = new_slide()
 heading(s, 0.85, 'What the first fill leaves in the wood', size=40, w=CW, h=0.9)
 pw = (CW - 0.25) / 2
-cards = [(X, OAK, OAK_EDGE, CREAM, 'First fill, bourbon', 'New barrel. Most of the colour, vanilla and tannin, '
+cards = [(X, OAK, OAK_EDGE, CREAM, 'First fill, bourbon', 'New barrel. Most of the color, vanilla and tannin, '
           'taken quickly.'),
          (X + pw + 0.25, WHITE, HAIR, INK, 'Second fill, abroad', 'What is left. It comes out slowly, over ten years '
           'or more.')]
@@ -223,15 +223,14 @@ footer(s, 10)
 
 # ---------------------------------------------------------------- 11 pour 2
 pour_slide(11, 'Pour 2 of 4', 'Laphroaig 10',
-           ['Laphroaig’s ex-bourbon barrels come largely from Maker’s Mark, its sister distillery.',
-            'Look under the peat smoke for the vanilla.'],
+           'Laphroaig’s ex-bourbon barrels come largely from Maker’s Mark, its sister distillery.',
            'Laphroaig, Islay', 'Islay single malt Scotch', '43% (US)', widths=(2.35, 3.2, 1.15))
 
 # ---------------------------------------------------------------- 12 filled more than once
 s = new_slide()
 heading(s, 0.85, 'A Scotch cask is filled more than once', size=40, w=CW, h=0.9)
 fills = [('Bourbon', 'New charred oak, used once.', 1.0),
-         ('First fill', 'The most flavour left to give.', 0.6),
+         ('First fill', 'The most flavor left to give.', 0.6),
          ('Refill', 'Less again. Often two or three times.', 0.33),
          ('Spent', ['Scraped and', 're-charred, or retired.'], 0.14)]
 g4 = 0.22
@@ -287,7 +286,7 @@ footer(s, 14)
 
 # ---------------------------------------------------------------- 15 pour 4
 pour_slide(15, 'Pour 4 of 4', ['Glenmorangie', 'The Original 12'],
-           ['Twelve years in ex-bourbon casks, with no peat.', 'Look for vanilla and coconut from the oak.'],
+           'Twelve years in ex-bourbon casks, with no peat.',
            'Glenmorangie, Tain', 'Highland single malt Scotch', '40%', two_line_name=True,
            widths=(2.55, 3.4, 0.85))
 
@@ -295,10 +294,10 @@ pour_slide(15, 'Pour 4 of 4', ['Glenmorangie', 'The Original 12'],
 s = new_slide()
 heading(s, 0.85, 'Reading the wood on a label', size=40, w=CW, h=0.9)
 rows_card(s, X, 2.0, CW, [
-    (['Bourbon,', 'straight bourbon'], 'New charred oak and no added colour, by law.'),
+    (['Bourbon,', 'straight bourbon'], 'New charred oak and no added color, by law.'),
     ('Ex-bourbon, first fill, refill', 'A used cask, and how often it was used. Optional.'),
     ('Double oaked, finished', 'Moved to a second cask near the end.'),
-    ('Natural colour', 'Scotch may contain caramel colouring without saying so.'),
+    ('Natural colour', 'Scotch may contain caramel coloring without saying so.'),
 ], label_w=3.75, row_h=1.0, label_size=21, size=19.5)
 footer(s, 16)
 

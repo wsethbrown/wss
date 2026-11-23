@@ -54,7 +54,7 @@ Most of those descriptions were written much later, and very few recipes from th
 
 The first bottle tonight is Overholt. Abraham Overholt was born in 1784 and died in 1870. He came from a Mennonite farming family in Westmoreland County, south-east of Pittsburgh. The brand dates itself to 1810, when the family was making whiskey at West Overton. It used that date in its advertising, and the advertisement on the slide is from 1897. Later the family built a much bigger distillery at Broad Ford, on the Youghiogheny River.
 
-Abraham's grandson was Henry Clay Frick, who got rich from coke and steel. Frick took over the business in the 1880s and brought in his friend Andrew Mellon as a partner. The whiskey was named Old Overholt in 1888. When Frick died in December 1919, he left his share to Mellon. Mellon was Secretary of the Treasury for most of Prohibition, and he was criticised for owning part of a distillery. He sold his share in 1925.
+Abraham's grandson was Henry Clay Frick, who got rich from coke and steel. Frick took over the business in the 1880s and brought in his friend Andrew Mellon as a partner. The whiskey was named Old Overholt in 1888. When Frick died in December 1919, he left his share to Mellon. Mellon was Secretary of the Treasury for most of Prohibition, and he was criticized for owning part of a distillery. He sold his share in 1925.
 
 Broad Ford reopened after Prohibition and made whiskey until 1951. For the next thirty years or so it was probably made somewhere else in Pennsylvania. In 1987 Beam bought the brand and moved it to Kentucky, and it is still made there.
 
@@ -68,7 +68,7 @@ Keep a little in the glass so you can compare it with the others.
 
 ## [SLIDE 7] Pikesville, the Maryland name that survived
 
-Maryland's whiskey business was centred on Baltimore. The city was a port and a railway hub, and before Prohibition there were a great many Maryland brands.
+Maryland's whiskey business was centered on Baltimore. The city was a port and a railway hub, and before Prohibition there were a great many Maryland brands.
 
 The one still on sale is Pikesville. It is named after a town just north-west of Baltimore. It goes back to the 1890s, when the Winand family ran a distillery near Pikesville. Prohibition closed that distillery. In the 1930s a Baltimore businessman brought the brand back and paid Baltimore distilleries to make it. The last batch made in Maryland was in 1972. There was enough in the warehouse to keep selling it for another ten years. In 1982 the name and the recipe were sold to Heaven Hill in Bardstown, Kentucky.
 
@@ -84,7 +84,7 @@ Both of the first two pours have old eastern names. Both are made in Kentucky no
 
 Prohibition ran from January 1920 to December 1933. It hit rye harder than bourbon.
 
-During those years six companies had licences to sell whiskey as medicine. You needed a doctor's prescription, and the whiskey came from barrels already in the warehouses. Old Overholt was one of the brands sold that way. That is one reason people criticised Mellon for owning a share of it. At the end of the 1920s the warehouses were running low, and the licensed companies were allowed to make a limited amount again.
+During those years six companies had licenses to sell whiskey as medicine. You needed a doctor's prescription, and the whiskey came from barrels already in the warehouses. Old Overholt was one of the brands sold that way. That is one reason people criticized Mellon for owning a share of it. At the end of the 1920s the warehouses were running low, and the licensed companies were allowed to make a limited amount again.
 
 Every other distillery closed, and the stills were sold or scrapped. When Prohibition ended, most distilleries had to start again with almost nothing. That included the old rye distilleries in Pennsylvania and Maryland.
 

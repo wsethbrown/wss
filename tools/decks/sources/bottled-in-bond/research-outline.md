@@ -17,12 +17,12 @@ Research outline: 1897
 ### Nailed down
 
 - In 1870 selling whiskey from the barrel, not in sealed bottles, was the norm; that is the point of the Old Forester story.
-- Rectifiers made "whiskey" from neutral spirit, coloured and flavoured; straight-whiskey makers and rectifiers were opposing interests in the fights of 1897 and 1906–1909.
+- Rectifiers made "whiskey" from neutral spirit, colored and flavored; straight-whiskey makers and rectifiers were opposing interests in the fights of 1897 and 1906–1909.
 - Historians disagree about motive: some read the pure-food fight over whiskey as straight distillers using the law against rectifiers as much as consumer protection.
 
 ### Primary documents
 
-- Annual Reports of the Commissioner of Internal Revenue (free, HathiTrust). Production, rectifier licences, warehouse stocks by year.
+- Annual Reports of the Commissioner of Internal Revenue (free, HathiTrust). Production, rectifier licenses, warehouse stocks by year.
 - Period trade papers, especially _Bonfort's Wine and Spirit Circular_.
 - Rectifiers' recipe manuals of the period.
 
@@ -145,7 +145,7 @@ Research outline: 1897
 
 - Pure Food and Drug Act, passed and signed 30 June 1906; enforced at first by the Bureau of Chemistry under Harvey W. Wiley.
 - Wiley held that whisky made from neutral spirit should not pass as whisky without qualification.
-- Taft had Solicitor General Lloyd Bowers rehear the matter and issued his decision on 27 December 1909: neutral-spirit whisky is whisky, but "straight whisky" is so labelled, a mixture of straight and neutral-spirit whisky is a blend, and whisky from neutral spirit names its principal ingredient.
+- Taft had Solicitor General Lloyd Bowers rehear the matter and issued his decision on 27 December 1909: neutral-spirit whisky is whisky, but "straight whisky" is so labeled, a mixture of straight and neutral-spirit whisky is a blend, and whisky from neutral spirit names its principal ingredient.
 
 ### Primary documents
 
@@ -182,7 +182,7 @@ Research outline: 1897
 
 - Surviving prescription forms and medicinal pint labels in museum collections.
 - Distilled Spirits Council statistics for volume by category.
-- Federal Register notices and TTB circulars for changes to stamp and labelling rules.
+- Federal Register notices and TTB circulars for changes to stamp and labeling rules.
 
 ### Sources
 
@@ -229,7 +229,7 @@ Producers, mash bills and availability change. Check each bottle's own label for
 - **The bonded strip stamps carrying Carlisle's portrait.** Not used. Settle with a dated stamp example.
 - **Green bottled-in-bond strip discontinued 1 December 1982.** Collector sources only; the timeline uses the TTB-confirmed 1985 date and the script says "early eighties". Settle with the ATF notice of 1982.
 - **Which distillery the slide 7 engraving shows.** The Commons title says only "the distillery of E. H. Taylor (Jr.) & Company", Frankfort, 1891, and the caption repeats that. The sunken garden court with a fountain suggests Old Taylor on Glenn's Creek (built 1887) rather than the O.F.C. and Carlisle plant on the Kentucky River, but no source names it. Settle with the book the engraving comes from or the Kentucky Historical Society collection. Sources consulted: Pre-Pro distillery records (https://www.pre-pro.com/midacore/view_distillery.php?did=DST438), Garden & Gun on the Old Taylor gardens (https://gardenandgun.com/first-look-reviving-a-lost-bourbon-landmark).
-- **The "nothing added" rule for straight whiskey.** Removed from slide 16 and the script; the search returned the ageing rule in 27 CFR 5.143 but not the additive wording. Settle with the full text of 5.143 and 5.23 on ecfr.gov.
+- **The "nothing added" rule for straight whiskey.** Removed from slide 16 and the script; the search returned the aging rule in 27 CFR 5.143 but not the additive wording. Settle with the full text of 5.143 and 5.23 on ecfr.gov.
 - **Rittenhouse's Pennsylvania origin.** Removed. Settle with Heaven Hill's brand history or 1930s trade records.
 - **Bonded apple brandy (Laird's).** Removed. Settle with Laird's current product page.
 

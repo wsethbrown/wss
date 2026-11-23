@@ -35,7 +35,7 @@ Western Pennsylvania, 1791–1794. A guide for anyone who wants to research the 
 ### Traps
 
 - The effective rates often quoted (about 6 cents a gallon for a large distiller against 9 for a small one) come from secondary accounts and were not confirmed against the statutes. The deck states the statutory rates instead.
-- In the 1791 act the capacity option was for country stills only. Do not describe it as an option that favoured town distillers.
+- In the 1791 act the capacity option was for country stills only. Do not describe it as an option that favored town distillers.
 - "The first federal tax" is wrong: import duties came first. It was the first federal tax on a domestic product.
 
 ## Module 2. Why the west distilled
@@ -56,7 +56,7 @@ Western Pennsylvania, 1791–1794. A guide for anyone who wants to research the 
 
 ### Primary documents
 
-- Hugh Henry Brackenridge, _Incidents of the Insurrection in the Western Parts of Pennsylvania_ (1795). A participant's account, written partly in self-defence.
+- Hugh Henry Brackenridge, _Incidents of the Insurrection in the Western Parts of Pennsylvania_ (1795). A participant's account, written partly in self-defense.
 - William Findley, _History of the Insurrection in the Four Western Counties of Pennsylvania_ (1796). Findley was the region's congressman.
 
 ### Traps
@@ -167,7 +167,7 @@ Western Pennsylvania, 1791–1794. A guide for anyone who wants to research the 
 - Commercial distilling in Kentucky is dated to at least 1783 (Evan Williams, Louisville, by the state marker; the "first distiller" title is a later claim). Kentucky became a state in 1792. Kentucky distillers largely refused to pay the excise and the Treasury could not force collection; some were later prosecuted.
 - Virginia created Bourbon County out of Fayette County by an act of 1785, effective 1786 (the Library of Virginia gives 1786 as the date of formation).
 - The earliest known printed use of "bourbon whiskey" is a Stout and Adams advertisement in the _Western Citizen_ (Paris, Kentucky), June 1821.
-- Elijah Craig was a Baptist preacher, jailed in Virginia for preaching without a licence, who distilled in Kentucky. Richard Collins's history of Kentucky (1874) credited him with the first bourbon in 1789; historians including Henry Crowgey and Charles Cowdery treat this as legend. Heaven Hill still credits him with first using charred barrels.
+- Elijah Craig was a Baptist preacher, jailed in Virginia for preaching without a license, who distilled in Kentucky. Richard Collins's history of Kentucky (1874) credited him with the first bourbon in 1789; historians including Henry Crowgey and Charles Cowdery treat this as legend. Heaven Hill still credits him with first using charred barrels.
 - Jefferson's Republicans had opposed the excise, and repeal was a leading recommendation of his First Annual Message. "An Act to repeal the Internal Taxes" was signed on 6 April 1802 (2 Stat. 148) and took effect on 30 June 1802. Its first section concerns the duties on stills and spirits.
 
 ### Sources

@@ -154,8 +154,9 @@ as a small mark only (never text on a light ground), no yellow or amber, no grad
 
 The pilot's look is the current default and is what `wsskit.py` draws: paper content slides,
 green for the title, Sláinte and one story slide; white hairline cards; big-year history
-slides; a bottle slide with photo or placeholder, meta line, three short facts and an "Ask the
-room" strip. Fonts are Avenir Next and Georgia (standard in Keynote on a Mac; the build
+slides; a bottle slide with photo or placeholder, the glass line ("Glass 1", nothing more), a
+meta line and three short facts. Nothing addressed to the host or the room goes on a slide: when
+to pour and what to ask are stage directions in `speaker-notes.md`. Fonts are Avenir Next and Georgia (standard in Keynote on a Mac; the build
 substitutes open fonts for rendering). Measured specs of all four looks:
 [reference/house-style.md](reference/house-style.md).
 

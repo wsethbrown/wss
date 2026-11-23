@@ -23,7 +23,7 @@ The Old Fashioned, the Manhattan and the Sazerac. A guide for anyone who wants t
 
 ### Primary documents
 
-- The Balance and Columbian Repository, 6 and 13 May 1806 (digitised runs exist; Readex America's Historical Newspapers).
+- The Balance and Columbian Repository, 6 and 13 May 1806 (digitized runs exist; Readex America's Historical Newspapers).
 - The Farmer's Cabinet, 28 April 1803.
 
 ### Sources
@@ -44,8 +44,8 @@ The Old Fashioned, the Manhattan and the Sazerac. A guide for anyone who wants t
 
 ### Nailed down
 
-- Rye was the prevalent whiskey of Pennsylvania, New York and Maryland; Pittsburgh was the centre of rye production in the late 1700s and early 1800s.
-- Early Monongahela rye was sold young; ageing was largely a by-product of storage and transport. Barrel ageing was known by the 1790s, but long ageing in charred barrels as standard practice came later (the exact date is not settled).
+- Rye was the prevalent whiskey of Pennsylvania, New York and Maryland; Pittsburgh was the center of rye production in the late 1700s and early 1800s.
+- Early Monongahela rye was sold young; aging was largely a by-product of storage and transport. Barrel aging was known by the 1790s, but long aging in charred barrels as standard practice came later (the exact date is not settled).
 - Corn whiskey developed in Kentucky from the late 1700s, because corn grew better there than rye or wheat; "bourbon" is first known in print around 1821.
 - Angostura bitters: Johann Gottlieb Benjamin Siegert began selling them in Angostura (now Ciudad Bolívar), Venezuela, in 1824, as a stomach remedy.
 - Abraham Overholt began commercial rye distilling at West Overton, Pennsylvania, in 1810 (West Overton Village dates distilling on the site to 1803).
@@ -82,7 +82,7 @@ The Old Fashioned, the Manhattan and the Sazerac. A guide for anyone who wants t
 
 ### Primary documents
 
-- The 1862, 1876 and 1887 editions of Thomas's guide (digitised on the Internet Archive).
+- The 1862, 1876 and 1887 editions of Thomas's guide (digitized on the Internet Archive).
 - David Wondrich, Imbibe! (2007; revised 2015), for a biography of Thomas and annotated recipes.
 
 ### Sources
@@ -173,7 +173,7 @@ The Old Fashioned, the Manhattan and the Sazerac. A guide for anyone who wants t
 - Sewell Taylor ran the Merchants Exchange Coffee House (Royal Street, back entrance on Exchange Alley) and later imported Sazerac-de-Forge et Fils cognac. Aaron Bird renamed it the Sazerac Coffee House, usually dated 1852.
 - Thomas H. Handy, formerly Taylor's clerk, took over around 1869–1870 and acquired the Peychaud's bitters business, usually dated 1873. These come from secondary histories that disagree by a year or two.
 - The Sazerac cocktail is first named in print in 1899. The first published recipe is in William Boothby, The World's Drinks and How to Mix Them (1908), with whiskey.
-- The Peychaud-and-cognac origin story was popularised by Stanley Clisby Arthur, Famous New Orleans Drinks and How to Mix 'Em (1937). Wondrich argues the Sazerac House sold it in the 1880s–90s as a bottled whiskey cocktail. Whether earlier versions used cognac is disputed.
+- The Peychaud-and-cognac origin story was popularized by Stanley Clisby Arthur, Famous New Orleans Drinks and How to Mix 'Em (1937). Wondrich argues the Sazerac House sold it in the 1880s–90s as a bottled whiskey cocktail. Whether earlier versions used cognac is disputed.
 - Antoine Amédée Peychaud died in 1883 aged 80 (so born about 1803); most accounts say he came from Saint-Domingue, one says France. Dates for his shop (1832, 1834, 1841) and for the bitters (1830s to 1857) vary by source.
 - Absinthe was banned in the US by USDA Food Inspection Decision 147, 25 July 1912. Herbsaint was launched in New Orleans by J. M. Legendre as Legendre Absinthe in December 1933 and renamed Herbsaint in 1934.
 - Phylloxera devastated French vineyards in the late nineteenth century; Punch printed Sambourne's phylloxera cartoon on 6 September 1890.
@@ -251,7 +251,7 @@ None of these is on a slide.
 - **1810 count of over 14,000 distilleries.** Cut from the deck. No source found gives the figure. Settle with Coxe's 1814 digest (census.gov, "A Statement of the Arts and Manufactures … for the year 1810").
 - **Thomas in San Francisco during the Gold Rush.** Cut from the script. Settle with Wondrich's Imbibe!.
 - **Whether the Blue Blazer engraving is from the 1862 book, and its date.** Commons dates it 1862 from the Museum of the American Cocktail; no other source found. The caption gives no date. Settle by checking the plates of the 1862 edition (Internet Archive, NYPL b11968240).
-- **When long ageing in charred barrels became standard.** The slide and script say only "later". Settle with a history such as Crowgey, Kentucky Bourbon: The Early Years (1971).
+- **When long aging in charred barrels became standard.** The slide and script say only "later". Settle with a history such as Crowgey, Kentucky Bourbon: The Early Years (1971).
 - **Vodka overtaking whiskey in the 1970s (one source says 1976) and rye's near-disappearance.** Cut from the deck. Settle with Distilled Spirits Council statistics.
 - **Peychaud's exact birthplace and the year his bitters were first sold.** Sources conflict; the script gives the range. Settle with New Orleans city directories and newspaper advertisements.
 

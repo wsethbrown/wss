@@ -44,14 +44,14 @@ picture(s, LOGO_CREAM, 0.85, 0.75, 1.9, 1.9 * LOGO_RATIO)
 ja(text(s, 0.85, 2.55, 6.0, 0.5, 'ウイスキー', size=20, font=SANS, color=CREAM_MUTE))
 text(s, 0.85, 3.05, 6.4, 1.0, 'Whisky From Japan', size=50, font=SANS, bold=True, color=CREAM, ls=0.95)
 rect(s, 0.88, 4.2, 0.9, 0.045, fill=MARK)
-text(s, 0.85, 4.45, 6.0, 0.6, 'Hakata: a whisky made in Japan that cannot be labelled Japanese whisky', size=24, italic=True, color=CREAM_MUTE)
+text(s, 0.85, 4.45, 6.0, 0.6, 'Hakata: a whisky made in Japan that cannot be labeled Japanese whisky', size=24, italic=True, color=CREAM_MUTE)
 text(s, 0.85, 6.3, 6.4, 0.6, 'The Whiskey Share Society  ·  Hakata  ·  Hikari Distillery, Fukuoka',
      size=11, font=SANS, color=CREAM_MUTE)
 picture(s, A / 'title_print.jpg', 7.58, 0.85, 4.9, 5.75, radius_in=0.3)
 
 # ---------------------------------------------------------------- 2 Perry
 s = new_slide()
-text(s, 0.85, 0.75, 8, 0.4, [[('●  ', {'color': MARK_DEEP, 'size': 12}), ('Glass 1. Pour the Hakata 10 now.', {})]],
+text(s, 0.85, 0.75, 8, 0.4, [[('●  ', {'color': MARK_DEEP, 'size': 12}), ('Glass 1', {})]],
      size=15, font=SANS, bold=True, color=INK)
 label(s, 1.2, 'How whisky reached Japan')
 heading(s, 1.62, 'Japan had no whisky until the late nineteenth century.', size=30, h=1.0)
@@ -279,7 +279,7 @@ text(s, 0.85, 0.75, 11.6, 0.4, 'What is in your glass', size=15, font=SANS, bold
 heading(s, 1.15, 'Hikari Distillery, Fukuoka. Founded 1912.', size=36, color=CREAM, h=0.7)
 cols = [
     ('The grain', '100% barley.',
-     'One third is saccharified with koji, the mould used for miso and soy sauce. The other two thirds is unmalted.',
+     'One third is saccharified with koji, the mold used for miso and soy sauce. The other two thirds is unmalted.',
      'There is no malted barley in it.'),
     ('The law', 'Not whisky in Japan.',
      'Japan’s Liquor Tax Act defines whisky as made with malted grain. A barley spirit made with koji is shochu.',
@@ -305,7 +305,7 @@ footer(s, 10, dark=True)
 s = new_slide()
 label(s, 0.8, 'How to taste it')
 heading(s, 1.22, 'Four steps.', size=30, h=0.6)
-tsteps = [('Look', 'Colour tells you about the cask, not the quality.'),
+tsteps = [('Look', 'Color tells you about the cask, not the quality.'),
           ('Nose', 'Short sniffs, mouth slightly open. Do not bury your face in it.'),
           ('Taste', 'Small sip. Hold it. Swallow, then breathe out through your nose.'),
           ('Finish', 'What lingers, and for how long? Look past the burn.')]
@@ -319,16 +319,16 @@ for i, (k, v) in enumerate(tsteps, 1):
     if i < 4:
         line(s, 1.55, yy + 0.83, 8.2, yy + 0.83, HAIR, 1.0)
     yy += 0.95
-strip(s, 0.85, 5.9, 7.35, 0.75, [[('Heat is not flavour. If you score heat, you are just scoring proof.', {'bold': True})]],
+strip(s, 0.85, 5.9, 7.35, 0.75, [[('Heat is not flavor. If you score heat, you are just scoring proof.', {'bold': True})]],
       size=14.5)
 rrect(s, 8.85, 2.15, 3.63, 4.5, r=0.3, fill=WHITE, line=HAIR)
 picture(s, A / 'glencairn.png', 8.85 + (3.63 - 2.23) / 2, 2.4, 2.23, 4.0)
 footer(s, 11)
 
-# ---------------------------------------------------------------- 12 flavours
+# ---------------------------------------------------------------- 12 flavors
 s = new_slide()
 label(s, 0.8, 'What you might find')
-heading(s, 1.22, 'Fruit, sweetness, wood, and a savoury note from the koji.', size=30, h=0.6)
+heading(s, 1.22, 'Fruit, sweetness, wood, and a savory note from the koji.', size=30, h=0.6)
 groups = [('Fruit', 'Plum · Dark cherry · Raisin · Green grape · Prune'),
           ('Sweet', 'Caramel · Honey · Chocolate · Candied nuts'),
           ('Wood & spice', 'Oak · Tobacco · Leather · Nutmeg · Clove')]
@@ -341,7 +341,7 @@ for i, (k, v) in enumerate(groups):
 rrect(s, 0.85, 3.95, 11.63, 2.65, r=0.3, fill=WHITE, line=HAIR)
 dot(s, 1.27, 4.42, 0.14, MARK_DEEP)
 text(s, 1.45, 4.25, 4, 0.35, 'Umami', size=14, font=SANS, bold=True, color=MUTE)
-text(s, 1.15, 4.7, 10.9, 0.6, 'Savoury and brothy, like soy sauce.', size=30, font=SANS, bold=True, color=INK)
+text(s, 1.15, 4.7, 10.9, 0.6, 'Savory and brothy, like soy sauce.', size=30, font=SANS, bold=True, color=INK)
 text(s, 1.15, 5.4, 10.9, 1.1, [
     'That taste comes from the koji.',
     'Koji is also what miso and soy sauce are made with.',
@@ -376,24 +376,24 @@ def bottle_slide(n, glass, name, sub, notes, specs, photo, ph_w, ph_h):
 
 
 MASH = ('Mash bill', '100% barley: 1/3 koji, 2/3 unmalted')
-bottle_slide(13, 'Glass 1, the one you have been drinking', 'Hakata 10 Year',
+bottle_slide(13, 'Glass 1', 'Hakata 10 Year',
              'The youngest of the three. The koji shows most here, because it has had the least time in the cask.',
              [('Nose', 'Plum · Dark cherry · Raisin · Caramel · Oak'),
               ('Palate', 'Soft texture. Raisin, plum, cherry cola, then candied nuts, nutmeg, tobacco leaf and leather.'),
               ('Finish', 'Long. Leather and oak, a slow warmth, several minutes of it.')],
              [MASH, ('Age · proof', '10 Year  ·  84 proof (42%)'), ('Cask · price', 'Ex-sherry  ·  $80 approx.')],
              'hakata10.png', 1.62, 5.3)
-bottle_slide(14, 'Glass 2, pour now', 'Hakata 12 Year',
+bottle_slide(14, 'Glass 2', 'Hakata 12 Year',
              'Two more years in the cask. More sherry, less koji.',
              [('Nose', 'Nutmeg · Cherry · Leather · Tobacco'),
-              ('Palate', 'Drier than the 10. More cask, less of the savoury note.'),
+              ('Palate', 'Drier than the 10. More cask, less of the savory note.'),
               ('Finish', 'Medium-long, with a faint salinity several tasters pick up.')],
              [MASH, ('Age · proof', '12 Year  ·  84 proof (42%)'), ('Cask · price', 'Ex-sherry  ·  $100 approx.')],
              'hakata12.png', 1.56, 5.3)
-bottle_slide(15, 'Glass 3, pour now', 'Hakata 16 Year',
-             'The sherry cask leads. Compare it with the 10 and decide which you prefer.',
+bottle_slide(15, 'Glass 3', 'Hakata 16 Year',
+             'The sherry cask leads.',
              [('Nose', 'Nuts · Raisin · Chocolate · Green grape'),
-              ('Palate', 'Prune, honey, dark chocolate. The savoury note is still there, but fainter.'),
+              ('Palate', 'Prune, honey, dark chocolate. The savory note is still there, but fainter.'),
               ('Finish', 'Long, round, gentle.')],
              [MASH, ('Age · proof', '16 Year  ·  84 proof (42%)'), ('Cask · price', 'Ex-sherry  ·  $150 approx.')],
              'hakata16.png', 1.6, 5.3)
@@ -406,7 +406,7 @@ text(s, 0.8, 3.4, 11.733, 0.8, 'Sláinte', size=44, font=SANS, bold=True, color=
      anchor=MSO_ANCHOR.MIDDLE)
 text(s, 1.6, 4.2, 10.13, 1.7, [
     'The standard exists because whisky made elsewhere was being bottled in Japan and sold as Japanese.',
-    'It also excludes Hakata: made in Fukuoka from Kyushu barley and koji, aged up to sixteen years, and labelled for what it is.',
+    'It also excludes Hakata: made in Fukuoka from Kyushu barley and koji, aged up to sixteen years, and labeled for what it is.',
 ], size=15, italic=True, color=CREAM_MUTE, align=PP_ALIGN.CENTER, ls=1.2, space_after=8)
 rrect(s, SLIDE_W / 2 - 3.1, 6.08, 6.2, 0.95, r=0.24, fill=OAK, line=OAK_EDGE)
 text(s, SLIDE_W / 2 - 3.1, 6.08, 6.2, 0.95, ['To Hikari Distillery, Fukuoka.', ''], size=19,

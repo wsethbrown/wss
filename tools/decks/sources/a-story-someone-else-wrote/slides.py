@@ -20,7 +20,7 @@ import wsskit
 
 
 def place_bottle(s, path, x, y, w, h):
-    """Fit a cut-out bottle photo inside the box, centred, keeping its proportions."""
+    """Fit a cut-out bottle photo inside the box, centered, keeping its proportions."""
     iw, ih = Image.open(path).size
     scale = min(w / iw, h / ih)
     bw, bh = iw * scale, ih * scale
@@ -41,7 +41,7 @@ text(s, 0.8, 3.95, 11.733, 0.55, 'Value vs. Prestige', size=26, italic=True, col
      align=PP_ALIGN.CENTER, anchor=MSO_ANCHOR.MIDDLE)
 rect(s, SLIDE_W / 2 - 0.45, 4.72, 0.9, 0.045, fill=MARK)
 text(s, 2.4, 5.0, 8.533, 1.0,
-     'A blind tasting of six whiskeys. Score each one, then see the names and prices.',
+     'A blind tasting of six whiskeys. The names and prices come after the scores.',
      size=20, italic=True, color=CREAM_MUTE, align=PP_ALIGN.CENTER, ls=1.15)
 text(s, 0.8, 6.55, 11.733, 0.35, 'The Whiskey Share Society  ·  A blind tasting', size=11, font=SANS,
      color=CREAM_MUTE, align=PP_ALIGN.CENTER)
@@ -52,8 +52,7 @@ label_line(s, 0.85, 0.85, 6.5, 'The premise')
 heading(s, 1.3, 'Tonight is a blind tasting.', size=36, w=6.9, h=1.3)
 text(s, 0.85, 2.85, 6.4, 3.6, [
     'A price reflects age, proof and barrel selection. It also reflects scarcity and marketing.',
-    'Score each pour before you know what it is. Names and prices come at the end.',
-    [('Then compare your scores with the prices.', {'bold': True})],
+    'Every pour is scored blind. Names and prices come at the end.',
 ], size=18, ls=1.25, space_after=12)
 rrect(s, 7.95, 0.85, 4.53, 5.65, r=0.36, fill=WHITE, line=HAIR)
 rect(s, 8.4, 1.55, 0.9, 0.045, fill=MARK_DEEP)
@@ -86,7 +85,7 @@ footer(s, 3)
 
 
 # ---------------------------------------------------------------- 4-9 the reveals, one slide per sample
-def sample_slide(n, letter, name, meta, body, nose, taste, finish, photo, discussion=None):
+def sample_slide(n, letter, name, meta, body, nose, taste, finish, photo):
     """One sample, revealed after scoring. Self-contained: delete the slide to drop the sample."""
     s = new_slide()
     px, py, pw, ph = 0.85, 0.8, 3.1, 5.92
@@ -107,11 +106,6 @@ def sample_slide(n, letter, name, meta, body, nose, taste, finish, photo, discus
         text(s, cx + 0.28, yy, cwid - 0.5, 0.3, lab, size=11.5, font=SANS, bold=True, color=MUTE)
         text(s, cx + 0.28, yy + 0.27, cwid - 0.5, 0.7, val, size=12.5, color=INK, ls=1.08)
         yy += 1.02
-    if discussion:
-        rrect(s, x, 6.12, 8.03, 0.6, r=0.18, fill=W100)
-        text(s, x + 0.3, 6.12, 7.5, 0.6, [[('Discussion  ', {'font': SANS, 'bold': True, 'size': 12.5,
-                                                              'italic': False}), (discussion, {})]],
-             size=13.5, italic=True, color=INK, anchor=MSO_ANCHOR.MIDDLE)
     footer(s, n)
     return s
 
@@ -135,8 +129,7 @@ sample_slide(5, 'B', 'Blanton’s Original',
              'Honeysuckle · Vanilla · Citrus peel · Caramel',
              'Light caramel · Honey · Brown sugar · Charred oak',
              'Crisp, medium · Vanilla · Dry leather · Light peppercorn',
-             'blantons.png',
-             'Same distillery as sample A, different mash bill. Did A and B taste related?')
+             'blantons.png')
 
 sample_slide(6, 'C', 'Evan Williams Bottled-in-Bond',
              'Heaven Hill Distillery  ·  Bardstown, KY  ·  100 proof  ·  Bottled-in-Bond',
@@ -148,8 +141,7 @@ sample_slide(6, 'C', 'Evan Williams Bottled-in-Bond',
              'Caramel · Vanilla · Peanut brittle · Toasted oak',
              'Brown sugar · Cornbread · Baking spice · Dark fruit',
              'Long & dry · Oak tannin · Cocoa · Lingering spice',
-             'evan_williams_bib.png',
-             'This was the cheapest pour, straight after the most expensive. How did you score it against B?')
+             'evan_williams_bib.png')
 
 sample_slide(7, 'D', 'Four Roses Small Batch Select',
              'Four Roses Distillery  ·  Lawrenceburg, KY  ·  104 proof  ·  Non-chill-filtered',
@@ -169,8 +161,7 @@ sample_slide(8, 'E', 'Barrell Seagrass',
              'Apricot · Tropical fruit · Cedar · Rye spice',
              'Candied apricot · Rum sweetness · Vanilla & toffee · White pepper',
              'Medium · Spiced apricot · Rye bread · Salted peanut',
-             'barrell_seagrass.png',
-             'Did you notice it was not a bourbon?')
+             'barrell_seagrass.png')
 
 sample_slide(9, 'F', 'Elijah Craig Barrel Proof',
              'Heaven Hill Distillery  ·  Bardstown, KY  ·  118.2 proof  ·  10 yrs 7 mos',
@@ -180,8 +171,7 @@ sample_slide(9, 'F', 'Elijah Craig Barrel Proof',
              'Charred oak · Dark toffee · Vanilla bean · Flamed orange peel',
              'Brown sugar · Dark chocolate · Black pepper · Cherry cordial',
              'Long & hot · Chocolate · Torched sugar · Lingering spice',
-             'elijah_craig_bp.png',
-             'Did its strength raise or lower your score?')
+             'elijah_craig_bp.png')
 
 # ---------------------------------------------------------------- 10 one thing to notice
 s = new_slide(INK)
@@ -199,7 +189,7 @@ for i, (letter, name, price, meta, photo) in enumerate(pair):
     text(s, tx, y + 2.3, 1.6, 1.4, meta.split('  ·  '), size=12.5, font=SANS, color=CREAM_MUTE, ls=1.2)
 text(s, 8.0, 2.55, 4.48, 3.9,
      'Both are made by Buffalo Trace in Frankfort, Kentucky, from different mash bills. One sells for around '
-     'forty dollars and the other for about three times that. Compare your scores for the two.',
+     'forty dollars and the other for about three times that.',
      size=19, color=CREAM, ls=1.3)
 footer(s, 10, dark=True)
 
@@ -283,4 +273,4 @@ text(s, 1.35, 3.6, 10.6, 2.3,
 footer(s, 12)
 
 # ---------------------------------------------------------------- 13 Sláinte
-slainte_slide('Pour another of whichever you scored highest.')
+slainte_slide('To the people who made these six whiskeys.')

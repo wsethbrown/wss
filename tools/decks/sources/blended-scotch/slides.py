@@ -123,7 +123,7 @@ footer(s, 3)
 
 # ---------------------------------------------------------------- 4 pour 1
 pour_slide(4, 'Pour 1 of 4', 'Haig Club Clubman',
-           ['Grain whisky on its own, which few people taste.', 'Notice how light it is.'],
+           ['Grain whisky on its own.', 'Most grain whisky goes into blends.'],
            'Diageo, Cameronbridge, Fife', 'Single grain Scotch whisky', '40%',
            widths=(3.2, 2.95, 0.6), val_size=16.5)
 
@@ -174,7 +174,7 @@ footer(s, 6)
 
 # ---------------------------------------------------------------- 7 pour 2
 pour_slide(7, 'Pour 2 of 4', ['The Glenlivet', '12 Year Old'],
-           ['The malt Usher vatted.', 'Taste it against the grain whisky:', 'heavier, with more fruit and cereal.'],
+           ['The malt Usher vatted.', 'Heavier than the grain whisky,', 'with more fruit and cereal.'],
            'Chivas Brothers, Speyside', 'Single malt Scotch whisky', '40%', two_line_name=True)
 
 # ---------------------------------------------------------------- 8 1860, the Spirits Act
@@ -213,7 +213,7 @@ footer(s, 9)
 
 # ---------------------------------------------------------------- 10 pour 3
 pour_slide(10, 'Pour 3 of 4', ['Johnnie Walker', 'Black Label'],
-           ['Malt and grain together.', 'Look for the fruit of the malt', 'and the lightness of the grain.'],
+           'Malt and grain together.',
            'Diageo, Scotland', 'Blended Scotch, 12 years', '40%', two_line_name=True)
 
 # ---------------------------------------------------------------- 11 1860s phylloxera (the green story slide)
@@ -273,7 +273,7 @@ footer(s, 13)
 
 # ---------------------------------------------------------------- 14 pour 4
 pour_slide(14, 'Pour 4 of 4', ['Dewar’s', 'White Label'],
-           'Taste a little neat, then try it in a tall glass with ice and soda water, as London drank it in the 1890s.',
+           'In the 1890s London drank it in a tall glass with ice and soda water.',
            'John Dewar & Sons, Perth', 'Blended Scotch whisky', '40%', two_line_name=True,
            widths=(3.35, 2.6, 0.9))
 

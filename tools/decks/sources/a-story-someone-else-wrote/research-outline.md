@@ -68,7 +68,7 @@ The order of reveal is dramaturgy: go value first, prestige last. You want the r
 
 - **Don't rig it.** A bad expensive bottle proves nothing. Every bottle on the table should be one you'd happily drink.
 - **Don't tell them what they found.** Read the averages. Let the room draw the conclusion. If you narrate the moral, you've taken the evening away from them.
-- **Beware "unfamiliar therefore worse."** People routinely mark down the ringer for not tasting like its neighbours. That instinct is worth naming out loud at the reveal, it is the same instinct prestige pricing feeds on.
+- **Beware "unfamiliar therefore worse."** People routinely mark down the ringer for not tasting like its neighbors. That instinct is worth naming out loud at the reveal, it is the same instinct prestige pricing feeds on.
 - **Beware the loudest palate.** One confident person can move a room. Written-first scores are the defense; enforce them.
 - **Prices move.** A bottle that was thirty dollars three years ago may be allocated now. Check the current shelf price before you print anything, and say which price you're using, shelf, secondary, or what you actually paid. They are three different numbers and the difference is itself part of the argument.
 
@@ -82,13 +82,13 @@ If your value bottle happens to be bottled-in-bond, you have been handed the bes
 
 - **3 March 1897.** The Bottled-in-Bond Act is signed into law. It grew out of a market full of adulterated whiskey, and made the federal government the guarantor of a spirit's authenticity in return for a tax incentive. It took effect in about 1901.
 - **1906.** The Pure Food and Drug Act follows, nine years later, and bans adulterated and misbranded food and drugs in interstate commerce.
-- **Today (27 CFR 5.88).** To be labelled bottled in bond, a domestic spirit must be distilled in one distilling season by one distiller at one distillery; stored at least four years in wooden containers; reduced only with pure water; bottled at exactly 50% alcohol (100 proof); and the label must carry the real name or trade name of the distillery and the number of the plant where it was distilled (and where bottled).
+- **Today (27 CFR 5.88).** To be labeled bottled in bond, a domestic spirit must be distilled in one distilling season by one distiller at one distillery; stored at least four years in wooden containers; reduced only with pure water; bottled at exactly 50% alcohol (100 proof); and the label must carry the real name or trade name of the distillery and the number of the plant where it was distilled (and where bottled).
 
 ### Go to the source
 
 - › _Code of Federal Regulations, 27 CFR 5.88 "Bottled in bond", via Cornell LII or eCFR: the current rule, word for word._
 - › _Distillery Trail, "What is the Bottled-in-Bond Act of 1897, Passed March 3, 1897": the date and the background._
-- › _Cato Institute, Regulation, Fall 2023, "Straight whiskey, bad regulation": a sceptical reading, that straight-whiskey distillers used the law against their rivals, the rectifiers. Worth reading so the story isn't told only one way._
+- › _Cato Institute, Regulation, Fall 2023, "Straight whiskey, bad regulation": a skeptical reading, that straight-whiskey distillers used the law against their rivals, the rectifiers. Worth reading so the story isn't told only one way._
 
 ### Threads worth pulling
 

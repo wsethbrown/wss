@@ -84,7 +84,7 @@ Taste it next to the first one. This one is cold, it has more water in it from t
 
 ## [SLIDE 9] The Manhattan is printed in a bartenders' guide.
 
-The Manhattan adds one ingredient to the cocktail, and that is vermouth. Vermouth is wine with spirit added to it, flavoured with herbs.
+The Manhattan adds one ingredient to the cocktail, and that is vermouth. Vermouth is wine with spirit added to it, flavored with herbs.
 
 The earliest mention of a Manhattan cocktail that anyone has found is from 1882. It was in a New York gossip column that was printed in small-town papers that summer. The first printed recipes came two years later, in The Modern Bartenders' Guide by O. H. Byron. He gives two. The first has twice as much vermouth as whiskey, with Angostura bitters and gum syrup. The second is equal parts whiskey and vermouth, with curaçao and Angostura. Both are sweeter than a Manhattan is today.
 

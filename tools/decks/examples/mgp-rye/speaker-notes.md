@@ -24,10 +24,10 @@ Four. You can add High West Double Rye at the end to make five. More than five i
 
 ### Cast the roles, then find the bottles
 
-- **Glass 1: the Lawrenceburg rye that is easiest to find.** Tonight: Bulleit 95 Rye.
-- **Glass 2: the same rye with a step added by the brand.** Tonight: George Dickel Rye, which is filtered through sugar-maple charcoal.
-- **Glass 3: a brand named for a town that has since built a distillery there.** Tonight: Templeton Straight Rye.
-- **Glass 4: a rye sold by the distillery itself.** Tonight: Rossville Union Straight Rye.
+- **Glass 1: the Lawrenceburg rye that is easiest to find.** Suggested bottle: Bulleit 95 Rye.
+- **Glass 2: the same rye with a step added by the brand.** Suggested bottle: George Dickel Rye, which is filtered through sugar-maple charcoal.
+- **Glass 3: a brand named for a town that has since built a distillery there.** Suggested bottle: Templeton Straight Rye.
+- **Glass 4: a rye sold by the distillery itself.** Suggested bottle: Rossville Union Straight Rye.
 
 ### Bottle ideas by role
 
@@ -140,7 +140,7 @@ Seagram owned the plant for nearly seventy years. Much of the whiskey it made th
 
 ## [SLIDE 7] A rye made for blending
 
-Seagram's business was blended whiskey. 7 Crown and 5 Crown were two of its blends. A blend gets much of its flavour from a small amount of strong-tasting whiskey.
+Seagram's business was blended whiskey. 7 Crown and 5 Crown were two of its blends. A blend gets much of its flavor from a small amount of strong-tasting whiskey.
 
 Larry Ebersold started at the plant in 1972 and was its master distiller for more than twenty years. In the early 1990s he was asked for a rye strong enough to taste through a blend.
 
@@ -216,7 +216,7 @@ _Ask: "Of the three so far, which would you buy again?"_
 
 _Pick up any bottle on the table and turn it round._
 
-Federal labelling rules say most American whiskey has to show the state where it was distilled. "Distilled in Indiana" is one way a label can do that. It is usually on the back, in small type.
+Federal labeling rules say most American whiskey has to show the state where it was distilled. "Distilled in Indiana" is one way a label can do that. It is usually on the back, in small type.
 
 Every approved label is also in a public database run by the government, called the COLA registry. You can look up any bottle.
 

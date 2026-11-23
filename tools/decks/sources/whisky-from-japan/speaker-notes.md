@@ -22,9 +22,9 @@ Three, all from the same distillery: the Hakata 10, 12 and 16 Year. The only thi
 
 ### Cast the roles, then find the bottles
 
-- **The opener (glass 1).** Poured on slide 2 and drunk through the history, before anyone knows what it is. The koji is loudest here. Tonight: Hakata 10 Year.
-- **Two more years (glass 2).** Poured on slide 14. Same spirit, same casks, more time. Tonight: Hakata 12 Year.
-- **The most polished (glass 3).** Poured on slide 15, for the question of the night: does more time make it better, or more like everything else? Tonight: Hakata 16 Year.
+- **The opener (glass 1).** Poured on slide 2 and drunk through the history, before anyone knows what it is. The koji is loudest here. Suggested bottle: Hakata 10 Year.
+- **Two more years (glass 2).** Poured on slide 14. Same spirit, same casks, more time. Suggested bottle: Hakata 12 Year.
+- **The most polished (glass 3).** Poured on slide 15, for the question of the night: does more time make it better, or more like everything else? Suggested bottle: Hakata 16 Year.
 
 ### Bottle ideas by role
 
@@ -48,7 +48,7 @@ Suggestions, not instructions. Prices are rough US shelf prices from retailer li
 - Other koji whiskies from Japan are sold in the US as whisky, mostly made from rice: Fukano and Ohishi (both imported by ImpEx, which also imports Hakata) and Kikori. They are not barley and not sherry-cask Hakata, so slides 10 and 13 to 15 need editing. Check proof and price where you shop; they were not checked for this deck.
 
 > **AN OPTIONAL CONTRAST**
-> If you want a fourth glass that shows the other side of the rule, pour something labelled Japanese whisky. Suntory said in 2021 that every Japanese whisky it exports already met the new standard. Pour it after slide 10 and before the Hakata 12, and say why it is there.
+> If you want a fourth glass that shows the other side of the rule, pour something labeled Japanese whisky. Suntory said in 2021 that every Japanese whisky it exports already met the new standard. Pour it after slide 10 and before the Hakata 12, and say why it is there.
 
 ### How to order them
 
@@ -187,7 +187,7 @@ Now go back to that rulebook. The third line. **Malted grains must always be use
 
 **There is no malted barley in your glass. None.**
 
-One third of that grain is saccharified with **koji.** Koji is a mould. It is the mould used to make miso, soy sauce, and sake, and it does the same job malting does: it converts starch to sugar. It just does it from the outside, instead of waking the grain up to do it itself. The other two thirds of the barley is simply unmalted.
+One third of that grain is saccharified with **koji.** Koji is a mold. It is the mold used to make miso, soy sauce, and sake, and it does the same job malting does: it converts starch to sugar. It just does it from the outside, instead of waking the grain up to do it itself. The other two thirds of the barley is simply unmalted.
 
 And under Japanese law, **a spirit made this way cannot be called whisky.** Japan's Liquor Tax Act defines whisky as grain turned to sugar by malt. Barley turned to sugar by koji and distilled in a pot still is shochu.
 
@@ -198,7 +198,7 @@ And under Japanese law, **a spirit made this way cannot be called whisky.** Japa
 
 Which is why they never call it Japanese whisky. They call it **whisky from Japan.**
 
-That savoury note some of you have been trying to name? **That is the koji.** It is the same thing that makes miso taste like miso.
+That savory note some of you have been trying to name? **That is the koji.** It is the same thing that makes miso taste like miso.
 
 > **DO NOT OVERSELL IT**
 > One reviewer also says the strength rules keep it out of Japan. The Liquor Tax Act caps single-distilled shochu at 45%, and Hakata is 42%, so I could not make that claim work. Leave it out.
@@ -207,19 +207,19 @@ That savoury note some of you have been trying to name? **That is the koji.** It
 
 _Housekeeping. Keep it short, they have a drink in hand._
 
-Four steps, and none of them are difficult. Look: colour tells you about the cask, not the quality. Nose: short sniffs, mouth slightly open. Taste: small sip, hold it, swallow, then breathe out through your nose. Finish: what lingers, and for how long?
+Four steps, and none of them are difficult. Look: color tells you about the cask, not the quality. Nose: short sniffs, mouth slightly open. Taste: small sip, hold it, swallow, then breathe out through your nose. Finish: what lingers, and for how long?
 
-Heat is not flavour. If you score heat, you are just scoring proof.
+Heat is not flavor. If you score heat, you are just scoring proof.
 
 ## [SLIDE 12] What You Might Find
 
-Use the wheel if it helps. And a word of encouragement: if you are getting something savoury, brothy, or frankly like soy sauce, you are not doing it wrong. You are tasting the thing that makes this whisky what it is.
+Use the wheel if it helps. And a word of encouragement: if you are getting something savory, brothy, or frankly like soy sauce, you are not doing it wrong. You are tasting the thing that makes this whisky what it is.
 
 ## [SLIDE 13] Hakata 10 Year
 
 The one you have been drinking. Ten years in ex-sherry, 84 proof, around $80.
 
-This is the one where the koji is loudest, because it has had the least time under the cask. Plum, dark cherry, raisin, and then that savoury, brothy thread underneath.
+This is the one where the koji is loudest, because it has had the least time under the cask. Plum, dark cherry, raisin, and then that savory, brothy thread underneath.
 
 > **THE QUESTION FOR THE ROOM**
 > "Now that you know what it is, does it taste different?"
@@ -243,7 +243,7 @@ _Pour the 16 Year._
 
 Sixteen years, around $150.
 
-By now the sherry has largely won. Nuts, raisin, chocolate, green grape, prune, honey. The savoury note is still there, but it has been folded into everything else rather than sitting on top.
+By now the sherry has largely won. Nuts, raisin, chocolate, green grape, prune, honey. The savory note is still there, but it has been folded into everything else rather than sitting on top.
 
 > **THE REAL QUESTION OF THE NIGHT**
 > Line the three up. Does more time make it better, or does it just make it more like everything else?
@@ -255,7 +255,7 @@ Here is what I want to leave you with.
 
 The rulebook we read tonight exists for a good reason. It was written because people were importing Scotch, bottling it in Japan, and selling it as something it was not.
 
-But a rule written to stop dishonesty will always catch a few honest things by accident. This is one of them. A family distillery in Fukuoka, making something from Kyushu barley and a mould their country has used for a thousand years, aging it for sixteen years in sherry casks, and doing it all in the open.
+But a rule written to stop dishonesty will always catch a few honest things by accident. This is one of them. A family distillery in Fukuoka, making something from Kyushu barley and a mold their country has used for a thousand years, aging it for sixteen years in sherry casks, and doing it all in the open.
 
 It is not Japanese whisky. It could not be more Japanese.
 

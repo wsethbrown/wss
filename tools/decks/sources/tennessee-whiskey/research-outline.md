@@ -14,9 +14,9 @@ Tennessee whiskey and Nearest Green. A guide for anyone who wants to research th
 
 ### Nailed down
 
-- New-make spirit runs through vats of sugar-maple charcoal before it is barrelled. Jack Daniel's describes its vats as ten feet tall with about ten feet of packed charcoal; the spirit is pumped in at the top and runs down by gravity. The maple is burned on site in ricks.
+- New-make spirit runs through vats of sugar-maple charcoal before it is barreled. Jack Daniel's describes its vats as ten feet tall with about ten feet of packed charcoal; the spirit is pumped in at the top and runs down by gravity. The maple is burned on site in ricks.
 - The time the spirit takes is given variously as two to three days (Distiller, Difford's) and about ten days (one magazine). The script says only "days".
-- The name refers to Lincoln County. Moore County, with Lynchburg as its seat, was formed in 1871 (Acts of 1871, chapter 96) from parts of Lincoln and neighbouring counties.
+- The name refers to Lincoln County. Moore County, with Lynchburg as its seat, was formed in 1871 (Acts of 1871, chapter 96) from parts of Lincoln and neighboring counties.
 - George Dickel chills the spirit before the charcoal step. The company ties this to a belief that whisky made in winter was mellower; VinePair calls it legend. The chilling is a process fact; the attribution is company lore.
 
 ### Sources
@@ -38,7 +38,7 @@ Tennessee whiskey and Nearest Green. A guide for anyone who wants to research th
 
 - The claim that the method was invented by Alfred Eaton around 1825 rests on weak evidence. A search found nothing to support it. Name it as a story.
 - The claim that the method came from West African practice brought by enslaved people has no documentary support found. Present it as a theory or leave it out.
-- "Charcoal filtered" on non-Tennessee labels usually describes a filtration after ageing. It is a different step.
+- "Charcoal filtered" on non-Tennessee labels usually describes a filtration after aging. It is a different step.
 
 ## Module 2. Dan Call, Nearest Green and the young Jack Daniel
 
@@ -185,11 +185,11 @@ Tennessee whiskey and Nearest Green. A guide for anyone who wants to research th
 
 ### Nailed down
 
-- House Bill 1084, signed by Governor Bill Haslam on May 13, 2013 (2013 Tenn. Acts ch. 341, effective July 1, 2013), now Tenn. Code Ann. § 57-2-106: made in Tennessee; at least 51% corn; distilled to no more than 160 proof; aged in new charred oak barrels in Tennessee; filtered through maple charcoal before ageing; barrelled at no more than 125 proof; bottled at not less than 80 proof. Brown-Forman lobbied for it.
+- House Bill 1084, signed by Governor Bill Haslam on May 13, 2013 (2013 Tenn. Acts ch. 341, effective July 1, 2013), now Tenn. Code Ann. § 57-2-106: made in Tennessee; at least 51% corn; distilled to no more than 160 proof; aged in new charred oak barrels in Tennessee; filtered through maple charcoal before aging; barreled at no more than 125 proof; bottled at not less than 80 proof. Brown-Forman lobbied for it.
 - Benjamin Prichard's, Kelso, was exempted from the charcoal step. A later state attorney general's opinion said the exemption might be unconstitutional.
-- In 2014 a bill introduced at Diageo's request would have allowed used barrels and ageing outside Tennessee; the Senate sent it to a summer study and it went no further.
+- In 2014 a bill introduced at Diageo's request would have allowed used barrels and aging outside Tennessee; the Senate sent it to a summer study and it went no further.
 - The federal bourbon standard (27 CFR 5.143) has the same corn, proof and new charred oak rules; the state rules mostly echo it.
-- NAFTA (in force January 1, 1994), Annex 313, recognised Bourbon Whiskey and Tennessee Whiskey as distinctive US products; the USMCA (Annex 3-C) keeps "Tennessee Whiskey, which is a straight Bourbon Whiskey authorized to be produced only in the State of Tennessee".
+- NAFTA (in force January 1, 1994), Annex 313, recognized Bourbon Whiskey and Tennessee Whiskey as distinctive US products; the USMCA (Annex 3-C) keeps "Tennessee Whiskey, which is a straight Bourbon Whiskey authorized to be produced only in the State of Tennessee".
 
 ### Sources
 
@@ -248,7 +248,7 @@ Tennessee whiskey and Nearest Green. A guide for anyone who wants to research th
 - **Pour 3. Buffalo Trace.** A Kentucky bourbon at the same proof as the Dickel, with no charcoal step
 - **Pour 4. Jack Daniel's Bonded.** The distillery that names Green its first master distiller, bottled in bond at 100 proof
 
-Uncle Nearest 1856 was the original pour four; it was replaced because its maker is in receivership and being sold (Module 7). Jack Daniel's Bonded is listed by US retailers (Total Wine, Whole Foods, QFC) as a 700 ml bottled-in-bond Tennessee whiskey at 100 proof (50% ABV); a one-litre version is sold in travel retail. Sources: https://www.totalwine.com/spirits/american-whiskey/tennessee-whiskey/jack-daniels-bonded-tennessee-whiskey/p/245570700 and https://www.wholefoodsmarket.com/product/jack-daniels-bonded-tennessee-whiskey-700-ml-b0b4x4bybb .
+Uncle Nearest 1856 was the original pour four; it was replaced because its maker is in receivership and being sold (Module 7). Jack Daniel's Bonded is listed by US retailers (Total Wine, Whole Foods, QFC) as a 700 ml bottled-in-bond Tennessee whiskey at 100 proof (50% ABV); a one-liter version is sold in travel retail. Sources: https://www.totalwine.com/spirits/american-whiskey/tennessee-whiskey/jack-daniels-bonded-tennessee-whiskey/p/245570700 and https://www.wholefoodsmarket.com/product/jack-daniels-bonded-tennessee-whiskey-700-ml-b0b4x4bybb .
 
 Current US proofs confirmed: Jack Daniel's Old No. 7, 80 proof (Virginia ABC listing; Jack Daniel's fact sheet, https://pressroom.jackdaniels.com/wp-content/uploads/2015/01/Old-No.7-Fact-Sheet.pdf ; https://www.abc.virginia.gov/products/virginia-spirits/jack-daniels-old-no-7-tennessee-whiskey). George Dickel Signature Recipe, 45% (90 proof), Cascade Hollow Distilling Co., Tullahoma; renamed from No. 12 with the whisky unchanged (https://www.georgedickel.com/whiskies/signature-recipe ; https://www.klwines.com/Products/i?i=630008). Buffalo Trace Kentucky Straight Bourbon, 90 proof (https://www.buffalotracedistillery.com/brands/buffalo-trace-bourbon/).
 

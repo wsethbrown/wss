@@ -130,7 +130,7 @@ heading(s, 0.85, 'Called the Lincoln County Process', size=40, w=CW, h=0.9)
 text(s, X, 1.75, CW, 0.5, 'Lynchburg’s county, Moore, was carved partly out of Lincoln County in 1871.',
      size=21, color=MUTE)
 rows_card(s, X, 2.55, CW, [
-    ('What it does', 'The charcoal takes some of the oils and heavier flavours out of the new spirit.'),
+    ('What it does', 'The charcoal takes some of the oils and heavier flavors out of the new spirit.'),
     ('What is argued', 'How much of that difference is still there after four years in' + NB + 'oak.'),
     ('Who started it', 'Nobody knows. Several names are put forward and none is' + NB + 'proved.'),
 ], label_w=3.1, row_h=1.2, label_size=23, size=21)
@@ -180,8 +180,7 @@ footer(s, 6)
 
 # ---------------------------------------------------------------- 7 pour 1
 pour_slide(7, 'Pour 1 of 4', ['Jack Daniel’s', 'Old No. 7'],
-           'Before anything else, notice the weight of it in your mouth. The charcoal is meant to make it'
-           + NB + 'lighter.',
+           'The charcoal is meant to make it' + NB + 'lighter.',
            ['Jack Daniel Distillery,', 'Lynchburg'], 'Tennessee whiskey', '80', two_line_name=True)
 
 # ---------------------------------------------------------------- 8 1910 (big year, on paper)
@@ -219,8 +218,7 @@ footer(s, 10)
 
 # ---------------------------------------------------------------- 11 pour 2
 pour_slide(11, 'Pour 2 of 4', ['George Dickel', 'Signature Recipe'],
-           'The same process at another distillery. Compare it with the Jack Daniel’s for sweetness and'
-           + NB + 'weight.',
+           'The same process at another distillery.',
            ['Cascade Hollow Distilling', 'Co., Tullahoma'], 'Tennessee whisky', '90', two_line_name=True)
 
 # ---------------------------------------------------------------- 12 the 2013 law
@@ -274,7 +272,7 @@ footer(s, 13)
 
 # ---------------------------------------------------------------- 14 pour 3
 pour_slide(14, 'Pour 3 of 4', 'Buffalo Trace',
-           ['A Kentucky bourbon with no charcoal step.', 'Taste it beside the Dickel, which is the same proof.'],
+           ['A Kentucky bourbon with no charcoal step.', 'The same proof as the Dickel.'],
            ['Buffalo Trace,', 'Frankfort, Kentucky'], ['Kentucky straight', 'bourbon'], '90')
 
 # ---------------------------------------------------------------- 15 2016 (big year, on paper)
@@ -318,8 +316,7 @@ footer(s, 16)
 
 # ---------------------------------------------------------------- 17 pour 4
 pour_slide(17, 'Pour 4 of 4', ['Jack Daniel’s', 'Bonded'],
-           ['Jack Daniel’s again, this time at 100 proof.',
-            'Compare it with the first pour, then try it with a few drops of water.'],
+           ['Jack Daniel’s again, this time at 100 proof.'],
            ['Jack Daniel Distillery,', 'Lynchburg'], ['Tennessee whiskey,', 'bottled in bond'], '100',
            two_line_name=True)
 

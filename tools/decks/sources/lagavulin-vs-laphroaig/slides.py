@@ -94,7 +94,7 @@ footer(s, 2)
 # ---------------------------------------------------------------- 3 pour 1
 pour_slide(3, 'Glass 1 of 4', 'Craigellachie 13',
            ['From the Speyside distillery Mackie invested in, built in 1890 and 1891.',
-            'No peat, so start here.'],
+            'No peat.'],
            'Craigellachie, Speyside', 'Speyside single malt, 13 years', '46%')
 
 # ---------------------------------------------------------------- 4 two distilleries
@@ -155,7 +155,7 @@ footer(s, 6)
 
 # ---------------------------------------------------------------- 7 pour 2
 pour_slide(7, 'Glass 2 of 4', 'White Horse',
-           ['Mackie’s blend, built on Lagavulin.', 'Look for the Islay smoke in it.'],
+           ['Mackie’s blend, built on Lagavulin.'],
            'Diageo', 'Blended Scotch whisky', '40%')
 
 # ---------------------------------------------------------------- 8 1907
@@ -170,7 +170,7 @@ footer(s, 8)
 
 # ---------------------------------------------------------------- 9 pour 3
 pour_slide(9, 'Glass 3 of 4', 'Lagavulin 16',
-           ['Mackie’s own distillery.', 'Keep some back to taste beside the Laphroaig.'],
+           ['Mackie’s own distillery.'],
            'Lagavulin, Islay', 'Islay single malt, 16 years', '43%')
 
 # ---------------------------------------------------------------- 10 Malt Mill

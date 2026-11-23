@@ -132,7 +132,7 @@ footer(s, 4)
 
 # ---------------------------------------------------------------- 5 pour 1
 pour_slide(5, 'Pour 1 of 4', ['Glenmorangie', 'The Original'],
-           ['Malt with next to no peat in it.', 'Keep a little back to compare with the last pour.'],
+           ['Malt with next to no peat in it.'],
            'Glenmorangie, Tain', 'Highland single malt, 12 years', '40%', two_line_name=True)
 
 # ---------------------------------------------------------------- 6 Islay
@@ -164,7 +164,7 @@ footer(s, 7)
 # ---------------------------------------------------------------- 8 pour 2
 pour_slide(8, 'Pour 2 of 4', 'Bowmore 12',
            ['Usually described as medium peated.',
-            'Taste it beside the Glenmorangie: same age and strength, different kiln.'],
+            'The same age and strength as the Glenmorangie, from a different kiln.'],
            'Bowmore, Islay', 'Islay single malt, 12 years', '40%')
 
 # ---------------------------------------------------------------- 9 ppm
@@ -217,8 +217,7 @@ footer(s, 11)
 
 # ---------------------------------------------------------------- 12 pour 3
 pour_slide(12, 'Pour 3 of 4', 'Caol Ila 12',
-           ['Malt largely from Port Ellen, and a whisky made mostly for blending.',
-            'Notice how dry the smoke is next to the Bowmore.'],
+           ['Malt largely from Port Ellen, and a whisky made mostly for blending.'],
            'Caol Ila, Islay', 'Islay single malt, 12 years', '43%')
 
 # ---------------------------------------------------------------- 13 closures
@@ -284,8 +283,7 @@ footer(s, 15)
 
 # ---------------------------------------------------------------- 16 pour 4
 pour_slide(16, 'Pour 4 of 4', 'Ardbeg Ten',
-           ['The main bottling after the 1997 restart.',
-            'Try it neat, then with a few drops of water, then go back to the Glenmorangie.'],
+           ['The main bottling after the 1997 restart.'],
            'Ardbeg, Islay', 'Islay single malt, 10 years', '46%')
 
 # ---------------------------------------------------------------- 17 reading the label

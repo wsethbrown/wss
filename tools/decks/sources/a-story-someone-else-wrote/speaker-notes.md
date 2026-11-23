@@ -60,7 +60,7 @@ Chased, allocated, or simply expensive. Pick one. All of these are good whiskey,
 - **Weller Special Reserve or Weller Antique 107.** Wheated, Buffalo Trace, permanently unfindable, and priced accordingly.
 - **Eagle Rare 10.** A genuinely lovely bourbon with a genuinely absurd markup.
 - **E. H. Taylor Small Batch.** Bottled-in-bond, well regarded, hard to get.
-- **Michter's Small Batch.** Widely available, widely argued about, priced well above its neighbours.
+- **Michter's Small Batch.** Widely available, widely argued about, priced well above its neighbors.
 - **Angel's Envy.** Port-finished, beautiful bottle, a lot of people's first "nice" bourbon.
 - **Basil Hayden.** Low proof, high price, a lot of shelf presence. A very interesting thing to put in a blind lineup.
 - **WhistlePig 10.** If you want the hyped bottle to also be your ringer, a rye does both jobs.
@@ -163,8 +163,8 @@ Score each pour on its own merits. Names and prices at the end. Then we find out
 Quickly, because I know you want the whiskey.
 
 - **Nose.** Swirl it. Short sniffs, mouth slightly open, which lets the ethanol escape past your palate instead of scorching your nose. Do not bury your face in the glass.
-- **Palate.** Small sip. Hold it a beat. Swallow, then breathe out through your nose. That is where most of the flavour actually arrives.
-- **Finish.** What lingers, and for how long? And look past the burn. Heat is not flavour. Some of tonight's pours are strong and some are gentle. If you score heat, you are just scoring proof.
+- **Palate.** Small sip. Hold it a beat. Swallow, then breathe out through your nose. That is where most of the flavor actually arrives.
+- **Finish.** What lingers, and for how long? And look past the burn. Heat is not flavor. Some of tonight's pours are strong and some are gentle. If you score heat, you are just scoring proof.
 - **Score.** Write the number down before you talk with everyone. We'll chat and discuss between pours so we're not going too fast.
 
 > **THE POUR SEQUENCE. THIS SLIDE STAYS UP.**
@@ -212,7 +212,7 @@ _Ask: "Same distillery as sample A, different mash bill. Could you tell they wer
 
 ## [SLIDE 6] Sample C: Evan Williams Bottled-in-Bond
 
-_The Sleeper. This is the emotional centre of the night. Slow down. Say what it cost. Then say the fact that makes it more than a cheap bottle._
+_The Sleeper. This is the emotional center of the night. Slow down. Say what it cost. Then say the fact that makes it more than a cheap bottle._
 
 Sample C was Evan Williams Bottled-in-Bond. It is the cheapest bottle on the table tonight.
 
@@ -220,7 +220,7 @@ Sample C was Evan Williams Bottled-in-Bond. It is the cheapest bottle on the tab
 > "Bottled-in-bond" is not marketing. It is law.
 > It requires the product of one distilling season, by one distiller, at one distillery. Aged at least four years in a warehouse under federal supervision. Bottled at exactly 100 proof. And the label must name the distillery that made it.
 > That standard was signed into law on March 3rd, 1897. It was among the first consumer-protection laws of its kind in the United States, nine years before the Pure Food and Drug Act.
-> It exists because the whiskey market of the 1890s was full of grain neutral spirit, coloured and flavoured with whatever was at hand and sold as bourbon. Honest distillers wanted a way to prove they were not doing that. So they went to the government and asked to be inspected.
+> It exists because the whiskey market of the 1890s was full of grain neutral spirit, colored and flavored with whatever was at hand and sold as bourbon. Honest distillers wanted a way to prove they were not doing that. So they went to the government and asked to be inspected.
 > The line: the cheapest bottle on this table is the only one carrying a federal guarantee of exactly what it is.
 
 > **DO NOT OVERCLAIM IT. SAY THIS TOO.**
@@ -246,7 +246,7 @@ Sample E was Barrell Seagrass.
 The odd one out, and not even a bourbon. Barrell does not distill; they source rye from the U.S. and Canada, then finish it separately in three different casks: Martinique rum, Madeira, and apricot brandy. Blended back together at cask strength, it tastes unlike anything else on the table.
 
 > **THE KIND TRAP. NAME IT GENTLY.**
-> Look for anyone who marked the ringer down because it did not taste like its neighbours.
+> Look for anyone who marked the ringer down because it did not taste like its neighbors.
 > That instinct, this is unfamiliar, therefore it is worse, is the same instinct that prestige pricing feeds on.
 > It is worth saying out loud, and it is worth saying without a trace of gotcha in your voice. Everyone in the room has done it. Including you.
 

@@ -83,7 +83,7 @@ credit(s, 7.35, 0.6 + th + 0.08, tw,
 
 # ---------------------------------------------------------------- 2 pour 1
 pour_slide(2, 'Glass 1 of 4', 'Cardhu 12 Year Old',
-           ['The distillery’s own single malt.', 'Taste it on its own before the others.'],
+           ['The distillery’s own single malt.'],
            'Cardhu, Knockando', 'Speyside single malt, 12 years', '40%')
 
 # ---------------------------------------------------------------- 3 the farm
@@ -175,7 +175,7 @@ footer(s, 8)
 # ---------------------------------------------------------------- 9 pour 2
 pour_slide(9, 'Glass 2 of 4', 'Glenfiddich 12 Year Old',
            ['Started by William Grant with Cardow’s old stills.',
-            'Taste it next to glass 1. Both are 12 years old.'],
+            'Glass 1 and this one are both 12 years old.'],
            'Glenfiddich, Dufftown', 'Speyside single malt, 12 years', '40%')
 
 # ---------------------------------------------------------------- 10 the sale
@@ -225,7 +225,7 @@ footer(s, 11)
 
 # ---------------------------------------------------------------- 12 pour 3
 pour_slide(12, 'Glass 3 of 4', ['Johnnie Walker', 'Black Label'],
-           ['The firm that bought Cardow in 1893.', 'Go back to glass 1. Can you taste the Cardhu in this one?'],
+           ['The firm that bought Cardow in 1893.'],
            'John Walker & Sons', 'Blended Scotch, 12 years', '40%', two_line_name=True)
 
 # ---------------------------------------------------------------- 13 2003

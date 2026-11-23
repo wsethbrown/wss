@@ -34,7 +34,7 @@ There were also two different products being sold as whiskey.
 
 The first was what we now call straight whiskey. It was made from grain, distilled, put in a charred barrel and left in a warehouse for years.
 
-The second was rectified whiskey. A rectifier bought neutral spirit, which was cheap and could be made in huge amounts. He added colouring and flavouring so it looked and tasted something like aged whiskey. This was legal, and a large share of what Americans drank was made this way.
+The second was rectified whiskey. A rectifier bought neutral spirit, which was cheap and could be made in huge amounts. He added coloring and flavoring so it looked and tasted something like aged whiskey. This was legal, and a large share of what Americans drank was made this way.
 
 The rectifiers said blending was a skill and their customers liked what they made. They kept saying so for the next thirty years.
 
@@ -70,7 +70,7 @@ Two men get most of the credit for the law.
 
 The first is Colonel Edmund Haynes Taylor Junior. He had a distillery in Frankfort, Kentucky, and his name is still on Old Taylor and the E.H. Taylor bottles. He had been campaigning against the rectifiers for years.
 
-The second is John G. Carlisle, also from Kentucky. He was Secretary of the Treasury under President Cleveland, and the bonded warehouses came under his department. Taylor organised the distillers and Carlisle got the bill through.
+The second is John G. Carlisle, also from Kentucky. He was Secretary of the Treasury under President Cleveland, and the bonded warehouses came under his department. Taylor organized the distillers and Carlisle got the bill through.
 
 The rectifiers argued against it. They said it gave the straight whiskey distillers an unfair advantage. Two of the men who said so were Isaac Bernheim and George Garvin Brown, the man who started Old Forester.
 
@@ -122,7 +122,7 @@ The rectifiers sold a large share of the whiskey in the country, and they would 
 
 In the end President Taft decided it. Taft had been a judge before he was president. He had new hearings held, read the evidence himself and gave his decision on the 27th of December 1909.
 
-Taft did not agree with Wiley. He said spirit made from grain could be called whisky, even if it was neutral spirit. So the rectifiers could keep using the word. But the label had to say what was in the bottle. Aged whiskey was labelled "straight whisky". Straight whisky mixed with neutral spirit was labelled a "blend".
+Taft did not agree with Wiley. He said spirit made from grain could be called whisky, even if it was neutral spirit. So the rectifiers could keep using the word. But the label had to say what was in the bottle. Aged whiskey was labeled "straight whisky". Straight whisky mixed with neutral spirit was labeled a "blend".
 
 A bonded bourbon or rye is also a straight whiskey. It has had at least four years in wood and nothing added but water.
 
@@ -140,7 +140,7 @@ It should taste drier and more peppery than the two bourbons, with less caramel.
 
 ## [SLIDE 14] What happened to bonded whiskey
 
-Prohibition started in January 1920. You could still buy whiskey legally if a doctor prescribed it. Six companies had a licence to sell it. The pints sold in pharmacies were bottled in bond at 100 proof. Until Prohibition ended in December 1933, that was about the only legal American whiskey.
+Prohibition started in January 1920. You could still buy whiskey legally if a doctor prescribed it. Six companies had a license to sell it. The pints sold in pharmacies were bottled in bond at 100 proof. Until Prohibition ended in December 1933, that was about the only legal American whiskey.
 
 From the 1960s bonded whiskey sold less. People were drinking more vodka. In the 1970s prices rose and distillers lowered their proofs to save money. Bonded bottles ended up on the bottom shelf. The green tax stamp that used to go over the cork was dropped in the early 1980s.
 

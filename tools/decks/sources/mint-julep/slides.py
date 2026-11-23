@@ -91,10 +91,8 @@ text(s, 7.58, 6.43, 4.9, 0.4,
 
 # ---------------------------------------------------------------- 2 the drink in your hand
 s = new_slide()
-glass_line(s, 0.85, 0.85, 'Glass A. Pour it now.')
-heading(s, 1.35, 'Start with glass A.', size=40, w=6.6, h=0.8)
-text(s, 0.85, 2.2, 6.2, 0.9, 'Taste it now. What is in it comes at slide 16.', size=19, italic=True, color=MUTE)
-text(s, 0.85, 3.0, 6.2, 0.5, '', size=18, italic=True, color=MUTE)
+glass_line(s, 0.85, 0.85, 'Glass A')
+heading(s, 1.35, 'What goes into every julep.', size=40, w=6.2, h=1.6)
 rrect(s, 7.45, 0.85, 5.03, 5.65, r=0.36, fill=WHITE, line=HAIR)
 yy = 1.35
 for i, t in enumerate(['Sugar', 'Mint', 'Spirit',
@@ -352,7 +350,7 @@ jfooter(s, 12)
 
 # ---------------------------------------------------------------- 13 damn the excise
 s = new_slide()
-glass_line(s, 0.85, 0.85, 'Glass B. Pour it now.')
+glass_line(s, 0.85, 0.85, 'Glass B')
 heading(s, 1.3, 'Damn the excise.', size=38, w=5.4, h=0.75)
 text(s, 0.85, 2.05, 5.4, 0.75, 'In 1791 Congress put a tax on American-made spirits.',
      size=16, italic=True, color=MUTE, ls=1.12)

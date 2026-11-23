@@ -22,10 +22,10 @@ Four.
 
 ### Cast the roles, then find the bottles
 
-- **Glass 1: The Glenlivet.** The distillery that took legal action. Tonight: The Glenlivet 12 Year Old.
-- **Glass 2: a distillery the Smiths complained about by name.** Tonight: Glenfarclas 12.
-- **Glass 3: a distillery listed in the 1884 settlement.** Tonight: Aberlour 12 Double Cask.
-- **Glass 4: a distillery built after the settlement that used the name too.** Tonight: Glen Moray 12.
+- **Glass 1: The Glenlivet.** The distillery that took legal action. Suggested bottle: The Glenlivet 12 Year Old.
+- **Glass 2: a distillery the Smiths complained about by name.** Suggested bottle: Glenfarclas 12.
+- **Glass 3: a distillery listed in the 1884 settlement.** Suggested bottle: Aberlour 12 Double Cask.
+- **Glass 4: a distillery built after the settlement that used the name too.** Suggested bottle: Glen Moray 12.
 
 ### Bottle ideas by role
 
@@ -88,6 +88,8 @@ The Smiths did not win. We'll get to what happened, and we'll taste The Glenlive
 ## [SLIDE 2] Pour 1 of 4: The Glenlivet 12
 
 _Glass 1 should already be poured. If not, pour it now and keep talking._
+
+_Tell the room to keep a little of glass 1 back to compare with the other three._
 
 This is The Glenlivet 12 Year Old. It is made at Minmore, in Glenlivet. It is aged in American and European oak and bottled at 40 percent.
 

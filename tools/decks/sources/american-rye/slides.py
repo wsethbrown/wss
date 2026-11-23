@@ -203,7 +203,7 @@ footer(s, 7)
 # ---------------------------------------------------------------- 8 pour 2
 pour_slide(8, 'Pour 2 of 4', ['Pikesville', 'Straight Rye'],
            ['Reported to be 51% rye, the legal minimum.',
-            'Six years old and 110 proof. Try it neat, then with water.'],
+            'Six years old and 110 proof.'],
            'Heaven Hill, Kentucky', 'Straight rye, 6 years old', '110', two_line_name=True)
 
 # ---------------------------------------------------------------- 9 1920 (big year, on paper)
@@ -290,8 +290,7 @@ def mash_card(s):
 
 
 pour_slide(13, 'Pour 3 of 4', 'Old Forester Rye',
-           ['65% rye, 20% malted barley, 15% corn,', 'as Brown-Forman publishes it.',
-            'Compare it with the Pikesville.'],
+           ['65% rye, 20% malted barley, 15% corn,', 'as Brown-Forman publishes it.'],
            'Brown-Forman, Kentucky', 'Kentucky straight rye whisky', '100', left=mash_card)
 
 # ---------------------------------------------------------------- 14 95%
@@ -335,8 +334,7 @@ footer(s, 15)
 
 # ---------------------------------------------------------------- 16 pour 4
 pour_slide(16, 'Pour 4 of 4', 'Bulleit 95 Rye',
-           ['95% rye, distilled in Indiana.',
-            'Find that on the back label, then taste it against\u00a0the\u00a0Pikesville.'],
+           ['95% rye, distilled in Indiana.'],
            'Bulleit (Diageo), distilled by MGP', 'Straight rye whiskey', '90')
 
 # ---------------------------------------------------------------- 17 reading the label

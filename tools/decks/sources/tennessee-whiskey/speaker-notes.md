@@ -30,13 +30,13 @@ Jack Daniel's makes its own charcoal. It buys sugar maple, cuts it into strips a
 
 The charcoal is broken into small pieces and packed into tall vats, about ten feet deep. The new spirit comes off the still completely clear. It goes in at the top of the vat and drips down through the charcoal. That takes days.
 
-After that it goes into new charred oak barrels, the same as bourbon. So the charcoal comes before the ageing. Some other whiskeys say "charcoal filtered" on the label. That usually means a quick pass through charcoal after the barrel, just before bottling. It is a different step.
+After that it goes into new charred oak barrels, the same as bourbon. So the charcoal comes before the aging. Some other whiskeys say "charcoal filtered" on the label. That usually means a quick pass through charcoal after the barrel, just before bottling. It is a different step.
 
 ## [SLIDE 3] Called the Lincoln County Process
 
 The trade calls this the Lincoln County Process. Lynchburg is in Moore County, and Moore County was made partly out of Lincoln County in 1871. Jack Daniel's calls it charcoal mellowing.
 
-The charcoal takes out some of the oils and heavier flavours in the new spirit. Spirit that has been through the charcoal tastes cleaner and a little sweeter than it did before.
+The charcoal takes out some of the oils and heavier flavors in the new spirit. Spirit that has been through the charcoal tastes cleaner and a little sweeter than it did before.
 
 People disagree about how much of that difference is left after four or more years in a barrel. The Tennessee distilleries say a lot. Some Kentucky distillers say not much. Two of tonight's pours are here so you can compare for yourselves.
 
@@ -72,7 +72,7 @@ This photograph shows Jack Daniel in the white hat with some of his workers. We 
 
 Let's pour the first one. This is the standard Jack Daniel's, with the black label, at 80 proof. It is called Old No. 7. There are several stories about where that name came from, and nobody knows which is true.
 
-Before you think about flavour, notice how thick or thin it feels in your mouth. The charcoal is meant to make the whiskey lighter.
+Before you think about flavor, notice how thick or thin it feels in your mouth. The charcoal is meant to make the whiskey lighter.
 
 ## [SLIDE 8] 1910: Tennessee bans making whiskey, ten years before the rest of the country.
 
@@ -112,7 +112,7 @@ These are the rules. The grain has to be at least 51 percent corn. The spirit ca
 
 All of those except the last two are the same as the federal rules for bourbon.
 
-Diageo, which owns Dickel, said the law was written to suit Jack Daniel's. In 2014 it backed a bill to allow used barrels and ageing outside the state. That bill went nowhere.
+Diageo, which owns Dickel, said the law was written to suit Jack Daniel's. In 2014 it backed a bill to allow used barrels and aging outside the state. That bill went nowhere.
 
 There is one exception. Prichard's is a small distillery in Kelso that had been making Tennessee whiskey without the charcoal step, and the law lets it carry on.
 
@@ -166,7 +166,7 @@ One more slide. This is what the words on a Tennessee whiskey label mean.
 
 "Sour mash" means some of the used mash from one batch is added to the next, to keep each batch the same. Jack Daniel's prints it on the label. Most Kentucky bourbon is made the same way.
 
-"Charcoal filtered" on other whiskeys usually means a quick pass through charcoal after ageing. That is a different step.
+"Charcoal filtered" on other whiskeys usually means a quick pass through charcoal after aging. That is a different step.
 
 Whisky can be spelled with or without an e. In the United States there is no legal difference.
 

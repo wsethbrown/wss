@@ -135,8 +135,7 @@ footer(s, 3)
 
 # ---------------------------------------------------------------- 4 pour 1
 pour_slide(4, 'Pour 1 of 4', ['Redbreast', '12 Year Old'],
-           ['Notice how it feels in your mouth before the flavour.',
-            'People say unmalted barley makes it thick and oily.'],
+           ['People say unmalted barley makes it thick and oily.'],
            ['Irish Distillers,', 'Midleton'], ['Single pot still', 'Irish whiskey'], '40%', two_line_name=True)
 
 # ---------------------------------------------------------------- 5 pot still and Coffey still
@@ -190,7 +189,7 @@ footer(s, 7)
 
 # ---------------------------------------------------------------- 8 pour 2
 pour_slide(8, 'Pour 2 of 4', ['Bushmills', '10 Year Old'],
-           ['Malted barley only, distilled three times.', 'Put it beside the Redbreast and compare the weight.'],
+           ['Malted barley only, distilled three times.'],
            ['Bushmills,', 'County Antrim'], ['Single malt', 'Irish whiskey'], '40%', two_line_name=True)
 
 # ---------------------------------------------------------------- 9 export markets
@@ -246,8 +245,7 @@ footer(s, 12)
 
 # ---------------------------------------------------------------- 13 pour 3
 pour_slide(13, 'Pour 3 of 4', 'Powers Gold Label',
-           ['Pot still whiskey blended with grain whiskey from a column still.',
-            'Taste it after the Redbreast.'],
+           ['Pot still whiskey blended with grain whiskey from a column still.'],
            ['Irish Distillers,', 'Midleton'], ['Blended', 'Irish whiskey'], '43.2%')
 
 # ---------------------------------------------------------------- 14 the revival

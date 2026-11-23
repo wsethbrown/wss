@@ -95,8 +95,7 @@ credit(s, 7.35, 0.6 + th + 0.08, tw,
 
 # ---------------------------------------------------------------- 2 pour 1
 pour_slide(2, 'Pour 1 of 4', 'The Glenlivet 12',
-           ['The only distillery allowed to call itself The Glenlivet.',
-            'Keep a little back to compare with the other three.'],
+           ['The only distillery allowed to call itself The Glenlivet.'],
            'The Glenlivet, Minmore', 'Speyside single malt, 12 years', '40%',
            'glenlivet-distillery.jpg', 'The Glenlivet distillery, 2009. Photo: Alan Jamieson, CC BY-SA 3.0, via Wikimedia Commons. Cropped.')
 

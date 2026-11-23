@@ -24,10 +24,10 @@ Four. Three are 40 percent and one is 43 percent.
 
 ### Cast the roles, then find the bottles
 
-- **Glass 1: Cardhu's own single malt.** Tonight: Cardhu 12 Year Old.
-- **Glass 2: the distillery that started with Cardhu's old stills.** Tonight: Glenfiddich 12 Year Old.
-- **Glass 3: a Johnnie Walker blend.** John Walker & Sons bought the distillery in 1893. Tonight: Johnnie Walker Black Label 12 Year Old.
-- **Glass 4: a blended malt.** This is malt whisky from several distilleries, with no grain whisky. Cardhu Pure Malt was this kind of whisky. Tonight: Johnnie Walker Green Label 15 Year Old.
+- **Glass 1: Cardhu's own single malt.** Suggested bottle: Cardhu 12 Year Old.
+- **Glass 2: the distillery that started with Cardhu's old stills.** Suggested bottle: Glenfiddich 12 Year Old.
+- **Glass 3: a Johnnie Walker blend.** John Walker & Sons bought the distillery in 1893. Suggested bottle: Johnnie Walker Black Label 12 Year Old.
+- **Glass 4: a blended malt.** This is malt whisky from several distilleries, with no grain whisky. Cardhu Pure Malt was this kind of whisky. Suggested bottle: Johnnie Walker Green Label 15 Year Old.
 
 ### Bottle ideas by role
 

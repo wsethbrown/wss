@@ -50,9 +50,9 @@ Before the ends go in, the inside of the barrel is heated again. There are two w
 
 Char comes in four grades, number one to number four. Number four is the heaviest. It's called alligator char because the surface cracks into scales like an alligator's skin.
 
-If you cut through a charred stave you would see three layers. On the inside is the black char. It works like charcoal and takes some of the sulphur smell out of the spirit. Behind the char is a band a few millimetres thick that coopers call the red layer. There the heat has caramelised the sugars in the wood without burning them. Behind that is plain oak.
+If you cut through a charred stave you would see three layers. On the inside is the black char. It works like charcoal and takes some of the sulfur smell out of the spirit. Behind the char is a band a few millimeters thick that coopers call the red layer. There the heat has caramelized the sugars in the wood without burning them. Behind that is plain oak.
 
-Most of what bourbon gets from the barrel comes from the red layer and the wood just behind it. Vanillin gives the vanilla smell. Oak lactones smell of coconut. Tannin is the drying feeling on your gums. The colour comes from the barrel too. The spirit goes in as clear as water.
+Most of what bourbon gets from the barrel comes from the red layer and the wood just behind it. Vanillin gives the vanilla smell. Oak lactones smell of coconut. Tannin is the drying feeling on your gums. The color comes from the barrel too. The spirit goes in as clear as water.
 
 ## [SLIDE 5] 1935: the Federal Alcohol Administration Act
 
@@ -73,19 +73,19 @@ Let's pour the first one. This is Maker's Mark, from Loretto, Kentucky, at 90 pr
 
 I picked it because we know where its barrels go. Maker's Mark and Laphroaig have had the same owner since the late 1980s. Today that is Suntory. Most of the bourbon barrels Laphroaig uses come from Maker's Mark. In 2022 Laphroaig released a whisky aged only in Maker's Mark barrels. So this glass is the first fill, and the next glass is mostly the second fill of the same barrels.
 
-Look at the colour before you taste it. Nothing can be added to bourbon except water, so all of that colour came from the barrel. Then taste it, and see if you can find vanilla and caramel. Those come from the red layer.
+Look at the color before you taste it. Nothing can be added to bourbon except water, so all of that color came from the barrel. Then taste it, and see if you can find vanilla and caramel. Those come from the red layer.
 
 ## [SLIDE 7] Years in a Kentucky rickhouse
 
 The full barrels go into a warehouse. In Kentucky it's called a rickhouse. It is a big building, often several floors high, with the barrels lying on their sides on wooden racks.
 
-In summer the warehouse heats up. The spirit expands and is pushed into the wood. In winter it cools and comes back out, and it brings flavour and colour with it. Kentucky has hot summers and cold winters, so this happens more there than in Scotland.
+In summer the warehouse heats up. The spirit expands and is pushed into the wood. In winter it cools and comes back out, and it brings flavor and color with it. Kentucky has hot summers and cold winters, so this happens more there than in Scotland.
 
-The floor matters too. The top floors are much hotter than the ground floor. A barrel near the roof ages faster and comes out darker, with more flavour. Most distilleries blend barrels from different floors. Maker's Mark says it still moves its barrels between floors by hand.
+The floor matters too. The top floors are much hotter than the ground floor. A barrel near the roof ages faster and comes out darker, with more flavor. Most distilleries blend barrels from different floors. Maker's Mark says it still moves its barrels between floors by hand.
 
-## [SLIDE 8] 53: US gallons in a standard bourbon barrel, about 200 litres
+## [SLIDE 8] 53: US gallons in a standard bourbon barrel, about 200 liters
 
-A standard bourbon barrel holds 53 US gallons, which is about 200 litres. No law sets that size. It is just what the trade uses. The story in the trade is that it replaced a 48-gallon barrel during the Second World War.
+A standard bourbon barrel holds 53 US gallons, which is about 200 liters. No law sets that size. It is just what the trade uses. The story in the trade is that it replaced a 48-gallon barrel during the Second World War.
 
 The law does set the strength. The spirit can go into the barrel at no more than 125 proof.
 
@@ -99,7 +99,7 @@ When the bourbon is ready, the barrel is emptied. The trade calls that dumping. 
 
 Some whiskey stays soaked into the staves. Jim Beam sells a bourbon called Devil's Cut, and part of it is whiskey pulled back out of the wood of emptied barrels.
 
-The wood also still has flavour in it. The bourbon takes most of the colour, vanilla and tannin, and it takes them quickly. The next spirit gets what is left. That is milder, and it comes out more slowly. This is one reason Scotch often spends ten or twelve years in a used barrel.
+The wood also still has flavor in it. The bourbon takes most of the color, vanilla and tannin, and it takes them quickly. The next spirit gets what is left. That is milder, and it comes out more slowly. This is one reason Scotch often spends ten or twelve years in a used barrel.
 
 ## [SLIDE 10] Where the empty barrels go
 
@@ -109,7 +109,7 @@ Scotch whisky uses the most. Scotch has to spend at least three years in oak cas
 
 Irish whiskey has the same kind of rule. It has to spend three years in wooden casks in Ireland, north or south, and it uses the same barrels. A lot of Caribbean rum is aged in them, and so is a lot of aged tequila.
 
-Until the late 1980s most barrels were taken apart and shipped to Scotland as bundles of staves, then rebuilt there. Now most are shipped whole. Many are rebuilt in Scotland into bigger casks called hogsheads, which hold about 250 litres.
+Until the late 1980s most barrels were taken apart and shipped to Scotland as bundles of staves, then rebuilt there. Now most are shipped whole. Many are rebuilt in Scotland into bigger casks called hogsheads, which hold about 250 liters.
 
 ## [SLIDE 11] Pour 2 of 4: Laphroaig 10
 
@@ -119,13 +119,13 @@ You'll notice smoke first. That comes from peat. Peat is burnt to dry the barley
 
 Under the smoke, look for vanilla and something sweet, close to what you tasted in the Maker's Mark. That part came from the barrel.
 
-Then hold it next to the bourbon and compare the colour. Scotch is allowed to have caramel colouring added and bourbon is not. So the colour of a Scotch tells you less about the barrel.
+Then hold it next to the bourbon and compare the color. Scotch is allowed to have caramel coloring added and bourbon is not. So the color of a Scotch tells you less about the barrel.
 
 ## [SLIDE 12] A Scotch cask is filled more than once
 
 In Scotland a barrel is usually filled more than once.
 
-The first time it is filled with Scotch, it's called a first-fill cask. It has the most flavour left, so the whisky from it tastes the most like bourbon. The next time it's called a refill cask, and it gives less. Some distilleries fill a cask three or four times. After that the wood has little left. It is either scraped and charred again, or it is retired.
+The first time it is filled with Scotch, it's called a first-fill cask. It has the most flavor left, so the whisky from it tastes the most like bourbon. The next time it's called a refill cask, and it gives less. Some distilleries fill a cask three or four times. After that the wood has little left. It is either scraped and charred again, or it is retired.
 
 Most single malts are a mix of first-fill and refill casks. The label rarely says how much of each.
 
@@ -161,13 +161,13 @@ When you've finished, go back to the Maker's Mark and taste the two side by side
 
 This is what a label can tell you about the barrel.
 
-"Bourbon" and "straight bourbon" mean new charred oak and no added colour. That is the law. So in a bourbon, the colour comes from the wood.
+"Bourbon" and "straight bourbon" mean new charred oak and no added color. That is the law. So in a bourbon, the color comes from the wood.
 
 "Ex-bourbon", "first fill" and "refill" on a Scotch or Irish label mean the cask was used before, and how many times. The producer doesn't have to print them.
 
 "Double oaked" or "finished" means the whiskey was moved into a second cask near the end. The label usually says what kind.
 
-A Scotch label doesn't have to say whether caramel colouring was added. Some say "natural colour". If the label doesn't say, you can't judge the cask by the colour.
+A Scotch label doesn't have to say whether caramel coloring was added. Some say "natural colour". If the label doesn't say, you can't judge the cask by the color.
 
 ## [SLIDE 17] Sláinte
 

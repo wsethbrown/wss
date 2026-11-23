@@ -92,11 +92,11 @@ _What does "Japanese whisky" mean, and who enforces it?_
 ### What's established
 
 - **12 February 2021.** The Japan Spirits & Liqueurs Makers Association (JSLMA) establishes the Standards for Labeling Japanese Whisky; published 16 February (Whisky Advocate).
-- The requirements, from JSLMA's English text: raw ingredients limited to malted grains, other cereal grains and water extracted in Japan, and malted grains must always be used; saccharification, fermentation and distillation at a distillery in Japan, distilled below 95%; matured in Japan in wooden casks of no more than 700 litres for at least three years; bottled only in Japan at 40% or more; plain caramel allowed.
+- The requirements, from JSLMA's English text: raw ingredients limited to malted grains, other cereal grains and water extracted in Japan, and malted grains must always be used; saccharification, fermentation and distillation at a distillery in Japan, distilled below 95%; matured in Japan in wooden casks of no more than 700 liters for at least three years; bottled only in Japan at 40% or more; plain caramel allowed.
 - **1 April 2021.** In force. Products already sold with these terms before 31 March 2021 could keep their labels until **31 March 2024**.
 - It is voluntary, applies to members, and has no government enforcement (Whisky Advocate). JSLMA had 104 members in March 2025.
-- **27 March 2025.** JSLMA adopts a "JW" logo for compliant bottles and says it is working towards a legally binding definition: a Geographical Indication and a National Tax Agency labelling standard. A document on its site dated January 2026 repeats this; no sign was found that either has been adopted.
-- JSLMA's own note on the standard names two problems: imported whisky sold as Japanese whisky, and products that do not meet the Japanese tax-law definition of whisky being sold as whisky abroad. Article 6.3 asks members not to supply products labelled that way.
+- **27 March 2025.** JSLMA adopts a "JW" logo for compliant bottles and says it is working towards a legally binding definition: a Geographical Indication and a National Tax Agency labeling standard. A document on its site dated January 2026 repeats this; no sign was found that either has been adopted.
+- JSLMA's own note on the standard names two problems: imported whisky sold as Japanese whisky, and products that do not meet the Japanese tax-law definition of whisky being sold as whisky abroad. Article 6.3 asks members not to supply products labeled that way.
 
 ### Go to the source
 
@@ -105,7 +105,7 @@ _What does "Japanese whisky" mean, and who enforces it?_
 - › _JSLMA press release, 27 March 2025, on the JW logo and GI plans. Read in full._
 
 > **TRAPS**
-> The slide lists five rules; the standard also caps cask size at 700 litres and distillation strength below 95%. "Full compliance 31 March 2024" is the end of the transition for existing labels. Check whether the standard has become law before you present.
+> The slide lists five rules; the standard also caps cask size at 700 liters and distillation strength below 95%. "Full compliance 31 March 2024" is the end of the transition for existing labels. Check whether the standard has become law before you present.
 
 ## Module 6. Koji and the law in Japan
 
@@ -114,8 +114,8 @@ _Why can't Hakata be called whisky at home?_
 ### What's established
 
 - Japan's Liquor Tax Act (Act No. 6 of 1953), Article 3, item 15, defines whisky as distilled from grain saccharified by malted grain (e-Gov text). Item 10 defines single-distilled shochu as a pot-still spirit from grain, its koji and water, at 45% or less.
-- Koji is a mould grown on grain that converts starch to sugar; it is used for sake, miso and soy sauce (Punch; Hakata's importer).
-- Cask-aged koji spirits in Japan have to be stripped of colour or blended with unaged spirit to be sold as shochu; Punch gives the limit as a reading of 0.08 or lower on a spectrometer.
+- Koji is a mold grown on grain that converts starch to sugar; it is used for sake, miso and soy sauce (Punch; Hakata's importer).
+- Cask-aged koji spirits in Japan have to be stripped of color or blended with unaged spirit to be sold as shochu; Punch gives the limit as a reading of 0.08 or lower on a spectrometer.
 - In the US, whisky is a distillate from a fermented mash of any grain, below 95%, stored in oak, bottled at 40% or more (27 CFR 5.143). It does not ask how the starch was converted.
 - The JSLMA standard's malted-grain rule shuts koji whisky out of "Japanese whisky" (Punch, 2021).
 

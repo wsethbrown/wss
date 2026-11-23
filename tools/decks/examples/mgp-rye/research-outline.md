@@ -104,7 +104,7 @@ _Why did one plant make such an unusual rye, and who designed it?_
 
 - **1933–2001.** Seagram owns the plant. Its whiskey went largely into blends such as Seagram's 5 Crown and 7 Crown; it also made Seagram's gin and vodka. Seagram's other American plant for blending stock was at Lawrenceburg, Kentucky, now Four Roses.
 - **Larry Ebersold.** Born 1950; a master's in chemical engineering from the University of Louisville; started at the Lawrenceburg plant in 1972 and was master distiller there for more than twenty years; retired in 2010; inducted into the Kentucky Bourbon Hall of Fame in 2025 (Whiskey University profile; VinePair, 2025).
-- **The recipe.** Two accounts, both credited to Ebersold, differ in the steps. Whiskey University and VinePair: in the early 1990s he was asked for a rye bold enough to show through in a blend; he first tried 100% malted rye, which he thinks was among the best whiskey he made, but it cost too much, and he settled on 95% rye and 5% malted barley. Chuck Cowdery (2012): they started from a 51% rye, tried 80% rye with 20% malted rye, then 95% rye with 5% malted rye, and finally replaced the rye malt with cheaper barley malt; each step was pushed by the accountants. Both agree on the end point and the reason: flavour for blends at a price.
+- **The recipe.** Two accounts, both credited to Ebersold, differ in the steps. Whiskey University and VinePair: in the early 1990s he was asked for a rye bold enough to show through in a blend; he first tried 100% malted rye, which he thinks was among the best whiskey he made, but it cost too much, and he settled on 95% rye and 5% malted barley. Chuck Cowdery (2012): they started from a 51% rye, tried 80% rye with 20% malted rye, then 95% rye with 5% malted rye, and finally replaced the rye malt with cheaper barley malt; each step was pushed by the accountants. Both agree on the end point and the reason: flavor for blends at a price.
 - **Gimli.** Cowdery reports that Seagram tried to make the same rye at its Gimli, Manitoba plant for Canadian whisky and failed, because "a crucial strain of bacteria, native to Indiana, couldn't survive". One account only.
 - **Greg Metze**, Ebersold's protégé, ran the distillery for 38 years and left in 2016; Ian Stirsman has been master distiller since 2021 (Whisky Advocate, 2026).
 - The owner's product page today lists a 95% rye whiskey: rye 95%, barley malt 5% (sempreon.com, November 2026).
@@ -158,7 +158,7 @@ _What did each brand do with the same rye?_
 
 - **Templeton was first.** Cowdery (2012): Templeton "was the first to bring LDI's unique 95% rye to market"; since then the rye had appeared from High West, Redemption, Filibuster, Smooth Ambler, James E. Pepper, Bulleit and George Dickel. Diageo, which owns Bulleit and Dickel, was the plant's biggest customer.
 - **Bulleit 95 Rye.** Launched 2011; 95% rye, 5% malted barley from the Indiana plant, "as all Bulleit ryes have been, and will be"; Bulleit's two Kentucky distilleries make bourbon, not rye (Whisky Advocate, 9 July 2026). 90 proof; no age statement.
-- **George Dickel Rye.** 90 proof; the same 95/5 rye. In 2012 Dickel's master distiller John Lunn said the aged whiskey was trucked from Indiana to Diageo's bottling plant at Plainfield, Illinois, where it was chilled to 40°F and filtered through sugar-maple charcoal sent from the Dickel distillery near Tullahoma, Tennessee: the same process as Dickel's Tennessee whisky, but after ageing rather than before (Cowdery, 2012). Retailer pages in 2026 variously say Tennessee or Plainfield; nothing newer than 2012 from the company was found.
+- **George Dickel Rye.** 90 proof; the same 95/5 rye. In 2012 Dickel's master distiller John Lunn said the aged whiskey was trucked from Indiana to Diageo's bottling plant at Plainfield, Illinois, where it was chilled to 40°F and filtered through sugar-maple charcoal sent from the Dickel distillery near Tullahoma, Tennessee: the same process as Dickel's Tennessee whisky, but after aging rather than before (Cowdery, 2012). Retailer pages in 2026 variously say Tennessee or Plainfield; nothing newer than 2012 from the company was found.
 - **Redemption, Smooth Ambler Old Scout, High West, Filibuster, James E. Pepper** are named in Cowdery's 2012 list. Angel's Envy Rye is named only in Wikipedia's list.
 
 ### Go to the source
@@ -217,7 +217,7 @@ _What does federal law require a whiskey label to say about where it was distill
 
 - **27 CFR 5.66(f)(1), state of distillation for whisky.** "The State of distillation, which is the State in which original distillation takes place, must appear on the label of any type of whisky defined in § 5.143(c)(2) through (7), (15), and (16), which is distilled in the United States." It may be shown in one of four ways: a "distilled by" statement with a single location; a "bottled by" address that is in the state of distillation; the state next to the type ("Kentucky bourbon whisky"), only if distilled and aged there; or a separate statement "such as 'Distilled in [name of State].'" Types (2) to (7) include bourbon, rye, wheat, malt and corn whisky.
 - **5.66(f)(2).** TTB may require the state of distillation even where it already appears in the name and address, "to negate any misleading or deceptive impression".
-- **History of the text.** The rule was in 27 CFR 5.36 before 2022. The current numbering and wording come from TTB's labelling modernisation rule (published 9 February 2022, effective 11 March 2022). The American single malt rule (published 18 December 2024, effective 19 January 2025) added types (15) and (16) to the list.
+- **History of the text.** The rule was in 27 CFR 5.36 before 2022. The current numbering and wording come from TTB's labeling modernization rule (published 9 February 2022, effective 11 March 2022). The American single malt rule (published 18 December 2024, effective 19 January 2025) added types (15) and (16) to the list.
 - **27 CFR 5.88(c), bottled in bond.** A domestic bonded whisky "must bear the real name of the distillery or the trade name under which the distiller distilled and warehoused the spirits, and the number of the distilled spirits plant in which distilled, and the number of the distilled spirits plant in which bottled."
 - **The COLA registry.** TTB publishes approved labels in its public online registry, COLAs Online.
 
@@ -281,7 +281,7 @@ _What does the distillery sell under its own name, and what is it called now?_
 
 Said aloud as "the story goes" or hedged in the script, or kept off the slides.
 
-- **That Ross's distillery made rye.** The company says so; the 1885 history does not say what Rossville made (it describes its neighbours as making Bourbon whiskies and high wines). Not shown.
+- **That Ross's distillery made rye.** The company says so; the 1885 history does not say what Rossville made (it describes its neighbors as making Bourbon whiskies and high wines). Not shown.
 - **George Ross's life** beyond the brewery (1845), the distillery (1847) and that he ran it till his death; his death date was not found. Whether the church trustee of 1847 is the same man.
 - **The exact dates of Remus's purchase (1921) and of the Squibb plant's sale to Old Quaker (1937).** Company timeline only; the 1926 newspaper confirms Remus's control "a few years ago".
 - **The 1919 sale of the Walsh interests**, from a damaged scan.
@@ -357,7 +357,7 @@ Each is marked with how much of it was read for this outline.
 
 ## Image credits
 
-- **Slides 1 and 6.** "Seagrams Distillers, Ridge Avenue (Lawrenceburg, Ind.)". Indiana Landmarks; contributed by IUPUI University Library via DPLA. CC BY 4.0. Wikimedia Commons, File:Seagrams Distillers, Ridge Avenue (Lawrenceburg, Ind.) - DPLA - 8e5749164388f5e4505d3f3fbe6329a3.jpg. Cropped and printed in two inks (green and cream). On slide 1 the attribution is printed under the photograph, as the licence asks.
+- **Slides 1 and 6.** "Seagrams Distillers, Ridge Avenue (Lawrenceburg, Ind.)". Indiana Landmarks; contributed by IUPUI University Library via DPLA. CC BY 4.0. Wikimedia Commons, File:Seagrams Distillers, Ridge Avenue (Lawrenceburg, Ind.) - DPLA - 8e5749164388f5e4505d3f3fbe6329a3.jpg. Cropped and printed in two inks (green and cream). On slide 1 the attribution is printed under the photograph, as the license asks.
 - **Slide 8.** "Bulleit 95 Rye Frontier Whiskey", 9 April 2022. David (Flickr: brokentaco). CC BY 2.0. Wikimedia Commons, File:Bulleit 95 Rye Frontier Whiskey (52057370044).jpg. Cropped.
 - **Slide 10.** "Templeton Rye Whiskey", 12 February 2022. David (Flickr: brokentaco). CC BY 2.0. Wikimedia Commons, File:Templeton Rye Whiskey (52540441445).jpg. Cropped. The bottle pictured is Templeton Rye 6 Year, not the Straight Rye poured.
 - **Slides 1 and 14.** The Whiskey Share Society logo.

@@ -2,7 +2,7 @@
 
 Research outline: a map for doing your own digging
 
-_This is the other half of the speaker notes. It doesn't tell you what to say; it tells you where to look, what's already settled, what's still contested, and which widely repeated "facts" will embarrass you. Work through whichever module interests you. Each one is a night's reading, not a semester. Facts were checked again in November 2026; the Derby cup programme and bottle prices change every year, so check those before the night._
+_This is the other half of the speaker notes. It doesn't tell you what to say; it tells you where to look, what's already settled, what's still contested, and which widely repeated "facts" will embarrass you. Work through whichever module interests you. Each one is a night's reading, not a semester. Facts were checked again in November 2026; the Derby cup program and bottle prices change every year, so check those before the night._
 
 > **THE SPINE OF THE STORY**
 > Persian rosewater medicine (gulāb) → Arabic julāb → medieval European apothecary syrup → the rose is swapped for mint → Virginia turns it into a morning dram of rum, then brandy → ice arrives, 1807 → Black bartenders make it the finest drink in America → tax revolt, civil war, and phylloxera hand it to bourbon → it dies of fashion → the Kentucky Derby resurrects it as a souvenir.
@@ -38,7 +38,7 @@ _Why is an American whiskey drink named after a Persian rose?_
 - Compare the julep's path west to sherbet and sorbet, which came the same way from the same word-family. Two Persian drinks, two very different American afterlives.
 
 > **TRAPS**
-> Do not say the julep "came from" a Persian cocktail. The word and the form (sweet syrup + aromatic + water) travelled. The alcohol is an American addition.
+> Do not say the julep "came from" a Persian cocktail. The word and the form (sweet syrup + aromatic + water) traveled. The alcohol is an American addition.
 
 ---
 
@@ -120,7 +120,7 @@ _Why are the best bartenders of the julep's golden age missing from the julep's 
 - Could not read or write. Wendell Dabney records that when a member of the owner's family tried to teach him, "she was detected and sent away, while he received a severe whipping."
 - Married Elizabeth Foster, also enslaved. When her owners decided to sell her after the birth of their son Clarence, Dabney, who already had an agreement to buy his own freedom from his tips, paused those payments with DeJarnette's consent and bought Elizabeth.
 - Opened his own establishments while still enslaved: the Senate House (1862) and the Dabney House restaurant (1865), with Black partners, blocks from Richmond's slave-trading district.
-- He was still paying instalments on his own freedom when Emancipation cancelled the debt. He paid the balance anyway. The Richmond Enquirer's account, reprinted on the front page of the Alexandria Gazette on 26 September 1866, praised his "sense of honesty and personal obligation" and said "John will stand higher than ever in the estimation of every Richmond gentleman." Wendell: "My father's note was good at any bank, and his word equivalent to an oath."
+- He was still paying installments on his own freedom when Emancipation canceled the debt. He paid the balance anyway. The Richmond Enquirer's account, reprinted on the front page of the Alexandria Gazette on 26 September 1866, praised his "sense of honesty and personal obligation" and said "John will stand higher than ever in the estimation of every Richmond gentleman." Wendell: "My father's note was good at any bank, and his word equivalent to an oath."
 - The City of Richmond gave him an engraved silver goblet thanking him for his "Champion Juleps". A Lexington journalist in 1894 described a quart-sized sterling goblet 14 inches high inscribed "John Dabney, presented by the gentlemen of Richmond for champion juleps" (quoted by Wondrich).
 - **7 June 1900.** Died at home, 1414 East Broad Street. All four of Richmond's white dailies covered it. The Richmond Dispatch (8 June 1900): "He had the reputation of being the best man living to mix mint juleps." The Times (8 June 1900): "the well-known caterer and the celebrated julep maker", "about seventy-five years of age". The Black Richmond Planet, three weeks later, gave him twelve words, appended to a sentence about another man's funeral.
 - His son Wendell Phillips Dabney (born November 1865, named for the abolitionist) became a Cincinnati newspaper founder and first president of its NAACP chapter, and is the main source for his father's life.
@@ -134,7 +134,7 @@ _Why are the best bartenders of the julep's golden age missing from the julep's 
 ### Jim Cook and the Prince of Wales, October 1860
 
 - The Prince stayed at the Ballard Hotel (N. A. Woods, The Prince of Wales in Canada and the United States, 1861). The Toronto account of the tour (Visit of His Royal Highness the Prince of Wales … in the Year 1860, Rowsell, 1861, pp. 375–76) says "The Exchange Hotel in Richmond boasts the possession of the best compounder of cooling drinks in the world. The name of this celebrated man is Jim Cook." The Ballard and the Exchange were joined and run as one hotel.
-- That account, about 330 words, describes a tumbler "capable of holding a pint and a half", shaved ice pressed into an obelisk mould, a bouquet of flowers on top, the glass surrounded with ornamental ice bored through for straws. The Prince "sucked away until it was all gone; and then ordered another", which the Duke of Newcastle, the Earl of St Germains and Major General Bruce helped dispatch. A third, for the next morning, "was a very large one; was furnished with thirteen tubes, out of which an equal number of the Royal party pulled at one and the same time."
+- That account, about 330 words, describes a tumbler "capable of holding a pint and a half", shaved ice pressed into an obelisk mold, a bouquet of flowers on top, the glass surrounded with ornamental ice bored through for straws. The Prince "sucked away until it was all gone; and then ordered another", which the Duke of Newcastle, the Earl of St Germains and Major General Bruce helped dispatch. A third, for the next morning, "was a very large one; was furnished with thirteen tubes, out of which an equal number of the Royal party pulled at one and the same time."
 - The account does not name Dabney, and does not say whether Cook was enslaved. Wondrich calls Cook "also a slave" and Dabney's only rival in elaborate juleps.
 
 ### Tom Bullock (1872–1964): the one who left a book
@@ -163,7 +163,7 @@ _Why are the best bartenders of the julep's golden age missing from the julep's 
 ### Threads worth pulling
 
 - Who actually made the Prince's julep? Encyclopedia Virginia and most Richmond sources say Dabney. Wondrich argues it was Jim Cook, and the 1861 Toronto account names only Cook. Go read the 1860 tour account and decide. This is a live disagreement and you are allowed an opinion.
-- Why did he pay the debt? Three explanations, all defensible: the white papers said honour; Wendell said gratitude, because DeJarnette had let him pause payments while he fought to keep his wife; historians say he was buying a reputation, which converted directly into bank credit. Present all three.
+- Why did he pay the debt? Three explanations, all defensible: the white papers said honor; Wendell said gratitude, because DeJarnette had let him pause payments while he fought to keep his wife; historians say he was buying a reputation, which converted directly into bank credit. Present all three.
 - The Planet's twelve-word obituary against four full white obituaries is a whole slide on its own: who gets remembered, and by whom.
 - Bullock's book was prefaced by George Herbert Walker, grandfather of a U.S. president. Sit with that.
 - The Post-Dispatch's "of any race, color or condition of servitude" is close to the Fifteenth Amendment's "race, color, or previous condition of servitude". Was that the joke, and who was it on?
@@ -183,7 +183,7 @@ _The julep was a brandy drink. What actually changed, and it wasn't taste?_
 ### What's established
 
 - **3 March 1791.** Congress passes an excise tax on distilled spirits (Hamilton's): in the TTB's words, "the first nationwide internal revenue tax". This is not a tariff. A tariff is a duty on imports; an excise is a tax on domestic production. The distinction is the whole grievance.
-- **Whiskey Rebellion, 1791–94:** armed resistance centred on western Pennsylvania. In 1794 the Secretary of War asked four states for 12,950 militiamen; almost 13,000 gathered at Carlisle, and Washington led them in person (TTB).
+- **Whiskey Rebellion, 1791–94:** armed resistance centered on western Pennsylvania. In 1794 the Secretary of War asked four states for 12,950 militiamen; almost 13,000 gathered at Carlisle, and Washington led them in person (TTB).
 - Kentucky's resistance was different and arguably more effective: not violence but total non-compliance. Grand juries wouldn't indict for four years. Thomas Marshall (revenue chief, and John Marshall's father) offered informants half the penalties and got no takers. Washington couldn't find a prosecutor willing to take the job.
 - **1802.** "By 1802, Congress repealed the distilled spirits excise tax and all other internal Federal taxes" (TTB), under Jefferson.
 - Post-Civil War: imported brandy and rum become unaffordable in the ruined South.
@@ -301,7 +301,7 @@ These are the errors you will meet most often. They circulate widely, several of
 
 - "A silver cup is historically required." Silver and pewter are traditional because metal frosts. That is the real reason, and a better one.
 - "Prohibition converted drinkers to bourbon because corn looked less suspicious than rye." No mechanism is offered and none is obvious: Prohibition banned production of both.
-- The $1,000 julep's Irish mint, Bavarian ice, Australian sugar and gold straw describe an older promotion. The programme changes; check the current year.
+- The $1,000 julep's Irish mint, Bavarian ice, Australian sugar and gold straw describe an older promotion. The program changes; check the current year.
 
 **About Buckner**
 
@@ -329,7 +329,7 @@ If you only chase five things, chase these.
 Checked in November 2026 and not settled by a primary source. The script says each of these as written by the owner unless noted.
 
 - **Mr. Julip in The Candidates.** Reported by Wondrich and repeated widely; the play's cast list could not be reached for this edition. The play's title is plural.
-- **The 1770 hunting poem's couplet.** The poem is catalogued (Virginia Gazette, Rind, 11 January 1770, "A Short Poem on Hunting"); its text was not reached. The second line ("Which doctors storm at, and which some adore") is quoted the same way in secondary sources.
+- **The 1770 hunting poem's couplet.** The poem is cataloged (Virginia Gazette, Rind, 11 January 1770, "A Short Poem on Hunting"); its text was not reached. The second line ("Which doctors storm at, and which some adore") is quoted the same way in secondary sources.
 - **Toulmin 1793, the Wig-Wam advertisement of 4 May 1807, Orsamus Willard 1817, the 1830s hailstorm julep by mallet.** From Wondrich; the original documents were not reached. Power's 1836 "julep or hail-storm" confirms the hailstorm julep by the mid-1830s.
 - **Cato Alexander:** the 1835 "Not to know Cato's is not to know the world"; the site at 54th Street and Second Avenue; that he poured brandy juleps; that he was freed "under" the 1799 Gradual Abolition Act (that Act freed children born after 4 July 1799; he may have been freed by his owner in that year). Power confirms Cato's, the four miles, and the mint.
 - **Jasper Crouch as "the first acknowledged master of the julep"** and as a free man: Wondrich. Mordecai (1856) confirms the Quoit Club, its juleps, Marshall and Crouch as its cook, but uses neither phrase.
@@ -341,7 +341,7 @@ Checked in November 2026 and not settled by a primary source. The script says ea
 - **Roosevelt "noted that six cents was about the price of a good newspaper"; the Iron Ore "sold for three";** "Roosevelt has waited years for someone to put that in print". From McCommons, which could not be reached; not found in the 1913 wire reports read.
 - **Kentucky and the excise:** the four years of grand juries, Thomas Marshall's offer of half the penalties, the letter to Senator Brown. From Veach and Wondrich; not reached in a primary source.
 - **"More men than he commanded at most Revolutionary battles"** (slide 13): not checked against battle strengths.
-- **The Modjeska anecdote,** Clark's mint behind the clubhouse, "Grant, Sherman and Mark Twain were friends", and "godmother to Ethel Barrymore" (Wikipedia states it in one place; Ethel Barrymore's own account, as summarised there, names Modjeska as Lionel's godmother and others as hers).
+- **The Modjeska anecdote,** Clark's mint behind the clubhouse, "Grant, Sherman and Mark Twain were friends", and "godmother to Ethel Barrymore" (Wikipedia states it in one place; Ethel Barrymore's own account, as summarized there, names Modjeska as Lionel's godmother and others as hers).
 - **About 120,000 juleps** is a 2009 Churchill Downs figure.
 - **The Wondrich line** ("so high you can't get over it…") is quoted as the owner has it; its exact wording in print was not checked.
 - **Buckner's letter** wording ("a novice, a statistician, nor a Yankee") was not checked against the letter.
@@ -376,8 +376,8 @@ Encyclopedia Virginia, the Colonial Williamsburg Virginia Gazette archive, Virgi
 ## Image credits
 
 - **Slides 1 and 18.** The Whiskey Share Society logo.
-- **Slide 1, picture.** "Köhler's Medizinal-Pflanzen in naturgetreuen Abbildungen mit kurz erläuterndem Texte (Plate 66)", spearmint (Krauseminze, *Mentha viridis* L. var. *crispata* Schrader), drawn by W. Müller, from Franz Eugen Köhler's Medizinal-Pflanzen, 1887. Public domain (published 1887; the file page's licence field reads "Public domain"). Biodiversity Heritage Library, page image 303698. Wikimedia Commons, https://commons.wikimedia.org/wiki/File:K%C3%B6hler%27s_Medizinal-Pflanzen_in_naturgetreuen_Abbildungen_mit_kurz_erl%C3%A4uterndem_Texte_(Plate_66)_BHL303698.jpg. Licence and date read from the file page's metadata on 22 November 2026. Cropped to the plant and its flower details (the printed name, family heading and plate number left out); colours unchanged.
-- **Slide 3.** "The road to the julep" map, redrawn for this edition in the site's colours from the owner's original map (owner-supplied, from the original deck), keeping its six places and their labels. Coastlines from Natural Earth 1:50m land and lakes (public domain). The original's compass rose, ship and mint-sprig ornaments were not redrawn.
+- **Slide 1, picture.** "Köhler's Medizinal-Pflanzen in naturgetreuen Abbildungen mit kurz erläuterndem Texte (Plate 66)", spearmint (Krauseminze, *Mentha viridis* L. var. *crispata* Schrader), drawn by W. Müller, from Franz Eugen Köhler's Medizinal-Pflanzen, 1887. Public domain (published 1887; the file page's license field reads "Public domain"). Biodiversity Heritage Library, page image 303698. Wikimedia Commons, https://commons.wikimedia.org/wiki/File:K%C3%B6hler%27s_Medizinal-Pflanzen_in_naturgetreuen_Abbildungen_mit_kurz_erl%C3%A4uterndem_Texte_(Plate_66)_BHL303698.jpg. License and date read from the file page's metadata on 22 November 2026. Cropped to the plant and its flower details (the printed name, family heading and plate number left out); colors unchanged.
+- **Slide 3.** "The road to the julep" map, redrawn for this edition in the site's colors from the owner's original map (owner-supplied, from the original deck), keeping its six places and their labels. Coastlines from Natural Earth 1:50m land and lakes (public domain). The original's compass rose, ship and mint-sprig ornaments were not redrawn.
 - **Slide 6.** "In 1789, all of this was Virginia" map, redrawn for this edition from the owner's original (owner-supplied, from the original deck), keeping its circle, three citation sites, state names and note. State outlines from Natural Earth 1:10m admin-1 (public domain); 1789 Virginia shown as its modern successor states.
 - **Slide 11.** John Dabney, the only known photograph, at The Valentine, Richmond (found there by Maureen Egan in 2015, per hailstormdabney.com). Owner-supplied (from the original deck). Cropped and printed in two inks (green and cream).
 - **Slide 12.** Tom Bullock, frontispiece of The Ideal Bartender (St. Louis, 1917). Public domain. Wikimedia Commons, File:The Ideal Bartender - DPLA - 647f10be066ecf2f8417c0f99d03fe23 (page 7).jpg (DPLA; Missouri Historical Society copy). Replaces the owner's copy of the same portrait with a sharper scan. Cropped and printed in two inks.

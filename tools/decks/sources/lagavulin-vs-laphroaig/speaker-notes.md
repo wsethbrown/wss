@@ -24,10 +24,10 @@ Four. Two of them are heavily peated, and after that much smoke it is hard to ta
 
 ### Cast the roles, then find the bottles
 
-- **Glass 1: an unpeated malt from the Speyside distillery Mackie invested in.** Tonight: Craigellachie 13.
-- **Glass 2: Mackie's blend, which was built on Lagavulin.** Tonight: White Horse.
-- **Glass 3: Lagavulin, Mackie's own distillery.** Tonight: Lagavulin 16.
-- **Glass 4: Laphroaig, the whisky Mackie sold and then tried to copy.** Tonight: Laphroaig 10.
+- **Glass 1: an unpeated malt from the Speyside distillery Mackie invested in.** Suggested bottle: Craigellachie 13.
+- **Glass 2: Mackie's blend, which was built on Lagavulin.** Suggested bottle: White Horse.
+- **Glass 3: Lagavulin, Mackie's own distillery.** Suggested bottle: Lagavulin 16.
+- **Glass 4: Laphroaig, the whisky Mackie sold and then tried to copy.** Suggested bottle: Laphroaig 10.
 
 ### Bottle ideas by role
 

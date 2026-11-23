@@ -112,7 +112,7 @@ Research outline: 1790s to now
 - Abraham Overholt (1784–1870), Westmoreland County, Pennsylvania. The brand dates itself to 1810 at West Overton and is described as America's oldest continually maintained whiskey brand.
 - His grandson Henry Clay Frick took over the business in the 1880s (1881 in some accounts) with Andrew Mellon and Charles W. Mauck as partners, each with a third. Mauck adopted "Old Overholt" as the name in 1888, with Abraham's portrait as the logo.
 - Frick died in December 1919 and left his share to Mellon.
-- Old Overholt held one of the few Prohibition medicinal licences. Mellon's stake was politically controversial while he was Treasury Secretary, and he sold it in 1925 (Sotheby's and a second account agree on the year; one names the New York grocers Park & Tilford as buyer).
+- Old Overholt held one of the few Prohibition medicinal licenses. Mellon's stake was politically controversial while he was Treasury Secretary, and he sold it in 1925 (Sotheby's and a second account agree on the year; one names the New York grocers Park & Tilford as buyer).
 - Broad Ford reopened after Repeal; distilling there ended in 1951 under National Distillers.
 - After 1951 the whiskey is believed to have been made elsewhere in Pennsylvania; the record is thin. In 1987 Beam bought National Distillers' spirits business, including Old Overholt, and moved production to Kentucky.
 - Andrew Mellon was Secretary of the Treasury from 1921 to 1932.
@@ -125,7 +125,7 @@ Research outline: 1790s to now
 ### Traps
 
 - The size of Mellon's stake by the 1920s is disputed: Sotheby's calls him a minority partner, VinePair the majority owner. Do not give a figure.
-- Whether Mellon personally steered the medicinal licence to Overholt is asserted by one source (Bourbon Veach) and loosely by others. The deck says only that the brand held one and that his stake drew criticism.
+- Whether Mellon personally steered the medicinal license to Overholt is asserted by one source (Bourbon Veach) and loosely by others. The deck says only that the brand held one and that his stake drew criticism.
 
 ### Sources
 
@@ -178,15 +178,15 @@ Research outline: 1790s to now
 ### Nailed down
 
 - National Prohibition began on 17 January 1920 and ended with the ratification of the Twenty-first Amendment on 5 December 1933.
-- Six companies held medicinal whiskey licences (American Medicinal Spirits, Schenley, James Thompson and Brother, Frankfort, Brown-Forman, A. Ph. Stitzel; lists vary slightly). Old Overholt was a medicinal brand.
+- Six companies held medicinal whiskey licenses (American Medicinal Spirits, Schenley, James Thompson and Brother, Frankfort, Brown-Forman, A. Ph. Stitzel; lists vary slightly). Old Overholt was a medicinal brand.
 - Late in the 1920s the licensed companies were allowed to distil again to replenish stocks. Sources give 1928 or 1929, and different volumes.
 - In 1942 the War Production Board ordered distilleries to stop making beverage alcohol and make industrial alcohol. The restriction ended with the war; full beverage production resumed in 1945–46.
-- Congress agreed to S. Con. Res. 19, recognising bourbon as a distinctive product of the United States, on 4 May 1964. It is a resolution, not a statute.
+- Congress agreed to S. Con. Res. 19, recognizing bourbon as a distinctive product of the United States, on 4 May 1964. It is a resolution, not a statute.
 - Bomberger's Distillery at Schaefferstown made Michter's and closed in 1989 after Michter's bankruptcy (one source says 1990). It is a National Historic Landmark (1980). The current Michter's brand in Kentucky has no direct link to it.
 
 ### Primary documents
 
-- Bureau of Prohibition records on medicinal licences.
+- Bureau of Prohibition records on medicinal licenses.
 - War Production Board orders on distilleries, 1942–1945.
 - Senate Finance Committee Report 88-496 on the bourbon resolution.
 - National Register nomination for Bomberger's Distillery (NPS, 75001649).

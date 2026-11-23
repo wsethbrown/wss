@@ -118,14 +118,14 @@ heading(s, 0.85, 'American whiskey in 1806 was young.', size=40, w=CW, h=0.9)
 rows_card(s, X, 2.0, CW, [
     ('Rye', 'From farms and small distilleries in Pennsylvania, Maryland and New York.'),
     ('Corn', 'Further west, in Kentucky.'),
-    ('Age', 'Mostly sold young. Long ageing in charred barrels became usual later.'),
+    ('Age', 'Mostly sold young. Long aging in charred barrels became usual later.'),
     ('Bitters', 'Bark and roots in alcohol, sold for the stomach.'),
 ], label_w=1.6, row_h=1.05, label_size=26, size=19)
 footer(s, 3)
 
 # ---------------------------------------------------------------- 4 pour 1
 pour_slide(4, 'Pour 1 of 4', 'Plain whiskey cocktail',
-           ['Make it as the 1806 definition reads.', 'Taste it with no ice, then add one cube.'],
+           ['Rye, sugar, water and bitters, as the 1806 definition reads.'],
            'Old Overholt Rye', 'Built in the glass', 'Small tumbler', name_size=42)
 
 # ---------------------------------------------------------------- 5 Jerry Thomas, 1862
@@ -242,7 +242,7 @@ footer(s, 13)
 
 # ---------------------------------------------------------------- 14 pour 4
 pour_slide(14, 'Pour 4 of 4', 'Sazerac',
-           ['Rinse the glass with absinthe, strain in the drink with no ice, and throw away the lemon peel.'],
+           ['Served with no ice, in a glass rinsed with absinthe. The lemon peel is discarded.'],
            'Sazerac Rye', 'Stirred, strained', 'Rinsed rocks glass')
 
 # ---------------------------------------------------------------- 15 the fruit

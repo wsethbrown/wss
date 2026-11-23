@@ -62,7 +62,7 @@ Each item: where, current text, proposed text, why.
     Proposed: add after the recipe: "Orange peel is the modern habit. Use lemon if you want Kappeler's 1895 version."
     Why: every historical recipe the deck cites uses lemon (R 22).
 
-11. **Drink slides: a question for the room (found).** The pilot's pour slides have no "Ask the room" strip and neither does this deck. If the owner wants one, a question per drink would be new wording, for example slide 4 "What changes when the ice goes in?" Not added.
+11. **Drink slides: a question for the room (found).** The pilot's pour slides have no "Ask the room" strip and neither does this deck. If the owner wants one, a question per drink would be new wording, for example slide 4 "What changes when the ice goes in?" Not added. (Superseded, November 2026: the owner does not want questions or other callouts on slides. A question for the room goes in the script as an `_Ask: "..."_` direction.)
 
 ## C. Headings and slide wording
 

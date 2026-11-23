@@ -144,8 +144,8 @@ sides = [(X, WHITE, HAIR, INK, 'Straight whiskey',
           ['Grain, mashed and distilled', 'A charred oak barrel',
            [('Years', {'bold': True}), (' of waiting', {})]]),
          (X + pw + 0.25, OAK, OAK_EDGE, CREAM, 'Rectified whiskey',
-          ['Neutral spirit off a column still', 'Colour and flavour added',
-           [('Sold ', {}), ('without', {'bold': True}), (' ageing', {})]])]
+          ['Neutral spirit off a column still', 'Color and flavor added',
+           [('Sold ', {}), ('without', {'bold': True}), (' aging', {})]])]
 for (cx, fill, edge, col, name, rows) in sides:
     rrect(s, cx, 0.8, pw, 5.6, r=0.3, fill=fill, line=edge)
     text(s, cx + 0.45, 1.2, pw - 0.9, 0.9, name, size=40, font=SANS, bold=True, color=col)
@@ -160,7 +160,7 @@ footer(s, 3)
 
 # ---------------------------------------------------------------- 4 pour 1
 pour_slide(4, 'Pour 1 of 4', ['Evan Williams', 'Bottled-in-Bond'],
-           'Try it neat first, then with a few drops of water.',
+           'Usually the cheapest of the four bottles.',
            card=('Heaven Hill, Kentucky', 'Kentucky straight bourbon', '100'), two_line_name=True)
 
 # ---------------------------------------------------------------- 5 1870 (green story slide)
@@ -183,7 +183,7 @@ rows_card(s, X, 2.45, 6.6, [
 text(s, X, 5.5, 6.6, 1.0, 'The records showed who made each barrel, when, and how long it had been stored.',
      size=19, color=INK, ls=1.2)
 photo_right(s, 'woodford-reserve-barrels.jpg', 1285 / 1056,
-            'Barrels ageing at Woodford Reserve, Kentucky. Photo: Ken Thomas, public domain.')
+            'Barrels aging at Woodford Reserve, Kentucky. Photo: Ken Thomas, public domain.')
 footer(s, 6)
 
 # ---------------------------------------------------------------- 7 Taylor and Carlisle
@@ -258,8 +258,7 @@ def label_card(s):
 
 
 pour_slide(10, 'Pour 2 of 4', 'Old Grand-Dad Bonded',
-           [[('Jim Beam, Kentucky. A high-rye bourbon at 100 proof.', {'italic': False})],
-            'Before you taste, find these three things on the bottle.'],
+           [[('Jim Beam, Kentucky. A high-rye bourbon at 100 proof.', {'italic': False})]],
            left=label_card)
 
 # ---------------------------------------------------------------- 11 1906 (big year, on paper)
@@ -275,7 +274,7 @@ s = new_slide()
 heading(s, 0.75, ['December 1909: President', 'Taft rules on it himself.'], size=36, w=7.4, h=1.4)
 rows_card(s, X, 2.4, 7.4, [
     ('Straight', 'Grain spirit aged in oak, nothing added.'),
-    ('Blended', ['Straight whiskey mixed with', 'neutral-spirit whiskey,', 'labelled as a blend.']),
+    ('Blended', ['Straight whiskey mixed with', 'neutral-spirit whiskey,', 'labeled as a blend.']),
 ], label_w=1.7, row_h=1.25, mark=0, label_size=26, size=18.5)
 text(s, X, 5.25, 7.3, 1.0, 'A bonded bourbon or rye is also a straight whiskey: four years in wood, nothing added.',
      size=20, color=INK, ls=1.2)

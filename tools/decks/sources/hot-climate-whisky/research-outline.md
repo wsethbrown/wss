@@ -15,7 +15,7 @@ Single malt from India and Taiwan. A guide for anyone who wants to research the 
 ### Nailed down
 
 - India is the world's largest whisky market by consumption volume (IWSR, as reported); most of it is Indian whisky. India is also the largest export market for Scotch by volume (SWA, 2024 and 2025 figures).
-- Most Indian whisky is made from molasses-based neutral spirit, blended with a proportion of malt or grain whisky and coloured.
+- Most Indian whisky is made from molasses-based neutral spirit, blended with a proportion of malt or grain whisky and colored.
 - The legal standard is the Food Safety and Standards (Alcoholic Beverages) Regulations, 2018 (FSSAI). Whisky may be made from neutral spirit of agricultural origin, and the general definition of a distilled beverage lists molasses as a source. A blended whisky needs at least 2% malt or grain whisky. The Bureau of Indian Standards also publishes IS 4449 (current edition 2024), a voluntary specification for whisky.
 - "Indian-made foreign liquor" (IMFL) is the official excise term for spirits made in India after the manner of imported gin, brandy, whisky or rum (Andhra Pradesh distillery rules; CAG glossary). Rules vary by state; Uttar Pradesh's 2026–27 policy reportedly restricts molasses spirit to country liquor and rum.
 
@@ -48,7 +48,7 @@ Single malt from India and Taiwan. A guide for anyone who wants to research the 
 
 ### Nailed down
 
-- Regulation (EU) 2019/787, Annex I, point 2: whisky is produced by distilling a mash made from malted cereals, with or without whole grains of unmalted cereals; the final distillate is matured at least three years in wooden casks of no more than 700 litres; minimum strength 40%; no added alcohol. It replaced Regulation (EC) No 110/2008.
+- Regulation (EU) 2019/787, Annex I, point 2: whisky is produced by distilling a mash made from malted cereals, with or without whole grains of unmalted cereals; the final distillate is matured at least three years in wooden casks of no more than 700 liters; minimum strength 40%; no added alcohol. It replaced Regulation (EC) No 110/2008.
 - "Single malt" may be used only for whisky distilled exclusively from malted barley at a single distillery.
 - An age or maturation period on the label may refer only to the youngest alcoholic component (Regulation 2019/787, recital 15 and Article 13; for Scotch, the Scotch Whisky Regulations 2009, regulation 12).
 - The same definition applies to whisky made in or imported into the UK (HMRC).
@@ -179,13 +179,13 @@ Single malt from India and Taiwan. A guide for anyone who wants to research the 
 
 ### Nailed down
 
-- Taiwan's alcohol market was de-monopolised in 2002, when Taiwan joined the World Trade Organization.
+- Taiwan's alcohol market was de-monopolized in 2002, when Taiwan joined the World Trade Organization.
 - King Car Group was founded in 1979 by Lee Tien-tsai. Its plan to enter the alcohol business in 1995 was refused by the government.
 - King Car broke ground on the Kavalan distillery in Yilan County in 2005. A King Car representative dates the first new make to 3.30pm on 11 March 2006. (One source places first distillation in 2008; the 2006 date is better supported.)
 - The first bottling, Kavalan Classic, was released in December 2008 (4 December, per Wikipedia).
 - The name Kavalan is the old name of the Yilan area and of its indigenous people.
 - The Scottish consultant Dr Jim Swan advised on wood and maturation; Kavalan was the first distillery to use his STR (shaved, toasted, re-charred) cask treatment.
-- The Leith tasting, January 2010. _The Times_'s Scottish editor asked Charles MacLean to organise a blind comparison of the new English malt St George's with Scotch, for Burns Night. Nothing in the line-up could be older than St George's. It was held at the Vintners' Rooms in Leith; four judges, MacLean as head taster. A Kavalan reported as two years old, not then sold in Britain, won with 27.5 points out of 40. MacLean's own account lists six whiskies: Kavalan 27.5; two three-year-old Scotch blends, 22 and 20 (one named elsewhere as Lang's); St George's 15.5; Scotch malts at 8.5 and 4.5 (the last named in press reports as Bruichladdich X4+3). Press reports describe a field of five.
+- The Leith tasting, January 2010. _The Times_'s Scottish editor asked Charles MacLean to organize a blind comparison of the new English malt St George's with Scotch, for Burns Night. Nothing in the line-up could be older than St George's. It was held at the Vintners' Rooms in Leith; four judges, MacLean as head taster. A Kavalan reported as two years old, not then sold in Britain, won with 27.5 points out of 40. MacLean's own account lists six whiskies: Kavalan 27.5; two three-year-old Scotch blends, 22 and 20 (one named elsewhere as Lang's); St George's 15.5; Scotch malts at 8.5 and 4.5 (the last named in press reports as Bruichladdich X4+3). Press reports describe a field of five.
 - At the World Whiskies Awards 2015, Kavalan Solist Vinho Barrique (single cask, cask strength) was named World's Best Single Malt.
 
 ### Primary documents
@@ -242,7 +242,7 @@ Single malt from India and Taiwan. A guide for anyone who wants to research the 
 - **Pour 3. Kavalan Classic.** Why it is in the flight: Kavalan's first single malt, released in 2008.
 - **Pour 4. Glenfiddich 12 Year Old.** Why it is in the flight: the control: a stated age, matured in Speyside.
 
-Strengths as labelled in the US, confirmed November 2026:
+Strengths as labeled in the US, confirmed November 2026:
 
 - Amrut Fusion: 50% (100 proof), 750 ml. About 75% unpeated Indian barley and 25% peated Scottish barley (retailer and trade guides; not stated by Amrut in what was found). US importer PM Spirits from May 2026; listed at about $75–88.
 - Paul John Brilliance: 46%, 750 ml; about $58–65.
@@ -278,7 +278,7 @@ Check each bottle before the night; strengths can differ by market and change ov
 
 All images were taken from Wikimedia Commons and are in the public domain.
 
-- **Slide 1 (cover).** "At beach in Tsuyoshi, Giran, Formosa 1930s.jpg". The Commons description (in Chinese) reads "a school field trip at Zhuangwei beach, Yilan"; it is categorised under Zhuangwei Township, Yilan County, and shows Guishan Island offshore. Unknown photographer, 1930s, from the Formosa Vintage Museum. Public domain in Japan (photograph before 1957, Japanese Copyright Act) and in the US (PD-1996).
+- **Slide 1 (cover).** "At beach in Tsuyoshi, Giran, Formosa 1930s.jpg". The Commons description (in Chinese) reads "a school field trip at Zhuangwei beach, Yilan"; it is categorized under Zhuangwei Township, Yilan County, and shows Guishan Island offshore. Unknown photographer, 1930s, from the Formosa Vintage Museum. Public domain in Japan (photograph before 1957, Japanese Copyright Act) and in the US (PD-1996).
 - **Slide 2.** "The Main Street of the Pettah, Bangalore - Copy.jpg", illustration from a book by Edward Peter Rice, 1890 (Internet Archive). Public domain (published before 1931; Public Domain Mark).
 - **Slide 3.** "Sugar cane mill driven by bullock.jpg", from James Samuelson, _India, Past and Present_ (London: Trübner, 1890), British Library. No known copyright restrictions.
 - **Slide 4.** "Annan, Thomas - King Street (Zeno Fotografie).jpg", photograph by Thomas Annan, about 1870. Public domain (PD-old).

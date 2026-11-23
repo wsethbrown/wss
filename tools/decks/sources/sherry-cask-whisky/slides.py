@@ -228,7 +228,7 @@ footer(s, 7)
 
 # ---------------------------------------------------------------- 8 pour 1
 pour_slide(8, 'Pour 1 of 4', ['Glenmorangie', 'The Original'],
-           ['Aged only in ex-bourbon casks.', 'Keep a little in your glass to come back to.'],
+           ['Aged only in ex-bourbon casks.'],
            'Glenmorangie, Tain', 'Single malt, 12 years', '40%', two_line_name=True)
 
 # ---------------------------------------------------------------- 9 1981–1986 (the green story slide)
@@ -257,8 +257,7 @@ footer(s, 10)
 
 # ---------------------------------------------------------------- 11 pour 2
 pour_slide(11, 'Pour 2 of 4', ['Glenmorangie', 'Lasanta'],
-           ['The same distillery and age as pour one, with its last two years in oloroso and Pedro Ximénez casks.',
-            'Taste the two side by side.'],
+           ['The same distillery and age as pour one, with its last two years in oloroso and Pedro Ximénez casks.'],
            'Glenmorangie, Tain', 'Single malt, 12 years', '43%', two_line_name=True, note_size=19)
 
 # ---------------------------------------------------------------- 12 seasoned casks
@@ -286,8 +285,7 @@ footer(s, 13)
 
 # ---------------------------------------------------------------- 14 pour 3
 pour_slide(14, 'Pour 3 of 4', ['Macallan 12', 'Sherry Oak'],
-           ['Aged in sherry-seasoned oak casks', 'from Jerez, mostly European oak.',
-            'Compare it with the Lasanta.'],
+           ['Aged in sherry-seasoned oak casks', 'from Jerez, mostly European oak.'],
            'Macallan, Speyside', 'Single malt, 12 years', '43%', two_line_name=True, note_size=20)
 
 # ---------------------------------------------------------------- 15 oloroso and PX
@@ -315,7 +313,7 @@ footer(s, 16)
 
 # ---------------------------------------------------------------- 17 pour 4
 pour_slide(17, 'Pour 4 of 4', 'GlenDronach 12',
-           ['Aged in Pedro Ximénez and oloroso casks.', 'Put it next to the Macallan.'],
+           ['Aged in Pedro Ximénez and oloroso casks.'],
            'GlenDronach, Forgue', 'Single malt, 12 years', '43%')
 
 # ---------------------------------------------------------------- 18 reading the label

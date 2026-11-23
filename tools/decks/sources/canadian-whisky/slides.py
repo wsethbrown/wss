@@ -170,8 +170,7 @@ footer(s, 4)
 
 # ---------------------------------------------------------------- 5 pour 1
 pour_slide(5, 'Pour 1 of 4', 'Canadian Club 1858',
-           ['Walker’s brand, still made in Walkerville.',
-            'Smell it before you add anything, then try it with a splash of soda or water.'],
+           ['Walker’s brand, still made in Walkerville.'],
            'Hiram Walker & Sons, Windsor, Ontario', 'Blended Canadian whisky', '40%',
            widths=(3.0, 2.95, 0.85))
 
@@ -272,7 +271,7 @@ footer(s, 11)
 # ---------------------------------------------------------------- 12 pour 3
 pour_slide(12, 'Pour 3 of 4', ['Crown Royal', 'Fine Deluxe'],
            ['Seagram’s blend from 1939, now made by Diageo.',
-            'Compare it with the Canadian Club: two big blends, built mostly on base\u00a0whisky.'],
+            'Like the Canadian Club, a big blend built mostly on base\u00a0whisky.'],
            'Diageo, at Gimli, Manitoba', 'Blended Canadian whisky', '40%', two_line_name=True,
            widths=(3.0, 2.95, 0.85))
 

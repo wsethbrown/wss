@@ -32,7 +32,7 @@ India drinks more whisky than any other country. Some of the best-selling whisky
 
 Most whisky sold in India starts with molasses. Molasses is the thick syrup left over when sugar is made from sugar cane. India grows a lot of cane, so molasses is cheap.
 
-The usual Indian whisky is spirit made from molasses, with some malt whisky mixed in for flavour, and colouring. The Indian trade has an odd name for this kind of drink, left over from colonial times. It is called Indian-made foreign liquor.
+The usual Indian whisky is spirit made from molasses, with some malt whisky mixed in for flavor, and coloring. The Indian trade has an odd name for this kind of drink, left over from colonial times. It is called Indian-made foreign liquor.
 
 Under Indian law this is whisky. A blended whisky there can be mostly molasses spirit, with as little as 2 percent malt or grain whisky. Europe has a different rule. In the European Union whisky has to be made from grain, and it has to spend at least three years in wooden casks. So most Indian whisky cannot be sold in Europe as whisky.
 
@@ -68,7 +68,7 @@ When Amrut started keeping malt in casks for longer, it found out how much the h
 
 In Scotland a cask loses about 2 percent of its whisky each year to evaporation. Distillers call that the angels' share. In Bangalore Amrut loses a lot more. The family has given figures between 9 and 12 percent a year. Bangalore is on a plateau, so it is milder than most of India. Rakshit Jagdale has said that on the coast and in the north the loss can be 13 to 15 percent.
 
-Heat also makes the whisky take flavour from the wood faster. Amrut's master blender, Surinder Kumar, says a year in Bangalore does about what three years do in Scotland. That is the company's own estimate. There is no agreed way to measure it.
+Heat also makes the whisky take flavor from the wood faster. Amrut's master blender, Surinder Kumar, says a year in Bangalore does about what three years do in Scotland. That is the company's own estimate. There is no agreed way to measure it.
 
 ## [SLIDE 8] What is left in the cask
 
@@ -76,7 +76,7 @@ This chart shows how much is left in a cask over time. It uses 2 percent a year 
 
 After four years the Scottish cask still has about 92 percent of what went in. The hot cask has about two-thirds.
 
-After twelve years the Scottish cask has about 78 percent. The hot cask has just over a quarter. And the heat has been pulling flavour out of the wood that whole time.
+After twelve years the Scottish cask has about 78 percent. The hot cask has just over a quarter. And the heat has been pulling flavor out of the wood that whole time.
 
 So a distillery in India or Taiwan that wanted a 12-year-old would have to fill nearly three casks to end up with what one cask gives in Scotland. It would have to store them for twelve years, and by then the whisky might taste of little but oak. That costs too much, so almost nobody does it.
 
@@ -120,7 +120,7 @@ It was one small tasting set up for a newspaper story, but the result was report
 
 This is Kavalan Classic, the distillery's first single malt. The American bottle is 43 percent. In Britain it is 40 percent, so check your label. It will seem light after the Amrut.
 
-It has no age on the label. Look at the colour, and taste how sweet it is from the wood. The distillery only started in 2006.
+It has no age on the label. Look at the color, and taste how sweet it is from the wood. The distillery only started in 2006.
 
 ## [SLIDE 14] Why these labels carry no age
 

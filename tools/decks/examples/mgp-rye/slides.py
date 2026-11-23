@@ -27,13 +27,12 @@ text(s, 7.35, 1.2 + th + 0.08, tw, 0.5,
 
 # ---------------------------------------------------------------- 2 start with the Bulleit
 s = new_slide()
-text(s, 0.85, 0.85, 6.6, 0.4, [[('●  ', {'color': MARK_DEEP, 'size': 12}), ('Glass 1. Pour it now.', {})]],
+text(s, 0.85, 0.85, 6.6, 0.4, [[('●  ', {'color': MARK_DEEP, 'size': 12}), ('Glass 1', {})]],
      size=15, font=SANS, bold=True, color=INK)
-heading(s, 1.35, 'Glass 1: Bulleit 95 Rye', size=34, w=7.0, h=0.9)
+heading(s, 1.35, 'Bulleit 95 Rye', size=34, w=7.0, h=0.9)
 text(s, 0.85, 2.55, 6.5, 3.6, [
     'Distilled in Lawrenceburg, Indiana, like every glass tonight.',
     'The recipe is 95% rye. Most of the spice and the grassy, herbal notes come from that.',
-    [('Keep some in the glass to compare with the next two.', {'bold': True})],
 ], size=19, ls=1.25, space_after=12)
 rrect(s, 7.95, 0.85, 4.53, 5.65, r=0.36, fill=WHITE, line=HAIR)
 text(s, 8.35, 1.25, 3.8, 0.4, 'The recipe', size=14, font=SANS, bold=True, color=MUTE)
@@ -110,12 +109,12 @@ s = new_slide(INK)
 text(s, 0.85, 0.85, 6.0, 0.4, 'The Seagram years', size=15, font=SANS, bold=True, color=CREAM_MUTE)
 heading(s, 1.3, 'A rye made for blending.', size=42, color=CREAM, w=6.4, h=1.5)
 text(s, 0.85, 2.95, 6.0, 3.6, [
-    'Seagram’s business was blended whiskey. A blend gets much of its flavour from a small share of strong-tasting whiskey.',
+    'Seagram’s business was blended whiskey. A blend gets much of its flavor from a small share of strong-tasting whiskey.',
     'In the early 1990s Larry Ebersold, the master distiller, was asked for a rye strong enough to taste through a blend. He settled on 95% rye and 5% malted barley.',
 ], size=19, color=CREAM, ls=1.25, space_after=12)
 rrect(s, 7.45, 0.85, 5.03, 5.65, r=0.4, fill=OAK, line=OAK_EDGE)
 rect(s, 7.95, 1.55, 0.9, 0.045, fill=MARK)
-text(s, 7.95, 1.85, 4.1, 2.6, 'It was made to flavour blends such as 7 Crown and 5 Crown.', size=32, italic=True,
+text(s, 7.95, 1.85, 4.1, 2.6, 'It was made to flavor blends such as 7 Crown and 5 Crown.', size=32, italic=True,
      color=CREAM, ls=1.15)
 text(s, 7.95, 4.75, 4.1, 1.3,
      'Ebersold tried 100% malted rye first. He has said it was among the best whiskey he made, and that it cost too much.',
@@ -183,39 +182,34 @@ footer(s, 9)
 
 
 # ---------------------------------------------------------------- 8-10 the first three glasses
-glass_slide(10, 'Glass 1 again', 'Bulleit 95 Rye',
+glass_slide(10, 'Glass 1', 'Bulleit 95 Rye',
             'Distilled in Lawrenceburg  ·  bottled in Kentucky  ·  90 proof  ·  about $30',
             ['Launched in 2011. Distilled in Lawrenceburg to Bulleit’s specification and bottled in Kentucky.',
              'Bulleit’s Kentucky distilleries make its bourbon. Its rye has always come from Indiana.'],
             [('Distilled', 'Lawrenceburg, Indiana'), ('The brand', 'Specification, age, proof, bottling in Kentucky'),
-             ('Look for', 'Rye spice, mint, a grassy edge')],
-            'What in this glass would you call “rye”?',
+             ('Notes', 'Rye spice, mint, a grassy edge')],
             photo='bulleit95.jpg',
             credit='Photograph: David (brokentaco), CC BY 2.0, via Wikimedia Commons.')
 
-glass_slide(11, 'Glass 2, pour now', 'George Dickel Rye',
+glass_slide(11, 'Glass 2', 'George Dickel Rye',
             'Distilled in Lawrenceburg  ·  sold by a Tennessee distillery  ·  90 proof  ·  about $25',
             ['The same 95% rye as glass 1.',
-             'After ageing it is chilled and filtered through sugar-maple charcoal from the Dickel distillery. In 2012 Dickel’s master distiller said this was done at a bottling plant in Plainfield, Illinois.'],
+             'After aging it is chilled and filtered through sugar-maple charcoal from the Dickel distillery. In 2012 Dickel’s master distiller said this was done at a bottling plant in Plainfield, Illinois.'],
             [('Distilled', 'Lawrenceburg, Indiana'), ('The brand', 'Chill and sugar-maple charcoal'),
-             ('Look for', 'Is it softer than glass 1?')],
-            'Taste glasses 1 and 2 together. Can you taste the charcoal filtering?')
+             ('Filtered', 'After the barrel')])
 
-glass_slide(12, 'Glass 3, pour now', 'Templeton Straight Rye',
+glass_slide(12, 'Glass 3', 'Templeton Straight Rye',
             'Sourced rye, 95% recipe  ·  bottled in Iowa  ·  90 proof  ·  about $30',
             ['Named for Templeton, Iowa, which is said to have made bootleg rye during Prohibition. It was the first brand to sell the Lawrenceburg 95% rye.',
              'Since a 2015 settlement the label says “Distilled in Indiana”. Templeton opened its own distillery in 2018 and released its first Iowa-made rye in October 2025.'],
-            [('Distilled', 'Not stated. Check the back label'), ('The brand', 'At least four years, 90 proof, bottled in Iowa'),
+            [('Distilled', 'Not stated by the company'), ('The brand', 'At least four years, 90 proof, bottled in Iowa'),
              ('Now', 'Making its own rye in Templeton')],
-            'Of the three so far, which would you buy again?',
             photo='templeton.jpg',
             credit='Pictured: Templeton Rye 6 Year. Photograph: David (brokentaco), CC BY 2.0, via Wikimedia Commons.')
 
 # ---------------------------------------------------------------- 11 back label
 s = new_slide()
-text(s, 0.85, 0.85, 6.2, 0.4, [[('●  ', {'color': MARK_DEEP, 'size': 12}), ('Pick up any bottle and turn it round', {})]],
-     size=15, font=SANS, bold=True, color=INK)
-heading(s, 1.3, 'Reading the back label.', size=40, w=6.6, h=1.0)
+heading(s, 1.0, 'Reading the back label.', size=40, w=6.6, h=1.0)
 text(s, 0.85, 2.45, 6.0, 3.6, [
     'Federal rules say most American whiskies must show the state where they were first distilled.',
     'When the address on the label is in one state and the whiskey was distilled in another, that state has to appear too. It is usually on the back, in small type.',
@@ -238,13 +232,12 @@ text(s, 7.6, 5.98, 4.88, 0.6, 'An illustration of the lines to find, not any one
 footer(s, 13)
 
 # ---------------------------------------------------------------- 12 Rossville Union
-glass_slide(14, 'Glass 4, pour now', 'Rossville Union Straight Rye',
+glass_slide(14, 'Glass 4', 'Rossville Union Straight Rye',
             'Distilled in Lawrenceburg  ·  sold by the distillery  ·  94 proof  ·  about $40',
             ['In 2018 the distillery released its first rye under its own label, named for the 1847 Rossville distillery and the 1933 company, Rossville Union.',
              'It is a blend of the 95% rye and a 51% rye. The plant was called Ross & Squibb from 2021 and has been MGP Distillery since September 2026.'],
             [('Distilled', 'Lawrenceburg, Indiana'), ('The brand', 'The house blend: 95% and 51% rye'),
-             ('The name', 'Rossville, 1847')],
-            'What does the 51% rye change?')
+             ('The name', 'Rossville, 1847')])
 
 # ---------------------------------------------------------------- 13 what came next
 s = new_slide()
