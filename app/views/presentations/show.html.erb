@@ -101,7 +101,8 @@
         <% end %>
       </div>
 
-      <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:justify-end">
+      <%# From lg up the buttons keep to one row and the words beside them wrap instead. %>
+      <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:shrink-0 lg:flex-nowrap lg:justify-end">
         <% if owner_tools || viewer_owns %>
           <% if !owner_tools %>
             <%= link_to "Reactivate membership", membership_path(anchor: 'pricing'), class: "btn btn-primary min-h-12" %>
