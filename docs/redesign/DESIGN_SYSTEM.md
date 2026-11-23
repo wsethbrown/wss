@@ -258,7 +258,9 @@ glass and the view transitions. No animation library.
   out of the band; the faces still carry them. A window too short to hold the frame (a phone
   in landscape: the band would take more than half the height; a wide window that cannot fit
   the frame below the nav) shows the static faces instead, and the frame comes back if the
-  window grows. If anything in the frame throws, it stops and the static faces show.
+  window grows. If anything in the frame throws, it stops and the static faces show. Going live
+  changes the story's height, so the reader's place is kept: a link to `/#pricing` still lands on
+  its target at once (instantly, before anything there is sorted for its reveal).
 - **The re-pour**: when an RSVP's Turbo stream replaces the event's attendees region, each
   seat glass in the table (`data-repour` on `events/_table`) whose level changed moves from
   its old level to the new one over 500ms on the pour curve, seats matched in order. Only

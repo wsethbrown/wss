@@ -312,20 +312,49 @@ export default class extends Controller {
   }
 
   goStatic() {
+    const was = this.element.classList.contains("is-live")
+    const restore = was ? this.holdPlace() : null
     this.live = false
     this.element.classList.remove("is-live")
     if (this.padding !== undefined) document.documentElement.style.scrollPaddingTop = this.padding
+    restore?.()
+  }
+
+  // Going live (or back) changes the story's height: the faces leave the
+  // flow and the steps are spaced for the frame. Keep what the reader was
+  // looking at where it was: the element a #fragment points at (so a link to
+  // /#pricing still lands on the pricing rows), else the first thing in view.
+  // Instant, never smooth, and before the appear controller sorts what is on
+  // screen, so nothing that was in view starts hidden.
+  holdPlace() {
+    let target = null
+    try { target = window.location.hash && document.getElementById(decodeURIComponent(window.location.hash.slice(1))) } catch (_) { target = null }
+    // A #fragment: land on it, wherever the browser had got to.
+    if (target) return () => target.scrollIntoView({ block: "start", behavior: "instant" })
+    if (window.scrollY <= 0) return null
+    const candidates = [ ...this.beatTargets, ...document.querySelectorAll("main section") ]
+    const anchor = candidates.find((el) => el.getBoundingClientRect().bottom > 0)
+    if (!anchor) return null
+    const before = anchor.getBoundingClientRect().top
+    return () => {
+      const shift = anchor.getBoundingClientRect().top - before
+      if (Math.abs(shift) >= 1) window.scrollTo({ top: window.scrollY + shift, behavior: "instant" })
+    }
   }
 
   // Run the frame if the window can hold it; otherwise the static faces.
   start() {
+    const restore = this.holdPlace()
     this.element.classList.add("is-live")
     this.measure()
     if (!this.fits()) {
       console.info(`Story frame: ${window.innerWidth}x${window.innerHeight} is too short to hold the frame; showing the static faces`)
       this.goStatic()
+      restore?.()
       return
     }
+    restore?.()
+    this.measure() // the steps' positions after the scroll is put back
     this.live = true
     this.pick()
     this.P = this.target

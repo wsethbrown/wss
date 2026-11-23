@@ -23,17 +23,22 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
         const area = innerWidth >= 900 ? 0 : document.querySelector(".mm").getBoundingClientRect().bottom;
         scrollTo({ top: c().tops[i] - area - (innerHeight - area) * 0.3, behavior: "instant" });
       };
-      const settle = async (at) => {
-        for (let n = 0; n < 120 && (c().raf || c().P !== c().target); n++) await sleep(50);
-        await sleep(100);
-        record.push(snap(at));
+      // Wait on state, never on time: until the step read is the current one,
+      // the frame has arrived at it and nothing is pending (up to 10s).
+      let want = 0;
+      const until = async (ok, limit = 10000) => {
+        const start = performance.now();
+        while (!ok() && performance.now() - start < limit) await sleep(20);
+        return ok();
       };
+      const settled = () => c().target === want && c().P === want && !c().raf;
       for (const step of plan) {
-        if (step.read !== undefined) { read(step.read); record.push(snap(`read ${step.read}`)); }
+        if (step.read !== undefined) { want = step.read; read(step.read); record.push(snap(`read ${step.read}`)); }
         if (step.event) { document.dispatchEvent(new Event(step.event)); record.push(snap(step.event)); }
-        if (step.wait) await sleep(step.wait);
+        // Mid-move: wait until the frame is under way past a point, not for a time.
+        if (step.past !== undefined) { const ok = await until(() => c().P >= step.past); record.push({ ...snap("past"), reached: ok }); }
+        if (step.settle) { const ok = await until(settled); record.push({ ...snap(step.settle), settled: ok }); }
         if (step.sample) { for (let n = 0; n < step.sample; n++) { record.push(snap("sample")); await sleep(80); } }
-        if (step.settle) await settle(step.settle);
       }
       return { width: innerWidth, height: innerHeight, record,
                bandTop: Math.round(document.querySelector(".mm").getBoundingClientRect().top) };
@@ -81,28 +86,37 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
   test "the current step follows the scroll, and each move plays to its end after the scroll stops" do
     r = probe((1..4).map { |i| { read: i, settle: "step #{i}" } } + [ { read: 1, settle: "back to 1" } ])
     settled = r["record"].select { |s| s["at"].start_with?("step", "back") }
+    assert(settled.all? { |s| s["settled"] }, "each move reached its step and stopped: #{r}")
     assert_equal [ 1, 2, 3, 4, 1 ], settled.map { |s| s["P"] }, "each step's arrangement, at rest: #{r}"
     assert(settled.none? { |s| s["playing"] }, "nothing left playing once settled: #{r}")
   end
 
   test "a move keeps playing with the page still, and turning back mid-move reverses from where it was" do
-    r = probe([ { read: 1, settle: "at 1" }, { read: 2, wait: 300, sample: 1 }, { read: 1, sample: 8 }, { settle: "end" } ])
-    mid = r["record"].find { |s| s["at"] == "sample" }
-    assert_operator mid["P"], :>, 1.0, "the move to step 2 had started: #{r}"
-    assert_operator mid["P"], :<, 2.0, "and was still under way after 300ms of stillness: #{r}"
-    after = r["record"].select { |s| s["at"] == "sample" }.drop(1).map { |s| s["P"] }
-    assert_operator (after.first - mid["P"]).abs, :<, 0.3, "no jump when it turns back: #{r}"
-    after.each_cons(2) { |a, b| assert_operator b, :<=, a + 0.001, "it reverses steadily: #{r}" }
+    # The page is still while the move plays (no scroll between "read 2" and
+    # "past"); the turn back comes once it is a third of the way, whatever
+    # the machine's speed.
+    r = probe([ { read: 1, settle: "at 1" }, { read: 2, past: 1.33 }, { read: 1, sample: 8 }, { settle: "end" } ])
+    mid = r["record"].find { |s| s["at"] == "past" }
+    assert mid["reached"], "the move to step 2 played on its own with the page still: #{r}"
+    assert_operator mid["P"], :<, 2.0, "and was caught under way: #{r}"
+    after = r["record"].select { |s| s["at"] == "sample" }.map { |s| s["P"] }
+    # The scroll back is read on the next frame, so on a slow machine the move
+    # may go on a frame or two before it turns: allow that, then it only falls.
+    assert_operator after.max - mid["P"], :<, 0.15, "no jump when it turns back: #{r}"
+    falling = after.drop_while.with_index { |p, i| i + 1 < after.size && after[i + 1] >= p }
+    falling.each_cons(2) { |a, b| assert_operator b, :<=, a + 0.001, "once turned, it reverses steadily: #{r}" }
+    assert r["record"].last["settled"], "it comes to rest at step 1: #{r}"
     assert_equal 1, r["record"].last["P"], r
   end
 
   test "before Turbo caches the page the frame is at rest, and a hidden or shown tab changes nothing" do
-    r = probe([ { read: 1, settle: "at 1" }, { read: 2, wait: 300 }, { event: "turbo:before-cache" }, { wait: 200, sample: 1 },
-                { event: "visibilitychange" }, { wait: 200, sample: 1 } ])
+    # Mid-move, Turbo's before-cache lands the frame at once at the current step.
+    r = probe([ { read: 1, settle: "at 1" }, { read: 2, past: 1.2 }, { event: "turbo:before-cache" }, { sample: 1 },
+                { event: "visibilitychange" }, { sample: 2 } ])
     samples = r["record"].select { |s| s["at"] == "sample" }
     assert_equal 2, samples.first["P"], "landed at the current step: #{r}"
     refute samples.first["playing"], "no frame pending after turbo:before-cache: #{r}"
-    assert_equal samples.first["P"], samples.last["P"], "visibilitychange moves nothing: #{r}"
+    assert(samples.all? { |s| s["P"] == 2 && !s["playing"] }, "visibilitychange moves nothing: #{r}")
   end
 
   test "under reduced motion each step simply shows its arrangement" do
@@ -114,10 +128,15 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
         ? { matches: true, media: q, addEventListener() {}, removeEventListener() {}, addListener() {}, removeListener() {} }
         : real(q);
     JS
-    r = run_probe([ { read: 2, sample: 3 }, { read: 3, sample: 3 } ])
+    # The step changes on the frame after the scroll (the scroll handler runs
+    # once per frame), so wait for it, then check it never travels.
+    r = run_probe([ { read: 2, settle: "at 2", sample: 3 }, { read: 3, settle: "at 3", sample: 3 } ])
+    assert(r["record"].select { |s| s["at"].start_with?("at ") }.all? { |s| s["settled"] }, "each step reached: #{r}")
     samples = r["record"].select { |s| s["at"] == "sample" }
     assert(samples.all? { |s| s["P"] == s["P"].round && !s["playing"] }, "never in between, never playing: #{r}")
     assert_equal [ 2, 2, 2, 3, 3, 3 ], samples.map { |s| s["P"] }, r
+    passing = r["record"].each_cons(2).select { |a, _| a["at"].start_with?("read") }.map { |_, b| b["P"] }
+    assert(passing.all? { |p| p == p.round }, "even on its way it is only ever at a step: #{r}")
   ensure
     page.driver.browser.manage.window.resize_to(1400, 1400)
   end
@@ -142,10 +161,17 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
   test "crossing 900px keeps the current step" do
     visit_at(1440, 900)
     r = run_probe([ { read: 2, settle: "wide" } ])
+    assert r["record"].last["settled"], r
     assert_equal 2, r["record"].last["P"], r
     page.driver.browser.manage.window.resize_to(820, 1000)
-    sleep 0.6
-    state = page.evaluate_script("({ P: window.__storyFrame.P, live: !!document.querySelector('.story.is-live'), pos: getComputedStyle(document.querySelector('.mm')).position })")
+    state = nil
+    Timeout.timeout(10) do
+      loop do
+        state = page.evaluate_script("({ P: window.__storyFrame.P, playing: !!window.__storyFrame.raf, width: innerWidth, live: !!document.querySelector('.story.is-live'), pos: getComputedStyle(document.querySelector('.mm')).position })")
+        break if state["width"] < 900 && state["pos"] == "sticky" && !state["playing"]
+        sleep 0.1
+      end
+    end
     assert_equal 2, state["P"], state
     assert state["live"], state
     assert_equal "sticky", state["pos"], "the band below 900px: #{state}"
@@ -157,6 +183,7 @@ class HomeStoryFrameSystemTest < ApplicationSystemTestCase
     r = probe((1..4).map { |i| { read: i, settle: "step #{i}" } }, width: 400, height: 860)
     assert_operator r["width"], :<, 900, "a phone-width window: #{r}"
     settled = r["record"].select { |s| s["at"].start_with?("step") }
+    assert(settled.all? { |s| s["settled"] }, "each move reached its step: #{r}")
     assert_equal [ 1, 2, 3, 4 ], settled.map { |s| s["P"] }, r
     assert_operator r["bandTop"], :<, 140, "pinned near the top, under the nav: #{r}"
   end
