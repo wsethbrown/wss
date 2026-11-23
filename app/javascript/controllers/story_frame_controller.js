@@ -889,11 +889,11 @@ export default class extends Controller {
       this.css(this.el.cardScore?.querySelector("svg"), "visibility", P >= 4 ? "visible" : "hidden")
     }
     for (const w of this.wedges) {
-      const a = 0.4 + 0.08 * (reviewed ? 0 : w.k), b = Math.min(1, a + 0.24)
+      const a = 0.4 + 0.08 * (reviewed ? 0 : w.k), b = Math.min(1, a + 0.312) // grow and colour 30% slower than first built
       const g = P >= 4 ? 1 : P > 3 ? band(tDE, a, b, E.out) : 0
       const sc = lerp(w.from, 1, g)
       if (w.s !== sc) { w.el.style.transform = `scale(${sc.toFixed(4)})`; w.s = sc }
-      const fc = P >= 4 ? 1 : P > 3 ? band(tDE, a + 0.14, Math.min(1, b + 0.06), E.out) : 0
+      const fc = P >= 4 ? 1 : P > 3 ? band(tDE, a + 0.16, Math.min(1, b + 0.056), E.out) : 0
       if (w.c !== fc) { w.el.style.fill = fc >= 1 ? "" : mixOk(SOFT, SAGE, fc); w.c = fc }
     }
     const lo = P >= 4 ? 1 : P > 3 ? band(tDE, 0.86, 1, E.lin) : 0
