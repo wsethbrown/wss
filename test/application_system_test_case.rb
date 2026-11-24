@@ -3,7 +3,16 @@ require_relative "support/system_test_timeline"
 require_relative "support/stale_node_retry"
 
 class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
-  driven_by :selenium, using: :headless_chrome, screen_size: [ 1400, 1400 ]
+  # No back/forward cache in the test browser. In CI a page reached by a full
+  # navigation straight after a Turbo visit sometimes received none of the
+  # clicks WebDriver sent it: six over five seconds, with no pointerdown ever
+  # reaching the page, while scripts and element lookups on it worked. The
+  # page left behind goes into Chrome's back/forward cache at that moment, and
+  # the suspicion is that the driver's input stays attached to it. Unproven;
+  # AccountNavigationTest#click_tab reports if clicks are still lost.
+  driven_by :selenium, using: :headless_chrome, screen_size: [ 1400, 1400 ] do |options|
+    options.add_argument("--disable-features=BackForwardCache")
+  end
 
   # On failure, prints the browser-side timeline (loads, paints, Turbo, clicks)
   # and saves it beside the failure screenshot. See the module for details.

@@ -61,11 +61,16 @@ class AccountNavigationTest < ApplicationSystemTestCase
   # line when it had to, so the output shows how often clicks are being lost.
   def click_tab(name)
     selected = "[data-tab='#{name}'][role='tab'][aria-selected='true']"
-    4.times do |attempt|
+    2.times do |attempt|
       find("[data-tab='#{name}']").click
       return if has_selector?(selected, wait: 1)
       puts "account tab '#{name}': click #{attempt + 1} did not select it; clicking again"
     end
+    # Two clicks lost means this page is not receiving input at all (in CI, six
+    # clicks over five seconds never reached it). Load it again and click once more.
+    puts "account tab '#{name}': the page is not receiving clicks; reloading it"
+    visit account_path
+    wait_for_account_tabs
     find("[data-tab='#{name}']").click
   end
 
