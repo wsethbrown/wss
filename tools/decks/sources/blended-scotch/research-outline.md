@@ -314,7 +314,7 @@ Checked against US retail listings in November 2026: Haig Club Clubman is on sal
 
 ## Image credits
 
-All images are in the public domain and were taken from Wikimedia Commons.
+The historical images are in the public domain and were taken from Wikimedia Commons. The four bottle photographs on the pour slides carry the licences listed with them.
 
 - **Slide 1 (cover).** "Edwin Henry Landseer (1802-1873) - The Illicit Highland Whisky Still - WM.1532-1948 - Apsley House.jpg". Painting by Edwin Landseer, 1829, Apsley House (English Heritage). Public domain (artist died 1873).
 - **Slide 11.** "Phylloxera cartoon.png". "The Phylloxera, a true gourmet", _Punch_, 6 September 1890, p. 110; attributed on Commons to Edward Linley Sambourne. Public domain (PD-old).
@@ -323,3 +323,10 @@ All images are in the public domain and were taken from Wikimedia Commons.
 - **Slide 16.** "Lord James of Hereford.JPG". Carlo Pellegrini ("Ape"), "Nervous", _Vanity Fair_, 7 March 1874 (Statesmen no. 164): Sir Henry James, later Lord James of Hereford, chairman of the 1908–09 Commission. Public domain (PD-old-100).
 
 The Coffey still diagram used in an earlier version ("Coffey still.jpg") was dropped: its file page names no author and its public-domain status could not be established. Slide 3 now uses a diagram built in the slide.
+
+Bottle photographs on the pour slides, added 23 November 2026. For the Wikimedia Commons files the licence, author and date are as given in Commons' own data for the file; the file pages themselves could not be opened from the build machine.
+
+- **Slide 4.** "Haig Club", by arw49, Flickr photo 31802899113 (flickr.com/photos/100293475@N08/31802899113). CC BY 2.0, as recorded for the photo by Openverse; the Flickr page could not be opened from the build machine, so the licence was not read there. Cropped; the crop leaves out a signature, "A. Whittle", in the corner of the original. The label reads "Haig Club Clubman, Single Grain Scotch Whisky, Matured in Bourbon Casks, 700ml, 40% vol".
+- **Slide 7.** "The Glenlivet - 12 yr Single Malt.JPG", by ChickenFalls, 27 August 2011, Wikimedia Commons. CC BY-SA 3.0. Cropped. It shows the label of 2011 on a one-litre bottle ("Single Malt Scotch Whisky, Aged 12 Years, 1 litre, 40% vol"), not the label now on sale.
+- **Slide 10.** "Whisky in Glass and Bottle", by Marcelo Verfe, Pexels photo 15724170 (pexels.com/photo/whisky-in-glass-and-bottle-15724170). Pexels license. Cropped. The photographer's name is also in the file's own data. The Pexels page could not be opened from the build machine, so the license was not read there; the owner chose the photo. The same photograph as in the Cardhu deck.
+- **Slide 14.** "Bottle of Dewar's whisky.jpg", by Nfutvol, 24 January 2009, Wikimedia Commons. CC BY-SA 3.0. Cropped. It shows the White Label bottle of 2009 ("Dewar's White Label, Blended Scotch Whisky, John Dewar & Sons Ltd"), an older label than the one now on sale.

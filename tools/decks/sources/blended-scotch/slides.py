@@ -48,11 +48,12 @@ def big_year(s, year, y=1.15):
     rect(s, X + 0.03, y + 2.2, 1.2, 0.045, fill=MARK_DEEP)
 
 
-def pour_slide(n, pour, name, note, maker, style, abv, two_line_name=False, widths=(2.75, 3.15, 1.1), val_size=18):
-    """One pour: a bottle-shaped placeholder card (the old deck had no bottle photographs), the pour
+def pour_slide(n, pour, name, note, maker, style, abv, two_line_name=False, widths=(2.75, 3.15, 1.1), val_size=18,
+               photo=None, credit=None):
+    """One pour: the bottle's photograph (or the placeholder card when there is none), the pour
     line, the name, the old slide's note, and Maker / Style / ABV."""
     s = new_slide()
-    bottle_placeholder(s, X, 0.8, 3.4, 5.3)
+    bottle_panel(s, photo, X, 0.8, 3.4, 5.3, credit)
     x, w = 4.85, 7.63
     kicker(s, pour, x=x)
     name_h = 1.55 if two_line_name else 0.85
@@ -125,7 +126,8 @@ footer(s, 3)
 pour_slide(4, 'Pour 1 of 4', 'Haig Club Clubman',
            ['Grain whisky on its own.', 'Most grain whisky goes into blends.'],
            'Diageo, Cameronbridge, Fife', 'Single grain Scotch whisky', '40%',
-           widths=(3.2, 2.95, 0.6), val_size=16.5)
+           widths=(3.2, 2.95, 0.6), val_size=16.5,
+           photo='haig-club-clubman.jpg', credit='Photograph: arw49, CC BY 2.0, via Flickr. Cropped.')
 
 # ---------------------------------------------------------------- 5 malt and grain
 s = new_slide()
@@ -175,7 +177,9 @@ footer(s, 6)
 # ---------------------------------------------------------------- 7 pour 2
 pour_slide(7, 'Pour 2 of 4', ['The Glenlivet', '12 Year Old'],
            ['The malt Usher vatted.', 'Heavier than the grain whisky,', 'with more fruit and cereal.'],
-           'Chivas Brothers, Speyside', 'Single malt Scotch whisky', '40%', two_line_name=True)
+           'Chivas Brothers, Speyside', 'Single malt Scotch whisky', '40%', two_line_name=True,
+           photo='glenlivet-12.jpg',
+           credit='Pictured: an older label, on a litre bottle. Photograph: ChickenFalls, CC BY-SA 3.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 8 1860, the Spirits Act
 s = new_slide()
@@ -214,7 +218,8 @@ footer(s, 9)
 # ---------------------------------------------------------------- 10 pour 3
 pour_slide(10, 'Pour 3 of 4', ['Johnnie Walker', 'Black Label'],
            'Malt and grain together.',
-           'Diageo, Scotland', 'Blended Scotch, 12 years', '40%', two_line_name=True)
+           'Diageo, Scotland', 'Blended Scotch, 12 years', '40%', two_line_name=True,
+           photo='johnnie-walker-black.jpg', credit='Photograph: Marcelo Verfe, via Pexels. Cropped.')
 
 # ---------------------------------------------------------------- 11 1860s phylloxera (the green story slide)
 s = new_slide(INK)
@@ -275,7 +280,9 @@ footer(s, 13)
 pour_slide(14, 'Pour 4 of 4', ['Dewar’s', 'White Label'],
            'In the 1890s London drank it in a tall glass with ice and soda water.',
            'John Dewar & Sons, Perth', 'Blended Scotch whisky', '40%', two_line_name=True,
-           widths=(3.35, 2.6, 0.9))
+           widths=(3.35, 2.6, 0.9),
+           photo='dewars-white-label.jpg',
+           credit='Pictured: an older label. Photograph: Nfutvol, CC BY-SA 3.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 15 1898, Pattisons
 s = new_slide()
