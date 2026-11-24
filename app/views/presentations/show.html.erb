@@ -481,6 +481,14 @@
     </section>
   </div>
 
+  <%# Not ready to buy: an email when a new deck is published. Only for
+      visitors without the deck (no purchase row, no admin or membership access). %>
+  <% unless owned_purchase || admin_access || included_access %>
+    <div class="mb-12">
+      <%= render "shared/deck_news_form", source: "deck" %>
+    </div>
+  <% end %>
+
   <!-- More from the library, never dead-end a reader -->
   <% if @more_decks&.any? %>
     <section class="border-t border-hairline pt-12">

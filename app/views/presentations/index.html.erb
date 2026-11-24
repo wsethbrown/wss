@@ -140,5 +140,10 @@
       <%= link_to 'Show all decks', presentations_path, class: 'btn btn-secondary mt-6' %>
     </div>
   <% end %>
+
+  <%# For a visitor who is not ready to buy: an email when a new deck is published. %>
+  <div class="mt-12">
+    <%= render "shared/deck_news_form", source: "library" %>
+  </div>
 </div>
 

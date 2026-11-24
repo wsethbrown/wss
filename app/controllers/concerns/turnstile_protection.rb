@@ -1,7 +1,7 @@
 # Refuses a request whose Cloudflare Turnstile check does not pass. A no-op
 # while Turnstile is off (keys unset). Used as a before_action on the public
-# sign-up surfaces: MagicLinksController#create and
-# Users::RegistrationsController#create. Runs before the email is looked up,
+# sign-up surfaces: MagicLinksController#create,
+# Users::RegistrationsController#create and DeckNewsController#create. Runs before the email is looked up,
 # so the refusal is the same whether or not the address has an account.
 module TurnstileProtection
   extend ActiveSupport::Concern
@@ -25,6 +25,12 @@ module TurnstileProtection
       Rails.logger.warn "Turnstile refused #{where} (#{result.status}#{" #{codes}" if codes})"
       message = REFUSED_MESSAGE
     end
-    redirect_to auth_path, alert: message, status: :see_other
+    redirect_to turnstile_refusal_location, alert: message, status: :see_other
+  end
+
+  # Where a refused request is sent. The sign-up forms live on /auth; a
+  # controller whose form is elsewhere overrides this (DeckNewsController).
+  def turnstile_refusal_location
+    auth_path
   end
 end

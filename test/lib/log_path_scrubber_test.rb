@@ -12,7 +12,8 @@ class LogPathScrubberTest < ActiveSupport::TestCase
       "/invitations/#{TOKEN}" => "/invitations/[FILTERED]",
       "/invite/#{TOKEN}" => "/invite/[FILTERED]",
       "/invite/#{TOKEN}/card" => "/invite/[FILTERED]/card",
-      "/account/verify_email/#{TOKEN}" => "/account/verify_email/[FILTERED]"
+      "/account/verify_email/#{TOKEN}" => "/account/verify_email/[FILTERED]",
+      "/deck_news/confirm/#{TOKEN}" => "/deck_news/confirm/[FILTERED]"
     }.each do |raw, expected|
       assert_equal expected, LogPathScrubber.scrub(raw), raw
       refute_includes LogPathScrubber.scrub(raw), TOKEN
@@ -37,8 +38,14 @@ class LogPathScrubberTest < ActiveSupport::TestCase
     assert_equal "/email_rsvps/yes", LogPathScrubber.scrub("/email_rsvps/yes")
   end
 
+  test "the deck-news unsubscribe link's token is a query value and is filtered" do
+    assert_equal "/deck_news/unsubscribe?token=[FILTERED]",
+                 LogPathScrubber.scrub("/deck_news/unsubscribe?token=#{TOKEN}")
+  end
+
   test "leaves ordinary paths alone" do
-    %w[/ /societies/12 /account /presentations/4/downloads/sneak_peek /invitations /magic_links].each do |path|
+    %w[/ /societies/12 /account /presentations/4/downloads/sneak_peek /invitations /magic_links /deck_news /deck_news/confirm
+       /deck_news/unsubscribe].each do |path|
       assert_equal path, LogPathScrubber.scrub(path)
     end
   end

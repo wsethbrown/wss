@@ -1,0 +1,7 @@
+<%= render "mailers/layout_open" %>
+      <h2 style="margin-top:0;">Confirm your email</h2>
+      <p>Someone asked us to email this address when Whiskey Share Society publishes a new deck. Click the button to confirm.</p>
+      <a class="btn" href="<%= @confirm_url %>">Confirm my email</a>
+      <p class="meta" style="margin-top: 20px;">The link expires in 7 days. If you didn't ask for this, ignore this email and nothing happens.</p>
+      <p class="meta"><a href="<%= @unsubscribe_url %>">Stop these emails</a></p>
+<%= render "mailers/layout_close" %>

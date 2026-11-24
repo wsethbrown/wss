@@ -171,6 +171,8 @@ Rails.application.routes.draw do
       end
     end
     resources :activities, only: [ :index, :show ]
+    # The deck-news list (read-only): counts and the active addresses.
+    get "mailing_list", to: "mailing_list#index"
 
     # Bottles moderation
     resources :bottles, only: [ :index, :show, :edit, :update ] do
@@ -261,6 +263,15 @@ Rails.application.routes.draw do
   # List-Unsubscribe-Post header points mail clients at the POST.
   get "event_mute", to: "event_mutes#show", as: :event_mute
   post "event_mute", to: "event_mutes#create"
+
+  # "Tell me when a new deck is published" (DeckNewsController): the form, a
+  # confirm link whose page POSTs (token in the body, never acted on by a
+  # GET), and a signed unsubscribe link, also the List-Unsubscribe-Post target.
+  post "deck_news", to: "deck_news#create", as: :deck_news
+  get "deck_news/confirm/:token", to: "deck_news#confirmation", as: :deck_news_confirmation
+  post "deck_news/confirm", to: "deck_news#confirm", as: :confirm_deck_news
+  get "deck_news/unsubscribe", to: "deck_news#unsubscribe", as: :deck_news_unsubscribe
+  post "deck_news/unsubscribe", to: "deck_news#remove"
 
   # SEO: the sitemap (public pages only; the veil rules hold).
   get "sitemap.xml", to: "sitemaps#show", format: :xml

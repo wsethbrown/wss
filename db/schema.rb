@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_22_140000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_24_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -196,6 +196,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_22_140000) do
     t.index ["favoritable_type", "favoritable_id"], name: "index_favorites_on_favoritable"
     t.index ["user_id", "favoritable_type", "favoritable_id"], name: "index_favorites_on_user_and_favoritable", unique: true
     t.index ["user_id"], name: "index_favorites_on_user_id"
+  end
+
+  create_table "mailing_list_subscribers", force: :cascade do |t|
+    t.string "email", null: false
+    t.string "confirmation_token_digest"
+    t.datetime "confirmation_sent_at"
+    t.datetime "confirmed_at"
+    t.datetime "unsubscribed_at"
+    t.string "source", limit: 30
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["confirmation_token_digest"], name: "index_mailing_list_subscribers_on_confirmation_token_digest", unique: true
+    t.index ["email"], name: "index_mailing_list_subscribers_on_email", unique: true
   end
 
   create_table "notifications", force: :cascade do |t|
