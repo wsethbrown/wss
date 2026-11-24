@@ -229,9 +229,16 @@ Producers, cask policy and availability change. Check each bottle's own label an
 
 ## Image credits
 
-All images are in the public domain and were taken from Wikimedia Commons.
+The historical images are in the public domain and were taken from Wikimedia Commons. The bottle photographs on the pour slides carry the licenses listed with them.
 
 - **Slide 2.** "NAS-001 Quercus alba.png", White Oak, plate 1 of F. A. Michaux's _North American Sylva_, drawn by P. J. Redouté, engraved by Bessin. Public domain (published before 1929; artist died more than 100 years ago).
 - **Slide 3.** "Jean-François Millet - Cooper Tightening Staves on a Barrel - 17.1500 - Museum of Fine Arts.jpg", oil painting, about 1848–52. Museum of Fine Arts, Boston. Public domain (artist died 1875).
 - **Slide 1 (cover).** "Lincoln Heritage Scenic Highway - Bourbon Barrels in a Local Warehouse - NARA - 7720083.jpg", U.S. Department of Transportation, via the National Archives. Public domain (U.S. government work). Moved from slide 7, which is now a diagram.
 - **Slide 14.** "Photograph of One and a Half Ton Chevrolet Truck - NARA - 2128242.jpg", U.S. Forest Service photograph, National Archives. Public domain (U.S. government work). The archive's description is of a 1½-ton Chevrolet truck heavily loaded with white oak stave bolts going down a hillside in woods; the caption follows it. Date not given in the sources found.
+
+Bottle photographs on the pour slides, added 23 November 2026. For the two Scotch bottles the license, author and date are as given in Wikimedia Commons' own data for the file; the file pages themselves could not be opened from the build machine.
+
+- **Slide 6.** "Lincoln Heritage Scenic Highway - Maker's Mark Bottle - NARA - 7720075", U.S. National Archives and Records Administration, photographer not recorded, dated 9 July 2007 in the file's data. Marked public domain on Wikimedia Commons, file of that name. Cropped. The National Archives catalog record itself was not opened. The same photograph as in the Bourbon Basics deck; the owner chose it.
+- **Slide 11.** "Laphroaig - 10 years old - Scotch Whisky.JPG", by Datenralfi, 31 January 2021, Wikimedia Commons. CC BY-SA 3.0 Germany. Cropped. It shows the bottle and tube labeled "Aged 10 Years, 70cl, 40% vol", the bottling sold in Europe, not the 43% bottle sold in the United States.
+- **Slide 13.** A plain bottle placeholder. No freely licensed photograph of a Slane Irish Whiskey bottle was found on Wikimedia Commons or through Openverse.
+- **Slide 15.** "Glenmorangie - 10 years old -Scotch Whisky.JPG", by Datenralfi, 31 January 2021, Wikimedia Commons. CC BY-SA 3.0 Germany. Cropped. It shows the bottle and box labeled "Glenmorangie The Original, Highland Single Malt Scotch Whisky, Aged Ten Years": the 10 year old sold until 2024, not the 12 year old poured.

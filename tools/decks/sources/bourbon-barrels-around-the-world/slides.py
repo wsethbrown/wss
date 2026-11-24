@@ -60,12 +60,11 @@ def strip(s, y, h, t, size=20, x=X, w=CW):
 
 
 def pour_slide(n, pour, name, note, maker, style, strength, strength_label='ABV', two_line_name=False,
-               note_size=21, widths=(2.55, 3.15, 1.15)):
-    """One pour: a bottle-shaped placeholder card (no free photograph of any of the four bottles
-    was in the old deck), the pour line, the name, the old slide's note, and Maker / Style / ABV
-    (or Proof, as the old slide had it)."""
+               note_size=21, widths=(2.55, 3.15, 1.15), photo=None, credit=None):
+    """One pour: the bottle's photograph (or the placeholder card when there is none), the pour
+    line, the name, the old slide's note, and Maker / Style / ABV (or Proof, as the old slide had it)."""
     s = new_slide()
-    bottle_placeholder(s, X, 0.8, 3.4, 5.3)
+    bottle_panel(s, photo, X, 0.8, 3.4, 5.3, credit)
     x, w = 4.85, 7.63
     kicker(s, pour, x=x)
     name_h = 1.55 if two_line_name else 0.85
@@ -166,7 +165,9 @@ footer(s, 5, dark=True)
 pour_slide(6, 'Pour 1 of 4', 'Maker’s Mark',
            'Nothing may be added to bourbon but water, so all of this color came out of one new charred barrel.',
            'Maker’s Mark, Kentucky', ['Kentucky straight', 'bourbon, wheated'], '90', strength_label='Proof',
-           widths=(2.95, 3.05, 0.6))
+           widths=(2.95, 3.05, 0.6),
+           photo='makers-mark-crop.jpg',
+           credit='Photograph: U.S. National Archives, public domain, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 7 the rickhouse
 s = new_slide()
@@ -224,7 +225,9 @@ footer(s, 10)
 # ---------------------------------------------------------------- 11 pour 2
 pour_slide(11, 'Pour 2 of 4', 'Laphroaig 10',
            'Laphroaig’s ex-bourbon barrels come largely from Maker’s Mark, its sister distillery.',
-           'Laphroaig, Islay', 'Islay single malt Scotch', '43% (US)', widths=(2.35, 3.2, 1.15))
+           'Laphroaig, Islay', 'Islay single malt Scotch', '43% (US)', widths=(2.35, 3.2, 1.15),
+           photo='laphroaig-10.jpg',
+           credit='Pictured: the 40% bottling. Photograph: Datenralfi, CC BY-SA 3.0 DE, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 12 filled more than once
 s = new_slide()
@@ -288,7 +291,9 @@ footer(s, 14)
 pour_slide(15, 'Pour 4 of 4', ['Glenmorangie', 'The Original 12'],
            'Twelve years in ex-bourbon casks, with no peat.',
            'Glenmorangie, Tain', 'Highland single malt Scotch', '40%', two_line_name=True,
-           widths=(2.55, 3.4, 0.85))
+           widths=(2.55, 3.4, 0.85),
+           photo='glenmorangie-original.jpg',
+           credit='Pictured: the 10 year old sold until 2024. Photograph: Datenralfi, CC BY-SA 3.0 DE, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 16 reading the label
 s = new_slide()
