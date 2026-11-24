@@ -80,11 +80,11 @@ def table_card(s, y, heads, rows, mark_col, label_w=3.0, row_hs=None, size=19):
         yy += rh
 
 
-def pour_slide(n, pour, name, note, maker, style, abv, two_line_name=False, note_size=21):
-    """One pour: a bottle-shaped placeholder card (no free photograph of any of the four bottles
-    was in the old deck), the pour line, the name, the old slide's note, and Maker / Style / ABV."""
+def pour_slide(n, pour, name, note, maker, style, abv, two_line_name=False, note_size=21, photo=None, credit=None):
+    """One pour: the bottle's photograph (or the placeholder card when there is none), the pour
+    line, the name, the old slide's note, and Maker / Style / ABV."""
     s = new_slide()
-    bottle_placeholder(s, X, 0.8, 3.4, 5.3)
+    bottle_panel(s, photo, X, 0.8, 3.4, 5.3, credit)
     x, w = 4.85, 7.63
     kicker(s, pour, x=x)
     name_h = 1.55 if two_line_name else 0.85
@@ -229,7 +229,9 @@ footer(s, 7)
 # ---------------------------------------------------------------- 8 pour 1
 pour_slide(8, 'Pour 1 of 4', ['Glenmorangie', 'The Original'],
            ['Aged only in ex-bourbon casks.'],
-           'Glenmorangie, Tain', 'Single malt, 12 years', '40%', two_line_name=True)
+           'Glenmorangie, Tain', 'Single malt, 12 years', '40%', two_line_name=True,
+           photo='glenmorangie-original.jpg',
+           credit='Pictured: the 10 year old sold until 2024. Photograph: Datenralfi, CC BY-SA 3.0 DE, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 9 1981–1986 (the green story slide)
 s = new_slide(INK)
@@ -258,7 +260,9 @@ footer(s, 10)
 # ---------------------------------------------------------------- 11 pour 2
 pour_slide(11, 'Pour 2 of 4', ['Glenmorangie', 'Lasanta'],
            ['The same distillery and age as pour one, with its last two years in oloroso and Pedro Ximénez casks.'],
-           'Glenmorangie, Tain', 'Single malt, 12 years', '43%', two_line_name=True, note_size=19)
+           'Glenmorangie, Tain', 'Single malt, 12 years', '43%', two_line_name=True, note_size=19,
+           photo='glenmorangie-lasanta.jpg',
+           credit='Pictured: the 46% bottle of 2011, in a gift box. Photograph: Paul Hermans, CC BY-SA 3.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 12 seasoned casks
 s = new_slide()

@@ -266,8 +266,15 @@ Strengths are as on current US labels. Macallan Sherry Oak 12 is the most expens
 
 ## Image credits
 
-All images were taken from Wikimedia Commons and are in the public domain or carry no known copyright restrictions.
+All images were taken from Wikimedia Commons. The historical images are in the public domain or carry no known copyright restrictions; the two bottle photographs on the pour slides carry the licences listed with them.
 
 - **Slide 1 (cover).** "Wild Spain records of sport with rifle, rod, and gun, natural history and exploration (1893) (14751909382).jpg". Illustration from Abel Chapman and Walter J. Buck, _Wild Spain_ (1893), scanned by the Internet Archive from a University of California copy. No known copyright restrictions. The library stamp was cropped. The caption does not name the bodega's town, because the book's caption was not checked.
 - **Slide 5.** "David Lloyd George.jpg". Portrait photograph, photographer not named on the Commons page. Public domain (PD-US).
 - **Slide 3.** "1865-09-17, El Museo Universal, Interior de uno de los departamentos de la bodega de los señores González y Byass, en Jerez de la Frontera.jpg", engraving from _El Museo Universal_, 17 September 1865, signed Rico. Public domain (published 1865). The printed caption on the engraving confirms the slide caption.
+
+Bottle photographs on the pour slides, added 24 November 2026. The licence, author and date of each are as given in Wikimedia Commons' own data for the file; the file pages themselves could not be opened from the build machine.
+
+- **Slide 8.** "Glenmorangie - 10 years old -Scotch Whisky.JPG", by Datenralfi, 31 January 2021, Wikimedia Commons. CC BY-SA 3.0 Germany. Cropped. It shows the bottle and box labelled "Glenmorangie The Original, Highland Single Malt Scotch Whisky, Aged Ten Years": the 10 year old sold until 2024, not the 12 year old poured.
+- **Slide 11.** "2011 Ross-shire Glenmorangie Lasanta 1-06-2011 14-24-21.jpg", by Paul Hermans, 1 June 2011, Wikimedia Commons. CC BY-SA 3.0. Cropped. It shows a gift box of 2011 with the bottle and two glasses; the label reads "Glenmorangie, The Lasanta, Extra Matured in Sherry Casks, 12 Years Old, 46% vol", an older label and a higher strength than the 43% bottle now on sale.
+- **Slide 14.** A plain bottle placeholder. The free photographs of a Macallan 12 found on Wikimedia Commons show other bottlings (the Fine Oak and the Colour Collection), not the Sherry Oak, so none was used.
+- **Slide 17.** A plain bottle placeholder. No freely licensed photograph of a GlenDronach 12 bottle was found; the Commons photographs show the 18 and 21 year olds on a shop shelf.
