@@ -49,11 +49,11 @@ def rows_card(s, x, y, w, items, label_w, row_h, mark=None, label_size=20, size=
         yy += row_h
 
 
-def pour_slide(n, pour, name, note, maker, style, abv, two_line_name=False):
-    """One pour: a bottle-shaped placeholder card (no free photograph of any of the four bottles
-    was in the old deck), the pour line, the name, the old slide's note, and Maker / Style / ABV."""
+def pour_slide(n, pour, name, note, maker, style, abv, two_line_name=False, photo=None, credit=None):
+    """One pour: the bottle's photograph (or the placeholder card when there is none), the pour
+    line, the name, the old slide's note, and Maker / Style / ABV."""
     s = new_slide()
-    bottle_placeholder(s, X, 0.8, 3.4, 5.3)
+    bottle_panel(s, photo, X, 0.8, 3.4, 5.3, credit)
     x, w = 4.85, 7.63
     kicker(s, pour, x=x)
     name_h = 1.55 if two_line_name else 0.85
@@ -133,7 +133,9 @@ footer(s, 4)
 # ---------------------------------------------------------------- 5 pour 1
 pour_slide(5, 'Pour 1 of 4', ['Glenmorangie', 'The Original'],
            ['Malt with next to no peat in it.'],
-           'Glenmorangie, Tain', 'Highland single malt, 12 years', '40%', two_line_name=True)
+           'Glenmorangie, Tain', 'Highland single malt, 12 years', '40%', two_line_name=True,
+           photo='glenmorangie-original.jpg',
+           credit='Pictured: the 10 year old sold until 2024. Photograph: Datenralfi, CC BY-SA 3.0 DE, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 6 Islay
 s = new_slide()
@@ -165,7 +167,9 @@ footer(s, 7)
 pour_slide(8, 'Pour 2 of 4', 'Bowmore 12',
            ['Usually described as medium peated.',
             'The same age and strength as the Glenmorangie, made from peated malt.'],
-           'Bowmore, Islay', 'Islay single malt, 12 years', '40%')
+           'Bowmore, Islay', 'Islay single malt, 12 years', '40%',
+           photo='bowmore-12.jpg',
+           credit='Photograph: Keeezawa, CC BY-SA 4.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 9 ppm
 s = new_slide()
@@ -218,7 +222,9 @@ footer(s, 11)
 # ---------------------------------------------------------------- 12 pour 3
 pour_slide(12, 'Pour 3 of 4', 'Caol Ila 12',
            ['Malt largely from Port Ellen, and a whisky made mostly for blending.'],
-           'Caol Ila, Islay', 'Islay single malt, 12 years', '43%')
+           'Caol Ila, Islay', 'Islay single malt, 12 years', '43%',
+           photo='caol-ila-12.jpg',
+           credit='Photograph: JIP, CC BY-SA 4.0, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 13 closures
 s = new_slide()
@@ -284,7 +290,9 @@ footer(s, 15)
 # ---------------------------------------------------------------- 16 pour 4
 pour_slide(16, 'Pour 4 of 4', 'Ardbeg Ten',
            ['The main bottling after the 1997 restart.'],
-           'Ardbeg, Islay', 'Islay single malt, 10 years', '46%')
+           'Ardbeg, Islay', 'Islay single malt, 10 years', '46%',
+           photo='ardbeg-ten.jpg',
+           credit='Pictured: the bottle and box of 2008. Photograph: Christoph Müller, CC BY-SA 2.0 DE, via Wikimedia Commons. Cropped.')
 
 # ---------------------------------------------------------------- 17 reading the label
 s = new_slide()

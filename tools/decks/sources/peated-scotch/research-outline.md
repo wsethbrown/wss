@@ -291,7 +291,7 @@ Glenmorangie The Original became a 12-year-old in 2024 at the same 40% and price
 
 ## Image credits
 
-All images were taken from Wikimedia Commons.
+All images were taken from Wikimedia Commons. The historical images are in the public domain; the four bottle photographs on the pour slides carry the licences listed with them.
 
 - **Slide 1 (cover).** "Ardbeg distillery Alfred Barnard.jpg". Engraving from Alfred Barnard, _The Whisky Distilleries of the United Kingdom_ (1887). Public domain (PD-old).
 - **Slide 2.** "Joseph Mallord William Turner and George Clint, Peat Bog, Scotland, published 1812, NGA 10669.jpg" (cropped). J. M. W. Turner and George Clint, National Gallery of Art, Washington. Public domain (NGA open access, CC0).
@@ -300,3 +300,10 @@ All images were taken from Wikimedia Commons.
 - **Slide 10.** "View of Port Ellen from ferry.jpg". Photo by Johan Florin, 2010, released to the public domain.
 
 The 1918 painting of Highland Railway No. 49 that was on slide 4 has been removed: the engine was built in 1919, half a century after the railway reached Tain, so it did not illustrate the 1860s line.
+
+Bottle photographs on the pour slides, added 23 November 2026. The licence, author and date of each are as given in Wikimedia Commons' own data for the file; the file pages themselves could not be opened from the build machine.
+
+- **Slide 5.** "Glenmorangie - 10 years old -Scotch Whisky.JPG", by Datenralfi, 31 January 2021, Wikimedia Commons. CC BY-SA 3.0 Germany. Cropped. It shows the bottle and box labelled "Glenmorangie The Original, Highland Single Malt Scotch Whisky, Aged Ten Years": the 10 year old sold until 2024, not the 12 year old poured.
+- **Slide 8.** "Bowmore12yo.jpg", by Keeezawa, 10 January 2023, Wikimedia Commons. CC BY-SA 4.0. Cropped. It shows the bottle and box labelled "Bowmore, Islay Single Malt Scotch Whisky, Aged 12 Years, 700 ml, 40% vol". Whether the label has changed since 2023 was not checked.
+- **Slide 12.** "Caol Ila Aged 12 Years.jpg", by JIP, Wikimedia Commons. CC BY-SA 4.0. Cropped. The label reads "Caol Ila, Aged 12 Years, Islay Single Malt Scotch Whisky, 70cl". The licence and author are as recorded for the file by Openverse; the photo's date was not retrieved.
+- **Slide 16.** "Ardbeg Ten.jpg", by Christoph Müller, 6 March 2008, Wikimedia Commons. CC BY-SA 2.0 Germany. Cropped. It shows the bottle and box of 2008, labelled "Ardbeg, The Ultimate Single Islay Malt Scotch Whisky, Guaranteed Ten Years Old, Non Chill-Filtered, 46% vol, 70cl".
