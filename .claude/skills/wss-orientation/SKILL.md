@@ -59,6 +59,7 @@ wss-production-launch.
   slides, build with `tools/decks/`, QA, load as a draft (start here for any
   new deck; it hands off to the next two)
 - wss-deck-outline — researching a deck and writing its research outline
+- wss-research — any factual research: when to search, which sources to trust, and labeling what is sourced, inferred and uncertain
 - wss-deck-speaker-notes — the host's kit and read-aloud script, and the
   markdown the build tools and the site import rely on
 - wss-societies — privacy model, invites, member management, creation paywall

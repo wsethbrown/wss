@@ -16,6 +16,10 @@ way round.
 
 ## Research: the hard line
 
+The general rules for any research (when to search, which sources to trust, and how to
+label what is sourced, inferred and uncertain) are in the `wss-research` skill. Read it
+first; this section adds what is particular to a deck.
+
 "You need to do thorough research." Facts from memory are not acceptable, however sure you
 feel. Memory is where to start looking, never the source. Everything in "What's established"
 was found in a source during this deck's research, and the source is listed.

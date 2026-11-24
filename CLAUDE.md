@@ -215,6 +215,7 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 - **@docs/redesign/TASKS.md** - The redesign and backend task list with acceptance criteria and test plans
 - **docs/relaunch.md** - Bringing production back on a new server with `bin/relaunch-production` (tests: `test/bin/relaunch_production_test.sh`)
 - **tools/decks/README.md** - Deck build tools (pptx, branded PDFs, slide PNGs from markdown); the pilot deck's sources in `tools/decks/examples/`
+- **.claude/skills/wss-research/** - How to research a factual question and report what is sourced, inferred and uncertain (used by deck research and for any fact-checking)
 - **.claude/skills/wss-deck-creation/** - How to make a tasting-night deck package (with `wss-deck-outline` for research and `wss-deck-speaker-notes` for the script)
 
 ### Logging (STANDING RULE — applies to every change, not just debugging)
