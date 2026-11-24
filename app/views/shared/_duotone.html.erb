@@ -2,9 +2,16 @@
     cream. The only way a photograph appears on the site, and at most one per
     view. Sources and licences: docs/redesign/IMAGE_CREDITS.md.
     Locals:
-      src  (String) asset path of a greyscale image under app/assets/images
-      alt  (String) what the photograph shows
-      css  (String, optional) sizing classes, e.g. an aspect ratio %>
-<figure class="duotone <%= local_assigns[:css] %>">
-  <%= image_tag src, alt: alt, loading: "lazy", decoding: "async" %>
+      src    (String) asset path of a greyscale image under app/assets/images
+      alt    (String) what the photograph shows
+      css    (String, optional) sizing classes, e.g. an aspect ratio
+      width, height (Integer, optional) the file's pixel size, so the
+             browser reserves the space before the lazy image arrives
+    Motion (the appear controller): the photograph settles from a slight
+    scale to its place the first time it is seen (photo), clipped by the
+    frame so nothing shifts, and fades in if it is still loading (image).
+    appear: false leaves it out of both (the homepage story frame moves it). %>
+<% appear = local_assigns[:appear] != false %>
+<figure class="duotone <%= local_assigns[:css] %>"<% if appear %> data-appear-target="photo"<% end %>>
+  <%= image_tag src, alt: alt, loading: local_assigns.fetch(:loading, "lazy"), decoding: "async", width: local_assigns[:width], height: local_assigns[:height], data: (appear ? { appear_target: "image" } : {}) %>
 </figure>

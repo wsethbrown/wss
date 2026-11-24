@@ -1,0 +1,134 @@
+<%# The homepage story's frame: one pinned screen for the whole story, whose
+    objects travel from each step's arrangement to the next
+    (story_frame_controller.js; the content comes from StoryFrameHelper).
+    Presentational: aria-hidden, nothing in it takes focus (the static faces
+    beside each step's words carry the same content for screen readers, the
+    keyboard, no JS and print). Hidden until its controller runs.
+    Every object sits at its resting place for the hero; the controller
+    places the rest. Sizes are in cqw (1cqw = 1% of the screen's width),
+    so the frame scales like a picture.
+    locals: frame (StoryFrameHelper#story_frame). %>
+<% content_for :head do %>
+  <%# Its styles: app/assets/stylesheets/home/story_frame.css (no inline <style>: the CSP, issue #46). %>
+  <%= stylesheet_link_tag "home/story_frame" %>
+<% end %>
+<% f = frame %>
+<% inv = f[:invite] %>
+<% rec = f[:record] %>
+<% heading = rec[:kind] == :verdict ? "The verdict" : "The tasting record" %>
+<% invite_caption = inv[:sample] ? "Gather your society" : "The next tasting night" %>
+<% listed = rec[:kind] == :reviews %>
+<% config = { rows: f[:rows].size, picked: f[:picked], sample: inv[:sample], invite_glasses: inv[:glasses], going: inv[:going].present?,
+              record: rec[:kind], record_glasses: rec[:glasses], seats: f[:seats], table: f[:table], slide_in_invite: f[:slide_in_invite],
+              slide_in_record: f[:slide_in_record], wheel: rec[:profile].present?,
+              levels: rec[:pours] ? rec[:pours].map { |p| p[:level].round(3) } : (rec[:kind] == :review ? [ rec[:level].round(3) ] : []) } %>
+<div class="mm" data-story-frame-target="frame" data-config="<%= config.to_json %>" aria-hidden="true">
+  <div class="mm-pin">
+    <div class="mm-player">
+      <div class="mm-screen" data-story-frame-target="screen">
+        <div class="mm-layer mm-paper" data-mm="paper"></div>
+        <div class="mm-layer mm-oak" data-mm="oak"></div>
+        <div class="mm-layer mm-mark" data-mm="mark"></div>
+        <div class="mm-layer mm-photo" data-mm="photo">
+          <div class="mm-ph" data-mm="ph">
+            <%= render "shared/duotone", src: "photos/tasting-night-living-room.jpg", css: "duotone--heavy mm-ph-img", width: 1280, height: 512, alt: "", appear: false, loading: "eager" %>
+          </div>
+        </div>
+
+        <%# The record's card: the night's palate wheel, or the (first row's) review's score and wheel (or notes). %>
+        <% if rec[:kind] == :verdict && rec[:profile].present? %>
+          <div class="mm-obj mm-card" data-mm="card">
+            <div class="mm-wheel"><%= render "reviews/palate_wheel", profile: rec[:profile], draw: false, wedge_pours: rec[:wedge_pours] %></div>
+          </div>
+        <% elsif rec[:kind] == :review || listed %>
+          <% review = rec[:review] %>
+          <% tasting = { "Nose" => review.nose, "Palate" => review.palate, "Finish" => review.finish }.compact_blank %>
+          <div class="mm-obj mm-card mm-card--review<%= ' mm-card--notes' if rec[:profile].blank? %>" data-mm="card">
+            <div class="mm-score" data-mm="card-score"><%= render "shared/score", value: review.rating.to_f, appear: false %></div>
+            <% if rec[:profile].present? %>
+              <div class="mm-wheel"><%= render "reviews/palate_wheel", review: review, draw: false %></div>
+            <% elsif tasting.any? %>
+              <dl><% tasting.each do |label, text| %><div><dt><%= label %></dt><dd><%= text %></dd></div><% end %></dl>
+            <% end %>
+          </div>
+        <% end %>
+
+        <%# The library. The picked row's words and thumbnail are the travelling objects below. %>
+        <div class="mm-obj" data-mm="head"><span class="mm-h4 mm-t-head"><span class="mm-roll" data-states="<%= [ "", "Latest decks", "" ].to_json %>"></span></span></div>
+        <% f[:rows].each_with_index do |row, i| %>
+          <% if i == f[:picked] %>
+            <div class="mm-obj mm-rule" data-mm="row" data-row="<%= i %>"></div>
+          <% else %>
+            <div class="mm-obj mm-row" data-mm="row" data-row="<%= i %>">
+              <div class="mm-rule"></div>
+              <div class="mm-th"><% if row[:thumb] %><%= image_tag image_variant(row[:thumb], :card), alt: "", loading: "eager", decoding: "async" %><% end %></div>
+              <div class="mm-rt"><%= row[:title] %></div>
+              <div class="mm-rm"><%= row[:meta] %></div>
+            </div>
+          <% end %>
+        <% end %>
+
+        <%# The record's heading and the rules between its rows. %>
+        <div class="mm-obj" data-mm="heading"><span class="mm-h4 mm-t-heading"><span class="mm-roll" data-states="<%= [ "", heading ].to_json %>"></span></span></div>
+        <% if rec[:pours] %>
+          <% rec[:pours].each_index do |k| %><div class="mm-obj mm-vline" data-mm="vline" data-k="<%= k %>"></div><% end %>
+        <% end %>
+
+        <%# The deck: the hero's first slide, the picked row's thumbnail, the slide at the table. %>
+        <div class="mm-obj mm-slide-obj" data-mm="slide">
+          <div class="mm-lift" data-mm="lift"></div>
+          <div class="mm-slide">
+            <% if f[:slide] %>
+              <%= image_tag image_variant(f[:slide], :hero), alt: "", loading: "eager", decoding: "async" %>
+            <% else %>
+              <div class="mm-slide-ink"><span class="mm-h4">Every pour has a story.</span></div>
+            <% end %>
+          </div>
+        </div>
+
+        <%# Words that travel and change by rolling. %>
+        <div class="mm-obj" data-mm="time"><span class="mm-t-time mm-roll" data-states="<%= [ "", inv[:time], "" ].to_json %>"></span></div>
+        <% if inv[:tag] %>
+          <div class="mm-obj" data-mm="tag"><span class="mm-tag"><span class="mm-roll" data-states="<%= [ "", inv[:tag], "" ].to_json %>"></span></span></div>
+        <% end %>
+        <div class="mm-obj" data-mm="date"><span class="mm-t-date mm-roll" data-states="<%= [ "", inv[:date], "" ].to_json %>"></span></div>
+        <div class="mm-obj" data-mm="title"><span class="mm-t-title mm-roll" data-mode="words" data-states="<%= [ f[:rows][f[:picked]]&.dig(:title).to_s, inv[:title], rec[:title] ].to_json %>"></span></div>
+        <div class="mm-obj" data-mm="meta"><span class="mm-t-where mm-roll" data-mode="words" data-states="<%= [ f[:rows][f[:picked]]&.dig(:meta).to_s, inv[:where], rec[:meta] ].to_json %>"></span></div>
+        <div class="mm-obj" data-mm="going"><span class="mm-t-going mm-roll" data-states="<%= [ "", inv[:going], "" ].to_json %>"></span></div>
+
+        <% if listed %>
+          <div class="mm-obj mm-rv" data-mm="review"><span class="mm-rv-more"><%= with_arrow("Read the full tasting") %></span></div>
+        <% elsif rec[:kind] == :review && rec[:sample] %>
+          <%# The sample review has no words, reviewer or link: its name and
+              "Sample review" are the title and meta above. %>
+        <% elsif rec[:kind] == :review %>
+          <% review = rec[:review] %>
+          <% quote = review.notes.presence %>
+          <div class="mm-obj mm-rv" data-mm="review">
+            <% if quote %><p class="mm-rv-quote">&ldquo;<%= quote %>&rdquo;</p><% end %>
+            <div class="mm-rv-by"><b><%= "#{review.user.first_name} #{review.user.last_name}" %></b> <%= render "shared/century_badge", record: review.user, tone: :dark %> · <%= review.created_at.strftime("%B %-d, %Y") %></div>
+            <span class="mm-rv-more"><%= with_arrow("Read the full tasting") %></span>
+          </div>
+        <% end %>
+
+        <%# The glasses: guests on the invite, seats at the table, the night's pours. %>
+        <% f[:seats].times do |k| %>
+          <% pour = rec[:pours]&.[](k) %>
+          <div class="mm-obj mm-glass" data-mm="glass" data-k="<%= k %>"><%= render "shared/glass", level: 1, size: 40, appear: false %></div>
+          <div class="mm-obj" data-mm="label" data-k="<%= k %>"><span class="mm-t-label mm-roll" data-states="<%= [ "", inv[:initials][k].to_s, pour ? pour[:name] : "" ].to_json %>"></span></div>
+          <% if pour %>
+            <div class="mm-obj" data-mm="score" data-k="<%= k %>"><span class="mm-t-score mm-roll" data-align="right" data-states="<%= [ "", pour[:score] ].to_json %>"></span></div>
+          <% end %>
+          <% if pour && pour[:by] %>
+            <div class="mm-obj" data-mm="by" data-k="<%= k %>"><span class="mm-t-by mm-roll" data-mode="words" data-states="<%= [ "", pour[:by] ].to_json %>"></span></div>
+          <% end %>
+        <% end %>
+      </div>
+      <div class="mm-bar">
+        <%# Plain strings: escaped once here, set with textContent by the controller. %>
+        <span class="mm-roll" data-mm="cap-l" data-states="<%= [ f[:hero_title], "The library", invite_caption, f[:hero_title], "The tasting record" ].to_json %>"></span>
+        <span class="mm-roll" data-mm="cap-r" data-align="right" data-states="<%= ([ f[:hero_meta], "" ] + (1..f[:table]).map { |k| "Glass #{k} of #{f[:table]}" } + [ "" ]).to_json %>"></span>
+      </div>
+    </div>
+  </div>
+</div>

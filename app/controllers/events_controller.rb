@@ -22,6 +22,14 @@ class EventsController < ApplicationController
 
   def show
     authorize @event
+
+    # Add to calendar: the same permission as the page (EventPolicy#show?).
+    if request.format.ics?
+      ics = EventIcs.new(@event, url: society_event_url(@event.society, @event))
+      Rails.logger.info "Event #{@event.id}: .ics downloaded by #{current_user ? "user #{current_user.id}" : 'a signed-out visitor'}"
+      send_data ics.to_s, type: "text/calendar; charset=utf-8", disposition: "attachment", filename: ics.filename
+      return
+    end
     @pours = @event.event_bottles.ordered.includes(:bottle)
     @pours_visible = @event.pours_visible_to?(current_user)
     @rsvps = @event.event_rsvps.includes(:user)
@@ -46,16 +54,12 @@ class EventsController < ApplicationController
     @event = Event.new(event_params)
     @event.organizer = current_user
     resolve_host_query
-    # A deck can only be attached by someone entitled to offer it; anything
-    # else silently drops (decks are optional, never a hard failure). Checked
-    # against ownership directly, NOT deck_options_for — that helper always
-    # allows the event's current deck, which here is the one being smuggled.
-    if @event.presentation_id.present?
-      offerable_ids = [ @event.society&.creator_id, current_user.id, @event.host_id ].compact.uniq
-      unless Presentation.published.exists?(id: @event.presentation_id, author_id: offerable_ids)
-        Rails.logger.warn "Event create by user #{current_user.id}: deck #{@event.presentation_id} dropped, not offerable for society #{@event.society_id}"
-        @event.presentation_id = nil
-      end
+    # A deck can only be attached when the night could run it (Event#offerable_decks);
+    # anything else drops (decks are optional, never a hard failure). The
+    # current deck is excluded from the check: here it is the submitted value.
+    if @event.presentation_id.present? && !@event.deck_offerable?(@event.presentation_id, organizer: current_user, include_current: false)
+      Rails.logger.warn "Event create by user #{current_user.id}: deck #{@event.presentation_id} dropped, not offerable for society #{@event.society_id}"
+      @event.presentation_id = nil
     end
 
     # Convert times from browser timezone to UTC for storage
@@ -136,12 +140,13 @@ class EventsController < ApplicationController
       Rails.logger.info "Event #{@event.id}: deck cleared by user #{current_user.id}"
       redirect_to society_event_path(@society, @event), notice: "Deck removed from this event."
     else
-      deck = deck_options_for(@event).find { |p| p.id == params[:presentation_id].to_i }
+      deck = @event.offerable_decks.find { |p| p.id == params[:presentation_id].to_i }
       if deck
         @event.update!(presentation: deck)
         Rails.logger.info "Event #{@event.id}: deck set to presentation #{deck.id} by user #{current_user.id}"
         redirect_to society_event_path(@society, @event), notice: "This night runs #{deck.title}."
       else
+        Rails.logger.warn "Event #{@event.id}: deck #{params[:presentation_id].to_i} refused for user #{current_user.id}, not offerable in society #{@society.id}"
         redirect_to society_event_path(@society, @event), alert: "That deck isn't available for this event."
       end
     end
@@ -155,7 +160,7 @@ class EventsController < ApplicationController
   # is a read of the same data, not a lesser thing.
   def deck_options
     authorize @event, :manage_deck?
-    render json: autocomplete_matches(deck_options_for(@event), params[:q], &:title)
+    render json: autocomplete_matches(@event.offerable_decks, params[:q], &:title)
   end
 
   # Who can be tagged in Table talk. Gated on comment?, NOT update?: anyone
@@ -285,16 +290,6 @@ class EventsController < ApplicationController
            .first(AUTOCOMPLETE_LIMIT)
            .map { |record| { id: record.id, label: label.call(record) } }
   end
-
-  # Decks offerable on an event: published, owned by the society creator,
-  # the organizer, or the host. The current deck stays selectable.
-  def deck_options_for(event)
-    owner_ids = [ event.society.creator_id, event.organizer_id, event.host_id ].compact.uniq
-    options = Presentation.published.where(author_id: owner_ids).to_a
-    options |= [ event.presentation ] if event.presentation
-    options
-  end
-  helper_method :deck_options_for
 
   def event_params
     # society_id is permitted only on create (the nested form); update must not

@@ -1,11 +1,12 @@
-Tomorrow: <%= @event.title %>
+<%= @event.start_date_label %>: <%= @event.title %>
 
 When: <%= @event.start_time_label %>
 <% if @event.location.present? %>Where: <%= @event.location %>
 <% end %>
 See the event: <%= society_event_url(@event.society, @event) %>
 
-Change your RSVP with one click:
+Change your RSVP with one click.
+You can change your answer until the night starts. A new yes closes 24 hours before.
   Yes:   <%= @rsvp_urls["yes"] %>
   Maybe: <%= @rsvp_urls["maybe"] %>
   No:    <%= @rsvp_urls["no"] %>

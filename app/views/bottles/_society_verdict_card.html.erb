@@ -33,6 +33,6 @@
 
   <div class="mt-4 flex flex-wrap items-center justify-between gap-2">
     <p class="text-sm text-mute"><%= pluralize(society.verdict_reviewers, "taster") %> at their nights</p>
-    <%= link_to "Read the tastings →", verdict_bottle_path(bottle, society_id: society.id), class: "text-sm font-semibold text-ink hover:underline" %>
+    <%= link_to with_arrow("Read the tastings"), verdict_bottle_path(bottle, society_id: society.id), class: "text-sm font-semibold text-ink hover:underline" %>
   </div>
 </article>

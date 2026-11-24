@@ -1,0 +1,39 @@
+<%# Extra sections: free sections on the deck page, each a heading and a few
+    lines, rendered where "What you'll taste" used to be (they replaced the
+    four fixed tasting boxes). One card per section (_section_card).
+    The hidden field below always sends one empty section, which the model
+    drops: it keeps the key in the request when every card is removed, so
+    removing the last section clears them. Locals: form, presentation %>
+<% sections = Array(presentation.sections).select { |section| section.is_a?(Hash) } %>
+<% problems = presentation.errors.full_messages_for(:sections) %>
+<%# After a refused save, only the sections at fault are marked invalid. %>
+<% in_error = problems.any? ? Presentation.sections_in_error(sections) : [] %>
+<section id="f-sections" class="card scroll-mt-56 p-5 sm:p-7" data-controller="deck-sections">
+  <h2 class="text-xl font-semibold text-ink">Extra sections</h2>
+  <p id="sections-hint" class="mb-5 mt-1 text-sm text-mute">One line per item. Write "Nose: vanilla and oak" for a labelled row.</p>
+
+  <% if problems.any? %>
+    <ul class="mb-4 list-inside list-disc rounded-2xl bg-red-50 px-4 py-3 text-sm text-red-700">
+      <% problems.each do |problem| %>
+        <li><%= problem %></li>
+      <% end %>
+    </ul>
+  <% end %>
+
+  <input type="hidden" name="presentation[sections][][heading]" value="" autocomplete="off">
+  <div data-deck-sections-target="container" class="space-y-4">
+    <% sections.each_with_index do |section, index| %>
+      <%= render "admin/presentations/section_card", index: index, heading: section["heading"],
+                 lines: Array(section["lines"]).join("\n"), invalid: in_error.include?(index + 1) %>
+    <% end %>
+  </div>
+
+  <button type="button" data-action="click->deck-sections#add" class="btn btn-secondary mt-4 min-h-11 py-2.5">
+    <svg class="h-5 w-5" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path></svg>
+    Add a section
+  </button>
+
+  <template data-deck-sections-target="template">
+    <%= render "admin/presentations/section_card", index: "NEW_SECTION", heading: "", lines: "", invalid: false %>
+  </template>
+</section>

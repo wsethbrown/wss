@@ -21,13 +21,32 @@ source of truth for what's done and what's next. Key invariants established ther
   Do not reintroduce email-domain admin checks.
 - **Credits:** `credit_transactions` is the ledger and single source of truth. `users.credits` is a
   cache recomputed from the ledger; NEVER write it directly. All changes go through
-  `CreditTransaction.record!` / `use_credit` / `grant_monthly_credit` / `expire_all_credits`.
+  `CreditTransaction.record!` / `use_credit` / `grant_monthly_credit`. Credits are never wiped
+  when a membership ends; `use_credit` refuses to spend them until the member is active again.
 - **Stripe webhooks:** Idempotent via the `StripeEvent` claim table — process each event once.
 - **Secrets:** No `.pem`/`.key`/`.env`/`*.log` in git (see `.gitignore`); use env vars / credentials.
   The previously committed Apple signing key is compromised and must be rotated.
 - **Design:** The 2026 redesign is the direction: paper ground, white hairline cards, bottle
   green for ink and solid objects, the logo orange as a small mark only (never yellow/amber).
   `whiskey-*` is now the green-neutral scale. Rules and components: **@docs/redesign/DESIGN_SYSTEM.md**.
+
+## Issue tracker: GitHub Issues
+
+Open work lives in GitHub Issues on `wsethbrown/wss`, not in conversations.
+
+- At the start of a session, read the open issues (`gh issue list`) before picking up work.
+- Anything found but not finished in the session becomes an issue before the session ends: a bug noticed in passing, a check nobody has done, a decision waiting on the owner.
+- Reference the issue in commits and pull requests (`Fixes #N` closes it on merge). Close an issue only when the fix is verified, and say how.
+- The repository is public, so issues are too. Never put secrets, customer data, email addresses, server details or an unfixed security weakness in an issue; raise those with the owner privately.
+
+## Spelling: American
+
+The owner, 23 November 2026: use American spelling (color, flavor, labeled, aging, center,
+recognize) in everything written for this project: decks, scripts, site copy, emails, docs,
+commit messages. Two exceptions: text inside a quotation keeps the source's spelling, and a
+deck or page whose subject is British (Scotch, Irish and so on) may use British spelling.
+"Whisky" and "whiskey" follow the bottle or the country, as they always have.
+`tools/decks/american.py <files>` converts a file outside its quotation marks; read its output.
 
 ## Development Commands
 
@@ -194,6 +213,10 @@ This prevents context loss! Update this file IMMEDIATELY when creating important
 - **@docs/redesign/DESIGN_SYSTEM.md** - The 2026 design system: surfaces, colour, type, components, rejected directions
 - **@docs/redesign/ARCHITECTURE_REVIEW.md** - November 2026 architecture and backend review, findings by severity
 - **@docs/redesign/TASKS.md** - The redesign and backend task list with acceptance criteria and test plans
+- **docs/relaunch.md** - Bringing production back on a new server with `bin/relaunch-production` (tests: `test/bin/relaunch_production_test.sh`)
+- **tools/decks/README.md** - Deck build tools (pptx, branded PDFs, slide PNGs from markdown); the pilot deck's sources in `tools/decks/examples/`
+- **.claude/skills/wss-research/** - How to research a factual question and report what is sourced, inferred and uncertain (used by deck research and for any fact-checking)
+- **.claude/skills/wss-deck-creation/** - How to make a tasting-night deck package (with `wss-deck-outline` for research and `wss-deck-speaker-notes` for the script)
 
 ### Logging (STANDING RULE — applies to every change, not just debugging)
 

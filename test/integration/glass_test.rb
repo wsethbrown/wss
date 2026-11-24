@@ -19,9 +19,40 @@ class GlassPartialTest < ActiveSupport::TestCase
     clip = svg.at_css("clipPath")
     assert clip, "the liquid needs its clipPath"
     assert_equal "url(##{clip['id']})", svg.at_css("g")["clip-path"]
-    # y = 58.5 - 0.5 * 34 = 41.5; the body starts at y + 1.2.
-    assert_match(/\AM8 42.7 /, svg.css("g path").first["d"])
-    assert_equal %w[#e65c00 #f47a26], svg.css("g path").map { |p| p["fill"] }
+    # y = 58.5 - 0.5 * 24 = 46.5; the body starts at y + 1.2.
+    assert_match(/\AM8 47.7 /, svg.css("g path").first["d"])
+    assert_equal %w[#e65c00], svg.css("g path").map { |p| p["fill"] }, "one colour of liquid, no lighter crest"
+  end
+
+  test "a full glass stops well below the rim, and half is half of that" do
+    surface = ->(level) { glass(level: level, size: 64).at_css("g path")["d"][/\AM8 ([\d.]+)/, 1].to_f - 1.2 }
+    assert_in_delta 34.5, surface.(1.0), 0.01, "full sits a little above the bowl's widest point (y 45), clear of the rim (y 5)"
+    assert_in_delta 46.5, surface.(0.5), 0.01, "half is half of the new full"
+    assert_in_delta (58.5 + surface.(1.0)) / 2, surface.(0.5), 0.01
+    js = File.read(Rails.root.join("app/javascript/controllers/appear_controller.js"))
+    assert_match(/const GLASS_SPAN = 24/, js, "the pour and re-pour move by the same span")
+    assert_includes js, "level * GLASS_SPAN + 4"
+    assert_match(/const DROP = 28/, File.read(Rails.root.join("app/javascript/controllers/story_glass_controller.js")), "the story glass empties by span + 4")
+  end
+
+  test "the foot has its own small reflection, from 36px up" do
+    assert glass(level: 0.5, size: 40).at_css("svg path[data-glass-shine=foot]")
+    assert_nil glass(level: 0.5, size: 28).at_css("svg path[data-glass-shine=foot]"), "at 28px it would be noise"
+    assert_nil glass(level: 0.5, size: 40).at_css("g path[data-glass-shine]")
+    assert_nil glass(level: 0.5, size: 64, tone: :cream).at_css("svg path[data-glass-shine=foot]"), "only the green foot reflects"
+  end
+
+  test "the only highlight is a reflection on the glass, never part of the liquid" do
+    svg = glass(level: 0.5, size: 40).at_css("svg")
+    shine = svg.at_css("path[data-glass-shine='']") || svg.css("path[data-glass-shine]").find { |p| p["data-glass-shine"] != "foot" }
+    assert shine, "a reflection streak"
+    assert_nil svg.at_css("g path[data-glass-shine]"), "outside the liquid's group, so it never moves with the level"
+    assert_equal "none", shine["fill"]
+    assert_operator shine["stroke-opacity"].to_f, :<, 1, "soft"
+    assert_operator shine["stroke-width"].to_f, :<=, 2.5, "narrow"
+    xs = shine["d"].scan(/[\d.]+/).each_slice(2).map { |x, _| x.to_f }
+    assert xs.all? { |x| x < 22 }, "near the left wall of the bowl, not a band across it"
+    assert glass(level: 0, size: 40).css("svg path[data-glass-shine]").any? { |p| p["data-glass-shine"] != "foot" }, "an empty glass still has its reflection"
   end
 
   test "an empty glass has no liquid, and a glass is never below 28px" do
@@ -33,13 +64,16 @@ class GlassPartialTest < ActiveSupport::TestCase
   test "cream tone on green, numeral in white over a full glass, label as sr-only text" do
     html = glass(level: 0.9, tone: :cream, numeral: 2, size: 64, label: "Pour 2,")
     svg = html.at_css("svg")
-    assert_equal %w[#ff6d00 #ff8a33], svg.css("g path").map { |p| p["fill"] }
-    assert_equal "#f6f4ee", svg.at_css("> path")["stroke"]
+    assert_equal %w[#ff6d00], svg.css("g path").map { |p| p["fill"] }
+    assert_equal "#f6f4ee", svg.at_css("> path[stroke-width='3']")["stroke"], "the bowl is drawn in cream"
     assert_equal "#fff", svg.at_css("text")["fill"]
     assert_equal "Pour 2,", html.at_css(".sr-only").text
 
     low = glass(level: 0.3, numeral: 1, size: 64).at_css("text")
     assert_equal "#16332a", low["fill"]
+    # Partly above the liquid it stays ink, never white on paper.
+    assert_equal "#16332a", glass(level: 0.75, numeral: 1, size: 64).at_css("text")["fill"]
+    assert_equal "#fff", glass(level: 0.95, numeral: 1, size: 64).at_css("text")["fill"]
   end
 
   test "the numeral is ignored below 64px" do
@@ -194,7 +228,10 @@ class GlassPagesTest < ActionDispatch::IntegrationTest
     get root_path
     slide = css_select(".f4 .sl").first
     assert_match "The tasting record", slide.text
-    assert_empty slide.css("svg[data-glass]")
+    # No verdict glasses: one glass per listed review, plus the featured
+    # review's score (shared/_score) on the white card.
+    assert_equal slide.css(".rv-rows li.pour").size + 1, slide.css("svg[data-glass]").size
+    assert_equal 1, slide.css(".review .rv-card [data-score] svg[data-glass]").size
     assert_no_match "The verdict", slide.text
     assert_no_match "Allocated Bottles Night", response.body
   end

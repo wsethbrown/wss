@@ -1,0 +1,40 @@
+{
+  "slug": "MGP-Rye",
+  "title": "MGP Rye",
+  "subtitle": "One Indiana distillery and the American rye revival",
+  "category": "American Whiskey",
+  "difficulty": "Intermediate",
+  "duration": "50 min",
+  "description": "The story of the Lawrenceburg, Indiana distillery: George Ross's Rossville distillery of 1847, the Seagram years and the 95% rye made to flavor blends, a near-closure, and the rye revival that took its whiskey out under one label after another. Four pours, each from the same distillery in different hands.",
+  "tags": "rye, american whiskey, history, distilleries, sourcing, blending",
+  "pours": [
+    {
+      "name": "Bulleit 95 Rye",
+      "origin": "Distilled in Lawrenceburg, Indiana; bottled by Bulleit in Kentucky",
+      "style": "Straight rye whiskey, 95% rye, 5% malted barley",
+      "strength": "45% ABV (90 proof)",
+      "notes": "The opener, poured at the start while the history is told. Made to Bulleit's specification on the Lawrenceburg 95% rye recipe."
+    },
+    {
+      "name": "George Dickel Rye",
+      "origin": "Distilled in Lawrenceburg, Indiana; George Dickel (Diageo)",
+      "style": "Rye whiskey, 95% rye, 5% malted barley, chill and sugar-maple charcoal filtered",
+      "strength": "45% ABV (90 proof)",
+      "notes": "The same recipe with a step from Dickel's Tennessee tradition. Taste it next to glass 1 and ask what the charcoal does."
+    },
+    {
+      "name": "Templeton Straight Rye",
+      "origin": "Distilled in Lawrenceburg, Indiana; bottled by Templeton in Templeton, Iowa",
+      "style": "Straight rye whiskey, 95% rye, 5% malted barley, at least 4 years",
+      "strength": "45% ABV (90 proof)",
+      "notes": "Named for Templeton, Iowa. The label changed in 2015, and Templeton now makes its own rye in Iowa. This bottle is still made from rye it buys. Check the back label."
+    },
+    {
+      "name": "Rossville Union Straight Rye",
+      "origin": "MGP Distillery (called Ross & Squibb 2021 to 2026), Lawrenceburg, Indiana",
+      "style": "Straight rye whiskey, a blend of the distillery's 95% and 51% rye recipes, at least 4 years",
+      "strength": "47% ABV (94 proof)",
+      "notes": "The distillery under its own name, launched in 2018 and named after George Ross's Rossville distillery of 1847."
+    }
+  ]
+}

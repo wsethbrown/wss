@@ -1,22 +1,20 @@
 <%# The homepage.
 
-    The top of the page is one presentation. A deck screen stays pinned on
-    the right while the story scrolls past on the left, and each part of the
-    story drops a new slide onto the screen: the real deck, the real library,
-    the next real tasting night, the real tasting record. The later slides are
-    drawn in HTML with the deck template's own colours and type.
-    Pure CSS (sticky grid areas); on phones each slide follows its text.
-    Every visual is real data; nothing renders when the data is missing.
+    The top of the page is one presentation. One frame stays pinned beside
+    the story (a band at the top on phones) and its objects travel from each
+    step's arrangement to the next: the deck's slide shrinks into its row in
+    the library, the row lifts into the invite, the invite opens onto the
+    table, the glasses become the record (home/_story_frame,
+    story_frame_controller.js). Each step also has its static face beside its
+    words, server-rendered real HTML: that is the page without JS, in print
+    and for screen readers. Every visual is real data; nothing renders when
+    the data is missing.
     Styles are scoped to .hx (see docs/redesign/DESIGN_SYSTEM.md). %>
 <%
-  showcase_slides =
-    if @showcase_deck
-      @showcase_deck.slide_images.order(:id).first(@showcase_deck.effective_preview_slide_count)
-    else
-      []
-    end
+  showcase_slides = hero_reel_slides(@showcase_deck)
+  showcase_slide_count = @showcase_deck ? @showcase_deck.slide_images.count : 0
+  # The reel's length names its keyframes in home/index.css (.reel--3).
   reel = [ showcase_slides.size, 1 ].max
-  step = (100.0 / reel).round(2)
   rules = [
     "One presenter a month, everyone takes a turn.",
     "Research your topic like you mean it.",
@@ -24,219 +22,33 @@
     "No dry fact sheets. Follow the narrative threads."
   ]
   faqs = [
-    [ "What if I'm a complete whiskey beginner?", "Perfect. The decks are written for every experience level. Start with something like Bourbon Basics: the script covers the fundamentals and makes you sound like you've done this before, because the research already has." ],
+    [ "What if I'm a complete whiskey beginner?", "Perfect. The decks are written for every experience level. Each one covers the fundamentals and makes you sound like you've done this before." ],
     [ "How long is a deck?", "Most run 15–20 minutes, built for a relaxed evening. The structure bends: linger on a tasting when the room is into it, or trim sections for a casual night." ],
     [ "What equipment do I need?", "Glasses, water for rinsing, and the bottles from the deck's list. Tasting mats and notes come as downloadable PDFs. Nothing fancy required." ],
-    [ "Can I customize a deck?", "Yes. Swap bottles for budget or availability, skip sections, add your own chapter. Decks are guides with a spine, not scripts you owe obedience to." ],
+    [ "Can I customize a deck?", "Yes. Swap bottles for budget or availability, skip sections, or add a chapter of your own. The deck is a starting point." ],
     [ "How much do the whiskeys cost?", "Every deck recommends bottles across price ranges. You can host a full tasting for $60–80 total, or go deep with bottles north of $200, there's a version of the night for both." ],
     [ "What's the Century badge?", "The amber star beside certain tasters and societies. It marks anyone followed by 100 or more members, a signal that the room trusts their palate. There's no fee and no application: reach a hundred followers and it appears." ]
   ]
 %>
 
 <% content_for :head do %>
-  <style>
-    .hx { --bg: #f6f4ee; --card: #fff; --ink: #16332a; --text: #1b2924; --mute: #5f6b64; --line: rgba(22, 51, 42, .12); --mark: #ff6d00; --mark-deep: #e65c00; --pad: 20px;
-          background: var(--bg); color: var(--text); font-family: "Instrument Sans", system-ui, sans-serif; overflow-x: clip; }
-    .hx *, .hx *::before { box-sizing: border-box; }
-    .hx .wrap { max-width: 1240px; margin: 0 auto; padding: 0 var(--pad); }
-    .hx h1, .hx h2 { font-weight: 600; color: var(--ink); text-wrap: balance; }
-    .hx h1 { font-size: clamp(3rem, 6.6vw, 6rem); line-height: .94; letter-spacing: -.052em; }
-    .hx h2 { font-size: clamp(2.25rem, 4.6vw, 4rem); line-height: 1; letter-spacing: -.045em; }
-    .hx h1 em, .hx h2 em { font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: -.035em; }
-    .hx h3 { font-weight: 600; font-size: 22px; letter-spacing: -.03em; color: var(--ink); }
-    .hx p { color: var(--mute); line-height: 1.55; text-wrap: pretty; }
-    .hx .lede { font-size: clamp(1.0625rem, 1.5vw, 1.3125rem); max-width: 30em; }
-    .hx section { padding: 56px 0; }
-
-    .hx .btn2 { display: inline-flex; align-items: center; gap: 8px; min-height: 52px; padding: 0 24px; border-radius: 16px; font-weight: 600; font-size: 16px; letter-spacing: -.01em;
-                background: var(--ink); color: #f6f4ee; transition: transform .15s, box-shadow .15s; box-shadow: 0 1px 2px rgba(22, 51, 42, .3); }
-    .hx .btn2:hover { transform: translateY(-1px); box-shadow: 0 8px 20px -8px rgba(22, 51, 42, .55); }
-    .hx .btn2--quiet { background: var(--card); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
-    .hx .btn2--quiet:hover { box-shadow: inset 0 0 0 1px rgba(22, 51, 42, .3); }
-    .hx .btn2--light { background: #f6f4ee; color: var(--ink); }
-    .hx .more { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 15px; color: var(--ink); }
-    .hx .more::after { content: "→"; transition: transform .15s; }
-    .hx .more:hover::after { transform: translateX(3px); }
-    .hx a:focus-visible, .hx summary:focus-visible { outline: 2px solid var(--mark-deep); outline-offset: 3px; border-radius: 8px; }
-
-    /* Hero */
-    .hx .hero { padding: 124px 0 40px; }
-    .hx .hero-grid { display: grid; gap: 48px; align-items: center; }
-    .hx .acts { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 30px; }
-    .hx .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 28px; }
-    .hx .chips a { display: inline-flex; align-items: center; min-height: 36px; padding: 0 14px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); font-size: 14px; font-weight: 500; color: var(--ink); transition: background .15s; }
-    .hx .chips a:hover { background: #ecebe3; }
-    .hx .note { margin-top: 20px; font-size: 14px; }
-
-    /* The deck player, with the following slide riding on its corner. */
-    .hx .stage { position: relative; padding: 0 0 19% 0; }
-    .hx .player { display: block; background: var(--ink); border-radius: 28px; padding: 10px;
-                  box-shadow: 0 1px 2px rgba(22, 51, 42, .25), 0 50px 90px -36px rgba(22, 51, 42, .6); transition: transform .25s; }
-    .hx .stage:hover .player { transform: translateY(-4px); }
-    .hx .reel { position: relative; aspect-ratio: 16 / 9; border-radius: 19px; overflow: hidden; background: #0e211b; }
-    .hx .reel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; animation: hx-reel <%= reel * 4 %>s infinite; }
-    .hx .bar { display: flex; align-items: center; gap: 14px; padding: 14px 12px 6px; color: #f6f4ee; font-size: 14px; }
-    .hx .bar b { font-weight: 600; white-space: nowrap; }
-    .hx .bar span { opacity: .65; white-space: nowrap; }
-    .hx .ticks { flex: 1; display: flex; gap: 5px; min-width: 40px; }
-    .hx .ticks i { flex: 1; height: 3px; border-radius: 3px; background: #f6f4ee; opacity: .22; animation: hx-tick <%= reel * 4 %>s infinite; }
-    .hx .next { position: absolute; right: -3%; bottom: 0; width: 36%; border-radius: 16px; padding: 5px; background: var(--card);
-                box-shadow: 0 1px 2px rgba(22, 51, 42, .2), 0 24px 44px -18px rgba(22, 51, 42, .5); transition: transform .25s; }
-    .hx .stage:hover .next { transform: translate(4px, 4px); }
-    .hx .next .reel { border-radius: 12px; }
-    .hx .stage:hover img, .hx .stage:hover .ticks i { animation-play-state: paused; }
-    @keyframes hx-reel { 0% { opacity: 0; } 3% { opacity: 1; } <%= step %>% { opacity: 1; } <%= step + 3 %>% { opacity: 0; } 100% { opacity: 0; } }
-    @keyframes hx-tick { 0% { opacity: 1; } <%= step %>% { opacity: 1; } <%= step + 3 %>% { opacity: .22; } 100% { opacity: .22; } }
-
-
-    /* The pinned presentation. Faces share one grid column and each sticks
-       from its own row to the end, so a later face slides up over the last. */
-    .hx .story { display: grid; gap: 28px; padding: 112px 0 24px; }
-    .hx .beat { display: flex; flex-direction: column; justify-content: center; }
-    .hx .beat .n { display: inline-flex; align-items: center; justify-content: center; align-self: flex-start; min-width: 34px; height: 34px; padding: 0 11px; border-radius: 12px; background: var(--card); box-shadow: inset 0 0 0 1px var(--line); color: var(--ink); font-weight: 600; font-size: 14px; margin-bottom: 22px; }
-    .hx .beat h2 + p { margin-top: 18px; }
-    .hx .beat .more { margin-top: 24px; align-self: flex-start; }
-    .hx .face { margin-bottom: 36px; }
-    .hx .player { display: block; background: var(--ink); border-radius: 28px; padding: 10px; box-shadow: 0 1px 2px rgba(22, 51, 42, .25), 0 44px 80px -34px rgba(22, 51, 42, .6); }
-    .hx .screen { position: relative; aspect-ratio: 16 / 9; border-radius: 19px; overflow: hidden; container-type: inline-size; }
-    .hx .bar { display: flex; align-items: center; gap: 14px; padding: 14px 12px 6px; color: #f6f4ee; font-size: 14px; }
-    .hx .bar b { font-weight: 600; white-space: nowrap; }
-    .hx .bar span { opacity: .65; white-space: nowrap; font-variant-numeric: tabular-nums; }
-    .hx .ticks { flex: 1; display: flex; gap: 5px; min-width: 40px; }
-    .hx .ticks i { flex: 1; height: 3px; border-radius: 3px; background: #f6f4ee; opacity: .22; }
-    .hx .ticks i.on { opacity: 1; }
-    .hx .reel img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; animation: hx-reel <%= reel * 4 %>s infinite; }
-
-    /* Slides drawn in HTML, sized in container units so they scale like images. */
-    .hx .sl { position: absolute; inset: 0; padding: 6.5cqw 7cqw; display: flex; flex-direction: column; }
-    .hx .sl h4 { font-weight: 600; font-size: 6.4cqw; line-height: 1; letter-spacing: -.045em; }
-    .hx .sl--paper { background: #f6f4ee; color: var(--ink); }
-    .hx .sl--ink { background: var(--ink); color: #f6f4ee; }
-    .hx .sl--mark { background: var(--mark); color: var(--ink); }
-    .hx .sl ul { list-style: none; margin: auto 0 0; padding: 0; }
-    .hx .sl li { display: flex; justify-content: space-between; align-items: baseline; gap: 3cqw; padding: 2.1cqw 0; border-top: .35cqw solid currentColor; font-weight: 600; font-size: 3.6cqw; letter-spacing: -.03em; }
-    .hx .sl li small { font-family: "Source Serif 4", Georgia, serif; font-weight: 400; font-size: 2.9cqw; letter-spacing: 0; white-space: nowrap; }
-    .hx .sl li a { color: inherit; }
-    .hx .sl .date { font-weight: 700; font-size: 17cqw; line-height: .84; letter-spacing: -.065em; }
-    .hx .sl .ev { margin-top: auto; font-weight: 600; font-size: 4.4cqw; line-height: 1.04; letter-spacing: -.04em; }
-    .hx .sl .where { margin-top: 1.6cqw; font-family: "Source Serif 4", Georgia, serif; font-size: 2.9cqw; }
-    .hx .sl .score { display: grid; grid-template-columns: 1fr 34% 7cqw; align-items: center; }
-    .hx .sl .track { height: 1.1cqw; border-radius: 1cqw; background: rgba(246, 244, 238, .18); overflow: hidden; }
-    .hx .sl .track i { display: block; height: 100%; border-radius: 1cqw; background: var(--mark); }
-    .hx .sl .score span { text-align: right; font-variant-numeric: tabular-nums; }
-    .hx .sl .pour { display: grid; grid-template-columns: auto 1fr auto; align-items: center; padding: .9cqw 0; }
-    .hx .sl .pour svg { display: block; width: auto; height: max(28px, 7.4cqw); }
-    .hx .sl .pour a { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-    .hx .sl .pour span { font-variant-numeric: tabular-nums; }
-
-    @media (min-width: 900px) {
-      .hx .story { grid-template-columns: .86fr 1.14fr; column-gap: 72px; row-gap: 0; padding: 0; }
-      .hx .beat { grid-column: 1; min-height: 86svh; padding: 40px 0; }
-      .hx .beat:first-child { min-height: 100svh; padding-top: 104px; }
-      .hx .face { grid-column: 2; align-self: start; position: sticky; top: max(112px, calc(50svh - 17.5vw)); margin: 0; }
-      .hx .f1 { grid-row: 1 / 5; } .hx .f2 { grid-row: 2 / 5; } .hx .f3 { grid-row: 3 / 5; } .hx .f4 { grid-row: 4 / 5; }
-      .hx .b1 { grid-row: 1; } .hx .b2 { grid-row: 2; } .hx .b3 { grid-row: 3; } .hx .b4 { grid-row: 4; }
-    }
-    @media (min-width: 1400px) { .hx .face { top: max(112px, calc(50svh - 230px)); } }
-
-    /* Step grid: tiles sized by how much each has to show. */
-    .hx .grid { display: grid; gap: 14px; margin-top: 40px; }
-    .hx .tile { display: flex; flex-direction: column; background: var(--card); border-radius: 28px; padding: 26px; box-shadow: inset 0 0 0 1px var(--line); }
-    .hx .tile .n { display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 11px; background: var(--bg); color: var(--ink); font-weight: 600; font-size: 14px; margin-bottom: 18px; }
-    .hx .tile > p, .hx .tile .txt p { margin-top: 8px; font-size: 16px; max-width: 30em; }
-    .hx .tile .more { margin-top: 22px; }
-    .hx .mini { margin-top: 24px; background: var(--bg); border-radius: 20px; padding: 6px 16px; flex: 1; }
-    .hx .mini > * { display: flex; justify-content: space-between; align-items: center; gap: 14px; padding: 12px 0; font-size: 15px; color: var(--text); }
-    .hx .mini > * + * { border-top: 1px solid var(--line); }
-    .hx .mini b { font-weight: 600; letter-spacing: -.01em; }
-    .hx .mini small { color: var(--mute); font-size: 13px; white-space: nowrap; font-variant-numeric: tabular-nums; }
-    .hx .mini .star { color: var(--mark-deep); }
-    .hx .decks a { justify-content: flex-start; }
-    .hx .decks .th { flex: none; width: 84px; aspect-ratio: 16 / 9; border-radius: 9px; overflow: hidden; background: var(--ink); box-shadow: 0 0 0 1px var(--line); }
-    .hx .decks .th img { display: block; width: 100%; height: 100%; object-fit: cover; }
-    .hx .decks .t { flex: 1; min-width: 0; }
-    .hx .decks .t small { display: block; white-space: normal; margin-top: 2px; }
-    .hx .decks .p { font-weight: 600; font-size: 15px; color: var(--ink); font-variant-numeric: tabular-nums; }
-    .hx .when { display: grid !important; grid-template-columns: 54px 1fr; gap: 14px; justify-content: start; }
-    .hx .when .d { text-align: center; background: var(--card); border-radius: 13px; padding: 7px 0 8px; box-shadow: inset 0 0 0 1px var(--line); }
-    .hx .when .d small { display: block; text-transform: uppercase; letter-spacing: .06em; font-size: 11px; font-weight: 600; color: var(--ink); }
-    .hx .when .d b { display: block; font-size: 21px; line-height: 1; margin-top: 2px; color: var(--ink); }
-    .hx .when span { display: block; }
-    .hx .tile--ink { background: var(--ink); box-shadow: none; justify-content: flex-end; min-height: 260px; }
-    .hx .tile--ink h3 { color: #f6f4ee; font-size: clamp(1.75rem, 3vw, 2.5rem); letter-spacing: -.04em; line-height: 1.02; }
-    .hx .tile--ink p { color: rgba(246, 244, 238, .78); font-size: 17px; }
-
-    .hx .spot { display: grid; gap: 28px; align-items: center; }
-    .hx .spot-img img { display: block; width: 100%; aspect-ratio: 16 / 9; object-fit: cover; border-radius: 18px; box-shadow: 0 0 0 1px var(--line); }
-    @media (min-width: 900px) { .hx .spot { grid-template-columns: 1fr 1.1fr; gap: 48px; padding: 20px 48px 20px 20px; } }
-
-    /* Origin */
-    .hx .panel { background: var(--ink); color: #f6f4ee; border-radius: 32px; padding: 32px 26px; display: grid; gap: 36px; }
-    .hx .panel h2, .hx .panel h3 { color: #f6f4ee; }
-    .hx .panel p { color: rgba(246, 244, 238, .78); margin-top: 18px; }
-    .hx .rules { list-style: none; margin: 0; padding: 0; counter-reset: r; display: grid; gap: 10px; }
-    .hx .rules li { counter-increment: r; background: rgba(246, 244, 238, .07); border-radius: 20px; padding: 18px 20px 20px; font-size: 17px; letter-spacing: -.015em; line-height: 1.3; }
-    .hx .rules li::before { content: counter(r); display: block; color: #ff8a33; font-weight: 600; font-size: 14px; margin-bottom: 22px; }
-
-    .hx .split { display: grid; gap: 32px; }
-    .hx .plans { display: grid; gap: 12px; align-self: start; }
-    .hx .plan { background: var(--card); border-radius: 24px; padding: 22px; box-shadow: inset 0 0 0 1px var(--line); transition: transform .15s; }
-    .hx .plan:hover { transform: translateY(-2px); }
-    .hx .plan b { display: block; font-weight: 600; font-size: 15px; color: var(--mute); }
-    .hx .plan span { display: block; margin-top: 26px; font-weight: 600; font-size: 36px; letter-spacing: -.045em; color: var(--ink); font-variant-numeric: tabular-nums; }
-    .hx .plan span small { font-size: 15px; font-weight: 500; letter-spacing: 0; color: var(--mute); }
-    .hx .plan--pick { background: var(--ink); box-shadow: none; }
-    .hx .plan--pick b, .hx .plan--pick span small { color: rgba(246, 244, 238, .7); }
-    .hx .plan--pick span { color: #f6f4ee; }
-    .hx .faq { background: var(--card); border-radius: 28px; padding: 6px 26px; box-shadow: inset 0 0 0 1px var(--line); }
-    .hx details + details { border-top: 1px solid var(--line); }
-    .hx summary { cursor: pointer; list-style: none; display: flex; justify-content: space-between; gap: 20px; padding: 19px 0; font-weight: 600; font-size: 17px; letter-spacing: -.015em; color: var(--ink); }
-    .hx summary::-webkit-details-marker { display: none; }
-    .hx summary::after { content: "+"; font-weight: 400; color: var(--mute); }
-    .hx details[open] summary::after { content: "–"; }
-    .hx details p { padding: 0 0 20px; font-size: 16px; max-width: 42em; }
-
-    @media (min-width: 900px) {
-      .hx { --pad: 32px; }
-      .hx section { padding: 80px 0; }
-      .hx .hero { padding: 168px 0 64px; }
-      .hx .hero-grid { grid-template-columns: .9fr 1.1fr; gap: 56px; }
-      .hx .grid { grid-template-columns: repeat(12, 1fr); }
-      .hx .tile { padding: 32px; }
-      .hx .g7 { grid-column: span 7; } .hx .g5 { grid-column: span 5; }
-      .hx .tile--wide { display: grid; grid-template-columns: 1fr 1.15fr; gap: 28px; }
-      .hx .tile--wide .txt { display: flex; flex-direction: column; }
-      .hx .tile--wide .txt .more { margin-top: auto; padding-top: 22px; }
-      .hx .tile--wide .mini { margin-top: 0; }
-      .hx .panel { grid-template-columns: 1fr 1.2fr; gap: 64px; padding: 64px; align-items: center; }
-      .hx .rules { grid-template-columns: 1fr 1fr; }
-      .hx .split { grid-template-columns: 5fr 7fr; gap: 64px; }
-      .hx .plans { grid-template-columns: repeat(3, 1fr); }
-    }
-
-    /* Surfaces rise into place as they scroll in. */
-    @media (prefers-reduced-motion: no-preference) {
-      @supports (animation-timeline: view()) {
-        .hx .tile, .hx .panel, .hx .plan, .hx .faq { animation: hx-rise linear both; animation-timeline: view(); animation-range: entry 0% entry 55%; }
-        @keyframes hx-rise { from { opacity: 0; transform: translateY(36px) scale(.985); } to { opacity: 1; transform: none; } }
-      }
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .hx * { transition: none !important; }
-      .hx .reel img, .hx .ticks i { animation: none; }
-      .hx .reel img:first-child { opacity: 1; }
-      .hx .next .reel img:first-child { opacity: 0; }
-      .hx .next .reel img:nth-child(2) { opacity: 1; }
-    }
-  </style>
+  <%# The page's styles live in app/assets/stylesheets/home/index.css, not an
+      inline <style>: under the CSP an inline block needs this request's
+      nonce, and a Turbo Drive visit parses this page under the policy of
+      the page it came from (issue #46). %>
+  <%= stylesheet_link_tag "home/index" %>
 <% end %>
 
 <div class="hx">
-<div class="hx">
   <div class="wrap">
-    <div class="story">
+    <% frame = story_frame(showcase: @showcase_deck, showcase_slides: showcase_slides, slide_count: showcase_slide_count, decks: @featured_presentations,
+                           event: @next_event, guests: @next_event_guests, going: @next_event_going,
+                           verdict_night: @verdict_night, verdict_rows: @verdict_rows, verdict_reviews: @verdict_reviews, review: @featured_review,
+                           record_reviews: @record_reviews, sample: @sample_review) %>
+    <div class="story" data-controller="story-frame">
+      <%= render "home/story_frame", frame: frame %>
       <!-- Beat 1: the pitch, with the real deck on screen -->
-      <div class="beat b1">
+      <div class="beat b1" data-story-frame-target="beat">
         <h1>Every pour<br>has <em>a story.</em></h1>
         <p class="lede" style="margin-top:26px">Narrative tasting decks for whiskey nights that hold together, the research done, the script written, the bottles picked.</p>
         <div class="acts">
@@ -249,15 +61,16 @@
         <% if showcase_slides.any? %>
           <%# Real slides, limited to the deck's free-preview slides. %>
           <%= link_to presentation_path(@showcase_deck), class: "player", aria: { label: "#{@showcase_deck.title}, preview slides" } do %>
-            <div class="screen reel">
+            <div class="screen reel reel--<%= reel %>">
               <% showcase_slides.each_with_index do |slide, i| %>
                 <%= image_tag image_variant(slide, :hero), alt: (i.zero? ? "Opening slide of #{@showcase_deck.title}" : ""), style: "animation-delay: #{i * 4}s" %>
               <% end %>
             </div>
             <div class="bar">
               <b><%= @showcase_deck.title %></b>
-              <div class="ticks" aria-hidden="true"><i class="on"></i><i></i><i></i><i></i></div>
-              <span><%= [ "#{@showcase_deck.slide_images.count} slides", @showcase_deck.duration.presence ].compact.join(" · ") %></span>
+              <%# One tick per slide in the reel, lit with its slide. %>
+              <div class="ticks ticks--reel ticks--reel-<%= reel %>" aria-hidden="true"><% showcase_slides.size.times do |i| %><i style="animation-delay: <%= i * 4 %>s"></i><% end %></div>
+              <span><%= [ "#{showcase_slide_count} slides", @showcase_deck.duration.presence ].compact.join(" · ") %></span>
             </div>
           <% end %>
         <% else %>
@@ -267,11 +80,13 @@
       </div>
 
       <!-- Beat 2: pick a deck, with the real library on screen -->
-      <div id="how-it-works" class="beat b2">
-        <span class="n">1 of 3</span>
-        <h2>Pick <em>a deck</em></h2>
-        <p class="lede">Browse the library and choose the story you want to tell, bourbon, scotch, rye, or something stranger. Filter by difficulty and budget.</p>
-        <%= link_to "See the full library", presentations_path, class: "more" %>
+      <div id="how-it-works" class="beat b2" data-story-frame-target="beat">
+        <div class="beat-body" data-appear-target="item">
+          <span class="n">1 of 3</span>
+          <h2>Pick <em>a deck</em></h2>
+          <p class="lede">Browse the library and choose the story you want to tell, bourbon, scotch, rye, or something stranger. Filter by difficulty and budget.</p>
+          <%= link_to "See the full library", presentations_path, class: "more" %>
+        </div>
       </div>
       <div class="face f2">
         <div class="player">
@@ -288,45 +103,93 @@
               </ul>
             </div>
           </div>
-          <div class="bar"><b>The library</b><div class="ticks" aria-hidden="true"><i></i><i class="on"></i><i></i><i></i></div><span>2 / 4</span></div>
+          <div class="bar"><b>The library</b></div>
         </div>
       </div>
 
       <!-- Beat 3: gather, with the next real tasting night on screen -->
-      <div class="beat b3">
-        <span class="n">2 of 3</span>
-        <h2>Gather <em>your society</em></h2>
-        <p class="lede">Start a private society for your friends or join a public one near you. Schedule the night, share the link, and RSVPs take care of themselves.</p>
-        <%= link_to "Browse societies", societies_path, class: "more" %>
+      <div class="beat b3" data-story-frame-target="beat">
+        <div class="beat-body" data-appear-target="item">
+          <span class="n">2 of 3</span>
+          <h2>Gather <em>your society</em></h2>
+          <p class="lede">Start a private society for your friends or join a public one near you. Schedule the night, share the link, and RSVPs take care of themselves.</p>
+          <%= link_to "Browse societies", societies_path, class: "more" %>
+        </div>
       </div>
       <div class="face f3">
+        <%# The one photograph on this page (owner-supplied, AI-generated; see
+            docs/redesign/IMAGE_CREDITS.md). Same band in both invite states. %>
+        <% gathering_photo = capture do %><%= render "shared/duotone", src: "photos/tasting-night-living-room.jpg", css: "invite-photo", width: 1280, height: 512,
+              alt: "Five friends at a whiskey tasting in a lamp-lit living room. One stands by the TV with a glass raised, presenting, and four listen from the sofas, laughing, with glasses in hand." %><% end %>
         <div class="player">
-          <div class="screen">
+          <div class="screen screen--invite">
             <% if @next_event %>
-              <%# The next real tasting night at a public society. %>
-              <%= link_to event_path(@next_event), class: "sl sl--mark" do %>
-                <div class="date"><%= @next_event.start_time.strftime("%b %-d") %></div>
-                <div class="ev"><%= @next_event.title %></div>
-                <div class="where"><%= [ @next_event.society.name, @next_event.location.presence ].compact.join(" · ") %></div>
+              <%# The next real tasting night at a public society, drawn as its
+                  invite: when, what, where, and who has said yes (the names
+                  its event page already lists). %>
+              <%# Times in the event's own zone (as its invite email and .ics
+                  do): a first visit has no browser-zone cookie and would
+                  otherwise show UTC, weekday included. %>
+              <% local = @next_event.start_time.in_time_zone(@next_event.effective_time_zone) %>
+              <%= link_to event_path(@next_event), class: "sl sl--mark invite" do %>
+                <%= gathering_photo %>
+                <div class="invite-body">
+                <div class="top"><span><%= local.strftime("%a · %-l:%M %P %Z") %></span></div>
+                <div class="date"><%= local.strftime("%b %-d") %></div>
+                <div class="foot">
+                  <div>
+                    <div class="ev"><%= @next_event.title %></div>
+                    <div class="where"><%= [ @next_event.society.name, @next_event.location.presence ].compact.join(" · ") %></div>
+                  </div>
+                  <% if @next_event_going.positive? %>
+                    <div class="guests">
+                      <span class="faces"><% @next_event_guests.each do |guest| %><%= avatar(guest, size: 40) %><% end %></span>
+                      <span><%= @next_event_going %> going</span>
+                    </div>
+                  <% end %>
+                </div>
+                </div>
               <% end %>
             <% else %>
-              <div class="sl sl--mark"><h4>Gather your society</h4></div>
+              <%# No upcoming public night: a drawn sample invite showing what
+                  gathering a society looks like. An illustration, marked as
+                  one; it links nowhere and names nobody (initials only). %>
+              <% sample_date = Date.current.next_occurring(:friday) %>
+              <div class="sl sl--mark invite">
+                <%= gathering_photo %>
+                <div class="invite-body">
+                <div class="top"><span><%= sample_date.strftime("%a") %> · 7:30 pm</span><span class="tag">Sample invite</span></div>
+                <div class="date"><%= sample_date.strftime("%b %-d") %></div>
+                <div class="foot">
+                  <div>
+                    <div class="ev">Bourbon night</div>
+                    <div class="where">Your society · Your place</div>
+                  </div>
+                  <div class="guests">
+                    <span class="faces" aria-hidden="true"><% %w[JM AR TK LS DW].each do |initials| %><i><%= initials %></i><% end %></span>
+                    <span>5 going</span>
+                  </div>
+                </div>
+                </div>
+              </div>
             <% end %>
           </div>
-          <div class="bar"><b>The next tasting night</b><div class="ticks" aria-hidden="true"><i></i><i></i><i class="on"></i><i></i></div><span>3 / 4</span></div>
+          <div class="bar"><b><%= @next_event ? "The next tasting night" : "Gather your society" %></b></div>
         </div>
       </div>
 
       <!-- Beat 4: pour, with the real tasting record on screen -->
-      <div class="beat b4">
-        <span class="n">3 of 3</span>
-        <h2>Pour <em>and present</em></h2>
-        <p class="lede">Follow the thread from first nose to final pour. The script keeps the room moving; the tasting notes keep it honest.</p>
-        <%= link_to "Read the record", reviews_path, class: "more" %>
+      <div class="beat b4" data-story-frame-target="beat">
+        <div class="beat-body" data-appear-target="item">
+          <span class="n">3 of 3</span>
+          <h2>Pour <em>and present</em></h2>
+          <p class="lede">Open the deck, pour the first bottle, and tell the story. Everyone rates each whiskey as you go, and the scores are saved to your society's record.</p>
+          <%= link_to "Read the record", reviews_path, class: "more" %>
+        </div>
       </div>
       <div class="face f4">
         <div class="player">
-          <div class="screen">
+          <div class="screen<%= ' screen--tall' if @verdict_rows.blank? && (@featured_review || @sample_review) %>">
             <div class="sl sl--ink">
               <% if @verdict_rows.present? %>
                 <%# The verdict of a real revealed night at a public society:
@@ -343,25 +206,103 @@
                     </li>
                   <% end %>
                 </ul>
-              <% else %>
-              <h4>The tasting record</h4>
-              <% if @top_bottles.present? %>
-                <%# Real scores from the public tasting record. %>
-                <ul>
-                  <% @top_bottles.each do |bottle| %>
-                    <li class="score">
-                      <%= link_to bottle.name, bottle_path(bottle) %>
-                      <div class="track" aria-hidden="true"><i style="width: <%= (bottle.avg_rating.to_f / 5 * 100).round %>%"></i></div>
-                      <span><%= number_with_precision(bottle.avg_rating, precision: 2, strip_insignificant_zeros: true) %></span>
-                    </li>
+              <% elsif @featured_review %>
+                <%# One real review from the public record (its own page and
+                    the /reviews feed show the same), with its palate wheel.
+                    The reviewer is shown as the tasting card shows them. A
+                    review that cannot draw a wheel shows its tasting notes. %>
+                <% review = @featured_review %>
+                <% profile = review.wheel_display_profile %>
+                <% tasting = { "Nose" => review.nose, "Palate" => review.palate, "Finish" => review.finish }.compact_blank %>
+                <% quote = review.notes.presence %>
+                <div class="review">
+                  <% if @record_reviews.present? %>
+                    <%# Each drink with its review (the newest public reviews,
+                        one per bottle): the score glass and number, the
+                        reviewer as the tasting card shows them. The card
+                        beside them is the first row's review. %>
+                    <div class="rv-txt">
+                      <h4>The tasting record</h4>
+                      <ul class="rv-rows">
+                        <% @record_reviews.each do |row| %>
+                          <li class="pour">
+                            <%= render "shared/glass", level: row.rating.to_f / 5, tone: :cream, size: 28 %>
+                            <span class="rv-who">
+                              <%= link_to row.bottle.name, bottle_path(row.bottle) %>
+                              <small><%= link_to "#{row.user.first_name} #{row.user.last_name}", profile_path(row.user), class: "rv-name" %> <%= render "shared/century_badge", record: row.user, tone: :dark %></small>
+                            </span>
+                            <span data-score-text><%= number_with_precision(row.rating.to_f, precision: 2, strip_insignificant_zeros: true) %><span class="sr-only"> out of 5</span></span>
+                          </li>
+                        <% end %>
+                      </ul>
+                      <%= link_to with_arrow("Read the full tasting"), review_path(review), class: "rv-more" %>
+                    </div>
+                  <% else %>
+                  <div class="rv-txt">
+                    <h4>The tasting record</h4>
+                    <div class="rv-foot">
+                      <%= link_to review.bottle.name, bottle_path(review.bottle), class: "rv-bottle" %>
+                      <% if review.bottle.distillery.present? %><div class="where"><%= review.bottle.distillery %></div><% end %>
+                      <% if quote %><p class="rv-quote">&ldquo;<%= quote %>&rdquo;</p><% end %>
+                      <div class="rv-by">
+                        <%= link_to "#{review.user.first_name} #{review.user.last_name}", profile_path(review.user) %> <%= render "shared/century_badge", record: review.user, tone: :dark %> · <%= review.created_at.strftime("%B %-d, %Y") %>
+                      </div>
+                      <%= link_to with_arrow("Read the full tasting"), review_path(review), class: "rv-more" %>
+                    </div>
+                  </div>
                   <% end %>
-                </ul>
-              <% end %>
+                  <% if profile.any? %>
+                    <div class="rv-card">
+                      <%= render "shared/score", value: review.rating.to_f %>
+                      <div class="rv-wheel"><%= render "reviews/palate_wheel", review: review %></div>
+                    </div>
+                  <% else %>
+                    <div class="rv-card rv-card--notes">
+                      <%= render "shared/score", value: review.rating.to_f %>
+                      <% if tasting.any? %>
+                        <dl>
+                          <% tasting.each do |label, text| %>
+                            <div><dt><%= label %></dt><dd><%= text %></dd></div>
+                          <% end %>
+                        </dl>
+                      <% end %>
+                    </div>
+                  <% end %>
+                </div>
+              <% elsif @sample_review %>
+                <%# The featured deck has no publicly reviewed bottle of its
+                    own: a sample review (HomepageFeature::SAMPLE), said to be
+                    one, with no reviewer and no link to a tasting. %>
+                <div class="review">
+                  <div class="rv-txt">
+                    <h4>The tasting record</h4>
+                    <div class="rv-foot">
+                      <span class="rv-bottle"><%= @sample_review.bottle_name %></span>
+                      <div class="where">Sample review</div>
+                    </div>
+                  </div>
+                  <div class="rv-card">
+                    <%= render "shared/score", value: @sample_review.rating.to_f %>
+                    <div class="rv-wheel"><%= render "reviews/palate_wheel", profile: @sample_review.wheel_display_profile %></div>
+                  </div>
+                </div>
+              <% else %>
+                <h4>The tasting record</h4>
               <% end %>
             </div>
           </div>
-          <div class="bar"><b>The tasting record</b><div class="ticks" aria-hidden="true"><i></i><i></i><i></i><i class="on"></i></div><span>4 / 4</span></div>
+          <div class="bar"><b>The tasting record</b></div>
         </div>
+      </div>
+
+      <%# The story glass: fills with the scroll through the steps. %>
+      <%= render "home/story_glass" %>
+
+      <!-- The close: the end of the three steps, in the same column -->
+      <div class="beat beat--close" data-story-frame-target="beat">
+        <h2>That's <em>the whole ritual.</em></h2>
+        <p class="lede">Pick your first deck and set a date. The deck recommends some bottles to buy.</p>
+        <div class="acts"><%= link_to "Browse the decks", presentations_path, class: "btn2" %></div>
       </div>
     </div>
   </div>
@@ -371,7 +312,7 @@
     <% spot_image = @spotlight_deck.slide_images.attached? ? @spotlight_deck.slide_images.order(:id).first : (@spotlight_deck.featured_image.attached? ? @spotlight_deck.featured_image : nil) %>
     <section style="padding-bottom:0">
       <div class="wrap">
-        <div class="tile spot">
+        <div class="tile spot" data-appear-target="item">
           <% if spot_image %>
             <%= link_to presentation_path(@spotlight_deck), class: "spot-img", aria: { hidden: true }, tabindex: -1 do %>
               <%= image_tag image_variant(spot_image, :card), alt: "", loading: "lazy" %>
@@ -393,23 +334,14 @@
 
   <section>
     <div class="wrap">
-      <div class="tile tile--ink" style="min-height:0;padding:40px 32px">
-        <h3>That's the whole ritual.</h3>
-        <p style="margin-top:12px">Pick your first deck and set a date. The rest is poured, not planned.</p>
-        <div class="acts" style="margin-top:24px"><%= link_to "Browse the decks", presentations_path, class: "btn2 btn2--light" %></div>
-      </div>
-    </div>
-  </section>
-
-  <section>
-    <div class="wrap">
+      <%# The panel stays put; its two halves reveal (it is tall on a phone). %>
       <div class="panel">
-        <div>
-          <h2>Born from a <em>monthly ritual.</em></h2>
-          <p class="lede">The first Whiskey Share Society started as a circle of friends in 2019. Each month one of us drew a topic, did the research, bought the bottles, and told its story over a deck of slides.</p>
+        <div data-appear-target="item">
+          <h2>Born from a <em>real society.</em></h2>
+          <p class="lede">The first Whiskey Share Society started as a circle of friends in 2019. Each month one of us drew a topic, did the research, bought the bottles, and told its story over a deck of slides and a glass of whiskey.</p>
           <div class="acts"><%= link_to "Find your society", societies_path, class: "btn2 btn2--light" %></div>
         </div>
-        <ol class="rules" aria-label="House rules">
+        <ol class="rules" aria-label="House rules" data-appear-target="item">
           <% rules.each do |rule| %><li><%= rule %></li><% end %>
         </ol>
       </div>
@@ -418,26 +350,37 @@
 
   <section id="pricing">
     <div class="wrap split">
-      <div>
+      <div data-appear-target="item">
         <h2>Choose <em>your pour.</em></h2>
         <p class="lede" style="margin-top:18px">One membership, three ways to pay it. Every plan unlocks the same thing, a deck credit every month and a society of your own.</p>
         <div class="acts"><%= link_to "See the plans", membership_path, class: "btn2" %></div>
       </div>
+      <%# One row per plan, each a link to /membership. Names, prices,
+          billing lines and the "Best value" mark match that page; savings
+          are worked out from the live per-month prices (HomeHelper). %>
       <div class="plans">
         <% @stripe_products.each do |product| %>
-          <%= link_to membership_path, class: "plan #{'plan--pick' if product[:popular]}" do %>
-            <b><%= product[:name].to_s.gsub(" Membership", "") %></b>
-            <span>$<%= sprintf("%.2f", product[:price] / 100.0) %> <small>/mo</small></span>
+          <% savings = plan_savings_percent(product, @stripe_products) %>
+          <%= link_to membership_path, class: "plan #{'plan--pick' if product[:popular]}", data: { appear_target: "item" } do %>
+            <span class="plan-head">
+              <h3><%= product[:name].to_s.gsub(" Membership", "") %></h3>
+              <% if product[:popular] %><span class="plan-tag">Best value</span><% end %>
+            </span>
+            <span class="plan-bill"><%= plan_billing_line(product) %></span>
+            <span class="plan-price">$<%= sprintf("%.2f", product[:price] / 100.0) %><small>/mo</small></span>
+            <% if savings %><span class="plan-save">Save <%= savings %>%</span><% end %>
+            <span class="plan-go" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
           <% end %>
         <% end %>
+        <p class="plans-note" data-appear-target="item">Joining a society is free · Membership required to run a society</p>
       </div>
     </div>
   </section>
 
   <section id="faq" style="padding-bottom:96px">
     <div class="wrap split">
-      <div><h2>Questions, <em>answered.</em></h2></div>
-      <div class="faq">
+      <div data-appear-target="item"><h2>Frequently asked <em>questions</em></h2></div>
+      <div class="faq" data-appear-target="item">
         <% faqs.each do |q, a| %>
           <details>
             <summary><%= q %></summary>

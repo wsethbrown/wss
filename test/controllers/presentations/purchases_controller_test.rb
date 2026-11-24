@@ -61,6 +61,24 @@ class Presentations::PurchasesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "a lapsed member keeps their credits but cannot spend them until they rejoin" do
+    CreditTransaction.record!(user: @user, amount: 2, transaction_type: "granted")
+    @user.update!(subscription_status: "canceled", subscription_ends_at: 1.day.ago)
+
+    assert_no_difference -> { CreditTransaction.count } do
+      post presentation_purchases_path(@deck), params: { purchase_method: "credit" }
+    end
+    assert_redirected_to new_presentation_purchase_path(@deck)
+    assert_equal 2, @user.reload.credits
+    assert_not UserPresentation.exists?(user: @user, presentation: @deck)
+
+    @user.update!(subscription_status: "active", subscription_ends_at: 1.month.from_now)
+    post presentation_purchases_path(@deck), params: { purchase_method: "credit" }
+    assert_redirected_to presentation_path(@deck)
+    assert_equal 1, @user.reload.credits
+    assert UserPresentation.exists?(user: @user, presentation: @deck, purchase_type: "credit")
+  end
+
   test "claiming a free deck twice leaves one row" do
     free = Presentation.create!(author: users(:admin), title: "Free Deck", content: "Story.", price: 0)
     free.update_column(:published, true)

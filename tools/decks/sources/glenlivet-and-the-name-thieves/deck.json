@@ -1,0 +1,40 @@
+{
+  "slug": "Glenlivet-and-the-Name-Thieves",
+  "title": "Glenlivet and the Name Thieves",
+  "subtitle": "",
+  "category": "Scotch Whisky",
+  "difficulty": "Intermediate",
+  "duration": "45 min",
+  "description": "How the Smith family of The Glenlivet took legal action in the 1880s to stop other distilleries using the name Glenlivet, why the 1884 settlement let their neighbours keep it, and where the suffix survives. Four pours.",
+  "pours": [
+    {
+      "name": "The Glenlivet 12 Year Old",
+      "origin": "The Glenlivet, Minmore, Glenlivet",
+      "style": "Speyside single malt, 12 years",
+      "strength": "40% ABV",
+      "notes": "The only distillery allowed to call itself The Glenlivet since the 1884 settlement. Pour it first and keep some back."
+    },
+    {
+      "name": "Glenfarclas 12",
+      "origin": "Glenfarclas, Ballindalloch",
+      "style": "Speyside single malt, 12 years",
+      "strength": "43% ABV",
+      "notes": "Named in John Gordon Smith's 1881 complaint and sold in the US as Glenfarclas-Glenlivet in the 1960s. About six miles from The Glenlivet."
+    },
+    {
+      "name": "Aberlour 12 Double Cask Matured",
+      "origin": "Aberlour, Aberlour",
+      "style": "Speyside single malt, 12 years",
+      "strength": "40% ABV",
+      "notes": "Built in 1879 and 1880, during the fight over the name. Its company was Aberlour-Glenlivet until 2007."
+    },
+    {
+      "name": "Glen Moray 12",
+      "origin": "Glen Moray, Elgin",
+      "style": "Speyside single malt, 12 years",
+      "strength": "40% ABV",
+      "notes": "Built in 1897, after the settlement, and took the suffix anyway. A company named Glen Moray-Glenlivet Distillery Co. is still registered."
+    }
+  ],
+  "tags": "scotch, speyside, single malt, glenlivet, history"
+}

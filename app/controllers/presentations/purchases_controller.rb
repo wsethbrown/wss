@@ -34,7 +34,9 @@ class Presentations::PurchasesController < ApplicationController
 
   def set_presentation
     @presentation = Presentation.find(params[:presentation_id])
-    # Drafts are not for sale/download: 404 for non-admins (see PresentationsController).
+    # Unpublished decks (drafts, or decks taken out of the library) are never
+    # for sale: 404 for non-admins. Their owners keep them through the deck
+    # page and downloads, not through here (see Presentation#visible_to?).
     raise ActiveRecord::RecordNotFound unless @presentation.published? || current_user&.admin?
   end
 
@@ -44,6 +46,15 @@ class Presentations::PurchasesController < ApplicationController
   # row to a direct purchase; see Presentations::CheckoutFulfillment).
   def check_already_purchased
     owned = current_user.user_presentations.find_by(presentation_id: @presentation.id)
+
+    # A member never pays for, or spends a credit on, a deck included with
+    # membership: they already have it while the membership lasts.
+    if !owned&.direct_purchase? && current_user.included_with_membership_access?(@presentation.id)
+      Rails.logger.info "Purchase of presentation #{@presentation.id} skipped for user #{current_user.id}: included with membership"
+      redirect_to @presentation, notice: "Included with your membership"
+      return
+    end
+
     return unless owned
     return if owned.credit_purchase? && !@presentation.free? && !current_user.can_access_presentation?(@presentation.id)
 

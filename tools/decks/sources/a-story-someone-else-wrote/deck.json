@@ -1,0 +1,54 @@
+{
+  "slug": "A-Story-Someone-Else-Wrote",
+  "title": "A Story Someone Else Wrote",
+  "subtitle": "Value vs. Prestige",
+  "category": "Blind Tasting",
+  "difficulty": "Beginner",
+  "duration": "60 min",
+  "description": "A blind tasting, and an argument that your own palate knows more than the price tag does. Every pour is scored with no labels, no prices and no bottles in the room. Then the samples are revealed one by one, the room's averages go on the board, and the prices go back on. Built around roles rather than a fixed lineup: a hyped bottle, a sleeper, a workhorse, a ringer and a barrel-proof closer, with two bottles from the same distillery at very different prices.",
+  "tags": "blind tasting, bourbon, rye, value, price, bottled in bond, barrel proof, buffalo trace",
+  "pours": [
+    {
+      "name": "Buffalo Trace",
+      "origin": "Buffalo Trace Distillery, Frankfort, Kentucky",
+      "style": "Kentucky straight bourbon, Mash Bill #1, no age statement",
+      "strength": "45% ABV (90 proof)",
+      "notes": "Sample A, the workhorse. Half of the same-distillery pair with sample B."
+    },
+    {
+      "name": "Blanton's Original Single Barrel",
+      "origin": "Buffalo Trace Distillery, Frankfort, Kentucky",
+      "style": "Single-barrel bourbon, Mash Bill #2, from Warehouse H",
+      "strength": "46.5% ABV (93 proof)",
+      "notes": "Sample B, the hyped one. Same distillery as sample A, at around three times the price."
+    },
+    {
+      "name": "Evan Williams Bottled-in-Bond",
+      "origin": "Heaven Hill, Kentucky",
+      "style": "Kentucky straight bourbon, bottled in bond",
+      "strength": "50% ABV (100 proof)",
+      "notes": "Sample C, the sleeper. The cheapest bottle on the table, and the only one carrying a federal guarantee of how it was made."
+    },
+    {
+      "name": "Four Roses Small Batch Select",
+      "origin": "Four Roses Distillery, Lawrenceburg, Kentucky",
+      "style": "Kentucky straight bourbon, six of the distillery's ten recipes, non-chill-filtered",
+      "strength": "52% ABV (104 proof)",
+      "notes": "Sample D, a deliberately constructed blend: a bottle where the money buys something you can taste."
+    },
+    {
+      "name": "Barrell Seagrass",
+      "origin": "Barrell Craft Spirits, Louisville, Kentucky (sourced American and Canadian rye)",
+      "style": "Rye whiskey finished in Martinique rum, Madeira and apricot brandy casks, cask strength",
+      "strength": "59.2% ABV (118.4 proof)",
+      "notes": "Sample E, the ringer: not a bourbon at all."
+    },
+    {
+      "name": "Elijah Craig Barrel Proof",
+      "origin": "Heaven Hill, Kentucky",
+      "style": "Kentucky straight bourbon, barrel proof, batch-dated",
+      "strength": "Varies by batch (batch A125: 59.1% ABV, 118.2 proof)",
+      "notes": "Sample F, the closer. Poured last because its heat lingers longest; add a few drops of water and taste again."
+    }
+  ]
+}

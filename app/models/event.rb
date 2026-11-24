@@ -10,6 +10,48 @@ class Event < ApplicationRecord
   # the host isn't a member (host_id wins whenever both are set).
   belongs_to :presentation, optional: true
 
+  # Decks this night can run (owner decision, November 2026): published decks
+  # that the organiser, the host or an admin of the society (its creator and
+  # active members with the admin role) can access right now. Access is the
+  # existing rule, never a fork of it: the organiser goes through
+  # Presentation#can_download_full_presentation? (so a site admin organising
+  # the night keeps every deck), everyone else through
+  # User#can_access_presentation? (bought outright is forever; a credit unlock
+  # counts only while that person's membership is active; a deck included with
+  # membership counts the same way, with no purchase row). Authorship grants
+  # nothing. The deck already attached stays selectable unless
+  # include_current is false (create, where it is the value being checked).
+  #
+  # The one rule behind the creation form, the deck_options autocomplete and
+  # the server-side checks on create and assign_deck.
+  def offerable_decks(organizer: self.organizer, include_current: true)
+    decks =
+      if organizer&.admin?
+        Presentation.published.order(:title).to_a
+      else
+        offerers = deck_offerers(organizer)
+        candidates = Presentation.published.where(id: UserPresentation.where(user_id: offerers.map(&:id)).select(:presentation_id))
+        # Decks included with membership are candidates while any offerer is an
+        # active member; the access check below decides, and writes no
+        # purchase or credit row.
+        if offerers.any?(&:has_active_subscription?)
+          candidates = candidates.or(Presentation.published.where(included_with_membership: true))
+        end
+        candidates = candidates.order(:title).to_a
+        candidates.select do |deck|
+          (organizer && deck.can_download_full_presentation?(organizer)) ||
+            offerers.any? { |person| person != organizer && person.can_access_presentation?(deck.id) }
+        end
+      end
+    decks |= [ presentation ] if include_current && presentation
+    decks
+  end
+
+  def deck_offerable?(presentation_id, organizer: self.organizer, include_current: true)
+    return false if presentation_id.blank?
+    offerable_decks(organizer: organizer, include_current: include_current).any? { |deck| deck.id == presentation_id.to_i }
+  end
+
   # The display name for whoever runs the night, member or guest.
   def host_display_name
     host&.full_name.presence || host_name.presence
@@ -44,6 +86,17 @@ class Event < ApplicationRecord
     start_clock_label
   end
 
+  # The people whose decks the night may run: the organiser, the host and the
+  # society's admins (creator plus active admin-role members).
+  def deck_offerers(organizer = self.organizer)
+    ids = [ organizer&.id, host_id ]
+    if society
+      ids << society.creator_id
+      ids.concat(society.society_memberships.where(role: "admin", status: "active").pluck(:user_id))
+    end
+    User.where(id: ids.compact.uniq).to_a
+  end
+
   def start_date_label
     local_start.strftime("%A, %B %-d")
   end
@@ -65,6 +118,10 @@ class Event < ApplicationRecord
   validate :time_zone_is_known
   validates :end_time, presence: true
   validate :end_time_after_start_time
+
+  # The .ics SEQUENCE (EventIcs): calendars replace their copy of the event
+  # when it rises, so it rises exactly when the time or the place changes.
+  before_update :bump_calendar_sequence, if: -> { will_save_change_to_start_time? || will_save_change_to_end_time? || will_save_change_to_location? }
 
   # Scopes
   scope :upcoming, -> { where("start_time > ?", Time.current).order(:start_time) }
@@ -142,8 +199,33 @@ class Event < ApplicationRecord
     (end_time - start_time) / 1.hour
   end
 
+  # The RSVP window (owner decision, November 2026). Answers can be given,
+  # changed or withdrawn until the event starts. A NEW yes (from someone not
+  # currently at yes) closes YES_CUTOFF before the start to protect the
+  # headcount, except for events created less than YES_CUTOFF before their
+  # start ("drinks tonight"), which take yeses until they start.
+  YES_CUTOFF = 24.hours
+
+  # Every answer is closed: the night has started.
   def rsvp_closed?
-    start_time <= 24.hours.from_now
+    start_time <= Time.current
+  end
+
+  # Whether the last-day cutoff applies to this event at all.
+  def yes_cutoff_applies?
+    created_at.nil? || start_time - created_at >= YES_CUTOFF
+  end
+
+  # A new yes can no longer be given (maybe and no still can, until the start).
+  def new_yes_closed?
+    rsvp_closed? || (yes_cutoff_applies? && start_time <= YES_CUTOFF.from_now)
+  end
+
+  # Whether moving from current_status to status is allowed right now.
+  def answer_allowed?(status, current_status = nil)
+    return false if rsvp_closed?
+    return true unless status.to_s == "yes"
+    current_status.to_s == "yes" || !new_yes_closed?
   end
 
   # OWNER DECISION POINT (B1, Nov 2026): may signed-in NON-members RSVP to
@@ -211,6 +293,10 @@ class Event < ApplicationRecord
   def time_zone_is_known
     return if time_zone.blank? || ActiveSupport::TimeZone[time_zone]
     errors.add(:time_zone, "is not a known time zone")
+  end
+
+  def bump_calendar_sequence
+    self.calendar_sequence = calendar_sequence.to_i + 1
   end
 
   def end_time_after_start_time

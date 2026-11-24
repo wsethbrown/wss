@@ -1,0 +1,75 @@
+<%# Every file slot, one row each: name, size, Open (the admin-only open
+    route, whoever owns the deck) and Replace, which reveals that slot's file
+    field. An empty slot shows its field straight away. Without JavaScript
+    every field shows. The fields belong to #deck-form and save with it.
+    Used on the deck page (Files tab) and the new-deck form.
+    Locals: form, presentation, saved (optional: the deck as stored, whose
+    files are listed; differs from presentation after a refused save) %>
+<% saved = local_assigns[:saved] || presentation %>
+<section class="card p-5 sm:p-6">
+  <h2 class="text-xl font-semibold text-ink">What buyers download</h2>
+  <p class="mb-3 mt-1 text-sm text-mute">Appears on: the buyer's "what you get" list before purchase, and their downloads after.</p>
+
+  <div>
+    <% admin_deck_file_slots(saved).each do |slot| %>
+      <% name = slot[:slot] %>
+      <%# A deck not yet created has nothing stored: after a refused create the
+          chosen files were not kept, so none is listed and every field is open. %>
+      <% attachments = if !saved.persisted?
+           []
+         elsif slot[:multiple]
+           saved.public_send(name).attachments.sort_by(&:id)
+         else
+           [ saved.public_send(name) ].select(&:attached?)
+         end %>
+      <% open = attachments.empty? || presentation.errors[name].any? %>
+      <div class="file-row grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-2 border-b border-hairline py-3 last:border-b-0 sm:grid-cols-[11rem_minmax(0,1fr)_auto]"
+           data-controller="reveal" data-reveal-open-value="<%= open %>">
+        <% if slot[:input] %>
+          <%= form.label name, slot[:label], class: "col-span-2 text-sm text-mute sm:col-span-1" %>
+        <% else %>
+          <span class="col-span-2 text-sm text-mute sm:col-span-1"><%= slot[:label] %></span>
+        <% end %>
+
+        <div class="min-w-0 space-y-1">
+          <% if attachments.empty? %>
+            <p class="text-sm text-mute">not uploaded</p>
+          <% end %>
+          <% attachments.each_with_index do |attachment, i| %>
+            <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-sm">
+              <span class="min-w-0 break-all font-semibold text-gray-900"><%= attachment.filename %>
+                <span class="font-normal text-mute">(<%= number_to_human_size(attachment.byte_size) %>)</span></span>
+              <% if slot[:multiple] && presentation.persisted? %>
+                <%= link_to "Open", admin_presentation_file_path(presentation, name, n: i + 1), target: "_blank", rel: "noopener",
+                            class: "inline-flex min-h-11 items-center text-sm #{admin_link_class}" %>
+              <% end %>
+            </p>
+          <% end %>
+        </div>
+
+        <div class="flex justify-end gap-2">
+          <% if !slot[:multiple] && attachments.any? && presentation.persisted? %>
+            <%= link_to "Open", admin_presentation_file_path(presentation, name), target: "_blank", rel: "noopener",
+                        class: "btn btn-secondary min-h-11 px-4 py-2" %>
+          <% end %>
+          <% if slot[:input] && attachments.any? %>
+            <button type="button" hidden class="btn btn-secondary min-h-11 px-4 py-2"
+                    data-reveal-target="button" data-action="reveal#toggle" aria-expanded="false">
+              <%= slot[:multiple] ? "Add files" : "Replace" %>
+            </button>
+          <% end %>
+        </div>
+
+        <% if slot[:input] %>
+          <div class="col-span-full" data-reveal-target="content">
+            <%# include_hidden: false: a multiple file field otherwise always sends
+                an empty value, which would read as "remove every extra". %>
+            <%= form.file_field name, multiple: slot[:multiple] || false, include_hidden: false, accept: slot[:accept], class: admin_field_class,
+                  data: { reveal_target: "field" } %>
+            <p class="mt-1 text-xs text-mute"><%= slot[:hint] %></p>
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+</section>

@@ -45,11 +45,16 @@ class EventRsvp < ApplicationRecord
     end
   end
 
-  # The kitchen needs a headcount: RSVPs close a day before the night.
+  # Answers stay changeable until the night starts; the kitchen still needs a
+  # headcount, so a NEW yes closes 24 hours out (see Event#answer_allowed?).
+  # Re-saving an existing yes (a note edit) is not a new yes.
   def rsvp_window_open
     return unless event
-    if event.rsvp_closed? && !event.past?
-      errors.add(:base, "RSVPs close 24 hours before the event")
+    return if event.past? # event_not_past already says so
+
+    previous = persisted? ? status_in_database : nil
+    unless event.answer_allowed?(status, previous)
+      errors.add(:base, "New yes answers close 24 hours before the event")
     end
   end
 end

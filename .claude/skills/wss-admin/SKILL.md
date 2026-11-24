@@ -55,10 +55,10 @@ organizers keep deleting their OWN records). Delete buttons hide for limited adm
 - **Credits are never edited on the user form.** The edit page shows balance
   read-only + a link to Credits→adjust (ledger write). :credits must stay OUT
   of user_params.
-- Deck show page renders the story via render_markdown (never simple_format /
-  raw dumps), slides as an order(:id) grid, recommendations as a parsed
-  table, and a COMPLETE file inventory (every slot: filename+size or "not
-  uploaded").
+- One page per deck: `/admin/presentations/:id/edit` (show only keeps the
+  flash and redirects there). Markdown is rendered via render_markdown (never
+  simple_format / raw dumps), slides are ordered by :id, and the Files tab is
+  a COMPLETE file inventory (every slot: filename+size or "not uploaded").
 - Admin deck table: title cell truncates (max-w-xs); whitespace-nowrap on it
   once pushed Actions off-screen.
 
@@ -76,15 +76,73 @@ ActivityLog is CURATED, not a firehose:
   records.
 - IP/UA live in dedicated columns only (not duplicated into metadata JSON).
 
-## The deck form (admin/presentations/_form)
+## The deck page (admin/presentations/edit)
 
-The form mirrors the buyer page top to bottom — seven numbered sections in the
-exact order buyers scroll them, each annotated "Appears on:". The sticky right
-rail ("The buyer page / What renders now") recomputes per render: green = will
-render (`bg-ink`), pale = section hidden because empty (takeaways/tasting/pours
-hide when blank), red (`bg-rsvp-no`) = blocks the sale (missing pitch line or
-deck file), mid green (`bg-whiskey-400`) = slides (automatic). No amber. Keep that rail honest — if you add a buyer-page section, add its
-rail row and its form section in page order.
+One page per deck, replacing the old view + edit pair (Nov 2026). A header
+(sticky from `lg`) with the title, Published/Draft chip, facts line
+(price · running time · slides · pours · purchases) and Save / Preview as
+buyer / Publish-Unpublish, then six tabs: Overview, Slides and script, Pour
+list, Listing, Files, Sales (`deck_tabs_controller.js`; tab in
+`location.hash`; without JS every pane shows). Field groups are shared
+partials (`_cover_fields`, `_takeaways_fields`, `_story_fields`,
+`_sections_fields`, `_pour_list_fields`, `_files_fields`); `_form` is the
+one-column new-deck form built from the same partials.
+
+The cover card has "Subtitle" directly under Title (`presentations.subtitle`,
+shown under the title on the deck page; also filled by a package's deck.json).
+
+The Listing tab (and the new-deck form) has "What the customer sees" beside
+the fields from `lg` (below them on a phone): `_customer_preview`, a sandboxed
+iframe (srcdoc `_preview_document`, so the deck page's own breakpoints apply
+to its width) refreshed by `deck_preview_controller.js` ~400ms after typing.
+It POSTs the form's fields (no files, no `_method`) to `preview`
+(member, or collection for a new deck), which builds an UNSAVED
+`Presentation.new` from the preview fields only and renders `_customer_view`:
+the deck page's own partials (`presentations/_deck_top`, `_what_youll_learn`,
+`_story_section` with `full_story: false`, `_extra_sections`). It never saves,
+never reads the stored story or slide script (only the saved cover and slide
+count), and is a fetch, so the unsaved-changes guard never sees it. If you
+change those deck page parts, change the partials, never a copy.
+
+"Extra sections" (`_sections_fields` + `_section_card`, editor
+`deck_sections_controller.js`) replaced the four tasting boxes: plain fields
+`presentation[sections][][heading]`/`[lines]` (heading first, so Rack groups
+each card), one textarea per section split by `Presentation#sections=`, plus a
+hidden empty heading that keeps the key in the request when every card is
+removed (the model drops empty sections).
+
+Rules with teeth:
+- ONE form (`#deck-form`) holds every editable field, so one Save saves all
+  tabs. Forms can't nest: Overview (publish block), the second half of Files
+  (package, re-render) and Sales sit OUTSIDE it; Save buttons outside use
+  `form="deck-form"`. `presentation_page_test` checks every permitted param
+  is on the form exactly once.
+- Redirects back to the page carry the tab twice: as the anchor and in
+  `flash[:deck_tab]` (Turbo drops anchors when following redirects).
+- "Anything else" (`supplemental_materials`, has_many_attached): assigning
+  REPLACES the set, and an empty array deletes every extra. The field uses
+  `include_hidden: false`, and `handle_file_uploads` drops blanks and adds new
+  uploads beside the existing ones (kept by signed blob id).
+- `unsaved_changes_controller.js` guards edits WITHOUT disabling Turbo
+  (disabling it skipped Delete/Unpublish's `data-turbo-confirm`): Turbo link
+  visits become full loads (native leave prompt), forms without their own
+  confirm ask once. Back/Forward are deliberately NOT guarded: holding
+  `turbo:before-render` without resuming froze every later Turbo render.
+- Every file field takes uploads only (`handle_file_uploads`, before the
+  record is built on create too): a string would be read as a signed blob id
+  and attach any stored blob.
+- After a refused save, read-only parts render `admin_deck_saved(deck)` (the
+  stored record) so they never show an unsaved title or file.
+- "The buyer page" checklist (Overview) recomputes per render: green = will
+  render (`bg-ink`), pale = hidden because empty, red (`bg-rsvp-no`) = blocks
+  the sale, mid green (`bg-whiskey-400`) = slides (automatic). No amber. If
+  you add a buyer-page section, add its checklist row, linked to its tab.
+- Per-slide script: `presentations.slide_script` (jsonb, `[{title, body}]`),
+  written by DeckPackageImport from `## [SLIDE n] Title` sections. Paid
+  content: rendered ONLY on the admin Slides tab. Decks loaded before it show
+  an Open link to the speaker notes PDF until re-uploaded.
+- Admin "Open" on files: `Admin::PresentationFilesController`, whitelisted
+  slot names (the nth extra by `?n=`), never a blob id; short-lived URL.
 
 Design rules learned the hard way:
 - There is NO manual slide-outline builder. Slides render from the deck file;
@@ -93,8 +151,8 @@ Design rules learned the hard way:
   Don't resurrect the builder.
 - `preview_images` is dead — never shown to buyers; removed from form/permit.
 - Copy must stay topic-generic ("the pour list", "what to pour", origin) —
-  decks cover cocktails and more, not just whiskey. Storage keys keep the
-  legacy `whiskey_*` names; only labels changed.
+  decks cover cocktails and more, not just whiskey. Never "Whiskey
+  recommendations". Storage keys keep the legacy `whiskey_*` names.
 - `Presentation#duration_label` renders duration everywhere ("20" → "20 min");
   never interpolate raw `duration` into buyer copy.
 
@@ -111,3 +169,10 @@ The marker between cards (a sentence-case `text-mute` line between two
 hairlines, no small caps) shows where the free teaser cuts off. It
 mirrors `PresentationsHelper#preview_markdown` (first 24 SOURCE lines) — if
 that number changes, change `TEASER_LINES` in the Stimulus controller too.
+
+## Deck packages, unpublish and free decks (November 2026)
+
+Decks can be created or replaced in place from a package zip (deck list → "Upload a package";
+a deck's Files tab → "Replace with a package"). The Unpublish button states how many people own the
+deck; owners keep access after it. Publishing at $0 is refused unless "This deck is free" is
+ticked. Details: wss-deck-pipeline.

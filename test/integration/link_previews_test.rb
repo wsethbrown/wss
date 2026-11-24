@@ -8,10 +8,26 @@ class LinkPreviewsTest < ActionDispatch::IntegrationTest
 
     assert_select "meta[property='og:site_name'][content='Whiskey Share Society']"
     assert_select "meta[property='og:title'][content='Whiskey Share Society']"
-    assert_select "meta[property='og:image'][content=?]", "http://www.example.com/og-image.png"
+    assert_select "meta[property='og:image'][content=?]", "http://www.example.com/og-card-2026.png"
+    assert_select "meta[name='twitter:image'][content=?]", "http://www.example.com/og-card-2026.png"
+    assert_select "meta[property='og:image:width'][content='1200']"
+    assert_select "meta[property='og:image:height'][content='630']"
     assert_select "meta[property='og:description']"
     assert_select "meta[name='twitter:card'][content='summary_large_image']"
     assert_select "meta[name='description']"
+  end
+
+  # The default card is a static file under a versioned name (Cloudflare holds
+  # the old /og-image.png). It must exist and match the size the tags promise,
+  # or iMessage falls back to the bare-domain chip. Sources: tools/og-card/.
+  test "the default brand card is a 1200x630 PNG in public" do
+    path = Rails.root.join("public", "og-card-2026.png")
+    assert File.exist?(path), "public/og-card-2026.png is missing; render it with tools/og-card/render.sh"
+
+    header = File.binread(path, 24)
+    assert_equal "\x89PNG\r\n\x1A\n".b, header[0, 8], "not a PNG"
+    width, height = header[16, 8].unpack("NN")
+    assert_equal [ 1200, 630 ], [ width, height ]
   end
 
   test "deck pages preview as the deck" do

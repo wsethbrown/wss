@@ -1,0 +1,14 @@
+<% content_for :title, "New decks by email - Whiskey Share Society" %>
+<%# The emailed confirm link lands here. The GET changes nothing, so a mail
+    scanner following the link confirms no one; the button POSTs
+    (DeckNewsController#confirm). %>
+<div class="mx-auto w-full max-w-md py-8">
+  <div class="card p-7 text-center sm:p-8">
+    <h1 class="font-display text-3xl font-semibold text-ink">Confirm your email</h1>
+    <p class="mt-2 text-mute">We will email you when a new deck is published. You can stop these emails at any time.</p>
+    <%= form_with url: confirm_deck_news_path, method: :post, class: "mt-7", data: { turbo: false } do %>
+      <%= hidden_field_tag :token, @token, id: nil %>
+      <%= button_tag "Confirm my email", type: "submit", class: "btn btn-primary min-h-12 w-full cursor-pointer" %>
+    <% end %>
+  </div>
+</div>

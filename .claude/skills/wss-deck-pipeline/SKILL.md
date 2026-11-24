@@ -26,6 +26,52 @@ auto-publish** — the narrative voice is the product.
    slide_images). Import returns immediately; slides appear when the job
    lands. Inline rendering once crashed the whole dev container.
 
+## Deck packages (finished decks, loaded in one step)
+A deck built outside the app arrives as a folder: `deck.json` (title, category,
+difficulty, duration, description, tags, pours, optional price, optional takeaways
+and sections),
+`speaker-notes.md`, `<slug>.pptx`, `<slug>-speaker-notes.pdf`,
+`<slug>-research-outline.pdf` and `slides/slide-NN.png`.
+`rake decks:load DIR=<folder of packages> [PUBLISH=1] [AUTHOR=email]` runs
+`DeckPackageImport` on each: story from the script, the pptx as the buyer
+download, the two PDFs as owner downloads, slide 1 as the cover, the slides
+as `slide_images` (already rendered, so no LibreOffice and no render job),
+the pour list as free-text rows, tags, and the takeaways and extra sections
+(below). New decks are drafts unless
+PUBLISH=1. Re-running updates the same deck by title and leaves its price
+and published state alone. Not to be confused with `decks:import`, which
+loads a production catalog snapshot into development.
+
+### Subtitle, takeaways and extra sections from deck.json (November 2026)
+- `"subtitle"` fills `presentations.subtitle` (string, up to 140 characters, blank stored as
+  nil), shown on the deck page under the title (`presentations/_deck_top`, so the admin preview
+  shows it too); not on the library card. Same present/absent rule as below: present sets it
+  (blank clears), absent keeps the admin's; not a string or over 140 refuses the package. The
+  package summary shows it; the import log notes set/cleared/kept, never the text.
+- `"takeaways": [{"title", "text"}]` fills "What you'll learn", stored in the existing
+  `what_youll_learn` text format through `Presentation#takeaways=` (the one writer of that
+  format; it agrees with the admin's takeaway editor and `parsed_what_youll_learn`).
+- `"sections": [{"heading", "lines": [..]}]` fills `presentations.sections` (jsonb), the
+  deck page's extra sections, which replaced the four fixed tasting boxes
+  (`nose/palate/finish/body_notes` stay in the table, unread; the migration
+  CarryTastingNotesIntoSections moved their text into a "What you'll taste" section).
+- A key PRESENT replaces what the deck had (an empty list clears it). A key ABSENT keeps what
+  the admin typed, so re-uploading an older package never wipes hand-typed copy.
+- Malformed values (not a list, wrong entry shape, over the limits: 10 takeaways, title 120,
+  text 400; 8 sections, heading 80, 12 lines, line 300) refuse the package before anything
+  changes. Limits live in `Presentation` (sections) and `DeckPackageImport` (takeaways), and
+  are mirrored in `tools/decks/build.py` `check_meta`.
+- No takeaways adds a "Worth a look" warning; the package summary counts both.
+- Rendering rule (one partial, `presentations/_extra_sections`, used by the deck page and the
+  admin preview): one plain line = a paragraph; otherwise rows; `Label: text` (label up to 24
+  characters, colon, space) = a labelled row. Plain text only, escaped.
+
+Making a package (the story, research, script, slides, and the build tools in
+`tools/decks/`, which produce exactly this folder layout) is covered by the
+wss-deck-creation skill and its two companions, wss-deck-outline and
+wss-deck-speaker-notes. The script's one `---` rule matters here: `story`
+keeps only what follows it.
+
 ## Story rendering & the teaser gate
 - render_markdown (PresentationsHelper): redcarpet, filter_html + sanitize
   allowlist, **NO hard_wrap** (hard_wrap turned authors' wrapped lines into
@@ -111,3 +157,24 @@ deck file, and on update that replaces the deck file; admins can also force one
 via the "Re-render slide previews" button (POST render_slides). The admin show
 page's Actions panel walks the states: no file → rendering → ready to publish →
 published.
+
+## Loading a package from the admin (November 2026)
+
+A finished package can be uploaded as a zip, without the command line:
+`Admin::DeckPackagesController`, zip handling in `app/services/deck_package_zip.rb`.
+
+- **Deck list → "Upload a package"** creates a new draft. It refuses if another deck already
+  has the package's title and links to that deck's replace page.
+- **A deck's admin page → "Replace with a package"** loads the zip into that deck whatever its
+  title. Title, description, category, difficulty, running time, story, files, slides, pours
+  and tags come from the package. Price, published state, featured flag, author, owners and
+  counters are kept. Everything is validated first and saved in one transaction; old files are
+  removed only after the save succeeds.
+- `bin/rails decks:load` takes `DECK_ID=` for the same explicit target, and `FREE=1` with
+  `PUBLISH=1` for a deck that is meant to be free.
+- The import runs inside the request. A very large package would need a background job.
+
+Unpublished decks stay open to the people who own them (`Presentation#visible_to?`): the deck
+page, Present mode and downloads work for admins, direct owners and credit owners with an
+active membership; the library, search, featured lists and the purchase page do not show
+them. Publishing at $0 needs "This deck is free" ticked.

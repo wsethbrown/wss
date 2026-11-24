@@ -38,6 +38,13 @@ class DesignHelperTest < ActionView::TestCase
     assert_includes deck_cover(deck, preloaded: deck.featured_image), "<img"
   end
 
+  test "deck_cover is lazy by default and takes a loading option" do
+    deck.featured_image.attach(png)
+    assert_includes deck_cover(deck), 'loading="lazy"'
+    assert_includes deck_cover(deck, loading: "eager"), 'loading="eager"'
+    assert_not_includes deck_cover(deck, loading: "eager"), 'loading="lazy"'
+  end
+
   test "avatar shows initials without a profile image" do
     html = avatar(users(:admin), size: 40)
     assert_includes html, "AU"

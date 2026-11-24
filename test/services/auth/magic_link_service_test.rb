@@ -36,7 +36,7 @@ class Auth::MagicLinkServiceTest < ActiveSupport::TestCase
     assert_nil Auth::MagicLinkService.consume(raw)
   end
 
-  test "consume of a new-user token creates the account" do
+  test "a new-user token creates nothing until the sign-up is completed, then works once" do
     # The new-user token lives in Rails.cache; the test env defaults to :null_store,
     # so swap in a real store for this test (prod/dev use solid_cache/memory).
     original_cache = Rails.cache
@@ -47,13 +47,26 @@ class Auth::MagicLinkServiceTest < ActiveSupport::TestCase
     Rails.cache.write(Auth::MagicLinkService.cache_key(Auth::MagicLinkService.digest(raw)),
                       { email: email }, expires_in: 15.minutes)
 
+    assert_no_difference -> { User.count } do
+      assert_nil Auth::MagicLinkService.consume(raw), "opening the link never creates an account"
+      assert Auth::MagicLinkService.pending_sign_up?(raw)
+    end
+
     assert_difference -> { User.count }, 1 do
-      user = Auth::MagicLinkService.consume(raw)
+      user = Auth::MagicLinkService.complete_sign_up(raw).user
       assert_equal email, user.email
       assert_not user.password_set_manually
     end
+    assert_not Auth::MagicLinkService.pending_sign_up?(raw)
+    assert_nil Auth::MagicLinkService.complete_sign_up(raw), "a sign-up link works once"
   ensure
     Rails.cache = original_cache
+  end
+
+  test "delivering to an unknown address creates no user" do
+    assert_no_difference -> { User.count } do
+      assert Auth::MagicLinkService.deliver("brand.new@example.com").success?
+    end
   end
 
   test "consume returns nil for a blank or unknown token" do

@@ -1,0 +1,28 @@
+<%# The story glass (owner's choice, November 2026): a glass that fills as the
+    reader scrolls through the homepage story, empty at the first step and
+    full at the closing beat ("That's the whole ritual."). Driven by
+    story_glass_controller.js.
+
+    The drawing is shared/_glass at full, its level lowered by the controller
+    (the liquid is translated down, as in the pour). It is a gauge, so it
+    stays out of the appear controller's pour.
+    - Desktop (900px and up): a 96px gauge in the gutter between the step
+      words and the face, held at the middle of the screen while the steps
+      pass. Sticky with no height, so it takes no space. The step words keep
+      a clear margin from it (.beat padding in home/index), and the faces sit
+      in their own column, so it never meets either.
+    - Phones and tablets: 40px in the bottom-right corner, in the page's
+      20px gutter (only the glass's transparent margin reaches past it), so
+      it never covers text, the nav or a tap target. Shown only while the
+      steps are on screen.
+    - aria-hidden, no words, lets every tap through. Hidden until its
+      controller connects (no JS, no glass), hidden in print. Under reduced
+      motion the level does not follow the scroll: it steps a third at a
+      time as each step is reached, with no motion. %>
+<% content_for :head do %>
+  <%# Its styles: app/assets/stylesheets/home/story_glass.css (no inline <style>: the CSP, issue #46). %>
+  <%= stylesheet_link_tag "home/story_glass" %>
+<% end %>
+<div class="story-glass" data-controller="story-glass" hidden aria-hidden="true">
+  <%= render "shared/glass", level: 1, size: 96, appear: false %>
+</div>

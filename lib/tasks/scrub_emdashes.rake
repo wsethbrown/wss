@@ -1,5 +1,6 @@
 # One-off maintenance task: strip em-dashes (U+2014) from author-entered deck
-# content, replacing them with natural punctuation (comma for a mid-sentence
+# content (text fields, the extra sections' headings and lines, the legacy
+# recommendations JSON), replacing them with natural punctuation (comma for a mid-sentence
 # pause). Dry-run by default; pass APPLY=1 to write. The em-dash is referenced by
 # its code point ("—") so this source file stays em-dash-free.
 #
@@ -37,6 +38,21 @@ namespace :scrub do
         p.public_send("#{f}=", nv)
         fields += 1
         dirty = true
+      end
+
+      # The extra sections: every heading and line.
+      if p.sections.is_a?(Array)
+        scrubbed = p.sections.map do |section|
+          next section unless section.is_a?(Hash)
+
+          section.merge("heading" => scrub.call(section["heading"]),
+                        "lines" => Array(section["lines"]).map { |line| scrub.call(line) })
+        end
+        if scrubbed != p.sections
+          p.sections = scrubbed
+          fields += 1
+          dirty = true
+        end
       end
 
       if p.whiskey_recommendations_json.is_a?(Array)

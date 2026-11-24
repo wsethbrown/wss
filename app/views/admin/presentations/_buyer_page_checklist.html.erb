@@ -1,0 +1,64 @@
+<%# "The buyer page": what the deck page will actually render given what is
+    filled in, and the fastest honest answer to "is this deck ready to sell?".
+    Recomputed on every render. Dots: green = renders (bg-ink), pale = hidden
+    because empty, red (bg-rsvp-no) = blocks the sale, mid green = automatic.
+    Each item links to the tab that edits it. If a buyer-page section is
+    added, add its row here, in page order. Locals: presentation, slides %>
+<%
+  takeaways_count = presentation.parsed_what_youll_learn.size
+  pours           = presentation.pour_list.to_a
+  linked_count    = pours.count(&:linked?)
+  story_words     = presentation.content.to_s.split.size
+  sections_count  = Array(presentation.sections).count { |section| section.is_a?(Hash) }
+  slides_count    = slides.size
+  extras_count    = [ presentation.sneak_peek_file, presentation.speaker_notes,
+                      presentation.outline_file, presentation.recommendations_sheet ].count(&:attached?) +
+                    presentation.supplemental_materials.attachments.size
+  dot_classes = { on: "bg-ink", auto: "bg-whiskey-400", off: "bg-whiskey-200", need: "bg-rsvp-no" }
+  link_class = "-my-3.5 inline-flex min-h-11 items-center font-medium text-ink underline-offset-4 hover:underline"
+  rows = [
+    [ "The cover", "#pane-listing", presentation.title.present? && presentation.description.present? ? :on : :need,
+      presentation.description.present? ? "title, pitch line & price" : "needs the one-line pitch" ],
+    [ "The takeaways", "#pane-listing", takeaways_count.positive? ? :on : :off,
+      takeaways_count.positive? ? pluralize(takeaways_count, "point") : "hidden, none yet" ],
+    [ "The story", "#pane-listing", story_words > 40 ? :on : :need,
+      story_words > 40 ? "#{number_with_delimiter(story_words)} words · ~#{presentation.reading_time} min read" : "too short, the teaser is the pitch" ],
+    [ "Extra sections", "#f-sections", sections_count.positive? ? :on : :off,
+      sections_count.positive? ? pluralize(sections_count, "section") : "hidden, none yet" ],
+    [ "The slides", "#pane-slides", slides_count.positive? ? :auto : :need,
+      if slides_count.positive?
+        "#{slides_count} rendered · first #{presentation.effective_preview_slide_count} free"
+      elsif presentation.slide_render_pending?
+        "rendering…"
+      elsif presentation.pdf_file.attached?
+        "not rendered yet"
+      else
+        "needs the deck file"
+      end ],
+    [ "The pour list", "#pane-pours", pours.any? ? :on : :off,
+      if pours.empty?
+        "hidden, empty"
+      else
+        "#{pluralize(pours.size, 'pour')} · #{linked_count.zero? ? 'none' : linked_count} linked to the catalog"
+      end ],
+    [ "What you get", "#pane-files", presentation.pdf_file.attached? ? :on : :need,
+      if presentation.pdf_file.attached?
+        "the deck#{extras_count.positive? ? " + #{pluralize(extras_count, 'extra')}" : ''}"
+      else
+        "no deck file, required to publish"
+      end ]
+  ]
+%>
+<section class="card p-5 sm:p-6">
+  <h2 class="text-lg font-semibold text-ink">The buyer page</h2>
+  <p class="mt-1 text-sm text-mute">What renders now</p>
+  <ol class="mt-4 space-y-3 text-sm">
+    <% rows.each do |label, href, state, detail| %>
+      <li class="flex gap-2.5">
+        <span class="mt-1.5 h-2 w-2 flex-shrink-0 rounded-full <%= dot_classes.fetch(state) %>" aria-hidden="true"></span>
+        <span><a href="<%= href %>" class="<%= link_class %>"><%= label %></a><br>
+          <span class="text-mute"><%= detail %></span></span>
+      </li>
+    <% end %>
+  </ol>
+</section>

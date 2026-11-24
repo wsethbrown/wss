@@ -29,3 +29,8 @@
 
 en:
   hello: "Hello world"
+  activerecord:
+    attributes:
+      presentation:
+        # Its errors read "Extra sections need a heading in section 2".
+        sections: "Extra sections"

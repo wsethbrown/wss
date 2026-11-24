@@ -115,8 +115,38 @@ class ApplicationController < ActionController::Base
     redirect_to auth_path, alert: "Your session expired. Please try again."
   end
 
-  # Redirect to the dashboard after sign in / sign up.
+  # After any sign-in or sign-up: back to the page that sent the visitor to
+  # sign in (Devise's stored location, set by authenticate_user! or by
+  # remember_return_to), when it is a same-site path; otherwise the dashboard.
+  # Reading the stored location consumes it.
   def after_sign_in_path_for(resource)
-    dashboard_path
+    stored = stored_location_for(resource)
+    safe = ReturnPath.sanitize(stored)
+    Rails.logger.warn "Stored return path for user #{resource.id} ignored: not a same-site path" if stored.present? && safe.nil?
+    safe || dashboard_path
   end
+
+  # Keep a requested return path for after sign-in (same browser). Refused
+  # values are dropped and logged, never stored.
+  def remember_return_to(value)
+    return if value.blank?
+
+    if (safe = ReturnPath.sanitize(value.to_s))
+      store_location_for(:user, safe)
+    else
+      Rails.logger.warn "Return path refused for #{self.class.name}##{action_name}: not a same-site path"
+    end
+  end
+
+  # The path waiting in this session for after sign-in, without consuming it.
+  def pending_return_path
+    ReturnPath.sanitize(session["user_return_to"])
+  end
+  helper_method :pending_return_path
+
+  # "Sign in to ..." links carry the page they sit on.
+  def sign_in_path_returning(path = request.fullpath)
+    auth_path(return_to: ReturnPath.sanitize(path))
+  end
+  helper_method :sign_in_path_returning
 end

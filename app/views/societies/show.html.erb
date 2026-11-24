@@ -47,7 +47,7 @@
         <span class="chip">Invite only</span>
       <% end %>
     <% else %>
-      <%= link_to "Sign in to join", auth_path, class: "btn btn-primary" %>
+      <%= link_to "Sign in to join", sign_in_path_returning, class: "btn btn-primary" %>
     <% end %>
     <%= render "favorites/button", favoritable: @society %>
   <% end %>
@@ -85,7 +85,7 @@
                     <% if event.location.present? %> · <%= event.location %><% end %>
                   </p>
                 </div>
-                <span class="mt-0.5 font-bold text-ink" aria-hidden="true">→</span>
+                <span class="arrow mt-0.5 font-bold text-ink" aria-hidden="true">→</span>
               <% end %>
             <% end %>
           </div>
@@ -114,7 +114,7 @@
                     <% if event.location.present? %> · <%= event.location %><% end %>
                   </p>
                 </div>
-                <span class="mt-0.5 font-bold text-ink" aria-hidden="true">→</span>
+                <span class="arrow mt-0.5 font-bold text-ink" aria-hidden="true">→</span>
               <% end %>
             <% end %>
           </div>

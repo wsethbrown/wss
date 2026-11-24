@@ -3,18 +3,7 @@
 <head>
   <title>Presenting: <%= @presentation.title %></title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <style>
-    html, body { margin: 0; height: 100%; background: #000; overflow: hidden;
-                 font-family: ui-sans-serif, system-ui, sans-serif; }
-    .slide { position: absolute; inset: 0; display: none; align-items: center; justify-content: center; }
-    .slide.active { display: flex; }
-    .slide img { max-width: 100vw; max-height: 100vh; object-fit: contain; }
-    .hud { position: fixed; bottom: 16px; right: 20px; color: rgba(246,237,218,.55);
-           font-size: 13px; letter-spacing: .08em; z-index: 2; }
-    .exit { position: fixed; top: 14px; right: 20px; color: rgba(246,237,218,.55);
-            text-decoration: none; font-size: 13px; z-index: 2; }
-    .exit:hover, .hud:hover { color: rgba(246,237,218,.9); }
-  </style>
+  <%= stylesheet_link_tag "present" %>
 </head>
 <body>
   <% slides = @presentation.slide_images.order(:id) %>

@@ -17,7 +17,7 @@
 
 <%# The deck page in two acts.
       Sell: the cover (its first real slide), title and meta, one action bar, the
-            story teaser, the first slides, tasting notes, pours, reviews.
+            story teaser, the first slides, the extra sections, pours, reviews.
       Own:  the same page for an owner swaps the offer for Present, the downloads
             and the whole story.
     Access is decided in the controller (@full_story) and by the ownership row
@@ -31,6 +31,16 @@
 <% viewer_can_credit = user_signed_in? && !viewer_owns && !@presentation.free? && current_user.subscription_active? && current_user.credits.to_i > 0 %>
 <% owned_purchase = user_signed_in? ? current_user.user_presentations.find_by(presentation_id: @presentation.id) : nil %>
 <% lapsed_credit_owner = owned_purchase && owned_purchase.purchase_type == 'credit' && !current_user.subscription_active? %>
+<%# Site admins open every deck without buying it. admin_access is that case (an
+    admin with no usable purchase); owner_tools is the ONE flag the action bar
+    and the Downloads box both read, derived from the controller's @full_story
+    so the page can never promise more than the downloads controller allows.
+    A lapsed credit owner who is not an admin keeps owner_tools false. %>
+<%# included_access: an active member opening a deck included with membership,
+    with no purchase row; @full_story already reflects it (User#can_access_presentation?). %>
+<% included_access = user_signed_in? && @full_story && owned_purchase.nil? && @presentation.included_for?(current_user) %>
+<% admin_access = user_signed_in? && current_user.admin? && @full_story && !included_access && (owned_purchase.nil? || lapsed_credit_owner) %>
+<% owner_tools = user_signed_in? && @full_story && (admin_access || included_access || (owned_purchase.present? && !lapsed_credit_owner)) %>
 <%# Rendered slides, loaded once: the cover, the slide count and the teaser all use them. %>
 <% slide_list = @presentation.slide_images.attached? ? @presentation.slide_images_attachments.includes(:blob).order(:id).to_a : [] %>
 <% get_label = if !user_signed_in?
@@ -40,45 +50,38 @@
                else
                  'Purchase'
                end %>
-<% get_path = user_signed_in? ? new_presentation_purchase_path(@presentation) : auth_path %>
+<% get_path = user_signed_in? ? new_presentation_purchase_path(@presentation) : sign_in_path_returning %>
 
 <%# Purchase outcomes are real flashes (overlay toasts from the layout), set by
     PresentationsController#handle_checkout_return. %>
 
 <div class="mx-auto w-full max-w-6xl px-4 pb-20 pt-28">
   <% unless @presentation.published? %>
-    <p class="mb-6 rounded-2xl border border-hairline bg-whiskey-100 px-4 py-3 text-sm font-semibold text-ink">
-      Draft, visible to admins only. Customers get a 404 until this deck is published.
-    </p>
+    <% if current_user&.admin? %>
+      <p class="mb-6 rounded-2xl border border-hairline bg-whiskey-100 px-4 py-3 text-sm font-semibold text-ink">
+        Draft, visible to admins and to people who already own it. Everyone else gets a 404 until this deck is published.
+      </p>
+    <% else %>
+      <p class="mb-6 rounded-2xl border border-hairline bg-whiskey-100 px-4 py-3 text-sm font-semibold text-ink">
+        This deck is no longer in the library. It stays in yours.
+      </p>
+    <% end %>
   <% end %>
 
-  <!-- Header: title and meta beside the cover. A deck with no slides and no
-       featured image has no cover, so the text takes the full width. -->
+  <!-- Header: title and meta beside the cover. -->
   <% cover_image = slide_list.first || (@presentation.featured_image if @presentation.featured_image.attached?) %>
-  <header class="grid gap-8 md:grid-cols-12 md:items-center">
-    <div class="min-w-0 <%= cover_image ? 'md:col-span-5' : 'md:col-span-8' %>">
-      <h1 class="font-display text-4xl font-semibold text-ink sm:text-5xl"><%= @presentation.title %></h1>
-      <% meta = [@presentation.category.presence, @presentation.difficulty.presence, @presentation.duration_label.presence,
-                 (slide_list.any? ? "#{slide_list.size} slides" : nil)].compact %>
-      <% if meta.any? %>
-        <p class="mt-3 text-sm text-mute"><%= meta.join(' · ') %></p>
-      <% end %>
-      <% if @presentation.description.present? %>
-        <p class="mt-5 whitespace-pre-line text-[17px] leading-relaxed text-gray-900"><%= @presentation.description %></p>
-      <% end %>
-    </div>
-    <% if cover_image %>
-      <div class="md:col-span-7" style="view-transition-name: deck-cover-<%= @presentation.id %>">
-        <%= deck_cover @presentation, preloaded: cover_image, alt: "#{@presentation.title}, first slide" %>
-      </div>
-    <% end %>
-  </header>
+  <%= render "presentations/deck_top", presentation: @presentation, cover_image: cover_image, slides_count: slide_list.size %>
 
   <!-- The action bar: price or ownership, and the page's main action -->
   <section id="deck-actions" class="card mt-8 p-5 sm:p-6" aria-label="Get this deck">
     <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
       <div class="min-w-0">
-        <% if owned_purchase %>
+        <% if admin_access %>
+          <p class="font-display text-2xl font-semibold text-ink">Admin access</p>
+          <p class="mt-1 text-mute">You can open every deck as a site admin. Customers see the price and purchase options here.</p>
+        <% elsif included_access %>
+          <p class="font-display text-2xl font-semibold text-ink">Included with your membership</p>
+        <% elsif owned_purchase %>
           <% if lapsed_credit_owner %>
             <p class="font-display text-2xl font-semibold text-ink">Membership paused</p>
             <p class="mt-1 text-mute">You unlocked this deck with a credit, reactivate to read it again.</p>
@@ -89,18 +92,22 @@
         <% else %>
           <p class="font-display text-3xl font-semibold tabular-nums text-ink"><%= @presentation.formatted_price %></p>
           <p class="mt-1 text-mute"><%= @presentation.free? ? 'Free for everyone' : 'One-time purchase, yours for good' %></p>
+          <% if @presentation.included_with_membership? && !@presentation.free? %>
+            <p class="mt-1 text-sm font-semibold text-ink">Included with membership</p>
+          <% end %>
           <% if viewer_can_credit %>
             <p class="mt-1 text-sm font-semibold text-ink">Members can use a credit at checkout.</p>
           <% end %>
         <% end %>
       </div>
 
-      <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:justify-end">
-        <% if viewer_owns %>
-          <% if lapsed_credit_owner %>
-            <%= link_to "Reactivate membership", root_path(anchor: 'pricing'), class: "btn btn-primary min-h-12" %>
+      <%# From lg up the buttons keep to one row and the words beside them wrap instead. %>
+      <div class="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center lg:shrink-0 lg:flex-nowrap lg:justify-end">
+        <% if owner_tools || viewer_owns %>
+          <% if !owner_tools %>
+            <%= link_to "Reactivate membership", membership_path(anchor: 'pricing'), class: "btn btn-primary min-h-12" %>
             <a href="#deck-story" data-turbo="false" class="btn btn-secondary min-h-12">Read the story</a>
-          <% elsif @presentation.pdf_file.attached? && @full_story %>
+          <% elsif @presentation.pdf_file.attached? %>
             <%# Owners: open the real deck when the file exists. %>
             <% if slide_list.any? %>
               <%= link_to "Present", present_presentation_path(@presentation), class: "btn btn-primary min-h-12" %>
@@ -121,7 +128,7 @@
       </div>
     </div>
 
-    <% unless owned_purchase %>
+    <% unless owned_purchase || admin_access || included_access %>
       <%# What you get, an honest manifest built ONLY from what exists. %>
       <% manifest = [
         (slide_list.any? ? "The full deck, #{slide_list.size} slides" : (@presentation.pdf_file.attached? ? "The full presentation file" : nil)),
@@ -152,7 +159,7 @@
   <%# Downloads: owners with access only, one list built from whatever files exist.
       The box only renders when there is something to download; an empty labeled
       box reads as broken. %>
-  <% if owned_purchase && !lapsed_credit_owner %>
+  <% if owner_tools %>
     <% downloads = [
       ['Full presentation', (full_presentation_presentation_downloads_path(@presentation) if @presentation.pdf_file.attached?)],
       ['Speaker notes',     (speaker_notes_presentation_downloads_path(@presentation) if @presentation.speaker_notes.attached?)],
@@ -169,7 +176,7 @@
     <% end %>
     <section id="deck-downloads" class="mt-6">
       <% if downloads.any? %>
-        <div class="card p-5 sm:p-6">
+        <div class="card p-5 sm:p-6" data-appear-target="item">
           <h2 class="font-display text-xl font-semibold text-ink">Downloads</h2>
           <ul class="mt-3 divide-y divide-hairline">
             <% downloads.each do |label, path| %>
@@ -202,88 +209,28 @@
     </section>
   <% end %>
 
-  <%# Each section below: heading in the narrow column, content in the wide one. %>
-  <% section_class = "grid gap-6 border-t border-hairline py-12 md:grid-cols-12 md:gap-10" %>
-  <% heading_class = "font-display text-2xl font-semibold text-ink sm:text-3xl" %>
+  <%# Each section below: heading in the narrow column, content in the wide one.
+      The sections the admin's "What the customer sees" preview also shows are
+      partials, so the two render from one copy. %>
+  <% section_class = deck_section_class %>
+  <% heading_class = deck_heading_class %>
 
   <div class="mt-12">
     <!-- What you'll learn -->
-    <% if @presentation.parsed_what_youll_learn.any? %>
-      <section class="<%= section_class %>">
-        <div class="md:col-span-4">
-          <h2 class="<%= heading_class %>">What you'll learn</h2>
-        </div>
-        <div class="md:col-span-8">
-          <ol class="card divide-y divide-hairline px-5 sm:px-6">
-            <% @presentation.parsed_what_youll_learn.each_with_index do |point, i| %>
-              <li class="flex items-start gap-4 py-5">
-                <span class="step-marker"><%= i + 1 %></span>
-                <div class="min-w-0 pt-1">
-                  <% if point.is_a?(Hash) && point[:title] %>
-                    <h3 class="font-semibold text-ink"><%= point[:title] %></h3>
-                    <% if point[:description].present? %>
-                      <p class="mt-1 text-sm text-mute"><%= point[:description] %></p>
-                    <% end %>
-                  <% else %>
-                    <p class="text-gray-900"><%= point %></p>
-                  <% end %>
-                </div>
-              </li>
-            <% end %>
-          </ol>
-        </div>
-      </section>
-    <% end %>
+    <%= render "presentations/what_youll_learn", presentation: @presentation %>
 
     <!-- The story, narrative deck content, rendered from Markdown -->
-    <section class="<%= section_class %> scroll-mt-24" id="deck-story" data-controller="deck-thread">
-      <div class="md:col-span-4">
-        <h2 class="<%= heading_class %>"><%= @full_story ? 'The story' : 'A taste of the writing' %></h2>
-        <% if @presentation.content.present? && @presentation.reading_time.positive? %>
-          <p class="mt-2 text-sm text-mute"><%= @presentation.reading_time %> min read</p>
-        <% end %>
-      </div>
-      <div class="md:col-span-8">
-        <div class="card p-6 sm:p-10">
-          <div class="relative pl-6 md:pl-8">
-            <%# The thread: a thin line that fills as you read, the narrative spine
-                connecting the pour to its story. %>
-            <div class="absolute bottom-1 left-0 top-1 w-[2px] rounded bg-whiskey-100" aria-hidden="true">
-              <div id="deck-thread" data-deck-thread-target="thread" class="w-full rounded bg-ink transition-[height] duration-150 ease-out" style="height: 0%"></div>
-            </div>
+    <%= render "presentations/story_section", presentation: @presentation, full_story: @full_story,
+               get_label: get_label, get_path: get_path %>
 
-            <% if @presentation.content.present? %>
-              <% if @full_story %>
-                <div class="prose-deck prose-deck--dropcap">
-                  <%= render_markdown(@presentation.content) %>
-                </div>
-              <% else %>
-                <%# Teaser: the opening of the story, cut at the source so the
-                    rest never reaches the page. Fades into the purchase CTA. %>
-                <div class="relative">
-                  <div class="prose-deck prose-deck--dropcap">
-                    <%= preview_markdown(@presentation.content) %>
-                  </div>
-                  <% if story_truncated?(@presentation.content) %>
-                    <div class="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white to-transparent" aria-hidden="true"></div>
-                  <% end %>
-                </div>
-              <% end %>
-            <% else %>
-              <p class="prose-deck whitespace-pre-line"><%= @presentation.description %></p>
-            <% end %>
-          </div>
-
-          <% if @presentation.content.present? && !@full_story && story_truncated?(@presentation.content) %>
-            <div class="inset mt-4 p-6 text-center sm:p-8">
-              <p class="font-display text-xl font-semibold text-ink">The story keeps going.</p>
-              <p class="mt-2 text-mute">Get the deck to read the rest, slides, script, and downloads included.</p>
-              <%= link_to get_label, get_path, class: 'btn btn-secondary mt-6 min-h-12' %>
-            </div>
-          <% end %>
-        </div>
-      </div>
-    </section>
+    <%# The page's one photograph, a wide band after the story (interim stock,
+        see docs/redesign/IMAGE_CREDITS.md), in the heavy two-ink duotone.
+        Never behind text. %>
+    <div class="border-t border-hairline py-12">
+      <%= render "shared/duotone", src: "photos/deck-pour-decanter.jpg", width: 1280, height: 427,
+            css: "duotone--heavy aspect-[2/1] sm:aspect-[3/1]",
+            alt: "A hand pours whiskey from a cut-glass decanter into a tumbler in a lamp-lit sitting room." %>
+    </div>
 
     <!-- The slides, a teaser for non-owners ONLY. We never show the whole deck
          here: the preview caps below the slide count and the last one fades
@@ -292,7 +239,7 @@
     <% unless @full_story %>
       <% if slide_list.any? %>
         <section class="<%= section_class %>">
-          <div class="md:col-span-4">
+          <div class="self-start md:col-span-4" data-appear-target="item">
             <h2 class="<%= heading_class %>">Inside the deck</h2>
           </div>
           <div class="md:col-span-8">
@@ -304,7 +251,7 @@
                 <% fade = teasing && i == visible.size - 1 %>
                 <figure class="<%= 'relative' if fade %>">
                   <%= image_tag image_variant(slide, :hero), alt: "Slide #{i + 1}", loading: 'lazy',
-                      class: 'aspect-video w-full rounded-[18px] border border-hairline object-cover' %>
+                      class: 'aspect-video w-full rounded-[18px] border border-hairline object-cover', data: { appear_target: 'image' } %>
                   <% if fade %>
                     <%# The last free slide dissolves from about halfway down into
                         the purchase prompt, the paywall, made of the deck itself. %>
@@ -324,7 +271,7 @@
         </section>
       <% elsif @presentation.parsed_slides_preview.any? %>
         <section class="<%= section_class %>">
-          <div class="md:col-span-4">
+          <div class="self-start md:col-span-4" data-appear-target="item">
             <h2 class="<%= heading_class %>">Slide-by-slide outline</h2>
           </div>
           <div class="md:col-span-8">
@@ -347,30 +294,8 @@
       <% end %>
     <% end %>
 
-    <!-- Tasting notes (if present) -->
-    <% if @presentation.nose_notes.present? || @presentation.palate_notes.present? || @presentation.finish_notes.present? || @presentation.body_notes.present? %>
-      <section class="<%= section_class %>">
-        <div class="md:col-span-4">
-          <h2 class="<%= heading_class %>">What you'll taste</h2>
-        </div>
-        <div class="md:col-span-8">
-          <dl class="card grid gap-x-10 gap-y-6 p-6 sm:grid-cols-2 sm:p-8">
-            <% {
-              "Nose"   => @presentation.nose_notes,
-              "Palate" => @presentation.palate_notes,
-              "Finish" => @presentation.finish_notes,
-              "Body"   => @presentation.body_notes
-            }.each do |label, notes| %>
-              <% next if notes.blank? %>
-              <div>
-                <dt class="text-sm font-semibold text-mute"><%= label %></dt>
-                <dd class="mt-1 font-reading text-lg leading-relaxed text-gray-900"><%= notes %></dd>
-              </div>
-            <% end %>
-          </dl>
-        </div>
-      </section>
-    <% end %>
+    <!-- The deck's extra sections (they replaced the fixed tasting notes) -->
+    <%= render "presentations/extra_sections", presentation: @presentation %>
 
     <%# THE pour list. One section, one storage format: presentation_bottles.
         A row is either linked to a catalog bottle (then it carries a rating
@@ -385,7 +310,7 @@
     <% pour_list = @presentation.presentation_bottles.ordered.includes(:bottle).to_a %>
     <% if pour_list.any? %>
       <section class="<%= section_class %>">
-        <div class="md:col-span-4">
+        <div class="self-start md:col-span-4" data-appear-target="item">
           <h2 class="<%= heading_class %>">What this deck calls for</h2>
           <p class="mt-3 text-mute">The pours this deck is built around. Pour what you can find; plenty of societies substitute, and the story still works.</p>
         </div>
@@ -416,7 +341,7 @@
     <% poured = @presentation.pours_from_nights %>
     <% if poured.any? %>
       <section class="<%= section_class %>">
-        <div class="md:col-span-4">
+        <div class="self-start md:col-span-4" data-appear-target="item">
           <h2 class="<%= heading_class %>">What societies actually poured</h2>
           <p class="mt-3 text-mute">Bottles opened on nights that ran this deck, scored by the rooms that were there.</p>
         </div>
@@ -453,10 +378,12 @@
 
     <%# Deck reviews: the real thing. Only owners and attendees may write one
         (model-enforced); everyone may read them. %>
+    <%# The review form is never revealed (people type in it): only the heading
+        column and the list of reviews are. %>
     <section id="reviews" class="<%= section_class %>">
       <% deck_reviews = @presentation.presentation_reviews.recent.includes(:user).to_a %>
       <% my_review = user_signed_in? ? deck_reviews.find { |r| r.user_id == current_user.id } : nil %>
-      <div class="md:col-span-4">
+      <div class="self-start md:col-span-4" data-appear-target="item">
         <h2 class="<%= heading_class %>">Reviews</h2>
         <% if deck_reviews.any? %>
           <div class="mt-3 flex flex-wrap items-center gap-2">
@@ -495,7 +422,7 @@
         <% end %>
 
         <% if deck_reviews.any? %>
-          <ul class="card divide-y divide-hairline">
+          <ul class="card divide-y divide-hairline" data-appear-target="item">
             <% deck_reviews.each do |review| %>
               <li class="p-5 sm:px-6">
                 <div class="flex items-center justify-between gap-3">
@@ -520,7 +447,7 @@
 
     <!-- The author, and tags as a "where next?" device for a reader who finished the teaser -->
     <section class="<%= section_class %>">
-      <div class="md:col-span-4">
+      <div class="self-start md:col-span-4" data-appear-target="item">
         <h2 class="<%= heading_class %>">About the author</h2>
       </div>
       <div class="space-y-6 md:col-span-8">
@@ -538,7 +465,7 @@
           <% if author.bio.present? %>
             <p class="mt-4 text-sm leading-relaxed text-gray-900"><%= author.bio %></p>
           <% end %>
-          <%= link_to "View profile →", profile_path(author), class: "mt-4 inline-block text-sm font-semibold text-ink hover:underline" %>
+          <%= link_to with_arrow("View profile"), profile_path(author), class: "mt-4 inline-block text-sm font-semibold text-ink hover:underline" %>
         </div>
 
         <%# Tags link to the library filtered by that tag. %>
@@ -554,12 +481,20 @@
     </section>
   </div>
 
+  <%# Not ready to buy: an email when a new deck is published. Only for
+      visitors without the deck (no purchase row, no admin or membership access). %>
+  <% unless owned_purchase || admin_access || included_access %>
+    <div class="mb-12">
+      <%= render "shared/deck_news_form", source: "deck" %>
+    </div>
+  <% end %>
+
   <!-- More from the library, never dead-end a reader -->
   <% if @more_decks&.any? %>
     <section class="border-t border-hairline pt-12">
-      <div class="flex flex-wrap items-end justify-between gap-4">
+      <div class="flex flex-wrap items-end justify-between gap-4" data-appear-target="item">
         <h2 class="<%= heading_class %>">More from the library</h2>
-        <%= link_to 'See all decks →', presentations_path, class: 'text-sm font-semibold text-ink hover:underline' %>
+        <%= link_to with_arrow('See all decks'), presentations_path, class: 'text-sm font-semibold text-ink hover:underline' %>
       </div>
       <div class="mt-8 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
         <% @more_decks.each do |deck| %>

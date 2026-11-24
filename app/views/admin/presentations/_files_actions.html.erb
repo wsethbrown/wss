@@ -1,0 +1,25 @@
+<%# The Files tab, second half: replacing the whole deck from a package, and
+    re-rendering the slide previews. Outside #deck-form (the re-render button
+    is a form of its own). Locals: presentation, slides %>
+<section class="card p-5 sm:p-6">
+  <h2 class="text-lg font-semibold text-ink">Replace with a package</h2>
+  <p class="mb-4 mt-1 text-sm text-mute">A package replaces the title, description, story, files, slides, pours and tags in one go. The price, the published state and the purchases stay as they are.</p>
+  <%= link_to "Replace with a package", new_admin_presentation_package_path(presentation), class: "btn btn-secondary min-h-11 py-2.5" %>
+</section>
+
+<section class="card p-5 sm:p-6">
+  <h2 class="text-lg font-semibold text-ink">Slide previews</h2>
+  <% if slides.any? %>
+    <p class="mb-4 mt-1 text-sm text-mute"><%= slides.size %> rendered from the deck file.</p>
+  <% elsif presentation.slide_render_pending? %>
+    <p class="mt-1 text-sm text-ink"><span class="font-semibold">Rendering slide previews&hellip;</span> usually under a minute. Reload to see them.</p>
+  <% elsif presentation.pdf_file.attached? %>
+    <p class="mb-4 mt-1 text-sm text-red-700"><span class="font-semibold">No slide previews.</span> The render didn't run or failed.</p>
+  <% else %>
+    <p class="mt-1 text-sm text-mute">This deck has no deck file to render. Upload one first.</p>
+  <% end %>
+  <% if presentation.pdf_file.attached? && !presentation.slide_render_pending? %>
+    <%= button_to "Re-render slide previews", render_slides_admin_presentation_path(presentation), method: :post,
+          params: { tab: "files" }, form: { class: "inline" }, class: "btn btn-secondary min-h-11 py-2.5" %>
+  <% end %>
+</section>

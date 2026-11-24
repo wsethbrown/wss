@@ -1,0 +1,14 @@
+<% content_for :title, "Join the Society - Whiskey Share Society" %>
+<%# A new account's magic link lands here. The GET creates nothing, so a mail
+    scanner following the link makes no account; the button's POST does
+    (MagicLinksController#confirm). Copy is the registration email's own. %>
+<div class="mx-auto w-full max-w-md py-8">
+  <div class="card p-7 text-center sm:p-8">
+    <h1 class="font-display text-3xl font-semibold text-ink">Welcome to the Society</h1>
+    <p class="mt-2 text-mute">Click the button to create your account and sign in. No password needed.</p>
+    <%= form_with url: confirm_magic_link_path, method: :post, class: "mt-7", data: { turbo: false } do %>
+      <%= hidden_field_tag :token, @token, id: nil %>
+      <%= button_tag "Create my account", type: "submit", class: "btn btn-primary min-h-12 w-full cursor-pointer" %>
+    <% end %>
+  </div>
+</div>

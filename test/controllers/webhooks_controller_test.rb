@@ -81,7 +81,28 @@ class WebhooksControllerTest < ActionDispatch::IntegrationTest
     @user.reload
     assert_equal "canceled", @user.subscription_status
     assert_nil @user.stripe_subscription_id
-    assert_equal 0, @user.credits
+    assert_equal 2, @user.credits, "unused credits are kept when the membership ends"
+  end
+
+  # Owner rule: credits are not wiped when a membership ends; a lapsed member
+  # just cannot spend them until they rejoin.
+  test "a deleted subscription keeps the unused balance and logs it" do
+    CreditTransaction.record!(user: @user, amount: 3, transaction_type: "granted", description: "setup")
+    logged = capture_log do
+      assert_no_difference -> { CreditTransaction.count } do
+        post_event("evt_keep_credits", "customer.subscription.deleted",
+                   sub_payload("sub_b5", "canceled").merge(cancel_at: nil))
+      end
+    end
+
+    assert_response :success
+    @user.reload
+    assert_equal 3, @user.credits
+    assert_equal CreditTransaction.balance_for(@user), @user.credits
+    assert_not CreditTransaction.where(user: @user, transaction_type: "expired").exists?
+    kept_line = logged.lines.grep(/kept \d+ unused credits/).join
+    assert_match(/user #{@user.id}\b.*kept 3 unused credits/, kept_line)
+    assert_no_match(/@/, kept_line, "no email addresses in the log line")
   end
 
   test "an updated event for an old subscription changes nothing" do
@@ -329,6 +350,16 @@ class WebhooksControllerTest < ActionDispatch::IntegrationTest
     yield
   ensure
     old.each { |k, v| ENV[k] = v }
+  end
+
+  def capture_log
+    io = StringIO.new
+    old = Rails.logger
+    Rails.logger = ActiveSupport::Logger.new(io)
+    yield
+    io.string
+  ensure
+    Rails.logger = old
   end
 
   def post_event(event_id, type, object)

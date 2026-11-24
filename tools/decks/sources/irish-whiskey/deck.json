@@ -1,0 +1,40 @@
+{
+  "slug": "Irish-Whiskey",
+  "title": "Irish Whiskey",
+  "subtitle": "From Dublin's four big distillers to two distilleries, and back",
+  "category": "Irish Whiskey",
+  "difficulty": "Intermediate",
+  "duration": "45 min",
+  "description": "How Irish whiskey fell to two working distilleries by 1980, and how it grew again after 1987. Four pours.",
+  "pours": [
+    {
+      "name": "Redbreast 12 Year Old",
+      "origin": "Irish Distillers, Midleton",
+      "style": "Single pot still Irish whiskey",
+      "strength": "40% ABV",
+      "notes": "Notice how it feels in your mouth before the flavour. People say unmalted barley makes it thick and oily."
+    },
+    {
+      "name": "Bushmills 10 Year Old",
+      "origin": "Bushmills, County Antrim",
+      "style": "Single malt Irish whiskey",
+      "strength": "40% ABV",
+      "notes": "Malted barley only, distilled three times. Put it beside the Redbreast and compare the weight."
+    },
+    {
+      "name": "Powers Gold Label",
+      "origin": "Irish Distillers, Midleton",
+      "style": "Blended Irish whiskey",
+      "strength": "43.2% ABV",
+      "notes": "Pot still whiskey blended with grain whiskey from a column still. Taste it after the Redbreast."
+    },
+    {
+      "name": "Connemara Original Peated Single Malt",
+      "origin": "Cooley, County Louth",
+      "style": "Peated single malt Irish whiskey",
+      "strength": "40% ABV",
+      "notes": "Peat smoke and two distillations, both unusual in Irish whiskey when Cooley started."
+    }
+  ],
+  "tags": "irish, history, pot still"
+}

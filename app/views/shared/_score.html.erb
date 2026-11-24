@@ -5,11 +5,12 @@
     locals:
       value:     the score, 0..5 (Numeric), or nil for "no tastings yet".
       precision: decimals shown (default 2, trailing zeros stripped).
-      tone:      :ink (default) or :cream, passed to the glass. %>
+      tone:      :ink (default) or :cream, passed to the glass.
+      appear:    false keeps the glass out of the pour (passed to the glass). %>
 <% if value.present? %>
   <% shown = number_with_precision(value, precision: local_assigns.fetch(:precision, 2), strip_insignificant_zeros: true) %>
   <span class="inline-flex items-center gap-1.5 whitespace-nowrap" data-score="<%= shown %>">
-    <%= render "shared/glass", level: value.to_f / 5, size: 28, tone: local_assigns.fetch(:tone, :ink) %>
+    <%= render "shared/glass", level: value.to_f / 5, size: 28, tone: local_assigns.fetch(:tone, :ink), appear: local_assigns.fetch(:appear, true) %>
     <span class="font-semibold tabular-nums text-ink"><%= shown %></span>
     <span class="sr-only"> out of 5</span>
   </span>

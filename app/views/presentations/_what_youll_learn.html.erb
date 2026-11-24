@@ -1,0 +1,29 @@
+<%# "What you'll learn": the deck's takeaways. Nothing when there are none.
+    Shared by the deck page and the admin preview. Locals: presentation %>
+<% points = presentation.parsed_what_youll_learn %>
+<% if points.any? %>
+  <section class="<%= deck_section_class %>">
+    <div class="self-start md:col-span-4" data-appear-target="item">
+      <h2 class="<%= deck_heading_class %>">What you'll learn</h2>
+    </div>
+    <div class="md:col-span-8">
+      <ol class="card divide-y divide-hairline px-5 sm:px-6">
+        <% points.each_with_index do |point, i| %>
+          <li class="flex items-start gap-4 py-5">
+            <span class="step-marker"><%= i + 1 %></span>
+            <div class="min-w-0 pt-1">
+              <% if point.is_a?(Hash) && point[:title] %>
+                <h3 class="font-semibold text-ink"><%= point[:title] %></h3>
+                <% if point[:description].present? %>
+                  <p class="mt-1 text-sm text-mute"><%= point[:description] %></p>
+                <% end %>
+              <% else %>
+                <p class="text-gray-900"><%= point %></p>
+              <% end %>
+            </div>
+          </li>
+        <% end %>
+      </ol>
+    </div>
+  </section>
+<% end %>

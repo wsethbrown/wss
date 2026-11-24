@@ -86,15 +86,29 @@ Rules:
   redrawn anywhere else. For a score, `level` is score / 5; for the table (RSVPs) going is 1, maybe
   0.5, unanswered 0; in a verdict the numeral is the serve order. Tones: `:ink` on paper and white,
   `:cream` on green. Minimum size 28px. It always sits beside its number or count (or carries
-  sr-only text), is aria-hidden, and has no shading or animation. Replaces star rows for display;
+  sr-only text), is aria-hidden, and has no shading. The liquid is one colour; a full glass is a
+  generous pour that stops a little above the bowl's widest point, with clear headroom below the
+  rim (level travel 24 units of the 60×80 drawing). The only highlights are reflections, lit from
+  the left: a soft narrow streak low inside the bowl's left wall (with a faint green edge under it
+  on paper and white, so it reads over an empty bowl), and a smaller one on the green foot (ink
+  tone, from 36px up). Its motions are the pour and, on the event page, the re-pour (see Motion). Replaces star rows for display;
   the half-step star control in review forms is an input and stays.
 - **Photograph**: only through `shared/_duotone`, which prints a greyscale image in bottle green
-  and cream. Public-domain or owner-supplied images only, at most one per view, never behind
-  text. Sources and licences are listed in `IMAGE_CREDITS.md`.
+  and cream. Public-domain or owner-supplied images, or free-licence stock (Unsplash, Pexels)
+  credited in `IMAGE_CREDITS.md` with the owner's approval of each photo; at most one per view,
+  never behind text. Photographs of people use the heavy variant (`duotone--heavy`: light in
+  orange, shadows in ink, softened by a 1.5px blur), which keeps faces unrecognisable. Sources and licences are listed in `IMAGE_CREDITS.md`.
 - **Primary button**: `btn btn-primary` (green, white text, 16px radius). One per view.
 - **Secondary button**: `btn btn-secondary` (white, hairline).
-- **Text link with arrow**: bold ink text followed by `→`.
+- **Text link with arrow**: bold ink text followed by `→`. Write it as `link_to with_arrow("Words"), path` so the
+  arrow is its own span (`.arrow`) and nudges on hover; the link's text is unchanged.
 - **Chip**: `inline-flex min-h-9 items-center rounded-xl border border-hairline bg-white px-3.5 text-sm font-medium text-ink`.
+- **Scrolling chip rows** (a row of chips or selects that scrolls sideways on a phone): `.scroll-row`
+  with `data-controller="scroll-fade"`. The row runs to the screen edges (`-mx-4 px-4`, so the
+  first item lines up with the page), shows no scrollbar, and fades out over 40px at whichever
+  edge has more to scroll (right at rest, left once scrolled, neither when it fits); a
+  keyboard-focused item is scrolled clear of the fade (48px `scroll-padding-inline`). Never a
+  hard cut at the edge. Rows that wrap instead (the reviews feed chips) need none of this.
 - **Step or count marker**: 32px rounded-[11px] paper square with a bold numeral.
 - **Lists of records**: rows separated by hairlines inside a `.card` or `.inset`. Title in
   bold ink on the left, meta in `text-mute`, the number or action on the right. Not a grid
@@ -125,9 +139,198 @@ Rules:
 
 ## Motion
 
-Quiet and functional: 150ms hover lifts of 1–3px, the hero player's slide change, and
-scroll-in reveals. Pages cross-fade (view transitions), a deck's cover travels from
-its card to the deck page, and the level in a glass rises once when it appears. Everything is disabled under `prefers-reduced-motion: reduce`.
+Quiet and functional. Movement is only `transform`, `translate` or `scale`, and fades only
+`opacity`; hover and press states may also change colour, background and `box-shadow` (the
+homepage buttons and chips do). Never animate layout (width, height, margins). Two curves, as
+tokens in `application.css`: `--motion-ease-out` (`cubic-bezier(0.23, 1, 0.32, 1)`) for things
+arriving and for presses, and `--motion-ease-pour` (`cubic-bezier(0.2, 0.7, 0.2, 1)`) for the
+glass and the view transitions. No animation library.
+
+- **Press**: buttons, tappable cards, chips, the homepage buttons and pricing rows press in to
+  `scale: .98` on `:active`, going in over 80ms on the strong ease-out, and step their fill a
+  shade (primary to `whiskey-700`, secondary, ghost and chips to `whiskey-100`); release takes
+  the element's own 150ms. This is the only feedback a phone gets (preflight hides the iOS tap
+  highlight; `application.js` adds the touchstart listener iOS needs for `:active`).
+- **Hover** (150ms): lifts of 1–3px; a deck cover scales to 1.02 inside its frame; an arrow
+  after a link's words moves 3px (`with_arrow`, or `class="arrow"` on an arrow span; the
+  homepage's `.more` arrow matches). Hand-written `:hover` rules sit inside
+  `@media (hover: hover) and (pointer: fine)` so a tap never leaves them stuck; Tailwind's
+  `hover:` variant is already limited to `(hover: hover)`. Focus-visible styles are never
+  changed by motion; keyboard focus on the hero player pauses its reel.
+- **Reveal on first view**: one system, the `appear` Stimulus controller on the public layout's
+  `<main>`. Mark a card, list row, short panel or section heading with
+  `data-appear-target="item"`. Out of view at load, it waits hidden and, the first time it
+  comes properly into view (its top above the bottom 18% of the screen, where the eye is,
+  not at the bottom edge; on phones a little earlier, above the bottom 9%, so a section eases
+  in as it rises rather than appearing abruptly), eases up 24px (16px on phones) and fades in
+  over 700ms. Items that arrive in the
+  same moment stagger by 0, then 60, then 110ms and so on (the gaps shrink, capped at 200ms); in
+  practice that is cards side by side in a grid on a wide screen, so most reveals, and nearly
+  all on a phone's single column, start at once. Rules: the hidden state is a class the
+  controller adds (no JS means visible); anything on screen at load is left alone; it is
+  time-based, runs once and then removes its classes; because the triggers sit inside the
+  screen, something can be on screen and still waiting, but only while the page is scrolling:
+  when the scroll or a resize settles (150ms) everything waiting on screen starts its motion
+  (started, not snapped; only what a jump carried past is shown at once), and a one-off 1.5s
+  limit does the same even if the observer never fires;
+  focusing anything inside a waiting item shows it at once; print shows everything; Turbo
+  snapshots and back/forward visits are never hidden.
+  **Never mark anything taller than about one screen**: mark its heading (a deck section's
+  heading column, a tall card's heading row) and let the content stand. Reading text never fades.
+  The controller refuses to hide an item taller than 1.2 times the viewport as a safety net.
+  One entrance per container: never mark an item inside another item, and mark a group of
+  words that read together (a homepage beat's numeral, heading, text and link) as one item.
+  Never mark the header, the footer, a form someone types in, the page heading, the homepage's
+  closing beat, or anything in admin (its layout has no controller). Never scroll-scrub a
+  reveal (`animation-timeline`): it stops part-faded wherever the scroll stops. Print shows
+  every start state at its final picture.
+- **Secondary motion**, the same controller: things inside a card that play once when seen.
+  Each kind has a start-state class the controller adds (`*-wait`) and a class that plays it
+  (`*-run`), both removed when it is done, so the server's markup is always the final picture.
+  It starts later than a reveal, once it is well on screen (it reaches the middle 60% of the
+  viewport), and lasts long enough to be watched. One inside a card starts at least 120ms after
+  its card starts to show (starting the card first if it is still waiting) and is shown at once
+  whenever its card is; one outside a card plays on its own trigger. On screen at load: a
+  draw-in plays 300ms after a Turbo visit (a click within the site; never back or forward), so
+  a review's wheel above the fold is seen to draw. Not on a full page load, where the browser
+  may already have painted the finished drawing and replaying it would flash (drawn, collapsed,
+  redrawn). A glass pours on load only before the first paint, as before; a face or a photo on
+  screen at load is left alone. These durations are the standard, set by the owner in
+  November 2026 ("too soon for us to see"): reveal 700ms, pour 1.2s, draw-ins about 1.2s,
+  photo settle 1.2s.
+  - **The glass pours** (1.2s; `glass`, set by `shared/_glass`). At rest, without JS and in
+    admin the level is simply drawn. `appear: false` leaves a glass out (a gauge another
+    controller drives).
+  - **Draw-ins** (`draw`, about 1.2s: the wheel's wedges 600ms each with delays up to 440ms,
+    labels at 850ms; the wave's stems 500ms, its line 1s, labels at 900ms), only on drawings that carry a value: the palate wheel's
+    lit wedges grow out from under the hub one after another (from the scale that puts their
+    edge at the hub, never from 0; scaled about the wheel's centre with `transform-box:
+    view-box`, checked in Chrome and WebKit), the flavor wave's stems grow from the base to their
+    value and its line draws left to right (`pathLength="1"` and `stroke-dashoffset`); labels
+    fade in last. Gaps shrink. The wheel's wedges stay inside their links, clickable throughout.
+  - **Photographs settle** (`photo` on `shared/_duotone`): from `scale: 1.04` to 1 over 1.2s
+    inside the frame, which clips it, so nothing moves around it.
+- **The homepage story** (`home/_story_frame`, `story_frame_controller.js`, content from
+  `StoryFrameHelper`; owner's choice, November 2026, "magic move"). One frame stays pinned beside
+  the story (a band under the nav below 900px) and never swaps, covers or fades (one
+  exception, a reader far from what it shows; see below): the objects
+  inside it travel from each step's arrangement to the next, the way Keynote's Magic Move
+  carries shared objects between slides. The hero's slide shrinks into its row in the library;
+  the picked row fills orange and opens into the invite, its title rolling into the night's;
+  the photo slides down into its band and settles; the date and the guests' glasses arrive;
+  the invite parts (the photo slides up, the orange drains down) onto the table, a raised green
+  band where the glasses stand while the slide takes the main area; the glasses fill one after
+  another; then they lift into the record's rows (or onto the review's score) and the card rises
+  from below; once it has landed, its wheel draws on its own clock. Objects with no counterpart rise or draw in;
+  text changes by rolling (old words lift away, new ones rise), never by fading. Everything is
+  a pure function of one progress number, each object in its own window of the move with its
+  own easing (the site's two curves plus a slow-settle travel curve; paths bow because the two
+  axes ease differently), and moves only by transform and opacity, except the first orange
+  fill (a clip) and colours (text and glass lines take the colour of what is under them;
+  blends are in OKLab, never through a muddy middle).
+  **Scroll picks the step, a clock plays the move.** A step becomes current when the top of
+  its words is 60% of the way down the reading area, and stops being current only when they
+  fall back past that line plus 12% of the screen (hysteresis). The move then plays to its end
+  whatever the scroll does: 1.05 to 1.3s per move on one overall curve (under way at once,
+  settling gently), reversing from where it is if the reader turns back, and compressed to at
+  most 1.5s (or 0.42s a step) when the reader passes on to the next step mid-move. A reader
+  more than one and a half steps from what the frame shows (a fast scroll, Home, a link back
+  to the top; owner's choice, November 2026, issue #51) is never shown the moves in between
+  at speed: the frame goes straight to their step and a still copy of the old picture, caption
+  included, fades off it over 0.3s (`JUMP`, `JUMP_FADE`). The step then plays only its own
+  part: the glasses fill, the wheel draws afresh (it is reset, never un-drawn). One step back
+  at reading pace still plays its move in reverse; under reduced motion it simply lands. At
+  the table the glasses then
+  fill on their own over 2.4s, the caption rolling "Glass k of n". At the record, once the move
+  has arrived, the wheel draws on its own (never with the scroll): each lit wedge grows from
+  under the hub over 0.9s and takes its colour 0.2s behind (over 0.9s), the next starting 0.25s
+  later (closer for a wheel with many wedges, so the last has its colour by 3s; a verdict
+  night's pour by pour, otherwise in reading order round the wheel), then the labels fade in
+  over 0.4s. Leaving the record it stays drawn until the card has sunk away, then is ready to
+  draw again; under reduced motion, off screen and before Turbo caches the page it is simply
+  drawn (the numbers are the `WHEEL_*` constants in the controller). The clock advances by frame
+  time capped at 50ms, so a backgrounded tab neither jumps nor stalls; nothing runs per frame
+  unless a move, the fill or the wheel is playing, and nothing plays while the frame is off
+  screen (a step change there just lands). Turning a tablet, resizing across 900px or making
+  the window taller or shorter while the frame runs keeps the current step: its words keep
+  the place the reader last saw them at (noted after every scroll, since the browser has
+  already re-laid the `svh` heights by the time the controller hears of a resize) where they
+  can, within the stretch of scroll where that step stays current.
+  **Data** follows the static faces' rules: the hero's showcase deck and its first slide (the
+  ink title slide without one); the "Latest decks" rows (the showcase deck takes the last row
+  when it is not among them); the next public night with its guests (at most four glasses,
+  the full going count), else the sample invite; at the table only the invite's glasses (a
+  real night never shows more people than said yes, and none when nobody has; the sample's
+  four); the verdict's top three pours (any beyond the table's glasses rise straight into
+  the record) and the night's
+  blended wheel; else, with two or more, the newest public reviews as rows (one per bottle, at
+  most three: the drink, its score glass and number, the reviewer; the card is the first row's
+  review and its wheel); else the one featured review; else the heading alone. The deck rides on the
+  invite and the record only when it is that night's deck (or on the sample invite). Long
+  strings are cut for the frame with an ellipsis; the faces keep them whole.
+  **Safety.** The frame is `aria-hidden` and nothing in it takes focus. Each step's static face
+  stays beside its words: it is the page without JS (beside the words on a wide screen,
+  below them on a phone), in print (the frame is never printed) and for screen readers (with
+  JS it is visually hidden on screen only, and shows again if keyboard focus reaches into
+  it). Under reduced motion each step shows its resting arrangement, no travel. Before Turbo
+  caches the page the frame is put at rest; disconnecting cancels every frame and listener.
+  On phones, words too small to read in the band (row prices, the invite's time, tag, place
+  and going count, the table's initials, the review's quote, credit line and link) are left
+  out of the band; the faces still carry them. A window too short to hold the frame shows the
+  static faces instead, and the frame comes back if the window grows. It is decided by the
+  width and the small viewport's height (`100svh`, the window with a phone's toolbar showing),
+  never by `innerHeight`, so a phone's toolbar collapsing and returning as the reader scrolls
+  changes nothing (no switch, no measuring, no log). With hysteresis: below 900px the band
+  and the nav go live when they take at most 56% of that height and stay live up to 60%, so
+  the words always keep at least 40% (nav and band take 326px at 375 wide, 334px at 390,
+  357px at 430: an iPhone mini, 13/14 or Pro Max runs the frame; an iPhone SE and a phone in
+  landscape show the faces); a wide window goes live with 16px to spare below the frame and
+  stays live while the frame fits. If anything in the frame throws, it stops for good (nothing
+  pending, nothing listening) and the static faces show. Going live or static changes the
+  story's height, so the reader's place is kept, where the reader last saw it: going static,
+  the words of the step the frame was showing; going live (a short window made taller, issue
+  #45), the step being read does (kept clear of the band); a link to `/#pricing` still lands
+  on its target at once (instantly, before anything there is sorted for its reveal). On a
+  phone the page's `scroll-padding-top` is the nav's, and only the story's own elements
+  add the band's height (`scroll-margin-top`, `--mm-clear`): the band covers only the story,
+  so `/#pricing` lands its heading just under the nav (issue #44) while a link or focus into
+  the story still clears the band. In the band's caption a long deck title gives way to the
+  slide count and ends in an ellipsis, as the faces' bar does.
+- **The re-pour**: when an RSVP's Turbo stream replaces the event's attendees region, each
+  seat glass in the table (`data-repour` on `events/_table`) whose level changed moves from
+  its old level to the new one over 500ms on the pour curve, seats matched in order. Only
+  glasses on screen; none under reduced motion; the drawn level is always the final one
+  (Web Animations, nothing left behind); a seat emptied to nothing shows empty at once.
+- **Images fade in as they load** (`image` on deck covers, the deck page's slides, bottle photos
+  and duotone photos): only an image not yet loaded when the page starts, 200ms on the strong
+  ease-out. A cached image is never touched (no flash); one that fails, or sits on screen for 2s
+  without loading, or is on a page Turbo caches, is shown at once.
+- **The hero player** (the hero's static face: without JS and in print) cross-fades its real
+  preview slides, one tick per slide lit in step (a one-slide reel does not cycle); hovering with
+  a pointer or focusing it pauses the reel. Only the hero has ticks. With the story frame
+  running, the hero shows the showcase deck's first slide and no reel.
+- **The story glass** (homepage only, `home/_story_glass`, `story_glass_controller.js`): one
+  glass that fills as the reader scrolls through the story, starting as the first step's words
+  come up over the bottom of the screen and full when the closing beat's heading is mid-screen.
+  It stays tied to the scroll (the frame beside it plays on a clock): it follows the scroll directly
+  (it is a gauge, not a reveal, so `appear: false` keeps it out of the pour). Desktop: a 96px
+  gauge in the gutter between the step words and the frame, sticky at the middle of the screen;
+  the beats keep 28px of right padding so the words never meet it. At the end of the story it
+  comes to rest standing on the next card (the spotlight, else the origin panel): its foot's
+  bottom (73.7 of the drawing's 80 units) sits exactly the next section's top padding
+  (`--section-pad`) below the story, so it is flush on the card's top edge (issue #52). Phones: 40px in the
+  bottom-right corner, inside the 20px page gutter, shown only while the steps are on screen.
+  aria-hidden, no words, `pointer-events: none`, out of the flow (no layout shift), hidden
+  until its controller runs and in print. Under reduced motion it steps a third at a time as
+  each step is reached instead of following the scroll.
+- **Pages** cross-fade (view transitions), and a deck's cover travels from its card to the deck
+  page. Turbo's progress bar is a 2px `mark-deep` line.
+- **Reduced motion** (`prefers-reduced-motion: reduce`), the same everywhere: the appear
+  controller does nothing, so nothing is hidden, no glass pours (the story glass steps), nothing draws in, no photo
+  settles and no image fades; the homepage frame changes step by step with no travel; the reel and ticks stand still on the first
+  slide; view transitions are off; nothing travels on hover (no card lift,
+  cover lean or arrow nudge). The press (fill step and `.98`) and colour changes stay: they are
+  feedback, not travel.
 
 ## Copy
 

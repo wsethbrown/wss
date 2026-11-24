@@ -1,0 +1,18 @@
+<% content_for :title, "Mailing list" %>
+
+<%= render "admin/shared/page_header", title: "Mailing list",
+      lede: "People who asked to hear when a new deck is published." %>
+
+<%= render "admin/shared/stats", stats: [
+  { label: "Confirmed and active", value: @active_count },
+  { label: "Waiting for confirmation", value: @waiting_count },
+  { label: "Unsubscribed", value: @unsubscribed_count }
+] %>
+
+<%= render "admin/shared/table", title: "Active addresses", rows: @subscribers, paginate: true,
+      columns: [ "Email", "Source", [ "Confirmed", :right ] ],
+      empty: "No confirmed addresses yet." do |subscriber| %>
+  <%= admin_td(subscriber.email, class: "max-w-[18rem] truncate font-medium") %>
+  <%= admin_td(subscriber.source.presence || "unknown", class: "text-mute") %>
+  <%= admin_td(subscriber.confirmed_at.strftime("%b %-d, %Y"), align: :right) %>
+<% end %>

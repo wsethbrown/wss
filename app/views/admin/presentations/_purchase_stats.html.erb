@@ -1,0 +1,13 @@
+<%# Purchase statistics for one deck (Overview and Sales tabs).
+    Locals: purchases, footer (optional HTML under the rows, e.g. a link) %>
+<% footer = local_assigns[:footer] %>
+<% rows = [
+     [ "Total purchases", purchases.size.to_s ],
+     [ "Revenue", number_to_currency(purchases.select { |p| p.purchase_type == "direct" }.sum { |p| p.purchase_price || 0 }) ],
+     [ "Credit purchases", purchases.count { |p| p.purchase_type == "credit" }.to_s ]
+   ] %>
+<% if footer %>
+  <%= render("admin/shared/detail_panel", title: "Purchase statistics", rows: rows) { footer } %>
+<% else %>
+  <%= render "admin/shared/detail_panel", title: "Purchase statistics", rows: rows %>
+<% end %>

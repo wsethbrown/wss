@@ -24,7 +24,9 @@
     <% og_description = content_for(:og_description).presence ||
          "Narrative tasting decks for whiskey nights that hold together, the research done, the script written, the bottles picked." %>
     <% og_image_override = content_for(:og_image).present? %>
-    <% og_image = og_image_override ? content_for(:og_image) : "#{request.base_url}/og-image.png" %>
+    <%# The default card's source is tools/og-card/ (README there). A new card
+        ships under a new filename: Cloudflare caches the old one. %>
+    <% og_image = og_image_override ? content_for(:og_image) : "#{request.base_url}/og-card-2026.png" %>
     <%# Dimensions only when we actually know them: the default card and the
         invite card are both 1200x630, but a deck's featured image or a
         society banner is arbitrary, so those pages set no size. Giving iMessage
@@ -98,32 +100,9 @@
       })();
     </script>
 
-    <style>
-      /* Smooth-scroll in-page anchors (e.g. hero "See how it works", deck
-         "Read the story"), but not for users who prefer reduced motion. */
-      @media (prefers-reduced-motion: no-preference) {
-        html {
-          scroll-behavior: smooth;
-        }
-      }
-      /* Sticky-footer layout. NOTE: keep body free of `height: 100%` and of any
-         overflow that creates a scroll container (overflow-x: hidden would),
-         or position: sticky descendants stop sticking. `clip` is safe. */
-      body {
-        margin: 0;
-        padding: 0;
-        min-height: 100vh;
-        display: flex;
-        flex-direction: column;
-        overflow-x: clip;
-      }
-      main {
-        flex: 1 0 auto;
-      }
-      footer {
-        flex-shrink: 0;
-      }
-    </style>
+    <%# Smooth scrolling and the sticky footer: app/assets/stylesheets/layout.css
+        (no inline <style>: the CSP, issue #46). %>
+    <%= stylesheet_link_tag "layout", "data-turbo-track": "reload" %>
   </head>
 
   <body class="bg-paper text-gray-900 min-h-screen font-sans">
@@ -133,12 +112,16 @@
     <nav class="fixed left-1/2 top-3 z-50 w-[min(1240px,calc(100%-1.5rem))] -translate-x-1/2 rounded-[22px] bg-char shadow-[0_10px_30px_-12px_rgba(22,51,42,0.45)]">
       <div class="flex items-center justify-between py-2 pl-4 pr-2.5">
         <!-- Logo -->
-        <a href="/" class="flex items-center gap-3 text-cream hover:text-whiskey-200 transition">
+        <%# The logo always goes home; signed-in users reach /dashboard via the Dashboard nav link. %>
+        <a href="<%= root_path %>" class="flex items-center gap-3 text-cream hover:text-whiskey-200 transition">
           <%= image_tag "wss-logo-inverted.png", alt: "Whiskey Share Society", class: "h-9 w-auto" %>
           <span class="hidden sm:inline font-display text-[17px] font-semibold">Whiskey Share Society</span>
         </a>
         <!-- Navigation Links -->
         <div class="hidden md:flex gap-2 items-center">
+          <% if user_signed_in? %>
+            <%= nav_link_to 'Dashboard', dashboard_path %>
+          <% end %>
           <%= nav_link_to 'Societies', societies_path %>
           <%= nav_link_to 'Decks', presentations_path %>
           <%= nav_link_to 'Reviews', reviews_path %>
@@ -185,6 +168,9 @@
             </svg>
           </summary>
           <div class="absolute right-0 mt-3 w-56 rounded-2xl border border-oak-edge bg-char p-2 shadow-xl">
+            <% if user_signed_in? %>
+              <%= link_to 'Dashboard', dashboard_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
+            <% end %>
             <%= link_to 'Societies', societies_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
             <%= link_to 'Decks', presentations_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
             <%= link_to 'Reviews', reviews_path, class: 'block rounded-xl px-4 py-2.5 font-medium text-cream/90 hover:bg-oak' %>
@@ -217,7 +203,9 @@
       </div>
     </div>
 
-    <!-- Main Content. Pages that open with a full-bleed char masthead manage
+    <!-- Main Content. The appear controller reveals cards, rows and headings
+         marked data-appear-target="item" as they first scroll in, and pours
+         each glass when it is seen (appear_controller.js). Pages that open with a full-bleed char masthead manage
          their own width and top padding; everything else gets the standard
          constrained container. -->
     <% full_bleed = (controller_name == 'home' && %w[index membership].include?(action_name)) ||
@@ -231,11 +219,11 @@
       <%# No top padding here: every full-bleed page opens with a char masthead
           that clears the fixed nav itself (pt-16/pt-28). Layout padding on top
           of that rendered as a white strip above the masthead. %>
-      <main id="main-content" class="min-h-[80vh] w-full">
+      <main id="main-content" class="min-h-[80vh] w-full" data-controller="appear">
         <%= yield %>
       </main>
     <% else %>
-      <main id="main-content" class="max-w-6xl mx-auto px-4 min-h-[80vh] pt-24 pb-16">
+      <main id="main-content" class="max-w-6xl mx-auto px-4 min-h-[80vh] pt-24 pb-16" data-controller="appear">
         <%= yield %>
       </main>
     <% end %>

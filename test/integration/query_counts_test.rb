@@ -66,6 +66,59 @@ class QueryCountsTest < ActionDispatch::IntegrationTest
     assert_operator many.size, :<=, few.size, "library queries grew with deck count:\n#{growth(few, many)}"
   end
 
+  # The homepage's library rows (the face and the story frame) show each
+  # deck's cover: preloaded, so a row costs no queries of its own.
+  test "homepage query count does not grow with the library's rows" do
+    new_deck(1)
+    few = measure(root_path)
+    2.times { |i| new_deck(2 + i) }
+    many = measure(root_path)
+    assert_operator many.size, :<=, few.size, "homepage queries grew with library rows:\n#{growth(few, many)}"
+  end
+
+  # The tasting record without a verdict night lists the newest public reviews,
+  # one row per bottle, each with its reviewer: preloaded, so a row costs no
+  # queries of its own.
+  test "homepage query count does not grow with the tasting record's rows" do
+    Review.destroy_all
+    review = lambda do |i|
+      Review.new(user: new_user(i, with_photo: false), bottle: Bottle.create!(name: "QC Record #{i}", distillery: "QC"),
+                 rating: 4.0, notes: "n", flavor_wheel: { "smoky" => 0.5 }).save!(validate: false)
+    end
+    2.times { |i| review.(i) }
+    # The rows lead with a bottle the featured deck pours (HomepageFeature).
+    new_deck(1).presentation_bottles.create!(bottle: Bottle.find_by!(name: "QC Record 0"))
+    few = measure(root_path)
+    assert_select ".face.f4 .rv-rows li.pour", 2
+    6.times { |i| review.(10 + i) }
+    many = measure(root_path)
+    assert_select ".face.f4 .rv-rows li.pour", 3
+    assert_operator many.size, :<=, few.size, "homepage queries grew with the record's rows:\n#{growth(few, many)}"
+  end
+
+  # With no deck featured the homepage rotates through the best sellers, each
+  # with a review of its own bottle (HomepageFeature): more decks, more sales,
+  # longer pour lists and more reviews of those bottles cost no more queries.
+  test "homepage query count does not grow with the rotation's decks, sales, pours or reviews" do
+    Review.destroy_all
+    stock = lambda do |i, pours:, buyers:, reviews:|
+      deck = new_deck(i)
+      buyers.times { |b| UserPresentation.create!(user: new_user("#{i}b#{b}", with_photo: false), presentation: deck, purchase_type: "direct", purchase_price: 5, purchased_at: Time.current) }
+      bottles = Array.new(pours) { |p| Bottle.create!(name: "QC Rotation #{i}-#{p}", distillery: "QC") }
+      bottles.each { |b| deck.presentation_bottles.create!(bottle: b) }
+      bottles.first(reviews).each_with_index do |b, r|
+        Review.new(user: new_user("#{i}r#{r}", with_photo: false), bottle: b, rating: 4.0, notes: "n", flavor_wheel: { "smoky" => 0.5 }).save!(validate: false)
+      end
+    end
+    3.times { |i| stock.(i, pours: 1, buyers: 1, reviews: 1) }
+    few = measure(root_path)
+    assert_equal :rotation, controller.instance_variable_get(:@feature).source
+    assert controller.instance_variable_get(:@feature).deck_review?
+    5.times { |i| stock.(10 + i, pours: 6, buyers: 4, reviews: 4) }
+    many = measure(root_path)
+    assert_operator many.size, :<=, few.size, "homepage queries grew with the rotation:\n#{growth(few, many)}"
+  end
+
   def add_society_rows(society, event, count, offset)
     count.times do |i|
       member = new_user(offset + i)
@@ -175,5 +228,31 @@ class QueryCountsTest < ActionDispatch::IntegrationTest
       end
     end
     assert_empty offenders, "image_tag of an original attachment (use a named variant): #{offenders.join(', ')}"
+  end
+
+  test "dashboard query count does not grow with the number of events, pours and societies" do
+    member = users(:seth)
+    society = societies(:single_malt)
+    make_night = lambda do |i, start|
+      e = Event.new(society: society, organizer: users(:admin), title: "QC night #{i}", description: "x",
+                    location: "den", start_time: start, end_time: start + 2.hours)
+      e.save!(validate: false)
+      e
+    end
+    sign_in member
+    few = measure(dashboard_path)
+
+    6.times do |i|
+      upcoming = make_night.(i, (i + 2).days.from_now)
+      EventRsvp.create!(event: upcoming, user: member, status: i.even? ? "yes" : "maybe") if i < 3
+      past = make_night.(i + 100, (i + 2).days.ago)
+      EventRsvp.new(event: past, user: member, status: "yes").save!(validate: false)
+      EventBottle.create!(event: past, bottle: bottles(:lagavulin), position: 1)
+      other = Society.create!(name: "QC Society #{i}", description: "x", creator: users(:admin), is_private: i.even?)
+      SocietyMembership.create!(user: member, society: other, role: "member", status: "active")
+    end
+    many = measure(dashboard_path)
+
+    assert_operator many.size, :<=, few.size, "dashboard grew:\n#{growth(few, many)}"
   end
 end

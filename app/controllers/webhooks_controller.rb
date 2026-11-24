@@ -165,13 +165,10 @@ class WebhooksController < ApplicationController
       Rails.logger.info "Founding member status revoked for user #{user.id} (subscription cancelled)"
     end
 
-    # If subscription is ending immediately (not at period end), expire credits
-    cancel_at = subscription.try(:cancel_at) || subscription["cancel_at"]
-    if cancel_at.nil? || cancel_at <= Time.current.to_i
-      CreditTransaction.expire_all_credits(user, "Subscription cancelled")
-    end
-
-    Rails.logger.info "Subscription cancelled for user #{user.id}: #{subscription_id}"
+    # Owner rule: unused credits are NOT wiped when a membership ends. The
+    # balance stays on the ledger; CreditTransaction.use_credit refuses to
+    # spend it until the member has an active membership again.
+    Rails.logger.info "Subscription cancelled for user #{user.id}: #{subscription_id}; kept #{user.credits.to_i} unused credits (spendable again on rejoin)"
   end
 
   def handle_payment_succeeded(invoice)

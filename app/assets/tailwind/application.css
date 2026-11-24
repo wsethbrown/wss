@@ -1,8 +1,10 @@
 @import "tailwindcss";
 
 /* Tailwind v4 scans project files for class names; binary fonts in
-   docker/fonts crash the scanner (RangeError: out of range code points). */
+   docker/fonts and tools/decks/fonts crash the scanner (RangeError: out of
+   range code points). */
 @source not "../../../docker";
+@source not "../../../tools";
 /* Same reason: shipped PDF assets (e.g. the blank scorecard) are binary. */
 @source not "../documents";
 
@@ -284,6 +286,8 @@
 /* Resting on Maybe before anyone has answered: visible, but never mistakable
    for a confirmed answer. No colour, no tick: a white seat on the paper track. */
 .rsvp-option[data-resting="true"] { color: var(--color-ink); }
+/* A new yes closes 24 hours before the night (Event#answer_allowed?). */
+.rsvp-option:disabled { cursor: not-allowed; color: var(--color-mute); text-decoration: line-through; }
 .rsvp-option[aria-pressed="true"] { color: #fff; }
 .rsvp-option .rsvp-tick { display: none; }
 .rsvp-option[aria-pressed="true"] .rsvp-tick { display: inline-flex; }
@@ -368,6 +372,14 @@
   mix-blend-mode: lighten;
   pointer-events: none;
 }
+/* The heavy variant, as on the homepage's invite slide: light in orange,
+   shadows in ink. Obscures detail (faces stay unrecognisable), so it is the
+   one used for stock photographs of people. */
+.duotone--heavy { background: var(--color-mark); }
+.duotone--heavy::after { background: var(--color-ink); }
+/* A slight softening on top, so a face in a stock photograph (no model
+   release) reads as a person, not as someone in particular. */
+.duotone--heavy img { filter: blur(1.5px); transform: scale(1.03); } /* the scale hides the blur's soft edge */
 
 /* Page changes cross-fade, and a deck's cover travels from its card to the
    deck page (view-transition-name set on both). Browsers without view
@@ -376,15 +388,184 @@
 ::view-transition-new(root) { animation-duration: 180ms; }
 ::view-transition-group(*) { animation-duration: 280ms; animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1); }
 
-/* The pour in a glass rises once when the glass first appears. */
-@keyframes glass-pour {
-  from { transform: translateY(34px); }
-  to   { transform: translateY(0); }
+/* Motion (docs/redesign/DESIGN_SYSTEM.md, "Motion"). Two curves:
+   --motion-ease-out, a strong ease-out for things arriving (reveals, presses),
+   and --motion-ease-pour, the gentler settle the view transitions and the
+   glass already used. Only transform, translate, scale and opacity move. */
+:root {
+  --motion-ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --motion-ease-pour: cubic-bezier(0.2, 0.7, 0.2, 1);
 }
-svg[data-glass] g > path { animation: glass-pour 700ms cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 
+/* Reveal on first view (appear_controller.js). Every class here is added in
+   the browser by the controller, never by the server, so without JavaScript,
+   or under reduced motion (the controller does nothing), the page is simply
+   there. The controller removes the classes once the reveal has run, so an
+   element's own hover and press styles are untouched afterwards.
+   `translate` rather than `transform`, so it composes with an element's own
+   transform instead of replacing it. */
+@media (prefers-reduced-motion: no-preference) {
+  .appear-pending {
+    opacity: 0;
+    translate: 0 24px;
+  }
+  .appear-pending.is-in {
+    opacity: 1;
+    translate: none;
+    transition:
+      opacity 700ms var(--motion-ease-out) var(--appear-delay, 0ms),
+      translate 700ms var(--motion-ease-out) var(--appear-delay, 0ms);
+  }
+  /* The pour in a glass: the level rises from under the bowl's foot to its
+     drawn height the first time the glass is seen. At rest the level is
+     simply drawn where it belongs. */
+  svg[data-glass].glass-wait g > path { transform: translateY(var(--glass-rise, 28px)); }
+  svg[data-glass].glass-pouring g > path { animation: glass-pour 1200ms var(--motion-ease-pour) var(--appear-delay, 0ms) both; }
+}
+@media (prefers-reduced-motion: no-preference) and (max-width: 639px) {
+  .appear-pending { translate: 0 16px; }
+}
+@keyframes glass-pour {
+  from { transform: translateY(var(--glass-rise, 28px)); }
+  to   { transform: none; }
+}
+
+/* Draw-ins, the same controller (data-appear-target="draw"): a drawing that
+   carries a value draws itself the first time it is seen, 120ms after its
+   card if it sits in one, once it is well on screen, and is done inside
+   1.25s, slow enough to be watched. .draw-wait holds the
+   start state, .draw-run plays it once; both are removed afterwards, so the
+   markup (the final picture) is what stays. Wedge, stem and label delays
+   (--d) are written by the partials, the gaps shrinking.
+   The palate wheel (reviews/_palate_wheel): each lit wedge grows out from
+   under the hub (--from puts its edge at the hub, never scale 0). Scaled
+   about the wheel's centre, which is the svg's 0,0: transform-box view-box
+   with origin 0 0 is that point in Chrome and in WebKit (checked in both).
+   The wedge stays inside its link, so it is clickable all the way. */
+.wheel-wedge { transform-box: view-box; transform-origin: 0 0; }
+@media (prefers-reduced-motion: no-preference) {
+  .draw-wait .wheel-wedge { transform: scale(var(--from, .25)); }
+  .draw-wait :is(.wheel-label, .wave-label) { opacity: 0; }
+  .draw-run .wheel-wedge { animation: wheel-grow 600ms var(--motion-ease-out) calc(var(--appear-delay, 0ms) + var(--d, 0ms)) both; }
+  .draw-run .wheel-label { animation: draw-label 300ms var(--motion-ease-out) calc(var(--appear-delay, 0ms) + 850ms) both; }
+  /* The flavor wave (bottles/_flavor_wave): the stems grow from the base to
+     their value, the line draws left to right over them (pathLength="1"),
+     the family names fade in last. */
+  .draw-wait .wave-stem { stroke-dasharray: var(--len); stroke-dashoffset: var(--len); }
+  .draw-wait .wave-line { stroke-dasharray: 1 2; stroke-dashoffset: 1; }
+  .draw-run .wave-stem { animation: wave-stem 500ms var(--motion-ease-out) calc(var(--appear-delay, 0ms) + var(--d, 0ms)) both; }
+  .draw-run .wave-line { animation: wave-line 1000ms var(--motion-ease-out) calc(var(--appear-delay, 0ms) + 100ms) both; }
+  .draw-run .wave-label { animation: draw-label 300ms var(--motion-ease-out) calc(var(--appear-delay, 0ms) + 900ms) both; }
+
+  /* A duotone photograph settles from 1.04 to its place inside its frame
+     (.duotone clips it, so nothing around it moves) as it is revealed. An
+     animation, not a transition, so it never fights the image fade below. */
+  .duotone.photo-wait img { scale: 1.04; }
+  .duotone.photo-run img { animation: photo-settle 1200ms var(--motion-ease-out) var(--appear-delay, 0ms) both; }
+
+  /* Images that are still loading when the page starts fade in as they
+     arrive (the controller's image target). One already loaded (cached) is
+     never touched, and one that fails, or never says it loaded, is shown
+     anyway. The deck cover keeps its hover lean. */
+  img.img-wait { opacity: 0; }
+  img.img-in { opacity: 1; transition: opacity 200ms var(--motion-ease-out), scale 250ms var(--motion-ease-out); }
+}
+@keyframes wheel-grow { from { transform: scale(var(--from, .25)); } to { transform: none; } }
+@keyframes wave-stem { from { stroke-dashoffset: var(--len); } to { stroke-dashoffset: 0; } }
+@keyframes wave-line { from { stroke-dasharray: 1 2; stroke-dashoffset: 1; } to { stroke-dasharray: 1 2; stroke-dashoffset: 0; } }
+@keyframes draw-label { from { opacity: 0; } to { opacity: 1; } }
+@keyframes photo-settle { from { scale: 1.04; } to { scale: 1; } }
+
+@media print {
+  .appear-pending { opacity: 1 !important; translate: none !important; }
+  svg[data-glass].glass-wait g > path,
+  svg[data-glass].glass-pouring g > path { transform: none !important; animation: none !important; }
+  :is(.draw-wait, .draw-run) :is(.wheel-wedge, .wheel-label, .wave-stem, .wave-line, .wave-label),
+  :is(.photo-wait, .photo-run) img,
+  img.img-wait, img.img-in {
+    transform: none !important; scale: none !important; opacity: 1 !important;
+    stroke-dasharray: none !important; stroke-dashoffset: 0 !important; animation: none !important;
+  }
+}
+
+/* Press and hover feedback. Buttons and tappable cards press in on :active,
+   which is the only feedback a phone gets (Tailwind's preflight removes the
+   iOS tap highlight, and a tap lasts 60-100ms). The press goes in fast, 80ms
+   on the strong ease-out, and also steps the fill a shade (existing tokens
+   only); the release keeps the element's own 150ms. `scale` is its own
+   property, so it composes with a card's hover lift instead of cancelling
+   it. Kept under reduced motion: it is feedback, not travel. */
+:where(.btn, .btn-primary, .btn-secondary, .btn-ghost, .card-hover, .chip):active:not(:disabled):not([aria-disabled="true"]),
+a:active > .card-hover {
+  scale: .98;
+  transition-duration: 80ms;
+  transition-timing-function: var(--motion-ease-out);
+}
+/* White on whiskey-700 is 15:1; ink on whiskey-100 is 11:1. */
+.btn-primary:active:not(:disabled):not([aria-disabled="true"]) { background-color: var(--color-whiskey-700); }
+:where(.btn-secondary, .btn-ghost):active:not(:disabled):not([aria-disabled="true"]),
+.chip:active:not([aria-current="true"]):not([aria-pressed="true"]) { background-color: var(--color-whiskey-100); }
+
+/* A deck cover leans in slightly inside its frame on hover (the frame has
+   overflow: hidden, so the card does not grow). Pointer devices only: a tap
+   would leave it stuck scaled. */
+.deck-cover img { transition: scale 250ms var(--motion-ease-out); }
+@media (hover: hover) and (pointer: fine) {
+  a:hover .deck-cover img { scale: 1.02; }
+}
+
+/* An arrow after a link's words nudges toward where the link goes. The arrow
+   is a span (`with_arrow`), so the link's text is unchanged. */
+/* In the components layer so utilities (`hidden sm:block`) still win. */
+@layer components {
+  .arrow {
+    display: inline-block;
+    transition: translate 150ms var(--motion-ease-out);
+  }
+}
+@media (hover: hover) and (pointer: fine) {
+  a:hover .arrow, .group:hover .arrow { translate: 3px 0; }
+}
+
+/* A row of chips or selects that scrolls sideways on a phone (the deck
+   filters and tags). It runs to the screen edges, its padding keeping the
+   first item in line with the page, and fades out at whichever edge has more
+   to scroll (scroll_fade_controller.js sets data-more-start/end), so the
+   edge reads as "more this way", not a cut. No scrollbar. When everything
+   fits, no attribute, no fade. */
+/* scroll-padding keeps a control that keyboard focus scrolls into view (and
+   its focus ring) clear of the 40px fade. */
+.scroll-row { scrollbar-width: none; scroll-padding-inline: 48px; }
+.scroll-row::-webkit-scrollbar { display: none; }
+.scroll-row[data-more-end] {
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+  mask-image: linear-gradient(to right, #000 calc(100% - 40px), transparent);
+}
+.scroll-row[data-more-start] {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 40px);
+  mask-image: linear-gradient(to right, transparent, #000 40px);
+}
+.scroll-row[data-more-start][data-more-end] {
+  -webkit-mask-image: linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent);
+  mask-image: linear-gradient(to right, transparent, #000 40px, #000 calc(100% - 40px), transparent);
+}
+
+/* Turbo's progress bar, drawn in the mark instead of Turbo's default blue.
+   Turbo's own rule is injected at the top of <head>, so this later one wins. */
+.turbo-progress-bar {
+  height: 2px;
+  background-color: var(--color-mark-deep);
+}
+
+/* Reduced motion, site-wide: nothing travels on hover (no card lift, no
+   cover lean, no arrow nudge); the press (fill step and .98) stays, because
+   it is feedback, not travel. The reveal and the pour do not run at all
+   (appear_controller.js does nothing). */
 @media (prefers-reduced-motion: reduce) {
-  svg[data-glass] g > path { animation: none; }
+  .deck-cover img, .arrow { transition: none; }
+  .card-hover:hover { translate: none; }
+  a:hover .deck-cover img { scale: none; }
+  a:hover .arrow, .group:hover .arrow { translate: none; }
   ::view-transition-group(*),
   ::view-transition-old(*),
   ::view-transition-new(*) { animation: none !important; }

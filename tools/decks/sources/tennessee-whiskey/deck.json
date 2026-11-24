@@ -1,0 +1,40 @@
+{
+  "slug": "Tennessee-Whiskey",
+  "title": "Tennessee Whiskey",
+  "subtitle": "Tennessee whiskey and Nearest Green",
+  "category": "American Whiskey",
+  "difficulty": "Beginner",
+  "duration": "45 min",
+  "description": "How Tennessee whiskey is made, and Nearest Green, the enslaved distiller who taught Jack Daniel. Four pours.",
+  "pours": [
+    {
+      "name": "Jack Daniel’s Old No. 7",
+      "origin": "Jack Daniel Distillery, Lynchburg",
+      "style": "Tennessee whiskey",
+      "strength": "80 proof",
+      "notes": "Before anything else, notice the weight of it in your mouth. The charcoal is meant to make it lighter."
+    },
+    {
+      "name": "George Dickel Signature Recipe",
+      "origin": "Cascade Hollow Distilling Co., Tullahoma",
+      "style": "Tennessee whisky",
+      "strength": "90 proof",
+      "notes": "The same process at another distillery. Compare it with the Jack Daniel’s for sweetness and weight."
+    },
+    {
+      "name": "Buffalo Trace",
+      "origin": "Buffalo Trace, Frankfort, Kentucky",
+      "style": "Kentucky straight bourbon",
+      "strength": "90 proof",
+      "notes": "A Kentucky bourbon with no charcoal step. Taste it beside the Dickel, which is the same proof."
+    },
+    {
+      "name": "Jack Daniel’s Bonded",
+      "origin": "Jack Daniel Distillery, Lynchburg",
+      "style": "Tennessee whiskey, bottled in bond",
+      "strength": "100 proof",
+      "notes": "Jack Daniel’s again, this time at 100 proof. Compare it with the first pour, then try it with a few drops of water."
+    }
+  ],
+  "tags": "tennessee, american whiskey, history"
+}

@@ -2,7 +2,7 @@
     the pours with the room's scores as the substance. Society and event
     are separate links (the card is a div, not one big anchor).
     locals: event, pours (hash of bottle => that night's reviews) %>
-<article class="card min-w-0 p-6">
+<article class="card min-w-0 p-6" data-appear-target="item">
   <p class="text-sm font-medium text-mute">
     <%= link_to event.society.name, society_path(event.society), class: "hover:text-ink" %>
     <%= render "shared/century_badge", record: event.society %>
@@ -25,5 +25,5 @@
     <% end %>
   </div>
 
-  <%= link_to "See the night →", society_event_path(event.society, event), class: "mt-4 inline-block text-sm font-semibold text-ink hover:underline" %>
+  <%= link_to with_arrow("See the night"), society_event_path(event.society, event), class: "mt-4 inline-block text-sm font-semibold text-ink hover:underline" %>
 </article>

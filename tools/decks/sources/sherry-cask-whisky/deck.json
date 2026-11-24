@@ -1,0 +1,40 @@
+{
+  "slug": "Sherry-Cask-Whisky",
+  "title": "Sherry Cask Whisky",
+  "subtitle": "Sherry casks and Scotch, 1800s to now",
+  "category": "Scotch Whisky",
+  "difficulty": "Intermediate",
+  "duration": "45 min",
+  "description": "How the British sherry trade put Spanish wine casks into Scottish distilleries, and how distillers kept getting them after Spain stopped shipping sherry in cask. Four pours.",
+  "pours": [
+    {
+      "name": "Glenmorangie The Original",
+      "origin": "Glenmorangie, Tain",
+      "style": "Single malt, 12 years",
+      "strength": "40% ABV",
+      "notes": "Aged only in ex-bourbon casks. Keep a little in your glass to come back to."
+    },
+    {
+      "name": "Glenmorangie Lasanta",
+      "origin": "Glenmorangie, Tain",
+      "style": "Single malt, 12 years",
+      "strength": "43% ABV",
+      "notes": "The same distillery and age as pour one, with its last two years in oloroso and Pedro Ximénez casks. Taste the two side by side."
+    },
+    {
+      "name": "Macallan 12 Sherry Oak",
+      "origin": "Macallan, Speyside",
+      "style": "Single malt, 12 years",
+      "strength": "43% ABV",
+      "notes": "Aged in sherry-seasoned oak casks from Jerez, mostly European oak. Compare it with the Lasanta."
+    },
+    {
+      "name": "GlenDronach 12",
+      "origin": "GlenDronach, Forgue",
+      "style": "Single malt, 12 years",
+      "strength": "43% ABV",
+      "notes": "Aged in Pedro Ximénez and oloroso casks. Put it next to the Macallan."
+    }
+  ],
+  "tags": "scotch, casks, sherry, single malt"
+}

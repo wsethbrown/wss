@@ -1,0 +1,34 @@
+<%# The deck's extra sections (Presentation#sections), in order, where "What
+    you'll taste" used to be. One rule, from PresentationsHelper#deck_section_layout:
+    a section whose only line is plain text is a short paragraph; otherwise
+    its lines are rows, and a "Label: text" line is a labelled row (label
+    muted, text beside it, set like the old tasting notes). Plain text only,
+    escaped by ERB. Nothing renders for a deck with no sections.
+    Shared by the deck page and the admin preview. Locals: presentation %>
+<% Array(presentation.sections).each do |section| %>
+  <% next unless section.is_a?(Hash) %>
+  <% kind, content = deck_section_layout(section["lines"]) %>
+  <section class="<%= deck_section_class %>" data-deck-section>
+    <div class="self-start md:col-span-4" data-appear-target="item">
+      <h2 class="<%= deck_heading_class %>"><%= section["heading"] %></h2>
+    </div>
+    <div class="md:col-span-8">
+      <% if kind == :paragraph %>
+        <div class="card p-6 sm:p-8">
+          <p class="font-reading text-lg leading-relaxed text-gray-900"><%= content %></p>
+        </div>
+      <% elsif content.any? %>
+        <ul class="card divide-y divide-hairline px-6 sm:px-8">
+          <% content.each do |label, text| %>
+            <li class="py-4 sm:flex sm:items-baseline sm:gap-6">
+              <% if label %>
+                <span class="block text-sm font-semibold text-mute sm:w-32 sm:shrink-0"><%= label %></span>
+              <% end %>
+              <span class="block min-w-0 font-reading text-lg leading-relaxed text-gray-900 <%= 'mt-1 sm:mt-0' if label %>"><%= text %></span>
+            </li>
+          <% end %>
+        </ul>
+      <% end %>
+    </div>
+  </section>
+<% end %>

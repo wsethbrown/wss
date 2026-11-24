@@ -104,9 +104,13 @@ class PresentationsController < ApplicationController
     ensure_deck_visible!
   end
 
-  # Drafts exist only in the admin panel: to customers they 404 as if they
-  # don't exist (no existence leak). Admins see them with a draft banner.
+  # An unpublished deck 404s as if it didn't exist (no existence leak), except
+  # to admins (with a draft banner) and to people who own it with working
+  # access: unpublishing hides a deck from the library, never from its owners.
   def ensure_deck_visible!
-    raise ActiveRecord::RecordNotFound unless @presentation.published? || current_user&.admin?
+    return if @presentation.visible_to?(current_user)
+
+    Rails.logger.info "Unpublished presentation #{@presentation.id} refused for #{current_user ? "user #{current_user.id}" : 'a signed-out visitor'}: no access"
+    raise ActiveRecord::RecordNotFound
   end
 end

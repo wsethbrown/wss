@@ -8,7 +8,7 @@ class CreditTransaction < ApplicationRecord
   TRANSACTION_TYPES = {
     granted: "granted",                    # subscription activation, monthly refresh
     used: "used",                          # spent on a presentation
-    expired: "expired",                    # removed when a subscription ends
+    expired: "expired",                    # historical only: balances once wiped when a membership ended (no longer written)
     refunded: "refunded",                  # returned on refund
     admin_adjustment: "admin_adjustment"   # manual correction by an admin
   }.freeze
@@ -181,8 +181,18 @@ class CreditTransaction < ApplicationRecord
   # The ownership re-check runs inside the user's row lock, so a double-click
   # (or two tabs) cannot spend two credits on one deck; the unique index on
   # user_presentations is the backstop and rolls the whole spend back.
+  #
+  # Credits are kept when a membership ends but can only be spent while it is
+  # active (owner rule), so a lapsed member's balance waits for them to rejoin.
+  # Checked here as well as in the purchase controller, so no caller can spend
+  # a lapsed balance.
   def self.use_credit(user, presentation)
     user.with_lock do
+      unless user.subscription_active?
+        Rails.logger.info "Credit not spent by user #{user.id} on presentation #{presentation.id}: no active membership (status #{user.subscription_status.inspect}, balance #{user.credits.to_i} kept)"
+        return false
+      end
+
       unless user.credits.to_i.positive?
         Rails.logger.info "Credit not spent by user #{user.id} on presentation #{presentation.id}: no credits"
         return false
@@ -216,20 +226,6 @@ class CreditTransaction < ApplicationRecord
     # A concurrent unlock won; the transaction rolled back, so no credit left.
     Rails.logger.warn "Credit spend by user #{user.id} on presentation #{presentation.id} lost a race to an existing ownership row; rolled back"
     false
-  end
-
-  def self.expire_all_credits(user, reason = "Subscription ended")
-    user.with_lock do
-      balance = user.credits.to_i
-      return if balance.zero?
-
-      create!(
-        user: user,
-        transaction_type: TRANSACTION_TYPES[:expired],
-        amount: -balance,
-        description: reason
-      )
-    end
   end
 
   # Cached balance derived straight from the ledger. Use for reconciliation checks.

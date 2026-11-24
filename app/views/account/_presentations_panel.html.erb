@@ -20,7 +20,7 @@
               <% elsif current_user.subscription_active? %>
                 Unlocked with a credit · active with your membership
               <% else %>
-                <span class="font-semibold text-ink">Membership paused, <%= link_to 'reactivate to read', root_path(anchor: 'pricing'), class: 'underline' %></span>
+                <span class="font-semibold text-ink">Membership paused, <%= link_to 'reactivate to read', membership_path(anchor: 'pricing'), class: 'underline' %></span>
               <% end %>
             </p>
           </div>

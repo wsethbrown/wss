@@ -49,7 +49,7 @@ class DeckPourLinksTest < ActionDispatch::IntegrationTest
     assert_no_difference "PresentationBottle.count" do
       save_deck({ "0" => { name: "", bottle_id: "", position: 1 } })
     end
-    assert_redirected_to admin_presentation_path(@deck)
+    assert_redirected_to edit_admin_presentation_path(@deck, anchor: "overview")
   end
 
   test "the same bottle cannot be linked twice" do
@@ -82,8 +82,8 @@ class DeckPourLinksTest < ActionDispatch::IntegrationTest
 
     assert_match "presentation[presentation_bottles_attributes]", response.body,
                  "pours must be nested fields on the deck form"
-    assert_equal 1, response.body.scan("· The pour list").size,
-                 "the admin must show one pour list section, not two"
+    assert_select "#pane-pours [data-controller=pour-list]", 1,
+                  "the admin must show one pour list section, not two"
     assert_no_match "whiskey_recommendations", response.body,
                     "the legacy pour field must be gone from the form"
   end

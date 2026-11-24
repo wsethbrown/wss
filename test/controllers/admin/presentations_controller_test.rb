@@ -52,4 +52,158 @@ class Admin::PresentationsControllerTest < ActionDispatch::IntegrationTest
       delete admin_presentation_path(@deck)
     end
   end
+
+  # Re-render slide previews: the manual recovery for a failed or missing render.
+  test "re-render enqueues the render job for a deck with a file" do
+    @deck.pdf_file.attach(io: StringIO.new("%PDF-1.4 fake"), filename: "deck.pdf", content_type: "application/pdf")
+    assert_enqueued_with(job: DeckSlideRenderJob, args: [ @deck.id ]) do
+      post render_slides_admin_presentation_path(@deck)
+    end
+    assert_redirected_to edit_admin_presentation_path(@deck, anchor: "files")
+    assert_match(/render queued/i, flash[:notice])
+  end
+
+  test "re-render on a deck with no file gives an alert and enqueues nothing" do
+    assert_no_enqueued_jobs only: DeckSlideRenderJob do
+      post render_slides_admin_presentation_path(@deck)
+    end
+    assert_redirected_to edit_admin_presentation_path(@deck, anchor: "files")
+    assert_match(/no deck file/i, flash[:alert])
+  end
+
+  test "re-render for an unknown deck is a 404, not a 500" do
+    post render_slides_admin_presentation_path(id: 0)
+    assert_response :not_found
+  end
+
+  test "a limited admin can re-render like the neighbouring actions" do
+    @deck.pdf_file.attach(io: StringIO.new("%PDF-1.4 fake"), filename: "deck.pdf", content_type: "application/pdf")
+    delete destroy_user_session_path
+    sign_in users(:limited_admin)
+    assert_enqueued_with(job: DeckSlideRenderJob, args: [ @deck.id ]) do
+      post render_slides_admin_presentation_path(@deck)
+    end
+  end
+
+  test "a non-admin cannot re-render" do
+    @deck.pdf_file.attach(io: StringIO.new("%PDF-1.4 fake"), filename: "deck.pdf", content_type: "application/pdf")
+    delete destroy_user_session_path
+    sign_in @buyer
+    assert_no_enqueued_jobs only: DeckSlideRenderJob do
+      post render_slides_admin_presentation_path(@deck)
+    end
+    assert_response :redirect
+  end
+
+  test "a failure enqueueing the render is reported, not a 500" do
+    @deck.pdf_file.attach(io: StringIO.new("%PDF-1.4 fake"), filename: "deck.pdf", content_type: "application/pdf")
+    DeckSlideRenderJob.stubs(:perform_later).raises(StandardError, "queue down")
+    post render_slides_admin_presentation_path(@deck)
+    assert_redirected_to edit_admin_presentation_path(@deck, anchor: "files")
+    assert_match(/could not queue/i, flash[:alert])
+  end
+
+  # Unpublishing takes a deck out of the library, not away from its owners;
+  # the admin is told how many people own it before and after.
+  def published_with_owners(count)
+    @deck.pdf_file.attach(io: StringIO.new("%PDF-1.4 fake"), filename: "deck.pdf", content_type: "application/pdf")
+    @deck.slide_images.attach(io: File.open(Rails.root.join("test/fixtures/files/slides/slide-01.png"), "rb"),
+                              filename: "slide-01.png", content_type: "image/png")
+    @deck.update!(published: true)
+    [ users(:john), users(:jane), users(:seth) ].first(count).each do |user|
+      UserPresentation.create!(user: user, presentation: @deck, purchase_type: "direct", purchased_at: Time.current)
+    end
+  end
+
+  test "the unpublish button states how many people own the deck" do
+    published_with_owners(2)
+    get edit_admin_presentation_path(@deck)
+    assert_select "form[action=?][data-turbo-confirm*='2 people own this deck']", unpublish_admin_presentation_path(@deck)
+    assert_match(/2 people own this deck/, response.body)
+  end
+
+  test "unpublishing says the owners keep the deck" do
+    published_with_owners(1)
+    post unpublish_admin_presentation_path(@deck)
+    assert_not @deck.reload.published?
+    assert_match(/1 person owns this deck and keeps it/, flash[:notice])
+  end
+
+  # No accidental free decks (publish action and the edit form).
+  def ready_to_publish(price:)
+    @deck.update_columns(price: price)
+    @deck.pdf_file.attach(io: StringIO.new("%PDF-1.4 fake"), filename: "deck.pdf", content_type: "application/pdf")
+    @deck.slide_images.attach(io: File.open(Rails.root.join("test/fixtures/files/slides/slide-01.png"), "rb"),
+                              filename: "slide-01.png", content_type: "image/png")
+  end
+
+  test "publishing a $0 deck without ticking the box is refused" do
+    ready_to_publish(price: 0)
+    post publish_admin_presentation_path(@deck)
+    assert_not @deck.reload.published?
+    assert_match(/This deck is free/, flash[:alert])
+  end
+
+  test "publishing a $0 deck with the box ticked works" do
+    ready_to_publish(price: 0)
+    post publish_admin_presentation_path(@deck), params: { free_confirmed: "1" }
+    assert @deck.reload.published?
+  end
+
+  test "the publish panel shows the price, and the free box only for a $0 deck" do
+    ready_to_publish(price: 0)
+    get edit_admin_presentation_path(@deck)
+    assert_select "form[action=?] input[type=checkbox][name=free_confirmed]", publish_admin_presentation_path(@deck)
+    ready_to_publish(price: 12)
+    get edit_admin_presentation_path(@deck)
+    assert_select "input[name=free_confirmed]", count: 0
+    assert_select "p", text: /Publishes at \$12\.00/
+  end
+
+  test "publishing without a deck file is refused, and the page says why" do
+    post publish_admin_presentation_path(@deck)
+    assert_not @deck.reload.published?
+    assert_match(/Attach the deck file/, flash[:alert])
+    get edit_admin_presentation_path(@deck)
+    assert_select "#publish", text: /Attach the deck file/
+    assert_select "form[action=?]", publish_admin_presentation_path(@deck), count: 0
+  end
+
+  test "publishing before the slides are rendered is refused" do
+    @deck.pdf_file.attach(io: StringIO.new("%PDF-1.4 fake"), filename: "deck.pdf", content_type: "application/pdf")
+    post publish_admin_presentation_path(@deck)
+    assert_not @deck.reload.published?
+    assert_match(/slide previews/i, flash[:alert])
+    get edit_admin_presentation_path(@deck)
+    assert_select "#publish", text: /No slide previews/
+  end
+
+  test "a free deck's header button goes to the publish block instead of publishing" do
+    ready_to_publish(price: 0)
+    get edit_admin_presentation_path(@deck)
+    assert_select "header a[href='#publish']", text: "Publish to the library"
+    assert_select "header form[action=?]", publish_admin_presentation_path(@deck), count: 0
+  end
+
+  test "a priced, ready deck publishes from the header" do
+    ready_to_publish(price: 12)
+    get edit_admin_presentation_path(@deck)
+    assert_select "header form[action=?] button", publish_admin_presentation_path(@deck), text: "Publish to the library"
+  end
+
+  test "the unpublish confirmation in the header names the owners" do
+    published_with_owners(1)
+    get edit_admin_presentation_path(@deck)
+    assert_select "header form[action=?][data-turbo-confirm*='1 person owns this deck']", unpublish_admin_presentation_path(@deck)
+  end
+
+  test "saving the form that drops a live deck to $0 needs the box" do
+    ready_to_publish(price: 12)
+    @deck.update!(published: true)
+    patch admin_presentation_path(@deck), params: { presentation: { price: "0" } }
+    assert_response :unprocessable_entity
+    assert_equal BigDecimal("12"), @deck.reload.price
+    patch admin_presentation_path(@deck), params: { presentation: { price: "0", free_confirmed: "1" } }
+    assert_equal BigDecimal("0"), @deck.reload.price
+  end
 end

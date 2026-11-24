@@ -41,7 +41,8 @@ class HomeControllerTest < ActionDispatch::IntegrationTest
     get root_path
     assert_response :success
     assert_select "div.hx h1", /Every pour/
-    assert_select "div.hx .story .beat", 4
+    assert_select "div.hx .story .beat:not(.beat--close)", 4
+    assert_select "div.hx .story .beat--close", 1
     assert_select "div.hx .story .face", 4
   end
 

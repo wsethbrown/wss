@@ -1,7 +1,92 @@
-<% content_for :title, "Edit Presentation - Admin" %>
+<%# One page per deck. A header that never leaves the top on desktop (title,
+    state, facts, Save / Preview / Publish), then six tabs. The deck-tabs
+    controller shows one pane at a time and keeps the tab in location.hash;
+    without JavaScript every pane is on the page, one after another.
 
-<%= render "admin/shared/page_header", title: "Edit presentation",
-           lede: "Each section mirrors the buyer page, top to bottom, the rail on the right shows what will actually render.",
-           back: [ @presentation.title, admin_presentation_path(@presentation) ] %>
+    ONE form (#deck-form) holds every editable field, so one Save saves all
+    of them, hidden tabs included. Forms cannot nest, so the panes that hold
+    other forms (publish, unpublish, re-render) sit outside it: Overview before
+    it, the Files tab's second half and Sales after it. Buttons outside the
+    form reach it through the form="deck-form" attribute. %>
+<%
+  presentation = @presentation
+  saved = admin_deck_saved(presentation) # differs from presentation only after a refused save
+  content_for :title, "#{saved.title} - Admin"
+  slides = presentation.slide_images_attachments.includes(:blob, :record).order(:id).to_a
+  script = Array(presentation.slide_script).select { |entry| entry.is_a?(Hash) }
+  downloads_count = admin_deck_download_count(saved)
+  tabs = Admin::PresentationsController::TABS
+  tab = params[:tab].presence_in(tabs) || flash[:deck_tab].presence_in(tabs) || "overview"
+%>
 
-<%= render 'form', presentation: @presentation, submit_text: 'Save deck' %>
+<div data-controller="deck-tabs" class="pb-24 lg:pb-0">
+  <%= render "admin/presentations/deck_header", presentation: saved, slides: slides,
+             downloads_count: downloads_count, purchases_count: @purchases.size %>
+
+  <%= render "admin/presentations/errors", presentation: presentation %>
+
+  <%# ── Overview (read-only, plus the publish block's own forms) ── %>
+  <section id="pane-overview" data-deck-tabs-target="pane" data-pane="overview" aria-label="Overview"
+           class="scroll-mt-56 space-y-6 pt-6">
+    <%= render "admin/presentations/overview", presentation: saved, slides: slides, purchases: @purchases %>
+  </section>
+
+  <%= form_with model: [ :admin, presentation ], local: true,
+        html: { id: "deck-form", data: { controller: "unsaved-changes",
+                                          unsaved_changes_dirty_value: presentation.errors.any?,
+                                          deck_tabs_target: "form",
+                                          action: "input->unsaved-changes#changed change->unsaved-changes#changed submit->unsaved-changes#saving" } } do |form| %>
+    <%= hidden_field_tag :tab, tab, id: "deck-tab", data: { deck_tabs_target: "field" } %>
+
+    <section id="pane-slides" data-deck-tabs-target="pane" data-pane="slides" aria-label="Slides and script"
+             class="scroll-mt-56 space-y-6 pt-6">
+      <%= render "admin/presentations/slides_pane", form: form, presentation: presentation, saved: saved, slides: slides, script: script %>
+    </section>
+
+    <section id="pane-pours" data-deck-tabs-target="pane" data-pane="pours" aria-label="Pour list"
+             class="scroll-mt-56 space-y-6 pt-6">
+      <%= render "admin/presentations/pour_list_fields", form: form, presentation: presentation %>
+    </section>
+
+    <%# The Listing fields, with "What the customer sees" beside them from lg
+        (below them on a phone), refreshed as the admin types. %>
+    <section id="pane-listing" data-deck-tabs-target="pane" data-pane="listing" aria-label="Listing"
+             class="scroll-mt-56 pt-6">
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-2 lg:items-start"
+           data-controller="deck-preview" data-deck-preview-url-value="<%= preview_admin_presentation_path(presentation) %>"
+           data-action="input->deck-preview#schedule change->deck-preview#schedule click->deck-preview#schedule deck-tabs:shown@window->deck-preview#resize">
+        <div class="min-w-0 space-y-6">
+          <%= render "admin/presentations/cover_fields", form: form, presentation: presentation, saved: saved, files_link: true %>
+          <%= render "admin/presentations/takeaways_fields", form: form, presentation: presentation %>
+          <%= render "admin/presentations/story_fields", form: form, presentation: presentation %>
+          <%= render "admin/presentations/sections_fields", form: form, presentation: presentation %>
+        </div>
+        <%= render "admin/presentations/customer_preview", presentation: presentation,
+                   cover_image: slides.first || (saved.featured_image if saved.featured_image.attached?),
+                   slides_count: slides.size %>
+      </div>
+    </section>
+
+    <section id="pane-files" data-deck-tabs-target="pane" data-pane="files" aria-label="Files"
+             class="scroll-mt-56 space-y-6 pt-6">
+      <%= render "admin/presentations/files_fields", form: form, presentation: presentation, saved: saved %>
+    </section>
+  <% end %>
+
+  <%# The Files tab, continued: its cards hold their own forms and links. %>
+  <section data-deck-tabs-target="pane" data-pane="files" aria-label="Files" class="space-y-6 pt-6">
+    <%= render "admin/presentations/files_actions", presentation: saved, slides: slides %>
+  </section>
+
+  <section id="pane-sales" data-deck-tabs-target="pane" data-pane="sales" aria-label="Sales"
+           class="scroll-mt-56 space-y-6 pt-6">
+    <%= render "admin/presentations/sales", presentation: saved, purchases: @purchases %>
+  </section>
+
+  <%# Phone: Save is always one tap away, at the bottom of the screen. %>
+  <div class="fixed inset-x-0 bottom-0 z-30 flex items-center justify-between gap-3 border-t border-hairline bg-white px-4 py-3 lg:hidden">
+    <%= render "admin/shared/status_chip", label: (saved.published? ? "Published" : "Draft"),
+               tone: (saved.published? ? :ok : :attention) %>
+    <button type="submit" form="deck-form" class="btn btn-primary min-h-11 flex-1 py-2.5 sm:flex-none">Save deck</button>
+  </div>
+</div>

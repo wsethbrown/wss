@@ -82,7 +82,10 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     }
     follow_redirect!
 
+    # /dashboard is its own page now (finding 3); the account page is /account.
     assert_response :success
+    assert_select "h2", "Your next tastings"
+    get account_path
     assert_select "h1", "Account"
     assert_select "h2", "Profile"
   end
@@ -112,7 +115,7 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
     assert_select "form[action*='/users/auth/google_oauth2'] button", /Continue with Google/
   end
 
-  test "dashboard shows user profile information" do
+  test "the account page shows user profile information after sign-in" do
     post user_session_path, params: {
       user: {
         email: @user.email,
@@ -120,6 +123,8 @@ class AuthenticationTest < ActionDispatch::IntegrationTest
       }
     }
     follow_redirect!
+    assert_response :success
+    get account_path # the profile lives on the account page, not the dashboard
 
     assert_response :success
     assert_select "input[value=?]", @user.first_name

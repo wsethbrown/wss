@@ -1,5 +1,12 @@
 # Small building blocks from the 2026 design system (docs/redesign/DESIGN_SYSTEM.md).
 module DesignHelper
+  # A link's words followed by its arrow, the arrow in its own span so it can
+  # nudge on hover (application.css, .arrow). The text reads exactly as
+  # "words →", so the link's accessible name does not change.
+  def with_arrow(text)
+    safe_join([ text, " ", content_tag(:span, "→", class: "arrow") ])
+  end
+
   # A deck's cover: its first rendered slide, else its featured image, else a plain
   # green block. Always 16:9, 18px radius, hairline edge. Never the title on a box.
   #
@@ -7,14 +14,18 @@ module DesignHelper
   #   preloaded: an already-loaded attachment to show (skips the slide query)
   #   class:     extra classes for the wrapper
   #   alt:       alt text (defaults to the deck title)
-  def deck_cover(deck, preloaded: nil, class: nil, alt: nil)
+  #   loading:   "lazy" (default) or "eager", for covers above the fold
+  def deck_cover(deck, preloaded: nil, class: nil, alt: nil, loading: "lazy")
     extra = binding.local_variable_get(:class)
-    wrapper = [ "relative aspect-video w-full overflow-hidden rounded-[18px] border border-hairline bg-char", extra ].compact.join(" ")
+    wrapper = [ "deck-cover relative aspect-video w-full overflow-hidden rounded-[18px] border border-hairline bg-char", extra ].compact.join(" ")
     image = preloaded || deck_cover_attachment(deck)
 
     content_tag(:div, class: wrapper) do
       if image
-        image_tag image_variant(image, :card), alt: alt || deck.title, loading: "lazy", class: "absolute inset-0 h-full w-full object-cover"
+        # Fades in if it is still loading when the page starts (the appear
+        # controller's image target; cached covers are left alone).
+        image_tag image_variant(image, :card), alt: alt || deck.title, loading: loading, class: "absolute inset-0 h-full w-full object-cover",
+                  data: { appear_target: "image" }
       else
         "".html_safe
       end

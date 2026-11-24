@@ -32,9 +32,15 @@ class EventRsvpsController < ApplicationController
       end
     else
       Rails.logger.warn "Event #{@event.id}: RSVP by user #{current_user.id} refused: #{@rsvp.errors.full_messages.to_sentence}"
+      reason = @rsvp.errors.full_messages.to_sentence.presence || "Unable to RSVP to the event."
       respond_to do |format|
-        format.html { redirect_to @event, alert: "Unable to RSVP to the event." }
-        format.turbo_stream { render turbo_stream: turbo_stream.update("flash-messages", partial: "shared/flash_messages") }
+        format.html { redirect_to @event, alert: reason }
+        # A failed status lets the segmented control put the old answer back.
+        format.turbo_stream do
+          flash.now[:alert] = reason
+          render turbo_stream: turbo_stream.update("flash-messages", partial: "shared/flash_messages"),
+                 status: :unprocessable_entity
+        end
       end
     end
   end

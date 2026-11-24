@@ -1,0 +1,53 @@
+<%# The story, rendered from Markdown. Readers with access (full_story) get
+    all of it; everyone else gets the teaser, cut at the source so the rest
+    never reaches the page, fading into the purchase prompt. The admin preview
+    renders this with full_story: false, so it shows only the teaser.
+    Locals: presentation, full_story, get_label, get_path %>
+<section class="<%= deck_section_class %> scroll-mt-24" id="deck-story" data-controller="deck-thread">
+  <div class="self-start md:col-span-4" data-appear-target="item">
+    <h2 class="<%= deck_heading_class %>"><%= full_story ? 'The story' : 'A taste of the writing' %></h2>
+    <% if presentation.content.present? && presentation.reading_time.positive? %>
+      <p class="mt-2 text-sm text-mute"><%= presentation.reading_time %> min read</p>
+    <% end %>
+  </div>
+  <div class="md:col-span-8">
+    <div class="card p-6 sm:p-10">
+      <div class="relative pl-6 md:pl-8">
+        <%# The thread: a thin line that fills as you read, the narrative spine
+            connecting the pour to its story. %>
+        <div class="absolute bottom-1 left-0 top-1 w-[2px] rounded bg-whiskey-100" aria-hidden="true">
+          <div id="deck-thread" data-deck-thread-target="thread" class="w-full rounded bg-ink transition-[height] duration-150 ease-out" style="height: 0%"></div>
+        </div>
+
+        <% if presentation.content.present? %>
+          <% if full_story %>
+            <div class="prose-deck prose-deck--dropcap">
+              <%= render_markdown(presentation.content) %>
+            </div>
+          <% else %>
+            <%# Teaser: the opening of the story, cut at the source so the
+                rest never reaches the page. Fades into the purchase CTA. %>
+            <div class="relative">
+              <div class="prose-deck prose-deck--dropcap">
+                <%= preview_markdown(presentation.content) %>
+              </div>
+              <% if story_truncated?(presentation.content) %>
+                <div class="pointer-events-none absolute inset-x-0 bottom-0 h-40 bg-gradient-to-t from-white to-transparent" aria-hidden="true"></div>
+              <% end %>
+            </div>
+          <% end %>
+        <% else %>
+          <p class="prose-deck whitespace-pre-line"><%= presentation.description %></p>
+        <% end %>
+      </div>
+
+      <% if presentation.content.present? && !full_story && story_truncated?(presentation.content) %>
+        <div class="inset mt-4 p-6 text-center sm:p-8">
+          <p class="font-display text-xl font-semibold text-ink">The story keeps going.</p>
+          <p class="mt-2 text-mute">Get the deck to read the rest, slides, script, and downloads included.</p>
+          <%= link_to get_label, get_path, class: 'btn btn-secondary mt-6 min-h-12' %>
+        </div>
+      <% end %>
+    </div>
+  </div>
+</section>

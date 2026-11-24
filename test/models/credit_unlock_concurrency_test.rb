@@ -14,7 +14,8 @@ class CreditUnlockConcurrencyTest < ActiveSupport::TestCase
 
   setup do
     @user = User.create!(email: "race-#{SecureRandom.hex(4)}@example.com", password: "password123",
-                         password_confirmation: "password123", first_name: "Race", last_name: "Test")
+                         password_confirmation: "password123", first_name: "Race", last_name: "Test",
+                         subscription_status: "active", subscription_ends_at: 1.month.from_now) # credits spend only while active
     @author = User.create!(email: "race-author-#{SecureRandom.hex(4)}@example.com", password: "password123",
                            password_confirmation: "password123", first_name: "Race", last_name: "Author")
     @deck = Presentation.create!(author: @author, title: "Race Deck #{SecureRandom.hex(3)}", content: "Story.", price: 10)

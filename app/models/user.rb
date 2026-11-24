@@ -324,6 +324,28 @@ class User < ApplicationRecord
     member_societies.joins(:society_memberships).where(society_memberships: { user: self, role: [ :admin, :officer ], status: :active })
   end
 
+  # Every society the user belongs to: the ones they created plus their active
+  # memberships, each once. "Your societies" on /societies and the dashboard.
+  def belonging_societies
+    Society.where(creator_id: id)
+           .or(Society.where(id: society_memberships.active.select(:society_id)))
+  end
+
+  # The viewer's role label per society id ("Creator", "Society admin",
+  # "Officer", "Member"), from one query, for lists of societies.
+  def society_role_labels(societies)
+    roles = society_memberships.active.where(society_id: societies.map(&:id)).pluck(:society_id, :role).to_h
+    societies.to_h do |society|
+      label =
+        if society.creator_id == id then "Creator"
+        elsif roles[society.id] == "admin" then "Society admin"
+        elsif roles[society.id] == "officer" then "Officer"
+        else "Member"
+        end
+      [ society.id, label ]
+    end
+  end
+
   def administered_societies
     # Returns societies where the user can create events (created societies + admin/officer roles)
     Society.left_joins(:society_memberships)
@@ -451,17 +473,34 @@ class User < ApplicationRecord
     end
   end
 
+  # Plan names for the admin label. Prices are NOT kept here: they come from
+  # SubscriptionProducts, the one source of truth, so the label cannot drift
+  # from what members are billed.
+  PLAN_DISPLAY_NAMES = {
+    "monthly" => "Monthly",
+    "quarterly" => "Quarterly",
+    "yearly" => "Yearly",
+    "founding_monthly" => "Founding Monthly",
+    "founding_society" => "Founding Society"
+  }.freeze
+
+  # Words for the billing period, by months between invoices.
+  PLAN_PERIOD_WORDS = { 1 => "month", 3 => "quarter", 12 => "year" }.freeze
+
+  # "Yearly ($131.88/year)": the plan name and what one invoice charges.
   def subscription_plan_display
-    case subscription_plan
-    when "monthly"
-      "Monthly ($19.99/month)"
-    when "quarterly"
-      "Quarterly ($38.97/quarter)"
-    when "yearly"
-      "Yearly ($119.88/year)"
-    else
-      "No Plan"
+    name = PLAN_DISPLAY_NAMES[subscription_plan]
+    return "No Plan" unless name
+
+    product = SubscriptionProducts.plans_by_id[subscription_plan]
+    period = PLAN_PERIOD_WORDS[product&.dig(:billing_months)]
+    cents = product&.dig(:billed_price)
+    unless period && cents
+      Rails.logger.warn "Plan label for user #{id}: no billed price for plan #{subscription_plan.inspect}; showing the name only"
+      return name
     end
+
+    format("%s ($%.2f/%s)", name, cents / 100.0, period)
   end
 
   def subscription_active?
@@ -477,13 +516,17 @@ class User < ApplicationRecord
     user_presentations.exists?(presentation_id: presentation_id)
   end
 
+  # THE deck access rule; every access decision (deck page, present, downloads,
+  # purchase page, event decks) goes through here.
+  #   direct purchase                -> always
+  #   credit unlock                  -> while the membership is active
+  #   deck included with membership  -> while the deck is published and the
+  #                                     membership is active, with no credit
+  #                                     spent and no ownership row written
   def can_access_presentation?(presentation_id)
-    return false unless owns_presentation?(presentation_id)
-
     purchase = user_presentations.find_by(presentation_id: presentation_id)
-    return false unless purchase
 
-    case purchase.purchase_type
+    case purchase&.purchase_type
     when "direct"
       # Direct purchases are always accessible
       true
@@ -491,8 +534,19 @@ class User < ApplicationRecord
       # Credit purchases require active subscription
       has_active_subscription?
     else
-      false
+      included_with_membership_access?(presentation_id)
     end
+  end
+
+  # True (and logged) when the deck is PUBLISHED, included with membership, and
+  # this user's membership is active. An unpublished or withdrawn deck grants
+  # nothing this way (owners and admins keep their own routes to it).
+  def included_with_membership_access?(presentation_id)
+    return false unless has_active_subscription?
+    return false unless Presentation.published.where(id: presentation_id, included_with_membership: true).exists?
+
+    Rails.logger.info "Deck access granted to user #{id} for presentation #{presentation_id}: included with membership"
+    true
   end
 
   def presentation_access_type(presentation_id)

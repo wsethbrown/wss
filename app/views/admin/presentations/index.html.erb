@@ -1,18 +1,19 @@
-<% content_for :title, "Admin - Presentations" %>
+<% content_for :title, "Admin - Decks" %>
 
 <%# Flash messages (including B7's "This deck has owners or credit history, so it
     can't be deleted. Unpublish it instead.") are rendered once by the admin layout. %>
-<%= render "admin/shared/page_header", title: "Presentations",
-           lede: "#{@presentations.count} presentations total" do %>
-  <%= link_to "New presentation", new_admin_presentation_path, class: "btn btn-primary min-h-11 py-2.5" %>
+<%= render "admin/shared/page_header", title: "Decks",
+           lede: "#{pluralize(@presentations.count, 'deck')} total" do %>
+  <%= link_to "New deck", new_admin_presentation_path, class: "btn btn-primary min-h-11 py-2.5" %>
+  <%= link_to "Upload a package", new_admin_deck_package_path, class: "btn btn-secondary min-h-11 py-2.5" %>
 <% end %>
 
 <%= render "admin/shared/table", rows: @presentations,
            columns: [ "Title", "Author", "Category", [ "Price", :right ], [ "Purchases", :right ], "Status", [ "", :right ] ],
-           empty: "No presentations yet.",
-           empty_action: [ "Create your first presentation", new_admin_presentation_path ] do |presentation| %>
+           empty: "No decks yet.",
+           empty_action: [ "Create your first deck", new_admin_presentation_path ] do |presentation| %>
   <%= admin_td(class: "max-w-xs") do %>
-    <div class="truncate font-medium text-ink"><%= presentation.title %></div>
+    <div class="truncate font-medium text-ink"><%= link_to presentation.title, edit_admin_presentation_path(presentation), class: "hover:underline underline-offset-4" %></div>
     <div class="truncate text-mute"><%= presentation.description %></div>
   <% end %>
   <%= admin_td(class: "whitespace-nowrap") { presentation.author&.full_name || "N/A" } %>
@@ -28,11 +29,10 @@
   <% end %>
   <%= admin_td(align: :right) do %>
     <div class="flex items-center justify-end gap-4">
-      <%= link_to "View", admin_presentation_path(presentation), class: "text-sm #{admin_link_class}" %>
       <%= link_to "Edit", edit_admin_presentation_path(presentation), class: "text-sm #{admin_link_class}" %>
       <% if current_user.can_delete? %>
         <%= render "admin/shared/confirm_button", label: "Delete", url: admin_presentation_path(presentation),
-                   confirm: "Are you sure you want to delete this presentation?" %>
+                   confirm: "Are you sure you want to delete this deck?" %>
       <% end %>
     </div>
   <% end %>

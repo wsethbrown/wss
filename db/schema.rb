@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_19_160000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_24_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -176,6 +176,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_160000) do
     t.bigint "presentation_id"
     t.string "host_name"
     t.string "time_zone"
+    t.integer "calendar_sequence", default: 0, null: false
     t.index ["host_id"], name: "index_events_on_host_id"
     t.index ["location"], name: "index_events_on_location"
     t.index ["organizer_id"], name: "index_events_on_organizer_id"
@@ -195,6 +196,19 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_160000) do
     t.index ["favoritable_type", "favoritable_id"], name: "index_favorites_on_favoritable"
     t.index ["user_id", "favoritable_type", "favoritable_id"], name: "index_favorites_on_user_and_favoritable", unique: true
     t.index ["user_id"], name: "index_favorites_on_user_id"
+  end
+
+  create_table "mailing_list_subscribers", force: :cascade do |t|
+    t.string "email", null: false
+    t.string "confirmation_token_digest"
+    t.datetime "confirmation_sent_at"
+    t.datetime "confirmed_at"
+    t.datetime "unsubscribed_at"
+    t.string "source", limit: 30
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["confirmation_token_digest"], name: "index_mailing_list_subscribers_on_confirmation_token_digest", unique: true
+    t.index ["email"], name: "index_mailing_list_subscribers_on_email", unique: true
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -281,6 +295,10 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_160000) do
     t.boolean "featured", default: false, null: false
     t.integer "reviews_count", default: 0, null: false
     t.decimal "reviews_average", precision: 3, scale: 2
+    t.jsonb "slide_script", default: [], null: false
+    t.jsonb "sections", default: [], null: false
+    t.string "subtitle"
+    t.boolean "included_with_membership", default: false, null: false
     t.index ["author_id"], name: "index_presentations_on_author_id"
     t.index ["category"], name: "index_presentations_on_category"
     t.index ["download_count"], name: "index_presentations_on_download_count"
@@ -624,6 +642,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_19_160000) do
     t.datetime "invitation_sent_at"
     t.datetime "invitation_accepted_at"
     t.bigint "invited_by_id"
+    t.string "magic_link_return_to"
     t.index ["admin_role"], name: "index_users_on_admin_role"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["email_change_token"], name: "index_users_on_email_change_token", unique: true

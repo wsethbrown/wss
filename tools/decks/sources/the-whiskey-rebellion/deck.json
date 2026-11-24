@@ -1,0 +1,40 @@
+{
+  "slug": "The-Whiskey-Rebellion",
+  "title": "The Whiskey Rebellion",
+  "subtitle": "Western Pennsylvania, 1791–1794",
+  "category": "American History",
+  "difficulty": "Beginner",
+  "duration": "45 min",
+  "description": "The 1791 federal tax on whiskey, the uprising against it in western Pennsylvania, and how it ended without a battle. Four pours.",
+  "pours": [
+    {
+      "name": "Old Overholt Straight Rye",
+      "origin": "Jim Beam, Kentucky",
+      "style": "Straight rye whiskey",
+      "strength": "86 proof",
+      "notes": "A brand that began in Westmoreland County, one of the four counties at the center of the rebellion, in the years after 1794."
+    },
+    {
+      "name": "Pikesville Straight Rye",
+      "origin": "Heaven Hill, Kentucky",
+      "style": "Straight rye whiskey",
+      "strength": "110 proof",
+      "notes": "A Maryland rye name. Maryland was one of the four states that sent militia west in 1794. It is 110 proof, so try it with water."
+    },
+    {
+      "name": "Michter’s US*1 Straight Rye",
+      "origin": "Michter’s, Kentucky",
+      "style": "Single barrel straight rye",
+      "strength": "84.8 proof",
+      "notes": "The name comes from an old distillery in Lebanon County, Pennsylvania. The company now distills in Louisville."
+    },
+    {
+      "name": "Elijah Craig Small Batch",
+      "origin": "Heaven Hill, Kentucky",
+      "style": "Kentucky straight bourbon",
+      "strength": "94 proof",
+      "notes": "Named for a Baptist preacher in Kentucky. People later said he made the first bourbon. There is no proof of that."
+    }
+  ],
+  "tags": "american history, rye, bourbon"
+}

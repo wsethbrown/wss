@@ -1,0 +1,67 @@
+<%# The deck page's header and tab row. On desktop it stays at the top while
+    the page scrolls (sticky on a paper ground; no ancestor of it may be a
+    scroll container, see the wss-design-system skill). On phones it scrolls
+    away and the Save bar at the bottom of the screen takes over.
+    Locals: presentation, slides, downloads_count, purchases_count %>
+<% owners = presentation.user_presentations.size %>
+<% owners_line = owners.zero? ? "Nobody owns this deck yet." : "#{pluralize(owners, 'person')} #{owners == 1 ? 'owns' : 'own'} this deck and #{owners == 1 ? 'keeps' : 'keep'} it." %>
+<% publish_now = !presentation.published? && presentation.pdf_file.attached? && slides.any? && !presentation.free? %>
+
+<div class="z-30 -mx-4 bg-paper px-4 sm:-mx-6 sm:px-6 lg:sticky lg:top-0 lg:-mx-10 lg:px-10 lg:pt-4">
+  <header class="flex flex-col gap-3">
+    <%= link_to "← Decks", admin_presentations_path,
+                class: "inline-flex min-h-11 items-center self-start text-sm font-medium text-mute hover:text-ink lg:min-h-0" %>
+
+    <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+      <div class="min-w-0">
+        <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
+          <h1 class="min-w-0 break-words font-display text-3xl font-semibold text-ink sm:text-4xl"><%= presentation.title %></h1>
+          <%= render "admin/shared/status_chip", label: (presentation.published? ? "Published" : "Draft"),
+                     tone: (presentation.published? ? :ok : :attention) %>
+        </div>
+        <p class="mt-2 text-sm text-mute tabular-nums"><%= admin_deck_facts(presentation, slides_count: slides.size, purchases_count: purchases_count) %></p>
+      </div>
+
+      <div class="flex shrink-0 flex-wrap items-center gap-3">
+        <% if presentation.published? %>
+          <%= button_to "Unpublish", unpublish_admin_presentation_path(presentation), method: :post,
+                params: { tab: "overview" },
+                form: { class: "inline", data: { turbo_confirm: "Unpublish #{presentation.title}? #{owners_line} It leaves the library and can't be bought." } },
+                class: "btn btn-secondary min-h-11 py-2.5" %>
+        <% elsif publish_now %>
+          <%= button_to "Publish to the library", publish_admin_presentation_path(presentation), method: :post,
+                params: { tab: "overview" }, form: { class: "inline" },
+                class: "btn btn-secondary min-h-11 py-2.5" %>
+        <% else %>
+          <%# A $0 deck needs "This deck is free" ticked, and a deck that can't
+              publish yet says why: both live in the publish block. %>
+          <a href="#publish" class="btn btn-secondary min-h-11 py-2.5">Publish to the library</a>
+        <% end %>
+        <%= link_to "Preview as buyer ↗", presentation_path(presentation), target: "_blank", rel: "noopener",
+                    class: "btn btn-secondary min-h-11 py-2.5" %>
+        <button type="submit" form="deck-form" class="btn btn-primary hidden min-h-11 py-2.5 lg:inline-flex">Save deck</button>
+      </div>
+    </div>
+  </header>
+
+  <%# Tab links jump to their pane without JavaScript; deck-tabs turns them
+      into tabs. The row scrolls sideways on a phone, never the page. %>
+  <nav aria-label="Deck sections" class="-mx-4 mt-4 overflow-x-auto border-b border-hairline px-4 [scrollbar-width:none] sm:mx-0 sm:px-0 [&::-webkit-scrollbar]:hidden">
+    <div class="flex gap-1" data-deck-tabs-target="tablist">
+      <% [
+           [ "overview", "Overview", nil ],
+           [ "slides", "Slides and script", slides.size ],
+           [ "pours", "Pour list", presentation.pours_count ],
+           [ "listing", "Listing", nil ],
+           [ "files", "Files", downloads_count ],
+           [ "sales", "Sales", nil ]
+         ].each do |key, label, count| %>
+        <a href="#pane-<%= key %>" id="tab-<%= key %>" data-deck-tabs-target="tab" data-tab="<%= key %>"
+           class="inline-flex min-h-11 shrink-0 items-center gap-1.5 whitespace-nowrap border-b-[3px] border-transparent px-3 text-sm font-semibold text-mute hover:text-ink aria-selected:border-ink aria-selected:text-ink">
+          <%= label %>
+          <% unless count.nil? %><span class="font-medium text-mute tabular-nums"><%= count %></span><% end %>
+        </a>
+      <% end %>
+    </div>
+  </nav>
+</div>

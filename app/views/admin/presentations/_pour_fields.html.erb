@@ -1,5 +1,8 @@
 <%# locals: f (a fields_for builder for one PresentationBottle)
-    One row of the deck's pour list. Two shapes in one card:
+    One row of the deck's pour list: a summary line (number, name, origin,
+    price, linked or not) that opens to the fields. A native <details>, so it
+    opens and closes without JavaScript; a new pour or a row with errors
+    starts open. Two shapes in one row:
       - linked: bottle_id is set, so the name follows the catalog and the deck
         picks up that bottle's reviews.
       - free text: no bottle, just a name, for a cocktail or an uncatalogued
@@ -11,73 +14,90 @@
     picking a bottle can prefill this row's origin and style fields
     ([data-bottle-fill]). They have to be inside the controller's element to be
     in scope. %>
-<div class="pour-row rounded-2xl border border-hairline bg-paper p-4" data-pour-list-target="row"
-     data-controller="bottle-search" data-bottle-search-url-value="<%= search_bottles_path %>"
-     data-bottle-search-name-field-value="true">
-  <div class="mb-3 flex items-start justify-between gap-3">
-    <h3 class="text-sm font-semibold text-ink">Pour</h3>
-    <label class="flex min-h-11 cursor-pointer items-center gap-2 text-sm font-medium text-red-700 hover:underline">
-      <%= f.check_box :_destroy, class: "h-5 w-5 rounded border-hairline text-ink focus:ring-ink/30",
-          data: { action: "change->pour-list#toggleDestroy" } %>
-      Remove
-    </label>
-  </div>
+<% pour = f.object %>
+<% linked = pour.bottle %>
+<% number = f.index.is_a?(Integer) ? f.index + 1 : nil %>
+<% open = pour.new_record? || pour.errors.any? %>
+<details class="pour-row group border-b border-hairline" data-pour-list-target="row"
+         data-controller="bottle-search" data-bottle-search-url-value="<%= search_bottles_path %>"
+         data-bottle-search-name-field-value="true" <%= "open" if open %>>
+  <summary class="grid min-h-11 cursor-pointer list-none grid-cols-[2rem_minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 py-3 sm:grid-cols-[2rem_minmax(0,1.3fr)_minmax(0,1.4fr)_4.5rem_auto_auto] [&::-webkit-details-marker]:hidden">
+    <span class="pour-num inline-flex h-8 w-8 items-center justify-center rounded-[11px] bg-paper text-sm font-bold text-ink tabular-nums"><%= number %></span>
+    <span class="min-w-0 break-words font-semibold text-ink"><%= pour.title.presence || "Pour" %></span>
+    <span class="col-span-2 col-start-2 row-start-2 min-w-0 break-words text-sm text-mute sm:col-span-1 sm:col-start-auto sm:row-start-auto"><%= pour.origin_text %></span>
+    <span class="col-start-3 row-start-1 text-right text-sm font-semibold text-ink tabular-nums sm:col-start-auto sm:row-start-auto"><%= pour.price %></span>
+    <span class="col-start-2 row-start-3 justify-self-start sm:col-start-auto sm:row-start-auto">
+      <%= render "admin/shared/status_chip", label: (linked ? "Linked" : "Not linked"), tone: (linked ? :ok : :attention) %>
+    </span>
+    <span class="col-start-3 row-start-3 text-right text-sm <%= admin_link_class %> sm:col-start-auto sm:row-start-auto">
+      <span class="group-open:hidden">Edit</span><span class="hidden group-open:inline">Close</span>
+    </span>
+  </summary>
 
-  <%# ONE name box. "Catalog bottle" and "Name" were the same field wearing two
-      hats, so they're merged: type free text to name an uncatalogued pour
-      (a cocktail), or pick a suggestion to link the catalog bottle. Linking is
-      what earns this deck real tasting scores, so the state is shown, never
-      implied. The model clears `name` on a linked row: the catalog owns it. %>
-  <% linked = f.object.bottle %>
-  <div class="relative mb-3">
-    <%= f.label :name, "Name", class: admin_label_class %>
-    <%= f.text_field :name, value: f.object.title, autocomplete: "off",
-        placeholder: "Start typing: Glenfiddich 12, or Mint Julep",
-        data: { bottle_search_target: "input", action: "input->bottle-search#query" },
-        class: admin_field_class %>
-    <%= f.hidden_field :bottle_id, data: { bottle_search_target: "bottleId" } %>
-    <div data-bottle-search-target="results"
-         class="absolute inset-x-0 top-full z-20 mt-1 hidden overflow-hidden rounded-2xl border border-hairline bg-white shadow-lg"></div>
-    <p data-bottle-search-target="linkState"
-       class="mt-1 text-xs <%= linked ? 'text-ink' : 'text-mute' %>">
-      <%= linked ? "Linked to #{linked.display_name}" : "Not linked to the catalog, so this pour earns no scores." %>
-    </p>
-  </div>
+  <div class="pb-5 sm:pl-11">
+    <div class="mb-3 flex justify-end">
+      <label class="flex min-h-11 cursor-pointer items-center gap-2 text-sm font-medium text-red-700 hover:underline">
+        <%= f.check_box :_destroy, class: "h-5 w-5 rounded border-hairline text-ink focus:ring-ink/30",
+            data: { action: "change->pour-list#toggleDestroy" } %>
+        Remove
+      </label>
+    </div>
 
-  <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
-    <div>
-      <%= f.label :origin, "Origin", class: admin_label_class %>
-      <%= f.text_field :origin, placeholder: "e.g., Speyside, or Kentucky, 1803",
-          data: { bottle_fill: "origin" },
+    <%# ONE name box. "Catalog bottle" and "Name" were the same field wearing two
+        hats, so they're merged: type free text to name an uncatalogued pour
+        (a cocktail), or pick a suggestion to link the catalog bottle. Linking is
+        what earns this deck real tasting scores, so the state is shown, never
+        implied. The model clears `name` on a linked row: the catalog owns it. %>
+    <div class="relative mb-3">
+      <%= f.label :name, "Name", class: admin_label_class %>
+      <%= f.text_field :name, value: pour.title, autocomplete: "off",
+          placeholder: "Start typing: Glenfiddich 12, or Mint Julep",
+          data: { bottle_search_target: "input", action: "input->bottle-search#query" },
           class: admin_field_class %>
-      <p class="mt-1 text-xs text-mute">Filled in from the catalog when you link a bottle; edit freely.</p>
+      <%= f.hidden_field :bottle_id, data: { bottle_search_target: "bottleId" } %>
+      <div data-bottle-search-target="results"
+           class="absolute inset-x-0 top-full z-20 mt-1 hidden overflow-hidden rounded-2xl border border-hairline bg-white shadow-lg"></div>
+      <p data-bottle-search-target="linkState"
+         class="mt-1 text-xs <%= linked ? 'text-ink' : 'text-mute' %>">
+        <%= linked ? "Linked to #{linked.display_name}" : "Not linked to the catalog, so this pour earns no scores." %>
+      </p>
     </div>
-    <div>
-      <%= f.label :price, "Price", class: admin_label_class %>
-      <%= f.text_field :price, placeholder: "e.g., $45",
-          data: { bottle_fill: "price" },
-          class: admin_field_class %>
-      <p class="mt-1 text-xs text-mute">Suggested from what tasters paid. Yours to change.</p>
-    </div>
-    <div>
-      <%= f.label :label, "Role on the night", class: admin_label_class %>
-      <%= f.text_field :label, placeholder: 'e.g., "the opener"',
-          class: admin_field_class %>
-    </div>
-    <div class="md:col-span-2">
-      <%= f.label :style, "Style", class: admin_label_class %>
-      <%= f.text_area :style, rows: 2, placeholder: "e.g., Light and fruity. How it's made, how it's matured.",
-          data: { bottle_fill: "style" },
-          class: admin_field_class %>
-    </div>
-    <div class="md:col-span-2">
-      <%= f.label :notes, "Tasting notes", class: admin_label_class %>
-      <%= f.text_area :notes, rows: 2, placeholder: "e.g., Pear, oak, subtle spice. Pour it for the 1820s chapter.",
-          data: { bottle_fill: "notes" },
-          class: admin_field_class %>
-      <p class="mt-1 text-xs text-mute">Suggested from the words tasters used. Rewrite it in the deck's voice.</p>
-    </div>
-  </div>
 
-  <%= f.hidden_field :position, value: f.object.position %>
-</div>
+    <div class="grid grid-cols-1 gap-3 md:grid-cols-2">
+      <div class="md:col-span-2">
+        <%= f.label :origin, "Origin", class: admin_label_class %>
+        <%= f.text_field :origin, placeholder: "e.g., Speyside, or Kentucky, 1803",
+            data: { bottle_fill: "origin" },
+            class: admin_field_class %>
+        <p class="mt-1 text-xs text-mute">Filled in from the catalog when you link a bottle; edit freely.</p>
+      </div>
+      <div>
+        <%= f.label :price, "Price", class: admin_label_class %>
+        <%= f.text_field :price, placeholder: "e.g., $45",
+            data: { bottle_fill: "price" },
+            class: admin_field_class %>
+        <p class="mt-1 text-xs text-mute">Suggested from what tasters paid. Yours to change.</p>
+      </div>
+      <div>
+        <%= f.label :label, "Role on the night", class: admin_label_class %>
+        <%= f.text_field :label, placeholder: 'e.g., "the opener"',
+            class: admin_field_class %>
+      </div>
+      <div class="md:col-span-2">
+        <%= f.label :style, "Style", class: admin_label_class %>
+        <%= f.text_area :style, rows: 3, placeholder: "e.g., Light and fruity. How it's made, how it's matured.",
+            data: { bottle_fill: "style" },
+            class: admin_field_class %>
+      </div>
+      <div class="md:col-span-2">
+        <%= f.label :notes, "Tasting notes", class: admin_label_class %>
+        <%= f.text_area :notes, rows: 2, placeholder: "e.g., Pear, oak, subtle spice. Pour it for the 1820s chapter.",
+            data: { bottle_fill: "notes" },
+            class: admin_field_class %>
+        <p class="mt-1 text-xs text-mute">Suggested from the words tasters used. Rewrite it in the deck's voice.</p>
+      </div>
+    </div>
+
+    <%= f.hidden_field :position, value: pour.position %>
+  </div>
+</details>

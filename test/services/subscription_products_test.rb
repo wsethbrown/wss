@@ -38,6 +38,12 @@ class SubscriptionProductsTest < ActiveSupport::TestCase
     assert_not_nil @store.read("stripe_products")
   end
 
+  test "each live plan carries what one invoice charges and how often" do
+    stub_prices
+    billed = SubscriptionProducts.load_all.to_h { |p| [ p[:id], [ p[:billed_price], p[:billing_months] ] ] }
+    assert_equal({ "monthly" => [ 1599, 1 ], "quarterly" => [ 3900, 3 ], "yearly" => [ 13_200, 12 ] }, billed)
+  end
+
   test "a partial result is returned but not cached" do
     stub_prices(failing: [ "price_q" ])
     result = SubscriptionProducts.load_all

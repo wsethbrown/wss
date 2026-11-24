@@ -22,6 +22,45 @@ send.whiskeysharesociety.com, every sender is
 stay on the verified subdomain or Resend rejects). First prod magic link
 verified delivered end-to-end.
 
+New addresses (November 2026, after the junk-account incident): requesting a
+link for an email with no account creates NO users row. The pending sign-up
+(email + return path) sits in Rails.cache under the hashed token for 15
+minutes. Opening the link (GET /magic_links/:token) only renders
+magic_links/confirm; the account is created by the POST from its button
+(POST /magic_links/confirm, token in the body) via
+MagicLinkService.complete_sign_up, which claims the entry with the cache
+delete (single use). Why: between August and October a script typed ~89
+harvested business addresses into /auth, and corporate mail scanners that
+follow every link created an account for each one when the GET did it.
+Existing accounts are unchanged: their link signs in on the GET. The visitor
+sees the same redirect and flash for known and unknown addresses. Junk
+accounts from before the fix: `rake users:purge_unused` (dry run unless
+CONFIRM=1).
+
+## Cloudflare Turnstile (bot check on sign-up)
+- Turnstile (app/services/turnstile.rb) guards the two public sign-up surfaces:
+  MagicLinksController#create and Users::RegistrationsController#create, via the
+  TurnstileProtection concern (before_action, after the rate limits, before any
+  email lookup, so known and unknown addresses get the same refusal).
+- OFF unless BOTH TURNSTILE_SITE_KEY and TURNSTILE_SECRET_KEY are set (dev, tests
+  and a deploy without them behave as before; the production boot guard does NOT
+  require them). In deploy.yml env.secret and .kamal/secrets; blank = off.
+- Widget: AuthHelper#turnstile_widget (inside the magic-link form, the /auth
+  sign-up form and /users/sign_up), rendered explicitly by
+  turnstile_controller.js, which loads api.js?render=explicit once with the CSP
+  nonce. CSP (report-only) allows challenges.cloudflare.com for script-src and
+  frame-src.
+- Server check: POST to /turnstile/v0/siteverify with secret, token
+  (`cf-turnstile-response`) and request.remote_ip, Net::HTTP, 3s open / 5s read.
+  Missing or failed token: refused, warn. Cloudflare error/timeout/malformed
+  answer: FAILS CLOSED (refused, error log with the exception class), with its
+  own message. Never log the token, secret or email.
+- NOT on password sign-in for existing accounts (rate limits cover it), not on
+  the magic-link confirm page, not on password reset.
+- To turn on: Cloudflare dashboard -> Turnstile -> Add widget (Managed mode,
+  hostname whiskeysharesociety.com), copy Site Key -> TURNSTILE_SITE_KEY and
+  Secret Key -> TURNSTILE_SECRET_KEY in ~/.wss-production.env, redeploy.
+
 ## Admin invitations (fourth sign-in path)
 Auth::InvitationService (admin/invitations_controller, admin/users#resend_invitation,
 InvitationsController#show at /invitations/:token). An admin creates the User and

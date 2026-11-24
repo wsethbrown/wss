@@ -1,0 +1,40 @@
+{
+  "slug": "Cardhu",
+  "title": "Cardhu: The Women Behind Johnnie Walker's Malt",
+  "subtitle": "",
+  "category": "Scotch Whisky",
+  "difficulty": "Intermediate",
+  "duration": "45 min",
+  "description": "The Cumming family made whisky without a licence on a Speyside hill farm, and one account says Helen Cumming did the distilling. Her daughter-in-law Elizabeth built a new distillery and sold the old stills to the man starting Glenfiddich. In 1893 the family sold the distillery to John Walker & Sons. Four pours.",
+  "pours": [
+    {
+      "name": "Cardhu 12 Year Old",
+      "origin": "Cardhu, Knockando, Speyside",
+      "style": "Speyside single malt, 12 years",
+      "strength": "40% ABV",
+      "notes": "The distillery's own single malt. Diageo calls Cardhu a key malt in Johnnie Walker. Taste it by itself first."
+    },
+    {
+      "name": "Glenfiddich 12 Year Old",
+      "origin": "Glenfiddich, Dufftown, Speyside",
+      "style": "Speyside single malt, 12 years",
+      "strength": "40% ABV",
+      "notes": "William Grant started Glenfiddich in 1886 with the old stills and equipment he bought from Cardow for about £120."
+    },
+    {
+      "name": "Johnnie Walker Black Label",
+      "origin": "John Walker & Sons (Diageo)",
+      "style": "Blended Scotch whisky, 12 years",
+      "strength": "40% ABV",
+      "notes": "The firm that bought Cardow in 1893, its first distillery. Go back to glass 1 and look for the Cardhu in it."
+    },
+    {
+      "name": "Johnnie Walker Green Label",
+      "origin": "John Walker & Sons (Diageo)",
+      "style": "Blended malt Scotch whisky, 15 years",
+      "strength": "43% ABV",
+      "notes": "Malts from several distilleries and no grain, the same kind of whisky as the 2003 Cardhu Pure Malt. Sold as Johnnie Walker Pure Malt until 2004."
+    }
+  ],
+  "tags": "scotch, speyside, single malt, blended malt, johnnie walker, women in whisky"
+}

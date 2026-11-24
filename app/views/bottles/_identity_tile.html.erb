@@ -23,7 +23,7 @@
 <div class="shrink-0 overflow-hidden rounded-xl ring-1 <%= skin %>">
   <% if bottle.display_image %>
     <%= image_tag bottle.display_image.variant(:portrait),
-        class: "#{box} object-cover", alt: bottle.name %>
+        class: "#{box} object-cover", alt: bottle.name, data: { appear_target: "image" } %>
   <% else %>
     <div class="flex <%= box %> items-center justify-center">
       <%= render "bottles/placeholder", bottle: bottle,

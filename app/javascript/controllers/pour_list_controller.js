@@ -22,8 +22,10 @@ export default class extends Controller {
     const html = this.templateTarget.innerHTML.replace(/NEW_RECORD/g, new Date().getTime())
     this.containerTarget.insertAdjacentHTML("beforeend", html)
     this.renumber()
+    // A new pour arrives open (its <details> is rendered open) with the name
+    // box focused.
     const added = this.rowTargets[this.rowTargets.length - 1]
-    if (added) added.querySelector("input[type=search]")?.focus()
+    if (added) added.querySelector("input[name$='[name]']")?.focus()
   }
 
   // A ticked row stays in the DOM (Rails needs the _destroy field submitted)
@@ -41,6 +43,8 @@ export default class extends Controller {
     this.rowTargets.forEach((row, i) => {
       const position = row.querySelector("input[name*='[position]']")
       if (position) position.value = i + 1
+      const number = row.querySelector(".pour-num")
+      if (number) number.textContent = i + 1
     })
   }
 }

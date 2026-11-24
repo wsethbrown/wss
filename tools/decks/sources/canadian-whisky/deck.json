@@ -1,0 +1,40 @@
+{
+  "slug": "Canadian-Whisky",
+  "title": "Canadian Whisky",
+  "subtitle": "Canadian whisky and the American market",
+  "category": "Canadian Whisky",
+  "difficulty": "Beginner",
+  "duration": "45 min",
+  "description": "How Canadian whisky is made, and how distillers in Ontario and Quebec came to sell so much of it in the United States. Four pours.",
+  "pours": [
+    {
+      "name": "Canadian Club 1858",
+      "origin": "Hiram Walker & Sons, Windsor, Ontario",
+      "style": "Blended Canadian whisky",
+      "strength": "40% ABV",
+      "notes": "Walker’s brand, still made in Walkerville. Smell it before you add anything, then try it with a splash of soda or water."
+    },
+    {
+      "name": "Lot No. 40",
+      "origin": "Corby, at the Hiram Walker distillery, Windsor",
+      "style": "Canadian rye whisky, 100% rye",
+      "strength": "43% ABV",
+      "notes": "All rye, from a single copper pot still. This is close to what a flavouring whisky tastes like before it is blended."
+    },
+    {
+      "name": "Crown Royal Fine Deluxe",
+      "origin": "Diageo, at Gimli, Manitoba",
+      "style": "Blended Canadian whisky",
+      "strength": "40% ABV",
+      "notes": "Seagram’s blend from 1939, now made by Diageo. Compare it with the Canadian Club: two big blends, built mostly on base whisky."
+    },
+    {
+      "name": "Forty Creek Copper Pot Reserve",
+      "origin": "Forty Creek Distillery, Grimsby, Ontario (Campari)",
+      "style": "Canadian whisky",
+      "strength": "43% ABV",
+      "notes": "Made on the Niagara Peninsula at a distillery a winemaker took over in 1992. The grains are distilled and aged apart, then blended."
+    }
+  ],
+  "tags": "canadian, history, blending, prohibition"
+}

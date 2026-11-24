@@ -15,7 +15,7 @@ class AccountNavigationTest < ApplicationSystemTestCase
   # magic-link field, "Use a password instead" reveals the password form for an
   # existing account, which copies the email into #signin-email.
   def sign_in_user
-    visit auth_path
+    visit_sign_in_page
 
     fill_in "magic-link-email", with: @user.email
     find("#password-toggle").click
@@ -28,9 +28,50 @@ class AccountNavigationTest < ApplicationSystemTestCase
 
     # Signed in once the nav offers "Sign out" (the sign-in redirect target may vary).
     assert_link "Sign out"
+    # Let that Turbo visit finish (it renders inside a view transition) before
+    # the next navigation starts. The CI timeline for a lost tab click showed
+    # /account loading while the sign-in visit's transition was still running.
+    assert_no_selector "html[aria-busy='true']", visible: :all
+
+    # Let the sign-in redirect finish before leaving the page. "Sign out" shows as
+    # soon as Turbo renders the dashboard, while its visit and page transition are
+    # still running. A CI failure's timeline showed this test navigating away at
+    # that moment, after which Chrome delivered none of the clicks sent to the
+    # account page (no pointerdown ever reached it).
+    wait_for_turbo_visit
 
     visit account_path
     assert_current_path account_path
+    wait_for_account_tabs
+  end
+
+  # The account-tabs Stimulus controller sets data-account-tabs-ready as the
+  # last step of connect(), after its click listener is bound and the initial
+  # tab is active. Wait for it before any click: on a cold first page load the
+  # controller is imported asynchronously and an early click would be lost.
+  def wait_for_account_tabs
+    assert_selector "[data-controller~='account-tabs'][data-account-tabs-ready='true']"
+  end
+
+  # Clicks a tab and makes sure the click arrived. Three CI failures had the
+  # same timeline: WebDriver sent clicks to /account straight after it loaded
+  # and Chrome delivered none of them (no pointerdown ever reached the page),
+  # even with the controller ready and the previous visit finished. A person
+  # whose click did nothing clicks again, so the helper does too, and prints a
+  # line when it had to, so the output shows how often clicks are being lost.
+  def click_tab(name)
+    selected = "[data-tab='#{name}'][role='tab'][aria-selected='true']"
+    2.times do |attempt|
+      find("[data-tab='#{name}']").click
+      return if has_selector?(selected, wait: 1)
+      puts "account tab '#{name}': click #{attempt + 1} did not select it; clicking again"
+    end
+    # Two clicks lost means this page is not receiving input at all (in CI, six
+    # clicks over five seconds never reached it). Load it again and click once more.
+    puts "account tab '#{name}': the page is not receiving clicks; reloading it"
+    visit account_path
+    wait_for_account_tabs
+    find("[data-tab='#{name}']").click
   end
 
   def assert_tab_selected(name)
@@ -63,7 +104,7 @@ class AccountNavigationTest < ApplicationSystemTestCase
   test "clicking account details tab shows account details content" do
     sign_in_user
 
-    find("[data-tab='account-details']").click
+    click_tab("account-details")
 
     assert_tab_selected("account-details")
     assert_selector "[data-tab='profile'][aria-selected='false']"
@@ -77,15 +118,15 @@ class AccountNavigationTest < ApplicationSystemTestCase
 
     assert_only_panel_visible("profile")
 
-    find("[data-tab='account-details']").click
+    click_tab("account-details")
     assert_tab_selected("account-details")
     assert_only_panel_visible("account-details")
 
-    find("[data-tab='presentations']").click
+    click_tab("presentations")
     assert_tab_selected("presentations")
     assert_only_panel_visible("presentations")
 
-    find("[data-tab='profile']").click
+    click_tab("profile")
     assert_tab_selected("profile")
     assert_only_panel_visible("profile")
   end
@@ -111,7 +152,7 @@ class AccountNavigationTest < ApplicationSystemTestCase
 
     # Each tab selects itself and shows only its own panel
     tabs.each do |t|
-      find("[data-tab='#{t[:tab]}']").click
+      click_tab("#{t[:tab]}")
       assert_tab_selected(t[:tab])
       assert_only_panel_visible(t[:tab])
     end

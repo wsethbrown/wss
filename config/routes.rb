@@ -4,7 +4,8 @@ Rails.application.routes.draw do
   # the OmniAuth strategies (signature-checked); we no longer hand-roll any callback.
   devise_for :users, controllers: {
     omniauth_callbacks: "users/omniauth_callbacks",
-    registrations: "users/registrations"
+    registrations: "users/registrations",
+    passwords: "users/passwords"
   }, skip: [ :sessions ]
 
   devise_scope :user do
@@ -28,6 +29,9 @@ Rails.application.routes.draw do
   # Magic Links
   post "magic_links", to: "magic_links#create"
   get "magic_links/:token", to: "magic_links#show", as: "magic_link"
+  # A new account's link opens a confirmation page; its button posts here
+  # (token in the body, never the path) and only then is the account created.
+  post "magic_links/confirm", to: "magic_links#confirm", as: "confirm_magic_link"
 
   # Admin invitations: the claim link from the invite email.
   get "invitations/:token", to: "invitations#show", as: :invitation
@@ -41,9 +45,9 @@ Rails.application.routes.draw do
   # Contact addresses (hello@ / support@ / partners@)
   get "contact", to: "home#contact"
 
-  # The signed-in landing page. /dashboard and /account render the same account
-  # surface; /dashboard is the canonical post-authentication destination.
-  get "dashboard", to: "account#index", as: :dashboard
+  # The signed-in landing page (DashboardController): next tastings, what is
+  # waiting on you, your societies. /account is the account page.
+  get "dashboard", to: "dashboard#index", as: :dashboard
 
   # Account
   get "account", to: "account#index"
@@ -123,9 +127,21 @@ Rails.application.routes.draw do
   # Admin panel
   namespace :admin do
     get "dashboard", to: "dashboard#index"
+    # Finished deck packages (.zip): "Upload a package" creates a new draft;
+    # "Replace with a package" updates that one deck in place.
+    resources :deck_packages, only: [ :new, :create ]
     resources :presentations do
       collection { post :import }
       member { post :publish; post :unpublish; post :render_slides }
+      # "What the customer sees" on the Listing tab: the deck page's top,
+      # takeaways, story teaser and extra sections, rendered from the typed
+      # (unsaved) fields. Collection for a deck not created yet.
+      post :preview, on: :collection
+      post :preview, on: :member
+      resource :package, only: [ :new, :create ], controller: "deck_packages"
+      # "Open" on the deck page: one of the deck's files by slot name (a
+      # whitelist in the controller), for any admin, whoever owns the deck.
+      get "files/:slot", to: "presentation_files#show", as: :file
       # The deck's pour list, linked to catalog bottles (Phase 3 deck ties).
     end
     resources :users, only: [ :index, :show, :edit, :update ] do
@@ -155,6 +171,8 @@ Rails.application.routes.draw do
       end
     end
     resources :activities, only: [ :index, :show ]
+    # The deck-news list (read-only): counts and the active addresses.
+    get "mailing_list", to: "mailing_list#index"
 
     # Bottles moderation
     resources :bottles, only: [ :index, :show, :edit, :update ] do
@@ -245,6 +263,15 @@ Rails.application.routes.draw do
   # List-Unsubscribe-Post header points mail clients at the POST.
   get "event_mute", to: "event_mutes#show", as: :event_mute
   post "event_mute", to: "event_mutes#create"
+
+  # "Tell me when a new deck is published" (DeckNewsController): the form, a
+  # confirm link whose page POSTs (token in the body, never acted on by a
+  # GET), and a signed unsubscribe link, also the List-Unsubscribe-Post target.
+  post "deck_news", to: "deck_news#create", as: :deck_news
+  get "deck_news/confirm/:token", to: "deck_news#confirmation", as: :deck_news_confirmation
+  post "deck_news/confirm", to: "deck_news#confirm", as: :confirm_deck_news
+  get "deck_news/unsubscribe", to: "deck_news#unsubscribe", as: :deck_news_unsubscribe
+  post "deck_news/unsubscribe", to: "deck_news#remove"
 
   # SEO: the sitemap (public pages only; the veil rules hold).
   get "sitemap.xml", to: "sitemaps#show", format: :xml

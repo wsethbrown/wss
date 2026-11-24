@@ -114,8 +114,12 @@ class Presentations::DownloadsController < ApplicationController
 
   def set_presentation
     @presentation = Presentation.find(params[:presentation_id])
-    # Drafts are not for sale/download: 404 for non-admins (see PresentationsController).
-    raise ActiveRecord::RecordNotFound unless @presentation.published? || current_user&.admin?
+    # An unpublished deck's files stay with the people who own it (and admins);
+    # to everyone else it 404s like a draft (see PresentationsController).
+    return if @presentation.visible_to?(current_user)
+
+    Rails.logger.info "Download of unpublished presentation #{@presentation.id} refused for #{current_user ? "user #{current_user.id}" : 'a signed-out visitor'}: no access"
+    raise ActiveRecord::RecordNotFound
   end
 
   def check_access
@@ -126,7 +130,7 @@ class Presentations::DownloadsController < ApplicationController
     elsif @presentation.purchased_by?(current_user)
       # Owns the deck via a credit but the membership has lapsed, downloads
       # come back when the membership does.
-      redirect_to root_path(anchor: "pricing"),
+      redirect_to membership_path(anchor: "pricing"),
                   alert: "This deck was unlocked with a credit. Reactivate your membership to download it"
     else
       redirect_to new_presentation_purchase_path(@presentation),

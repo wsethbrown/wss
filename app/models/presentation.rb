@@ -58,10 +58,16 @@ class Presentation < ApplicationRecord
   # Validations
   validates :title, presence: true, length: { minimum: 2, maximum: 200 }
   validates :description, length: { maximum: 1000 }
+  SUBTITLE_MAX = 140
+  validates :subtitle, length: { maximum: SUBTITLE_MAX, message: "can be at most #{SUBTITLE_MAX} characters" }
   validates :content, presence: true
   validates :price, numericality: { greater_than_or_equal_to: 0 }
   validates :category, length: { maximum: 100 }
   validates :difficulty, inclusion: { in: %w[Beginner Intermediate Advanced], allow_blank: true }
+  # Checked only when the sections change, so a deck whose sections were
+  # written before a limit existed (the tasting-notes migration) can still be
+  # saved for an unrelated edit.
+  validate :sections_within_limits, if: :will_save_change_to_sections?
 
   # Publishing gate: a deck cannot go live without the file buyers download
   # and its rendered slide previews (the buyer page leans on the slide strip;
@@ -69,6 +75,14 @@ class Presentation < ApplicationRecord
   # draft->published transition only, so unrelated edits to legacy published
   # records don't get stuck.
   validate :ready_to_publish, if: -> { published? && will_save_change_to_published? }
+
+  # No accidental free decks: a deck goes live at $0 (or a live deck drops to
+  # $0) only when the admin ticks "This deck is free". Not a column: it is
+  # asked for again on every such change. Free decks stay possible; they are
+  # claimable without Stripe.
+  attribute :free_confirmed, :boolean, default: false
+  validate :free_publish_confirmed,
+           if: -> { published? && price.present? && price.zero? && (will_save_change_to_published? || will_save_change_to_price?) }
 
   # File attachment validations
   validate :featured_image_validation
@@ -97,6 +111,131 @@ class Presentation < ApplicationRecord
   def tag_names=(value)
     names = value.to_s.split(",").map { |n| n.strip.downcase }.reject(&:blank?).uniq.first(10)
     self.tags = names.map { |n| Tag.find_or_create_by(name: n) { |t| t.category = "deck" } }
+  end
+
+  # The subtitle: one line under the title on the deck page. Optional;
+  # stripped, and blank is stored as nil (nothing renders).
+  def subtitle=(value)
+    super(value.is_a?(String) ? value.squish.presence : value)
+  end
+
+  # --- Extra sections ---------------------------------------------------------
+  #
+  # The deck page's free-form sections, in order, stored as
+  # [{ "heading" => String, "lines" => [String] }] and rendered by
+  # presentations/_extra_sections (one line per row; "Label: text" is a
+  # labelled row). Plain text only: no Markdown, no HTML. They replaced the
+  # four fixed tasting boxes. Filled from a package's deck.json
+  # (DeckPackageImport) or typed on the admin Listing tab, where each
+  # section's lines arrive as one textarea string.
+  SECTIONS_MAX = 8
+  SECTION_HEADING_MAX = 80
+  SECTION_LINES_MAX = 12
+  SECTION_LINE_MAX = 300
+
+  # Normalised on assignment, so the form, the importer and the preview all
+  # store the same shape: headings and lines stripped, blank lines dropped,
+  # and a section with neither a heading nor a line dropped. Lines may come as
+  # a list or as one string with a line per item. Entries that are not a
+  # heading-and-lines object are kept as they are, for the validation to
+  # refuse.
+  def sections=(value)
+    super(self.class.normalize_sections(value))
+  end
+
+  def self.normalize_sections(value)
+    value = value.to_unsafe_h if value.respond_to?(:to_unsafe_h)
+    # A hash keyed "0", "1", ... (indexed form fields) is taken in key order.
+    value = value.sort_by { |key, _| key.to_s.to_i }.map(&:last) if value.is_a?(Hash)
+    return value unless value.is_a?(Array)
+
+    value.filter_map do |entry|
+      entry = entry.to_unsafe_h if entry.respond_to?(:to_unsafe_h)
+      next entry unless entry.is_a?(Hash)
+
+      entry = entry.stringify_keys
+      heading = entry["heading"].to_s.squish
+      raw_lines = entry["lines"].is_a?(Array) ? entry["lines"] : entry["lines"].to_s.split(/\r?\n/)
+      lines = raw_lines.map { |line| line.to_s.strip }.reject(&:blank?)
+      next if heading.blank? && lines.empty?
+
+      { "heading" => heading, "lines" => lines }
+    end
+  end
+
+  # What is wrong with a list of sections, as phrases that follow "Extra
+  # sections" (the model's errors) or a deck.json key (the importer's).
+  # Empty when the list is fine.
+  def self.section_problems(list)
+    section_problems_by_section(list).map(&:last)
+  end
+
+  # The 1-based numbers of the sections at fault, so the form marks only
+  # those. A problem with the list as a whole (too many sections, not a list)
+  # is no one section's: then every section is marked.
+  def self.sections_in_error(list)
+    numbers = section_problems_by_section(list).map(&:first)
+    return (1..Array(list).size).to_a if numbers.include?(nil)
+
+    numbers.uniq
+  end
+
+  # [[section number or nil, phrase], ...]
+  def self.section_problems_by_section(list)
+    return [ [ nil, "must be a list of sections" ] ] unless list.is_a?(Array)
+
+    problems = []
+    if list.size > SECTIONS_MAX
+      problems << [ nil, "can have at most #{SECTIONS_MAX} sections (there are #{list.size})" ]
+    end
+    list.each.with_index(1) do |section, n|
+      unless section.is_a?(Hash) && section["heading"].is_a?(String) && section["lines"].is_a?(Array)
+        problems << [ n, "need a heading and a list of lines in section #{n}" ]
+        next
+      end
+
+      heading, lines = section["heading"], section["lines"]
+      problems << [ n, "need a heading in section #{n}" ] if heading.blank?
+      if heading.length > SECTION_HEADING_MAX
+        problems << [ n, "allow headings of up to #{SECTION_HEADING_MAX} characters (section #{n} has #{heading.length})" ]
+      end
+      problems << [ n, "need at least one line in section #{n}" ] if lines.empty?
+      if lines.size > SECTION_LINES_MAX
+        problems << [ n, "allow up to #{SECTION_LINES_MAX} lines in a section (section #{n} has #{lines.size})" ]
+      end
+      lines.each.with_index(1) do |line, i|
+        next if line.to_s.length <= SECTION_LINE_MAX
+
+        problems << [ n, "allow lines of up to #{SECTION_LINE_MAX} characters (section #{n}, line #{i} has #{line.to_s.length})" ]
+      end
+    end
+    problems
+  end
+
+  # --- Takeaways ("What you'll learn") ----------------------------------------
+  #
+  # Stored in what_youll_learn as text: "- Title\nOne sentence", entries
+  # separated by a blank line. That is the format the admin's takeaway editor
+  # (what_youll_learn_controller.js) writes and #parsed_what_youll_learn reads.
+  # This is the one writer of it from a list, used by DeckPackageImport.
+  # Titles and text are squished onto one line each, so they read back as
+  # written; an entry without a title is dropped (the format cannot hold one).
+  def takeaways=(list)
+    self.what_youll_learn = self.class.what_youll_learn_text(list)
+  end
+
+  def takeaways
+    parsed_what_youll_learn.map { |point| { "title" => point[:title], "text" => point[:description] } }
+  end
+
+  def self.what_youll_learn_text(list)
+    Array(list).filter_map do |entry|
+      entry = entry.stringify_keys
+      title = entry["title"].to_s.squish
+      next if title.blank?
+
+      "- #{title}\n#{entry['text'].to_s.squish}"
+    end.join("\n\n").presence
   end
 
   # THE pour list. Every reader goes through this: the deck page, the buyer's
@@ -176,7 +315,8 @@ class Presentation < ApplicationRecord
 
   def formatted_price
     return "Free" if free?
-    "$#{price}"
+    # Always two decimals: a price stored as 19.0 reads "$19.00", not "$19.0".
+    format("$%.2f", price)
   end
 
   def excerpt(length = 150)
@@ -202,6 +342,13 @@ class Presentation < ApplicationRecord
     user_presentations.exists?(user: user)
   end
 
+  # For labels only ("Included with your membership"): the deck is published and
+  # included, and this user's membership is active. Access itself is decided by
+  # User#can_access_presentation?, which applies the same rule.
+  def included_for?(user)
+    published? && included_with_membership? && user.present? && user.has_active_subscription?
+  end
+
   # File access control methods
   def can_view_sneak_peek?(user = nil)
     # Sneak peek is always available to everyone
@@ -215,6 +362,15 @@ class Presentation < ApplicationRecord
     # Delegates to the access rule that understands purchase types: direct
     # purchases are forever, credit purchases require an active subscription.
     user.can_access_presentation?(id)
+  end
+
+  # Who can open the deck page, present it and download its files. A published
+  # deck is open to everyone (downloads still check access). Unpublishing only
+  # takes a deck out of the library, search and new purchases: anyone whose
+  # ownership grants access today (can_download_full_presentation?: admins,
+  # direct owners, credit owners with an active membership) keeps it.
+  def visible_to?(user)
+    published? || can_download_full_presentation?(user)
   end
 
   def can_download_speaker_notes?(user)
@@ -381,6 +537,10 @@ class Presentation < ApplicationRecord
 
   private
 
+  def sections_within_limits
+    self.class.section_problems(sections).each { |problem| errors.add(:sections, problem) }
+  end
+
   def ready_to_publish
     unless pdf_file.attached?
       errors.add(:base, "Attach the deck file (the presentation buyers download) before publishing")
@@ -394,6 +554,13 @@ class Presentation < ApplicationRecord
     else
       errors.add(:base, "No slide previews have been rendered for this deck, re-render them, then publish")
     end
+  end
+
+  def free_publish_confirmed
+    return if free_confirmed
+
+    errors.add(:base, "The price is $0, so publishing would make this deck free for everyone. " \
+                      "Set a price, or tick \"This deck is free\" to publish it free on purpose")
   end
 
   def featured_image_validation

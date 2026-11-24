@@ -32,7 +32,7 @@
       <% if review.user == current_user %>
         <%= link_to "Edit", edit_review_path(review), class: "text-sm font-semibold text-ink hover:underline" %>
       <% end %>
-      <%= link_to "Read the full tasting →", review_path(review), class: "text-sm font-semibold text-ink hover:underline" %>
+      <%= link_to with_arrow("Read the full tasting"), review_path(review), class: "text-sm font-semibold text-ink hover:underline" %>
     </span>
   </div>
 </article>

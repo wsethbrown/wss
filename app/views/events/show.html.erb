@@ -65,6 +65,18 @@
             </span>
           </span>
         </div>
+
+        <%# Add to calendar: the .ics (Apple Calendar, Outlook, anything) and a
+            Google Calendar link. Same permission as this page. Upcoming only. %>
+        <% if @event.upcoming? %>
+          <div class="mt-4 flex flex-wrap items-center gap-x-2 gap-y-2 text-sm" aria-label="Add to calendar" role="group">
+            <span class="font-medium text-ink">Add to calendar</span>
+            <%= link_to "Apple or Outlook (.ics)", society_event_path(@event.society, @event, format: :ics),
+                  class: "chip min-h-11", data: { turbo: false } %>
+            <%= link_to "Google Calendar", google_calendar_url(@event),
+                  class: "chip min-h-11", target: "_blank", rel: "noopener" %>
+          </div>
+        <% end %>
       </div>
 
       <%# RSVP. The reason a member opens this page, so it gets the card beside
@@ -72,22 +84,16 @@
           Edit is an organiser's tool and sits quietly at the bottom. %>
       <div class="card w-full p-5 sm:p-6 lg:w-[380px] lg:shrink-0">
         <% if user_signed_in? %>
+          <%# Answers stay open until the start; a new yes closes 24 hours out
+              (Event#answer_allowed?), which the control shows by disabling Yes. %>
           <% if @event.upcoming? && !@event.rsvp_closed? %>
             <% user_rsvp = @event.event_rsvps.find_by(user: current_user) %>
             <%= render "rsvp_buttons", event: @event, user_rsvp: user_rsvp %>
-          <% elsif @event.upcoming? %>
-            <% user_rsvp = @event.event_rsvps.find_by(user: current_user) %>
-            <p class="text-sm text-mute">
-              <% if user_rsvp %>
-                You said <span class="font-semibold text-ink"><%= user_rsvp.status %></span>.
-              <% end %>
-              RSVPs closed 24 hours before the night.
-            </p>
           <% else %>
             <p class="text-sm text-mute">This night has passed.</p>
           <% end %>
         <% else %>
-          <%= link_to "Sign in to RSVP", new_user_session_path, class: "btn-primary w-full" %>
+          <%= link_to "Sign in to RSVP", sign_in_path_returning, class: "btn-primary w-full" %>
         <% end %>
 
         <p class="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 border-t border-hairline pt-4 text-sm text-mute">
@@ -141,13 +147,13 @@
             <% if @event.presentation %>
               <%= link_to presentation_path(@event.presentation), class: "group block" do %>
                 <p class="text-lg font-semibold leading-snug text-ink group-hover:text-whiskey-500"><%= @event.presentation.title %></p>
-                <p class="mt-1 text-sm font-semibold text-ink">See the deck <span aria-hidden="true">→</span></p>
+                <p class="mt-1 text-sm font-semibold text-ink">See the deck <span class="arrow" aria-hidden="true">→</span></p>
               <% end %>
             <% else %>
               <p class="text-sm text-mute">No deck attached. Plenty of nights run without one.</p>
             <% end %>
             <% if user_signed_in? && policy(@event).manage_deck? %>
-              <% if deck_options_for(@event).any? %>
+              <% if @event.offerable_decks.any? %>
                 <%= form_with url: assign_deck_society_event_path(@event.society, @event), method: :patch, local: true, class: "space-y-2" do %>
                   <%= render "events/autocomplete_field",
                       name: "presentation_id",
