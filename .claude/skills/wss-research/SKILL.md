@@ -36,6 +36,20 @@ Best first:
 On a contested topic, read more than one side before you write. Say who holds each position
 and what each rests on.
 
+Four habits the research on research methods supports (details and sources in
+`reference/research-practices.md`):
+
+- **Judge an unfamiliar source from outside it.** Find out who is behind a site, book or
+  organization from other sources before trusting what it says about itself. A polished page
+  proves nothing.
+- **Trace a claim to where it first appears.** A later retelling is only as good as its
+  origin. If the trail ends nowhere, the claim is unsourced, however often it is repeated.
+- **Count independent origins, not repetitions.** Ten pages repeating one story are one
+  source. Shared wording, shared order and shared mistakes mean copying.
+- **Do not treat a search result or an AI summary as a source.** Search rank is not
+  reliability, and AI-generated citations and quotations are often wrong. Open the document
+  and find the words in it.
+
 ## How to report
 
 Do these every time:
@@ -77,6 +91,11 @@ factual claim is not.
 3. What is disputed or unresolved, and what would settle it.
 4. Sources: what each one is (primary, secondary, weak), its date, and how much of it you
    read. List what you looked for and could not find or could not open.
+
+For anything longer than a quick answer, keep a search log as you go: where you looked, the
+date, the terms, and what you looked for and did not find. "Searched X on this date and found
+nothing" is a finding about that search, not proof the thing did not happen; report it that
+way. Keep what a source says and what you conclude from it in separate sentences.
 
 Keep quotations exact and short. Never invent a citation, a page number, a date or a quote
 to make a claim look sourced: an honest "uncertain" is the correct output when the evidence

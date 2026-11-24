@@ -19,6 +19,9 @@ way round.
 The general rules for any research (when to search, which sources to trust, and how to
 label what is sourced, inferred and uncertain) are in the `wss-research` skill. Read it
 first; this section adds what is particular to a deck.
+Its `reference/research-practices.md` ends with working rules for deck research (tracing a
+story to its first appearance in print, treating reprints and repeats as one source, searching
+digitized newspapers, brand pages as claims, and keeping a search log in the outline).
 
 "You need to do thorough research." Facts from memory are not acceptable, however sure you
 feel. Memory is where to start looking, never the source. Everything in "What's established"
