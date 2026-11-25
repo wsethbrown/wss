@@ -45,8 +45,8 @@ Rails.application.routes.draw do
   # Contact addresses (hello@ / support@ / partners@)
   get "contact", to: "home#contact"
 
-  # Live interactive homepage design concepts (/concepts/1, /concepts/2, /concepts/3)
-  get "concepts/:id", to: "home#concept", as: :home_concept, constraints: { id: /[123]/ }
+  # Live interactive homepage design concepts (/concepts/1..4)
+  get "concepts/:id", to: "home#concept", as: :home_concept, constraints: { id: /[1-4]/ }
 
   # The signed-in landing page (DashboardController): next tastings, what is
   # waiting on you, your societies. /account is the account page.

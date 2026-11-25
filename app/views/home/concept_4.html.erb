@@ -1,0 +1,322 @@
+<% content_for :title, "Concept 4: Theatre of the Pour — Whiskey Share Society" %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "concepts/concept4" %>
+<% end %>
+
+<%
+  showcase_slides = @showcase_deck ? hero_reel_slides(@showcase_deck) : []
+  sample_date = @next_event ? @next_event.start_time.in_time_zone(@next_event.effective_time_zone) : Date.current.next_occurring(:friday)
+  invite_title = @next_event ? @next_event.title : "Bourbon night"
+  invite_where = @next_event ? [ @next_event.society.name, @next_event.location.presence ].compact.join(" · ") : "Your society · Your living room"
+
+  pours = [
+    { name: "Buffalo Trace",          proof: "90°",    score: "4.10", rank_label: "#4", sub: "Vanilla bean & bright orange peel" },
+    { name: "Maker's Mark 46",        proof: "94°",    score: "4.25", rank_label: "#3", sub: "Caramel, baked apple & French oak" },
+    { name: "Heaven Hill 7yr BiB",    proof: "100°",   score: "4.40", rank_label: "#2", sub: "Roasted peanut & warm baking spice" },
+    { name: "Wild Turkey Rare Breed", proof: "116.8°", score: "4.65", rank_label: "#1", sub: "Cinnamon heat & deep barrel char" }
+  ]
+  palate_axes = [
+    [ "Sweet",   -90 ], [ "Oaky",    -45 ], [ "Spicy",     0 ], [ "Fruity",   45 ],
+    [ "Smoky",    90 ], [ "Grainy",  135 ], [ "Floral",  180 ], [ "Coastal", 225 ]
+  ]
+  rules = [
+    "One presenter a month, everyone takes a turn.",
+    "Research your topic like you mean it.",
+    "Choose the bottles that belong to the story.",
+    "No dry fact sheets. Follow the narrative threads."
+  ]
+%>
+
+<div class="c4" data-controller="concept-four">
+  <!-- ======================================================================
+       TRIGGER-DRIVEN FULL-VIEWPORT THEATRE
+       Scroll only selects the Beat; every transition plays to FULL completion!
+       ====================================================================== -->
+  <section class="c4-theatre" data-concept-four-target="theatre" aria-label="The Whiskey Share Society story">
+    <!-- Five invisible scroll sentinel zones -->
+    <div class="c4-sentinels" aria-hidden="true">
+      <% 5.times do %><div class="c4-sentinel" data-concept-four-target="sentinel"></div><% end %>
+    </div>
+
+    <!-- ONE fixed/parked 100vw x 100svh choreographed stage -->
+    <div class="c4-stage" data-concept-four-target="stage" data-beat="0">
+      <!-- Clock-driven room transitions: Iris Wipe & Curtain Dim -->
+      <div class="c4-iris-orange" aria-hidden="true"></div>
+      <div class="c4-room-dark" aria-hidden="true"></div>
+      <div class="c4-verdict-glow" aria-hidden="true"></div>
+
+      <!-- Beat 2 Duotone Living Room Cinema Shutter -->
+      <div class="c4-invite-photo" aria-hidden="true">
+        <%= image_tag "photos/tasting-night-living-room.jpg", alt: "" %>
+      </div>
+
+      <!-- Beat 3 Rising Oak Tasting Table -->
+      <div class="c4-oak-table" aria-hidden="true"></div>
+
+      <!-- Beat 3 Animated Pour Stream -->
+      <svg class="c4-pour-svg" data-concept-four-target="pourSvg" viewBox="0 0 24 170" aria-hidden="true">
+        <path class="c4-pour-path" d="M 12 0 Q 14 85 12 166"/>
+        <path class="c4-pour-highlight" d="M 10 4 Q 12 85 10 162"/>
+      </svg>
+
+      <!-- ====== MASKED KINETIC COPY BEATS (0..4) ====== -->
+      <div class="c4-copy c4-copy--0 is-active" data-concept-four-target="copy">
+        <span class="c4-act-label c4-fade">Est. 2019 · Narrative Tasting Decks</span>
+        <h1>
+          <span class="c4-line"><span>Every pour</span></span>
+          <span class="c4-line"><span>has <em>a story.</em></span></span>
+        </h1>
+        <p class="c4-fade">Slide decks built for whiskey nights that hold together — the research done, the script written, the bottles picked.</p>
+        <div class="c4-copy-acts c4-fade">
+          <%= link_to "Browse the decks", presentations_path, class: "btn-th" %>
+          <button type="button" class="btn-th btn-th--quiet" data-beat="1" data-action="click->concept-four#jumpBeat">Start the night ↓</button>
+        </div>
+      </div>
+
+      <div class="c4-copy c4-copy--1" data-concept-four-target="copy">
+        <span class="c4-act-label c4-fade">Act I · Pick a deck</span>
+        <h2>
+          <span class="c4-line"><span>Choose the night</span></span>
+          <span class="c4-line"><span><em>you want to host.</em></span></span>
+        </h2>
+        <p class="c4-fade">Tap either deck beside the spotlight to swap it into tonight's invite.</p>
+      </div>
+
+      <div class="c4-copy c4-copy--2 c4-copy--orange" data-concept-four-target="copy">
+        <span class="c4-act-label c4-fade">Act II · Gather your society</span>
+        <div class="c4-big-date"><span class="c4-line"><span><%= sample_date.strftime("%b %-d") %></span></span></div>
+        <h2><span class="c4-line"><span><%= invite_title %></span></span></h2>
+        <p class="c4-fade"><%= invite_where %> · Featuring <strong data-concept-four-target="deckTitle">Bourbon Basics</strong>.</p>
+        <div class="c4-copy-acts c4-fade">
+          <button type="button" class="c4-rsvp-chip" data-concept-four-target="rsvpChip" data-action="click->concept-four#toggleRsvp">Save my seat</button>
+          <%= link_to "Browse societies →", societies_path, class: "btn-th btn-th--quiet" %>
+        </div>
+      </div>
+
+      <div class="c4-copy c4-copy--3 c4-copy--dark" data-concept-four-target="copy">
+        <span class="c4-act-label c4-fade">Act III · Pour &amp; present</span>
+        <h2>
+          <span class="c4-line"><span>Open <em data-concept-four-target="deckTitle">Bourbon Basics</em>.</span></span>
+          <span class="c4-line"><span>Pour the flight.</span></span>
+        </h2>
+      </div>
+
+      <div class="c4-copy c4-copy--4 c4-copy--dark" data-concept-four-target="copy">
+        <span class="c4-act-label c4-fade">Act IV · The verdict</span>
+        <h2>
+          <span class="c4-line"><span>Four pours,</span></span>
+          <span class="c4-line"><span><em>ranked by the room.</em></span></span>
+        </h2>
+        <p class="c4-fade">Hover or tap any pour to morph the palate wheel.</p>
+      </div>
+
+      <!-- ====== CLICKABLE SIBLING DECKS (Beat 1) ====== -->
+      <button type="button" class="c4-sib c4-sib--left" data-title="Peated Islay & Smoke" data-action="click->concept-four#swapDeck">
+        <div class="c4-sib-art">
+          <%= image_tag "photos/deck-pour-decanter.jpg", alt: "" %>
+          <span>Scotch Whisky</span>
+          <strong>Peated Islay &amp; Smoke</strong>
+        </div>
+        <div class="c4-sib-foot"><span>4 pours · 20 min</span><small>Tap to pick</small></div>
+      </button>
+
+      <button type="button" class="c4-sib c4-sib--right" data-title="Japanese Whisky Craft" data-action="click->concept-four#swapDeck">
+        <div class="c4-sib-art">
+          <%= image_tag "photos/reviews-glass-book.jpg", alt: "" %>
+          <span>Japanese Whisky</span>
+          <strong>Japanese Whisky Craft</strong>
+        </div>
+        <div class="c4-sib-foot"><span>4 pours · 18 min</span><small>Tap to pick</small></div>
+      </button>
+
+      <!-- ====== SHARED ELEMENT #1: THE HERO DECK SLIDE ====== -->
+      <div class="c4-deck" data-action="click->concept-four#nextSlide" role="button" tabindex="0" aria-label="Click to flip slide">
+        <div class="c4-deck-shell" data-concept-four-target="deckShell">
+          <div class="c4-deck-screen">
+            <div class="c4-deck-sheen" data-concept-four-target="deckSheen"></div>
+            <% if showcase_slides.any? %>
+              <% showcase_slides.first(4).each_with_index do |slide, i| %>
+                <div class="c4-dslide <%= 'is-active' if i.zero? %>" data-concept-four-target="dslide">
+                  <%= image_tag image_variant(slide, :hero), alt: "" %>
+                </div>
+              <% end %>
+            <% else %>
+              <div class="c4-dslide is-active" data-concept-four-target="dslide">
+                <div class="c4-vs">
+                  <div>
+                    <%= image_tag "wss-logo-inverted.png", alt: "", class: "c4-vs-logo" %>
+                    <div class="c4-vs-h" data-concept-four-target="deckTitle">Bourbon Basics</div>
+                    <div class="c4-vs-line"></div>
+                    <div class="c4-vs-p">Four pours, lowest proof first, and what the words on their labels actually mean.</div>
+                  </div>
+                  <div class="c4-vs-pic"><%= image_tag "photos/rickhouse.jpg", alt: "" %></div>
+                </div>
+              </div>
+              <div class="c4-dslide" data-concept-four-target="dslide">
+                <div class="c4-vs c4-vs--paper">
+                  <div>
+                    <div class="c4-vs-h">51% Corn.<br>New Oak.</div>
+                    <div class="c4-vs-line"></div>
+                    <div class="c4-vs-p">Not a secret recipe — four strict federal rules you can taste in every glass.</div>
+                  </div>
+                  <div class="c4-vs-pic"><%= image_tag "photos/deck-pour-decanter.jpg", alt: "" %></div>
+                </div>
+              </div>
+              <div class="c4-dslide" data-concept-four-target="dslide">
+                <div class="c4-vs c4-vs--orange">
+                  <div>
+                    <div class="c4-vs-h">55 seconds<br>of fire.</div>
+                    <div class="c4-vs-line"></div>
+                    <div class="c4-vs-p">Char No. 4 blisters white oak into alligator skin — caramelizing sugars into vanilla and spice.</div>
+                  </div>
+                  <div class="c4-vs-pic"><%= image_tag "photos/saloon-1897.jpg", alt: "" %></div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+          <div class="c4-deck-bar">
+            <b data-concept-four-target="deckCapL">Bourbon Basics</b>
+            <span data-concept-four-target="deckCapR">24 slides · Click to flip</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====== THE 4 PHYSICAL TASTING GLASS ACTORS (Parabolic Arcs + Slosh!) ====== -->
+      <% pours.each_with_index do |pour, k| %>
+        <div class="c4-glass"
+             data-concept-four-target="glass"
+             data-index="<%= k %>"
+             data-action="click->concept-four#tapGlass mouseenter->concept-four#hoverRank">
+          <%= render "shared/glass", level: 1, size: 96, appear: false %>
+
+          <div class="c4-gcap" data-concept-four-target="gcap">
+            <b><%= pour[:name] %></b>
+            <small>Pour <%= k + 1 %> · <%= pour[:proof] %></small>
+          </div>
+
+          <div class="c4-rank <%= 'is-active' if k == 3 %>"
+               data-concept-four-target="rank"
+               data-index="<%= k %>"
+               data-action="mouseenter->concept-four#hoverRank click->concept-four#tapGlass">
+            <span class="c4-rank-n"><%= pour[:rank_label] %></span>
+            <span class="c4-rank-t"><b><%= pour[:name] %></b><small><%= pour[:sub] %></small></span>
+            <span class="c4-rank-s"><%= pour[:score] %></span>
+          </div>
+        </div>
+      <% end %>
+
+      <!-- ====== BLOOMING PALATE WHEEL (Beat 4 Right) ====== -->
+      <div class="c4-wheel">
+        <div class="c4-wheel-head">
+          <b data-concept-four-target="wheelTitle">Wild Turkey Rare Breed</b>
+          <span data-concept-four-target="wheelScore">4.65 / 5</span>
+        </div>
+        <svg class="c4-wheel-svg" viewBox="0 0 300 300" aria-label="Interactive palate wheel">
+          <circle cx="150" cy="150" r="112" fill="#f6f4ee" stroke="#dfe3dc" stroke-width="1"/>
+          <circle cx="150" cy="150" r="76" fill="none" stroke="#dfe3dc" stroke-width="1" stroke-dasharray="3 3"/>
+          <circle cx="150" cy="150" r="42" fill="none" stroke="#dfe3dc" stroke-width="1"/>
+          <% palate_axes.each_with_index do |(label, deg), i| %>
+            <% a1 = (deg - 20) * Math::PI / 180.0 %>
+            <% a2 = (deg + 20) * Math::PI / 180.0 %>
+            <% r = 108 %>
+            <% x1 = (150 + r * Math.cos(a1)).round(2); y1 = (150 + r * Math.sin(a1)).round(2) %>
+            <% x2 = (150 + r * Math.cos(a2)).round(2); y2 = (150 + r * Math.sin(a2)).round(2) %>
+            <% lx = (150 + 128 * Math.cos(deg * Math::PI / 180.0)).round(2) %>
+            <% ly = (150 + 128 * Math.sin(deg * Math::PI / 180.0) + 4).round(2) %>
+            <path class="c4-wedge" data-concept-four-target="wedge"
+                  d="M 150 150 L <%= x1 %> <%= y1 %> A <%= r %> <%= r %> 0 0 1 <%= x2 %> <%= y2 %> Z"
+                  fill="#16332a" opacity="0.6"/>
+            <text x="<%= lx %>" y="<%= ly %>" text-anchor="middle" font-size="11.5" font-weight="600" fill="#16332a"><%= label %></text>
+          <% end %>
+          <circle cx="150" cy="150" r="24" fill="#ffffff" stroke="#dfe3dc" stroke-width="1.2"/>
+          <text x="150" y="154" text-anchor="middle" font-size="10.5" font-weight="600" fill="#5f6b64">Palate</text>
+        </svg>
+      </div>
+
+      <!-- Bottom Beat Dock (Click or Scroll to Trigger Full Choreography) -->
+      <div class="c4-dock" role="navigation" aria-label="Story acts">
+        <% [ "Intro", "01 Pick", "02 Gather", "03 Pour", "04 Verdict" ].each_with_index do |label, b| %>
+          <button type="button" class="c4-dock-btn <%= 'is-active' if b.zero? %>"
+                  data-concept-four-target="dockBtn" data-beat="<%= b %>"
+                  data-action="click->concept-four#jumpBeat"><%= label %></button>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       LOWER PAGE — Resting Tasting Glass on Spotlight + Origin + Membership
+       ====================================================================== -->
+  <div class="c4-below">
+    <div class="c4-wrap">
+      <div class="c4-rest-zone">
+        <div class="c4-rest-glass" data-concept-four-target="restGlass" aria-hidden="true">
+          <%= render "shared/glass", level: 1, size: 78, appear: false %>
+        </div>
+
+        <% spot = @spotlight_deck || @concept_decks.first %>
+        <% spot_cover = spot ? deck_cover_attachment(spot) : nil %>
+        <div class="c4-spot">
+          <div class="c4-spot-img">
+            <% if spot_cover %>
+              <%= image_tag image_variant(spot_cover, :card), alt: spot.title %>
+            <% else %>
+              <%= image_tag "photos/rickhouse.jpg", alt: "Bourbon Basics" %>
+            <% end %>
+          </div>
+          <div>
+            <span class="c4-act-label">In the spotlight</span>
+            <h2 style="font-size:clamp(1.9rem,3.4vw,2.9rem);line-height:1.02;letter-spacing:-.045em;color:var(--ink)"><%= spot&.title || "Bourbon Basics" %></h2>
+            <p style="margin-top:14px;font-size:17px;line-height:1.55;color:var(--mute);max-width:34em">
+              <%= spot&.excerpt(170) || "A first tasting night for people who are new to bourbon. Four bourbons, lowest proof first, and what the words on their labels mean." %>
+            </p>
+            <div style="margin-top:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+              <%= link_to "See the deck", (spot ? presentation_path(spot) : presentations_path), class: "btn-th" %>
+              <span style="font-size:14px;color:var(--mute)"><%= spot ? "#{spot.formatted_price}, or one credit with membership" : "$16.99, or one credit with membership" %></span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="c4-origin">
+        <div>
+          <h2>Born from a <em>real society.</em></h2>
+          <p>The first Whiskey Share Society started as a circle of friends in 2019. Each month one of us drew a topic, did the research, bought the bottles, and told its story over a deck of slides and a glass of whiskey.</p>
+          <div style="margin-top:28px"><%= link_to "Find your society", societies_path, class: "btn-th btn-th--light" %></div>
+        </div>
+        <ol class="c4-rules" aria-label="House rules">
+          <% rules.each do |rule| %><li><%= rule %></li><% end %>
+        </ol>
+      </div>
+
+      <div class="c4-pricing">
+        <div>
+          <h2>Choose <em>your pour.</em></h2>
+          <p style="margin-top:16px;font-size:17.5px;line-height:1.55;color:var(--mute)">One membership, three ways to pay it. Every plan unlocks a monthly deck credit and a society of your own.</p>
+          <div style="margin-top:24px"><%= link_to "See the plans", membership_path, class: "btn-th" %></div>
+        </div>
+        <div class="c4-plans">
+          <% @stripe_products.each do |product| %>
+            <%= link_to membership_path, class: "c4-plan #{'c4-plan--pick' if product[:popular]}" do %>
+              <div>
+                <h3 style="font-size:20px"><%= product[:name].to_s.gsub(" Membership", "") %></h3>
+                <div style="font-size:13.5px;opacity:.7;margin-top:2px"><%= plan_billing_line(product) %></div>
+              </div>
+              <div class="c4-plan-p">$<%= sprintf("%.2f", product[:price] / 100.0) %><small>/mo</small></div>
+              <span style="font-size:18px" aria-hidden="true">→</span>
+            <% end %>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Concept Switcher Pill -->
+  <nav class="concept-switcher" aria-label="Switch homepage concept">
+    <%= link_to "Live", root_path %>
+    <%= link_to "1", home_concept_path(1) %>
+    <%= link_to "2", home_concept_path(2) %>
+    <%= link_to "3 · Living", home_concept_path(3) %>
+    <%= link_to "4 · Theatre", home_concept_path(4), "aria-current": "page" %>
+  </nav>
+</div>

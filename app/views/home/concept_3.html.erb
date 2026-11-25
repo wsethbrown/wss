@@ -295,8 +295,9 @@
   <!-- Concept Switcher Pill -->
   <nav class="concept-switcher" aria-label="Switch homepage concept">
     <%= link_to "Live", root_path %>
-    <%= link_to "1 · Cinema", home_concept_path(1) %>
-    <%= link_to "2 · Tabletop", home_concept_path(2) %>
-    <%= link_to "3 · Living Pour", home_concept_path(3), "aria-current": "page" %>
+    <%= link_to "1", home_concept_path(1) %>
+    <%= link_to "2", home_concept_path(2) %>
+    <%= link_to "3 · Living", home_concept_path(3), "aria-current": "page" %>
+    <%= link_to "4 · Theatre", home_concept_path(4) %>
   </nav>
 </div>
