@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
   <title>Presenting: <%= @presentation.title %></title>
   <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -7,27 +7,119 @@
 </head>
 <body>
   <% slides = @presentation.slide_images.order(:id) %>
-  <% slides.each_with_index do |slide, i| %>
-    <div class="slide <%= 'active' if i.zero? %>"><%= image_tag image_variant(slide, :hero), alt: "Slide #{i + 1}", loading: i < 3 ? 'eager' : 'lazy' %></div>
-  <% end %>
-  <a class="exit" href="<%= presentation_path(@presentation) %>">esc, exit</a>
-  <div class="hud"><span id="n">1</span> / <%= slides.size %></div>
-  <script>
-    const slides = document.querySelectorAll('.slide'), n = document.getElementById('n');
-    let i = 0;
-    function go(d) {
-      slides[i].classList.remove('active');
-      i = Math.min(Math.max(i + d, 0), slides.length - 1);
-      slides[i].classList.add('active');
-      n.textContent = i + 1;
-    }
-    document.addEventListener('keydown', e => {
-      if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); go(1); }
-      else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); go(-1); }
-      else if (e.key === 'Escape') location.href = '<%= presentation_path(@presentation) %>';
-      else if (e.key === 'f') document.documentElement.requestFullscreen?.();
-    });
-    document.addEventListener('click', e => { if (!e.target.closest('a')) go(1); });
+  <main class="stage" id="stage" aria-label="<%= @presentation.title %> slides">
+    <% slides.each_with_index do |slide, i| %>
+      <div class="slide <%= 'active' if i.zero? %>" aria-hidden="<%= !i.zero? %>">
+        <%= image_tag image_variant(slide, :hero), alt: "Slide #{i + 1}", loading: i < 3 ? 'eager' : 'lazy' %>
+      </div>
+    <% end %>
+  </main>
+
+  <div class="topbar chrome">
+    <button type="button" class="ctrl" id="fs-btn" aria-label="Toggle fullscreen (F)">Fullscreen</button>
+    <a class="exit" href="<%= presentation_path(@presentation) %>" aria-label="Exit presentation (Escape)">Exit</a>
+  </div>
+
+  <div class="hud chrome" aria-live="polite"><span id="n">1</span> / <%= slides.size %></div>
+  <div class="bar" aria-hidden="true"><div class="bar-fill" id="bar"></div></div>
+
+  <script nonce="<%= content_security_policy_nonce %>">
+    (function () {
+      const slides = Array.from(document.querySelectorAll('.slide'));
+      const n = document.getElementById('n');
+      const bar = document.getElementById('bar');
+      const fsBtn = document.getElementById('fs-btn');
+      const exitUrl = '<%= j presentation_path(@presentation) %>';
+      let i = 0;
+      let idleTimer;
+
+      function update() {
+        slides.forEach((s, idx) => {
+          const active = idx === i;
+          s.classList.toggle('active', active);
+          s.setAttribute('aria-hidden', active ? 'false' : 'true');
+        });
+        n.textContent = i + 1;
+        const pct = slides.length > 0 ? ((i + 1) / slides.length) * 100 : 100;
+        bar.style.width = pct + '%';
+
+        const nextImg = slides[i + 1]?.querySelector('img[loading="lazy"]');
+        if (nextImg) nextImg.loading = 'eager';
+      }
+
+      function go(delta) {
+        if (!slides.length) return;
+        const next = Math.min(Math.max(i + delta, 0), slides.length - 1);
+        if (next === i) return;
+        i = next;
+        update();
+      }
+
+      function goTo(index) {
+        if (!slides.length) return;
+        i = Math.min(Math.max(index, 0), slides.length - 1);
+        update();
+      }
+
+      function poke() {
+        document.body.classList.remove('idle');
+        clearTimeout(idleTimer);
+        idleTimer = setTimeout(() => document.body.classList.add('idle'), 2600);
+      }
+
+      function toggleFullscreen() {
+        if (!document.fullscreenElement) {
+          document.documentElement.requestFullscreen?.().catch(() => {});
+        } else {
+          document.exitFullscreen?.().catch(() => {});
+        }
+      }
+
+      function syncFsLabel() {
+        if (fsBtn) fsBtn.textContent = document.fullscreenElement ? 'Exit fullscreen' : 'Fullscreen';
+      }
+
+      document.addEventListener('keydown', e => {
+        poke();
+        if (['ArrowRight', ' ', 'PageDown'].includes(e.key)) { e.preventDefault(); go(1); }
+        else if (['ArrowLeft', 'PageUp'].includes(e.key)) { e.preventDefault(); go(-1); }
+        else if (e.key === 'Home') { e.preventDefault(); goTo(0); }
+        else if (e.key === 'End') { e.preventDefault(); goTo(slides.length - 1); }
+        else if (e.key === 'Escape' && !document.fullscreenElement) { location.href = exitUrl; }
+        else if (e.key === 'f' || e.key === 'F') { e.preventDefault(); toggleFullscreen(); }
+      });
+
+      document.getElementById('stage').addEventListener('click', e => {
+        poke();
+        go(e.clientX < window.innerWidth * 0.3 ? -1 : 1);
+      });
+
+      let touchStartX = null, touchStartY = null;
+      document.addEventListener('touchstart', e => {
+        if (e.touches.length !== 1) return;
+        touchStartX = e.touches[0].clientX;
+        touchStartY = e.touches[0].clientY;
+      }, { passive: true });
+
+      document.addEventListener('touchend', e => {
+        if (touchStartX === null || e.changedTouches.length !== 1) return;
+        const dx = e.changedTouches[0].clientX - touchStartX;
+        const dy = e.changedTouches[0].clientY - touchStartY;
+        touchStartX = touchStartY = null;
+        if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) {
+          poke();
+          go(dx < 0 ? 1 : -1);
+        }
+      }, { passive: true });
+
+      fsBtn?.addEventListener('click', e => { e.stopPropagation(); toggleFullscreen(); });
+      document.addEventListener('fullscreenchange', syncFsLabel);
+      document.addEventListener('mousemove', poke, { passive: true });
+
+      update();
+      syncFsLabel();
+      poke();
+    })();
   </script>
 </body>
 </html>

@@ -24,10 +24,13 @@ module DesignHelper
       if image
         # Fades in if it is still loading when the page starts (the appear
         # controller's image target; cached covers are left alone).
-        image_tag image_variant(image, :card), alt: alt || deck.title, loading: loading, class: "absolute inset-0 h-full w-full object-cover",
+        image_tag image_variant(image, :card), alt: alt || deck.title, loading: loading,
+                  class: "absolute inset-0 h-full w-full object-cover motion-safe:transition-transform motion-safe:duration-300 motion-safe:group-hover:scale-[1.02]",
                   data: { appear_target: "image" }
       else
-        "".html_safe
+        content_tag(:div, class: "flex h-full w-full items-center justify-center") do
+          render("shared/glass", level: 0, size: 52, tone: :cream, appear: false, css: "opacity-30")
+        end
       end
     end
   end

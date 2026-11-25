@@ -60,7 +60,7 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"></path>
             </svg>
             <span>
-              Organised by <%= link_to @event.organizer.full_name, profile_path(@event.organizer),
+              Organized by <%= link_to @event.organizer.full_name, profile_path(@event.organizer),
                   class: "font-semibold text-ink transition hover:text-whiskey-500" %>
             </span>
           </span>
@@ -146,8 +146,15 @@
           <div class="mt-3 space-y-4">
             <% if @event.presentation %>
               <%= link_to presentation_path(@event.presentation), class: "group block" do %>
+                <% if (cover = deck_cover_attachment(@event.presentation)) %>
+                  <%= deck_cover @event.presentation, preloaded: cover, class: "mb-3" %>
+                <% end %>
                 <p class="text-lg font-semibold leading-snug text-ink group-hover:text-whiskey-500"><%= @event.presentation.title %></p>
                 <p class="mt-1 text-sm font-semibold text-ink">See the deck <span class="arrow" aria-hidden="true">→</span></p>
+              <% end %>
+              <% if user_signed_in? && @event.presentation.can_download_full_presentation?(current_user) && @event.presentation.slide_images.attached? %>
+                <%= link_to "Present", present_presentation_path(@event.presentation),
+                    class: "btn btn-primary w-full min-h-11" %>
               <% end %>
             <% else %>
               <p class="text-sm text-mute">No deck attached. Plenty of nights run without one.</p>
