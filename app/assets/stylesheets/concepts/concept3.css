@@ -1,0 +1,459 @@
+/* Concept 3: "The Living Pour" (/concepts/3)
+   Full-viewport kinetic shared-element choreography + live physics sloshing Glencairns.
+   One 100vw x 100svh continuous physical stage driven by scroll + spring physics.
+   Scoped strictly to .c3. */
+
+.c3 {
+  --bg: #f6f4ee;
+  --card: #ffffff;
+  --ink: #16332a;
+  --ink-deep: #0b1b16;
+  --oak: #1d4034;
+  --text: #1b2924;
+  --mute: #5f6b64;
+  --line: rgba(22, 51, 42, .13);
+  --mark: #ff6d00;
+  --mark-soft: #ff8a33;
+  --mark-deep: #e65c00;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Instrument Sans", system-ui, sans-serif;
+  overflow-x: clip;
+}
+.c3 *, .c3 *::before, .c3 *::after { box-sizing: border-box; }
+.c3 h1, .c3 h2, .c3 h3 { font-weight: 600; text-wrap: balance; }
+.c3 h1 em, .c3 h2 em { font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: -.03em; }
+
+.c3 .btn-lp {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 50px; padding: 0 24px; border-radius: 15px; font-weight: 600; font-size: 15.5px;
+  text-decoration: none; border: 0; cursor: pointer;
+  background: var(--ink); color: #f6f4ee;
+  box-shadow: 0 10px 24px -12px rgba(22, 51, 42, .52);
+  transition: transform 180ms var(--ease), background 150ms ease;
+}
+.c3 .btn-lp:hover { background: var(--oak); transform: translateY(-2px); }
+.c3 .btn-lp--quiet { background: rgba(255, 255, 255, .86); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.c3 .btn-lp--quiet:hover { background: #fff; }
+.c3 .btn-lp--light { background: #f6f4ee; color: var(--ink); }
+.c3 .btn-lp--light:hover { background: #fff; }
+
+/* ==========================================================================
+   FULL-VIEWPORT KINETIC STAGE (520svh track -> 100vw x 100svh pinned canvas)
+   ========================================================================== */
+.c3-track {
+  position: relative;
+  height: 540svh;
+}
+.c3-stage {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--bg);
+}
+
+/* Smooth full-bleed room atmosphere layers (cross-blended continuously with P) */
+.c3-bg-layer {
+  position: absolute; inset: 0; pointer-events: none; will-change: opacity, transform, clip-path;
+}
+.c3-bg-orange {
+  background: var(--mark);
+  opacity: 0;
+}
+.c3-bg-room {
+  background:
+    radial-gradient(ellipse 70% 55% at 50% 34%, rgba(36, 86, 68, .55) 0%, rgba(11, 27, 22, 0) 70%),
+    linear-gradient(180deg, #0b1b16 0%, #10251e 65%, #16332a 100%);
+  opacity: 0;
+}
+.c3-bg-verdict {
+  background:
+    radial-gradient(ellipse 60% 60% at 72% 52%, rgba(255, 109, 0, .14) 0%, rgba(22, 51, 42, 0) 68%),
+    #16332a;
+  opacity: 0;
+}
+
+/* Rising oak tasting table plane in Act 3 */
+.c3-table-plane {
+  position: absolute; left: -4vw; right: -4vw; bottom: 0; height: 34svh;
+  background:
+    linear-gradient(180deg, rgba(246, 244, 238, .14) 0px, rgba(246, 244, 238, .04) 2px, transparent 10px),
+    linear-gradient(180deg, #1d4034 0%, #132c24 100%);
+  border-top: 1px solid rgba(246, 244, 238, .18);
+  border-radius: 36px 36px 0 0;
+  box-shadow: 0 -24px 60px -18px rgba(0, 0, 0, .55);
+  transform: translate3d(0, 110%, 0);
+  will-change: transform, opacity;
+  pointer-events: none;
+  z-index: 4;
+}
+
+/* Duotone Living Room Band (unveils across upper invite in Act 2) */
+.c3-invite-backdrop {
+  position: absolute; left: 5vw; right: 5vw; top: 12svh; height: 32svh;
+  border-radius: 26px; overflow: hidden; background: var(--ink);
+  box-shadow: 0 28px 60px -24px rgba(22, 51, 42, .45);
+  opacity: 0; pointer-events: none; will-change: transform, opacity, clip-path;
+  z-index: 2;
+}
+.c3-invite-backdrop img {
+  width: 100%; height: 100%; object-fit: cover; object-position: 50% 14%;
+  filter: grayscale(100%) contrast(1.12); mix-blend-mode: screen; opacity: .82;
+}
+
+/* ==========================================================================
+   NARRATIVE COPY BEATS (Left / Top editorial headlines moving cleanly in/out)
+   ========================================================================== */
+.c3-copy {
+  position: absolute;
+  left: clamp(24px, 5.5vw, 84px);
+  z-index: 12;
+  pointer-events: none;
+  opacity: 0;
+  will-change: transform, opacity;
+}
+.c3-copy.is-interactive { pointer-events: auto; }
+.c3-copy--0 { top: 50%; max-width: min(520px, 44vw); }
+.c3-copy--1 { top: 13svh; left: 50%; text-align: center; max-width: 680px; }
+.c3-copy--2 { top: 48svh; max-width: min(560px, 52vw); }
+.c3-copy--3 { top: 11.5svh; left: 50%; text-align: center; max-width: 680px; }
+.c3-copy--4 { top: 12svh; max-width: 560px; }
+
+.c3-tag {
+  display: inline-flex; align-items: center; gap: 8px;
+  font-size: 12.5px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+  padding: 6px 12px; border-radius: 999px;
+  background: rgba(22, 51, 42, .07); color: var(--ink);
+  margin-bottom: 16px;
+}
+.c3-tag::before { content: ""; width: 6px; height: 6px; border-radius: 99px; background: var(--mark-deep); }
+.c3-copy--dark .c3-tag { background: rgba(246, 244, 238, .1); color: #f6f4ee; }
+.c3-copy--dark .c3-tag::before { background: var(--mark); }
+.c3-copy--orange .c3-tag { background: rgba(22, 51, 42, .14); color: var(--ink); }
+.c3-copy--orange .c3-tag::before { background: var(--ink); }
+
+.c3-copy h1 { font-size: clamp(3.2rem, 6.2vw, 5.8rem); line-height: .92; letter-spacing: -.056em; color: var(--ink); }
+.c3-copy h2 { font-size: clamp(2.1rem, 4.1vw, 3.6rem); line-height: .98; letter-spacing: -.048em; color: var(--ink); }
+.c3-copy--dark h2 { color: #f6f4ee; }
+.c3-copy p { margin-top: 16px; font-size: clamp(1rem, 1.35vw, 1.2rem); line-height: 1.52; color: var(--mute); }
+.c3-copy--dark p { color: rgba(246, 244, 238, .76); }
+.c3-copy--orange p { color: rgba(22, 51, 42, .85); }
+.c3-copy-acts { margin-top: 26px; display: flex; flex-wrap: wrap; gap: 10px; }
+
+/* Giant date stamp inside Beat 2 (Orange Invite) */
+.c3-invite-date {
+  font-weight: 700; font-size: clamp(3.4rem, 7vw, 6.4rem);
+  line-height: .84; letter-spacing: -.065em; color: var(--ink);
+  margin-bottom: 12px;
+}
+
+/* ==========================================================================
+   SHARED ELEMENT #1: THE HERO SLIDE (Physically flies across ALL 4 acts!)
+   ========================================================================== */
+.c3-sibling-deck {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: min(360px, 28vw);
+  aspect-ratio: 16 / 10.5;
+  border-radius: 22px;
+  background: #fff;
+  border: 1px solid var(--line);
+  padding: 12px;
+  box-shadow: 0 26px 56px -26px rgba(22, 51, 42, .35);
+  will-change: transform, opacity;
+  z-index: 6;
+  opacity: 0;
+  pointer-events: none;
+  display: flex; flex-direction: column;
+}
+.c3-sib-art {
+  flex: 1; border-radius: 14px; background: var(--ink); overflow: hidden;
+  padding: 16px; display: flex; flex-direction: column; justify-content: space-between;
+  color: #f6f4ee; position: relative;
+}
+.c3-sib-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .45; filter: grayscale(100%); }
+.c3-sib-art span { position: relative; z-index: 1; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--mark-soft); }
+.c3-sib-art strong { position: relative; z-index: 1; font-size: 20px; line-height: 1.08; letter-spacing: -.035em; }
+.c3-sib-meta { display: flex; justify-content: space-between; padding: 10px 4px 2px; font-size: 13px; font-weight: 600; color: var(--ink); }
+.c3-sib-meta small { color: var(--mute); font-weight: 500; }
+
+.c3-hero-deck {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: min(640px, 46vw);
+  aspect-ratio: 16 / 10.2;
+  z-index: 10;
+  perspective: 1200px;
+  will-change: transform, opacity;
+  pointer-events: auto;
+  cursor: pointer;
+}
+.c3-deck-shell {
+  width: 100%; height: 100%;
+  background: var(--ink);
+  border-radius: 26px;
+  padding: 10px;
+  display: flex; flex-direction: column;
+  box-shadow:
+    inset 0 1px 0 rgba(246, 244, 238, .2),
+    0 2px 6px rgba(22, 51, 42, .25),
+    0 44px 90px -28px rgba(10, 24, 20, .62);
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+.c3-deck-screen {
+  position: relative;
+  flex: 1;
+  border-radius: 18px;
+  overflow: hidden;
+  background: var(--ink-deep);
+  container-type: inline-size;
+}
+/* Specular sheen swept by mouse tilt */
+.c3-deck-sheen {
+  position: absolute; inset: 0; z-index: 5; pointer-events: none;
+  background: radial-gradient(circle at var(--sx, 50%) var(--sy, 30%), rgba(246, 244, 238, .18) 0%, transparent 56%);
+  mix-blend-mode: screen;
+}
+.c3-deck-slide {
+  position: absolute; inset: 0;
+  opacity: 0; transform: scale(1.03);
+  transition: opacity 420ms var(--ease), transform 520ms var(--ease);
+}
+.c3-deck-slide.is-active { opacity: 1; transform: scale(1); z-index: 2; }
+.c3-deck-slide > img { width: 100%; height: 100%; object-fit: cover; display: block; }
+
+.c3-vs {
+  position: absolute; inset: 0; padding: 6cqw 6.5cqw;
+  display: grid; grid-template-columns: 1.05fr .95fr; gap: 4.5cqw; align-items: center;
+  background: var(--ink); color: #f6f4ee;
+}
+.c3-vs--paper { background: #f6f4ee; color: var(--ink); }
+.c3-vs--orange { background: var(--mark); color: var(--ink); }
+.c3-vs--room { background: #10251e; color: #f6f4ee; }
+.c3-vs-logo { width: 7.5cqw; display: block; margin-bottom: 2.5cqw; }
+.c3-vs-h { font-size: 6cqw; font-weight: 600; line-height: .96; letter-spacing: -.048em; }
+.c3-vs-line { width: 6cqw; height: .45cqw; border-radius: 99px; background: var(--mark); margin: 2.2cqw 0; }
+.c3-vs--orange .c3-vs-line { background: var(--ink); }
+.c3-vs-p { font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-size: 2.75cqw; line-height: 1.38; opacity: .88; }
+.c3-vs-pic { height: 100%; max-height: 44cqw; border-radius: 2.2cqw; overflow: hidden; border: 1px solid rgba(246, 244, 238, .15); }
+.c3-vs-pic img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%) contrast(1.12); }
+
+.c3-deck-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 10px 10px 2px; color: #f6f4ee; font-size: 13px;
+}
+.c3-deck-bar b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.c3-deck-bar span { opacity: .66; font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+/* ==========================================================================
+   SHARED ELEMENTS #2-#5: THE 4 LIVE SLOSHING GLENCAIRN GLASSES
+   They travel from Hero -> Invite Arc -> Oak Tasting Table -> Mid-Air Sorted Leaderboard!
+   ========================================================================== */
+.c3-pour-stream {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 6px; height: 150px;
+  border-radius: 99px;
+  background: linear-gradient(180deg, rgba(255, 138, 51, 0) 0%, #ff6d00 22%, #ff8a33 100%);
+  transform-origin: top center;
+  opacity: 0; pointer-events: none;
+  z-index: 8;
+  will-change: transform, opacity;
+}
+
+.c3-glass-actor {
+  position: absolute;
+  left: 50%; top: 50%;
+  width: 96px; height: 128px;
+  z-index: 11;
+  will-change: transform, opacity;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer;
+}
+.c3-glass-actor svg {
+  width: 100%; height: 100%; overflow: visible;
+  filter: drop-shadow(0 16px 24px rgba(10, 24, 20, .28));
+}
+.c3-glass-actor svg.is-cream path[stroke="#16332a"]:not([stroke-opacity]) { stroke: #f6f4ee; }
+.c3-glass-actor svg.is-cream path[fill="#16332a"] { fill: #f6f4ee; }
+.c3-glass-actor svg.is-cream path[stroke-opacity="0.18"] { stroke-opacity: 0; }
+.c3-glass-actor svg.is-cream path[data-glass-shine="foot"] { stroke-opacity: 0; }
+
+/* Floating Bottle Label attached cleanly beside/below each Glass Actor */
+.c3-glass-caption {
+  position: absolute;
+  left: 50%; top: 100%;
+  transform: translate(-50%, 6px);
+  text-align: center;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 280ms var(--ease);
+}
+.c3-glass-caption b { display: block; font-size: 14px; font-weight: 600; color: #f6f4ee; letter-spacing: -.015em; }
+.c3-glass-caption small { display: block; font-size: 12px; color: var(--mark-soft); font-variant-numeric: tabular-nums; margin-top: 2px; }
+
+/* Leaderboard Row Card attached to the right of each Glass in Act 4 (Mid-Air Sort!) */
+.c3-rank-card {
+  position: absolute;
+  left: 104px; top: 50%;
+  transform: translateY(-50%) translateX(12px);
+  width: min(390px, 34vw);
+  padding: 14px 20px;
+  border-radius: 20px;
+  background: rgba(246, 244, 238, .08);
+  border: 1px solid rgba(246, 244, 238, .14);
+  color: #f6f4ee;
+  display: grid; grid-template-columns: 32px 1fr auto; align-items: center; gap: 14px;
+  opacity: 0; pointer-events: none;
+  transition: opacity 300ms var(--ease), transform 340ms var(--ease), background 180ms ease, border-color 180ms ease;
+}
+.c3-rank-card.is-visible { opacity: 1; pointer-events: auto; transform: translateY(-50%) translateX(0); }
+.c3-rank-card:hover, .c3-rank-card.is-active {
+  background: rgba(246, 244, 238, .15);
+  border-color: var(--mark);
+}
+.c3-rank-num { font-size: 13px; font-weight: 700; color: var(--mark-soft); font-variant-numeric: tabular-nums; }
+.c3-rank-meta b { display: block; font-size: 16px; letter-spacing: -.02em; }
+.c3-rank-meta small { display: block; font-size: 12.5px; color: rgba(246, 244, 238, .66); margin-top: 2px; }
+.c3-rank-score { font-size: 24px; font-weight: 700; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.c3-rank-card.is-active .c3-rank-score { color: var(--mark-soft); }
+
+/* ==========================================================================
+   SHARED ELEMENT #6: BLOOMING ARCHITECTURAL PALATE WHEEL (Act 4 Right)
+   ========================================================================== */
+.c3-wheel-wrap {
+  position: absolute;
+  right: clamp(28px, 6vw, 96px);
+  top: 52%;
+  width: min(390px, 34vw);
+  background: #fff;
+  color: var(--ink);
+  border-radius: 30px;
+  padding: 24px 26px;
+  box-shadow: 0 36px 80px -26px rgba(0, 0, 0, .55);
+  z-index: 12;
+  opacity: 0; pointer-events: none;
+  will-change: transform, opacity;
+}
+.c3-wheel-wrap.is-visible { pointer-events: auto; }
+.c3-wheel-head {
+  display: flex; align-items: baseline; justify-content: space-between;
+  padding-bottom: 12px; border-bottom: 1px solid var(--line);
+}
+.c3-wheel-head b { font-size: 17px; letter-spacing: -.025em; }
+.c3-wheel-head span { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+.c3-wheel-svg { width: 100%; height: auto; margin-top: 8px; overflow: visible; }
+.c3-wedge {
+  transform-origin: 150px 150px;
+  transition: transform 520ms cubic-bezier(0.34, 1.4, 0.64, 1), fill 260ms ease, opacity 260ms ease;
+}
+
+/* ==========================================================================
+   MINIMAL CHAPTER RAIL (Right edge dots — subtle, clickable)
+   ========================================================================== */
+.c3-rail {
+  position: absolute; right: 22px; top: 50%; transform: translateY(-50%);
+  z-index: 20; display: flex; flex-direction: column; gap: 10px;
+}
+.c3-rail-dot {
+  appearance: none; border: 0; padding: 0; cursor: pointer;
+  width: 9px; height: 9px; border-radius: 99px;
+  background: rgba(22, 51, 42, .25);
+  transition: transform 200ms var(--ease), background 200ms ease, height 220ms var(--ease);
+}
+.c3-stage[data-tone="dark"] .c3-rail-dot { background: rgba(246, 244, 238, .28); }
+.c3-rail-dot.is-active { height: 26px; background: var(--mark) !important; }
+
+/* Scroll cue at bottom of Hero */
+.c3-scroll-cue {
+  position: absolute; left: 50%; bottom: 26px; transform: translateX(-50%);
+  z-index: 14; font-size: 12.5px; font-weight: 600; letter-spacing: .06em; text-transform: uppercase;
+  color: var(--mute); pointer-events: none; transition: opacity 280ms ease;
+}
+
+/* ==========================================================================
+   LOWER PAGE — Full Living Glencairn Resting on Spotlight + Origin + Pricing
+   ========================================================================== */
+.c3-below { position: relative; background: var(--bg); padding: 12px 0 96px; z-index: 5; }
+.c3-wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
+@media (min-width: 900px) { .c3-wrap { padding: 0 36px; } }
+.c3-rest-zone { position: relative; padding-top: 76px; }
+.c3-rest-glass {
+  position: absolute; left: 50%; top: 10px; transform: translateX(-50%);
+  width: 58px; height: 78px; z-index: 4; pointer-events: none;
+}
+.c3-spot {
+  background: #fff; border: 1px solid var(--line); border-radius: 30px; padding: 24px;
+  display: grid; gap: 36px; align-items: center;
+  box-shadow: 0 24px 54px -34px rgba(22, 51, 42, .25);
+}
+@media (min-width: 900px) { .c3-spot { grid-template-columns: 1fr 1.1fr; padding: 24px 48px 24px 24px; } }
+.c3-spot-img { aspect-ratio: 16 / 9; border-radius: 20px; overflow: hidden; background: var(--ink); }
+.c3-spot-img img { width: 100%; height: 100%; object-fit: cover; }
+
+.c3-origin {
+  margin-top: 64px;
+  background: var(--ink); color: #f6f4ee; border-radius: 32px; padding: 56px 44px;
+  display: grid; gap: 44px; align-items: center;
+}
+@media (min-width: 900px) { .c3-origin { grid-template-columns: 1fr 1.15fr; padding: 64px; } }
+.c3-origin h2 { color: #f6f4ee; font-size: clamp(2.2rem, 4.2vw, 3.6rem); line-height: 1; letter-spacing: -.045em; }
+.c3-origin p { color: rgba(246, 244, 238, .76); font-size: 17.5px; line-height: 1.56; margin-top: 16px; }
+.c3-rules { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; counter-reset: r; }
+@media (min-width: 680px) { .c3-rules { grid-template-columns: 1fr 1fr; } }
+.c3-rules li {
+  counter-increment: r; background: rgba(246, 244, 238, .06);
+  border: 1px solid rgba(246, 244, 238, .1); border-radius: 20px; padding: 20px;
+  font-size: 16.5px; line-height: 1.32;
+}
+.c3-rules li::before { content: "0" counter(r); display: block; color: var(--mark-soft); font-size: 13px; font-weight: 700; margin-bottom: 18px; }
+
+.c3-pricing { margin-top: 72px; display: grid; gap: 36px; align-items: start; }
+@media (min-width: 900px) { .c3-pricing { grid-template-columns: 5fr 7fr; gap: 56px; } }
+.c3-pricing h2 { font-size: clamp(2.2rem, 4.2vw, 3.6rem); line-height: 1; letter-spacing: -.045em; color: var(--ink); }
+.c3-plans { display: grid; gap: 12px; }
+.c3-plan {
+  display: grid; grid-template-columns: 1fr auto 42px; align-items: center; gap: 16px;
+  padding: 22px 24px; border-radius: 24px; background: #fff; border: 1px solid var(--line);
+  text-decoration: none; color: var(--ink);
+  transition: transform 180ms var(--ease), border-color 180ms ease;
+}
+.c3-plan:hover { transform: translateY(-2px); border-color: var(--ink); }
+.c3-plan--pick { background: var(--ink); color: #f6f4ee; border-color: var(--ink); }
+.c3-plan--pick h3 { color: #f6f4ee; }
+.c3-plan-p { font-size: 32px; font-weight: 600; letter-spacing: -.045em; font-variant-numeric: tabular-nums; }
+.c3-plan-p small { font-size: 14px; font-weight: 500; opacity: .7; }
+
+/* Concept Switcher Pill */
+.concept-switcher {
+  position: fixed; left: 18px; bottom: 18px; z-index: 60;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px; border-radius: 999px;
+  background: rgba(13, 31, 25, .92);
+  border: 1px solid rgba(246, 244, 238, .18);
+  box-shadow: 0 14px 32px -12px rgba(0, 0, 0, .48);
+  backdrop-filter: blur(10px);
+}
+.concept-switcher a {
+  padding: 7px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
+  color: rgba(246, 244, 238, .76); text-decoration: none;
+  transition: background 150ms ease, color 150ms ease;
+}
+.concept-switcher a:hover { color: #f6f4ee; }
+.concept-switcher a[aria-current="page"] { background: var(--mark, #ff6d00); color: #16332a; }
+
+/* Mobile compact layout */
+@media (max-width: 899px) {
+  .c3-copy--0 { top: 14svh; left: 20px; right: 20px; max-width: none; }
+  .c3-hero-deck { width: 88vw; }
+  .c3-sibling-deck { display: none; }
+  .c3-rank-card { width: 64vw; left: 74px; padding: 10px 14px; }
+  .c3-wheel-wrap { display: none; }
+  .c3-rail { right: 10px; }
+}
