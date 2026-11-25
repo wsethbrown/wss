@@ -1,0 +1,464 @@
+<% content_for :title, "Concept 1: Full-Stage Projection — Whiskey Share Society" %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "concepts/concept1" %>
+<% end %>
+
+<%
+  showcase_slides = @showcase_deck ? hero_reel_slides(@showcase_deck) : []
+  decks_for_fan = @concept_decks.first(4)
+  if decks_for_fan.size < 4
+    fallback_struct = Data.define(:title, :category, :formatted_price, :duration_label)
+    fallback_decks = [
+      fallback_struct.new(title: "Bourbon Basics", category: "Bourbon", formatted_price: "$16.99", duration_label: "20 min"),
+      fallback_struct.new(title: "Peated Scotch", category: "Scotch", formatted_price: "$16.99", duration_label: "20 min"),
+      fallback_struct.new(title: "Japanese Whisky", category: "Japanese", formatted_price: "$16.99", duration_label: "18 min"),
+      fallback_struct.new(title: "Bottled-in-Bond", category: "Bourbon", formatted_price: "$16.99", duration_label: "20 min")
+    ]
+    decks_for_fan = (decks_for_fan + fallback_decks).first(4)
+  end
+  first_deck_title = decks_for_fan.first.title
+  sample_date = @next_event ? @next_event.start_time.in_time_zone(@next_event.effective_time_zone) : Date.current.next_occurring(:friday)
+  invite_title = @next_event ? @next_event.title : "Bourbon night"
+  invite_where = @next_event ? [ @next_event.society.name, @next_event.location.presence ].compact.join(" · ") : "Your society · Your living room"
+  invite_going = @next_event ? [ @next_event_going, 3 ].max : 5
+
+  palate_axes = [
+    [ "Sweet",   -90 ], [ "Oaky",    -45 ], [ "Spicy",     0 ], [ "Fruity",   45 ],
+    [ "Smoky",    90 ], [ "Grainy",  135 ], [ "Floral",  180 ], [ "Coastal", 225 ]
+  ]
+  rules = [
+    "One presenter a month, everyone takes a turn.",
+    "Research your topic like you mean it.",
+    "Choose the bottles that belong to the story.",
+    "No dry fact sheets. Follow the narrative threads."
+  ]
+  faqs = [
+    [ "What if I'm a complete whiskey beginner?", "Perfect. The decks are written for every experience level. Each one covers the fundamentals and makes you sound like you've done this before." ],
+    [ "How long is a deck?", "Most run 15–20 minutes, built for a relaxed evening. The structure bends: linger on a tasting when the room is into it, or trim sections for a casual night." ],
+    [ "What equipment do I need?", "Glasses, water for rinsing, and the bottles from the deck's list. Tasting mats and notes come as downloadable PDFs. Nothing fancy required." ],
+    [ "Can I customize a deck?", "Yes. Swap bottles for budget or availability, skip sections, or add a chapter of your own. The deck is a starting point." ],
+    [ "How much do the whiskeys cost?", "Every deck recommends bottles across price ranges. You can host a full tasting for $60–80 total, or go deep with bottles north of $200." ]
+  ]
+%>
+
+<div class="c1" data-controller="concept-one">
+  <!-- ======================================================================
+       HERO — Panoramic Scroll-Tilting Interactive Cinema Stage
+       ====================================================================== -->
+  <section class="c1-hero">
+    <div class="wrap">
+      <div class="c1-hero-head">
+        <h1>Every pour<br>has <em>a story.</em></h1>
+        <p class="lede">Narrative tasting decks for whiskey nights that hold together — the research done, the script written, the bottles picked.</p>
+        <div class="c1-hero-acts">
+          <%= link_to "Browse the decks", presentations_path, class: "btn-k" %>
+          <a href="#c1-theatre" data-turbo="false" class="btn-k btn-k--quiet">Step inside the night ↓</a>
+        </div>
+        <p class="c1-hero-note">One credit a month with membership · Or buy any deck outright</p>
+      </div>
+
+      <div class="c1-cinema-wrap">
+        <div class="c1-cinema" data-concept-one-target="cinema"
+             data-action="mouseenter->concept-one#pauseHero mouseleave->concept-one#resumeHero">
+          <div class="c1-cinema-screen" data-action="click->concept-one#nextHeroSlide" role="button" tabindex="0" aria-label="Advance preview slide">
+            <% if showcase_slides.any? %>
+              <% showcase_slides.first(4).each_with_index do |slide, i| %>
+                <div class="c1-hslide <%= 'is-active' if i.zero? %>" data-concept-one-target="hslide">
+                  <%= image_tag image_variant(slide, :hero), alt: "Slide #{i + 1} of #{@showcase_deck.title}" %>
+                </div>
+              <% end %>
+            <% else %>
+              <!-- Slide 1: Cover -->
+              <div class="c1-hslide is-active" data-concept-one-target="hslide">
+                <div class="c1-demo-slide">
+                  <div>
+                    <%= image_tag "wss-logo-inverted.png", alt: "", class: "c1-demo-logo" %>
+                    <div class="c1-demo-title">Bourbon<br>Basics</div>
+                    <div class="c1-demo-rule"></div>
+                    <div class="c1-demo-sub">Four bourbons, lowest proof first, and what the words on their labels actually mean.</div>
+                  </div>
+                  <div class="c1-demo-photo">
+                    <%= image_tag "photos/rickhouse.jpg", alt: "" %>
+                  </div>
+                  <div class="c1-demo-meta">Whiskey Share Society · Four pours · 20 minutes</div>
+                </div>
+              </div>
+
+              <!-- Slide 2: Federal Rules -->
+              <div class="c1-hslide" data-concept-one-target="hslide">
+                <div class="c1-demo-slide c1-demo-slide--paper">
+                  <div>
+                    <div class="c1-demo-kicker">Act I · The Law in the Glass</div>
+                    <div class="c1-demo-title">Not a recipe.<br>A set of rules.</div>
+                    <div class="c1-demo-rule"></div>
+                    <div class="c1-demo-sub">Every bottle labeled Straight Bourbon had to clear four federal standards before a drop hit the glass.</div>
+                  </div>
+                  <div class="c1-demo-stat-grid">
+                    <div class="c1-demo-stat"><b>51%</b><span>Minimum corn mash</span></div>
+                    <div class="c1-demo-stat"><b>New</b><span>Charred oak barrel</span></div>
+                    <div class="c1-demo-stat"><b>125°</b><span>Max barrel entry proof</span></div>
+                    <div class="c1-demo-stat"><b>0</b><span>Additives or colorings</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Slide 3: The Char -->
+              <div class="c1-hslide" data-concept-one-target="hslide">
+                <div class="c1-demo-slide c1-demo-slide--orange">
+                  <div>
+                    <div class="c1-demo-kicker">Act II · Inside the Barrel</div>
+                    <div class="c1-demo-title">55 seconds<br>of fire.</div>
+                    <div class="c1-demo-rule"></div>
+                    <div class="c1-demo-sub">Char No. 4 turns white oak into alligator skin — caramelizing wood sugars into vanillin and oak lactones.</div>
+                  </div>
+                  <div class="c1-demo-photo">
+                    <%= image_tag "photos/deck-pour-decanter.jpg", alt: "" %>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Slide 4: The Four-Pour Flight -->
+              <div class="c1-hslide" data-concept-one-target="hslide">
+                <div class="c1-demo-slide c1-demo-slide--deep" style="grid-template-columns:1fr;align-content:center;gap:3cqw">
+                  <div>
+                    <div class="c1-demo-kicker">Act III · Tonight's Flight</div>
+                    <div class="c1-demo-title">Four pours, lowest proof first.</div>
+                  </div>
+                  <div class="c1-demo-flight">
+                    <div class="c1-demo-pour"><b>01</b><span>Buffalo Trace</span><small>90 proof</small></div>
+                    <div class="c1-demo-pour"><b>02</b><span>Maker's 46</span><small>94 proof</small></div>
+                    <div class="c1-demo-pour"><b>03</b><span>Heaven Hill BiB</span><small>100 proof</small></div>
+                    <div class="c1-demo-pour"><b>04</b><span>Rare Breed</span><small>116.8 proof</small></div>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+
+          <div class="c1-cinema-bar">
+            <div class="c1-cinema-bar-left">
+              <b><%= @showcase_deck&.title || "Bourbon Basics" %></b>
+              <span><%= showcase_slides.any? ? "#{@showcase_deck.slide_images.count} slides" : "24 slides · 20 min" %></span>
+            </div>
+            <div class="c1-cinema-dots">
+              <% (showcase_slides.any? ? showcase_slides.first(4).size : 4).times do |i| %>
+                <button type="button" class="c1-cinema-dot <%= 'is-active' if i.zero? %>"
+                        data-concept-one-target="hdot" data-index="<%= i %>"
+                        data-action="click->concept-one#pickHeroSlide"
+                        aria-label="Preview slide <%= i + 1 %>"></button>
+              <% end %>
+            </div>
+            <span class="c1-cinema-hint">Click screen to flip slides</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       THE 4-ACT CONTINUOUS CINEMA THEATRE
+       ====================================================================== -->
+  <section id="c1-theatre" class="c1-theatre" data-concept-one-target="theatre" aria-label="How a whiskey night works">
+    <div class="c1-stage-pin">
+      <div class="c1-stage-shell" data-concept-one-target="shell" data-act="1">
+
+        <!-- ACT 1: PICK A DECK (Interactive 3D Deck Fan) -->
+        <div class="c1-act c1-act-1 is-active" data-concept-one-target="act">
+          <div class="c1-act-1-head">
+            <div>
+              <span class="c1-act-kicker">01 · Pick a deck</span>
+              <h2>Choose the story <em>you want to tell.</em></h2>
+              <p class="act-copy">Tap any deck below to carry it into tonight's invite and tasting room.</p>
+            </div>
+            <%= link_to "See full library →", presentations_path, class: "btn-k btn-k--quiet" %>
+          </div>
+
+          <div class="c1-fan">
+            <% decks_for_fan.each_with_index do |deck, i| %>
+              <% cover = deck.respond_to?(:slide_images) ? deck_cover_attachment(deck) : nil %>
+              <button type="button"
+                      class="c1-deck-card <%= 'is-picked' if i.zero? %>"
+                      data-concept-one-target="deckCard"
+                      data-title="<%= deck.title %>"
+                      data-action="click->concept-one#pickDeck">
+                <div class="c1-deck-thumb">
+                  <% if cover %>
+                    <%= image_tag image_variant(cover, :card), alt: "" %>
+                  <% else %>
+                    <div class="c1-deck-thumb-fallback">
+                      <span><%= deck.category.presence || "Whiskey" %></span>
+                      <strong><%= deck.title %></strong>
+                    </div>
+                  <% end %>
+                </div>
+                <h3><%= deck.title %></h3>
+                <div class="c1-deck-meta"><%= [ deck.category.presence, (deck.respond_to?(:duration_label) ? deck.duration_label : "20 min") ].compact.join(" · ") %></div>
+                <div class="c1-deck-foot">
+                  <span><%= deck.respond_to?(:formatted_price) ? deck.formatted_price : "$16.99" %></span>
+                  <span class="c1-deck-pill"><%= i.zero? ? "Selected" : "Pick" %></span>
+                </div>
+              </button>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- ACT 2: GATHER YOUR SOCIETY (Vivid Orange Invite + Live RSVP Pour) -->
+        <div class="c1-act c1-act-2 c1-act--orange" data-concept-one-target="act">
+          <div>
+            <span class="c1-act-kicker">02 · Gather your society</span>
+            <h2>One link.<br><em>The table fills itself.</em></h2>
+            <p class="act-copy">Attach your chosen deck, pick a Friday, and drop the link in the group chat. Calendar invites and seat counts take care of themselves.</p>
+            <div style="margin-top:24px">
+              <%= link_to "Browse societies →", societies_path, class: "btn-k" %>
+            </div>
+          </div>
+
+          <div class="c1-invite-ticket">
+            <div class="c1-invite-photo">
+              <%= image_tag "photos/tasting-night-living-room.jpg", alt: "Friends gathered for a whiskey tasting" %>
+              <div class="c1-invite-stub"><i></i> Deck attached: <span data-concept-one-target="carriedDeck"><%= first_deck_title %></span></div>
+            </div>
+            <div class="c1-invite-body">
+              <div class="c1-invite-top">
+                <div class="c1-invite-date"><%= sample_date.strftime("%b %-d") %></div>
+                <div class="c1-invite-time"><%= sample_date.strftime("%a · 7:30 pm") %></div>
+              </div>
+              <div class="c1-invite-title"><%= invite_title %></div>
+              <div class="c1-invite-where"><%= invite_where %></div>
+
+              <div class="c1-rsvp-row">
+                <div class="c1-rsvp-glasses">
+                  <% 5.times do %>
+                    <%= render "shared/glass", level: 1, size: 28, appear: false %>
+                  <% end %>
+                  <span class="c1-extra-seat" data-concept-one-target="extraSeat">
+                    <%= render "shared/glass", level: 1, size: 28, appear: false %>
+                  </span>
+                  <span class="c1-rsvp-count" data-concept-one-target="rsvpCount" data-base="<%= invite_going %>"><%= invite_going %> going</span>
+                </div>
+                <button type="button" class="c1-rsvp-btn" data-concept-one-target="rsvpBtn" data-action="click->concept-one#toggleRsvp">Count me in</button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ACT 3: POUR & PRESENT (Deep Bottle-Green Living Room Projection) -->
+        <div class="c1-act c1-act-3 c1-act--dark" data-concept-one-target="act">
+          <div class="c1-act-3-head">
+            <div>
+              <span class="c1-act-kicker">03 · Pour &amp; present</span>
+              <h2>Open <em data-concept-one-target="carriedDeck"><%= first_deck_title %></em> on the TV.</h2>
+            </div>
+            <span style="font-size:13.5px;color:rgba(246,244,238,.64)">Tap any glass below to pour &amp; advance</span>
+          </div>
+
+          <div class="c1-room-screen">
+            <div>
+              <div class="c1-room-badge" data-concept-one-target="roomBadge">Pour 01 · Low Proof Opener</div>
+              <div class="c1-room-bottle" data-concept-one-target="roomBottle">Buffalo Trace</div>
+              <p class="c1-room-note" data-concept-one-target="roomNote">“Sweet vanilla bean, brown sugar, and bright orange peel — sets the baseline for the flight.”</p>
+              <div class="c1-room-meta">
+                <span class="c1-room-chip" data-concept-one-target="roomProof">90 proof</span>
+                <span class="c1-room-chip" data-concept-one-target="roomAge">NAS · ~8 yrs</span>
+                <span class="c1-room-chip">Speaker script synced</span>
+              </div>
+            </div>
+            <div class="c1-room-visual">
+              <div data-concept-one-target="roomGlass">
+                <%= render "shared/glass", level: 0.82, size: 96, tone: :cream, appear: false %>
+              </div>
+              <div class="c1-room-big-score">
+                <b data-concept-one-target="roomScore">4.1</b>
+                <span>Room average / 5</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="c1-pour-rail">
+            <% [ [ "01", "Buffalo Trace", "90°", 0.82 ], [ "02", "Maker's Mark 46", "94°", 0.85 ], [ "03", "Heaven Hill BiB", "100°", 0.88 ], [ "04", "Rare Breed", "116.8°", 0.93 ] ].each_with_index do |(num, name, proof, lvl), i| %>
+              <button type="button" class="c1-pour-btn <%= 'is-active' if i.zero? %>"
+                      data-concept-one-target="pourBtn" data-index="<%= i %>"
+                      data-action="click->concept-one#selectPour">
+                <%= render "shared/glass", level: lvl, size: 32, tone: :cream, appear: false %>
+                <div>
+                  <b><%= num %> · <%= name %></b>
+                  <small><%= proof %></small>
+                </div>
+              </button>
+            <% end %>
+          </div>
+        </div>
+
+        <!-- ACT 4: THE TASTING RECORD (Ranked Verdict + Live Morphing Palate Wheel) -->
+        <div class="c1-act c1-act-4 c1-act--dark" data-concept-one-target="act">
+          <div>
+            <span class="c1-act-kicker">04 · The tasting record</span>
+            <h2>Every pour, <em>ranked by the room.</em></h2>
+            <p class="act-copy">Tap any bottle to watch the palate wheel morph to what the room tasted.</p>
+
+            <ul class="c1-verdict-list">
+              <% [ [ 3, "#1", "Wild Turkey Rare Breed", "116.8 proof · Cinnamony oak & burnt orange", "4.65" ],
+                   [ 2, "#2", "Heaven Hill 7 Year BiB", "100 proof · Roasted peanut & dark honey", "4.40" ],
+                   [ 1, "#3", "Maker's Mark 46", "94 proof · Caramel, baked apple & spice", "4.25" ],
+                   [ 0, "#4", "Buffalo Trace", "90 proof · Vanilla bean & bright citrus", "4.10" ] ].each_with_index do |(idx, rank, name, sub, score), row_i| %>
+                <li>
+                  <button type="button" class="c1-verdict-row <%= 'is-active' if row_i.zero? %>"
+                          data-concept-one-target="verdictRow" data-index="<%= idx %>"
+                          data-action="click->concept-one#selectVerdict">
+                    <span class="c1-verdict-rank"><%= rank %></span>
+                    <span class="c1-verdict-name"><b><%= name %></b><small><%= sub %></small></span>
+                    <span class="c1-verdict-score"><%= score %></span>
+                  </button>
+                </li>
+              <% end %>
+            </ul>
+          </div>
+
+          <div class="c1-wheel-card">
+            <div class="c1-wheel-top">
+              <b data-concept-one-target="wheelTitle">Wild Turkey Rare Breed</b>
+              <span data-concept-one-target="wheelScore">4.65 / 5</span>
+            </div>
+            <svg class="c1-wheel-svg" viewBox="0 0 300 300" aria-label="Interactive palate wheel">
+              <circle cx="150" cy="150" r="112" fill="#f6f4ee" stroke="#dfe3dc" stroke-width="1"/>
+              <circle cx="150" cy="150" r="76" fill="none" stroke="#dfe3dc" stroke-width="1" stroke-dasharray="3 3"/>
+              <circle cx="150" cy="150" r="42" fill="none" stroke="#dfe3dc" stroke-width="1"/>
+              <% palate_axes.each_with_index do |(label, deg), i| %>
+                <% a1 = (deg - 20) * Math::PI / 180.0 %>
+                <% a2 = (deg + 20) * Math::PI / 180.0 %>
+                <% r = 108 %>
+                <% x1 = (150 + r * Math.cos(a1)).round(2); y1 = (150 + r * Math.sin(a1)).round(2) %>
+                <% x2 = (150 + r * Math.cos(a2)).round(2); y2 = (150 + r * Math.sin(a2)).round(2) %>
+                <% lx = (150 + 128 * Math.cos(deg * Math::PI / 180.0)).round(2) %>
+                <% ly = (150 + 128 * Math.sin(deg * Math::PI / 180.0) + 4).round(2) %>
+                <path class="c1-wedge" data-concept-one-target="wedge"
+                      d="M 150 150 L <%= x1 %> <%= y1 %> A <%= r %> <%= r %> 0 0 1 <%= x2 %> <%= y2 %> Z"
+                      fill="#16332a" opacity="0.6"/>
+                <text x="<%= lx %>" y="<%= ly %>" text-anchor="middle" font-size="11.5" font-weight="600" fill="#16332a"><%= label %></text>
+              <% end %>
+              <circle cx="150" cy="150" r="24" fill="#ffffff" stroke="#dfe3dc" stroke-width="1.2"/>
+              <text x="150" y="154" text-anchor="middle" font-size="10.5" font-weight="600" fill="#5f6b64">Palate</text>
+            </svg>
+          </div>
+        </div>
+      </div>
+
+      <!-- Floating Chapter Dock + Live Scroll-Pouring Glencairn -->
+      <div class="c1-dock" role="navigation" aria-label="Story chapters">
+        <div class="c1-dock-glass" data-concept-one-target="dockGlass">
+          <%= render "shared/glass", level: 1, size: 32, tone: :cream, appear: false %>
+        </div>
+        <button type="button" class="c1-dock-btn is-active" data-concept-one-target="dockBtn" data-act="1" data-action="click->concept-one#jumpAct">01 Pick</button>
+        <button type="button" class="c1-dock-btn" data-concept-one-target="dockBtn" data-act="2" data-action="click->concept-one#jumpAct">02 Gather</button>
+        <button type="button" class="c1-dock-btn" data-concept-one-target="dockBtn" data-act="3" data-action="click->concept-one#jumpAct">03 Pour</button>
+        <button type="button" class="c1-dock-btn" data-concept-one-target="dockBtn" data-act="4" data-action="click->concept-one#jumpAct">04 Record</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       RESTING FULL GLENCAIRN ON THE SPOTLIGHT CARD ("The Table")
+       ====================================================================== -->
+  <section class="c1-section" style="padding-top:20px">
+    <div class="wrap c1-rest-wrap">
+      <div class="c1-rest-glass" aria-hidden="true">
+        <%= render "shared/glass", level: 1, size: 72, appear: false %>
+      </div>
+      <% spot = @spotlight_deck || decks_for_fan.first %>
+      <% spot_cover = spot.respond_to?(:slide_images) ? deck_cover_attachment(spot) : nil %>
+      <div class="c1-spot">
+        <div class="c1-spot-media">
+          <% if spot_cover %>
+            <%= image_tag image_variant(spot_cover, :card), alt: spot.title %>
+          <% else %>
+            <%= image_tag "photos/rickhouse.jpg", alt: spot.title %>
+          <% end %>
+        </div>
+        <div>
+          <span class="c1-spot-badge">In the spotlight</span>
+          <h2 style="font-size:clamp(1.9rem,3.4vw,2.9rem);line-height:1.02;letter-spacing:-.045em;margin-top:14px"><%= spot.title %></h2>
+          <p style="margin-top:14px;font-size:17px;line-height:1.55;color:var(--mute);max-width:34em">
+            <%= spot.respond_to?(:excerpt) ? spot.excerpt(170) : "A first tasting night for people who are new to bourbon. Four bourbons, lowest proof first, and what the words on their labels mean." %>
+          </p>
+          <div style="margin-top:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <%= link_to "See the deck", (spot.respond_to?(:id) ? presentation_path(spot) : presentations_path), class: "btn-k" %>
+            <span style="font-size:14px;color:var(--mute)"><%= spot.respond_to?(:formatted_price) ? "#{spot.formatted_price}, or one credit with membership" : "$16.99, or one credit with membership" %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ORIGIN MANIFESTO -->
+  <section class="c1-section">
+    <div class="wrap">
+      <div class="c1-origin">
+        <div>
+          <h2>Born from a <em>real society.</em></h2>
+          <p>The first Whiskey Share Society started as a circle of friends in 2019. Each month one of us drew a topic, did the research, bought the bottles, and told its story over a deck of slides and a glass of whiskey.</p>
+          <div style="margin-top:28px"><%= link_to "Find your society", societies_path, class: "btn-k btn-k--light" %></div>
+        </div>
+        <ol class="c1-rules" aria-label="House rules">
+          <% rules.each do |rule| %><li><%= rule %></li><% end %>
+        </ol>
+      </div>
+    </div>
+  </section>
+
+  <!-- INTERACTIVE PRICING -->
+  <section class="c1-section">
+    <div class="wrap c1-split">
+      <div>
+        <h2>Choose <em>your pour.</em></h2>
+        <p style="margin-top:16px;font-size:18px;color:var(--mute);line-height:1.55">One membership, three ways to pay it. Every plan unlocks a deck credit every month and a society of your own.</p>
+        <div class="c1-seg" role="tablist" aria-label="Compare billing cadence">
+          <% @stripe_products.each do |product| %>
+            <% key = product[:name].to_s.parameterize %>
+            <button type="button" class="c1-seg-btn <%= 'is-active' if product[:popular] %>"
+                    data-concept-one-target="segBtn" data-plan="<%= key %>"
+                    data-action="click->concept-one#highlightPlan">
+              <%= product[:name].to_s.gsub(" Membership", "") %>
+            </button>
+          <% end %>
+        </div>
+      </div>
+
+      <div class="c1-plans">
+        <% @stripe_products.each do |product| %>
+          <% key = product[:name].to_s.parameterize %>
+          <%= link_to membership_path, class: "c1-plan #{'is-highlighted' if product[:popular]}",
+                data: { concept_one_target: "planCard", plan: key } do %>
+            <div>
+              <h3><%= product[:name].to_s.gsub(" Membership", "") %></h3>
+              <div class="c1-plan-sub"><%= plan_billing_line(product) %></div>
+            </div>
+            <div class="c1-plan-price">$<%= sprintf("%.2f", product[:price] / 100.0) %><small>/mo</small></div>
+            <span class="c1-plan-go" aria-hidden="true">→</span>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- FAQ -->
+  <section class="c1-section" style="padding-bottom:104px">
+    <div class="wrap c1-split">
+      <div><h2>Frequently asked <em>questions</em></h2></div>
+      <div class="c1-faq">
+        <% faqs.each do |q, a| %>
+          <details>
+            <summary><%= q %></summary>
+            <p><%= a %></p>
+          </details>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Concept Switcher Pill -->
+  <nav class="concept-switcher" aria-label="Switch homepage concept">
+    <%= link_to "Live", root_path %>
+    <%= link_to "Concept 1 · Cinema", home_concept_path(1), "aria-current": "page" %>
+    <%= link_to "Concept 2 · Tabletop", home_concept_path(2) %>
+  </nav>
+</div>

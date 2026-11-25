@@ -1,0 +1,448 @@
+/* Concept 2: "The Tactile Tasting Table" (/concepts/2)
+   Stripe Press meets Teenage Engineering:
+   - Flickable 3D physical deck stack in the hero
+   - Continuous vertical-to-horizontal scrolling Tabletop Rail
+   - Live pouring Pour Thread + Glencairn tracking left-to-right
+   - Interactive Category Shelf, Tear-Off Invite, Overhead 4-Pour Mat,
+     and Clickable 8-Axis Palate Sculptor.
+   Scoped strictly to .c2. */
+
+.c2 {
+  --bg: #f6f4ee;
+  --paper-2: #ecebe3;
+  --card: #ffffff;
+  --ink: #16332a;
+  --ink-deep: #0d1f19;
+  --oak: #1d4034;
+  --text: #1b2924;
+  --mute: #5f6b64;
+  --line: rgba(22, 51, 42, .14);
+  --line-strong: rgba(22, 51, 42, .28);
+  --mark: #ff6d00;
+  --mark-soft: #ff8a33;
+  --mark-deep: #e65c00;
+  --ease: cubic-bezier(0.22, 1, 0.36, 1);
+  --spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  background: var(--bg);
+  color: var(--text);
+  font-family: "Instrument Sans", system-ui, sans-serif;
+  overflow-x: clip;
+}
+.c2 *, .c2 *::before, .c2 *::after { box-sizing: border-box; }
+.c2 .wrap { max-width: 1280px; margin: 0 auto; padding: 0 24px; }
+@media (min-width: 900px) { .c2 .wrap { padding: 0 36px; } }
+.c2 h1, .c2 h2, .c2 h3 { font-weight: 600; color: var(--ink); text-wrap: balance; }
+.c2 h1 em, .c2 h2 em { font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-weight: 400; letter-spacing: -.03em; }
+
+.c2 .btn-t {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 52px; padding: 0 24px; border-radius: 14px; font-weight: 600; font-size: 15.5px;
+  text-decoration: none; border: 0; cursor: pointer;
+  background: var(--ink); color: #f6f4ee;
+  transition: transform 180ms var(--ease), background 150ms ease, box-shadow 200ms var(--ease);
+}
+.c2 .btn-t:hover { background: var(--oak); transform: translateY(-2px); box-shadow: 0 14px 28px -12px rgba(22, 51, 42, .5); }
+.c2 .btn-t--outline { background: transparent; color: var(--ink); box-shadow: inset 0 0 0 1.5px var(--ink); }
+.c2 .btn-t--outline:hover { background: var(--ink); color: #f6f4ee; }
+.c2 .btn-t--light { background: #f6f4ee; color: var(--ink); }
+.c2 .btn-t--light:hover { background: #fff; }
+
+/* ==========================================================================
+   HERO — Asymmetric Swiss Poster + Physical Flickable 3D Deck Stack
+   ========================================================================== */
+.c2-hero {
+  padding: 126px 0 72px;
+  border-bottom: 1px solid var(--line);
+}
+.c2-hero-grid {
+  display: grid; gap: 48px; align-items: center;
+}
+@media (min-width: 960px) {
+  .c2-hero-grid { grid-template-columns: 1fr 1.08fr; gap: 64px; }
+}
+.c2-eyebrow {
+  display: inline-flex; align-items: center; gap: 10px;
+  font-size: 12.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--ink); margin-bottom: 22px;
+}
+.c2-eyebrow i { width: 22px; height: 2px; background: var(--mark-deep); display: block; }
+.c2-hero h1 {
+  font-size: clamp(3.3rem, 6.8vw, 6.2rem);
+  line-height: .91;
+  letter-spacing: -.058em;
+}
+.c2-hero .lede {
+  margin-top: 24px;
+  font-size: clamp(1.0625rem, 1.45vw, 1.25rem);
+  line-height: 1.55; color: var(--mute); max-width: 30em;
+}
+.c2-hero-acts { margin-top: 30px; display: flex; flex-wrap: wrap; gap: 12px; }
+.c2-hero-meta {
+  margin-top: 28px; padding-top: 20px; border-top: 1px solid var(--line);
+  display: flex; gap: 28px; flex-wrap: wrap; font-size: 13.5px; color: var(--mute);
+}
+.c2-hero-meta strong { display: block; color: var(--ink); font-size: 18px; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+
+/* Physical 3D Flickable Deck Stack */
+.c2-stack-area { position: relative; }
+.c2-stack {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16 / 10.6;
+  cursor: pointer;
+  user-select: none;
+  touch-action: pan-y;
+}
+.c2-card {
+  position: absolute; inset: 0;
+  border-radius: 26px; overflow: hidden;
+  border: 1px solid rgba(22, 51, 42, .16);
+  box-shadow: 0 28px 60px -26px rgba(22, 51, 42, .45);
+  transform-origin: center bottom;
+  transition: transform 480ms var(--spring), opacity 360ms var(--ease), box-shadow 360ms var(--ease);
+  will-change: transform, opacity;
+  container-type: inline-size;
+}
+.c2-card[data-pos="0"] { z-index: 4; transform: translate3d(0, 0, 0) rotate(0deg) scale(1); }
+.c2-card[data-pos="1"] { z-index: 3; transform: translate3d(14px, 12px, 0) rotate(2.6deg) scale(.965); opacity: .94; }
+.c2-card[data-pos="2"] { z-index: 2; transform: translate3d(-12px, 22px, 0) rotate(-2.4deg) scale(.93); opacity: .86; }
+.c2-card[data-pos="3"] { z-index: 1; transform: translate3d(8px, 30px, 0) rotate(1.4deg) scale(.895); opacity: .74; }
+.c2-card.is-flicking {
+  transform: translate3d(115%, -18px, 0) rotate(14deg) scale(.92) !important;
+  opacity: 0 !important;
+  z-index: 5 !important;
+  transition: transform 300ms ease-in, opacity 260ms ease-in;
+}
+.c2-card:hover[data-pos="0"] { transform: translate3d(0, -5px, 0) rotate(-.5deg) scale(1.01); }
+
+/* Card Slide Surfaces */
+.c2-slide {
+  position: absolute; inset: 0; padding: 6.5cqw;
+  display: flex; flex-direction: column; justify-content: space-between;
+  background: var(--ink); color: #f6f4ee;
+}
+.c2-slide--paper { background: #fff; color: var(--ink); }
+.c2-slide--orange { background: var(--mark); color: var(--ink); }
+.c2-slide--deep { background: var(--ink-deep); color: #f6f4ee; }
+.c2-slide-top { display: flex; align-items: center; justify-content: space-between; font-size: 2.2cqw; font-weight: 600; opacity: .72; letter-spacing: .06em; text-transform: uppercase; }
+.c2-slide-h { font-size: 6.8cqw; font-weight: 600; line-height: .96; letter-spacing: -.048em; }
+.c2-slide-p { font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-size: 3cqw; line-height: 1.38; opacity: .86; max-width: 24em; margin-top: 2.2cqw; }
+.c2-slide-photo-strip {
+  height: 22cqw; border-radius: 2.4cqw; overflow: hidden; margin-top: 3cqw;
+  border: 1px solid rgba(246, 244, 238, .15);
+}
+.c2-slide-photo-strip img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%) contrast(1.1); }
+.c2-slide-pills { display: grid; grid-template-columns: repeat(2, 1fr); gap: 2cqw; margin-top: 3cqw; }
+.c2-slide-pill { background: var(--bg); border: 1px solid var(--line); border-radius: 2cqw; padding: 2.4cqw; }
+.c2-slide-pill b { display: block; font-size: 5cqw; letter-spacing: -.04em; line-height: 1; }
+.c2-slide-pill span { display: block; font-size: 2.1cqw; color: var(--mute); margin-top: .8cqw; }
+
+.c2-stack-bar {
+  margin-top: 38px;
+  display: flex; align-items: center; justify-content: space-between; gap: 16px;
+}
+.c2-stack-hint { font-size: 13.5px; color: var(--mute); display: flex; align-items: center; gap: 8px; }
+.c2-stack-hint b { color: var(--ink); font-variant-numeric: tabular-nums; }
+.c2-stack-btn {
+  appearance: none; border: 1px solid var(--line-strong); background: #fff; color: var(--ink);
+  border-radius: 999px; padding: 8px 16px; font-size: 13.5px; font-weight: 600; cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, transform 160ms var(--ease);
+}
+.c2-stack-btn:hover { background: var(--ink); color: #f6f4ee; transform: translateY(-1px); }
+
+/* ==========================================================================
+   HORIZONTAL TABLETOP RAIL (Vertical Scroll -> 1:1 Horizontal Pan)
+   ========================================================================== */
+.c2-rail-wrap {
+  position: relative;
+  height: 410svh;
+  border-bottom: 1px solid var(--line);
+}
+.c2-rail-pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 86px 0 28px;
+  overflow: hidden;
+  background: var(--bg);
+}
+
+/* Tabletop Progress Header + Drawing Orange Pour Thread */
+.c2-rail-head {
+  max-width: 1280px; width: 100%; margin: 0 auto; padding: 0 36px;
+  display: flex; align-items: center; justify-content: space-between; gap: 20px;
+}
+.c2-rail-steps { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+.c2-step-btn {
+  appearance: none; border: 1px solid var(--line); background: #fff; color: var(--mute);
+  padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: background 180ms ease, color 180ms ease, border-color 180ms ease;
+}
+.c2-step-btn:hover { color: var(--ink); border-color: var(--line-strong); }
+.c2-step-btn.is-active { background: var(--ink); color: #f6f4ee; border-color: var(--ink); }
+
+.c2-thread-track {
+  position: relative; flex: 1; max-width: 340px; height: 2px;
+  background: var(--line); border-radius: 99px;
+}
+.c2-thread-fill {
+  position: absolute; left: 0; top: 0; bottom: 0; width: 100%;
+  background: var(--mark); border-radius: 99px;
+  transform-origin: left center; transform: scaleX(var(--rail-p, 0));
+}
+.c2-thread-glass {
+  position: absolute; top: 50%; left: calc(var(--rail-p, 0) * 100%);
+  transform: translate(-50%, -56%);
+}
+.c2-thread-glass svg g > path { transform: translateY(var(--c2-glass-drop, 28px)); }
+
+/* Horizontally Translating Track */
+.c2-track-viewport {
+  flex: 1; min-height: 0;
+  display: flex; align-items: center;
+  overflow: hidden;
+  padding: 18px 0;
+}
+.c2-track {
+  display: flex;
+  align-items: stretch;
+  gap: 32px;
+  padding: 0 4vw;
+  will-change: transform;
+  transform: translate3d(var(--rail-x, 0px), 0, 0);
+}
+.c2-station {
+  flex: 0 0 min(82vw, 1020px);
+  height: min(560px, calc(100svh - 210px));
+  background: #fff;
+  border: 1px solid var(--line);
+  border-radius: 30px;
+  padding: 34px 38px;
+  display: grid;
+  box-shadow: 0 26px 60px -36px rgba(22, 51, 42, .25);
+  overflow: hidden;
+}
+.c2-station--orange { background: var(--mark); border-color: transparent; color: var(--ink); }
+.c2-station--linen { background: #fbfaf6; }
+.c2-station--ink { background: var(--ink); border-color: transparent; color: #f6f4ee; }
+
+.c2-st-num { font-size: 12.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--mark-deep); }
+.c2-station--orange .c2-st-num { color: var(--ink); opacity: .75; }
+.c2-station--ink .c2-st-num { color: var(--mark-soft); }
+.c2-station h2 { font-size: clamp(1.85rem, 3.2vw, 2.85rem); line-height: 1.02; letter-spacing: -.045em; margin-top: 8px; }
+.c2-station--ink h2 { color: #f6f4ee; }
+
+/* Station 1: Live Filterable Deck Shelf */
+.c2-st-1 { grid-template-rows: auto 1fr; gap: 22px; }
+.c2-st-1-top { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; flex-wrap: wrap; }
+.c2-filter-row { display: flex; gap: 6px; flex-wrap: wrap; }
+.c2-fchip {
+  appearance: none; border: 1px solid var(--line); background: var(--bg); color: var(--ink);
+  padding: 7px 14px; border-radius: 999px; font-size: 13px; font-weight: 600; cursor: pointer;
+  transition: background 150ms ease, color 150ms ease;
+}
+.c2-fchip.is-active { background: var(--ink); color: #f6f4ee; border-color: var(--ink); }
+.c2-shelf { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: stretch; }
+.c2-shelf-item {
+  border-radius: 20px; border: 1px solid var(--line); background: var(--bg);
+  padding: 14px; display: flex; flex-direction: column; text-decoration: none; color: var(--ink);
+  transition: transform 200ms var(--ease), border-color 180ms ease, background 180ms ease;
+}
+.c2-shelf-item:hover { transform: translateY(-4px); border-color: var(--ink); background: #fff; }
+.c2-shelf-item[hidden] { display: none; }
+.c2-shelf-art {
+  aspect-ratio: 16 / 9; border-radius: 12px; overflow: hidden; background: var(--ink);
+  display: flex; flex-direction: column; justify-content: flex-end; padding: 12px; color: #f6f4ee;
+  position: relative;
+}
+.c2-shelf-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
+.c2-shelf-art span { position: relative; z-index: 1; font-size: 11px; font-weight: 600; color: var(--mark-soft); text-transform: uppercase; letter-spacing: .07em; }
+.c2-shelf-item h3 { font-size: 17px; margin-top: 12px; line-height: 1.2; }
+.c2-shelf-item p { font-size: 13px; color: var(--mute); margin-top: 4px; }
+.c2-shelf-foot { margin-top: auto; padding-top: 12px; display: flex; justify-content: space-between; font-size: 13.5px; font-weight: 600; }
+
+/* Station 2: Tear-Off Tasting Invite Ticket */
+.c2-st-2 { grid-template-columns: .92fr 1.08fr; gap: 36px; align-items: center; }
+.c2-ticket {
+  position: relative; background: #f6f4ee; border-radius: 22px; overflow: hidden;
+  box-shadow: 0 28px 56px -24px rgba(22, 51, 42, .48);
+}
+.c2-ticket-photo { height: 164px; overflow: hidden; background: var(--ink); position: relative; }
+.c2-ticket-photo img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 10%; filter: grayscale(100%) contrast(1.1); opacity: .82; mix-blend-mode: screen; }
+.c2-ticket-perf {
+  border-top: 2px dashed rgba(22, 51, 42, .2);
+  padding: 20px 24px 22px;
+}
+.c2-ticket-row { display: flex; justify-content: space-between; align-items: baseline; }
+.c2-ticket-date { font-size: 40px; font-weight: 700; letter-spacing: -.06em; line-height: .9; }
+.c2-ticket-rsvp { display: flex; gap: 6px; margin-top: 16px; }
+.c2-rsvp-pill {
+  flex: 1; appearance: none; border: 1px solid var(--line-strong); background: #fff; color: var(--ink);
+  padding: 9px 10px; border-radius: 12px; font-size: 13.5px; font-weight: 600; cursor: pointer;
+  transition: background 150ms ease, color 150ms ease, border-color 150ms ease;
+}
+.c2-rsvp-pill.is-yes { background: #55743f; border-color: #55743f; color: #fff; }
+.c2-rsvp-pill.is-maybe { background: #a15825; border-color: #a15825; color: #fff; }
+.c2-rsvp-pill.is-no { background: #a8503a; border-color: #a8503a; color: #fff; }
+
+/* Station 3: Overhead 4-Pour Printed Tasting Mat */
+.c2-st-3 { grid-template-rows: auto 1fr auto; gap: 18px; }
+.c2-mat {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; align-items: center;
+}
+.c2-coaster {
+  appearance: none; cursor: pointer; text-align: center;
+  background: #fff; border: 1.5px solid var(--line); border-radius: 24px;
+  padding: 22px 14px;
+  display: flex; flex-direction: column; align-items: center; gap: 10px;
+  transition: transform 240ms var(--spring), border-color 180ms ease, box-shadow 220ms var(--ease);
+}
+.c2-coaster:hover { transform: translateY(-6px); border-color: var(--ink); }
+.c2-coaster.is-active {
+  border-color: var(--mark);
+  box-shadow: 0 20px 40px -24px rgba(230, 92, 0, .42), 0 0 0 1px var(--mark);
+  transform: translateY(-6px);
+}
+.c2-coaster-ring {
+  width: 84px; height: 84px; border-radius: 999px;
+  background: var(--bg); border: 1px dashed rgba(22, 51, 42, .22);
+  display: flex; align-items: center; justify-content: center;
+}
+.c2-coaster.is-active .c2-coaster-ring { border-color: var(--mark-deep); border-style: solid; background: rgba(255, 109, 0, .07); }
+.c2-coaster-num { font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-size: 13px; color: var(--mute); }
+.c2-coaster b { font-size: 15px; line-height: 1.15; color: var(--ink); }
+.c2-coaster small { font-size: 12.5px; color: var(--mute); font-variant-numeric: tabular-nums; }
+
+.c2-mat-strip {
+  background: var(--ink); color: #f6f4ee; border-radius: 18px; padding: 16px 22px;
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px;
+}
+.c2-mat-strip dt { font-size: 11px; text-transform: uppercase; letter-spacing: .09em; color: var(--mark-soft); font-weight: 700; }
+.c2-mat-strip dd { margin: 4px 0 0; font-family: "Source Serif 4", Georgia, serif; font-size: 14.5px; color: rgba(246, 244, 238, .88); }
+
+/* Station 4: Interactive Palate Sculptor */
+.c2-st-4 { grid-template-columns: 1fr 1fr; gap: 36px; align-items: center; }
+.c2-sculpt-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+.c2-axis-btn {
+  appearance: none; cursor: pointer;
+  border: 1px solid rgba(246, 244, 238, .2);
+  background: rgba(246, 244, 238, .06); color: #f6f4ee;
+  padding: 8px 13px; border-radius: 12px; font-size: 13.5px; font-weight: 600;
+  display: inline-flex; align-items: center; gap: 8px;
+  transition: background 160ms ease, border-color 160ms ease, transform 150ms var(--ease);
+}
+.c2-axis-btn:hover { background: rgba(246, 244, 238, .12); transform: translateY(-1px); }
+.c2-axis-btn[data-level="2"] { border-color: rgba(255, 138, 51, .55); background: rgba(255, 109, 0, .16); }
+.c2-axis-btn[data-level="3"] { border-color: var(--mark); background: var(--mark); color: var(--ink); }
+.c2-axis-dots { display: inline-flex; gap: 3px; }
+.c2-axis-dots i { width: 5px; height: 5px; border-radius: 99px; background: currentColor; opacity: .28; }
+.c2-axis-btn[data-level="1"] .c2-axis-dots i:nth-child(1),
+.c2-axis-btn[data-level="2"] .c2-axis-dots i:nth-child(-n+2),
+.c2-axis-btn[data-level="3"] .c2-axis-dots i { opacity: 1; }
+
+.c2-sculpt-card {
+  background: #fff; color: var(--ink); border-radius: 26px; padding: 22px 24px;
+  display: flex; flex-direction: column; align-items: center;
+}
+.c2-sculpt-top { width: 100%; display: flex; align-items: center; justify-content: space-between; padding-bottom: 10px; border-bottom: 1px solid var(--line); }
+.c2-sculpt-score { display: flex; align-items: center; gap: 10px; font-size: 24px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.c2-sculpt-score svg g > path { transition: transform 360ms var(--ease); }
+.c2-sculpt-svg { width: min(275px, 100%); height: auto; margin-top: 6px; overflow: visible; }
+.c2-sculpt-wedge {
+  cursor: pointer; transform-origin: 150px 150px;
+  transition: transform 360ms var(--spring), fill 240ms ease, opacity 240ms ease;
+}
+
+/* ==========================================================================
+   LOWER VERTICAL EDITORIAL LOOKBOOK
+   ========================================================================== */
+.c2-section { padding: 72px 0; }
+.c2-rest-wrap { position: relative; padding-top: 68px; }
+.c2-rest-glass { position: absolute; left: 50%; top: 8px; transform: translateX(-50%); z-index: 3; pointer-events: none; }
+.c2-spot {
+  background: #fff; border: 1px solid var(--line); border-radius: 28px; padding: 24px;
+  display: grid; gap: 36px; align-items: center;
+}
+@media (min-width: 900px) { .c2-spot { grid-template-columns: 1fr 1.1fr; padding: 24px 48px 24px 24px; } }
+.c2-spot-img { aspect-ratio: 16 / 9; border-radius: 18px; overflow: hidden; background: var(--ink); }
+.c2-spot-img img { width: 100%; height: 100%; object-fit: cover; }
+
+/* Rickhouse Magazine Spread */
+.c2-spread {
+  display: grid; gap: 24px; align-items: stretch;
+}
+@media (min-width: 900px) { .c2-spread { grid-template-columns: .9fr 1.1fr; } }
+.c2-spread-photo {
+  border-radius: 30px; overflow: hidden; background: var(--ink); min-height: 360px; position: relative;
+}
+.c2-spread-photo img { width: 100%; height: 100%; object-fit: cover; filter: grayscale(100%) contrast(1.1); mix-blend-mode: screen; opacity: .78; }
+.c2-spread-caption {
+  position: absolute; left: 24px; right: 24px; bottom: 22px;
+  color: #f6f4ee; font-family: "Source Serif 4", Georgia, serif; font-style: italic; font-size: 16px;
+}
+.c2-spread-panel {
+  background: var(--ink); color: #f6f4ee; border-radius: 30px; padding: 48px 40px;
+  display: flex; flex-direction: column; justify-content: space-between;
+}
+.c2-spread-panel h2 { color: #f6f4ee; font-size: clamp(2.1rem, 3.8vw, 3.3rem); line-height: 1; letter-spacing: -.045em; }
+.c2-spread-panel p { color: rgba(246, 244, 238, .76); font-size: 17px; line-height: 1.56; margin-top: 16px; }
+.c2-rule-list { list-style: none; margin: 28px 0 0; padding: 0; counter-reset: r; border-top: 1px solid rgba(246, 244, 238, .14); }
+.c2-rule-list li {
+  counter-increment: r; display: grid; grid-template-columns: 36px 1fr; align-items: baseline;
+  padding: 14px 0; border-bottom: 1px solid rgba(246, 244, 238, .14); font-size: 16px;
+}
+.c2-rule-list li::before { content: "0" counter(r); color: var(--mark-soft); font-size: 13px; font-weight: 700; font-variant-numeric: tabular-nums; }
+
+/* 3-Column Swiss Pricing Ledger */
+.c2-ledger { display: grid; gap: 14px; margin-top: 32px; }
+@media (min-width: 860px) { .c2-ledger { grid-template-columns: repeat(3, 1fr); } }
+.c2-tier {
+  background: #fff; border: 1px solid var(--line); border-radius: 26px; padding: 28px;
+  display: flex; flex-direction: column; text-decoration: none; color: var(--ink);
+  transition: transform 200ms var(--ease), border-color 180ms ease, box-shadow 200ms var(--ease);
+}
+.c2-tier:hover { transform: translateY(-4px); border-color: var(--ink); box-shadow: 0 22px 44px -26px rgba(22, 51, 42, .24); }
+.c2-tier--pick { background: var(--ink); color: #f6f4ee; border-color: var(--ink); box-shadow: 0 26px 52px -24px rgba(22, 51, 42, .56); }
+.c2-tier--pick h3 { color: #f6f4ee; }
+.c2-tier-price { margin-top: 26px; font-size: 44px; font-weight: 600; letter-spacing: -.05em; line-height: 1; font-variant-numeric: tabular-nums; }
+.c2-tier-price small { font-size: 15px; font-weight: 500; opacity: .68; }
+.c2-tier-bill { margin-top: 10px; font-size: 14px; color: var(--mute); }
+.c2-tier--pick .c2-tier-bill { color: rgba(246, 244, 238, .72); }
+.c2-tier-cta { margin-top: auto; padding-top: 28px; font-weight: 600; font-size: 15px; display: inline-flex; align-items: center; gap: 6px; }
+
+/* Concept Switcher Pill (shared styling) */
+.concept-switcher {
+  position: fixed; left: 18px; bottom: 18px; z-index: 60;
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 5px; border-radius: 999px;
+  background: rgba(13, 31, 25, .92);
+  border: 1px solid rgba(246, 244, 238, .18);
+  box-shadow: 0 14px 32px -12px rgba(0, 0, 0, .48);
+  backdrop-filter: blur(10px);
+}
+.concept-switcher a {
+  padding: 7px 13px; border-radius: 999px; font-size: 12.5px; font-weight: 600;
+  color: rgba(246, 244, 238, .76); text-decoration: none;
+  transition: background 150ms ease, color 150ms ease;
+}
+.concept-switcher a:hover { color: #f6f4ee; }
+.concept-switcher a[aria-current="page"] { background: var(--mark, #ff6d00); color: #16332a; }
+
+/* Mobile: Horizontal Rail unfolds cleanly into vertical cards */
+@media (max-width: 899px) {
+  .c2-rail-wrap { height: auto; }
+  .c2-rail-pin { position: static; height: auto; padding: 36px 0; }
+  .c2-rail-head { padding: 0 20px; }
+  .c2-thread-track { display: none; }
+  .c2-track-viewport { overflow: visible; padding: 20px 16px 0; }
+  .c2-track { flex-direction: column; transform: none !important; padding: 0; gap: 20px; width: 100%; }
+  .c2-station { flex: none; width: 100%; height: auto; padding: 24px 20px; }
+  .c2-shelf, .c2-st-2, .c2-mat, .c2-mat-strip, .c2-st-4 { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .c2-card, .c2-coaster, .c2-sculpt-wedge, .c2-tier { transition: none !important; }
+}

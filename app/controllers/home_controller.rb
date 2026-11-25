@@ -2,6 +2,52 @@ class HomeController < ApplicationController
   include DesignPreview
 
   def index
+    load_homepage_data
+
+    # Earlier design studies, kept for reference: ?design=next and ?design=next2.
+    preview = { "next" => "index_next", "next2" => "index_next2", "next4" => "index_next4" }[params[:design]]
+    if preview && design_preview_allowed?
+      Rails.logger.info "Home: rendering #{preview} design study"
+      if preview == "index_next4"
+        # "The night, pour by pour" study (docs/redesign/DIRECTION_NIGHT.md).
+        # Public societies only, so nothing private reaches a signed-out page.
+        public_events = Event.joins(:society).where(societies: { is_private: false })
+        @night = public_events.upcoming.includes(:society, :host, :presentation).first
+        @coming_up = public_events.upcoming.includes(:society).limit(3)
+        if @night
+          @night_deck = @night.presentation if @night.presentation&.published?
+          # Pour names only once Event#pours_revealed? says so; the homepage
+          # never uses the host/manager bypass, so a secret pour stays secret.
+          @night_pours = @night.event_bottles.ordered.includes(:bottle).to_a
+          @night_members = @night.society.member_count
+        end
+        # The verdict (@verdict_night, @verdict_rows) is loaded above for slide four.
+        Rails.logger.info "Home next4: night #{@night&.id || 'none'}, verdict night #{@verdict_night&.id || 'none'}"
+        @night_story_deck = @night_deck if @night_deck&.slide_images&.attached?
+      end
+      render preview
+    end
+  end
+
+  def concept
+    load_homepage_data
+    @concept_decks = Presentation.published.recent.limit(6)
+                                 .includes(slide_images_attachments: { blob: :variant_records }, featured_image_attachment: { blob: :variant_records }).to_a
+    render "home/concept_#{params[:id]}"
+  end
+
+  # Standalone membership page: the "start your own whiskey club" pitch plus
+  # the same plan cards the homepage shows (shared partial).
+  def membership
+    @stripe_products = fetch_stripe_products
+  end
+
+  def contact
+  end
+
+  private
+
+  def load_homepage_data
     @stripe_products = fetch_stripe_products
     # The library rows (the face and the story frame); their covers preloaded,
     # so a row costs no queries of its own.
@@ -39,42 +85,7 @@ class HomeController < ApplicationController
     load_next_event_guests
     load_featured_review
     @deck_categories = Presentation.published.where.not(category: [ nil, "" ]).distinct.order(:category).limit(6).pluck(:category)
-
-    # Earlier design studies, kept for reference: ?design=next and ?design=next2.
-    preview = { "next" => "index_next", "next2" => "index_next2", "next4" => "index_next4" }[params[:design]]
-    if preview && design_preview_allowed?
-      Rails.logger.info "Home: rendering #{preview} design study"
-      if preview == "index_next4"
-        # "The night, pour by pour" study (docs/redesign/DIRECTION_NIGHT.md).
-        # Public societies only, so nothing private reaches a signed-out page.
-        public_events = Event.joins(:society).where(societies: { is_private: false })
-        @night = public_events.upcoming.includes(:society, :host, :presentation).first
-        @coming_up = public_events.upcoming.includes(:society).limit(3)
-        if @night
-          @night_deck = @night.presentation if @night.presentation&.published?
-          # Pour names only once Event#pours_revealed? says so; the homepage
-          # never uses the host/manager bypass, so a secret pour stays secret.
-          @night_pours = @night.event_bottles.ordered.includes(:bottle).to_a
-          @night_members = @night.society.member_count
-        end
-        # The verdict (@verdict_night, @verdict_rows) is loaded above for slide four.
-        Rails.logger.info "Home next4: night #{@night&.id || 'none'}, verdict night #{@verdict_night&.id || 'none'}"
-        @night_story_deck = @night_deck if @night_deck&.slide_images&.attached?
-      end
-      render preview
-    end
   end
-
-  # Standalone membership page: the "start your own whiskey club" pitch plus
-  # the same plan cards the homepage shows (shared partial).
-  def membership
-    @stripe_products = fetch_stripe_products
-  end
-
-  def contact
-  end
-
-  private
 
   # The latest revealed night at a public society whose pours have event
   # reviews, ranked by GlassHelper#verdict_rows. Sets @verdict_night and

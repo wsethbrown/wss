@@ -1,0 +1,393 @@
+<% content_for :title, "Concept 2: Tactile Tasting Table — Whiskey Share Society" %>
+<% content_for :head do %>
+  <%= stylesheet_link_tag "concepts/concept2" %>
+<% end %>
+
+<%
+  shelf_decks = @concept_decks.first(6)
+  if shelf_decks.size < 3
+    fallback_struct = Data.define(:title, :category, :formatted_price, :duration_label)
+    shelf_decks = [
+      fallback_struct.new(title: "Bourbon Basics", category: "Bourbon", formatted_price: "$16.99", duration_label: "20 min"),
+      fallback_struct.new(title: "Introduction to Scotch Whisky", category: "Scotch", formatted_price: "$16.99", duration_label: "20 min"),
+      fallback_struct.new(title: "Japanese Whisky Masterclass", category: "Japanese", formatted_price: "$16.99", duration_label: "18 min")
+    ]
+  end
+  shelf_cats = shelf_decks.map { |d| d.category.to_s.split.first }.compact_blank.uniq.first(4)
+  sample_date = @next_event ? @next_event.start_time.in_time_zone(@next_event.effective_time_zone) : Date.current.next_occurring(:friday)
+  invite_title = @next_event ? @next_event.title : "Bourbon night"
+  invite_where = @next_event ? [ @next_event.society.name, @next_event.location.presence ].compact.join(" · ") : "Your society · Your living room"
+
+  palate_axes = [
+    [ "Sweet",   -90 ], [ "Oaky",    -45 ], [ "Spicy",     0 ], [ "Fruity",   45 ],
+    [ "Smoky",    90 ], [ "Grainy",  135 ], [ "Floral",  180 ], [ "Coastal", 225 ]
+  ]
+  rules = [
+    "One presenter a month, everyone takes a turn.",
+    "Research your topic like you mean it.",
+    "Choose the bottles that belong to the story.",
+    "No dry fact sheets. Follow the narrative threads."
+  ]
+%>
+
+<div class="c2" data-controller="concept-two">
+  <!-- ======================================================================
+       HERO — Swiss Editorial Poster + Physical Flickable 3D Slide Stack
+       ====================================================================== -->
+  <section class="c2-hero">
+    <div class="wrap c2-hero-grid">
+      <div>
+        <div class="c2-eyebrow"><i></i> Est. 2019 · Narrative Tasting Decks</div>
+        <h1>Every pour<br>has <em>a story.</em></h1>
+        <p class="lede">Slide decks built for real living-room whiskey nights — researched, scripted, and paired with four bottles at any budget.</p>
+        <div class="c2-hero-acts">
+          <%= link_to "Browse the decks", presentations_path, class: "btn-t" %>
+          <a href="#c2-tabletop" data-turbo="false" class="btn-t btn-t--outline">Walk the table ↓</a>
+        </div>
+        <div class="c2-hero-meta">
+          <div><strong>15–20 min</strong><span>Relaxed script runtime</span></div>
+          <div><strong>4 pours</strong><span>Lowest proof first</span></div>
+          <div><strong>1 credit / mo</strong><span>Or buy any deck outright</span></div>
+        </div>
+      </div>
+
+      <div class="c2-stack-area">
+        <div class="c2-stack" data-action="click->concept-two#flickCard" role="button" tabindex="0" aria-label="Flip to next slide card">
+          <!-- Card 1: Cover -->
+          <div class="c2-card" data-concept-two-target="card" data-pos="0">
+            <div class="c2-slide">
+              <div class="c2-slide-top"><span>Whiskey Share Society</span><span>01 / 04</span></div>
+              <div>
+                <div class="c2-slide-h">Bourbon<br>Basics</div>
+                <div class="c2-slide-p">Four bourbons, lowest proof first, and what the words on their labels actually mean.</div>
+                <div class="c2-slide-photo-strip"><%= image_tag "photos/rickhouse.jpg", alt: "" %></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Mash & Law -->
+          <div class="c2-card" data-concept-two-target="card" data-pos="1">
+            <div class="c2-slide c2-slide--paper">
+              <div class="c2-slide-top"><span>Act I · Federal Standards</span><span>02 / 04</span></div>
+              <div>
+                <div class="c2-slide-h">Not a recipe.<br>Four rules.</div>
+                <div class="c2-slide-pills">
+                  <div class="c2-slide-pill"><b>51%</b><span>Corn minimum</span></div>
+                  <div class="c2-slide-pill"><b>New Oak</b><span>Charred barrel</span></div>
+                  <div class="c2-slide-pill"><b>125°</b><span>Max entry proof</span></div>
+                  <div class="c2-slide-pill"><b>Zero</b><span>Additives allowed</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 3: Char No. 4 -->
+          <div class="c2-card" data-concept-two-target="card" data-pos="2">
+            <div class="c2-slide c2-slide--orange">
+              <div class="c2-slide-top"><span>Act II · The Barrel</span><span>03 / 04</span></div>
+              <div>
+                <div class="c2-slide-h">55 seconds<br>of fire.</div>
+                <div class="c2-slide-p">Char No. 4 blisters white oak into alligator skin — caramelizing wood sugars into vanilla, spice, and color.</div>
+                <div class="c2-slide-photo-strip"><%= image_tag "photos/deck-pour-decanter.jpg", alt: "" %></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 4: The Flight -->
+          <div class="c2-card" data-concept-two-target="card" data-pos="3">
+            <div class="c2-slide c2-slide--deep">
+              <div class="c2-slide-top"><span>Act III · The Four Pours</span><span>04 / 04</span></div>
+              <div>
+                <div class="c2-slide-h">Pour low<br>to high.</div>
+                <div class="c2-slide-p">Buffalo Trace (90°) → Maker's Mark 46 (94°) → Heaven Hill BiB (100°) → Wild Turkey Rare Breed (116.8°).</div>
+              </div>
+              <div class="c2-slide-top"><span>Printable tasting mats included</span><span>Ready to present</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="c2-stack-bar">
+          <div class="c2-stack-hint"><b data-concept-two-target="stackCount">01 / 04</b> <span>Click the deck to flick through slides</span></div>
+          <button type="button" class="c2-stack-btn" data-action="click->concept-two#flickCard">Next slide →</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       THE HORIZONTAL TABLETOP RAIL (Vertical Scroll -> 1:1 Horizontal Pan)
+       ====================================================================== -->
+  <section id="c2-tabletop" class="c2-rail-wrap" data-concept-two-target="railWrap" aria-label="Interactive tasting table">
+    <div class="c2-rail-pin" data-concept-two-target="railPin">
+      <div class="c2-rail-head">
+        <div class="c2-rail-steps">
+          <button type="button" class="c2-step-btn is-active" data-concept-two-target="stepBtn" data-index="0" data-action="click->concept-two#jumpStation">01 Decks</button>
+          <button type="button" class="c2-step-btn" data-concept-two-target="stepBtn" data-index="1" data-action="click->concept-two#jumpStation">02 Invite</button>
+          <button type="button" class="c2-step-btn" data-concept-two-target="stepBtn" data-index="2" data-action="click->concept-two#jumpStation">03 Tasting Mat</button>
+          <button type="button" class="c2-step-btn" data-concept-two-target="stepBtn" data-index="3" data-action="click->concept-two#jumpStation">04 Palate</button>
+        </div>
+
+        <div class="c2-thread-track" aria-hidden="true">
+          <div class="c2-thread-fill"></div>
+          <div class="c2-thread-glass" data-concept-two-target="threadGlass">
+            <%= render "shared/glass", level: 1, size: 30, appear: false %>
+          </div>
+        </div>
+      </div>
+
+      <div class="c2-track-viewport">
+        <div class="c2-track" data-concept-two-target="track">
+
+          <!-- STATION 01: Live Filterable Deck Shelf -->
+          <article class="c2-station c2-st-1">
+            <div class="c2-st-1-top">
+              <div>
+                <div class="c2-st-num">Station 01 · The Library</div>
+                <h2>Pick <em>a deck</em> for the table.</h2>
+              </div>
+              <div class="c2-filter-row" role="group" aria-label="Filter preview decks">
+                <button type="button" class="c2-fchip is-active" data-concept-two-target="fchip" data-cat="all" data-action="click->concept-two#filterShelf">All</button>
+                <% shelf_cats.each do |cat| %>
+                  <button type="button" class="c2-fchip" data-concept-two-target="fchip" data-cat="<%= cat.downcase %>" data-action="click->concept-two#filterShelf"><%= cat %></button>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="c2-shelf">
+              <% shelf_decks.first(3).each do |deck| %>
+                <% cat_key = deck.category.to_s.split.first.to_s.downcase %>
+                <% cover = deck.respond_to?(:slide_images) ? deck_cover_attachment(deck) : nil %>
+                <%= link_to (deck.respond_to?(:id) ? presentation_path(deck) : presentations_path),
+                      class: "c2-shelf-item",
+                      data: { concept_two_target: "shelfItem", cat: cat_key } do %>
+                  <div class="c2-shelf-art">
+                    <% if cover %><%= image_tag image_variant(cover, :card), alt: "" %><% end %>
+                    <span><%= deck.category.presence || "Whiskey" %></span>
+                  </div>
+                  <h3><%= deck.title %></h3>
+                  <p><%= deck.respond_to?(:duration_label) ? (deck.duration_label || "20 min runtime") : "20 min runtime" %></p>
+                  <div class="c2-shelf-foot">
+                    <span><%= deck.respond_to?(:formatted_price) ? deck.formatted_price : "$16.99" %></span>
+                    <span>Open →</span>
+                  </div>
+                <% end %>
+              <% end %>
+            </div>
+          </article>
+
+          <!-- STATION 02: Tear-Off Society Invite Ticket -->
+          <article class="c2-station c2-station--orange c2-st-2">
+            <div>
+              <div class="c2-st-num">Station 02 · The Invite</div>
+              <h2>Send one link.<br><em>Fill the room.</em></h2>
+              <p style="margin-top:14px;font-size:16.5px;line-height:1.52;opacity:.85;max-width:28em">
+                Every tasting night gets its own invite page with calendar downloads, blind-pour controls, and live seat glasses. Try tapping an answer on the ticket.
+              </p>
+              <div style="margin-top:24px"><%= link_to "Browse societies →", societies_path, class: "btn-t" %></div>
+            </div>
+
+            <div class="c2-ticket">
+              <div class="c2-ticket-photo">
+                <%= image_tag "photos/tasting-night-living-room.jpg", alt: "" %>
+              </div>
+              <div class="c2-ticket-perf">
+                <div class="c2-ticket-row">
+                  <div class="c2-ticket-date"><%= sample_date.strftime("%b %-d") %></div>
+                  <div style="font-size:13px;font-weight:600;color:var(--mute)"><%= sample_date.strftime("%a · 7:30 pm") %></div>
+                </div>
+                <div style="font-size:21px;font-weight:600;margin-top:10px;letter-spacing:-.03em"><%= invite_title %></div>
+                <div style="font-family:'Source Serif 4',Georgia,serif;font-size:15px;color:var(--mute);margin-top:2px"><%= invite_where %></div>
+
+                <div class="c2-ticket-rsvp">
+                  <button type="button" class="c2-rsvp-pill is-yes" data-concept-two-target="rsvpPill" data-status="yes" data-action="click->concept-two#setRsvp">Going</button>
+                  <button type="button" class="c2-rsvp-pill" data-concept-two-target="rsvpPill" data-status="maybe" data-action="click->concept-two#setRsvp">Maybe</button>
+                  <button type="button" class="c2-rsvp-pill" data-concept-two-target="rsvpPill" data-status="no" data-action="click->concept-two#setRsvp">Can't make it</button>
+                </div>
+                <p style="margin-top:12px;font-size:13px;font-weight:600;color:var(--ink)" data-concept-two-target="rsvpStatus">Seat reserved · 6 glasses set for Friday</p>
+              </div>
+            </div>
+          </article>
+
+          <!-- STATION 03: Overhead 4-Pour Printed Tasting Mat -->
+          <article class="c2-station c2-station--linen c2-st-3">
+            <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:16px;flex-wrap:wrap">
+              <div>
+                <div class="c2-st-num">Station 03 · The Tasting Mat</div>
+                <h2>Four glasses, <em>in order.</em></h2>
+              </div>
+              <span style="font-size:13.5px;color:var(--mute)">Tap any coaster to inspect its tasting notes</span>
+            </div>
+
+            <div class="c2-mat">
+              <% [ [ "Pour I", "Buffalo Trace", "90 proof", 0.82 ],
+                   [ "Pour II", "Maker's Mark 46", "94 proof", 0.85 ],
+                   [ "Pour III", "Heaven Hill BiB", "100 proof", 0.88 ],
+                   [ "Pour IV", "Rare Breed", "116.8 proof", 0.93 ] ].each_with_index do |(roman, name, proof, lvl), i| %>
+                <button type="button" class="c2-coaster <%= 'is-active' if i.zero? %>"
+                        data-concept-two-target="coaster" data-index="<%= i %>"
+                        data-action="click->concept-two#selectCoaster">
+                  <span class="c2-coaster-num"><%= roman %></span>
+                  <span class="c2-coaster-ring">
+                    <%= render "shared/glass", level: lvl, size: 48, appear: false %>
+                  </span>
+                  <b><%= name %></b>
+                  <small><%= proof %></small>
+                </button>
+              <% end %>
+            </div>
+
+            <dl class="c2-mat-strip">
+              <div><dt>Nose</dt><dd data-concept-two-target="matNose">Vanilla bean, sweet corn, light citrus zest</dd></div>
+              <div><dt>Palate</dt><dd data-concept-two-target="matPalate">Honeyed caramel, soft toasted oak, mellow warmth</dd></div>
+              <div><dt>Finish</dt><dd data-concept-two-target="matFinish">Clean, gently sweet with a hint of mint</dd></div>
+            </dl>
+          </article>
+
+          <!-- STATION 04: Interactive Palate Sculptor -->
+          <article class="c2-station c2-station--ink c2-st-4">
+            <div>
+              <div class="c2-st-num">Station 04 · Try the Record</div>
+              <h2>Sculpt what's <em>in your glass.</em></h2>
+              <p style="margin-top:12px;font-size:16px;line-height:1.52;color:rgba(246,244,238,.74);max-width:30em">
+                No five-paragraph wine-critic essays. Tap any note below (or directly on the wheel) to feel how fast members log a pour.
+              </p>
+
+              <div class="c2-sculpt-chips">
+                <% palate_axes.each_with_index do |(label, _), i| %>
+                  <button type="button" class="c2-axis-btn" data-concept-two-target="axisBtn" data-axis="<%= i %>" data-level="1" data-action="click->concept-two#cycleAxis">
+                    <span><%= label %></span>
+                    <span class="c2-axis-dots" aria-hidden="true"><i></i><i></i><i></i></span>
+                  </button>
+                <% end %>
+              </div>
+            </div>
+
+            <div class="c2-sculpt-card">
+              <div class="c2-sculpt-top">
+                <span style="font-size:14px;font-weight:600;color:var(--mute)">Your live tasting</span>
+                <div class="c2-sculpt-score">
+                  <span data-concept-two-target="sculptGlass"><%= render "shared/glass", level: 0.84, size: 32, appear: false %></span>
+                  <span data-concept-two-target="sculptScore">4.27</span>
+                </div>
+              </div>
+
+              <svg class="c2-sculpt-svg" viewBox="0 0 300 300" aria-label="Clickable palate wheel">
+                <circle cx="150" cy="150" r="112" fill="#f6f4ee" stroke="#dfe3dc" stroke-width="1"/>
+                <circle cx="150" cy="150" r="76" fill="none" stroke="#dfe3dc" stroke-width="1" stroke-dasharray="3 3"/>
+                <circle cx="150" cy="150" r="42" fill="none" stroke="#dfe3dc" stroke-width="1"/>
+                <% palate_axes.each_with_index do |(label, deg), i| %>
+                  <% a1 = (deg - 20) * Math::PI / 180.0 %>
+                  <% a2 = (deg + 20) * Math::PI / 180.0 %>
+                  <% r = 108 %>
+                  <% x1 = (150 + r * Math.cos(a1)).round(2); y1 = (150 + r * Math.sin(a1)).round(2) %>
+                  <% x2 = (150 + r * Math.cos(a2)).round(2); y2 = (150 + r * Math.sin(a2)).round(2) %>
+                  <% lx = (150 + 128 * Math.cos(deg * Math::PI / 180.0)).round(2) %>
+                  <% ly = (150 + 128 * Math.sin(deg * Math::PI / 180.0) + 4).round(2) %>
+                  <path class="c2-sculpt-wedge"
+                        data-concept-two-target="sculptWedge"
+                        data-axis="<%= i %>"
+                        data-action="click->concept-two#cycleAxis"
+                        d="M 150 150 L <%= x1 %> <%= y1 %> A <%= r %> <%= r %> 0 0 1 <%= x2 %> <%= y2 %> Z"
+                        fill="#16332a" opacity="0.6"/>
+                  <text x="<%= lx %>" y="<%= ly %>" text-anchor="middle" font-size="11.5" font-weight="600" fill="#16332a"><%= label %></text>
+                <% end %>
+                <circle cx="150" cy="150" r="24" fill="#ffffff" stroke="#dfe3dc" stroke-width="1.2"/>
+                <text x="150" y="154" text-anchor="middle" font-size="10.5" font-weight="600" fill="#5f6b64">Tap</text>
+              </svg>
+            </div>
+          </article>
+
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ======================================================================
+       RESTING FULL GLENCAIRN ON THE SPOTLIGHT CARD
+       ====================================================================== -->
+  <section class="c2-section" style="padding-top:24px">
+    <div class="wrap c2-rest-wrap">
+      <div class="c2-rest-glass" aria-hidden="true">
+        <%= render "shared/glass", level: 1, size: 72, appear: false %>
+      </div>
+      <% spot = @spotlight_deck || shelf_decks.first %>
+      <% spot_cover = spot.respond_to?(:slide_images) ? deck_cover_attachment(spot) : nil %>
+      <div class="c2-spot">
+        <div class="c2-spot-img">
+          <% if spot_cover %>
+            <%= image_tag image_variant(spot_cover, :card), alt: spot.title %>
+          <% else %>
+            <%= image_tag "photos/rickhouse.jpg", alt: spot.title %>
+          <% end %>
+        </div>
+        <div>
+          <div class="c2-eyebrow" style="margin-bottom:14px"><i></i> In the spotlight</div>
+          <h2 style="font-size:clamp(1.9rem,3.4vw,2.9rem);line-height:1.02;letter-spacing:-.045em"><%= spot.title %></h2>
+          <p style="margin-top:14px;font-size:17px;line-height:1.55;color:var(--mute);max-width:34em">
+            <%= spot.respond_to?(:excerpt) ? spot.excerpt(170) : "A first tasting night for people who are new to bourbon. Four bourbons, lowest proof first, and what the words on their labels mean." %>
+          </p>
+          <div style="margin-top:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+            <%= link_to "See the deck", (spot.respond_to?(:id) ? presentation_path(spot) : presentations_path), class: "btn-t" %>
+            <span style="font-size:14px;color:var(--mute)"><%= spot.respond_to?(:formatted_price) ? "#{spot.formatted_price}, or one credit with membership" : "$16.99, or one credit with membership" %></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- EDITORIAL RICKHOUSE SPREAD -->
+  <section class="c2-section" style="padding-top:0">
+    <div class="wrap c2-spread">
+      <div class="c2-spread-photo">
+        <%= image_tag "photos/rickhouse.jpg", alt: "Whiskey barrels aging in a Kentucky rickhouse" %>
+        <div class="c2-spread-caption">“Each month one of us drew a topic, bought the bottles, and told its story over a glass.”</div>
+      </div>
+      <div class="c2-spread-panel">
+        <div>
+          <h2>Born from a <em>real society.</em></h2>
+          <p>Started as a circle of friends in 2019. Four simple house rules turned casual pours into the best night on the calendar.</p>
+          <ol class="c2-rule-list" aria-label="House rules">
+            <% rules.each do |rule| %><li><%= rule %></li><% end %>
+          </ol>
+        </div>
+        <div style="margin-top:28px"><%= link_to "Find your society", societies_path, class: "btn-t btn-t--light" %></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3-COLUMN SWISS PRICING LEDGER -->
+  <section class="c2-section" style="padding-top:16px;padding-bottom:104px">
+    <div class="wrap">
+      <div style="display:flex;align-items:flex-end;justify-content:space-between;gap:20px;flex-wrap:wrap">
+        <div>
+          <div class="c2-eyebrow" style="margin-bottom:12px"><i></i> Membership</div>
+          <h2 style="font-size:clamp(2.2rem,4.4vw,3.6rem);line-height:1;letter-spacing:-.048em">Choose <em>your pour.</em></h2>
+        </div>
+        <p style="font-size:16px;color:var(--mute);max-width:30em">One membership, three ways to pay it. Joining a society is always free; membership unlocks a monthly deck credit and hosting tools.</p>
+      </div>
+
+      <div class="c2-ledger">
+        <% @stripe_products.each do |product| %>
+          <%= link_to membership_path, class: "c2-tier #{'c2-tier--pick' if product[:popular]}" do %>
+            <div style="display:flex;justify-content:space-between;align-items:center">
+              <h3 style="font-size:21px"><%= product[:name].to_s.gsub(" Membership", "") %></h3>
+              <% if product[:popular] %>
+                <span style="font-size:12px;font-weight:700;padding:4px 10px;border-radius:99px;background:var(--mark);color:var(--ink)">Best value</span>
+              <% end %>
+            </div>
+            <div class="c2-tier-price">$<%= sprintf("%.2f", product[:price] / 100.0) %><small>/mo</small></div>
+            <div class="c2-tier-bill"><%= plan_billing_line(product) %></div>
+            <span class="c2-tier-cta">See plan details →</span>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <!-- Concept Switcher Pill -->
+  <nav class="concept-switcher" aria-label="Switch homepage concept">
+    <%= link_to "Live", root_path %>
+    <%= link_to "Concept 1 · Cinema", home_concept_path(1) %>
+    <%= link_to "Concept 2 · Tabletop", home_concept_path(2), "aria-current": "page" %>
+  </nav>
+</div>

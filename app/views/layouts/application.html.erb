@@ -208,7 +208,7 @@
          each glass when it is seen (appear_controller.js). Pages that open with a full-bleed char masthead manage
          their own width and top padding; everything else gets the standard
          constrained container. -->
-    <% full_bleed = (controller_name == 'home' && %w[index membership].include?(action_name)) ||
+    <% full_bleed = (controller_name == 'home' && %w[index membership concept].include?(action_name)) ||
                     (controller_name == 'societies' && %w[index show join_by_invite].include?(action_name)) ||
                     (controller_name == 'events' && action_name == 'show') ||
                     controller_name == 'presentations' ||
