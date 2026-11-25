@@ -1,11 +1,11 @@
-/* Concept 4: "The Theatre of the Pour" (/concepts/4)
-   Trigger-driven (NEVER scroll-scrubbed!) full-viewport physical choreography:
-   - Scroll only selects the active Beat (0..4) with hysteresis; every transition
-     plays to full, crisp completion on its own choreographed spring clock.
-   - Circular iris wipe into the Orange Invite; theatre curtain dim into Living Room.
-   - Masked kinetic line-reveal typography.
-   - Sequential animated pour stream filling all 4 tasting glasses one-by-one.
-   - Parabolic curved-arc mid-air glass sort with individual slosh physics on landing!
+/* Concept 4: "The Theatre of the Pour" (/concepts/4) — Tightened v2
+   - Pure position: sticky (100vh / 100dvh) stage: zero Safari bottom bleed, zero fixed->absolute jump.
+   - Quiet right-edge beat rail frees the entire bottom of every act on laptop screens.
+   - Strict non-overlapping vertical bands calibrated for 1280x720 through 1920x1080+.
+   - Paper-filled glass bowl on Beat 2's orange background so whiskey pours pop cleanly.
+   - Refined living-pour rise + glowing coaster ring in Beat 3 (no dashed cartoon stream).
+   - Physical 3D deck-swap transition when clicking flanking decks in Beat 1.
+   - Exact mathematical foot alignment (73.7 / 80) so the resting glass stands flush on Spotlight.
    Scoped strictly to .c4. */
 
 .c4 {
@@ -22,7 +22,7 @@
   --mark-soft: #ff8a33;
   --mark-deep: #e65c00;
   --ease: cubic-bezier(0.22, 1, 0.36, 1);
-  --spring: cubic-bezier(0.34, 1.38, 0.64, 1);
+  --spring: cubic-bezier(0.34, 1.36, 0.64, 1);
   background: var(--bg);
   color: var(--text);
   font-family: "Instrument Sans", system-ui, sans-serif;
@@ -34,23 +34,23 @@
 
 .c4 .btn-th {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
-  min-height: 50px; padding: 0 24px; border-radius: 15px; font-weight: 600; font-size: 15.5px;
+  min-height: 48px; padding: 0 22px; border-radius: 15px; font-weight: 600; font-size: 15px;
   text-decoration: none; border: 0; cursor: pointer;
   background: var(--ink); color: #f6f4ee;
-  box-shadow: 0 12px 26px -12px rgba(22, 51, 42, .52);
+  box-shadow: 0 10px 24px -12px rgba(22, 51, 42, .52);
   transition: transform 180ms var(--ease), background 150ms ease, box-shadow 200ms var(--ease);
 }
-.c4 .btn-th:hover { background: var(--oak); transform: translateY(-2px); box-shadow: 0 18px 34px -12px rgba(22, 51, 42, .65); }
+.c4 .btn-th:hover { background: var(--oak); transform: translateY(-2px); box-shadow: 0 16px 32px -12px rgba(22, 51, 42, .62); }
 .c4 .btn-th:active { transform: scale(.98); }
-.c4 .btn-th--quiet { background: rgba(255, 255, 255, .88); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
+.c4 .btn-th--quiet { background: rgba(255, 255, 255, .9); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line); }
 .c4 .btn-th--quiet:hover { background: #fff; }
 .c4 .btn-th--light { background: #f6f4ee; color: var(--ink); }
 .c4 .btn-th--light:hover { background: #fff; }
 
 /* ==========================================================================
-   TRIGGER-DRIVEN FULL-VIEWPORT THEATRE
-   Five spacious scroll sentinel bands (invisible triggers) drive ONE pinned
-   100vw x 100svh choreographed stage. Nothing freezes mid-animation!
+   PURE STICKY FULL-VIEWPORT THEATRE
+   Five spacious sentinel bands drive ONE sticky 100vh stage.
+   Nothing ever freezes mid-animation, and nothing peeks underneath in Safari.
    ========================================================================== */
 .c4-theatre {
   position: relative;
@@ -59,148 +59,131 @@
   position: relative;
   z-index: 0;
   pointer-events: none;
+  margin-top: -100vh;
 }
-.c4-sentinel {
-  height: 92svh;
-}
-.c4-sentinel:first-child { height: 100svh; }
-.c4-sentinel:last-child { height: 110svh; }
+.c4-sentinel { height: 92vh; }
+.c4-sentinel:first-child { height: 100vh; }
+.c4-sentinel:last-child { height: 105vh; }
 
 .c4-stage {
-  position: fixed;
-  inset: 0;
+  position: sticky;
+  top: 0;
   width: 100%;
-  height: 100svh;
+  height: 100vh;
+  height: 100dvh;
   overflow: hidden;
   isolation: isolate;
   background: var(--bg);
   z-index: 10;
-  transition: opacity 280ms var(--ease), visibility 280ms ease;
-}
-/* Releases cleanly into sticky/parked end-state once reader scrolls past Beat 4 */
-.c4-stage.is-parked {
-  position: absolute;
-  top: auto;
-  bottom: 0;
 }
 
 /* ==========================================================================
-   THEATRICAL ROOM ATMOSPHERE (Iris Wipes & Curtain Dimming — Clock-Driven!)
+   CLOCK-DRIVEN ROOM ATMOSPHERE (Iris Wipe & Curtain Dim)
    ========================================================================== */
 .c4-iris-orange {
   position: absolute; inset: 0; pointer-events: none;
   background: var(--mark);
   clip-path: circle(0% at 64% 52%);
-  transition: clip-path 880ms cubic-bezier(0.22, 1, 0.36, 1), opacity 420ms ease;
+  transition: clip-path 760ms cubic-bezier(0.22, 1, 0.36, 1);
   z-index: 1;
 }
-.c4-stage[data-beat="2"] .c4-iris-orange {
-  clip-path: circle(135% at 64% 52%);
-}
+.c4-stage[data-beat="2"] .c4-iris-orange { clip-path: circle(140% at 64% 52%); }
 
 .c4-room-dark {
   position: absolute; inset: 0; pointer-events: none;
   background:
-    radial-gradient(ellipse 68% 54% at 50% 32%, rgba(36, 92, 72, .56) 0%, rgba(10, 25, 20, 0) 70%),
+    radial-gradient(ellipse 68% 54% at 50% 34%, rgba(36, 92, 72, .54) 0%, rgba(10, 25, 20, 0) 70%),
     linear-gradient(180deg, #0a1914 0%, #10251e 60%, #16332a 100%);
   clip-path: inset(0 0 100% 0);
-  transition: clip-path 820ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: clip-path 720ms cubic-bezier(0.22, 1, 0.36, 1);
   z-index: 2;
 }
 .c4-stage[data-beat="3"] .c4-room-dark,
-.c4-stage[data-beat="4"] .c4-room-dark {
-  clip-path: inset(0 0 0% 0);
-}
+.c4-stage[data-beat="4"] .c4-room-dark { clip-path: inset(0 0 0% 0); }
 
-/* Warm amber spotlight pool behind Beat 4's Palate Wheel */
 .c4-verdict-glow {
   position: absolute; inset: 0; pointer-events: none;
-  background: radial-gradient(circle 42vw at 74% 52%, rgba(255, 109, 0, .14) 0%, transparent 72%);
+  background: radial-gradient(circle 40vw at 74% 56%, rgba(255, 109, 0, .14) 0%, transparent 70%);
   opacity: 0;
-  transition: opacity 700ms var(--ease);
+  transition: opacity 620ms var(--ease);
   z-index: 3;
 }
 .c4-stage[data-beat="4"] .c4-verdict-glow { opacity: 1; }
 
-/* Beat 2 Duotone Living Room Cinema Shutter */
+/* Beat 2 Duotone Living Room Cinema Shutter — compact height so lower half has plenty of room */
 .c4-invite-photo {
-  position: absolute; left: 5vw; right: 5vw; top: 11svh; height: 31svh;
-  border-radius: 26px; overflow: hidden; background: var(--ink);
-  box-shadow: 0 28px 60px -24px rgba(22, 51, 42, .45);
-  clip-path: inset(0 0 100% 0 round 26px);
+  position: absolute; left: 5vw; right: 5vw; top: 88px; height: 26vh;
+  border-radius: 24px; overflow: hidden; background: var(--ink);
+  box-shadow: 0 24px 52px -24px rgba(22, 51, 42, .45);
+  clip-path: inset(0 0 100% 0 round 24px);
   opacity: 0;
-  transition: clip-path 760ms cubic-bezier(0.22, 1, 0.36, 1) 140ms, opacity 320ms ease;
+  transition: clip-path 680ms cubic-bezier(0.22, 1, 0.36, 1) 110ms, opacity 280ms ease;
   z-index: 3; pointer-events: none;
 }
-.c4-stage[data-beat="2"] .c4-invite-photo {
-  clip-path: inset(0 0 0% 0 round 26px);
-  opacity: 1;
-}
+.c4-stage[data-beat="2"] .c4-invite-photo { clip-path: inset(0 0 0% 0 round 24px); opacity: 1; }
 .c4-invite-photo img {
   width: 100%; height: 100%; object-fit: cover; object-position: 50% 14%;
   filter: grayscale(100%) contrast(1.12); mix-blend-mode: screen; opacity: .82;
-  transform: scale(1.08);
-  transition: transform 1400ms var(--ease);
+  transform: scale(1.06); transition: transform 1100ms var(--ease);
 }
 .c4-stage[data-beat="2"] .c4-invite-photo img { transform: scale(1); }
 
-/* Beat 3 Rising Oak Tasting Table */
+/* Beat 3 Rising Oak Tasting Table — cleanly owns bottom 33vh */
 .c4-oak-table {
-  position: absolute; left: -3vw; right: -3vw; bottom: 0; height: 35svh;
+  position: absolute; left: -3vw; right: -3vw; bottom: 0; height: 33vh;
   background:
     linear-gradient(180deg, rgba(246, 244, 238, .18) 0px, rgba(246, 244, 238, .04) 2px, transparent 10px),
     linear-gradient(180deg, #1d4034 0%, #122921 100%);
   border-top: 1px solid rgba(246, 244, 238, .18);
   border-radius: 36px 36px 0 0;
-  box-shadow: 0 -24px 64px -16px rgba(0, 0, 0, .58);
+  box-shadow: 0 -24px 64px -16px rgba(0, 0, 0, .55);
   transform: translate3d(0, 108%, 0);
-  transition: transform 780ms cubic-bezier(0.22, 1, 0.36, 1) 120ms;
+  transition: transform 720ms cubic-bezier(0.22, 1, 0.36, 1) 100ms;
   z-index: 4; pointer-events: none;
 }
 .c4-stage[data-beat="3"] .c4-oak-table { transform: translate3d(0, 0%, 0); }
 
 /* ==========================================================================
-   MASKED KINETIC TYPOGRAPHY BEATS (Each line rises cleanly out of its mask!)
+   MASKED KINETIC TYPOGRAPHY BEATS (Strictly Bounded Vertical Zones)
    ========================================================================== */
 .c4-copy {
   position: absolute;
-  left: clamp(24px, 5.5vw, 84px);
+  left: clamp(24px, 5vw, 80px);
   z-index: 12;
   pointer-events: none;
   opacity: 0;
-  transition: opacity 280ms ease;
+  transition: opacity 240ms ease;
 }
 .c4-copy.is-active { opacity: 1; pointer-events: auto; }
 
-.c4-copy--0 { top: 50%; transform: translateY(-50%); max-width: min(530px, 44vw); }
-.c4-copy--1 { top: 12.5svh; left: 50%; transform: translateX(-50%); text-align: center; max-width: 720px; }
-.c4-copy--2 { top: 46svh; max-width: min(560px, 52vw); }
-.c4-copy--3 { top: 11svh; left: 50%; transform: translateX(-50%); text-align: center; max-width: 720px; }
-.c4-copy--4 { top: 11.5svh; max-width: 560px; }
+/* Strict vertical zones: zero collisions at 1280x720, 1440x780, 1920x1080 */
+.c4-copy--0 { top: 50%; transform: translateY(-50%); max-width: min(510px, 43vw); }
+.c4-copy--1 { top: 88px; left: 50%; transform: translateX(-50%); text-align: center; width: min(720px, 90vw); }
+.c4-copy--2 { top: calc(88px + 26vh + 26px); max-width: min(520px, 48vw); }
+.c4-copy--3 { top: 88px; left: 50%; transform: translateX(-50%); text-align: center; width: min(780px, 90vw); }
+.c4-copy--4 { top: 88px; max-width: min(620px, 54vw); }
 
-/* Kinetic line mask */
 .c4-line { display: block; overflow: hidden; padding-bottom: .08em; margin-bottom: -.08em; }
 .c4-line > span {
   display: inline-block;
   transform: translate3d(0, 112%, 0);
-  transition: transform 680ms cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 620ms cubic-bezier(0.22, 1, 0.36, 1);
 }
 .c4-copy.is-active .c4-line > span { transform: translate3d(0, 0%, 0); }
-.c4-copy.is-active .c4-line:nth-child(2) > span { transition-delay: 85ms; }
-.c4-copy.is-active .c4-line:nth-child(3) > span { transition-delay: 160ms; }
+.c4-copy.is-active .c4-line:nth-child(2) > span { transition-delay: 75ms; }
 
 .c4-fade {
-  opacity: 0; transform: translate3d(0, 16px, 0);
-  transition: opacity 520ms var(--ease) 190ms, transform 580ms var(--ease) 190ms;
+  opacity: 0; transform: translate3d(0, 14px, 0);
+  transition: opacity 460ms var(--ease) 150ms, transform 520ms var(--ease) 150ms;
 }
 .c4-copy.is-active .c4-fade { opacity: 1; transform: translate3d(0, 0, 0); }
 
 .c4-act-label {
   display: inline-flex; align-items: center; gap: 8px;
-  font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
-  padding: 6px 13px; border-radius: 999px;
+  font-size: 11.5px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase;
+  padding: 5px 12px; border-radius: 999px;
   background: rgba(22, 51, 42, .07); color: var(--ink);
-  margin-bottom: 16px;
+  margin-bottom: 10px;
 }
 .c4-act-label::before { content: ""; width: 6px; height: 6px; border-radius: 99px; background: var(--mark-deep); }
 .c4-copy--dark .c4-act-label { background: rgba(246, 244, 238, .1); color: #f6f4ee; }
@@ -208,25 +191,24 @@
 .c4-copy--orange .c4-act-label { background: rgba(22, 51, 42, .14); color: var(--ink); }
 .c4-copy--orange .c4-act-label::before { background: var(--ink); }
 
-.c4-copy h1 { font-size: clamp(3.3rem, 6.4vw, 6rem); line-height: .92; letter-spacing: -.056em; color: var(--ink); }
-.c4-copy h2 { font-size: clamp(2.1rem, 4.1vw, 3.6rem); line-height: .98; letter-spacing: -.048em; color: var(--ink); }
+.c4-copy h1 { font-size: clamp(3rem, 5.8vw, 5.6rem); line-height: .92; letter-spacing: -.056em; color: var(--ink); }
+.c4-copy h2 { font-size: clamp(1.75rem, 3.2vw, 2.85rem); line-height: 1.02; letter-spacing: -.045em; color: var(--ink); }
 .c4-copy--dark h2 { color: #f6f4ee; }
-.c4-copy p { margin-top: 15px; font-size: clamp(1rem, 1.35vw, 1.18rem); line-height: 1.52; color: var(--mute); }
-.c4-copy--dark p { color: rgba(246, 244, 238, .76); }
+.c4-copy p { margin-top: 10px; font-size: clamp(.95rem, 1.2vw, 1.1rem); line-height: 1.48; color: var(--mute); }
+.c4-copy--dark p { color: rgba(246, 244, 238, .74); }
 .c4-copy--orange p { color: rgba(22, 51, 42, .86); }
-.c4-copy-acts { margin-top: 24px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.c4-copy-acts { margin-top: 18px; display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
 
 .c4-big-date {
-  font-weight: 700; font-size: clamp(3.2rem, 6.6vw, 6rem);
-  line-height: .84; letter-spacing: -.065em; color: var(--ink);
-  margin-bottom: 8px;
+  font-weight: 700; font-size: clamp(2.6rem, 5vw, 4.6rem);
+  line-height: .88; letter-spacing: -.06em; color: var(--ink);
+  margin-bottom: 6px;
 }
 
-/* Interactive Seat-Save button inside Beat 2 */
 .c4-rsvp-chip {
   appearance: none; border: 0; cursor: pointer;
   display: inline-flex; align-items: center; gap: 8px;
-  padding: 11px 20px; border-radius: 14px; font-weight: 600; font-size: 14.5px;
+  padding: 11px 19px; border-radius: 14px; font-weight: 600; font-size: 14px;
   background: var(--ink); color: #f6f4ee;
   transition: transform 160ms var(--ease), background 180ms ease;
 }
@@ -234,72 +216,94 @@
 .c4-rsvp-chip.is-in { background: #f6f4ee; color: var(--ink); }
 
 /* ==========================================================================
-   SHARED ELEMENT #1: THE HERO SLIDE + CLICKABLE SIBLING DECKS
+   SHARED ELEMENT #1: THE HERO SLIDE + PHYSICAL 3D SWAP SIBLING DECKS
+   Viewport-height-aware widths so decks NEVER collide with top copy!
    ========================================================================== */
 .c4-sib {
   position: absolute; left: 50%; top: 50%;
-  width: min(340px, 26vw); aspect-ratio: 16 / 10.6;
-  border-radius: 22px; background: #fff; border: 1px solid var(--line); padding: 11px;
-  box-shadow: 0 28px 56px -24px rgba(22, 51, 42, .34);
+  width: min(320px, 24vw, 40vh); aspect-ratio: 16 / 10.6;
+  border-radius: 20px; background: #fff; border: 1px solid var(--line); padding: 10px;
+  box-shadow: 0 24px 48px -22px rgba(22, 51, 42, .32);
   z-index: 7; cursor: pointer; text-align: left;
   display: flex; flex-direction: column;
   opacity: 0; pointer-events: none;
-  transition: transform 760ms cubic-bezier(0.22, 1, 0.36, 1), opacity 420ms ease, box-shadow 220ms ease, border-color 180ms ease;
+  transition: transform 700ms cubic-bezier(0.22, 1, 0.36, 1), opacity 380ms ease, box-shadow 200ms ease, border-color 180ms ease;
 }
-.c4-sib--left { transform: translate3d(calc(-50% - 46vw), calc(-50% + 12svh), 0) rotate(-11deg) scale(.82); }
-.c4-sib--right { transform: translate3d(calc(-50% + 46vw), calc(-50% + 12svh), 0) rotate(11deg) scale(.82); }
+.c4-sib--left { transform: translate3d(calc(-50% - 45vw), calc(-50% + 14vh), 0) rotate(-10deg) scale(.82); }
+.c4-sib--right { transform: translate3d(calc(-50% + 45vw), calc(-50% + 14vh), 0) rotate(10deg) scale(.82); }
 .c4-stage[data-beat="1"] .c4-sib { opacity: 1; pointer-events: auto; }
-.c4-stage[data-beat="1"] .c4-sib--left { transform: translate3d(calc(-50% - 29vw), calc(-50% + 9svh), 0) rotate(-4.5deg) scale(.95); transition-delay: 90ms; }
-.c4-stage[data-beat="1"] .c4-sib--right { transform: translate3d(calc(-50% + 29vw), calc(-50% + 9svh), 0) rotate(4.5deg) scale(.95); transition-delay: 140ms; }
-.c4-stage[data-beat="1"] .c4-sib:hover { border-color: var(--mark); box-shadow: 0 32px 64px -22px rgba(22, 51, 42, .48); }
-.c4-stage[data-beat="1"] .c4-sib--left:hover { transform: translate3d(calc(-50% - 29vw), calc(-50% + 6svh), 0) rotate(-2deg) scale(.99); }
-.c4-stage[data-beat="1"] .c4-sib--right:hover { transform: translate3d(calc(-50% + 29vw), calc(-50% + 6svh), 0) rotate(2deg) scale(.99); }
+.c4-stage[data-beat="1"] .c4-sib--left { transform: translate3d(calc(-50% - 28vw), calc(-50% + 11vh), 0) rotate(-4deg) scale(.94); transition-delay: 80ms; }
+.c4-stage[data-beat="1"] .c4-sib--right { transform: translate3d(calc(-50% + 28vw), calc(-50% + 11vh), 0) rotate(4deg) scale(.94); transition-delay: 120ms; }
+.c4-stage[data-beat="1"] .c4-sib:hover { border-color: var(--mark); box-shadow: 0 30px 60px -20px rgba(22, 51, 42, .48); }
+.c4-stage[data-beat="1"] .c4-sib--left:hover { transform: translate3d(calc(-50% - 28vw), calc(-50% + 8.5vh), 0) rotate(-1.5deg) scale(.99); }
+.c4-stage[data-beat="1"] .c4-sib--right:hover { transform: translate3d(calc(-50% + 28vw), calc(-50% + 8.5vh), 0) rotate(1.5deg) scale(.99); }
+
+/* Physical card-swap animation kick when a flanking deck is clicked */
+.c4-sib.is-swapping {
+  transform: translate3d(-50%, calc(-50% + 8vh), 0) rotate(0deg) scale(1.06) !important;
+  opacity: 0 !important;
+  z-index: 12 !important;
+  transition: transform 280ms var(--ease), opacity 240ms ease !important;
+}
 
 .c4-sib-art {
-  flex: 1; border-radius: 13px; background: var(--ink); overflow: hidden;
-  padding: 15px; display: flex; flex-direction: column; justify-content: space-between;
+  flex: 1; border-radius: 12px; background: var(--ink); overflow: hidden;
+  padding: 13px; display: flex; flex-direction: column; justify-content: space-between;
   color: #f6f4ee; position: relative;
 }
-.c4-sib-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .44; filter: grayscale(100%); }
-.c4-sib-art span { position: relative; z-index: 1; font-size: 11px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--mark-soft); }
-.c4-sib-art strong { position: relative; z-index: 1; font-size: 19px; line-height: 1.08; letter-spacing: -.035em; }
-.c4-sib-foot { display: flex; justify-content: space-between; padding: 9px 4px 2px; font-size: 13px; font-weight: 600; color: var(--ink); }
+.c4-sib-art img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: .88; }
+.c4-sib-art--fallback img { opacity: .44; filter: grayscale(100%); }
+.c4-sib-art span { position: relative; z-index: 1; font-size: 10.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--mark-soft); text-shadow: 0 1px 6px rgba(0, 0, 0, .6); }
+.c4-sib-art strong { position: relative; z-index: 1; font-size: 16px; line-height: 1.1; letter-spacing: -.03em; text-shadow: 0 1px 8px rgba(0, 0, 0, .65); }
+.c4-sib-foot { display: flex; justify-content: space-between; padding: 8px 4px 1px; font-size: 12.5px; font-weight: 600; color: var(--ink); }
 .c4-sib-foot small { color: var(--mute); font-weight: 500; }
 
-/* The Hero Deck Actor — Smooth spring-driven state transitions! */
+/* The Hero Deck Actor — height-constrained so it ALWAYS clears the top copy on laptop screens */
 .c4-deck {
   position: absolute; left: 50%; top: 50%;
-  width: min(630px, 46vw); aspect-ratio: 16 / 10.2;
+  width: min(600px, 44vw, 66vh); aspect-ratio: 16 / 10.2;
   z-index: 10; perspective: 1200px;
   cursor: pointer;
-  transform: translate3d(calc(-50% + 21vw), calc(-50% + 2svh), 0) scale(1) rotate(0deg);
+  transform: translate3d(calc(-50% + 21vw), calc(-50% + 2vh), 0) scale(1) rotate(0deg);
   opacity: 1;
-  transition: transform 860ms cubic-bezier(0.22, 1, 0.36, 1), opacity 420ms ease;
+  transition: transform 800ms cubic-bezier(0.22, 1, 0.36, 1), opacity 400ms ease;
 }
 .c4-stage[data-beat="1"] .c4-deck {
-  transform: translate3d(-50%, calc(-50% + 6svh), 0) scale(.69) rotate(0deg);
+  transform: translate3d(-50%, calc(-50% + 9vh), 0) scale(.78) rotate(0deg);
 }
 .c4-stage[data-beat="2"] .c4-deck {
-  transform: translate3d(calc(-50% + 26vw), calc(-50% + 14svh), 0) scale(.49) rotate(-3deg);
+  transform: translate3d(calc(-50% + 25vw), calc(-50% + 10vh), 0) scale(.56) rotate(-2.5deg);
 }
 .c4-stage[data-beat="3"] .c4-deck {
-  transform: translate3d(-50%, calc(-50% - 4svh), 0) scale(.81) rotate(0deg);
+  transform: translate3d(-50%, calc(-50% - 4vh), 0) scale(.78) rotate(0deg);
 }
 .c4-stage[data-beat="4"] .c4-deck {
-  transform: translate3d(-50%, calc(-50% - 26svh), 0) scale(.62) rotate(0deg);
+  transform: translate3d(-50%, calc(-50% - 26vh), 0) scale(.6) rotate(0deg);
   opacity: 0; pointer-events: none;
 }
 
 .c4-deck-shell {
   width: 100%; height: 100%;
-  background: var(--ink); border-radius: 26px; padding: 10px;
+  background: var(--ink); border-radius: 24px; padding: 9px;
   display: flex; flex-direction: column;
-  box-shadow: inset 0 1px 0 rgba(246, 244, 238, .22), 0 2px 6px rgba(22, 51, 42, .25), 0 46px 94px -28px rgba(10, 24, 20, .64);
+  box-shadow: inset 0 1px 0 rgba(246, 244, 238, .22), 0 2px 6px rgba(22, 51, 42, .25), 0 42px 86px -26px rgba(10, 24, 20, .6);
   transform-style: preserve-3d;
   will-change: transform;
+  transition: box-shadow 260ms var(--ease);
 }
+/* Crisp physical pulse + 3D settle when a swapped deck lands in center */
+.c4-deck.is-swapped .c4-deck-shell {
+  animation: c4-deck-pop 460ms var(--spring);
+  box-shadow: inset 0 1px 0 rgba(246, 244, 238, .3), 0 0 0 2px var(--mark), 0 46px 92px -24px rgba(10, 24, 20, .68);
+}
+@keyframes c4-deck-pop {
+  0%   { transform: scale(.91) rotateY(-12deg); }
+  55%  { transform: scale(1.035) rotateY(3deg); }
+  100% { transform: scale(1) rotateY(0deg); }
+}
+
 .c4-deck-screen {
-  position: relative; flex: 1; border-radius: 18px; overflow: hidden;
+  position: relative; flex: 1; border-radius: 16px; overflow: hidden;
   background: var(--ink-deep); container-type: inline-size;
 }
 .c4-deck-sheen {
@@ -310,7 +314,7 @@
 .c4-dslide {
   position: absolute; inset: 0;
   opacity: 0; transform: scale(1.035);
-  transition: opacity 420ms var(--ease), transform 540ms var(--ease);
+  transition: opacity 380ms var(--ease), transform 480ms var(--ease);
 }
 .c4-dslide.is-active { opacity: 1; transform: scale(1); z-index: 2; }
 .c4-dslide > img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -322,7 +326,6 @@
 }
 .c4-vs--paper { background: #f6f4ee; color: var(--ink); }
 .c4-vs--orange { background: var(--mark); color: var(--ink); }
-.c4-vs--deep { background: #0f241d; color: #f6f4ee; }
 .c4-vs-logo { width: 7.5cqw; display: block; margin-bottom: 2.5cqw; }
 .c4-vs-h { font-size: 6cqw; font-weight: 600; line-height: .96; letter-spacing: -.048em; }
 .c4-vs-line { width: 6cqw; height: .45cqw; border-radius: 99px; background: var(--mark); margin: 2.2cqw 0; }
@@ -333,54 +336,55 @@
 
 .c4-deck-bar {
   display: flex; align-items: center; justify-content: space-between; gap: 12px;
-  padding: 10px 10px 2px; color: #f6f4ee; font-size: 13px;
+  padding: 9px 10px 2px; color: #f6f4ee; font-size: 13px;
 }
 .c4-deck-bar b { font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .c4-deck-bar span { opacity: .66; font-variant-numeric: tabular-nums; white-space: nowrap; }
 
 /* ==========================================================================
-   ANIMATED SVG POURING STREAM (Beat 3 Sequential Fill)
-   ========================================================================== */
-.c4-pour-svg {
-  position: absolute; left: 50%; top: 50%;
-  width: 24px; height: 170px;
-  transform: translate3d(-50%, 6svh, 0);
-  opacity: 0; pointer-events: none; z-index: 9;
-  transition: opacity 180ms ease;
-}
-.c4-pour-svg.is-pouring { opacity: 1; }
-.c4-pour-path {
-  stroke: #ff6d00; stroke-width: 5.5; stroke-linecap: round; fill: none;
-  stroke-dasharray: 20 8;
-  animation: c4-stream-flow 360ms linear infinite;
-}
-.c4-pour-highlight {
-  stroke: #ffb370; stroke-width: 2; stroke-linecap: round; fill: none; opacity: .75;
-  stroke-dasharray: 12 16;
-  animation: c4-stream-flow 260ms linear infinite;
-}
-@keyframes c4-stream-flow { from { stroke-dashoffset: 28; } to { stroke-dashoffset: 0; } }
-
-/* ==========================================================================
-   THE 4 PHYSICAL TASTING GLASS ACTORS (Parabolic Arc Flights + Slosh!)
+   THE 4 PHYSICAL TASTING GLASS ACTORS
+   - Paper-filled bowl backdrop in Beat 2 so orange whiskey pops on orange bg!
+   - Illuminated oak coaster ring in Beat 3 as each glass fills cleanly!
+   - Parabolic curved-arc mid-air sort into Beat 4 with zero headline overlap!
    ========================================================================== */
 .c4-glass {
   position: absolute; left: 50%; top: 50%;
-  width: 96px; height: 128px;
+  width: 88px; height: 118px;
   z-index: 11; cursor: pointer;
   display: flex; align-items: center; justify-content: center;
   will-change: transform, opacity;
 }
 .c4-glass svg {
   width: 100%; height: 100%; overflow: visible;
-  filter: drop-shadow(0 18px 26px rgba(10, 24, 20, .3));
+  filter: drop-shadow(0 16px 24px rgba(10, 24, 20, .28));
 }
 .c4-glass svg.is-cream path[stroke="#16332a"]:not([stroke-opacity]) { stroke: #f6f4ee; }
 .c4-glass svg.is-cream path[fill="#16332a"] { fill: #f6f4ee; }
 .c4-glass svg.is-cream path[stroke-opacity="0.18"] { stroke-opacity: 0; }
 .c4-glass svg.is-cream path[data-glass-shine="foot"] { stroke-opacity: 0; }
 
-/* Coaster captions in Beat 3 */
+/* On Beat 2's #ff6d00 orange backdrop, concept_four_controller inserts a
+   warm paper #f6f4ee bowl backing behind the liquid <g> so the orange pour
+   pops at full contrast without covering the liquid. */
+
+/* Illuminated tasting coaster ring under each glass on Beat 3's Oak Table */
+.c4-coaster-glow {
+  position: absolute;
+  left: 50%; bottom: 4px;
+  width: 72px; height: 16px;
+  transform: translateX(-50%) scale(.7);
+  border-radius: 999px;
+  border: 1.5px solid rgba(255, 138, 51, .55);
+  background: radial-gradient(ellipse at center, rgba(255, 109, 0, .28) 0%, transparent 72%);
+  opacity: 0; pointer-events: none;
+  transition: opacity 320ms var(--ease), transform 420ms var(--spring);
+}
+.c4-glass.is-pouring .c4-coaster-glow {
+  opacity: 1;
+  transform: translateX(-50%) scale(1.12);
+}
+
+/* Coaster captions in Beat 3 — cleanly spaced inside bottom oak table */
 .c4-gcap {
   position: absolute; left: 50%; top: 100%;
   transform: translate(-50%, 6px);
@@ -389,43 +393,43 @@
   transition: opacity 320ms var(--ease), transform 320ms var(--ease);
 }
 .c4-gcap.is-visible { opacity: 1; transform: translate(-50%, 4px); }
-.c4-gcap b { display: block; font-size: 14px; font-weight: 600; color: #f6f4ee; letter-spacing: -.015em; }
-.c4-gcap small { display: block; font-size: 12px; color: var(--mark-soft); font-variant-numeric: tabular-nums; margin-top: 2px; }
+.c4-gcap b { display: block; font-size: 13.5px; font-weight: 600; color: #f6f4ee; letter-spacing: -.015em; }
+.c4-gcap small { display: block; font-size: 11.5px; color: var(--mark-soft); font-variant-numeric: tabular-nums; margin-top: 2px; }
 
-/* Ranked Podium Rows appearing beside the Mid-Air Sorted Glasses in Beat 4 */
+/* Ranked Podium Rows in Beat 4 */
 .c4-rank {
-  position: absolute; left: 102px; top: 50%;
-  transform: translateY(-50%) translateX(18px);
+  position: absolute; left: 92px; top: 50%;
+  transform: translateY(-50%) translateX(16px);
   width: min(390px, 34vw);
-  padding: 14px 20px; border-radius: 20px;
+  padding: 12px 18px; border-radius: 18px;
   background: rgba(246, 244, 238, .07);
   border: 1px solid rgba(246, 244, 238, .13);
   color: #f6f4ee;
-  display: grid; grid-template-columns: 32px 1fr auto; align-items: center; gap: 14px;
+  display: grid; grid-template-columns: 30px 1fr auto; align-items: center; gap: 12px;
   opacity: 0; pointer-events: none;
-  transition: opacity 380ms var(--ease), transform 440ms var(--ease), background 180ms ease, border-color 180ms ease;
+  transition: opacity 360ms var(--ease), transform 420ms var(--ease), background 180ms ease, border-color 180ms ease;
 }
 .c4-rank.is-visible { opacity: 1; pointer-events: auto; transform: translateY(-50%) translateX(0); }
 .c4-rank:hover, .c4-rank.is-active { background: rgba(246, 244, 238, .15); border-color: var(--mark); }
 .c4-rank-n { font-size: 13px; font-weight: 700; color: var(--mark-soft); font-variant-numeric: tabular-nums; }
-.c4-rank-t b { display: block; font-size: 16px; letter-spacing: -.02em; }
-.c4-rank-t small { display: block; font-size: 12.5px; color: rgba(246, 244, 238, .66); margin-top: 2px; }
-.c4-rank-s { font-size: 24px; font-weight: 700; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
+.c4-rank-t b { display: block; font-size: 15.5px; letter-spacing: -.02em; }
+.c4-rank-t small { display: block; font-size: 12px; color: rgba(246, 244, 238, .66); margin-top: 2px; }
+.c4-rank-s { font-size: 22px; font-weight: 700; letter-spacing: -.03em; font-variant-numeric: tabular-nums; }
 .c4-rank.is-active .c4-rank-s { color: var(--mark-soft); }
 
 /* ==========================================================================
-   PALATE WHEEL (Blooms Wedge-by-Wedge Once Beat 4 Lands!)
+   PALATE WHEEL (Beat 4 Right — Sized to fit cleanly on laptop screens)
    ========================================================================== */
 .c4-wheel {
-  position: absolute; right: clamp(28px, 6vw, 96px); top: 52%;
-  width: min(390px, 34vw);
+  position: absolute; right: clamp(56px, 7vw, 108px); top: 56%;
+  width: min(370px, 33vw, 52vh);
   background: #fff; color: var(--ink);
-  border-radius: 30px; padding: 24px 26px;
-  box-shadow: 0 38px 84px -26px rgba(0, 0, 0, .58);
+  border-radius: 28px; padding: 20px 22px;
+  box-shadow: 0 36px 80px -26px rgba(0, 0, 0, .55);
   z-index: 12;
   opacity: 0; pointer-events: none;
-  transform: translate3d(0, calc(-50% + 42px), 0) scale(.86) rotate(-5deg);
-  transition: opacity 520ms var(--ease) 280ms, transform 680ms var(--spring) 280ms;
+  transform: translate3d(0, calc(-50% + 36px), 0) scale(.88) rotate(-4deg);
+  transition: opacity 480ms var(--ease) 240ms, transform 640ms var(--spring) 240ms;
 }
 .c4-stage[data-beat="4"] .c4-wheel {
   opacity: 1; pointer-events: auto;
@@ -433,52 +437,74 @@
 }
 .c4-wheel-head {
   display: flex; align-items: baseline; justify-content: space-between;
-  padding-bottom: 12px; border-bottom: 1px solid var(--line);
+  padding-bottom: 10px; border-bottom: 1px solid var(--line);
 }
-.c4-wheel-head b { font-size: 17px; letter-spacing: -.025em; }
-.c4-wheel-head span { font-size: 22px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
-.c4-wheel-svg { width: 100%; height: auto; margin-top: 8px; overflow: visible; }
+.c4-wheel-head b { font-size: 16px; letter-spacing: -.025em; }
+.c4-wheel-head span { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; color: var(--ink); }
+.c4-wheel-svg { width: 100%; height: auto; margin-top: 6px; overflow: visible; }
 .c4-wedge {
   transform-origin: 150px 150px;
-  transition: transform 580ms var(--spring), fill 260ms ease, opacity 320ms ease;
+  transition: transform 540ms var(--spring), fill 240ms ease, opacity 280ms ease;
 }
 
 /* ==========================================================================
-   BOTTOM TACTILE BEAT DOCK (Click any Beat to Trigger Full Choreography!)
+   QUIET RIGHT-EDGE CHAPTER RAIL (Frees the entire bottom of every beat!)
    ========================================================================== */
-.c4-dock {
-  position: absolute; left: 50%; bottom: 20px; transform: translateX(-50%);
-  z-index: 25;
-  display: inline-flex; align-items: center; gap: 4px;
-  padding: 5px; border-radius: 999px;
-  background: rgba(22, 51, 42, .9);
-  border: 1px solid rgba(246, 244, 238, .16);
-  box-shadow: 0 18px 36px -14px rgba(10, 24, 20, .52);
-  backdrop-filter: blur(10px);
+.c4-rail {
+  position: absolute; right: 20px; top: 50%; transform: translateY(-50%);
+  z-index: 25; display: flex; flex-direction: column; align-items: flex-end; gap: 10px;
 }
-.c4-dock-btn {
+.c4-rail-btn {
   appearance: none; border: 0; background: transparent; cursor: pointer;
-  padding: 7px 14px; border-radius: 999px;
-  font-size: 12.5px; font-weight: 600; color: rgba(246, 244, 238, .7);
-  transition: background 180ms ease, color 180ms ease;
+  display: inline-flex; align-items: center; gap: 8px; padding: 4px;
 }
-.c4-dock-btn:hover { color: #f6f4ee; }
-.c4-dock-btn.is-active { background: #f6f4ee; color: var(--ink); }
+.c4-rail-label {
+  font-size: 11.5px; font-weight: 600; color: var(--ink);
+  opacity: 0; transform: translateX(6px);
+  transition: opacity 180ms ease, transform 180ms var(--ease);
+  pointer-events: none; white-space: nowrap;
+}
+.c4-stage[data-beat="3"] .c4-rail-label,
+.c4-stage[data-beat="4"] .c4-rail-label { color: #f6f4ee; }
+.c4-rail-btn:hover .c4-rail-label,
+.c4-rail-btn.is-active .c4-rail-label { opacity: .88; transform: translateX(0); }
+.c4-rail-dot {
+  width: 8px; height: 8px; border-radius: 99px;
+  background: rgba(22, 51, 42, .26);
+  transition: height 220ms var(--ease), background 200ms ease;
+}
+.c4-stage[data-beat="3"] .c4-rail-dot,
+.c4-stage[data-beat="4"] .c4-rail-dot { background: rgba(246, 244, 238, .3); }
+.c4-rail-btn.is-active .c4-rail-dot { height: 26px; background: var(--mark); }
+.c4-stage[data-beat="2"] .c4-rail-btn.is-active .c4-rail-dot { background: var(--ink); }
 
 /* ==========================================================================
-   LOWER PAGE (Spotlight with Resting Living Glass, Origin, Membership)
+   LOWER PAGE — Exact Foot Alignment for Resting Glass on Spotlight Card!
+   shared/_glass foot bottom is at y = 73.7 of 80 units -> 6.3/80 empty bottom.
+   At 78px height, 78 * (6.3 / 80) = 6.14px -> translateY(6.14px) seats it FLUSH!
    ========================================================================== */
-.c4-below { position: relative; background: var(--bg); padding: 20px 0 96px; z-index: 15; }
+.c4-below { position: relative; background: var(--bg); padding: 86px 0 96px; z-index: 15; }
 .c4-wrap { max-width: 1240px; margin: 0 auto; padding: 0 24px; }
 @media (min-width: 900px) { .c4-wrap { padding: 0 36px; } }
-.c4-rest-zone { position: relative; padding-top: 76px; }
-.c4-rest-glass { position: absolute; left: 50%; top: 10px; transform: translateX(-50%); width: 58px; height: 78px; z-index: 4; pointer-events: none; }
 .c4-spot {
+  position: relative;
   background: #fff; border: 1px solid var(--line); border-radius: 30px; padding: 24px;
   display: grid; gap: 36px; align-items: center;
   box-shadow: 0 24px 54px -34px rgba(22, 51, 42, .25);
 }
 @media (min-width: 900px) { .c4-spot { grid-template-columns: 1fr 1.1fr; padding: 24px 48px 24px 24px; } }
+.c4-rest-glass {
+  position: absolute;
+  left: 50%;
+  bottom: 100%;
+  width: 58.5px;
+  height: 78px;
+  transform: translateX(-50%) translateY(6.2px);
+  z-index: 4;
+  pointer-events: none;
+}
+.c4-rest-glass svg { display: block; width: 100%; height: 100%; }
+
 .c4-spot-img { aspect-ratio: 16 / 9; border-radius: 20px; overflow: hidden; background: var(--ink); }
 .c4-spot-img img { width: 100%; height: 100%; object-fit: cover; }
 
@@ -533,18 +559,17 @@
 .concept-switcher a[aria-current="page"] { background: var(--mark, #ff6d00); color: #16332a; }
 
 @media (max-width: 899px) {
-  .c4-copy--0 { top: 13svh; transform: none; left: 20px; right: 20px; max-width: none; }
-  .c4-deck { width: 88vw; transform: translate3d(-50%, calc(-50% + 16svh), 0); }
-  .c4-stage[data-beat="1"] .c4-deck { transform: translate3d(-50%, calc(-50% + 8svh), 0) scale(.86); }
-  .c4-stage[data-beat="2"] .c4-deck { transform: translate3d(-50%, calc(-50% - 14svh), 0) scale(.62); }
-  .c4-stage[data-beat="3"] .c4-deck { transform: translate3d(-50%, calc(-50% - 8svh), 0) scale(.84); }
-  .c4-sib, .c4-wheel, .c4-dock { display: none; }
-  .c4-rank { width: 64vw; left: 74px; padding: 10px 14px; }
+  .c4-copy--0 { top: 96px; transform: none; left: 20px; right: 20px; max-width: none; }
+  .c4-deck { width: 86vw; transform: translate3d(-50%, calc(-50% + 16vh), 0); }
+  .c4-stage[data-beat="1"] .c4-deck { transform: translate3d(-50%, calc(-50% + 10vh), 0) scale(.86); }
+  .c4-stage[data-beat="2"] .c4-deck { transform: translate3d(-50%, calc(-50% - 10vh), 0) scale(.62); }
+  .c4-stage[data-beat="3"] .c4-deck { transform: translate3d(-50%, calc(-50% - 6vh), 0) scale(.82); }
+  .c4-sib, .c4-wheel, .c4-rail { display: none; }
+  .c4-rank { width: 64vw; left: 72px; padding: 10px 14px; }
 }
 
 @media (prefers-reduced-motion: reduce) {
   .c4-iris-orange, .c4-room-dark, .c4-invite-photo, .c4-oak-table, .c4-deck, .c4-sib, .c4-line > span, .c4-wheel, .c4-wedge {
     transition: none !important;
   }
-  .c4-pour-path, .c4-pour-highlight { animation: none; }
 }
