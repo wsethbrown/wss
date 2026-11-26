@@ -204,12 +204,12 @@
 .c4-what b { font-size: clamp(1.25rem, 2vw, 1.75rem); line-height: 1.1; letter-spacing: -.03em; font-weight: 600; text-underline-offset: 4px; }
 .c4-what span { font-size: 15.5px; line-height: 1.35; }
 .c4-invite-foot { display: flex; align-items: stretch; gap: 12px; margin-top: 4px; }
-.c4-guests { display: flex; align-items: center; gap: 12px; padding: 10px 14px; border-radius: 18px; background: #fff; }
+.c4-guests { display: flex; align-items: center; gap: 12px; flex: none; padding: 10px 14px; border-radius: 18px; background: #fff; }
 .c4-guests > b { font-size: 15px; font-weight: 600; white-space: nowrap; }
 .c4-seats { display: flex; gap: 8px; }
 .c4-seat { display: grid; justify-items: center; gap: 2px; }
 .c4-seat small { font-size: 13px; font-weight: 600; line-height: 1; }
-.c4-invite-deck { display: grid; align-content: start; gap: 5px; flex: 0 1 190px; min-width: 96px; }
+.c4-invite-deck { display: grid; align-content: start; gap: 5px; flex: 0 1 190px; min-width: 0; }
 .c4-invite-deck .c4-slot { border-radius: 10px; box-shadow: 0 12px 24px -14px rgba(10, 24, 20, .6); }
 .c4-invite-deck small { font-size: 13px; font-weight: 600; line-height: 1.2; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .c4-go {
@@ -395,11 +395,10 @@ a.c4-rank:focus-visible { background: rgba(246, 244, 238, .15); border-radius: 1
     border: 0; border-radius: 12px; background: transparent; cursor: pointer; font: inherit; color: var(--ink);
   }
   .c4-rail-label { font-size: 13px; font-weight: 600; opacity: 0; translate: 6px 0; transition: opacity 180ms ease, translate 180ms var(--ease); white-space: nowrap; }
-  .c4-rail-dot { width: 8px; height: 8px; border-radius: 99px; background: currentColor; opacity: .45; transition: height 220ms var(--ease), opacity 200ms ease; }
+  .c4-rail-dot { width: 8px; height: 8px; border-radius: 99px; background: currentColor; transition: height 220ms var(--ease); }
   .c4-rail-btn:hover .c4-rail-label, .c4-rail-btn:focus-visible .c4-rail-label { opacity: 1; translate: 0 0; }
   .c4-rail-btn:hover, .c4-rail-btn:focus-visible { background: var(--bg); color: var(--ink) !important; box-shadow: 0 0 0 1px var(--line); }
-  .c4-rail-btn:hover .c4-rail-dot { opacity: 1; }
-  .c4-rail-btn[aria-current] .c4-rail-dot { height: 26px; opacity: 1; }
+  .c4-rail-btn[aria-current] .c4-rail-dot { height: 26px; }
   .c4-stage[data-beat="3"] .c4-rail-btn, .c4-stage[data-beat="4"] .c4-rail-btn { color: var(--cream); }
   .c4-stage[data-beat="3"] .c4-rail :focus-visible, .c4-stage[data-beat="4"] .c4-rail :focus-visible { outline-color: var(--mark); }
   .c4-stage[data-beat="2"] .c4-rail :focus-visible { outline-color: var(--ink); }
