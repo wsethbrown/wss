@@ -1,498 +1,439 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Concept 4: "The Theatre of the Pour" — Tightened v2
-// Fixes every laptop-viewport issue from real MacBook Safari review:
-// - Pure position: sticky stage (zero fixed->parked jump, zero bottom peek)
-// - Laptop-safe non-overlapping coordinates across all 5 beats
-// - Paper-backed bowl on Beat 2 orange so pours are 100% crisp & visible
-// - Physical 3D deck-swap animation when clicking a flanking deck in Beat 1
-//   (swaps actual cover/title/meta between center & flank and carries forward!)
-// - Refined Beat 3 living pour: sequential glass rise + illuminated coaster ring
-//   + gentle slosh wave (removed the dashed vertical stream)
-// - Clean vertical spacing on Beat 4 sorted leaderboard (zero headline overlap)
+// Concept 4: "The Theatre of the Pour" (/concepts/4, home/concept_4).
+//
+// The page arrives as five stacked beats of real HTML (that is the page
+// without JS, in print, and in a window too short to hold a beat). This
+// controller goes "live" when every beat fits the screen: the beats share
+// one pinned screen, the scroll picks the beat, and two kinds of object
+// travel between the beats' slots ([data-slot]), wherever each beat's own
+// layout puts them:
+//   - the deck screen (one), on every [data-slot="deck"];
+//   - the glasses, on [data-slot="glass"][data-k].
+// A slot keeps its own static picture; while an object rests on it the slot
+// is .is-held and its picture hidden, so anything that fails leaves the
+// static picture showing.
+//
+// All content is the server's: names, numbers and words live in the markup
+// (elements marked [data-for-deck] follow the picked deck). The config value
+// carries only ids, counts and glass levels (ConceptFourHelper).
+//
+// Frames run only while something moves (a glass travelling, filling or
+// settling) and never while the theatre is off screen. Under reduced motion
+// every beat lands at rest: no travel, no fill, no slosh.
 
-const POURS = [
-  { name: "Buffalo Trace",          proof: "90°",    score: "4.10", level: 0.72, rank: 3, wheel: [0.85, 0.52, 0.36, 0.72, 0.14, 0.50, 0.44, 0.10] },
-  { name: "Maker's Mark 46",        proof: "94°",    score: "4.25", level: 0.78, rank: 2, wheel: [0.92, 0.80, 0.48, 0.62, 0.20, 0.42, 0.35, 0.10] },
-  { name: "Heaven Hill 7yr BiB",    proof: "100°",   score: "4.40", level: 0.85, rank: 1, wheel: [0.76, 0.85, 0.72, 0.45, 0.24, 0.65, 0.25, 0.12] },
-  { name: "Wild Turkey Rare Breed", proof: "116.8°", score: "4.65", level: 0.94, rank: 0, wheel: [0.72, 0.96, 0.92, 0.58, 0.42, 0.55, 0.20, 0.18] }
-]
-
+const BEATS = 5
+const DWELL = 4.6      // bands of scroll the screen stays pinned (the last beat dwells .6)
+const SCREEN_W = 640   // the deck screen's layout width (CSS), scaled to its slot
+const GLASS_H = 80     // a glass object's layout height (CSS)
+const SPAN = 24        // shared/_glass: the level's travel in drawing units
+const TRAVEL = 0.8     // seconds a glass takes between slots
+const STEP = 1000 / 60 // the slosh spring's fixed step, ms
 const clamp = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v))
-const lerp = (a, b, t) => a + (b - a) * t
-const easeOutCubic = (t) => 1 - Math.pow(1 - clamp(t), 3)
-const easeOutBack = (t) => {
-  const c = clamp(t)
-  const c1 = 1.25, c3 = c1 + 1
-  return 1 + c3 * Math.pow(c - 1, 3) + c1 * Math.pow(c - 1, 2)
-}
+const easeOut = (t) => 1 - Math.pow(1 - clamp(t), 3)
 
 export default class extends Controller {
-  static targets = [
-    "theatre", "stage", "sentinel", "copy", "railBtn",
-    "deck", "deckShell", "deckSheen", "dslide", "deckCapL", "deckCapR", "deckTitle", "swapCover",
-    "rsvpChip",
-    "glass", "gcap", "rank",
-    "wheelTitle", "wheelScore", "wedge",
-    "restGlass"
-  ]
+  static targets = [ "theatre", "stage", "beat", "rail", "screen", "reel", "glass", "pick", "flip", "count", "rank", "wheel" ]
+  static values = { config: Object }
 
   connect() {
-    this.reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches
+    this.motion = window.matchMedia("(prefers-reduced-motion: reduce)")
     this.beat = 0
-    this.chosenDeck = this.element.dataset.initialDeck || "Bourbon Basics"
-    this.rsvpIn = false
-    this.slideIdx = 0
-    this.activeWheelIdx = 3
-    this.mx = 0; this.my = 0; this.curMx = 0; this.curMy = 0
-    this.running = true
-    this.seqTimers = []
-    this.swapping = false
-
-    this.gState = POURS.map((_, k) => {
-      const p = this.poseFor(0, k)
-      return {
-        x: p.x, y: p.y, sc: p.sc, op: p.op, lvl: p.lvl, rot: 0,
-        from: { ...p }, to: { ...p }, ctrl: { x: p.x, y: p.y },
-        tStart: 0, dur: 0.001, active: false,
-        slosh: 0, sloshVel: 0, targetLvl: p.lvl
-      }
-    })
+    this.live = false
+    this.visible = true
+    this.deck = String(this.configValue.deck ?? "")
+    this.slideAt = {}
+    this.timers = []
+    this.raf = null
+    this.last = 0
+    this.acc = 0
+    this.glasses = this.glassTargets.map((el, k) => ({
+      el, k, body: el.querySelector("svg g > path"),
+      x: 0, y: 0, sc: 1, op: 0, rot: 0, lvl: 1, goal: 1, slosh: 0, vel: 0, moving: false
+    }))
 
     this.onScroll = this.onScroll.bind(this)
-    this.onMouseMove = this.onMouseMove.bind(this)
-    this.onKeyDown = this.onKeyDown.bind(this)
-    this.loop = this.loop.bind(this)
-
+    this.onResize = this.onResize.bind(this)
+    this.onFocus = this.onFocus.bind(this)
+    this.tick = this.tick.bind(this)
     window.addEventListener("scroll", this.onScroll, { passive: true })
-    window.addEventListener("resize", this.onScroll, { passive: true })
-    window.addEventListener("mousemove", this.onMouseMove, { passive: true })
-    window.addEventListener("keydown", this.onKeyDown)
+    window.addEventListener("resize", this.onResize, { passive: true })
+    this.motion.addEventListener("change", this.onResize)
+    this.stageTarget.addEventListener("focusin", this.onFocus)
+    this.watcher = new IntersectionObserver(([ entry ]) => this.seen(entry.isIntersecting))
+    this.watcher.observe(this.theatreTarget)
+    if (document.fonts?.ready) document.fonts.ready.then(() => { if (this.connected) this.refresh() })
 
-    this.enterBeat(0, true)
-    this.onScroll()
-    this.raf = requestAnimationFrame(this.loop)
+    this.connected = true
+    this.syncFlip()
+    this.refresh()
+    if (this.live && window.location.hash === "#how-it-works") this.go(1, true)
   }
 
   disconnect() {
-    this.running = false
+    this.connected = false
     this.clearTimers()
-    window.removeEventListener("scroll", this.onScroll)
-    window.removeEventListener("resize", this.onScroll)
-    window.removeEventListener("mousemove", this.onMouseMove)
-    window.removeEventListener("keydown", this.onKeyDown)
     if (this.raf) cancelAnimationFrame(this.raf)
+    this.raf = null
+    clearTimeout(this.resizeTimer)
+    window.removeEventListener("scroll", this.onScroll)
+    window.removeEventListener("resize", this.onResize)
+    this.motion.removeEventListener("change", this.onResize)
+    this.stageTarget.removeEventListener("focusin", this.onFocus)
+    this.watcher.disconnect()
+    this.goStatic()
   }
 
-  clearTimers() {
-    this.seqTimers.forEach((id) => clearTimeout(id))
-    this.seqTimers = []
+  get reduced() { return this.motion.matches }
+
+  // ---- Live or static ----------------------------------------------------
+
+  // Live only when every beat's content fits the pinned screen.
+  refresh() {
+    try {
+      this.element.classList.add("is-live")
+      const fits = this.beatTargets.every((beat) => beat.scrollHeight <= beat.clientHeight + 1 && beat.scrollWidth <= beat.clientWidth + 1)
+      if (!fits) { this.goStatic(); return }
+      this.live = true
+      this.pickRects = this.measurePicks()
+      this.enter(this.beatFromScroll(), true)
+    } catch (error) {
+      console.error("Concept 4: showing the static page", error)
+      this.goStatic()
+    }
   }
 
-  after(ms, fn) {
-    const id = setTimeout(fn, this.reduced ? 0 : ms)
-    this.seqTimers.push(id)
+  goStatic() {
+    this.live = false
+    this.clearTimers()
+    this.element.classList.remove("is-live")
+    this.element.querySelectorAll(".c4-slot.is-held").forEach((slot) => slot.classList.remove("is-held"))
   }
 
-  // Laptop-safe non-overlapping coordinates (in vw / vh relative to stage center 50%, 50%)
-  poseFor(beat, k) {
-    const mobile = window.innerWidth < 900
-    const pour = POURS[k]
-    if (beat === 0) {
-      return { x: -2, y: 36, sc: 0.68, op: k === 0 ? 0.96 : 0, lvl: 0.14 }
-    }
-    if (beat === 1) {
-      return { x: 0, y: 39, sc: 0.68, op: k === 0 ? 1 : 0, lvl: 0.42 }
-    }
-    if (beat === 2) {
-      // Positioned cleanly under the right-hand docked deck card — ZERO text overlap!
-      const invXs = mobile ? [ -24, -8, 8, 24 ] : [ 12, 20.5, 29, 37.5 ]
-      return { x: invXs[k], y: 34, sc: 0.58, op: 1, lvl: 0.72 }
-    }
-    if (beat === 3) {
-      // Comfortably seated on the bottom oak table with full air below captions
-      const tblXs = mobile ? [ -34, -11, 11, 34 ] : [ -26, -8.5, 8.5, 26 ]
-      return { x: tblXs[k], y: 29, sc: mobile ? 0.64 : 0.88, op: 1, lvl: 0.06 }
-    }
-    // Beat 4: Sorted vertical podium well below the top-left headline!
-    // Center 50% + [-7, 7, 21, 35] -> 43vh, 57vh, 71vh, 85vh (headline ends by ~28vh!)
-    const sortYs = [ -7, 7, 21, 35 ]
-    return {
-      x: mobile ? -38 : -37,
-      y: sortYs[pour.rank],
-      sc: mobile ? 0.52 : 0.60,
-      op: 1,
-      lvl: pour.level
-    }
+  seen(visible) {
+    this.visible = visible
+    if (!this.live) return
+    if (visible) this.enter(this.beatFromScroll(), true)
+    else if (this.raf) { cancelAnimationFrame(this.raf); this.raf = null }
+  }
+
+  onResize() {
+    clearTimeout(this.resizeTimer)
+    this.resizeTimer = setTimeout(() => { if (this.connected) this.refresh() }, 120)
+  }
+
+  // ---- Which beat --------------------------------------------------------
+
+  band() {
+    return (this.theatreTarget.offsetHeight - this.stageTarget.offsetHeight) / DWELL
+  }
+
+  beatFromScroll() {
+    const top = this.theatreTarget.getBoundingClientRect().top
+    return clamp(Math.round(-top / this.band()), 0, BEATS - 1)
   }
 
   onScroll() {
-    if (!this.hasSentinelTarget) return
-    const mid = window.innerHeight * 0.52
-    let best = this.beat
-    const rects = this.sentinelTargets.map((el) => el.getBoundingClientRect())
+    if (!this.live || !this.visible) return
+    const beat = this.beatFromScroll()
+    if (beat !== this.beat) this.enter(beat, false)
+  }
 
-    for (let i = 0; i < rects.length; i++) {
-      if (rects[i].top <= mid && rects[i].bottom >= mid) {
-        best = i
-        break
-      }
+  // Keyboard: focus moving into another beat brings that beat on.
+  onFocus(event) {
+    if (!this.live) return
+    const beat = this.beatTargets.findIndex((el) => el.contains(event.target))
+    if (beat >= 0 && beat !== this.beat) this.go(beat, true)
+  }
+
+  // The rail and "See how it works".
+  jump(event) {
+    event.preventDefault()
+    this.go(Number(event.currentTarget.dataset.beat), false)
+  }
+
+  go(beat, instant) {
+    if (!this.live) {
+      this.beatTargets[beat]?.scrollIntoView({ behavior: instant || this.reduced ? "auto" : "smooth" })
+      return
     }
-    if (rects[0] && rects[0].top > mid) best = 0
-    if (rects[rects.length - 1] && rects[rects.length - 1].bottom < mid) best = rects.length - 1
-
-    if (best !== this.beat) this.enterBeat(best, false)
+    const top = this.theatreTarget.getBoundingClientRect().top + window.scrollY + beat * this.band()
+    window.scrollTo({ top, behavior: instant || this.reduced ? "instant" : "smooth" })
+    if (instant) this.enter(beat, true)
   }
 
-  onMouseMove(e) {
-    if (this.reduced) return
-    this.mx = (e.clientX / window.innerWidth - 0.5) * 2
-    this.my = (e.clientY / window.innerHeight - 0.5) * 2
-  }
-
-  onKeyDown(e) {
-    if (e.target.closest("input, textarea, button, a")) return
-    const tRect = this.theatreTarget?.getBoundingClientRect()
-    if (!tRect || tRect.bottom < window.innerHeight * 0.6) return
-    if (e.key === "ArrowDown" && this.beat < 4) {
-      e.preventDefault(); this.scrollToBeat(this.beat + 1)
-    } else if (e.key === "ArrowUp" && this.beat > 0) {
-      e.preventDefault(); this.scrollToBeat(this.beat - 1)
-    }
-  }
-
-  jumpBeat(event) {
-    const b = parseInt(event.currentTarget.dataset.beat, 10)
-    this.scrollToBeat(b)
-  }
-
-  scrollToBeat(b) {
-    const target = this.sentinelTargets[b]
-    if (!target) return
-    const y = target.getBoundingClientRect().top + window.scrollY + (b === 0 ? 0 : 12)
-    window.scrollTo({ top: y, behavior: this.reduced ? "auto" : "smooth" })
-  }
-
-  enterBeat(nextBeat, instant = false) {
-    this.beat = nextBeat
+  enter(beat, instant) {
+    instant = instant || this.reduced
+    this.beat = beat
     this.clearTimers()
+    this.stageTarget.dataset.beat = String(beat)
+    this.beatTargets.forEach((el, i) => el.classList.toggle("is-active", i === beat))
+    this.railTargets.forEach((el, i) => { if (i === beat) el.setAttribute("aria-current", "step"); else el.removeAttribute("aria-current") })
+    this.placeScreen(instant)
+    this.placeGlasses(instant)
+    this.kick()
+  }
 
-    if (this.hasStageTarget) this.stageTarget.dataset.beat = String(nextBeat)
-    this.copyTargets.forEach((el, i) => el.classList.toggle("is-active", i === nextBeat))
-    this.railBtnTargets.forEach((el, i) => el.classList.toggle("is-active", i === nextBeat))
+  // ---- Slots -------------------------------------------------------------
 
-    const caps = [
-      [ this.chosenDeck, "Click to preview slides" ],
-      [ this.chosenDeck, "Click either flanking deck to swap" ],
-      [ `Deck: ${this.chosenDeck}`, "Attached to Friday" ],
-      [ `Presenting: ${this.chosenDeck}`, "Four pours, lowest proof first" ],
-      [ "The tasting record", "Ranked by the room" ]
-    ]
-    if (this.hasDeckCapLTarget) this.deckCapLTarget.textContent = caps[nextBeat][0]
-    if (this.hasDeckCapRTarget) this.deckCapRTarget.textContent = caps[nextBeat][1]
+  slots(beat, kind) {
+    return [ ...this.beatTargets[beat].querySelectorAll(`[data-slot="${kind}"]`) ].filter((el) => el.offsetParent !== null)
+  }
 
-    this.gcapTargets.forEach((c) => c.classList.toggle("is-visible", nextBeat === 3))
-    this.rankTargets.forEach((r) => r.classList.remove("is-visible"))
-    this.glassTargets.forEach((g) => g.classList.remove("is-pouring"))
+  // A slot's box in the stage's own coordinates.
+  box(el) {
+    const stage = this.stageTarget.getBoundingClientRect()
+    const r = el.getBoundingClientRect()
+    return { x: r.left - stage.left, y: r.top - stage.top, w: r.width, h: r.height }
+  }
 
-    const nowSec = performance.now() * 0.001
+  release(beat, kind) {
+    this.beatTargets[beat].querySelectorAll(`[data-slot="${kind}"].is-held`).forEach((slot) => slot.classList.remove("is-held"))
+  }
 
-    this.gState.forEach((g, k) => {
-      const dest = this.poseFor(nextBeat, k)
-      g.from = { x: g.x, y: g.y, sc: g.sc, op: g.op, lvl: g.lvl }
-      g.to = { ...dest }
-      const midX = (g.from.x + dest.x) * 0.5
-      const arcLift = nextBeat === 4 ? -11 - k * 2.5 : (nextBeat === 2 ? -8 : -5)
-      g.ctrl = { x: midX + (nextBeat === 4 ? (k % 2 === 0 ? -5 : 5) : 0), y: Math.min(g.from.y, dest.y) + arcLift }
+  // Change an element with no transition, then let transitions run again.
+  instantly(el, change) {
+    el.style.transition = "none"
+    change()
+    void el.offsetWidth
+    el.style.transition = ""
+  }
 
-      const stagger = instant || this.reduced ? 0 : (nextBeat === 4 ? k * 0.075 : k * 0.055)
-      g.tStart = nowSec + stagger
-      g.dur = instant || this.reduced ? 0.001 : (nextBeat === 4 ? 0.86 : 0.72)
-      g.active = true
-      g.targetLvl = dest.lvl
-      g.landedKick = false
-    })
+  // ---- The deck screen ---------------------------------------------------
 
-    // --- BEAT 3: Refined Sequential Living Pour (no cartoon dashed line!) ---
-    if (nextBeat === 3) {
-      POURS.forEach((pour, k) => {
-        this.after(420 + k * 420, () => {
-          if (this.beat !== 3) return
-          const gEl = this.glassTargets[k]
-          if (gEl) gEl.classList.add("is-pouring")
-          this.gState[k].targetLvl = pour.level
-          this.gState[k].sloshVel += (k % 2 === 0 ? 4.4 : -4.4)
-          this.after(520, () => {
-            if (gEl && this.beat === 3) gEl.classList.remove("is-pouring")
-          })
-        })
-      })
-    }
+  pickedCard() {
+    return this.pickTargets.find((card) => card.querySelector("input")?.checked)
+  }
 
-    // --- BEAT 4: Mid-Air Sort -> Ranked Podium -> Staggered Palate Wheel Bloom ---
-    if (nextBeat === 4) {
-      if (!this.reduced) {
-        this.wedgeTargets.forEach((w) => {
-          w.style.transitionDelay = "0ms"
-          w.style.transform = "scale(0.08)"
-          w.style.opacity = "0"
-        })
-      }
-      this.after(560, () => {
-        if (this.beat !== 4) return
-        this.rankTargets.forEach((r) => r.classList.add("is-visible"))
-      })
-      this.after(700, () => {
-        if (this.beat !== 4) return
-        this.applyWheel(3, true)
-      })
-    }
+  deckSlot(beat) {
+    if (beat === 1) return this.pickedCard()?.querySelector('[data-slot="deck"]') || null
+    return this.slots(beat, "deck").find((slot) => !slot.dataset.onlyDeck || slot.dataset.onlyDeck === this.deck) || null
+  }
 
-    if (nextBeat === 2 && !instant) {
-      this.after(300, () => {
-        this.gState.forEach((g, k) => { g.sloshVel += (k - 1.5) * 1.8 })
-      })
+  setScreen(slot) {
+    const b = this.box(slot)
+    const scale = b.w / SCREEN_W
+    const radius = parseFloat(getComputedStyle(slot).borderTopLeftRadius) || 0
+    this.screenTarget.style.transform = `translate3d(${b.x.toFixed(2)}px, ${b.y.toFixed(2)}px, 0) scale(${scale.toFixed(4)})`
+    this.screenTarget.style.borderRadius = `${(radius / scale).toFixed(2)}px`
+  }
+
+  placeScreen(instant) {
+    if (!this.hasScreenTarget) return
+    const screen = this.screenTarget
+    this.unpark()
+    this.release(this.beat, "deck")
+    const slot = this.deckSlot(this.beat)
+    if (!slot) { screen.classList.add("is-out"); return }
+    slot.classList.add("is-held")
+    if (instant || screen.classList.contains("is-out")) this.instantly(screen, () => this.setScreen(slot))
+    else this.setScreen(slot)
+    screen.classList.remove("is-out")
+    // On the pick beat the screen hands over to the picked card's own cover
+    // once it has landed, so the cards are whole when they trade places.
+    // (so the screen shows the cover the card shows: its first slide).
+    if (this.beat === 1) {
+      if (this.slideAt[this.deck]) this.flip(-this.slideAt[this.deck])
+      this.after(instant ? 0 : 820, () => this.park())
     }
   }
 
-  // --- Interactive Actions ---
-  nextSlide() {
-    if (!this.dslideTargets.length) return
-    // Hide temporary swapped cover overlay if cycling through real hero slides
-    if (this.hasSwapCoverTarget) this.swapCoverTarget.hidden = true
-    this.slideIdx = (this.slideIdx + 1) % this.dslideTargets.length
-    this.dslideTargets.forEach((s, i) => s.classList.toggle("is-active", i === this.slideIdx))
-    this.gState[0].sloshVel += 2.8
+  park() {
+    if (this.beat !== 1 || !this.hasScreenTarget) return
+    this.pickTargets.forEach((card) => card.querySelector('[data-slot="deck"]')?.classList.remove("is-held"))
+    this.screenTarget.classList.add("is-parked")
+    this.parked = true
   }
 
-  // Real physical 3D deck-swap animation when clicking either flanking deck in Beat 1!
-  swapDeck(event) {
-    if (this.swapping) return
-    const btn = event.currentTarget
-    const newTitle = btn.dataset.title
-    const newCat = btn.dataset.category || "Whiskey"
-    const newCover = btn.dataset.cover || ""
-    if (!newTitle) return
-
-    this.swapping = true
-    const oldTitle = this.chosenDeck
-    const oldCover = this.currentCover || this.element.dataset.initialCover || ""
-    const oldCat = this.currentCategory || this.element.dataset.initialCategory || "Featured"
-
-    // 1. Fly the clicked flanking card toward center
-    btn.classList.add("is-swapping")
-
-    setTimeout(() => {
-      // 2. Swap state between center spotlight & clicked flank
-      this.chosenDeck = newTitle
-      this.currentCover = newCover
-      this.currentCategory = newCat
-
-      // Update center deck titles everywhere
-      this.deckTitleTargets.forEach((el) => { el.textContent = newTitle })
-      if (this.hasDeckCapLTarget) this.deckCapLTarget.textContent = newTitle
-
-      // Show swapped deck's real cover image (or stylized cover) inside the center screen!
-      if (this.hasSwapCoverTarget) {
-        const img = this.swapCoverTarget.querySelector("img")
-        const titleEl = this.swapCoverTarget.querySelector("[data-swap-title]")
-        const catEl = this.swapCoverTarget.querySelector("[data-swap-cat]")
-        if (newCover && img) {
-          img.src = newCover
-          img.hidden = false
-        } else if (img) {
-          img.hidden = true
-        }
-        if (titleEl) titleEl.textContent = newTitle
-        if (catEl) catEl.textContent = newCat
-        this.swapCoverTarget.hidden = false
-      }
-
-      // Put the previous center deck onto the clicked flank so it genuinely traded places!
-      btn.dataset.title = oldTitle
-      btn.dataset.category = oldCat
-      btn.dataset.cover = oldCover
-      const flankTitle = btn.querySelector("strong")
-      const flankCat = btn.querySelector(".c4-sib-art span")
-      const flankImg = btn.querySelector(".c4-sib-art img")
-      if (flankTitle) flankTitle.textContent = oldTitle
-      if (flankCat) flankCat.textContent = oldCat
-      if (flankImg && oldCover) flankImg.src = oldCover
-
-      // 3. Pop the center deck with 3D spring settle + kick the glass!
-      if (this.hasDeckTarget) {
-        this.deckTarget.classList.remove("is-swapped")
-        void this.deckTarget.offsetWidth
-        this.deckTarget.classList.add("is-swapped")
-        setTimeout(() => this.deckTarget?.classList.remove("is-swapped"), 520)
-      }
-      this.gState[0].sloshVel += 4.6
-      this.gState[0].targetLvl = Math.min(0.68, this.gState[0].targetLvl + 0.1)
-
-      btn.classList.remove("is-swapping")
-      this.swapping = false
-    }, this.reduced ? 0 : 250)
-  }
-
-  toggleRsvp() {
-    this.rsvpIn = !this.rsvpIn
-    if (this.hasRsvpChipTarget) {
-      this.rsvpChipTarget.classList.toggle("is-in", this.rsvpIn)
-      this.rsvpChipTarget.textContent = this.rsvpIn ? "Seat saved · 6 going ✓" : "Save my seat"
-    }
-    this.gState.forEach((g, k) => {
-      g.sloshVel += (k % 2 === 0 ? 4.2 : -4.2)
-      g.targetLvl = this.rsvpIn ? 0.88 : 0.72
+  // Back on the picked card's cover, shown, ready to travel.
+  unpark() {
+    if (!this.parked) return
+    this.parked = false
+    this.pickTargets.forEach((card) => card.getAnimations().forEach((animation) => animation.finish()))
+    const slot = this.pickedCard()?.querySelector('[data-slot="deck"]')
+    this.instantly(this.screenTarget, () => {
+      if (slot) { slot.classList.add("is-held"); this.setScreen(slot) }
+      this.screenTarget.classList.remove("is-parked")
     })
   }
 
-  tapGlass(event) {
-    const idx = parseInt(event.currentTarget.dataset.index, 10)
-    if (this.beat === 3) {
-      const gEl = this.glassTargets[idx]
-      if (gEl) {
-        gEl.classList.add("is-pouring")
-        setTimeout(() => gEl.classList.remove("is-pouring"), 520)
-      }
-      this.gState[idx].sloshVel += 5.6
-      this.nextSlide()
-    } else if (this.beat === 4) {
-      this.applyWheel(idx, false)
-      this.gState[idx].sloshVel += 5.0
-    }
+  // ---- Picking a deck ----------------------------------------------------
+
+  measurePicks() {
+    return this.pickTargets.map((card) => card.getBoundingClientRect())
   }
 
-  hoverRank(event) {
-    if (this.beat !== 4) return
-    const idx = parseInt(event.currentTarget.dataset.index, 10)
-    if (idx !== this.activeWheelIdx) {
-      this.applyWheel(idx, false)
-      this.gState[idx].sloshVel += 3.4
-    }
-  }
-
-  applyWheel(idx, staggered = false) {
-    this.activeWheelIdx = idx
-    const pour = POURS[idx] || POURS[3]
-    this.rankTargets.forEach((r) => r.classList.toggle("is-active", parseInt(r.dataset.index, 10) === idx))
-    if (this.hasWheelTitleTarget) this.wheelTitleTarget.textContent = pour.name
-    if (this.hasWheelScoreTarget) this.wheelScoreTarget.textContent = `${pour.score} / 5`
-
-    this.wedgeTargets.forEach((w, i) => {
-      const v = pour.wheel[i] ?? 0.22
-      w.style.transitionDelay = staggered && !this.reduced ? `${i * 50}ms` : "0ms"
-      w.style.transform = `scale(${(0.24 + v * 0.76).toFixed(3)})`
-      w.style.opacity = (0.25 + v * 0.75).toFixed(2)
-      w.setAttribute("fill", v >= 0.72 ? "#ff6d00" : (v >= 0.5 ? "#16332a" : "#8fa397"))
+  pick(event) {
+    this.deck = String(event.target.value)
+    this.element.querySelectorAll("[data-for-deck]").forEach((el) => { el.hidden = el.dataset.forDeck !== this.deck })
+    this.syncFlip()
+    if (!this.live) return
+    if (this.beat === 1) { this.clearTimers(); this.park() }
+    // The cards trade places (FLIP): from where they were to where the new layout puts them.
+    this.pickTargets.forEach((card) => card.getAnimations().forEach((animation) => animation.finish()))
+    const first = this.pickRects
+    const last = this.measurePicks()
+    this.pickRects = last
+    if (!first || this.reduced) return
+    this.pickTargets.forEach((card, i) => {
+      const a = first[i], z = last[i]
+      if (!a || !z || !z.width) return
+      const dx = a.left - z.left, dy = a.top - z.top, scale = a.width / z.width
+      if (Math.abs(dx) < 1 && Math.abs(dy) < 1 && Math.abs(scale - 1) < 0.01) return
+      card.animate(
+        [ { transformOrigin: "0 0", transform: `translate(${dx}px, ${dy}px) scale(${scale})` }, { transformOrigin: "0 0", transform: "none" } ],
+        { duration: 520, easing: "cubic-bezier(0.23, 1, 0.32, 1)" }
+      )
     })
   }
 
-  drawLiquid(svgEl, level, slosh, phase, mode) {
-    svgEl.classList.toggle("is-cream", mode === "dark")
-    svgEl.classList.toggle("is-on-orange", mode === "orange")
+  // ---- The picked deck's slides ------------------------------------------
 
-    // On orange bg, make sure the white bowl fill sits BEHIND the liquid group
-    if (mode === "orange" && !svgEl.dataset.orangeBacked) {
-      const bowlPath = svgEl.querySelector('path[stroke="#16332a"][fill="none"]:not([stroke-opacity])')
-      const liqGroup = svgEl.querySelector("g")
-      if (bowlPath && liqGroup) {
-        const bg = bowlPath.cloneNode(false)
-        bg.setAttribute("fill", "#f6f4ee")
-        bg.setAttribute("stroke", "none")
-        bg.setAttribute("data-orange-bg", "1")
-        svgEl.insertBefore(bg, liqGroup)
-      }
-      svgEl.dataset.orangeBacked = "1"
-    }
-    const bgPath = svgEl.querySelector("[data-orange-bg]")
-    if (bgPath) bgPath.style.display = mode === "orange" ? "" : "none"
-
-    const body = svgEl.querySelector("g > path")
-    if (!body) return
-    const lvl = clamp(level, 0, 1)
-    if (lvl < 0.02) { body.setAttribute("d", ""); return }
-
-    const baseY = 58.5 - lvl * 24
-    const tilt = clamp(slosh, -6.5, 6.5)
-    const wave = Math.sin(phase) * (0.85 + Math.abs(tilt) * 0.22)
-    const yL = (baseY - tilt + wave).toFixed(2)
-    const yM1 = (baseY - tilt * 0.35 - wave * 1.1).toFixed(2)
-    const yM2 = (baseY + tilt * 0.35 + wave * 1.1).toFixed(2)
-    const yR = (baseY + tilt - wave).toFixed(2)
-
-    body.setAttribute("d", `M 6 ${yL} C 18 ${yM1}, 38 ${yM2}, 54 ${yR} L 54 70 L 6 70 Z`)
-    body.setAttribute("fill", mode === "dark" ? "#ff6d00" : "#e65c00")
+  reel() {
+    return this.reelTargets.find((el) => el.dataset.forDeck === this.deck)
   }
 
-  loop(now) {
-    if (!this.running) return
-    const t = now * 0.001
+  syncFlip() {
+    const count = this.configValue.decks?.[this.deck]?.slides || 0
+    const at = this.slideAt[this.deck] || 0
+    this.flipTargets.forEach((el) => { el.hidden = count < 2 })
+    this.countTargets.forEach((el) => { el.textContent = count < 2 ? "" : `${at + 1} / ${count}` })
+  }
 
-    if (!this.reduced) {
-      this.curMx += (this.mx - this.curMx) * 0.08
-      this.curMy += (this.my - this.curMy) * 0.08
-    }
+  nextSlide() { this.flip(1) }
+  previousSlide() { this.flip(-1) }
 
-    if (this.hasDeckShellTarget) {
-      const tiltAmt = this.beat === 0 ? 7 : (this.beat === 3 ? 2.5 : 1.5)
-      this.deckShellTarget.style.transform = `rotateX(${(-this.curMy * tiltAmt).toFixed(2)}deg) rotateY(${(this.curMx * tiltAmt).toFixed(2)}deg)`
-    }
-    if (this.hasDeckSheenTarget) {
-      this.deckSheenTarget.style.setProperty("--sx", `${(50 + this.curMx * 32).toFixed(1)}%`)
-      this.deckSheenTarget.style.setProperty("--sy", `${(35 + this.curMy * 28).toFixed(1)}%`)
-    }
+  flip(by) {
+    const reel = this.reel()
+    if (!reel || reel.children.length < 2) return
+    const count = reel.children.length
+    const at = ((this.slideAt[this.deck] || 0) + by + count) % count
+    this.slideAt[this.deck] = at
+    ;[ ...reel.children ].forEach((slide, i) => slide.classList.toggle("is-on", i === at))
+    this.syncFlip()
+  }
 
-    const mode = this.beat >= 3 ? "dark" : (this.beat === 2 ? "orange" : "paper")
+  // ---- The verdict's wheel: a pour's row lights the wedges it feeds --------
 
-    this.gState.forEach((g, k) => {
-      if (g.active) {
-        const raw = (t - g.tStart) / g.dur
-        if (raw >= 0) {
-          const u = easeOutCubic(clamp(raw, 0, 1))
-          const inv = 1 - u
-          g.x = inv * inv * g.from.x + 2 * inv * u * g.ctrl.x + u * u * g.to.x
-          g.y = inv * inv * g.from.y + 2 * inv * u * g.ctrl.y + u * u * g.to.y
-          g.sc = lerp(g.from.sc, g.to.sc, easeOutBack(clamp(raw, 0, 1)))
-          g.op = lerp(g.from.op, g.to.op, clamp(raw * 1.4, 0, 1))
-          const dx = g.to.x - g.from.x
-          g.rot = Math.sin(u * Math.PI) * clamp(dx * 0.14, -7, 7)
+  lightWedges(event) {
+    if (!this.hasWheelTarget) return
+    const k = event.currentTarget.dataset.k
+    this.wheelTarget.querySelectorAll("[data-pour]").forEach((wedge) => wedge.classList.toggle("is-lit", wedge.dataset.pour === k))
+  }
 
-          if (raw >= 1) {
-            g.active = false
-            g.x = g.to.x; g.y = g.to.y; g.sc = g.to.sc; g.op = g.to.op; g.rot = 0
-            if (!g.landedKick && !this.reduced) {
-              g.landedKick = true
-              g.sloshVel += (k % 2 === 0 ? 4.2 : -4.2)
-            }
-          }
+  dimWedges() {
+    if (!this.hasWheelTarget) return
+    this.wheelTarget.querySelectorAll(".is-lit").forEach((wedge) => wedge.classList.remove("is-lit"))
+  }
+
+  // ---- The glasses -------------------------------------------------------
+
+  placeGlasses(instant) {
+    const beat = this.beat
+    this.release(beat, "glass")
+    const slots = this.slots(beat, "glass")
+    const levels = this.configValue.record?.levels || []
+    const now = performance.now() / 1000
+    this.glasses.forEach((g) => {
+      const slot = slots.find((el) => Number(el.dataset.k) === g.k)
+      let to = { x: g.x, y: g.y, sc: g.sc, op: 0 }
+      if (slot) {
+        slot.classList.add("is-held")
+        const b = this.box(slot)
+        to = { x: b.x + b.w / 2, y: b.y + b.h / 2, sc: b.h / GLASS_H, op: 1 }
+        g.el.classList.toggle("is-cream", beat >= 3)
+        g.cream = beat >= 3
+      }
+      // Full on the invite, poured one after another at the table, the room's score on the record.
+      const goal = beat === 4 ? clamp(levels[g.k] ?? 1) : 1
+      if (instant) {
+        Object.assign(g, to, { rot: 0, lvl: goal, goal, slosh: 0, vel: 0, moving: false })
+        return
+      }
+      if (g.op < 0.05 && slot) Object.assign(g, { x: to.x, y: to.y + 26, sc: to.sc }) // arrives in place, rising
+      g.from = { x: g.x, y: g.y, sc: g.sc, op: g.op }
+      g.to = to
+      g.ctrl = { x: (g.x + to.x) / 2, y: Math.min(g.y, to.y) - (slot && g.op > 0.05 ? 48 : 0) }
+      g.t0 = now + g.k * 0.06
+      g.moving = true
+      if (beat === 3 && slot) {
+        g.goal = 0
+        this.after(520 + g.k * 380, () => { g.goal = 1; g.vel += g.k % 2 ? -3.6 : 3.6; this.kick() })
+      } else {
+        g.goal = goal
+      }
+    })
+    if (instant) this.glasses.forEach((g) => this.draw(g))
+  }
+
+  kick() {
+    if (this.raf || !this.live || !this.visible || this.reduced) return
+    this.last = 0
+    this.raf = requestAnimationFrame(this.tick)
+  }
+
+  tick(now) {
+    this.raf = null
+    const dt = this.last ? Math.min(now - this.last, 50) : STEP
+    this.last = now
+    this.acc += dt
+    const steps = Math.floor(this.acc / STEP)
+    this.acc -= steps * STEP
+    const t = now / 1000
+    let busy = false
+    this.glasses.forEach((g) => {
+      if (g.moving) {
+        busy = true
+        const raw = (t - g.t0) / TRAVEL
+        if (raw >= 1) {
+          Object.assign(g, g.to, { rot: 0, moving: false })
+          if (g.op > 0) g.vel += g.k % 2 ? -3.2 : 3.2 // it lands, the liquid rocks
+        } else if (raw > 0) {
+          const u = easeOut(raw), v = 1 - u
+          g.x = v * v * g.from.x + 2 * v * u * g.ctrl.x + u * u * g.to.x
+          g.y = v * v * g.from.y + 2 * v * u * g.ctrl.y + u * u * g.to.y
+          g.sc = g.from.sc + (g.to.sc - g.from.sc) * u
+          g.op = g.from.op + (g.to.op - g.from.op) * clamp(raw * 1.6)
+          g.rot = Math.sin(u * Math.PI) * clamp((g.to.x - g.from.x) * 0.02, -7, 7)
         }
       }
-
-      g.lvl += (g.targetLvl - g.lvl) * (this.reduced ? 1 : 0.085)
-
-      if (!this.reduced) {
-        g.sloshVel += -g.slosh * 0.14
-        g.sloshVel *= 0.87
-        g.slosh += g.sloshVel * 0.17
+      for (let i = 0; i < steps; i++) {
+        g.lvl += (g.goal - g.lvl) * 0.085
+        g.vel += -g.slosh * 0.14
+        g.vel *= 0.87
+        g.slosh += g.vel * 0.17
       }
-
-      const el = this.glassTargets[k]
-      if (el) {
-        const px = g.x + (this.beat === 3 ? this.curMx * (1.1 + k * 0.2) : 0)
-        const py = g.y + (this.beat === 3 ? this.curMy * 0.6 : 0)
-        el.style.opacity = g.op.toFixed(3)
-        el.style.pointerEvents = g.op > 0.4 ? "auto" : "none"
-        el.style.transform = `translate3d(calc(-50% + ${px.toFixed(2)}vw), calc(-50% + ${py.toFixed(2)}vh), 0) scale(${g.sc.toFixed(3)}) rotate(${g.rot.toFixed(2)}deg)`
-        const svg = el.querySelector("svg")
-        if (svg) this.drawLiquid(svg, g.lvl, g.slosh + Math.sin(t * 2.1 + k * 1.5) * 0.35, t * 4.2 + k * 1.2, mode)
-      }
+      if (Math.abs(g.goal - g.lvl) > 0.003) busy = true
+      else g.lvl = g.goal
+      if (Math.abs(g.slosh) > 0.03 || Math.abs(g.vel) > 0.03) busy = true
+      else { g.slosh = 0; g.vel = 0 }
+      this.draw(g)
     })
+    if (busy && this.live && this.visible) this.raf = requestAnimationFrame(this.tick)
+  }
 
-    if (this.hasRestGlassTarget) {
-      const rsvg = this.restGlassTarget.querySelector("svg")
-      if (rsvg) this.drawLiquid(rsvg, 0.94, Math.sin(t * 1.8) * 0.45, t * 3.1, "paper")
-    }
+  // A glass where it is, as full as it is. At rest the surface is exactly
+  // shared/_glass's own, so a glass and its slot's static picture agree.
+  draw(g) {
+    g.el.style.opacity = g.op.toFixed(3)
+    g.el.style.transform = `translate3d(${(g.x - 30).toFixed(2)}px, ${(g.y - 40).toFixed(2)}px, 0) scale(${g.sc.toFixed(4)}) rotate(${g.rot.toFixed(2)}deg)`
+    if (!g.body) return
+    if (g.lvl < 0.02) { g.body.setAttribute("d", ""); return }
+    const y = 58.5 - clamp(g.lvl) * SPAN
+    const tilt = clamp(g.slosh, -6, 6)
+    const f = (d, lean) => (y + d + tilt * lean).toFixed(2)
+    g.body.setAttribute("d", `M8 ${f(1.2, -1)} C18 ${f(-2.2, -0.6)} 26 ${f(3.2, -0.2)} 36 ${f(0.6, 0.3)} C42 ${f(-1, 0.5)} 48 ${f(-1.6, 0.8)} 52 ${f(-0.6, 1)} L52 70 L8 70 Z`)
+    g.body.setAttribute("fill", g.cream ? "#ff6d00" : "#e65c00")
+  }
 
-    this.raf = requestAnimationFrame(this.loop)
+  // ---- Timers ------------------------------------------------------------
+
+  after(ms, fn) {
+    this.timers.push(setTimeout(fn, ms))
+  }
+
+  clearTimers() {
+    this.timers.forEach((id) => clearTimeout(id))
+    this.timers = []
   }
 }

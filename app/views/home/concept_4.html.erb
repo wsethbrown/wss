@@ -1,338 +1,423 @@
-<% content_for :title, "Concept 4: Theatre of the Pour — Whiskey Share Society" %>
+<%# Concept 4: "The Theatre of the Pour" (/concepts/4).
+
+    Five beats (the pitch, pick, gather, pour, the verdict). Each beat is real,
+    server-rendered HTML with its own layout at every width: stacked and
+    readable without JS, in print, and in a window too short to hold a beat.
+    With JS (concept_four_controller.js) the beats share one pinned screen and
+    the scroll picks the beat; one deck screen and the glasses travel between
+    the beats' slots (data-slot), which the beats' own layouts place.
+
+    The content is the live homepage's, chosen by the same code
+    (HomeController#load_homepage_data, StoryFrameHelper#story_frame): the
+    featured deck, the latest decks, the next public night or the sample
+    invite, the verdict or the tasting record or the sample review.
+    ConceptFourHelper adds each deck's own pour list. The owner allows this
+    concept the full-screen orange and green beats (the design system's
+    colour rules are otherwise kept). %>
+<% content_for :title, "Concept 4: The Theatre of the Pour" %>
 <% content_for :head do %>
   <%= stylesheet_link_tag "concepts/concept4" %>
 <% end %>
-
 <%
-  showcase_slides = @showcase_deck ? hero_reel_slides(@showcase_deck) : []
-  primary_deck_title = @showcase_deck&.title || "Bourbon Basics"
-  primary_deck_category = @showcase_deck&.category.presence || "Featured"
-  primary_deck_cover = @showcase_deck ? deck_cover_attachment(@showcase_deck) : nil
-  primary_deck_cover_url = primary_deck_cover ? url_for(image_variant(primary_deck_cover, :card)) : ""
-
-  # Two real sibling decks from the catalog (falling back gracefully if DB has fewer than 3)
-  other_decks = (@concept_decks || []).reject { |d| d.id == @showcase_deck&.id }.first(2)
-  sib_left_deck = other_decks[0]
-  sib_right_deck = other_decks[1]
-  sib_left_cover = sib_left_deck ? deck_cover_attachment(sib_left_deck) : nil
-  sib_right_cover = sib_right_deck ? deck_cover_attachment(sib_right_deck) : nil
-  sib_left_url = sib_left_cover ? url_for(image_variant(sib_left_cover, :card)) : asset_path("photos/deck-pour-decanter.jpg")
-  sib_right_url = sib_right_cover ? url_for(image_variant(sib_right_cover, :card)) : asset_path("photos/reviews-glass-book.jpg")
-
-  sample_date = @next_event ? @next_event.start_time.in_time_zone(@next_event.effective_time_zone) : Date.current.next_occurring(:friday)
-  invite_title = @next_event ? @next_event.title : "Bourbon night"
-  invite_where = @next_event ? [ @next_event.society.name, @next_event.location.presence ].compact.join(" · ") : "Your society · Your living room"
-
-  pours = [
-    { name: "Buffalo Trace",          proof: "90°",    score: "4.10", rank_label: "#4", sub: "Vanilla bean & bright orange peel" },
-    { name: "Maker's Mark 46",        proof: "94°",    score: "4.25", rank_label: "#3", sub: "Caramel, baked apple & French oak" },
-    { name: "Heaven Hill 7yr BiB",    proof: "100°",   score: "4.40", rank_label: "#2", sub: "Roasted peanut & warm baking spice" },
-    { name: "Wild Turkey Rare Breed", proof: "116.8°", score: "4.65", rank_label: "#1", sub: "Cinnamon heat & deep barrel char" }
-  ]
-  palate_axes = [
-    [ "Sweet",   -90 ], [ "Oaky",    -45 ], [ "Spicy",     0 ], [ "Fruity",   45 ],
-    [ "Smoky",    90 ], [ "Grainy",  135 ], [ "Floral",  180 ], [ "Coastal", 225 ]
-  ]
+  showcase_slides = hero_reel_slides(@showcase_deck)
+  showcase_slide_count = @showcase_deck ? @showcase_deck.slide_images.count : 0
+  frame = story_frame(showcase: @showcase_deck, showcase_slides: showcase_slides, slide_count: showcase_slide_count, decks: @featured_presentations,
+                      event: @next_event, guests: @next_event_guests, going: @next_event_going,
+                      verdict_night: @verdict_night, verdict_rows: @verdict_rows, verdict_reviews: @verdict_reviews, review: @featured_review,
+                      record_reviews: @record_reviews, sample: @sample_review)
+  c4 = concept_four(frame, showcase_slides: showcase_slides)
+  decks = c4[:decks]
+  inv = frame[:invite]
+  rec = frame[:record]
   rules = [
     "One presenter a month, everyone takes a turn.",
     "Research your topic like you mean it.",
     "Choose the bottles that belong to the story.",
     "No dry fact sheets. Follow the narrative threads."
   ]
-%>
+  # A deck slot's static picture: each deck's first slide (the picked deck's
+  # shown, the others ready for a pick), else the live homepage's ink slide.
+  slot_pictures = lambda do |variant|
+    if decks.empty?
+      tag.div(tag.span("Every pour has a story."), class: "c4-ink-slide")
+    else
+      safe_join(decks.map do |d|
+        if d[:slides].first
+          image_tag image_variant(d[:slides].first, variant), alt: "", hidden: !d[:picked], data: { for_deck: d[:deck].id }, loading: "eager", decoding: "async"
+        else
+          tag.div(tag.span("Every pour has a story."), class: "c4-ink-slide", hidden: !d[:picked], data: { for_deck: d[:deck].id })
+        end
+      end)
+    end
+  end
+  # Words that follow the picked deck: one element per deck, the picked one shown.
+  per_deck = ->(key) { safe_join(decks.map { |d| tag.span(d[key], hidden: !d[:picked], data: { for_deck: d[:deck].id }) }) }
+  # The slide controls of a player (shown by the controller when the deck has more than one slide).
+  flip_controls = capture do %>
+    <span class="c4-flip" data-concept-four-target="flip" hidden>
+      <button type="button" class="c4-flip-btn" data-action="concept-four#previousSlide" aria-label="Previous slide"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg></button>
+      <span class="c4-flip-count" data-concept-four-target="count" aria-live="polite"></span>
+      <button type="button" class="c4-flip-btn" data-action="concept-four#nextSlide" aria-label="Next slide"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg></button>
+    </span>
+  <% end %>
 
-<div class="c4"
-     data-controller="concept-four"
-     data-initial-deck="<%= primary_deck_title %>"
-     data-initial-category="<%= primary_deck_category %>"
-     data-initial-cover="<%= primary_deck_cover_url %>">
-
-  <!-- ======================================================================
-       PURE STICKY TRIGGER-DRIVEN FULL-VIEWPORT THEATRE
-       ====================================================================== -->
-  <section class="c4-theatre" data-concept-four-target="theatre" aria-label="The Whiskey Share Society story">
-    <!-- Sticky 100vh choreographed stage -->
+<div class="c4" data-controller="concept-four" data-concept-four-config-value="<%= c4[:config].to_json %>">
+  <div class="c4-theatre" data-concept-four-target="theatre">
     <div class="c4-stage" data-concept-four-target="stage" data-beat="0">
-      <div class="c4-iris-orange" aria-hidden="true"></div>
-      <div class="c4-room-dark" aria-hidden="true"></div>
-      <div class="c4-verdict-glow" aria-hidden="true"></div>
+      <div class="c4-room c4-room--orange" aria-hidden="true"></div>
+      <div class="c4-room c4-room--green" aria-hidden="true"></div>
 
-      <!-- Beat 2 Duotone Living Room Cinema Shutter -->
-      <div class="c4-invite-photo" aria-hidden="true">
-        <%= image_tag "photos/tasting-night-living-room.jpg", alt: "" %>
-      </div>
-
-      <!-- Beat 3 Rising Oak Tasting Table -->
-      <div class="c4-oak-table" aria-hidden="true"></div>
-
-      <!-- ====== MASKED KINETIC COPY BEATS (0..4) ====== -->
-      <div class="c4-copy c4-copy--0 is-active" data-concept-four-target="copy">
-        <span class="c4-act-label c4-fade">Est. 2019 · Narrative Tasting Decks</span>
-        <h1>
-          <span class="c4-line"><span>Every pour</span></span>
-          <span class="c4-line"><span>has <em>a story.</em></span></span>
-        </h1>
-        <p class="c4-fade">Slide decks built for whiskey nights that hold together — the research done, the script written, the bottles picked.</p>
-        <div class="c4-copy-acts c4-fade">
-          <%= link_to "Browse the decks", presentations_path, class: "btn-th" %>
-          <button type="button" class="btn-th btn-th--quiet" data-beat="1" data-action="click->concept-four#jumpBeat">Start the night ↓</button>
-        </div>
-      </div>
-
-      <div class="c4-copy c4-copy--1" data-concept-four-target="copy">
-        <span class="c4-act-label c4-fade">Act I · Pick a deck</span>
-        <h2><span class="c4-line"><span>Choose the night <em>you want to host.</em></span></span></h2>
-        <p class="c4-fade">Click either deck beside the spotlight to swap it into tonight's invite.</p>
-      </div>
-
-      <div class="c4-copy c4-copy--2 c4-copy--orange" data-concept-four-target="copy">
-        <span class="c4-act-label c4-fade">Act II · Gather your society</span>
-        <div class="c4-big-date"><span class="c4-line"><span><%= sample_date.strftime("%b %-d") %></span></span></div>
-        <h2><span class="c4-line"><span><%= invite_title %></span></span></h2>
-        <p class="c4-fade"><%= invite_where %> · Featuring <strong data-concept-four-target="deckTitle"><%= primary_deck_title %></strong>.</p>
-        <div class="c4-copy-acts c4-fade">
-          <button type="button" class="c4-rsvp-chip" data-concept-four-target="rsvpChip" data-action="click->concept-four#toggleRsvp">Save my seat</button>
-          <%= link_to "Browse societies →", societies_path, class: "btn-th btn-th--quiet" %>
-        </div>
-      </div>
-
-      <div class="c4-copy c4-copy--3 c4-copy--dark" data-concept-four-target="copy">
-        <span class="c4-act-label c4-fade">Act III · Pour &amp; present</span>
-        <h2><span class="c4-line"><span>Open <em data-concept-four-target="deckTitle"><%= primary_deck_title %></em>. Pour the flight.</span></span></h2>
-      </div>
-
-      <div class="c4-copy c4-copy--4 c4-copy--dark" data-concept-four-target="copy">
-        <span class="c4-act-label c4-fade">Act IV · The verdict</span>
-        <h2><span class="c4-line"><span>Four pours, <em>ranked by the room.</em></span></span></h2>
-        <p class="c4-fade">Hover or tap any pour to morph the palate wheel.</p>
-      </div>
-
-      <!-- ====== CLICKABLE SIBLING DECKS (Beat 1 — Physically Swap into Center!) ====== -->
-      <button type="button"
-              class="c4-sib c4-sib--left"
-              data-title="<%= sib_left_deck&.title || 'Peated Islay & Smoke' %>"
-              data-category="<%= sib_left_deck&.category.presence || 'Scotch Whisky' %>"
-              data-cover="<%= sib_left_url %>"
-              data-action="click->concept-four#swapDeck">
-        <div class="c4-sib-art <%= 'c4-sib-art--fallback' unless sib_left_cover %>">
-          <%= image_tag sib_left_url, alt: "" %>
-          <span><%= sib_left_deck&.category.presence || "Scotch Whisky" %></span>
-          <strong><%= sib_left_deck&.title || "Peated Islay & Smoke" %></strong>
-        </div>
-        <div class="c4-sib-foot"><span><%= sib_left_deck&.duration_label || "20 min" %></span><small>Swap in ⇄</small></div>
-      </button>
-
-      <button type="button"
-              class="c4-sib c4-sib--right"
-              data-title="<%= sib_right_deck&.title || 'Japanese Whisky Craft' %>"
-              data-category="<%= sib_right_deck&.category.presence || 'Japanese Whisky' %>"
-              data-cover="<%= sib_right_url %>"
-              data-action="click->concept-four#swapDeck">
-        <div class="c4-sib-art <%= 'c4-sib-art--fallback' unless sib_right_cover %>">
-          <%= image_tag sib_right_url, alt: "" %>
-          <span><%= sib_right_deck&.category.presence || "Japanese Whisky" %></span>
-          <strong><%= sib_right_deck&.title || "Japanese Whisky Craft" %></strong>
-        </div>
-        <div class="c4-sib-foot"><span><%= sib_right_deck&.duration_label || "18 min" %></span><small>Swap in ⇄</small></div>
-      </button>
-
-      <!-- ====== SHARED ELEMENT #1: THE HERO DECK SLIDE ====== -->
-      <div class="c4-deck" data-concept-four-target="deck" data-action="click->concept-four#nextSlide" role="button" tabindex="0" aria-label="Click to flip slide">
-        <div class="c4-deck-shell" data-concept-four-target="deckShell">
-          <div class="c4-deck-screen">
-            <div class="c4-deck-sheen" data-concept-four-target="deckSheen"></div>
-
-            <!-- Swapped deck cover overlay (shown cleanly when user swaps in a flanking deck) -->
-            <div class="c4-dslide is-active" data-concept-four-target="swapCover" hidden style="z-index:4">
-              <div class="c4-vs">
-                <div>
-                  <span style="font-size:1.8cqw;font-weight:700;letter-spacing:.09em;text-transform:uppercase;color:var(--mark-soft)" data-swap-cat>Featured</span>
-                  <div class="c4-vs-h" style="margin-top:1.4cqw" data-swap-title><%= primary_deck_title %></div>
-                  <div class="c4-vs-line"></div>
-                  <div class="c4-vs-p">Selected for tonight's tasting night — attached to your invite and ready to present.</div>
-                </div>
-                <div class="c4-vs-pic"><img src="" alt="" hidden></div>
-              </div>
+      <%# ---- Beat 1: the pitch, with the featured deck on screen ---- %>
+      <section class="c4-beat c4-beat--hero is-active" data-concept-four-target="beat">
+        <div class="c4-in">
+          <div class="c4-hero-copy">
+            <h1><span class="c4-line"><span>Every pour</span></span><span class="c4-line"><span>has <em>a story.</em></span></span></h1>
+            <p class="c4-lede c4-rise">Narrative tasting decks for whiskey nights that hold together, the research done, the script written, the bottles picked.</p>
+            <div class="c4-acts c4-rise">
+              <%= link_to "Browse the decks", presentations_path, class: "c4-btn" %>
+              <a href="#how-it-works" class="c4-btn c4-btn--quiet" data-action="concept-four#jump" data-beat="1">See how it works</a>
             </div>
-
-            <% if showcase_slides.any? %>
-              <% showcase_slides.first(4).each_with_index do |slide, i| %>
-                <div class="c4-dslide <%= 'is-active' if i.zero? %>" data-concept-four-target="dslide">
-                  <%= image_tag image_variant(slide, :hero), alt: "" %>
-                </div>
+            <p class="c4-note c4-rise">One credit a month with membership · Or buy any deck outright</p>
+          </div>
+          <div class="c4-player">
+            <div class="c4-slot c4-slot--deck" data-slot="deck"><%= slot_pictures.call(:hero) %></div>
+            <div class="c4-bar">
+              <% if decks.any? %>
+                <b><% decks.each do |d| %><%= link_to d[:title], presentation_path(d[:deck]), hidden: !d[:picked], data: { for_deck: d[:deck].id } %><% end %></b>
+                <%= flip_controls %>
+                <span class="c4-bar-meta"><%= per_deck.call(:bar) %></span>
+              <% else %>
+                <b>Whiskey Share Society</b>
               <% end %>
-            <% else %>
-              <div class="c4-dslide is-active" data-concept-four-target="dslide">
-                <div class="c4-vs">
-                  <div>
-                    <%= image_tag "wss-logo-inverted.png", alt: "", class: "c4-vs-logo" %>
-                    <div class="c4-vs-h" data-concept-four-target="deckTitle"><%= primary_deck_title %></div>
-                    <div class="c4-vs-line"></div>
-                    <div class="c4-vs-p">Four pours, lowest proof first, and what the words on their labels actually mean.</div>
-                  </div>
-                  <div class="c4-vs-pic"><%= image_tag "photos/rickhouse.jpg", alt: "" %></div>
-                </div>
-              </div>
-              <div class="c4-dslide" data-concept-four-target="dslide">
-                <div class="c4-vs c4-vs--paper">
-                  <div>
-                    <div class="c4-vs-h">51% Corn.<br>New Oak.</div>
-                    <div class="c4-vs-line"></div>
-                    <div class="c4-vs-p">Not a secret recipe — four strict federal rules you can taste in every glass.</div>
-                  </div>
-                  <div class="c4-vs-pic"><%= image_tag "photos/deck-pour-decanter.jpg", alt: "" %></div>
-                </div>
-              </div>
-              <div class="c4-dslide" data-concept-four-target="dslide">
-                <div class="c4-vs c4-vs--orange">
-                  <div>
-                    <div class="c4-vs-h">55 seconds<br>of fire.</div>
-                    <div class="c4-vs-line"></div>
-                    <div class="c4-vs-p">Char No. 4 blisters white oak into alligator skin — caramelizing sugars into vanilla and spice.</div>
-                  </div>
-                  <div class="c4-vs-pic"><%= image_tag "photos/saloon-1897.jpg", alt: "" %></div>
-                </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <%# ---- Beat 2: pick a deck, the latest decks as a choice ---- %>
+      <section id="how-it-works" class="c4-beat c4-beat--pick" data-concept-four-target="beat">
+        <div class="c4-in">
+          <div class="c4-head">
+            <h2><span class="c4-line"><span>Pick <em>a deck</em></span></span></h2>
+            <p class="c4-lede c4-rise">Browse the library and choose the story you want to tell, bourbon, scotch, rye, or something stranger. Filter by difficulty and budget.</p>
+          </div>
+          <% if decks.any? %>
+            <fieldset class="c4-decks" data-count="<%= decks.size %>">
+              <legend class="sr-only">Latest decks</legend>
+              <% decks.each do |d| %>
+                <label class="c4-pick" data-concept-four-target="pick" data-deck="<%= d[:deck].id %>">
+                  <input type="radio" name="c4-deck" value="<%= d[:deck].id %>" class="sr-only"<%= " checked" if d[:picked] %> data-action="change->concept-four#pick">
+                  <span class="c4-slot c4-slot--deck" data-slot="deck">
+                    <% if d[:slides].first %>
+                      <%= image_tag image_variant(d[:slides].first, :hero), alt: "", loading: "eager", decoding: "async" %>
+                    <% else %>
+                      <span class="c4-ink-slide"><span>Every pour has a story.</span></span>
+                    <% end %>
+                  </span>
+                  <span class="c4-pick-text">
+                    <b><%= d[:title] %></b>
+                    <small><%= d[:meta] %></small>
+                  </span>
+                  <span class="c4-pick-mark" aria-hidden="true"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+                </label>
+              <% end %>
+            </fieldset>
+          <% end %>
+          <%= link_to with_arrow("See the full library"), presentations_path, class: "c4-more c4-rise" %>
+        </div>
+      </section>
+
+      <%# ---- Beat 3: gather, the next public night's invite (or the sample) ---- %>
+      <section class="c4-beat c4-beat--gather" data-concept-four-target="beat">
+        <div class="c4-in">
+          <div class="c4-head">
+            <h2><span class="c4-line"><span>Gather <em>your society</em></span></span></h2>
+            <p class="c4-lede c4-rise">Start a private society for your friends or join a public one near you. Schedule the night, share the link, and RSVPs take care of themselves.</p>
+            <%= link_to with_arrow("Browse societies"), societies_path, class: "c4-more c4-rise" %>
+          </div>
+          <%# The invite. A real night links to its page; the sample links nowhere. %>
+          <% invite = capture do %>
+            <%= render "shared/duotone", src: "photos/tasting-night-living-room.jpg", css: "duotone--heavy c4-invite-photo", width: 1280, height: 512, appear: false, loading: "eager",
+                  alt: "Five friends at a whiskey tasting in a lamp-lit living room. One stands by the TV with a glass raised, presenting, and four listen from the sofas, laughing, with glasses in hand." %>
+            <span class="c4-invite-top">
+              <span><%= inv[:time] %></span>
+              <% if inv[:tag] %><span class="c4-tag"><%= inv[:tag] %></span><% end %>
+            </span>
+            <span class="c4-invite-main">
+              <span class="c4-date"><%= inv[:date] %></span>
+              <span class="c4-what">
+                <b><%= @next_event ? @next_event.title : inv[:title] %></b>
+                <span><%= @next_event ? [ @next_event.society.name, @next_event.location.presence ].compact.join(" · ") : inv[:where] %></span>
+              </span>
+            </span>
+            <% if inv[:going].present? || frame[:slide_in_invite] %>
+              <span class="c4-invite-foot">
+                <% if inv[:going].present? %>
+                  <span class="c4-guests">
+                    <span class="c4-seats">
+                      <% inv[:glasses].times do |k| %>
+                        <span class="c4-seat">
+                          <span class="c4-slot c4-slot--glass" data-slot="glass" data-k="<%= k %>"><%= render "shared/glass", level: 1, size: 40, appear: false %></span>
+                          <% if inv[:initials][k].present? %><small><%= inv[:initials][k] %></small><% end %>
+                        </span>
+                      <% end %>
+                    </span>
+                    <b><%= inv[:going] %></b>
+                  </span>
+                <% end %>
+                <% if frame[:slide_in_invite] && decks.any? %>
+                  <%# The deck rides on the invite only where it is that night's
+                      deck (or on the sample invite), as the live homepage decides. %>
+                  <span class="c4-invite-deck">
+                    <% if inv[:sample] %>
+                      <span class="c4-slot c4-slot--deck" data-slot="deck"><%= slot_pictures.call(:card) %></span>
+                      <small><%= per_deck.call(:title) %></small>
+                    <% else %>
+                      <% night_deck = decks.find { |d| d[:picked] } %>
+                      <span class="c4-slot c4-slot--deck" data-slot="deck" data-only-deck="<%= night_deck[:deck].id %>">
+                        <% if night_deck[:slides].first %><%= image_tag image_variant(night_deck[:slides].first, :card), alt: "", loading: "eager", decoding: "async" %><% else %><span class="c4-ink-slide"><span>Every pour has a story.</span></span><% end %>
+                      </span>
+                      <small><%= night_deck[:title] %></small>
+                    <% end %>
+                  </span>
+                <% end %>
+              </span>
+            <% end %>
+          <% end %>
+          <% if @next_event %>
+            <%= link_to event_path(@next_event), class: "c4-invite" do %><%= invite %><span class="c4-go" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span><% end %>
+          <% else %>
+            <div class="c4-invite"><%= invite %></div>
+          <% end %>
+        </div>
+      </section>
+
+      <%# ---- Beat 4: pour and present, the picked deck and its own pour list ---- %>
+      <section class="c4-beat c4-beat--pour" data-concept-four-target="beat">
+        <div class="c4-in">
+          <div class="c4-head">
+            <h2><span class="c4-line"><span>Pour <em>and present</em></span></span></h2>
+            <p class="c4-lede c4-rise">Open the deck, pour the first bottle, and tell the story. Everyone rates each whiskey as you go, and the scores are saved to your society's record.</p>
+          </div>
+          <div class="c4-present">
+            <div class="c4-slot c4-slot--deck" data-slot="deck"><%= slot_pictures.call(:hero) %></div>
+            <% if decks.any? %>
+              <div class="c4-bar c4-bar--open">
+                <b><%= per_deck.call(:title) %></b>
+                <%= flip_controls %>
               </div>
             <% end %>
           </div>
-          <div class="c4-deck-bar">
-            <b data-concept-four-target="deckCapL"><%= primary_deck_title %></b>
-            <span data-concept-four-target="deckCapR">Click to preview slides</span>
+          <% if decks.any? { |d| d[:pours].any? } %>
+            <div class="c4-table">
+              <% decks.each do |d| %>
+                <ol class="c4-pours" data-count="<%= d[:pours].size %>" data-for-deck="<%= d[:deck].id %>"<%= " hidden" unless d[:picked] %>>
+                  <% d[:pours].each_with_index do |pour, k| %>
+                    <li>
+                      <span class="c4-slot c4-slot--glass" data-slot="glass" data-k="<%= k %>"><%= render "shared/glass", level: 1, tone: :cream, size: 64, appear: false %></span>
+                      <span class="c4-pour-text">
+                        <b><%= pour.title %></b>
+                        <% detail = pour.label.presence || pour.style_text.presence %>
+                        <% if detail %><small><%= detail %></small><% end %>
+                      </span>
+                    </li>
+                  <% end %>
+                </ol>
+              <% end %>
+            </div>
+          <% elsif c4[:seats].positive? %>
+            <%# No pour list: the table seats the invite's guests, as the live homepage's does. %>
+            <div class="c4-table" aria-hidden="true">
+              <ol class="c4-pours" data-count="<%= c4[:seats] %>">
+                <% c4[:seats].times do |k| %>
+                  <li><span class="c4-slot c4-slot--glass" data-slot="glass" data-k="<%= k %>"><%= render "shared/glass", level: 1, tone: :cream, size: 64, appear: false %></span></li>
+                <% end %>
+              </ol>
+            </div>
+          <% end %>
+        </div>
+      </section>
+
+      <%# ---- Beat 5: the verdict, or the tasting record, or the sample review ---- %>
+      <section class="c4-beat c4-beat--verdict" data-concept-four-target="beat" data-kind="<%= rec[:kind] %>">
+        <div class="c4-in">
+          <div class="c4-record">
+            <% if rec[:kind] == :verdict %>
+              <%# A real revealed night at a public society: its top pours, ranked by the room. %>
+              <div class="c4-head">
+                <h2><span class="c4-line"><span>The <em>verdict</em></span></span></h2>
+                <p class="c4-where c4-rise"><%= link_to @verdict_night.title, society_event_path(@verdict_night.society, @verdict_night) %> · <%= @verdict_night.society.name %></p>
+              </div>
+              <ol class="c4-ranks">
+                <% @verdict_rows.first(rec[:pours].size).each_with_index do |row, k| %>
+                  <li>
+                    <%= link_to bottle_path(row[:pour].bottle), class: "c4-rank", data: { concept_four_target: "rank", k: k, action: "mouseenter->concept-four#lightWedges focus->concept-four#lightWedges mouseleave->concept-four#dimWedges blur->concept-four#dimWedges" } do %>
+                      <span class="c4-rank-n"><%= k + 1 %></span>
+                      <span class="c4-slot c4-slot--glass" data-slot="glass" data-k="<%= k %>"><%= render "shared/glass", level: row[:mean] / 5.0, tone: :cream, size: 44, appear: false, label: "Pour #{row[:number]}," %></span>
+                      <b><%= row[:pour].bottle.name %></b>
+                      <span class="c4-rank-s"><%= number_with_precision(row[:mean], precision: 2, strip_insignificant_zeros: true) %><span class="sr-only"> out of 5</span></span>
+                    <% end %>
+                  </li>
+                <% end %>
+              </ol>
+            <% elsif rec[:kind] == :reviews %>
+              <%# The newest public reviews, one per bottle; the card is the first row's review. %>
+              <div class="c4-head">
+                <h2><span class="c4-line"><span>The <em>tasting record</em></span></span></h2>
+              </div>
+              <ol class="c4-ranks">
+                <% rec[:reviews].each_with_index do |row, k| %>
+                  <li>
+                    <%= link_to bottle_path(row.bottle), class: "c4-rank c4-rank--by" do %>
+                      <span class="c4-slot c4-slot--glass" data-slot="glass" data-k="<%= k %>"><%= render "shared/glass", level: row.rating.to_f / 5, tone: :cream, size: 44, appear: false %></span>
+                      <span class="c4-rank-who"><b><%= row.bottle.name %></b><small><%= "#{row.user.first_name} #{row.user.last_name}" %></small></span>
+                      <span class="c4-rank-s"><%= number_with_precision(row.rating.to_f, precision: 2, strip_insignificant_zeros: true) %><span class="sr-only"> out of 5</span></span>
+                    <% end %>
+                  </li>
+                <% end %>
+              </ol>
+              <%= link_to with_arrow("Read the full tasting"), review_path(rec[:review]), class: "c4-more c4-more--cream c4-rise" %>
+            <% elsif rec[:kind] == :review && rec[:sample] %>
+              <%# The sample review (HomepageFeature::SAMPLE): said to be one, no reviewer, no link. %>
+              <div class="c4-head">
+                <h2><span class="c4-line"><span>The <em>tasting record</em></span></span></h2>
+              </div>
+              <div class="c4-ranks">
+                <div class="c4-rank c4-rank--by c4-rank--plain">
+                  <span class="c4-slot c4-slot--glass" data-slot="glass" data-k="0"><%= render "shared/glass", level: rec[:level], tone: :cream, size: 44, appear: false %></span>
+                  <span class="c4-rank-who"><b><%= rec[:review].bottle_name %></b><small>Sample review</small></span>
+                  <span class="c4-rank-s"><%= number_with_precision(rec[:review].rating.to_f, precision: 2, strip_insignificant_zeros: true) %><span class="sr-only"> out of 5</span></span>
+                </div>
+              </div>
+            <% elsif rec[:kind] == :review %>
+              <% review = rec[:review] %>
+              <div class="c4-head">
+                <h2><span class="c4-line"><span>The <em>tasting record</em></span></span></h2>
+              </div>
+              <div class="c4-ranks">
+                <%= link_to bottle_path(review.bottle), class: "c4-rank c4-rank--by" do %>
+                  <span class="c4-slot c4-slot--glass" data-slot="glass" data-k="0"><%= render "shared/glass", level: rec[:level], tone: :cream, size: 44, appear: false %></span>
+                  <span class="c4-rank-who"><b><%= review.bottle.name %></b><% if review.bottle.distillery.present? %><small><%= review.bottle.distillery %></small><% end %></span>
+                  <span class="c4-rank-s"><%= number_with_precision(review.rating.to_f, precision: 2, strip_insignificant_zeros: true) %><span class="sr-only"> out of 5</span></span>
+                <% end %>
+              </div>
+              <% if review.notes.present? %><p class="c4-quote c4-rise">&ldquo;<%= review.notes %>&rdquo;</p><% end %>
+              <p class="c4-where c4-rise"><%= link_to "#{review.user.first_name} #{review.user.last_name}", profile_path(review.user) %> · <%= review.created_at.strftime("%B %-d, %Y") %></p>
+              <%= link_to with_arrow("Read the full tasting"), review_path(review), class: "c4-more c4-more--cream c4-rise" %>
+            <% else %>
+              <div class="c4-head">
+                <h2><span class="c4-line"><span>The <em>tasting record</em></span></span></h2>
+              </div>
+            <% end %>
+            <% unless rec[:kind] == :reviews || (rec[:kind] == :review && !rec[:sample]) %>
+              <%= link_to with_arrow("Read the record"), reviews_path, class: "c4-more c4-more--cream c4-rise" %>
+            <% end %>
           </div>
+
+          <%# The card: the night's blended palate wheel, or the (first) review's wheel or notes. %>
+          <% if rec[:kind] == :verdict && rec[:profile].present? %>
+            <div class="c4-wheel" data-concept-four-target="wheel">
+              <%= render "reviews/palate_wheel", profile: rec[:profile], draw: false, wedge_pours: rec[:wedge_pours] %>
+            </div>
+          <% elsif rec[:kind] == :review || rec[:kind] == :reviews %>
+            <% review = rec[:review] %>
+            <% tasting = { "Nose" => review.nose, "Palate" => review.palate, "Finish" => review.finish }.compact_blank %>
+            <% if rec[:profile].present? %>
+              <div class="c4-wheel" data-concept-four-target="wheel">
+                <%= render "reviews/palate_wheel", profile: rec[:profile], draw: false %>
+              </div>
+            <% elsif tasting.any? %>
+              <div class="c4-wheel c4-wheel--notes">
+                <dl><% tasting.each do |label, text| %><div><dt><%= label %></dt><dd><%= text %></dd></div><% end %></dl>
+              </div>
+            <% end %>
+          <% end %>
+        </div>
+      </section>
+
+      <%# ---- The travelling objects (the controller places them; hidden until it runs) ---- %>
+      <div class="c4-screen" data-concept-four-target="screen" aria-hidden="true">
+        <div class="c4-screen-in" data-concept-four-target="tilt">
+          <% if decks.empty? %>
+            <div class="c4-reel"><div class="c4-ink-slide is-on"><span>Every pour has a story.</span></div></div>
+          <% end %>
+          <% decks.each do |d| %>
+            <div class="c4-reel" data-concept-four-target="reel" data-for-deck="<%= d[:deck].id %>"<%= " hidden" unless d[:picked] %>>
+              <% if d[:slides].any? %>
+                <% d[:slides].each_with_index do |slide, i| %>
+                  <%= image_tag image_variant(slide, :hero), alt: "", class: ("is-on" if i.zero?), loading: "eager", decoding: "async" %>
+                <% end %>
+              <% else %>
+                <div class="c4-ink-slide is-on"><span>Every pour has a story.</span></div>
+              <% end %>
+            </div>
+          <% end %>
         </div>
       </div>
+      <% c4[:glasses].times do %>
+        <div class="c4-glass" data-concept-four-target="glass" aria-hidden="true"><%= render "shared/glass", level: 1, size: 80, appear: false %></div>
+      <% end %>
 
-      <!-- ====== THE 4 PHYSICAL TASTING GLASS ACTORS ====== -->
-      <% pours.each_with_index do |pour, k| %>
-        <div class="c4-glass"
-             data-concept-four-target="glass"
-             data-index="<%= k %>"
-             data-action="click->concept-four#tapGlass mouseenter->concept-four#hoverRank">
-          <span class="c4-coaster-glow" aria-hidden="true"></span>
-          <%= render "shared/glass", level: 1, size: 96, appear: false %>
+      <nav class="c4-rail" aria-label="The story">
+        <% [ "Intro", "Pick", "Gather", "Pour", "Verdict" ].each_with_index do |label, b| %>
+          <button type="button" class="c4-rail-btn" data-concept-four-target="rail" data-beat="<%= b %>" data-action="concept-four#jump"<%= ' aria-current="step"'.html_safe if b.zero? %>>
+            <span class="c4-rail-label"><%= label %></span>
+            <span class="c4-rail-dot" aria-hidden="true"></span>
+          </button>
+        <% end %>
+      </nav>
+    </div>
+  </div>
 
-          <div class="c4-gcap" data-concept-four-target="gcap">
-            <b><%= pour[:name] %></b>
-            <small>Pour <%= k + 1 %> · <%= pour[:proof] %></small>
-          </div>
-
-          <div class="c4-rank <%= 'is-active' if k == 3 %>"
-               data-concept-four-target="rank"
-               data-index="<%= k %>"
-               data-action="mouseenter->concept-four#hoverRank click->concept-four#tapGlass">
-            <span class="c4-rank-n"><%= pour[:rank_label] %></span>
-            <span class="c4-rank-t"><b><%= pour[:name] %></b><small><%= pour[:sub] %></small></span>
-            <span class="c4-rank-s"><%= pour[:score] %></span>
+  <%# ---- The rest of the page: the live homepage's sections, in its words ---- %>
+  <div class="c4-below">
+    <div class="c4-wrap">
+      <% if @spotlight_deck %>
+        <% spot_cover = deck_cover_attachment(@spotlight_deck) %>
+        <div class="c4-spot">
+          <div class="c4-rest-glass" aria-hidden="true"><%= render "shared/glass", level: 1, size: 78, appear: false %></div>
+          <% if spot_cover %>
+            <%= link_to presentation_path(@spotlight_deck), class: "c4-spot-img", aria: { hidden: true }, tabindex: -1 do %>
+              <%= image_tag image_variant(spot_cover, :card), alt: "", loading: "lazy" %>
+            <% end %>
+          <% end %>
+          <div>
+            <h2><%= @spotlight_deck.title %></h2>
+            <p><%= @spotlight_deck.excerpt(170) %></p>
+            <div class="c4-acts">
+              <%= link_to "See the deck", presentation_path(@spotlight_deck), class: "c4-btn" %>
+              <span class="c4-price"><%= @spotlight_deck.free? ? "Free for everyone" : "#{@spotlight_deck.formatted_price}, or one credit with membership" %></span>
+            </div>
           </div>
         </div>
       <% end %>
-
-      <!-- ====== BLOOMING PALATE WHEEL (Beat 4 Right) ====== -->
-      <div class="c4-wheel">
-        <div class="c4-wheel-head">
-          <b data-concept-four-target="wheelTitle">Wild Turkey Rare Breed</b>
-          <span data-concept-four-target="wheelScore">4.65 / 5</span>
-        </div>
-        <svg class="c4-wheel-svg" viewBox="0 0 300 300" aria-label="Interactive palate wheel">
-          <circle cx="150" cy="150" r="112" fill="#f6f4ee" stroke="#dfe3dc" stroke-width="1"/>
-          <circle cx="150" cy="150" r="76" fill="none" stroke="#dfe3dc" stroke-width="1" stroke-dasharray="3 3"/>
-          <circle cx="150" cy="150" r="42" fill="none" stroke="#dfe3dc" stroke-width="1"/>
-          <% palate_axes.each_with_index do |(label, deg), i| %>
-            <% a1 = (deg - 20) * Math::PI / 180.0 %>
-            <% a2 = (deg + 20) * Math::PI / 180.0 %>
-            <% r = 108 %>
-            <% x1 = (150 + r * Math.cos(a1)).round(2); y1 = (150 + r * Math.sin(a1)).round(2) %>
-            <% x2 = (150 + r * Math.cos(a2)).round(2); y2 = (150 + r * Math.sin(a2)).round(2) %>
-            <% lx = (150 + 128 * Math.cos(deg * Math::PI / 180.0)).round(2) %>
-            <% ly = (150 + 128 * Math.sin(deg * Math::PI / 180.0) + 4).round(2) %>
-            <path class="c4-wedge" data-concept-four-target="wedge"
-                  d="M 150 150 L <%= x1 %> <%= y1 %> A <%= r %> <%= r %> 0 0 1 <%= x2 %> <%= y2 %> Z"
-                  fill="#16332a" opacity="0.6"/>
-            <text x="<%= lx %>" y="<%= ly %>" text-anchor="middle" font-size="11.5" font-weight="600" fill="#16332a"><%= label %></text>
-          <% end %>
-          <circle cx="150" cy="150" r="24" fill="#ffffff" stroke="#dfe3dc" stroke-width="1.2"/>
-          <text x="150" y="154" text-anchor="middle" font-size="10.5" font-weight="600" fill="#5f6b64">Palate</text>
-        </svg>
-      </div>
-
-      <!-- Quiet Right-Edge Chapter Rail -->
-      <div class="c4-rail" role="navigation" aria-label="Story acts">
-        <% [ "Intro", "Pick", "Gather", "Pour", "Verdict" ].each_with_index do |label, b| %>
-          <button type="button" class="c4-rail-btn <%= 'is-active' if b.zero? %>"
-                  data-concept-four-target="railBtn" data-beat="<%= b %>"
-                  data-action="click->concept-four#jumpBeat"
-                  aria-label="Jump to <%= label %>">
-            <span class="c4-rail-label"><%= label %></span>
-            <span class="c4-rail-dot"></span>
-          </button>
-        <% end %>
-      </div>
-    </div>
-
-    <!-- Invisible scroll sentinel bands (behind sticky stage) -->
-    <div class="c4-sentinels" aria-hidden="true">
-      <% 5.times do %><div class="c4-sentinel" data-concept-four-target="sentinel"></div><% end %>
-    </div>
-  </section>
-
-  <!-- ======================================================================
-       LOWER PAGE — Resting Tasting Glass Seated FLUSH on Spotlight Card
-       ====================================================================== -->
-  <div class="c4-below">
-    <div class="c4-wrap">
-      <% spot = @spotlight_deck || @concept_decks.first %>
-      <% spot_cover = spot ? deck_cover_attachment(spot) : nil %>
-      <div class="c4-spot">
-        <div class="c4-rest-glass" data-concept-four-target="restGlass" aria-hidden="true">
-          <%= render "shared/glass", level: 1, size: 78, appear: false %>
-        </div>
-
-        <div class="c4-spot-img">
-          <% if spot_cover %>
-            <%= image_tag image_variant(spot_cover, :card), alt: spot.title %>
-          <% else %>
-            <%= image_tag "photos/rickhouse.jpg", alt: "Bourbon Basics" %>
-          <% end %>
-        </div>
-        <div>
-          <span class="c4-act-label">In the spotlight</span>
-          <h2 style="font-size:clamp(1.9rem,3.4vw,2.9rem);line-height:1.02;letter-spacing:-.045em;color:var(--ink)"><%= spot&.title || "Bourbon Basics" %></h2>
-          <p style="margin-top:14px;font-size:17px;line-height:1.55;color:var(--mute);max-width:34em">
-            <%= spot&.excerpt(170) || "A first tasting night for people who are new to bourbon. Four bourbons, lowest proof first, and what the words on their labels mean." %>
-          </p>
-          <div style="margin-top:24px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
-            <%= link_to "See the deck", (spot ? presentation_path(spot) : presentations_path), class: "btn-th" %>
-            <span style="font-size:14px;color:var(--mute)"><%= spot ? "#{spot.formatted_price}, or one credit with membership" : "$16.99, or one credit with membership" %></span>
-          </div>
-        </div>
-      </div>
 
       <div class="c4-origin">
         <div>
           <h2>Born from a <em>real society.</em></h2>
           <p>The first Whiskey Share Society started as a circle of friends in 2019. Each month one of us drew a topic, did the research, bought the bottles, and told its story over a deck of slides and a glass of whiskey.</p>
-          <div style="margin-top:28px"><%= link_to "Find your society", societies_path, class: "btn-th btn-th--light" %></div>
+          <div class="c4-acts"><%= link_to "Find your society", societies_path, class: "c4-btn c4-btn--light" %></div>
         </div>
         <ol class="c4-rules" aria-label="House rules">
           <% rules.each do |rule| %><li><%= rule %></li><% end %>
         </ol>
       </div>
 
-      <div class="c4-pricing">
+      <div class="c4-pricing" id="pricing">
         <div>
           <h2>Choose <em>your pour.</em></h2>
-          <p style="margin-top:16px;font-size:17.5px;line-height:1.55;color:var(--mute)">One membership, three ways to pay it. Every plan unlocks a monthly deck credit and a society of your own.</p>
-          <div style="margin-top:24px"><%= link_to "See the plans", membership_path, class: "btn-th" %></div>
+          <p>One membership, three ways to pay it. Every plan unlocks the same thing, a deck credit every month and a society of your own.</p>
+          <div class="c4-acts"><%= link_to "See the plans", membership_path, class: "c4-btn" %></div>
         </div>
         <div class="c4-plans">
           <% @stripe_products.each do |product| %>
             <%= link_to membership_path, class: "c4-plan #{'c4-plan--pick' if product[:popular]}" do %>
-              <div>
-                <h3 style="font-size:20px"><%= product[:name].to_s.gsub(" Membership", "") %></h3>
-                <div style="font-size:13.5px;opacity:.7;margin-top:2px"><%= plan_billing_line(product) %></div>
-              </div>
-              <div class="c4-plan-p">$<%= sprintf("%.2f", product[:price] / 100.0) %><small>/mo</small></div>
-              <span style="font-size:18px" aria-hidden="true">→</span>
+              <span>
+                <b><%= product[:name].to_s.gsub(" Membership", "") %></b>
+                <small><%= plan_billing_line(product) %></small>
+              </span>
+              <span class="c4-plan-p">$<%= sprintf("%.2f", product[:price] / 100.0) %><small>/mo</small></span>
+              <span class="c4-plan-go" aria-hidden="true"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></span>
             <% end %>
           <% end %>
         </div>
@@ -340,7 +425,7 @@
     </div>
   </div>
 
-  <!-- Concept Switcher Pill -->
+  <%# The concepts' switcher (a preview tool, not part of the design). %>
   <nav class="concept-switcher" aria-label="Switch homepage concept">
     <%= link_to "Live", root_path %>
     <%= link_to "1", home_concept_path(1) %>
